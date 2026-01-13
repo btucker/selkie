@@ -379,8 +379,8 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
         let end_point = intersect_node(&node_w, &p2);
 
         // Add start and end points
-        points.insert(0, start_point.clone());
-        points.push(end_point.clone());
+        points.insert(0, start_point);
+        points.push(end_point);
 
         // For edges with only 2 points (no intermediate dummy nodes from normalization),
         // add a midpoint to create the 3-point structure that curveBasis expects.
