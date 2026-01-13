@@ -2,6 +2,29 @@
 
 The evaluation system is a core component of Selkie's development process. It compares Selkie's output against the reference Mermaid.js implementation, providing automated feedback on parsing and rendering parity.
 
+## Current Status
+
+```
+Selkie Evaluation Report
+========================
+
+Overall Parity: 100.0% (16/16 diagrams match reference)
+
+By Diagram Type:
+  class        ████████████████████  100% (1/1)
+  er           ████████████████████  100% (1/1)
+  flowchart    ████████████████████  100% (4/4)
+  gantt        ████████████████████  100% (1/1)
+  pie          ████████████████████  100% (3/3)
+  sequence     ████████████████████  100% (5/5)
+  state        ████████████████████  100% (1/1)
+
+Issues Summary:
+    0 Error    - Structural breaks
+    0 Warning  - Significant differences
+    0 Info     - Acceptable variations
+```
+
 ## Overview
 
 The eval system serves as the primary guidance mechanism for Claude Code during development. By quantifying differences between Selkie and Mermaid.js outputs, it enables targeted improvements and prevents regressions.
