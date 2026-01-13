@@ -11,9 +11,9 @@
 //! # References
 //! - <https://sw.kovidgoyal.net/kitty/graphics-protocol/>
 
-use std::io::{self, Write};
 #[cfg(unix)]
 use std::io::Read;
+use std::io::{self, Write};
 use std::sync::OnceLock;
 
 use base64::Engine;
