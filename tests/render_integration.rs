@@ -401,6 +401,40 @@ fn test_pie_chart_preserves_section_order() {
 }
 
 #[test]
+fn test_pie_chart_uses_theme_colors() {
+    // Verify pie chart uses theme colors instead of hardcoded values
+    let input = r#"pie title Themed Pie
+    "A" : 50
+    "B" : 50"#;
+
+    let diagram = parse(input).expect("Failed to parse pie chart");
+
+    // Test with forest theme which has distinctive green colors
+    let config = RenderConfig {
+        theme: Theme::forest(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with forest theme");
+
+    // Forest theme pie colors include #cde498, #cdffb2
+    assert!(
+        svg.contains("#cde498") || svg.contains("#cdffb2"),
+        "Pie chart should use forest theme colors. SVG:\n{}",
+        &svg[..1000.min(svg.len())]
+    );
+
+    // Test with default theme
+    let default_svg = render(&diagram).expect("Failed to render with default theme");
+
+    // Default theme uses different colors (#ECECFF, #ffffde)
+    assert!(
+        default_svg.contains("#ECECFF") || default_svg.contains("#ffffde"),
+        "Pie chart should use default theme colors. SVG:\n{}",
+        &default_svg[..1000.min(default_svg.len())]
+    );
+}
+
+#[test]
 fn test_flowchart_edge_stroke_width() {
     // mermaid.js uses stroke-width: 1px for normal edges, not 2px
     let input = r#"flowchart LR
