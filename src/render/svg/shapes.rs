@@ -96,6 +96,7 @@ pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> S
         }
         FlowVertexType::Subroutine => {
             // Subroutine (predefined process) - rectangle with vertical lines
+            // Stroke color comes from CSS .node line rule for theming
             let bar_offset = 10.0;
             SvgElement::group(vec![
                 SvgElement::rect(x, y, w, h),
@@ -104,18 +105,14 @@ pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> S
                     y1: y,
                     x2: x + bar_offset,
                     y2: y + h,
-                    attrs: Attrs::new()
-                        .with_stroke("#9370DB")
-                        .with_stroke_width(1.0),
+                    attrs: Attrs::new(),
                 },
                 SvgElement::Line {
                     x1: x + w - bar_offset,
                     y1: y,
                     x2: x + w - bar_offset,
                     y2: y + h,
-                    attrs: Attrs::new()
-                        .with_stroke("#9370DB")
-                        .with_stroke_width(1.0),
+                    attrs: Attrs::new(),
                 },
             ])
         }
@@ -193,4 +190,34 @@ pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> S
         .with_id(&format!("node-{}", node.id));
 
     SvgElement::group(vec![shape, label]).with_attrs(group_attrs)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_subroutine_uses_css_class_not_hardcoded_stroke() {
+        // This test verifies that the subroutine shape's vertical lines
+        // do NOT have hardcoded stroke colors, allowing CSS theme styling to work.
+        let mut node = LayoutNode::new("test", 100.0, 60.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.text = Some("Subroutine".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Subroutine);
+
+        let theme = Theme::default();
+        let shape_element = render_shape(&node, &vertex, &theme);
+        let svg = shape_element.to_svg(0);
+
+        // The subroutine lines should NOT have hardcoded stroke color
+        // They should use CSS class for theming
+        assert!(
+            !svg.contains("stroke=\"#9370DB\""),
+            "Subroutine lines should not have hardcoded stroke '#9370DB', got: {}",
+            svg
+        );
+    }
 }

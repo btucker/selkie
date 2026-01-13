@@ -95,6 +95,11 @@ impl Theme {
   stroke-width: 1px;
 }}
 
+.node line {{
+  stroke: {primary_border_color};
+  stroke-width: 1px;
+}}
+
 .node .label {{
   fill: {primary_text_color};
 }}
