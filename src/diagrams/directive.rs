@@ -187,11 +187,9 @@ fn sanitize_config(mut config: DiagramConfig) -> DiagramConfig {
     }
 
     // Sanitize theme variables
-    config.theme_variables = config
+    config
         .theme_variables
-        .into_iter()
-        .filter(|(key, value)| is_safe_key(key) && is_safe_css_value(value))
-        .collect();
+        .retain(|key, value| is_safe_key(key) && is_safe_css_value(value));
 
     // Sanitize extra config
     config.extra = config
@@ -268,9 +266,8 @@ fn sanitize_value(value: serde_json::Value) -> serde_json::Value {
 fn normalize_json(json: &str) -> String {
     let mut result = String::with_capacity(json.len());
     let mut in_double_quote = false;
-    let mut chars = json.chars().peekable();
 
-    while let Some(c) = chars.next() {
+    for c in json.chars() {
         match c {
             '"' => {
                 in_double_quote = !in_double_quote;
