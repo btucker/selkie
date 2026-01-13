@@ -622,6 +622,141 @@ marker path {{
         }
     }
 
+    /// Apply variable overrides to the theme
+    ///
+    /// This follows the mermaid.js themeVariables pattern where users can
+    /// override specific theme variables while keeping others intact.
+    ///
+    /// # Arguments
+    /// * `overrides` - A map of variable names to values
+    ///
+    /// # Example
+    /// ```
+    /// use std::collections::HashMap;
+    /// use mermaid::render::svg::Theme;
+    ///
+    /// let mut overrides = HashMap::new();
+    /// overrides.insert("primaryColor".to_string(), "#ff0000".to_string());
+    /// overrides.insert("nodeBkg".to_string(), "#00ff00".to_string());
+    ///
+    /// let theme = Theme::default().with_overrides(&overrides);
+    /// ```
+    pub fn with_overrides(mut self, overrides: &std::collections::HashMap<String, String>) -> Self {
+        for (key, value) in overrides {
+            self.set_variable(key, value);
+        }
+        self
+    }
+
+    /// Apply overrides in place (mutating version)
+    pub fn apply_overrides(&mut self, overrides: &std::collections::HashMap<String, String>) {
+        for (key, value) in overrides {
+            self.set_variable(key, value);
+        }
+    }
+
+    /// Set a single theme variable by name
+    ///
+    /// Variable names follow mermaid.js conventions (camelCase).
+    /// Returns true if the variable was found and set.
+    pub fn set_variable(&mut self, name: &str, value: &str) -> bool {
+        match name {
+            // Common colors
+            "primaryColor" => { self.primary_color = value.to_string(); true }
+            "primaryTextColor" => { self.primary_text_color = value.to_string(); true }
+            "primaryBorderColor" => { self.primary_border_color = value.to_string(); true }
+            "secondaryColor" => { self.secondary_color = value.to_string(); true }
+            "tertiaryColor" => { self.tertiary_color = value.to_string(); true }
+            "clusterBorderColor" | "clusterBorder" => { self.cluster_border_color = value.to_string(); true }
+            "lineColor" => { self.line_color = value.to_string(); true }
+            "background" => { self.background = value.to_string(); true }
+            "fontFamily" => { self.font_family = value.to_string(); true }
+            "fontSize" => { self.font_size = value.to_string(); true }
+
+            // Flowchart aliases (mermaid.js compatibility)
+            "nodeBkg" | "mainBkg" => { self.primary_color = value.to_string(); true }
+            "nodeBorder" | "border1" => { self.primary_border_color = value.to_string(); true }
+            "clusterBkg" | "secondBkg" => { self.secondary_color = value.to_string(); true }
+            "edgeLabelBackground" | "labelBackground" => { self.background = value.to_string(); true }
+
+            // Pie chart colors
+            "pieStrokeColor" => { self.pie_stroke_color = value.to_string(); true }
+            "pieOuterStrokeColor" => { self.pie_outer_stroke_color = value.to_string(); true }
+            "pieOpacity" => { self.pie_opacity = value.to_string(); true }
+            "pieTitleTextColor" => { self.pie_title_text_color = value.to_string(); true }
+            "pieLegendTextColor" => { self.pie_legend_text_color = value.to_string(); true }
+
+            // Sequence diagram colors
+            "actorBkg" => { self.actor_bkg = value.to_string(); true }
+            "actorBorder" => { self.actor_border = value.to_string(); true }
+            "actorTextColor" => { self.actor_text_color = value.to_string(); true }
+            "actorLineColor" => { self.actor_line_color = value.to_string(); true }
+            "signalColor" => { self.signal_color = value.to_string(); true }
+            "signalTextColor" => { self.signal_text_color = value.to_string(); true }
+            "noteBkgColor" => { self.note_bkg_color = value.to_string(); true }
+            "noteBorderColor" => { self.note_border_color = value.to_string(); true }
+            "noteTextColor" => { self.note_text_color = value.to_string(); true }
+            "activationBkgColor" => { self.activation_bkg_color = value.to_string(); true }
+            "activationBorderColor" => { self.activation_border_color = value.to_string(); true }
+            "labelBoxBkgColor" => { self.label_box_bkg_color = value.to_string(); true }
+            "labelBoxBorderColor" => { self.label_box_border_color = value.to_string(); true }
+
+            // Gantt chart colors
+            "sectionBkgColor" => { self.section_bkg_color = value.to_string(); true }
+            "sectionBkgColor2" | "altSectionBkgColor" => { self.section_bkg_color2 = value.to_string(); true }
+            "taskBkgColor" => { self.task_bkg_color = value.to_string(); true }
+            "taskBorderColor" => { self.task_border_color = value.to_string(); true }
+            "taskTextLightColor" => { self.task_text_light_color = value.to_string(); true }
+            "taskTextDarkColor" => { self.task_text_dark_color = value.to_string(); true }
+            "activeTaskBkgColor" => { self.active_task_bkg_color = value.to_string(); true }
+            "activeTaskBorderColor" => { self.active_task_border_color = value.to_string(); true }
+            "doneTaskBkgColor" => { self.done_task_bkg_color = value.to_string(); true }
+            "doneTaskBorderColor" => { self.done_task_border_color = value.to_string(); true }
+            "critBkgColor" => { self.crit_bkg_color = value.to_string(); true }
+            "critBorderColor" => { self.crit_border_color = value.to_string(); true }
+            "gridColor" => { self.grid_color = value.to_string(); true }
+            "todayLineColor" => { self.today_line_color = value.to_string(); true }
+
+            // Pie colors (pie1-pie12)
+            name if name.starts_with("pie") && name.len() <= 5 => {
+                if let Ok(idx) = name[3..].parse::<usize>() {
+                    if idx >= 1 && idx <= self.pie_colors.len() {
+                        self.pie_colors[idx - 1] = value.to_string();
+                        return true;
+                    }
+                }
+                false
+            }
+
+            _ => false
+        }
+    }
+
+    /// Get a theme variable by name
+    ///
+    /// Returns None if the variable name is not recognized.
+    pub fn get_variable(&self, name: &str) -> Option<&str> {
+        match name {
+            "primaryColor" => Some(&self.primary_color),
+            "primaryTextColor" => Some(&self.primary_text_color),
+            "primaryBorderColor" => Some(&self.primary_border_color),
+            "secondaryColor" => Some(&self.secondary_color),
+            "tertiaryColor" => Some(&self.tertiary_color),
+            "clusterBorderColor" | "clusterBorder" => Some(&self.cluster_border_color),
+            "lineColor" => Some(&self.line_color),
+            "background" => Some(&self.background),
+            "fontFamily" => Some(&self.font_family),
+            "fontSize" => Some(&self.font_size),
+            "nodeBkg" | "mainBkg" => Some(&self.primary_color),
+            "nodeBorder" | "border1" => Some(&self.primary_border_color),
+            "clusterBkg" | "secondBkg" => Some(&self.secondary_color),
+            "pieStrokeColor" => Some(&self.pie_stroke_color),
+            "actorBkg" => Some(&self.actor_bkg),
+            "taskBkgColor" => Some(&self.task_bkg_color),
+            _ => None,
+        }
+    }
+
     /// Create a custom theme with builder-style overrides
     ///
     /// Start with base colors and override specific values as needed.
@@ -743,5 +878,99 @@ mod tests {
         assert_eq!(theme.primary_color, "#ff0000");
         assert_eq!(theme.secondary_color, "#00ff00");
         assert_eq!(theme.background, "#0000ff");
+    }
+
+    #[test]
+    fn test_with_overrides() {
+        use std::collections::HashMap;
+
+        let mut overrides = HashMap::new();
+        overrides.insert("primaryColor".to_string(), "#ff0000".to_string());
+        overrides.insert("secondaryColor".to_string(), "#00ff00".to_string());
+
+        let theme = Theme::default().with_overrides(&overrides);
+
+        assert_eq!(theme.primary_color, "#ff0000");
+        assert_eq!(theme.secondary_color, "#00ff00");
+        // Other colors should remain default
+        assert_eq!(theme.background, "#ffffff");
+    }
+
+    #[test]
+    fn test_apply_overrides_mutating() {
+        use std::collections::HashMap;
+
+        let mut theme = Theme::dark();
+        let mut overrides = HashMap::new();
+        overrides.insert("primaryColor".to_string(), "#123456".to_string());
+
+        theme.apply_overrides(&overrides);
+
+        assert_eq!(theme.primary_color, "#123456");
+    }
+
+    #[test]
+    fn test_set_variable_aliases() {
+        let mut theme = Theme::default();
+
+        // nodeBkg should set primary_color
+        assert!(theme.set_variable("nodeBkg", "#aabbcc"));
+        assert_eq!(theme.primary_color, "#aabbcc");
+
+        // clusterBkg should set secondary_color
+        assert!(theme.set_variable("clusterBkg", "#ddeeff"));
+        assert_eq!(theme.secondary_color, "#ddeeff");
+
+        // Unknown variable should return false
+        assert!(!theme.set_variable("unknownVar", "#000000"));
+    }
+
+    #[test]
+    fn test_set_pie_color() {
+        let mut theme = Theme::default();
+
+        // pie1 should set first pie color
+        assert!(theme.set_variable("pie1", "#ff0000"));
+        assert_eq!(theme.pie_colors[0], "#ff0000");
+
+        // pie5 should set fifth pie color
+        assert!(theme.set_variable("pie5", "#00ff00"));
+        assert_eq!(theme.pie_colors[4], "#00ff00");
+
+        // pie0 should fail (1-indexed)
+        assert!(!theme.set_variable("pie0", "#0000ff"));
+    }
+
+    #[test]
+    fn test_get_variable() {
+        let theme = Theme::default();
+
+        assert_eq!(theme.get_variable("primaryColor"), Some("#ECECFF"));
+        assert_eq!(theme.get_variable("background"), Some("#ffffff"));
+        assert_eq!(theme.get_variable("unknownVar"), None);
+
+        // Aliases should work
+        assert_eq!(theme.get_variable("nodeBkg"), Some("#ECECFF"));
+    }
+
+    #[test]
+    fn test_theme_variables_integration() {
+        // Test the full mermaid.js pattern: start with a theme, apply overrides
+        use std::collections::HashMap;
+
+        let mut overrides = HashMap::new();
+        overrides.insert("primaryColor".to_string(), "#ff6600".to_string());
+        overrides.insert("actorBkg".to_string(), "#ffcc00".to_string());
+        overrides.insert("taskBkgColor".to_string(), "#00ccff".to_string());
+
+        let theme = Theme::forest().with_overrides(&overrides);
+
+        // Overridden values
+        assert_eq!(theme.primary_color, "#ff6600");
+        assert_eq!(theme.actor_bkg, "#ffcc00");
+        assert_eq!(theme.task_bkg_color, "#00ccff");
+
+        // Non-overridden values should keep forest theme colors
+        assert_eq!(theme.line_color, "#008000"); // forest green
     }
 }
