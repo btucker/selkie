@@ -192,7 +192,7 @@ selkie -i diagram.mmd -o output.png
 
 ### Evaluation System
 
-Selkie includes a built-in evaluation system that compares output against Mermaid.js:
+Selkie includes a built-in evaluation system that compares output against Mermaid.js. See [EVAL.md](EVAL.md) for detailed documentation.
 
 ```bash
 # Run evaluation with built-in samples
@@ -203,15 +203,14 @@ selkie eval --type flowchart
 
 # Generate HTML comparison report
 selkie eval --html report.html
-
-# Evaluate a directory of .mmd files
-selkie eval ./diagrams/
 ```
 
 The eval system performs:
 - **Structural comparison** - Node/edge counts, labels, connections
 - **Visual similarity** - SSIM-based image comparison
 - **Report generation** - Text, JSON, and HTML outputs
+
+Current status: **100% parity** on built-in test samples (16/16 diagrams match reference).
 
 ### As a Library
 
