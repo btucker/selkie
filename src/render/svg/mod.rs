@@ -10,7 +10,7 @@ mod theme;
 
 pub use document::SvgDocument;
 pub use elements::{Attrs, SvgElement};
-pub use structure::{CompareConfig, ComparisonResult, SvgStructure};
+pub use structure::SvgStructure;
 pub use theme::Theme;
 
 use crate::diagrams::flowchart::{FlowSubGraph, FlowchartDb};

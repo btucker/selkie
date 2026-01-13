@@ -3,18 +3,20 @@
 //! CLI interface compatible with mermaid-cli (mmdc) for easy migration.
 //!
 //! Usage:
-//!   selkie -i input.mmd -o output.svg
-//!   cat diagram.mmd | selkie -i - -o -
-//!   selkie -i input.mmd -o output.svg -t dark
+//!   selkie render -i input.mmd -o output.svg
+//!   selkie -i input.mmd -o output.svg          # implicit render
+//!   selkie eval                                 # evaluate with gallery samples
+//!   selkie eval --type flowchart --html report.html
 
 use std::fs;
 use std::io::{self, Read, Write};
 use std::path::PathBuf;
 use std::process;
 
-use clap::{Parser, ValueEnum};
+use clap::{Parser, Subcommand, ValueEnum};
 use serde::Deserialize;
 
+use mermaid::eval::{self, runner::DiagramInput, samples};
 use mermaid::render::{RenderConfig, Theme};
 use mermaid::{parse, render_with_config};
 
@@ -48,16 +50,33 @@ struct ThemeVariables {
 }
 
 /// A fast mermaid diagram renderer
-///
-/// Rust implementation of the mermaid diagramming parser and renderer.
-/// Compatible with mermaid-cli (mmdc) interface for easy migration.
 #[derive(Parser, Debug)]
 #[command(name = "selkie")]
 #[command(version, about = "A fast mermaid diagram renderer")]
 struct Args {
+    #[command(subcommand)]
+    command: Option<Commands>,
+
+    // Flattened render args for backwards compatibility
+    // When no subcommand is given but -i is provided, run render
+    #[command(flatten)]
+    render: RenderArgs,
+}
+
+#[derive(Subcommand, Debug)]
+enum Commands {
+    /// Render a mermaid diagram to SVG/PNG/PDF
+    Render(RenderArgs),
+    /// Evaluate selkie against mermaid.js reference
+    Eval(EvalArgs),
+}
+
+/// Arguments for the render command
+#[derive(Parser, Debug, Default)]
+struct RenderArgs {
     /// Input file (.mmd, .md) or - for stdin
-    #[arg(short, long, required = true)]
-    input: String,
+    #[arg(short, long)]
+    input: Option<String>,
 
     /// Output file (.svg) or - for stdout
     #[arg(short, long)]
@@ -106,8 +125,41 @@ struct Args {
     force_display: bool,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, ValueEnum)]
+/// Arguments for the eval command
+#[derive(Parser, Debug)]
+struct EvalArgs {
+    /// Input to evaluate: JSON file, directory, .mmd file, or omit for gallery samples
+    #[arg(value_name = "TARGET")]
+    target: Option<String>,
+
+    /// Filter by diagram type (flowchart, sequence, pie, etc.)
+    #[arg(short = 't', long = "type")]
+    diagram_type: Option<String>,
+
+    /// Write JSON report to file
+    #[arg(short, long)]
+    output: Option<PathBuf>,
+
+    /// Generate visual comparison HTML
+    #[arg(long)]
+    html: Option<PathBuf>,
+
+    /// Save comparison PNGs for AI review
+    #[arg(long)]
+    pngs: Option<PathBuf>,
+
+    /// Show detailed diff per diagram
+    #[arg(short, long)]
+    verbose: bool,
+
+    /// Re-render all reference SVGs (ignore cache)
+    #[arg(long)]
+    force_refresh: bool,
+}
+
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
 enum ThemeArg {
+    #[default]
     Default,
     Dark,
     Forest,
@@ -158,8 +210,30 @@ fn main() {
 }
 
 fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
+    match args.command {
+        Some(Commands::Render(render_args)) => run_render(render_args),
+        Some(Commands::Eval(eval_args)) => run_eval(eval_args),
+        None => {
+            // Backwards compatibility: if -i is provided without subcommand, run render
+            if args.render.input.is_some() {
+                run_render(args.render)
+            } else {
+                // No input and no subcommand - show help
+                eprintln!("Usage: selkie [render] -i <INPUT> -o <OUTPUT>");
+                eprintln!("       selkie eval [OPTIONS] [TARGET]");
+                eprintln!();
+                eprintln!("Run 'selkie --help' for more information.");
+                process::exit(1);
+            }
+        }
+    }
+}
+
+fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let input_path = args.input.as_ref().ok_or("Input file is required")?;
+
     // Read input
-    let input = read_input(&args.input)?;
+    let input = read_input(input_path)?;
 
     if args.verbose {
         eprintln!("Read {} bytes from input", input.len());
@@ -362,6 +436,140 @@ fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
+    // Build evaluation config
+    let eval_config = eval::runner::EvalConfig {
+        diagram_type_filter: args.diagram_type.clone(),
+        skip_visual: true, // TODO: enable when PNG rendering is ready
+        force_refresh: args.force_refresh,
+        ..Default::default()
+    };
+
+    let cache = eval::cache::ReferenceCache::with_defaults();
+    let runner = eval::runner::EvalRunner::new(eval_config, cache);
+
+    // Get diagrams to evaluate
+    let inputs = match &args.target {
+        None => {
+            // Use built-in gallery samples
+            eprintln!("Using built-in gallery samples...");
+            samples::all_samples()
+                .into_iter()
+                .map(DiagramInput::from)
+                .collect()
+        }
+        Some(target) => {
+            let path = PathBuf::from(target);
+            if path.is_dir() {
+                // Evaluate all .mmd files in directory
+                load_directory(&path)?
+            } else if target.ends_with(".json") {
+                // Load from JSON file (extract_diagrams output)
+                load_json_diagrams(&path)?
+            } else {
+                // Single .mmd file
+                let content = fs::read_to_string(&path)
+                    .map_err(|e| format!("Failed to read {}: {}", target, e))?;
+                vec![DiagramInput {
+                    name: path.file_stem()
+                        .map(|s| s.to_string_lossy().to_string())
+                        .unwrap_or_else(|| "diagram".to_string()),
+                    source: Some(target.clone()),
+                    diagram_type: None,
+                    text: content,
+                }]
+            }
+        }
+    };
+
+    if inputs.is_empty() {
+        return Err("No diagrams to evaluate".into());
+    }
+
+    eprintln!("Evaluating {} diagrams...", inputs.len());
+
+    // Run evaluation
+    let result = runner.evaluate(&inputs);
+
+    // Output results
+    if args.verbose {
+        println!("{}", eval::report::text_detailed(&result));
+    } else {
+        println!("{}", eval::report::text_summary(&result));
+    }
+
+    // Write JSON if requested
+    if let Some(ref path) = args.output {
+        eval::report::write_json(&result, path)?;
+        eprintln!("Wrote JSON report to {}", path.display());
+    }
+
+    // Write HTML if requested
+    if let Some(ref path) = args.html {
+        eval::report::write_html(&result, path)?;
+        eprintln!("Wrote HTML report to {}", path.display());
+    }
+
+    // Write PNGs if requested
+    if let Some(ref _path) = args.pngs {
+        eprintln!("PNG generation not yet implemented (requires 'png' feature)");
+        // TODO: Implement when resvg is available
+    }
+
+    // Exit with error code if there are failures
+    if result.issue_counts.errors > 0 {
+        process::exit(1);
+    }
+
+    Ok(())
+}
+
+/// Load diagrams from a directory of .mmd files
+fn load_directory(dir: &PathBuf) -> Result<Vec<DiagramInput>, Box<dyn std::error::Error>> {
+    let pattern = dir.join("**/*.mmd").to_string_lossy().to_string();
+    let mut inputs = Vec::new();
+
+    for entry in glob::glob(&pattern)? {
+        let path = entry?;
+        let content = fs::read_to_string(&path)?;
+        inputs.push(DiagramInput {
+            name: path.file_stem()
+                .map(|s| s.to_string_lossy().to_string())
+                .unwrap_or_else(|| "diagram".to_string()),
+            source: Some(path.to_string_lossy().to_string()),
+            diagram_type: None,
+            text: content,
+        });
+    }
+
+    Ok(inputs)
+}
+
+/// Load diagrams from JSON file (extract_diagrams output format)
+fn load_json_diagrams(path: &PathBuf) -> Result<Vec<DiagramInput>, Box<dyn std::error::Error>> {
+    #[derive(Deserialize)]
+    struct JsonDiagram {
+        name: Option<String>,
+        #[serde(alias = "type")]
+        diagram_type: Option<String>,
+        source: String,
+    }
+
+    let content = fs::read_to_string(path)?;
+    let diagrams: Vec<JsonDiagram> = serde_json::from_str(&content)?;
+
+    Ok(diagrams
+        .into_iter()
+        .enumerate()
+        .map(|(i, d)| DiagramInput {
+            name: d.name.unwrap_or_else(|| format!("diagram_{}", i)),
+            source: Some(path.to_string_lossy().to_string()),
+            diagram_type: d.diagram_type,
+            text: d.source,
+        })
+        .collect())
+}
+
 fn read_input(input: &str) -> Result<String, Box<dyn std::error::Error>> {
     if input == "-" {
         let mut buffer = String::new();
@@ -384,6 +592,7 @@ fn write_output(output: &Option<String>, content: &[u8]) -> Result<(), Box<dyn s
     Ok(())
 }
 
+#[cfg(any(feature = "png", feature = "pdf"))]
 fn write_binary_output(
     output: &Option<String>,
     content: &[u8],

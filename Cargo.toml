@@ -42,6 +42,9 @@ log = "0.4"
 # File globbing (for CLI tools)
 glob = "0.3"
 
+# Cache directory discovery
+dirs = "5.0"
+
 # XML parsing (for SVG analysis)
 roxmltree = "0.20"
 
@@ -52,22 +55,6 @@ pretty_assertions = "1.4"
 [[bin]]
 name = "extract-diagrams"
 path = "src/bin/extract_diagrams.rs"
-
-[[bin]]
-name = "cross-validate"
-path = "src/bin/cross_validate.rs"
-
-[[bin]]
-name = "render-validate"
-path = "src/bin/render_validate.rs"
-
-[[bin]]
-name = "gallery-generate"
-path = "tools/gallery/generate.rs"
-
-[[bin]]
-name = "analyze-diff"
-path = "tools/gallery/analyze_diff.rs"
 
 [[bin]]
 name = "selkie"

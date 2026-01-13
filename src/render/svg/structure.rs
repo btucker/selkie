@@ -84,191 +84,6 @@ impl SvgStructure {
     }
 }
 
-/// Result of comparing two SVG structures
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ComparisonResult {
-    /// Whether the structures are considered equivalent
-    pub matches: bool,
-    /// Overall similarity score (0.0 - 1.0)
-    pub similarity: f64,
-    /// Detailed differences found
-    pub differences: Vec<Difference>,
-}
-
-/// A specific difference between two SVG structures
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Difference {
-    pub field: String,
-    pub expected: String,
-    pub actual: String,
-    pub severity: Severity,
-}
-
-/// Severity of a difference
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
-pub enum Severity {
-    /// Critical difference that indicates a bug
-    Critical,
-    /// Important difference that should be investigated
-    Major,
-    /// Minor difference that may be acceptable
-    Minor,
-    /// Informational, likely acceptable variation
-    Info,
-}
-
-/// Configuration for structural comparison
-#[derive(Debug, Clone)]
-pub struct CompareConfig {
-    /// Tolerance for dimension comparison (percentage)
-    pub dimension_tolerance: f64,
-    /// Whether label order matters
-    pub strict_label_order: bool,
-    /// Whether to require exact shape counts
-    pub strict_shape_counts: bool,
-}
-
-impl Default for CompareConfig {
-    fn default() -> Self {
-        Self {
-            dimension_tolerance: 0.1, // 10% tolerance
-            strict_label_order: false,
-            strict_shape_counts: false,
-        }
-    }
-}
-
-impl SvgStructure {
-    /// Compare this structure against another (expected) structure
-    pub fn compare(&self, expected: &SvgStructure, config: &CompareConfig) -> ComparisonResult {
-        let mut differences = Vec::new();
-        let mut score_parts: Vec<f64> = Vec::new();
-
-        // Compare dimensions
-        let width_diff = (self.width - expected.width).abs() / expected.width.max(1.0);
-        let height_diff = (self.height - expected.height).abs() / expected.height.max(1.0);
-
-        if width_diff > config.dimension_tolerance {
-            differences.push(Difference {
-                field: "width".to_string(),
-                expected: format!("{:.1}", expected.width),
-                actual: format!("{:.1}", self.width),
-                severity: Severity::Major,
-            });
-            score_parts.push(1.0 - width_diff.min(1.0));
-        } else {
-            score_parts.push(1.0);
-        }
-
-        if height_diff > config.dimension_tolerance {
-            differences.push(Difference {
-                field: "height".to_string(),
-                expected: format!("{:.1}", expected.height),
-                actual: format!("{:.1}", self.height),
-                severity: Severity::Major,
-            });
-            score_parts.push(1.0 - height_diff.min(1.0));
-        } else {
-            score_parts.push(1.0);
-        }
-
-        // Compare node count
-        if self.node_count != expected.node_count {
-            differences.push(Difference {
-                field: "node_count".to_string(),
-                expected: expected.node_count.to_string(),
-                actual: self.node_count.to_string(),
-                severity: Severity::Critical,
-            });
-            let ratio = self.node_count.min(expected.node_count) as f64
-                / self.node_count.max(expected.node_count).max(1) as f64;
-            score_parts.push(ratio);
-        } else {
-            score_parts.push(1.0);
-        }
-
-        // Compare edge count
-        if self.edge_count != expected.edge_count {
-            differences.push(Difference {
-                field: "edge_count".to_string(),
-                expected: expected.edge_count.to_string(),
-                actual: self.edge_count.to_string(),
-                severity: Severity::Critical,
-            });
-            let ratio = self.edge_count.min(expected.edge_count) as f64
-                / self.edge_count.max(expected.edge_count).max(1) as f64;
-            score_parts.push(ratio);
-        } else {
-            score_parts.push(1.0);
-        }
-
-        // Compare labels
-        let expected_labels: std::collections::HashSet<_> = expected.labels.iter().collect();
-        let actual_labels: std::collections::HashSet<_> = self.labels.iter().collect();
-
-        let missing: Vec<_> = expected_labels.difference(&actual_labels).collect();
-        let extra: Vec<_> = actual_labels.difference(&expected_labels).collect();
-
-        if !missing.is_empty() {
-            differences.push(Difference {
-                field: "labels_missing".to_string(),
-                expected: format!("{:?}", missing),
-                actual: "[]".to_string(),
-                severity: Severity::Critical,
-            });
-        }
-        if !extra.is_empty() {
-            differences.push(Difference {
-                field: "labels_extra".to_string(),
-                expected: "[]".to_string(),
-                actual: format!("{:?}", extra),
-                severity: Severity::Minor,
-            });
-        }
-
-        let label_match = expected_labels.intersection(&actual_labels).count() as f64
-            / expected_labels.len().max(1) as f64;
-        score_parts.push(label_match);
-
-        // Compare shape counts (if strict)
-        if config.strict_shape_counts {
-            compare_shape_counts(
-                &self.shapes,
-                &expected.shapes,
-                &mut differences,
-                &mut score_parts,
-            );
-        }
-
-        // Check for defs and style
-        if expected.has_defs && !self.has_defs {
-            differences.push(Difference {
-                field: "has_defs".to_string(),
-                expected: "true".to_string(),
-                actual: "false".to_string(),
-                severity: Severity::Minor,
-            });
-        }
-
-        // Calculate overall similarity
-        let similarity = if score_parts.is_empty() {
-            1.0
-        } else {
-            score_parts.iter().sum::<f64>() / score_parts.len() as f64
-        };
-
-        // Determine if structures match (no critical differences and high similarity)
-        let has_critical = differences.iter().any(|d| d.severity == Severity::Critical);
-        let matches = !has_critical && similarity >= 0.8;
-
-        ComparisonResult {
-            matches,
-            similarity,
-            differences,
-        }
-    }
-}
-
 // Helper functions
 
 fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64) {
@@ -370,39 +185,6 @@ fn extract_labels(doc: &roxmltree::Document) -> Vec<String> {
     labels
 }
 
-fn compare_shape_counts(
-    actual: &ShapeCounts,
-    expected: &ShapeCounts,
-    differences: &mut Vec<Difference>,
-    score_parts: &mut Vec<f64>,
-) {
-    let fields = [
-        ("rect", actual.rect, expected.rect),
-        ("circle", actual.circle, expected.circle),
-        ("ellipse", actual.ellipse, expected.ellipse),
-        ("polygon", actual.polygon, expected.polygon),
-        ("path", actual.path, expected.path),
-        ("line", actual.line, expected.line),
-        ("polyline", actual.polyline, expected.polyline),
-    ];
-
-    for (name, actual_count, expected_count) in fields {
-        if actual_count != expected_count {
-            differences.push(Difference {
-                field: format!("shapes.{}", name),
-                expected: expected_count.to_string(),
-                actual: actual_count.to_string(),
-                severity: Severity::Minor,
-            });
-            let ratio = actual_count.min(expected_count) as f64
-                / actual_count.max(expected_count).max(1) as f64;
-            score_parts.push(ratio);
-        } else {
-            score_parts.push(1.0);
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -428,12 +210,10 @@ mod tests {
             <text>Label</text>
         </svg>"#;
 
-        let structure = SvgStructure::from_svg(svg).unwrap();
-        let result = structure.compare(&structure, &CompareConfig::default());
+        let s1 = SvgStructure::from_svg(svg).unwrap();
+        let s2 = SvgStructure::from_svg(svg).unwrap();
 
-        assert!(result.matches);
-        assert_eq!(result.similarity, 1.0);
-        assert!(result.differences.is_empty());
+        assert_eq!(s1, s2);
     }
 
     #[test]
@@ -444,8 +224,7 @@ mod tests {
         let s1 = SvgStructure::from_svg(svg1).unwrap();
         let s2 = SvgStructure::from_svg(svg2).unwrap();
 
-        let result = s1.compare(&s2, &CompareConfig::default());
-        assert!(!result.matches);
-        assert!(result.differences.iter().any(|d| d.field == "width"));
+        assert_ne!(s1.width, s2.width);
+        assert_ne!(s1.height, s2.height);
     }
 }

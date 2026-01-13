@@ -8,6 +8,7 @@ pub mod common;
 pub mod config;
 pub mod diagrams;
 pub mod error;
+pub mod eval;
 pub mod layout;
 pub mod render;
 

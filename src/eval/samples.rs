@@ -1,17 +1,27 @@
-//! Gallery generator - renders sample diagrams with selkie
+//! Built-in sample diagrams for evaluation.
+//!
+//! These diagrams provide a quick way to evaluate selkie without external test files.
+//! They cover various diagram types and edge cases.
 
-use std::fs;
-use std::path::Path;
+/// A sample diagram for evaluation
+#[derive(Debug, Clone)]
+pub struct Sample {
+    /// Name/identifier for the sample
+    pub name: &'static str,
+    /// Diagram type (flowchart, sequence, pie, etc.)
+    pub diagram_type: &'static str,
+    /// The mermaid diagram source
+    pub source: &'static str,
+}
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let output_dir = Path::new("tools/gallery/output");
-    fs::create_dir_all(output_dir)?;
-
-    // Sample diagrams - complex examples to exercise more features
-    let diagrams = vec![
-        (
-            "flowchart",
-            r#"flowchart LR
+/// Get all built-in sample diagrams
+pub fn all_samples() -> Vec<Sample> {
+    vec![
+        // Basic diagram types
+        Sample {
+            name: "flowchart",
+            diagram_type: "flowchart",
+            source: r#"flowchart LR
     A[Start] --> B{Decision}
     B -->|Yes| C[Action 1]
     B -->|No| D[Action 2]
@@ -21,10 +31,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     F --> G[[Subroutine]]
     G --> H[(Database)]
     H o--o I((Circle))"#,
-        ),
-        (
-            "flowchart_full",
-            r#"flowchart TB
+        },
+        Sample {
+            name: "flowchart_full",
+            diagram_type: "flowchart",
+            source: r#"flowchart TB
     subgraph main [Main Flow]
         A[Rectangle] --> B(Rounded)
         B --> C{Diamond Decision}
@@ -54,18 +65,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     end
     F --> G
     N --> O"#,
-        ),
-        (
-            "pie",
-            r#"pie title Project Distribution
+        },
+        Sample {
+            name: "pie",
+            diagram_type: "pie",
+            source: r#"pie title Project Distribution
     "Development" : 40
     "Testing" : 25
     "Documentation" : 15
     "Design" : 20"#,
-        ),
-        (
-            "sequence",
-            r#"sequenceDiagram
+        },
+        Sample {
+            name: "sequence",
+            diagram_type: "sequence",
+            source: r#"sequenceDiagram
     participant A as Alice
     participant B as Bob
     participant C as Server
@@ -77,10 +90,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     A->>B: How are you?
     B-->>A: I'm good, thanks!
     Note right of B: Bob thinks"#,
-        ),
-        (
-            "class",
-            r#"classDiagram
+        },
+        Sample {
+            name: "class",
+            diagram_type: "class",
+            source: r#"classDiagram
     Animal <|-- Duck
     Animal <|-- Fish
     Animal <|-- Zebra
@@ -102,20 +116,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         +run()
     }
     Duck "1" *-- "many" Egg : has"#,
-        ),
-        (
-            "state",
-            r#"stateDiagram-v2
+        },
+        Sample {
+            name: "state",
+            diagram_type: "state",
+            source: r#"stateDiagram-v2
     [*] --> Idle
     Idle --> Running : start
     Running --> Idle : stop
     Running --> Error : error
     Error --> Idle : reset
     Error --> [*]"#,
-        ),
-        (
-            "er",
-            r#"erDiagram
+        },
+        Sample {
+            name: "er",
+            diagram_type: "er",
+            source: r#"erDiagram
     CUSTOMER ||--o{ ORDER : places
     ORDER ||--|{ LINE-ITEM : contains
     PRODUCT ||--o{ LINE-ITEM : includes
@@ -134,10 +150,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         string name
         float price
     }"#,
-        ),
-        (
-            "gantt",
-            r#"gantt
+        },
+        Sample {
+            name: "gantt",
+            diagram_type: "gantt",
+            source: r#"gantt
     title Project Timeline
     dateFormat YYYY-MM-DD
     section Planning
@@ -150,27 +167,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     section Testing
     Unit Tests  :c1, after b2, 3d
     QA          :c2, after b3, 5d"#,
-        ),
-        // ========================================
+        },
+
         // Examples from mermaid.js documentation
-        // https://mermaid.ai/open-source/syntax/examples.html
-        // ========================================
-        (
-            "example_pie_netflix",
-            r#"pie title NETFLIX
+        Sample {
+            name: "example_pie_netflix",
+            diagram_type: "pie",
+            source: r#"pie title NETFLIX
          "Time spent looking for movie" : 90
          "Time spent watching it" : 10"#,
-        ),
-        (
-            "example_pie_voldemort",
-            r#"pie title What Voldemort doesn't have?
+        },
+        Sample {
+            name: "example_pie_voldemort",
+            diagram_type: "pie",
+            source: r#"pie title What Voldemort doesn't have?
          "FRIENDS" : 2
          "FAMILY" : 3
          "NOSE" : 45"#,
-        ),
-        (
-            "example_sequence_basic",
-            r#"sequenceDiagram
+        },
+        Sample {
+            name: "example_sequence_basic",
+            diagram_type: "sequence",
+            source: r#"sequenceDiagram
     Alice ->> Bob: Hello Bob, how are you?
     Bob-->>John: How about you John?
     Bob--x Alice: I am good thanks!
@@ -179,18 +197,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Bob-->Alice: Checking with John...
     Alice->John: Yes... John, how are you?"#,
-        ),
-        (
-            "example_flowchart_basic",
-            r#"graph LR
+        },
+        Sample {
+            name: "example_flowchart_basic",
+            diagram_type: "flowchart",
+            source: r#"graph LR
     A[Square Rect] -- Link text --> B((Circle))
     A --> C(Round Rect)
     B --> D{Rhombus}
     C --> D"#,
-        ),
-        (
-            "example_flowchart_styled",
-            r#"graph TB
+        },
+        Sample {
+            name: "example_flowchart_styled",
+            diagram_type: "flowchart",
+            source: r#"graph TB
     sq[Square shape] --> ci((Circle shape))
 
     subgraph A
@@ -209,10 +229,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
      classDef orange fill:#f96,stroke:#333,stroke-width:4px
      class sq,e green
      class di orange"#,
-        ),
-        (
-            "example_sequence_loops",
-            r#"sequenceDiagram
+        },
+        Sample {
+            name: "example_sequence_loops",
+            diagram_type: "sequence",
+            source: r#"sequenceDiagram
     loop Daily query
         Alice->>Bob: Hello Bob, how are you?
         alt is sick
@@ -225,10 +246,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Bob->>Alice: Thanks for asking
         end
     end"#,
-        ),
-        (
-            "example_sequence_self_loop",
-            r#"sequenceDiagram
+        },
+        Sample {
+            name: "example_sequence_self_loop",
+            diagram_type: "sequence",
+            source: r#"sequenceDiagram
     participant Alice
     participant Bob
     Alice->>John: Hello John, how are you?
@@ -239,10 +261,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     John-->>Alice: Great!
     John->>Bob: How about you?
     Bob-->>John: Jolly good!"#,
-        ),
-        (
-            "example_sequence_blogging",
-            r#"sequenceDiagram
+        },
+        Sample {
+            name: "example_sequence_blogging",
+            diagram_type: "sequence",
+            source: r#"sequenceDiagram
     participant web as Web Browser
     participant blog as Blog Service
     participant account as Account Service
@@ -270,47 +293,50 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             blog-->>-web: Successfully posted
         end
     end"#,
-        ),
-    ];
-
-    println!("Generating {} diagram SVGs...", diagrams.len());
-
-    for (name, source) in &diagrams {
-        let output_path = output_dir.join(format!("{}_rs.svg", name));
-
-        match render_diagram(source) {
-            Ok(svg) => {
-                fs::write(&output_path, &svg)?;
-                println!("  ✓ {}", name);
-            }
-            Err(e) => {
-                println!("  ✗ {} - {}", name, e);
-            }
-        }
-    }
-
-    // Write diagram sources for the JS renderer
-    let sources_path = output_dir.join("sources.json");
-    let sources_json: Vec<_> = diagrams
-        .iter()
-        .map(|(name, source)| {
-            serde_json::json!({
-                "name": name,
-                "source": source
-            })
-        })
-        .collect();
-    fs::write(&sources_path, serde_json::to_string_pretty(&sources_json)?)?;
-
-    println!("\nDiagram sources written to {:?}", sources_path);
-    println!("Run 'node tools/gallery/render_reference.mjs' to generate mermaid.js versions");
-
-    Ok(())
+        },
+    ]
 }
 
-fn render_diagram(source: &str) -> Result<String, String> {
-    use mermaid::{parse, render};
+/// Get samples filtered by diagram type
+pub fn samples_by_type(diagram_type: &str) -> Vec<Sample> {
+    all_samples()
+        .into_iter()
+        .filter(|s| s.diagram_type == diagram_type)
+        .collect()
+}
 
-    let diagram = parse(source).map_err(|e| e.to_string())?;
-    render(&diagram).map_err(|e| e.to_string())
+/// Get available diagram types
+pub fn available_types() -> Vec<&'static str> {
+    let mut types: Vec<&'static str> = all_samples()
+        .iter()
+        .map(|s| s.diagram_type)
+        .collect();
+    types.sort();
+    types.dedup();
+    types
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_all_samples_not_empty() {
+        assert!(!all_samples().is_empty());
+    }
+
+    #[test]
+    fn test_available_types() {
+        let types = available_types();
+        assert!(types.contains(&"flowchart"));
+        assert!(types.contains(&"sequence"));
+        assert!(types.contains(&"pie"));
+    }
+
+    #[test]
+    fn test_samples_by_type() {
+        let flowcharts = samples_by_type("flowchart");
+        assert!(!flowcharts.is_empty());
+        assert!(flowcharts.iter().all(|s| s.diagram_type == "flowchart"));
+    }
 }
