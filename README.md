@@ -233,17 +233,83 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## Features
+## Feature Flags
 
-- `cli` - Command line interface (enabled by default)
-- `png` - PNG output support via resvg
-- `pdf` - PDF output support via svg2pdf
-- `kitty` - Terminal image display for kitty/ghostty terminals
-- `all-formats` - Enable all output formats
+Selkie uses Cargo feature flags to enable optional functionality. This keeps the core library lightweight while allowing additional capabilities when needed.
+
+### Default Features
+
+| Feature | Description | Dependencies |
+|---------|-------------|--------------|
+| `cli` | Command line interface | [clap](https://crates.io/crates/clap) |
+
+The CLI is enabled by default. To build only the library without CLI:
 
 ```bash
-# Build with all features
+cargo build --release --no-default-features
+```
+
+### Output Format Features
+
+| Feature | Description | Dependencies |
+|---------|-------------|--------------|
+| `png` | PNG raster output | [resvg](https://crates.io/crates/resvg) |
+| `pdf` | PDF document output | [svg2pdf](https://crates.io/crates/svg2pdf), resvg |
+| `kitty` | Terminal inline images | resvg, [image](https://crates.io/crates/image), [base64](https://crates.io/crates/base64), libc, atty |
+| `all-formats` | Enable png, pdf, and kitty | All of the above |
+
+### Usage Examples
+
+```bash
+# Build with PNG support
+cargo build --release --features png
+
+# Build with all output formats
 cargo build --release --features all-formats
+
+# Install with PDF support
+cargo install selkie --features pdf
+
+# Library only (no CLI, minimal dependencies)
+cargo build --release --no-default-features
+```
+
+### Feature Details
+
+#### `cli`
+
+Provides the `selkie` command-line binary with subcommands for rendering and evaluation. Without this feature, only the library is built.
+
+#### `png`
+
+Enables PNG output via the `resvg` crate, a high-quality SVG rendering library. Use with:
+
+```bash
+selkie -i diagram.mmd -o output.png
+```
+
+#### `pdf`
+
+Enables PDF output via `svg2pdf`. Useful for generating print-ready documents:
+
+```bash
+selkie -i diagram.mmd -o output.pdf
+```
+
+#### `kitty`
+
+Enables inline image display in terminals that support the Kitty graphics protocol (Kitty, Ghostty, WezTerm). When enabled, diagrams can be rendered directly in the terminal:
+
+```bash
+selkie -i diagram.mmd  # Displays inline if terminal supports it
+```
+
+#### `all-formats`
+
+Convenience feature that enables `png`, `pdf`, and `kitty` together. Best for development or when you need maximum flexibility:
+
+```bash
+cargo install selkie --features all-formats
 ```
 
 ## Issue Tracking
