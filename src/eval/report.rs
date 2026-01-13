@@ -144,8 +144,7 @@ pub fn text_detailed(result: &EvalResult) -> String {
 
 /// Write JSON report to file
 pub fn write_json(result: &EvalResult, path: &Path) -> std::io::Result<()> {
-    let json = serde_json::to_string_pretty(result)
-        .map_err(std::io::Error::other)?;
+    let json = serde_json::to_string_pretty(result).map_err(std::io::Error::other)?;
     fs::write(path, json)
 }
 
