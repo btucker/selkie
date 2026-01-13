@@ -10,7 +10,7 @@ use crate::layout::dagre::graph::{DagreGraph, EdgeKey};
 use std::collections::{HashMap, HashSet};
 
 /// Type alias for tracking edge exchanges during network simplex iteration
-type ExchangeKey = ((String, String), (String, String));
+type EdgeExchange = ((String, String), (String, String));
 
 /// A spanning tree used for network simplex
 #[derive(Debug, Clone)]
@@ -151,7 +151,7 @@ pub fn run(g: &mut DagreGraph) {
     let max_iterations = g.node_count() * g.edge_count() + 1; // dagre.js uses this formula
 
     // Track exchanges for cycle detection - count how many times each exchange occurs
-    let mut exchange_counts: HashMap<ExchangeKey, usize> = HashMap::new();
+    let mut exchange_counts: HashMap<EdgeExchange, usize> = HashMap::new();
 
     while let Some(leave) = leave_edge(&tree) {
         if iterations >= max_iterations {

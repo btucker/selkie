@@ -4,10 +4,11 @@
 //! using SSIM (Structural Similarity Index).
 
 #[cfg(feature = "png")]
-use super::ssim::{calculate_ssim_with_resize, rgba_to_grayscale};
-#[cfg(feature = "png")]
 use std::fs;
 use std::path::Path;
+
+#[cfg(feature = "png")]
+use super::ssim::{calculate_ssim_with_resize, rgba_to_grayscale};
 
 /// Result of visual comparison between two images
 #[derive(Debug, Clone)]
@@ -294,6 +295,7 @@ pub fn write_comparison_pngs(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     #[cfg(feature = "png")]
@@ -326,5 +328,61 @@ mod tests {
             comparison.ssim > 0.99,
             "Identical SVGs should have SSIM > 0.99"
         );
+    }
+
+    #[test]
+    #[cfg(feature = "png")]
+    fn test_svg_with_foreign_object_should_succeed() {
+        // Mermaid.js uses foreignObject with HTML content for labels
+        // resvg cannot parse HTML p tags, so we need to pre-process
+        let svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"100\">\
+            <rect x=\"10\" y=\"10\" width=\"180\" height=\"80\" fill=\"blue\"/>\
+            <foreignObject x=\"20\" y=\"30\" width=\"160\" height=\"40\">\
+            <div xmlns=\"http://www.w3.org/1999/xhtml\">\
+            <p>Hello World</p>\
+            </div>\
+            </foreignObject>\
+            </svg>";
+
+        // Should succeed after pre-processing strips foreignObject
+        let result = svg_to_png(svg);
+        assert!(result.is_ok(), "SVG with foreignObject should render");
+    }
+
+    #[test]
+    #[cfg(feature = "png")]
+    fn test_svg_with_mermaid_style_foreign_object() {
+        // Exact structure used by mermaid.js flowcharts
+        let svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"100\">\
+            <g class=\"nodes\">\
+            <g class=\"node\" transform=\"translate(100, 50)\">\
+            <rect x=\"-40\" y=\"-20\" width=\"80\" height=\"40\"/>\
+            <g class=\"label\">\
+            <rect></rect>\
+            <foreignObject width=\"60\" height=\"24\">\
+            <div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: table-cell;\">\
+            <span class=\"nodeLabel\"><p>Start</p></span>\
+            </div>\
+            </foreignObject>\
+            </g>\
+            </g>\
+            </g>\
+            </svg>";
+
+        let result = svg_to_png(svg);
+        assert!(result.is_ok(), "Mermaid-style foreignObject should render");
+    }
+
+    #[test]
+    #[cfg(feature = "png")]
+    fn test_real_mermaid_flowchart_svg() {
+        // An actual mermaid.js flowchart SVG with foreignObject HTML
+        let svg = include_str!("../../tests/fixtures/mermaid_flowchart.svg");
+        let result = svg_to_png(svg);
+        // resvg handles foreignObject with HTML content
+        assert!(result.is_ok(), "Real mermaid SVG should render to PNG");
+        let (data, w, h) = result.unwrap();
+        assert!(!data.is_empty(), "PNG should have data");
+        assert!(w > 0 && h > 0, "PNG should have dimensions");
     }
 }
