@@ -43,6 +43,10 @@ pub struct DiagramConfig {
     #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub theme_variables: HashMap<String, String>,
 
+    /// Custom CSS to inject after theme CSS
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub theme_css: Option<String>,
+
     /// Diagram-specific configuration (opaque JSON)
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
@@ -56,6 +60,9 @@ impl DiagramConfig {
         }
         for (k, v) in &other.theme_variables {
             self.theme_variables.insert(k.clone(), v.clone());
+        }
+        if other.theme_css.is_some() {
+            self.theme_css = other.theme_css.clone();
         }
         for (k, v) in &other.extra {
             self.extra.insert(k.clone(), v.clone());
@@ -127,12 +134,8 @@ pub fn detect_init(text: &str) -> Option<DiagramConfig> {
 
 /// Parse init directive arguments into DiagramConfig
 fn parse_init_args(args: &serde_json::Value) -> Result<DiagramConfig, serde_json::Error> {
-    // First try direct deserialization
-    if let Ok(config) = serde_json::from_value::<DiagramConfig>(args.clone()) {
-        return Ok(config);
-    }
-
-    // Manual extraction for more flexibility
+    // Always use manual extraction because serde's #[serde(flatten)] on `extra`
+    // consumes keys like "themeCSS" before rename_all can match them to theme_css.
     let mut config = DiagramConfig::default();
 
     if let Some(obj) = args.as_object() {
@@ -150,9 +153,14 @@ fn parse_init_args(args: &serde_json::Value) -> Result<DiagramConfig, serde_json
             }
         }
 
+        // Extract themeCSS
+        if let Some(css) = obj.get("themeCSS").and_then(|v| v.as_str()) {
+            config.theme_css = Some(css.to_string());
+        }
+
         // Collect other keys into extra
         for (key, value) in obj {
-            if key != "theme" && key != "themeVariables" {
+            if key != "theme" && key != "themeVariables" && key != "themeCSS" {
                 config.extra.insert(key.clone(), value.clone());
             }
         }
@@ -362,6 +370,16 @@ flowchart TD
     A --> B"#;
 
         assert!(detect_init(text).is_none());
+    }
+
+    #[test]
+    fn test_theme_css_parsing() {
+        let text = r#"%%{init: {"themeCSS": ".node rect { rx: 10; }"}}%%
+flowchart TD
+    A --> B"#;
+
+        let config = detect_init(text).expect("Should parse directive");
+        assert_eq!(config.theme_css, Some(".node rect { rx: 10; }".to_string()));
     }
 
     #[test]

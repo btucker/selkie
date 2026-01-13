@@ -46,10 +46,11 @@ pub fn render_text(text: &str) -> Result<String> {
     // Extract directive configuration
     let directive_config = detect_init(text);
 
-    // Build render config with directive theme
+    // Build render config with directive theme and themeCSS
     let config = if let Some(ref dc) = directive_config {
         RenderConfig {
             theme: Theme::from_directive(dc),
+            theme_css: dc.theme_css.clone(),
             ..RenderConfig::default()
         }
     } else {
