@@ -58,7 +58,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     // Add theme styles
     if config.embed_css {
         doc.add_style(&config.theme.generate_css());
-        doc.add_style(&generate_sequence_css());
+        doc.add_style(&generate_sequence_css(&config.theme));
     }
 
     // Add arrow markers
@@ -242,10 +242,7 @@ fn render_actor(
                 cx: center_x,
                 cy: top_y + head_radius,
                 r: head_radius,
-                attrs: Attrs::new()
-                    .with_fill("none")
-                    .with_stroke("#333333")
-                    .with_stroke_width(2.0),
+                attrs: Attrs::new().with_fill("none").with_stroke_width(2.0),
             });
 
             // Body
@@ -254,7 +251,8 @@ fn render_actor(
                 y1: top_y + head_radius * 2.0,
                 x2: center_x,
                 y2: top_y + head_radius * 2.0 + body_length,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             });
 
             // Arms
@@ -263,7 +261,8 @@ fn render_actor(
                 y1: top_y + head_radius * 2.0 + 5.0,
                 x2: center_x + arm_length,
                 y2: top_y + head_radius * 2.0 + 5.0,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             });
 
             // Left leg
@@ -272,7 +271,8 @@ fn render_actor(
                 y1: top_y + head_radius * 2.0 + body_length,
                 x2: center_x - 8.0,
                 y2: top_y + head_radius * 2.0 + body_length + leg_length,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             });
 
             // Right leg
@@ -281,7 +281,8 @@ fn render_actor(
                 y1: top_y + head_radius * 2.0 + body_length,
                 x2: center_x + 8.0,
                 y2: top_y + head_radius * 2.0 + body_length + leg_length,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             });
 
             // Label below
@@ -322,8 +323,7 @@ fn render_actor(
             children.push(SvgElement::Path {
                 d: path,
                 attrs: Attrs::new()
-                    .with_fill("#ECECFF")
-                    .with_stroke("#333333")
+                    .with_class("actor-box")
                     .with_stroke_width(1.0)
                     .with_class("actor-box"),
             });
@@ -334,10 +334,7 @@ fn render_actor(
                 cy: top_y + ellipse_ry,
                 rx: (width - padding * 2.0) / 2.0,
                 ry: ellipse_ry,
-                attrs: Attrs::new()
-                    .with_fill("#ECECFF")
-                    .with_stroke("#333333")
-                    .with_stroke_width(1.0),
+                attrs: Attrs::new().with_class("actor-box").with_stroke_width(1.0),
             });
 
             // Label
@@ -361,8 +358,8 @@ fn render_actor(
                 rx: Some(3.0),
                 ry: Some(3.0),
                 attrs: Attrs::new()
-                    .with_fill("#eaeaea") // mermaid.js gray
-                    .with_stroke("#666") // mermaid.js stroke
+                    .with_class("activation")
+                    .with_stroke("#666")
                     .with_stroke_width(1.0)
                     .with_class("actor actor-box"),
             });
@@ -413,7 +410,6 @@ fn render_message(from_x: f64, to_x: f64, y: f64, label: &str, msg_type: LineTyp
 
     // Message line
     let mut line_attrs = Attrs::new()
-        .with_stroke("#333333")
         .with_stroke_width(1.0)
         .with_class("message-line")
         .with_attr("marker-end", &format!("url(#{})", marker_id));
@@ -470,7 +466,6 @@ fn render_self_message(x: f64, y: f64, label: &str, is_dotted: bool) -> SvgEleme
 
     let mut path_attrs = Attrs::new()
         .with_fill("none")
-        .with_stroke("#333333")
         .with_stroke_width(1.0)
         .with_class("message-line")
         .with_attr("marker-end", "url(#arrow-filled)");
@@ -539,8 +534,7 @@ fn render_note(
     children.push(SvgElement::Path {
         d: path,
         attrs: Attrs::new()
-            .with_fill("#FFFFCC")
-            .with_stroke("#333333")
+            .with_class("note")
             .with_stroke_width(1.0)
             .with_class("note-box"),
     });
@@ -558,10 +552,7 @@ fn render_note(
 
     children.push(SvgElement::Path {
         d: fold_path,
-        attrs: Attrs::new()
-            .with_fill("none")
-            .with_stroke("#333333")
-            .with_stroke_width(1.0),
+        attrs: Attrs::new().with_fill("none").with_stroke_width(1.0),
     });
 
     // Note text
@@ -589,7 +580,12 @@ fn create_arrow_marker(id: &str, filled: bool) -> SvgElement {
         "M 0 0 L 10 5 L 0 10"
     };
 
-    let fill = if filled { "#333333" } else { "none" };
+    // Use class for theming - fill handled by CSS .sequence-marker rule
+    let class_name = if filled {
+        "sequence-marker-filled"
+    } else {
+        "sequence-marker-open"
+    };
 
     SvgElement::Marker {
         id: id.to_string(),
@@ -602,10 +598,7 @@ fn create_arrow_marker(id: &str, filled: bool) -> SvgElement {
         marker_units: None,
         children: vec![SvgElement::Path {
             d: path.to_string(),
-            attrs: Attrs::new()
-                .with_fill(fill)
-                .with_stroke("#333333")
-                .with_stroke_width(1.0),
+            attrs: Attrs::new().with_class(class_name).with_stroke_width(1.0),
         }],
     }
 }
@@ -627,67 +620,116 @@ fn create_cross_marker() -> SvgElement {
                 y1: 0.0,
                 x2: 10.0,
                 y2: 10.0,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             },
             SvgElement::Line {
                 x1: 10.0,
                 y1: 0.0,
                 x2: 0.0,
                 y2: 10.0,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             },
         ],
     }
 }
 
-fn generate_sequence_css() -> String {
-    r#"
-.sequence-title {
-  fill: #333333;
-}
+fn generate_sequence_css(theme: &crate::render::svg::Theme) -> String {
+    format!(
+        r#"
+.sequence-title {{
+  fill: {signal_text_color};
+}}
 
-.actor {
-  stroke: #666;
-  fill: #eaeaea;
-}
+.actor {{
+  stroke: {actor_border};
+  fill: {actor_bkg};
+}}
+
+.actor-box {{
+  stroke: {actor_border};
+  fill: {actor_bkg};
+}}
 
 /* Actor text - no stroke (avoid outlined appearance) */
-text.actor, text.actor > tspan, text.actor-box, text.actor-label {
-  fill: black;
+text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
+  fill: {actor_text_color};
   stroke: none;
-}
+}}
 
-.actor-line {
-  stroke: #999;
+.actor-line {{
+  stroke: {actor_line_color};
   stroke-width: 0.5px;
-}
+}}
 
-.messageLine0 {
+.messageLine0 {{
   stroke-width: 1.5;
   stroke-dasharray: none;
-  stroke: #333;
-}
+  stroke: {signal_color};
+}}
 
-.messageLine1 {
+.messageLine1 {{
   stroke-width: 1.5;
   stroke-dasharray: 2, 2;
-  stroke: #333;
-}
+  stroke: {signal_color};
+}}
 
-.messageText {
-  fill: #333;
+.messageText {{
+  fill: {signal_text_color};
   stroke: none;
-}
+}}
 
-.note {
-  stroke: #aaaa33;
-  fill: #fff5ad;
-}
+.note {{
+  stroke: {note_border_color};
+  fill: {note_bkg_color};
+}}
 
-.noteText, .noteText > tspan {
-  fill: black;
+.noteText, .noteText > tspan {{
+  fill: {note_text_color};
   stroke: none;
-}
-"#
-    .to_string()
+}}
+
+.activation {{
+  fill: {activation_bkg_color};
+  stroke: {activation_border_color};
+}}
+
+.loopLine {{
+  stroke: {label_box_border_color};
+}}
+
+.loopText {{
+  fill: {signal_text_color};
+}}
+
+.labelBox {{
+  stroke: {label_box_border_color};
+  fill: {label_box_bkg_color};
+}}
+
+.sequence-marker-filled {{
+  fill: {signal_color};
+  stroke: {signal_color};
+}}
+
+.sequence-marker-open {{
+  fill: none;
+  stroke: {signal_color};
+}}
+"#,
+        signal_text_color = theme.signal_text_color,
+        actor_border = theme.actor_border,
+        actor_bkg = theme.actor_bkg,
+        actor_text_color = theme.actor_text_color,
+        actor_line_color = theme.actor_line_color,
+        signal_color = theme.signal_color,
+        note_border_color = theme.note_border_color,
+        note_bkg_color = theme.note_bkg_color,
+        note_text_color = theme.note_text_color,
+        activation_bkg_color = theme.activation_bkg_color,
+        activation_border_color = theme.activation_border_color,
+        label_box_border_color = theme.label_box_border_color,
+        label_box_bkg_color = theme.label_box_bkg_color,
+    )
 }

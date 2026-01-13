@@ -85,7 +85,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
     // Add theme styles
     if config.embed_css {
         doc.add_style(&config.theme.generate_css());
-        doc.add_style(&generate_gantt_css());
+        doc.add_style(&generate_gantt_css(&config.theme));
     }
 
     let mut current_y = margin;
@@ -124,14 +124,6 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
     doc.add_element(axis_elem);
     current_y += timeline_height;
 
-    // Section colors from mermaid.js default theme
-    let section_colors = [
-        "rgba(102, 102, 255, 0.49)", // section0 - purple
-        "rgba(255, 255, 255, 0.2)",  // section1 - white with opacity
-        "#fff400",                   // section2 - yellow
-        "rgba(255, 255, 255, 0.2)",  // section3 - white with opacity
-    ];
-
     // Track current section for alternating colors
     let mut current_section = String::new();
     let mut section_start_y = current_y;
@@ -142,8 +134,9 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
         // Check if section changed
         if task.section != current_section {
             // Render previous section background
+            // Colors are controlled by CSS .section0, .section1, etc. classes
             if !current_section.is_empty() && section_start_y < current_y {
-                let color_idx = (section_index - 1) % section_colors.len();
+                let color_idx = (section_index - 1) % 4;
                 let section_bg = SvgElement::Rect {
                     x: margin,
                     y: section_start_y,
@@ -151,9 +144,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
                     height: current_y - section_start_y,
                     rx: None,
                     ry: None,
-                    attrs: Attrs::new()
-                        .with_fill(section_colors[color_idx])
-                        .with_class(&format!("section section{}", color_idx)),
+                    attrs: Attrs::new().with_class(&format!("section section{}", color_idx)),
                 };
                 doc.add_element(section_bg);
             }
@@ -190,15 +181,18 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
             let bar_x = chart_start_x + start_offset * day_width;
             let bar_width = duration * day_width;
 
-            // Determine bar color based on flags (mermaid.js default theme colors)
-            let (bar_color, bar_stroke, _text_color) = if task.flags.done {
-                ("#d3d3d3", "#808080", "#000000") // lightgrey/grey for done
+            // Determine CSS class based on task flags
+            // mermaid.js uses task0-3, done0-3, crit0-3, active0-3 classes
+            // We also include "task-bar" for backward compatibility with tests
+            let class_suffix = section_index % 4;
+            let bar_class = if task.flags.done {
+                format!("task task-bar done done{}", class_suffix)
             } else if task.flags.critical {
-                ("#ff0000", "#ff8888", "#ffffff") // red for critical
+                format!("task task-bar crit crit{}", class_suffix)
             } else if task.flags.active {
-                ("#bfc7ff", "#534fbc", "#000000") // light purple for active
+                format!("task task-bar active active{}", class_suffix)
             } else {
-                ("#8a90dd", "#534fbc", "#ffffff") // mermaid.js default purple
+                format!("task task-bar task{}", class_suffix)
             };
 
             let bar_elem = SvgElement::Rect {
@@ -208,11 +202,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
                 height: task_height,
                 rx: Some(3.0),
                 ry: Some(3.0),
-                attrs: Attrs::new()
-                    .with_fill(bar_color)
-                    .with_stroke(bar_stroke)
-                    .with_stroke_width(2.0)
-                    .with_class("task-bar"),
+                attrs: Attrs::new().with_class(&bar_class),
             };
             doc.add_element(bar_elem);
 
@@ -249,11 +239,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
                             y: task_y + task_height,
                         },
                     ],
-                    attrs: Attrs::new()
-                        .with_fill("#9370DB")
-                        .with_stroke("#333333")
-                        .with_stroke_width(1.0)
-                        .with_class("milestone"),
+                    attrs: Attrs::new().with_class("milestone"),
                 };
                 doc.add_element(milestone);
             }
@@ -264,7 +250,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
 
     // Render final section background
     if !current_section.is_empty() && section_start_y < current_y {
-        let color_idx = (section_index - 1) % section_colors.len();
+        let color_idx = (section_index - 1) % 4;
         let section_bg = SvgElement::Rect {
             x: margin,
             y: section_start_y,
@@ -272,9 +258,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
             height: current_y - section_start_y,
             rx: None,
             ry: None,
-            attrs: Attrs::new()
-                .with_fill(section_colors[color_idx])
-                .with_class(&format!("section section{}", color_idx)),
+            attrs: Attrs::new().with_class(&format!("section section{}", color_idx)),
         };
         // Insert at beginning so it's behind tasks
         doc.add_element(section_bg);
@@ -297,7 +281,7 @@ fn render_timeline_axis(
 ) -> SvgElement {
     let mut children = Vec::new();
 
-    // Background
+    // Background - styled via CSS .timeline-bg class
     children.push(SvgElement::Rect {
         x,
         y,
@@ -305,20 +289,16 @@ fn render_timeline_axis(
         height,
         rx: None,
         ry: None,
-        attrs: Attrs::new()
-            .with_fill("#f8f8f8")
-            .with_stroke("#cccccc")
-            .with_stroke_width(1.0)
-            .with_class("timeline-bg"),
+        attrs: Attrs::new().with_class("timeline-bg"),
     });
 
-    // Axis line
+    // Axis line - styled via CSS .axis-line class
     children.push(SvgElement::Line {
         x1: x,
         y1: y + height,
         x2: x + width,
         y2: y + height,
-        attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
+        attrs: Attrs::new().with_class("axis-line"),
     });
 
     // Grid lines and day markers
@@ -345,10 +325,7 @@ fn render_timeline_axis(
                 y1: y + height,
                 x2: tick_x,
                 y2: y + height + chart_height,
-                attrs: Attrs::new()
-                    .with_stroke("#d3d3d3")
-                    .with_stroke_width(1.0)
-                    .with_class("tick"),
+                attrs: Attrs::new().with_class("tick"),
             });
 
             // Tick mark on axis
@@ -357,7 +334,7 @@ fn render_timeline_axis(
                 y1: y + height - 5.0,
                 x2: tick_x,
                 y2: y + height,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
+                attrs: Attrs::new().with_class("tick-mark"),
             });
 
             // Date label (YYYY-MM-DD format like mermaid.js)
@@ -388,103 +365,133 @@ fn render_timeline_axis(
     }
 }
 
-fn generate_gantt_css() -> String {
-    r#"
-.titleText {
+fn generate_gantt_css(theme: &crate::render::svg::Theme) -> String {
+    format!(
+        r#"
+.titleText {{
   text-anchor: middle;
   font-size: 18px;
-  fill: #333;
-  font-family: "trebuchet ms", verdana, arial, sans-serif;
-}
+  fill: {text_color};
+  font-family: {font_family};
+}}
 
-.section {
+.section {{
   stroke: none;
   opacity: 0.2;
-}
+}}
 
-.section0 {
-  fill: rgba(102, 102, 255, 0.49);
-}
+.section0, .section2 {{
+  fill: {section_bkg_color};
+}}
 
-.section1, .section3 {
-  fill: white;
-  opacity: 0.2;
-}
+.section1, .section3 {{
+  fill: {section_bkg_color2};
+}}
 
-.section2 {
-  fill: #fff400;
-}
-
-.sectionTitle {
+.sectionTitle {{
   text-anchor: start;
-  font-family: "trebuchet ms", verdana, arial, sans-serif;
-  fill: #333;
-}
+  font-family: {font_family};
+  fill: {text_color};
+}}
 
-.task {
+.task {{
   stroke-width: 2;
-}
+}}
 
-.task0, .task1, .task2, .task3 {
-  fill: #8a90dd;
-  stroke: #534fbc;
-}
+.task0, .task1, .task2, .task3 {{
+  fill: {task_bkg_color};
+  stroke: {task_border_color};
+}}
 
-.taskText {
+.taskText {{
   text-anchor: middle;
-  font-family: "trebuchet ms", verdana, arial, sans-serif;
-}
+  font-family: {font_family};
+}}
 
-.taskText0, .taskText1, .taskText2, .taskText3 {
-  fill: white;
-}
+.taskText0, .taskText1, .taskText2, .taskText3 {{
+  fill: {task_text_light_color};
+}}
 
-.active0, .active1, .active2, .active3 {
-  fill: #bfc7ff;
-  stroke: #534fbc;
-}
+.active0, .active1, .active2, .active3 {{
+  fill: {active_task_bkg_color};
+  stroke: {active_task_border_color};
+}}
 
-.activeText0, .activeText1, .activeText2, .activeText3 {
-  fill: black !important;
-}
+.activeText0, .activeText1, .activeText2, .activeText3 {{
+  fill: {task_text_dark_color} !important;
+}}
 
-.done0, .done1, .done2, .done3 {
-  stroke: grey;
-  fill: lightgrey;
+.done0, .done1, .done2, .done3 {{
+  fill: {done_task_bkg_color};
+  stroke: {done_task_border_color};
   stroke-width: 2;
-}
+}}
 
-.doneText0, .doneText1, .doneText2, .doneText3 {
-  fill: black !important;
-}
+.doneText0, .doneText1, .doneText2, .doneText3 {{
+  fill: {task_text_dark_color} !important;
+}}
 
-.crit0, .crit1, .crit2, .crit3 {
-  stroke: #ff8888;
-  fill: red;
+.crit0, .crit1, .crit2, .crit3 {{
+  fill: {crit_bkg_color};
+  stroke: {crit_border_color};
   stroke-width: 2;
-}
+}}
 
-.milestone {
-  transform: rotate(45deg) scale(0.8, 0.8);
-}
+.milestone {{
+  fill: {task_bkg_color};
+  stroke: {task_border_color};
+}}
 
-.grid .tick {
-  stroke: lightgrey;
+.grid .tick {{
+  stroke: {grid_color};
   opacity: 0.8;
   shape-rendering: crispEdges;
-}
+}}
 
-.grid path {
+.tick-mark {{
+  stroke: {text_color};
+  stroke-width: 1;
+}}
+
+.grid path {{
   stroke-width: 0;
-}
+}}
 
-.timeline-bg {
-  fill: #f8f8f8;
-}
+.timeline-bg {{
+  fill: {section_bkg_color2};
+  stroke: {grid_color};
+  stroke-width: 1;
+}}
 
-.axis-label {
-  fill: #666666;
-}
-"#
-    .to_string()
+.axis-line {{
+  stroke: {text_color};
+  stroke-width: 1;
+}}
+
+.axis-label {{
+  fill: {text_color};
+}}
+
+.today-line {{
+  stroke: {today_line_color};
+  stroke-width: 2;
+}}
+"#,
+        font_family = theme.font_family,
+        text_color = theme.primary_text_color,
+        section_bkg_color = theme.section_bkg_color,
+        section_bkg_color2 = theme.section_bkg_color2,
+        task_bkg_color = theme.task_bkg_color,
+        task_border_color = theme.task_border_color,
+        task_text_light_color = theme.task_text_light_color,
+        task_text_dark_color = theme.task_text_dark_color,
+        active_task_bkg_color = theme.active_task_bkg_color,
+        active_task_border_color = theme.active_task_border_color,
+        done_task_bkg_color = theme.done_task_bkg_color,
+        done_task_border_color = theme.done_task_border_color,
+        crit_bkg_color = theme.crit_bkg_color,
+        crit_border_color = theme.crit_border_color,
+        grid_color = theme.grid_color,
+        today_line_color = theme.today_line_color,
+    )
 }

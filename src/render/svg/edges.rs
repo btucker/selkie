@@ -74,10 +74,9 @@ pub fn render_edge_parts(
             let text_height = 16.0;
             let padding = 4.0;
 
-            // Background rect
+            // Background rect - uses CSS class for theming
             let bg_attrs = Attrs::new()
                 .with_class("edge-label-bg")
-                .with_fill("#e8e8e8")
                 .with_attr("fill-opacity", "0.8");
 
             label_elements.push(
@@ -365,6 +364,59 @@ mod tests {
         assert!(
             label_svg.contains("opacity") || label_svg.contains("fill-opacity"),
             "Edge label background should have opacity for translucent effect"
+        );
+    }
+
+    #[test]
+    fn test_edge_label_background_uses_css_class_not_hardcoded_color() {
+        // This test verifies that the edge label background does NOT have
+        // a hardcoded fill color, allowing CSS theme styling to work.
+        // Hardcoded inline fill attributes override CSS rules.
+        use crate::diagrams::flowchart::{EdgeStroke, FlowEdge, FlowTextType};
+        use std::collections::HashMap;
+
+        let layout_edge = LayoutEdge {
+            id: "e1".to_string(),
+            sources: vec!["a".to_string()],
+            targets: vec!["b".to_string()],
+            label: Some("label".to_string()),
+            bend_points: vec![Point::new(0.0, 0.0), Point::new(100.0, 100.0)],
+            label_position: Some(Point::new(50.0, 50.0)),
+            weight: 1,
+            reversed: false,
+            metadata: HashMap::new(),
+        };
+
+        let flow_edge = FlowEdge {
+            id: None,
+            is_user_defined_id: false,
+            start: "a".to_string(),
+            end: "b".to_string(),
+            interpolate: None,
+            edge_type: Some("arrow_point".to_string()),
+            stroke: EdgeStroke::Normal,
+            style: vec![],
+            length: None,
+            text: "label".to_string(),
+            label_type: FlowTextType::Text,
+            classes: vec![],
+            animation: None,
+            animate: None,
+        };
+
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+
+        // Get the label SVG to check for hardcoded colors
+        assert!(result.label.is_some(), "Edge should have a label element");
+        let svg = result.label.unwrap().to_svg(0);
+
+        // The edge-label-bg rect should NOT have a hardcoded fill color
+        // It should use the CSS class for theming
+        assert!(
+            !svg.contains("fill=\"#e8e8e8\""),
+            "Edge label background should not have hardcoded fill '#e8e8e8', got: {}",
+            svg
         );
     }
 }

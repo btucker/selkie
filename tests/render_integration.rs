@@ -1,7 +1,7 @@
 //! Integration tests for the rendering engine
 
 use mermaid::render::{RenderConfig, Theme};
-use mermaid::{parse, render, render_with_config};
+use mermaid::{parse, render, render_text, render_with_config};
 
 // ============================================================================
 // Output Format Tests (PNG/PDF)
@@ -310,6 +310,58 @@ fn test_render_with_dark_theme() {
 }
 
 #[test]
+fn test_render_with_forest_theme() {
+    let input = r#"flowchart LR
+    A --> B"#;
+
+    let diagram = parse(input).expect("Failed to parse flowchart");
+    let config = RenderConfig {
+        theme: Theme::forest(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with forest theme");
+
+    // Verify SVG generated with forest theme
+    assert!(svg.contains("<svg"), "SVG should have opening tag");
+    assert!(
+        svg.contains("<style>"),
+        "SVG should contain embedded styles"
+    );
+    // Forest theme should have green colors in styles
+    assert!(
+        svg.contains("#cde498") || svg.contains("#cdffb2") || svg.contains("#13540c"),
+        "Forest theme should have green color palette, got: {}",
+        &svg[..500.min(svg.len())]
+    );
+}
+
+#[test]
+fn test_render_with_base_theme() {
+    let input = r#"flowchart LR
+    A --> B"#;
+
+    let diagram = parse(input).expect("Failed to parse flowchart");
+    let config = RenderConfig {
+        theme: Theme::base(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with base theme");
+
+    // Verify SVG generated with base theme
+    assert!(svg.contains("<svg"), "SVG should have opening tag");
+    assert!(
+        svg.contains("<style>"),
+        "SVG should contain embedded styles"
+    );
+    // Base theme should have neutral warm colors
+    assert!(
+        svg.contains("#fff4dd") || svg.contains("#f4f4f4"),
+        "Base theme should have neutral warm color palette, got: {}",
+        &svg[..500.min(svg.len())]
+    );
+}
+
+#[test]
 fn test_render_with_custom_padding() {
     let input = r#"flowchart LR
     A --> B"#;
@@ -594,6 +646,40 @@ fn test_pie_chart_preserves_section_order() {
         zebra_pos < apple_pos && apple_pos < mango_pos,
         "Pie chart sections should be rendered in declaration order (Zebra, Apple, Mango), not alphabetically. Zebra={}, Apple={}, Mango={}",
         zebra_pos, apple_pos, mango_pos
+    );
+}
+
+#[test]
+fn test_pie_chart_uses_theme_colors() {
+    // Verify pie chart uses theme colors instead of hardcoded values
+    let input = r#"pie title Themed Pie
+    "A" : 50
+    "B" : 50"#;
+
+    let diagram = parse(input).expect("Failed to parse pie chart");
+
+    // Test with forest theme which has distinctive green colors
+    let config = RenderConfig {
+        theme: Theme::forest(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with forest theme");
+
+    // Forest theme pie colors include #cde498, #cdffb2
+    assert!(
+        svg.contains("#cde498") || svg.contains("#cdffb2"),
+        "Pie chart should use forest theme colors. SVG:\n{}",
+        &svg[..1000.min(svg.len())]
+    );
+
+    // Test with default theme
+    let default_svg = render(&diagram).expect("Failed to render with default theme");
+
+    // Default theme uses different colors (#ECECFF, #ffffde)
+    assert!(
+        default_svg.contains("#ECECFF") || default_svg.contains("#ffffde"),
+        "Pie chart should use default theme colors. SVG:\n{}",
+        &default_svg[..1000.min(default_svg.len())]
     );
 }
 
@@ -1632,5 +1718,330 @@ fn test_class_diagram_parent_centered_over_children() {
         animal_x,
         duck_x,
         zebra_x
+    );
+}
+
+#[test]
+fn test_gantt_uses_css_classes_not_hardcoded_colors() {
+    // Issue mermaid-rs-lg2: Gantt charts should use CSS classes for colors,
+    // not hardcoded inline fill/stroke attributes. This enables theme switching.
+    let input = r#"gantt
+    title Test
+    dateFormat YYYY-MM-DD
+    section S1
+    Task :a1, 2024-01-01, 3d"#;
+
+    let diagram = parse(input).expect("Failed to parse Gantt chart");
+    let svg = render(&diagram).expect("Failed to render Gantt chart");
+
+    // Task bars should NOT have hardcoded inline fill colors
+    // They should use CSS classes like "task" or "task-bar" that get
+    // their colors from the embedded stylesheet
+    assert!(
+        !svg.contains("fill=\"#8a90dd\""),
+        "Gantt task bars should not have hardcoded fill='#8a90dd', should use CSS class. SVG:\n{}",
+        svg
+    );
+    assert!(
+        !svg.contains("stroke=\"#534fbc\""),
+        "Gantt task bars should not have hardcoded stroke='#534fbc', should use CSS class. SVG:\n{}", svg
+    );
+}
+
+// ============================================================================
+// Directive-Based Theme Configuration Tests
+// ============================================================================
+
+#[test]
+fn test_render_text_with_dark_theme_directive() {
+    // Test that %%{init: {"theme": "dark"}}%% directive selects dark theme
+    let input = r##"%%{init: {"theme": "dark"}}%%
+flowchart LR
+    A --> B"##;
+
+    let svg = render_text(input).expect("Failed to render with directive");
+
+    // Dark theme has dark background color
+    assert!(
+        svg.contains("#1f2020"),
+        "Dark theme should have #1f2020 color"
+    );
+}
+
+#[test]
+fn test_render_text_with_forest_theme_directive() {
+    // Test that %%{init: {"theme": "forest"}}%% directive selects forest theme
+    let input = r##"%%{init: {"theme": "forest"}}%%
+flowchart LR
+    A --> B"##;
+
+    let svg = render_text(input).expect("Failed to render with directive");
+
+    // Forest theme has green colors
+    assert!(
+        svg.contains("#cde498") || svg.contains("#13540c") || svg.contains("#008000"),
+        "Forest theme should have green colors"
+    );
+}
+
+#[test]
+fn test_render_text_with_theme_variables_override() {
+    // Test that themeVariables overrides work
+    let input = r##"%%{init: {"theme": "default", "themeVariables": {"primaryColor": "#ff5500"}}}%%
+flowchart LR
+    A --> B"##;
+
+    let svg = render_text(input).expect("Failed to render with theme variables");
+
+    // Custom primary color should be used
+    assert!(
+        svg.contains("#ff5500"),
+        "Custom primaryColor should appear in SVG styles"
+    );
+}
+
+#[test]
+fn test_render_text_with_single_quotes() {
+    // Test that single quote JSON syntax works (common in mermaid.js examples)
+    let input = r#"%%{init: {'theme': 'dark'}}%%
+flowchart LR
+    A --> B"#;
+
+    let svg = render_text(input).expect("Failed to render with single quote directive");
+
+    // Dark theme colors should be present
+    assert!(
+        svg.contains("#1f2020"),
+        "Dark theme should be applied with single quote syntax"
+    );
+}
+
+#[test]
+fn test_render_text_without_directive() {
+    // Test that diagrams without directives still render correctly
+    let input = r#"flowchart LR
+    A --> B"#;
+
+    let svg = render_text(input).expect("Failed to render without directive");
+
+    // Default theme colors should be present
+    assert!(
+        svg.contains("#ECECFF") || svg.contains("#ececff"),
+        "Default theme should be used when no directive"
+    );
+}
+
+#[test]
+fn test_render_text_directive_removed_from_output() {
+    // Test that directives are stripped from final output
+    let input = r##"%%{init: {"theme": "dark"}}%%
+flowchart LR
+    A --> B"##;
+
+    let svg = render_text(input).expect("Failed to render");
+
+    // Directive should not appear in final SVG
+    assert!(
+        !svg.contains("%%{init"),
+        "Directive should be removed from output"
+    );
+}
+
+#[test]
+fn test_render_text_with_theme_css_directive() {
+    // Test that themeCSS in directive is applied
+    let input = r#"%%{init: {"themeCSS": ".node rect { rx: 15; }"}}%%
+flowchart LR
+    A --> B"#;
+
+    let svg = render_text(input).expect("Failed to render with themeCSS directive");
+
+    // Custom CSS should appear in output
+    assert!(
+        svg.contains("/* Custom CSS */"),
+        "SVG should contain custom CSS marker"
+    );
+    assert!(
+        svg.contains(".node rect { rx: 15; }"),
+        "SVG should contain custom CSS from directive"
+    );
+}
+
+// ============================================================================
+// Comprehensive Theme Tests (mermaid-rs-l27)
+// ============================================================================
+
+#[test]
+fn test_render_with_neutral_theme() {
+    let input = "flowchart TD\n    A[Start] --> B[End]";
+
+    let diagram = parse(input).expect("Failed to parse flowchart");
+    let config = RenderConfig {
+        theme: Theme::neutral(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with neutral theme");
+
+    // Neutral theme has gray-ish colors
+    assert!(svg.contains("<svg"), "Should produce SVG output");
+    // Verify neutral theme CSS is embedded
+    assert!(
+        svg.contains("<style>"),
+        "Should contain embedded CSS styling"
+    );
+}
+
+#[test]
+fn test_flowchart_nodes_use_theme_primary_color() {
+    let input = "flowchart TD\n    A[Node A] --> B[Node B]";
+
+    let diagram = parse(input).expect("Failed to parse flowchart");
+    let config = RenderConfig {
+        theme: Theme::default(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render flowchart");
+
+    // Default theme primary color is #ECECFF - should appear in CSS
+    // Nodes should use CSS class styling, not hardcoded colors
+    assert!(
+        svg.contains("class=\"node\"") || svg.contains("class=\"default\""),
+        "Nodes should have CSS class for styling"
+    );
+    // CSS should define node styling
+    assert!(
+        svg.contains(".node") || svg.contains(".default"),
+        "CSS should define node styles"
+    );
+}
+
+#[test]
+fn test_flowchart_edges_use_theme_line_color() {
+    let input = "flowchart TD\n    A --> B";
+
+    let diagram = parse(input).expect("Failed to parse flowchart");
+    let config = RenderConfig {
+        theme: Theme::forest(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with forest theme");
+
+    // Forest theme line color is #008000 (green)
+    assert!(
+        svg.contains("#008000") || svg.contains("class=\"edge\"") || svg.contains("stroke:"),
+        "Edges should use theme line color or CSS class"
+    );
+}
+
+#[test]
+fn test_sequence_diagram_uses_theme_colors() {
+    let input = r#"sequenceDiagram
+    participant A
+    participant B
+    A->>B: Hello"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let config = RenderConfig {
+        theme: Theme::dark(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with dark theme");
+
+    // Dark theme uses #1f2020 background, #cccccc text
+    assert!(svg.contains("<svg"), "Should produce SVG output");
+    // Actors should use CSS classes for theming
+    assert!(
+        svg.contains("class=\"actor\"") || svg.contains(".actor"),
+        "Actors should have CSS class styling"
+    );
+}
+
+#[test]
+fn test_theme_override_appears_in_svg() {
+    // Override primary color to a distinctive red
+    let svg = render_text(
+        r##"%%{init: {"theme": "default", "themeVariables": {"primaryColor": "#ff0000"}}}%%
+flowchart TD
+    A[Red Node]"##,
+    )
+    .expect("Failed to render with theme override");
+
+    // The red color should appear in the CSS
+    assert!(
+        svg.contains("#ff0000"),
+        "Custom primaryColor should appear in SVG CSS"
+    );
+}
+
+#[test]
+fn test_all_built_in_themes_produce_valid_svg() {
+    let themes = vec![
+        ("default", Theme::default()),
+        ("dark", Theme::dark()),
+        ("forest", Theme::forest()),
+        ("neutral", Theme::neutral()),
+    ];
+
+    for (name, theme) in themes {
+        let input = "flowchart TD\n    A --> B";
+        let diagram = parse(input).expect("Failed to parse flowchart");
+        let config = RenderConfig {
+            theme,
+            ..Default::default()
+        };
+        let svg = render_with_config(&diagram, &config).expect("Failed to render");
+
+        assert!(
+            svg.contains("<svg") && svg.contains("</svg>"),
+            "{} theme should produce valid SVG",
+            name
+        );
+        assert!(
+            svg.contains("<style>") || svg.contains("<defs>"),
+            "{} theme should include styling",
+            name
+        );
+    }
+}
+
+#[test]
+fn test_theme_css_overrides_built_in_styles() {
+    // Custom CSS should come after built-in theme CSS
+    let svg = render_text(
+        r#"%%{init: {"themeCSS": ".node rect { rx: 20; ry: 20; }"}}%%
+flowchart TD
+    A[Rounded]"#,
+    )
+    .expect("Failed to render with themeCSS");
+
+    // Custom CSS should appear in output
+    assert!(svg.contains("rx: 20"), "Custom themeCSS should be applied");
+    // Custom CSS marker should indicate it comes after theme CSS
+    assert!(
+        svg.contains("/* Custom CSS */"),
+        "Custom CSS section should be marked"
+    );
+}
+
+#[test]
+fn test_invalid_theme_name_falls_back_to_default() {
+    // Using invalid theme name should fall back to default
+    let svg = render_text(
+        r#"%%{init: {"theme": "nonexistent_theme_xyz"}}%%
+flowchart TD
+    A --> B"#,
+    )
+    .expect("Failed to render with invalid theme");
+
+    // Should still produce valid SVG
+    assert!(
+        svg.contains("<svg"),
+        "Should produce SVG even with invalid theme"
+    );
+
+    // Default theme primary color #ECECFF should be present
+    assert!(
+        svg.contains("#ECECFF") || svg.contains("#ececff"),
+        "Should use default theme colors as fallback"
     );
 }

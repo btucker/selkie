@@ -11,7 +11,7 @@ mod sequence;
 mod state;
 pub mod svg;
 
-use crate::diagrams::Diagram;
+use crate::diagrams::{detect_init, detect_type, parse, remove_directives, Diagram};
 use crate::error::{MermaidError, Result};
 use crate::layout::{self, CharacterSizeEstimator, ToLayoutGraph};
 
@@ -20,6 +20,52 @@ pub use svg::{RenderConfig, SvgRenderer, Theme};
 /// Render a diagram to SVG
 pub fn render(diagram: &Diagram) -> Result<String> {
     render_with_config(diagram, &RenderConfig::default())
+}
+
+/// Render diagram text to SVG with automatic directive processing
+///
+/// This function:
+/// 1. Detects and parses `%%{init: ...}%%` directives
+/// 2. Extracts theme configuration from directives
+/// 3. Detects the diagram type
+/// 4. Parses the diagram
+/// 5. Renders with directive-derived theme configuration
+///
+/// # Example
+///
+/// ```
+/// use mermaid::render::render_text;
+///
+/// let svg = render_text(r#"%%{init: {"theme": "dark"}}%%
+/// flowchart TD
+///     A[Start] --> B[End]
+/// "#).unwrap();
+/// assert!(svg.contains("<svg"));
+/// ```
+pub fn render_text(text: &str) -> Result<String> {
+    // Extract directive configuration
+    let directive_config = detect_init(text);
+
+    // Build render config with directive theme and themeCSS
+    let config = if let Some(ref dc) = directive_config {
+        RenderConfig {
+            theme: Theme::from_directive(dc),
+            theme_css: dc.theme_css.clone(),
+            ..RenderConfig::default()
+        }
+    } else {
+        RenderConfig::default()
+    };
+
+    // Remove directives from text before parsing
+    let clean_text = remove_directives(text);
+
+    // Detect diagram type and parse
+    let diagram_type = detect_type(&clean_text)?;
+    let diagram = parse(diagram_type, &clean_text)?;
+
+    // Render with config
+    render_with_config(&diagram, &config)
 }
 
 /// Render a diagram to SVG with custom configuration

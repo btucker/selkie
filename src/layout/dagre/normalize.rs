@@ -337,6 +337,24 @@ fn sx_for_sy(dx: f64, dy: f64, sy: f64) -> f64 {
 /// Assign node intersection points to edges
 /// This adds the start and end points where edges meet node boundaries
 pub fn assign_node_intersects(graph: &mut DagreGraph) {
+    // Calculate graph center from actual node positions (more reliable than graph.width/height)
+    let (mut min_x, mut max_x, mut min_y, mut max_y) = (f64::MAX, f64::MIN, f64::MAX, f64::MIN);
+    for node_id in graph.nodes() {
+        if let Some(node) = graph.node(&node_id) {
+            let x = node.x.unwrap_or(0.0);
+            let y = node.y.unwrap_or(0.0);
+            min_x = min_x.min(x);
+            max_x = max_x.max(x);
+            min_y = min_y.min(y);
+            max_y = max_y.max(y);
+        }
+    }
+    let graph_center_x = (min_x + max_x) / 2.0;
+    let graph_center_y = (min_y + max_y) / 2.0;
+
+    let rankdir = graph.graph().rankdir.as_str();
+    let is_horizontal = rankdir == "LR" || rankdir == "RL";
+
     // Collect edge data (v, w, points) upfront to avoid borrow issues
     let edge_data: Vec<_> = graph
         .edges()
@@ -379,21 +397,18 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
         let end_point = intersect_node(&node_w, &p2);
 
         // Add start and end points
-        points.insert(0, start_point.clone());
-        points.push(end_point.clone());
+        points.insert(0, start_point);
+        points.push(end_point);
 
         // For edges with only 2 points (no intermediate dummy nodes from normalization),
-        // add a midpoint to create the 3-point structure that curveBasis expects.
-        // The midpoint is biased toward the target's position to create natural curves
-        // that approach the target node more directly (matching mermaid.js behavior).
-        if points.len() == 2 {
-            // Bias the midpoint toward the target: X uses target's X, Y is midpoint
-            let mid_point = super::graph::Point {
-                x: end_point.x,
-                y: (start_point.y + end_point.y) / 2.0,
-            };
-            points.insert(1, mid_point);
-        }
+        // we do NOT add a midpoint. This matches dagre's behavior where short edges
+        // (between adjacent ranks) are straight lines from source boundary to target
+        // boundary. The intersection calculation already ensures edges connect at the
+        // correct points (e.g., bottom of source and top of target in TB layout).
+        //
+        // Mermaid.js renders these as straight lines with `curveBasis`, which for 2 points
+        // is just a straight line. Adding artificial midpoints caused edges to curve
+        // excessively and enter nodes from the wrong side (sides instead of top in TB).
 
         // Update edge with new points
         if let Some(edge) = graph.edge_mut(&v, &w) {

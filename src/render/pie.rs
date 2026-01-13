@@ -25,7 +25,7 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
     // Add theme styles
     if config.embed_css {
         doc.add_style(&config.theme.generate_css());
-        doc.add_style(&generate_pie_css());
+        doc.add_style(&generate_pie_css(&config.theme));
     }
 
     // Calculate total
@@ -65,20 +65,8 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
     let mut sorted_for_rendering: Vec<_> = sections_vec.clone();
     sorted_for_rendering.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
 
-    // Pie colors (mermaid.js default theme - pastel colors)
-    // These match the default theme from mermaid.js
-    let colors = [
-        "#ECECFF", // Light lavender (pie1)
-        "#ffffde", // Light yellow (pie2)
-        "#b9b9ff", // Medium lavender (pie3)
-        "#b5ff20", // Bright lime (pie4)
-        "#d4ffb2", // Light green (pie5)
-        "#ffb3e6", // Light pink (pie6)
-        "#ffd700", // Gold (pie7)
-        "#c4c4ff", // Soft purple (pie8)
-        "#ffe6cc", // Light peach (pie9)
-        "#ccffcc", // Mint (pie10)
-    ];
+    // Pie colors from theme
+    let colors: Vec<&str> = config.theme.pie_colors.iter().map(|s| s.as_str()).collect();
 
     let mut start_angle = -PI / 2.0; // Start at top (12 o'clock)
 
@@ -119,7 +107,7 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
         r: radius + 1.0,
         attrs: Attrs::new()
             .with_fill("none")
-            .with_stroke("black")
+            .with_stroke(&config.theme.pie_outer_stroke_color)
             .with_stroke_width(2.0)
             .with_class("pieOuterCircle"),
     };
@@ -161,9 +149,9 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
             d: path,
             attrs: Attrs::new()
                 .with_fill(color)
-                .with_stroke("black")
+                .with_stroke(&config.theme.pie_stroke_color)
                 .with_stroke_width(2.0)
-                .with_attr("opacity", "0.7")
+                .with_attr("opacity", &config.theme.pie_opacity)
                 .with_class("pieCircle"),
         };
         doc.add_element(slice);
@@ -261,38 +249,45 @@ fn render_legend(
     }
 }
 
-fn generate_pie_css() -> String {
-    r#"
-.pieCircle {
-  stroke: black;
+fn generate_pie_css(theme: &crate::render::svg::Theme) -> String {
+    format!(
+        r#"
+.pieCircle {{
+  stroke: {pie_stroke};
   stroke-width: 2px;
-  opacity: 0.7;
-}
+  opacity: {pie_opacity};
+}}
 
-.pieOuterCircle {
-  stroke: black;
+.pieOuterCircle {{
+  stroke: {pie_outer_stroke};
   stroke-width: 2px;
   fill: none;
-}
+}}
 
-.pieTitleText {
+.pieTitleText {{
   text-anchor: middle;
   font-size: 25px;
-  fill: black;
-  font-family: "trebuchet ms", verdana, arial, sans-serif;
-}
+  fill: {pie_title_color};
+  font-family: {font_family};
+}}
 
-.slice {
-  font-family: "trebuchet ms", verdana, arial, sans-serif;
-  fill: #333;
+.slice {{
+  font-family: {font_family};
+  fill: {pie_title_color};
   font-size: 17px;
-}
+}}
 
-.legend text {
-  fill: black;
-  font-family: "trebuchet ms", verdana, arial, sans-serif;
+.legend text {{
+  fill: {pie_legend_color};
+  font-family: {font_family};
   font-size: 17px;
-}
-"#
-    .to_string()
+}}
+"#,
+        pie_stroke = theme.pie_stroke_color,
+        pie_outer_stroke = theme.pie_outer_stroke_color,
+        pie_opacity = theme.pie_opacity,
+        pie_title_color = theme.pie_title_text_color,
+        pie_legend_color = theme.pie_legend_text_color,
+        font_family = theme.font_family,
+    )
 }

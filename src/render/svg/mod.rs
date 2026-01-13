@@ -1,5 +1,6 @@
 //! SVG rendering for mermaid diagrams
 
+pub mod color;
 mod document;
 mod edges;
 mod elements;
@@ -8,10 +9,11 @@ mod shapes;
 pub mod structure;
 mod theme;
 
+pub use color::Color;
 pub use document::SvgDocument;
 pub use elements::{Attrs, SvgElement};
 pub use structure::SvgStructure;
-pub use theme::Theme;
+pub use theme::{Theme, ThemeBuilder};
 
 use crate::diagrams::flowchart::{FlowSubGraph, FlowchartDb};
 use crate::error::Result;
@@ -26,6 +28,22 @@ pub struct RenderConfig {
     pub padding: f64,
     /// Include embedded CSS in SVG
     pub embed_css: bool,
+    /// Custom CSS to append after theme CSS (sanitized)
+    ///
+    /// Allows fine-grained style adjustments without modifying the theme.
+    /// CSS is sanitized to prevent script injection.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mermaid::render::RenderConfig;
+    ///
+    /// let config = RenderConfig {
+    ///     theme_css: Some(".node rect { rx: 10; }".to_string()),
+    ///     ..Default::default()
+    /// };
+    /// ```
+    pub theme_css: Option<String>,
 }
 
 impl Default for RenderConfig {
@@ -34,6 +52,7 @@ impl Default for RenderConfig {
             theme: Theme::default(),
             padding: 20.0,
             embed_css: true,
+            theme_css: None,
         }
     }
 }
@@ -61,7 +80,18 @@ impl SvgRenderer {
 
         // Add theme styles
         if self.config.embed_css {
-            doc.add_style(&self.config.theme.generate_css());
+            let mut css = self.config.theme.generate_css();
+
+            // Append custom CSS if provided (sanitized)
+            if let Some(ref custom_css) = self.config.theme_css {
+                let sanitized = sanitize_css(custom_css);
+                if !sanitized.is_empty() {
+                    css.push_str("\n/* Custom CSS */\n");
+                    css.push_str(&sanitized);
+                }
+            }
+
+            doc.add_style(&css);
         }
 
         // Add marker definitions
@@ -241,6 +271,47 @@ impl SvgRenderer {
 
         Some(SvgElement::group(vec![rect, label]).with_attrs(group_attrs))
     }
+}
+
+/// Sanitize CSS to prevent script injection and other attacks
+///
+/// This follows mermaid.js security patterns:
+/// - Removes `<script>` and similar tags
+/// - Blocks `javascript:` and `data:` URLs
+/// - Validates balanced braces
+/// - Removes potentially dangerous properties like `expression()`
+fn sanitize_css(css: &str) -> String {
+    // Check for dangerous patterns
+    let lower = css.to_lowercase();
+
+    // Block script tags and event handlers
+    if lower.contains("<script")
+        || lower.contains("</script")
+        || lower.contains("javascript:")
+        || lower.contains("vbscript:")
+        || lower.contains("expression(")
+        || lower.contains("behavior:")
+        || lower.contains("-moz-binding")
+    {
+        return String::new();
+    }
+
+    // Block data URLs (can contain scripts)
+    if lower.contains("url(data:") && (lower.contains("text/html") || lower.contains("image/svg")) {
+        return String::new();
+    }
+
+    // Check for balanced braces
+    let open_count = css.chars().filter(|&c| c == '{').count();
+    let close_count = css.chars().filter(|&c| c == '}').count();
+    if open_count != close_count {
+        return String::new();
+    }
+
+    // Basic validation passed, return CSS
+    // Note: This is intentionally permissive for legitimate use cases
+    // while blocking known attack vectors
+    css.to_string()
 }
 
 #[cfg(test)]
@@ -432,5 +503,128 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn test_sanitize_css_allows_valid_css() {
+        let css = ".node rect { fill: red; rx: 10; }";
+        assert_eq!(sanitize_css(css), css);
+
+        let css2 = ".edge-path { stroke-width: 2px; }";
+        assert_eq!(sanitize_css(css2), css2);
+    }
+
+    #[test]
+    fn test_sanitize_css_blocks_script_injection() {
+        // Script tags
+        assert_eq!(sanitize_css("<script>alert(1)</script>"), "");
+        assert_eq!(sanitize_css(".x { } <script>bad</script>"), "");
+
+        // JavaScript URLs
+        assert_eq!(sanitize_css("background: url(javascript:alert(1))"), "");
+
+        // VBScript
+        assert_eq!(sanitize_css("background: url(vbscript:msgbox)"), "");
+
+        // IE expression()
+        assert_eq!(sanitize_css("width: expression(alert(1))"), "");
+
+        // IE behavior
+        assert_eq!(sanitize_css("behavior: url(xss.htc)"), "");
+
+        // Firefox -moz-binding
+        assert_eq!(sanitize_css("-moz-binding: url(xss.xml)"), "");
+    }
+
+    #[test]
+    fn test_sanitize_css_blocks_dangerous_data_urls() {
+        // HTML in data URL
+        assert_eq!(sanitize_css("background: url(data:text/html,<script>)"), "");
+
+        // SVG in data URL (can contain scripts)
+        assert_eq!(
+            sanitize_css("background: url(data:image/svg+xml,<svg>)"),
+            ""
+        );
+
+        // Safe data URLs should be allowed
+        let safe = "background: url(data:image/png;base64,abc)";
+        assert_eq!(sanitize_css(safe), safe);
+    }
+
+    #[test]
+    fn test_sanitize_css_blocks_unbalanced_braces() {
+        assert_eq!(sanitize_css(".x { color: red;"), "");
+        assert_eq!(sanitize_css(".x color: red; }"), "");
+        assert_eq!(sanitize_css(".x {{ color: red; }"), "");
+    }
+
+    #[test]
+    fn test_theme_css_appended_to_output() {
+        use crate::diagrams::flowchart::parse;
+        use crate::layout;
+        use crate::layout::CharacterSizeEstimator;
+        use crate::layout::ToLayoutGraph;
+
+        let input = r#"flowchart TB
+    A[Node A] --> B[Node B]"#;
+
+        let db = parse(input).unwrap();
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+        let graph = layout::layout(graph).unwrap();
+
+        let config = RenderConfig {
+            theme_css: Some(".custom-class { fill: blue; }".to_string()),
+            ..Default::default()
+        };
+
+        let renderer = SvgRenderer::new(config);
+        let svg = renderer.render_flowchart(&db, &graph).unwrap();
+
+        // Custom CSS should appear in output
+        assert!(
+            svg.contains("/* Custom CSS */"),
+            "SVG should contain custom CSS marker"
+        );
+        assert!(
+            svg.contains(".custom-class { fill: blue; }"),
+            "SVG should contain custom CSS"
+        );
+    }
+
+    #[test]
+    fn test_theme_css_sanitized_in_output() {
+        use crate::diagrams::flowchart::parse;
+        use crate::layout;
+        use crate::layout::CharacterSizeEstimator;
+        use crate::layout::ToLayoutGraph;
+
+        let input = r#"flowchart TB
+    A[Node A]"#;
+
+        let db = parse(input).unwrap();
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+        let graph = layout::layout(graph).unwrap();
+
+        // Try to inject malicious CSS
+        let config = RenderConfig {
+            theme_css: Some("<script>alert(1)</script>".to_string()),
+            ..Default::default()
+        };
+
+        let renderer = SvgRenderer::new(config);
+        let svg = renderer.render_flowchart(&db, &graph).unwrap();
+
+        // Malicious CSS should NOT appear
+        assert!(
+            !svg.contains("<script>"),
+            "SVG should not contain script tags"
+        );
+        assert!(
+            !svg.contains("/* Custom CSS */"),
+            "Custom CSS marker should not appear when CSS was rejected"
+        );
     }
 }
