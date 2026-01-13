@@ -137,6 +137,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 cargo build --release --features all-formats
 ```
 
+## Issue Tracking
+
+This project uses [Beads](https://github.com/steveyegge/beads) for issue tracking - an AI-native issue tracker that lives directly in the repository. Issues are stored in `.beads/` and sync with git, making them accessible to both humans and AI coding agents.
+
+```bash
+# View available work
+bd ready
+
+# View issue details
+bd show <issue-id>
+
+# Update issue status
+bd update <issue-id> --status in_progress
+bd close <issue-id>
+
+# Sync with remote
+bd sync
+```
+
 ## Development
 
 This project follows test-driven development. Run the test suite:
