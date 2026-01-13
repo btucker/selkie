@@ -1,7 +1,7 @@
 //! Integration tests for the rendering engine
 
 use mermaid::render::{RenderConfig, Theme};
-use mermaid::{parse, render, render_with_config};
+use mermaid::{parse, render, render_text, render_with_config};
 
 // ============================================================================
 // Output Format Tests (PNG/PDF)
@@ -1740,5 +1740,98 @@ fn test_gantt_uses_css_classes_not_hardcoded_colors() {
     assert!(
         !svg.contains("stroke=\"#534fbc\""),
         "Gantt task bars should not have hardcoded stroke='#534fbc', should use CSS class. SVG:\n{}", svg
+    );
+}
+
+// ============================================================================
+// Directive-Based Theme Configuration Tests
+// ============================================================================
+
+#[test]
+fn test_render_text_with_dark_theme_directive() {
+    // Test that %%{init: {"theme": "dark"}}%% directive selects dark theme
+    let input = r##"%%{init: {"theme": "dark"}}%%
+flowchart LR
+    A --> B"##;
+
+    let svg = render_text(input).expect("Failed to render with directive");
+
+    // Dark theme has dark background color
+    assert!(svg.contains("#1f2020"), "Dark theme should have #1f2020 color");
+}
+
+#[test]
+fn test_render_text_with_forest_theme_directive() {
+    // Test that %%{init: {"theme": "forest"}}%% directive selects forest theme
+    let input = r##"%%{init: {"theme": "forest"}}%%
+flowchart LR
+    A --> B"##;
+
+    let svg = render_text(input).expect("Failed to render with directive");
+
+    // Forest theme has green colors
+    assert!(
+        svg.contains("#cde498") || svg.contains("#13540c") || svg.contains("#008000"),
+        "Forest theme should have green colors"
+    );
+}
+
+#[test]
+fn test_render_text_with_theme_variables_override() {
+    // Test that themeVariables overrides work
+    let input = r##"%%{init: {"theme": "default", "themeVariables": {"primaryColor": "#ff5500"}}}%%
+flowchart LR
+    A --> B"##;
+
+    let svg = render_text(input).expect("Failed to render with theme variables");
+
+    // Custom primary color should be used
+    assert!(
+        svg.contains("#ff5500"),
+        "Custom primaryColor should appear in SVG styles"
+    );
+}
+
+#[test]
+fn test_render_text_with_single_quotes() {
+    // Test that single quote JSON syntax works (common in mermaid.js examples)
+    let input = r#"%%{init: {'theme': 'dark'}}%%
+flowchart LR
+    A --> B"#;
+
+    let svg = render_text(input).expect("Failed to render with single quote directive");
+
+    // Dark theme colors should be present
+    assert!(svg.contains("#1f2020"), "Dark theme should be applied with single quote syntax");
+}
+
+#[test]
+fn test_render_text_without_directive() {
+    // Test that diagrams without directives still render correctly
+    let input = r#"flowchart LR
+    A --> B"#;
+
+    let svg = render_text(input).expect("Failed to render without directive");
+
+    // Default theme colors should be present
+    assert!(
+        svg.contains("#ECECFF") || svg.contains("#ececff"),
+        "Default theme should be used when no directive"
+    );
+}
+
+#[test]
+fn test_render_text_directive_removed_from_output() {
+    // Test that directives are stripped from final output
+    let input = r##"%%{init: {"theme": "dark"}}%%
+flowchart LR
+    A --> B"##;
+
+    let svg = render_text(input).expect("Failed to render");
+
+    // Directive should not appear in final SVG
+    assert!(
+        !svg.contains("%%{init"),
+        "Directive should be removed from output"
     );
 }

@@ -757,6 +757,42 @@ marker path {{
         }
     }
 
+    /// Create a Theme from a diagram directive configuration
+    ///
+    /// This method:
+    /// 1. Selects the base theme by name (default, dark, forest, etc.)
+    /// 2. Applies any themeVariables overrides
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mermaid::diagrams::DiagramConfig;
+    /// use mermaid::render::svg::Theme;
+    /// use std::collections::HashMap;
+    ///
+    /// let mut config = DiagramConfig::default();
+    /// config.theme = Some("dark".to_string());
+    /// config.theme_variables.insert("primaryColor".to_string(), "#ff0000".to_string());
+    ///
+    /// let theme = Theme::from_directive(&config);
+    /// assert_eq!(theme.primary_color, "#ff0000");
+    /// ```
+    pub fn from_directive(config: &crate::diagrams::DiagramConfig) -> Self {
+        // Select base theme
+        let mut theme = match config.theme.as_deref() {
+            Some("dark") => Self::dark(),
+            Some("forest") => Self::forest(),
+            Some("default") | Some("base") | None => Self::default(),
+            // Unknown theme name - fall back to default
+            _ => Self::default(),
+        };
+
+        // Apply themeVariables overrides
+        theme.apply_overrides(&config.theme_variables);
+
+        theme
+    }
+
     /// Create a custom theme with builder-style overrides
     ///
     /// Start with base colors and override specific values as needed.
@@ -972,5 +1008,56 @@ mod tests {
 
         // Non-overridden values should keep forest theme colors
         assert_eq!(theme.line_color, "#008000"); // forest green
+    }
+
+    #[test]
+    fn test_from_directive_selects_theme() {
+        use crate::diagrams::DiagramConfig;
+
+        // Test dark theme selection
+        let mut config = DiagramConfig::default();
+        config.theme = Some("dark".to_string());
+        let theme = Theme::from_directive(&config);
+        assert_eq!(theme.background, "#1f2020"); // dark background
+
+        // Test forest theme selection
+        config.theme = Some("forest".to_string());
+        let theme = Theme::from_directive(&config);
+        assert_eq!(theme.line_color, "#008000"); // forest green
+
+        // Test default theme (no theme specified)
+        config.theme = None;
+        let theme = Theme::from_directive(&config);
+        assert_eq!(theme.primary_color, "#ECECFF"); // default light purple
+    }
+
+    #[test]
+    fn test_from_directive_applies_overrides() {
+        use crate::diagrams::DiagramConfig;
+
+        let mut config = DiagramConfig::default();
+        config.theme = Some("default".to_string());
+        config.theme_variables.insert("primaryColor".to_string(), "#ff0000".to_string());
+        config.theme_variables.insert("lineColor".to_string(), "#00ff00".to_string());
+
+        let theme = Theme::from_directive(&config);
+
+        // Overrides should be applied
+        assert_eq!(theme.primary_color, "#ff0000");
+        assert_eq!(theme.line_color, "#00ff00");
+        // Other values should remain default
+        assert_eq!(theme.background, "#ffffff");
+    }
+
+    #[test]
+    fn test_from_directive_unknown_theme_falls_back() {
+        use crate::diagrams::DiagramConfig;
+
+        let mut config = DiagramConfig::default();
+        config.theme = Some("nonexistent_theme".to_string());
+
+        let theme = Theme::from_directive(&config);
+        // Should fall back to default theme
+        assert_eq!(theme.primary_color, "#ECECFF");
     }
 }

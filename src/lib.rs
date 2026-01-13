@@ -16,7 +16,7 @@ pub mod kitty;
 
 pub use config::Config;
 pub use error::{MermaidError, Result};
-pub use render::{render, render_with_config, RenderConfig, Theme};
+pub use render::{render, render_text, render_with_config, RenderConfig, Theme};
 
 /// Parse a mermaid diagram and return a diagram representation
 pub fn parse(input: &str) -> Result<diagrams::Diagram> {

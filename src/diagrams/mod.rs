@@ -25,8 +25,10 @@ pub mod treemap;
 pub mod xychart;
 
 mod detect;
+pub mod directive;
 
 pub use detect::{detect_type, DiagramType};
+pub use directive::{detect_init, remove_directives, DiagramConfig};
 
 use crate::error::Result;
 
