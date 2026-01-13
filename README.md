@@ -1,4 +1,4 @@
-# Selkie
+# Selkie (Still actively under development)
 
 A 100% Rust implementation of the [Mermaid](https://mermaid.js.org/) diagram parser and renderer.
 
@@ -6,24 +6,11 @@ A 100% Rust implementation of the [Mermaid](https://mermaid.js.org/) diagram par
 
 Selkie aims to provide a fast, native alternative to Mermaid.js for parsing and rendering diagrams. The entire implementation is written in Rust, with no JavaScript dependencies at runtime.
 
-This project has been built entirely by [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, ensuring visual and structural parity.
+This project has been built entirely by [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, toward visual and structural parity.
 
 ## Performance
 
-Selkie provides significant performance improvements compared to [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) (`mmdc`). Both are CLI tools with startup overhead, making this a fair comparison.
-
-### Run the Benchmark
-
-```bash
-# Build Selkie
-cargo build --release
-
-# Install mermaid-cli
-npm install -g @mermaid-js/mermaid-cli
-
-# Run CLI-to-CLI benchmark
-cd tools/benchmark && npm install && node cli-benchmark.mjs
-```
+Selkie provides significant performance improvements compared to [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) (`mmdc`).
 
 ### Benchmark Results
 
@@ -31,9 +18,9 @@ cd tools/benchmark && npm install && node cli-benchmark.mjs
 |---------|------|--------|---------|
 | Simple flowchart (5 nodes) | 3.21s | 7ms | **476x** |
 | Medium flowchart (15 nodes) | 4.89s | 8ms | **641x** |
+| Large flowchart (100 nodes) | 3.67s | 18ms | **203x** |
 | Sequence diagram (4 actors) | 2.86s | 6ms | **509x** |
 | Class diagram (5 classes) | 4.10s | 5ms | **797x** |
-| Large flowchart (100 nodes) | 3.67s | 18ms | **203x** |
 
 _CLI-to-CLI comparison. Median of 5 runs after 2 warmup runs._
 
@@ -246,6 +233,7 @@ selkie eval --pngs comparison_output/
 ```
 
 The eval system performs:
+
 - **Structural comparison** - Node/edge counts, labels, connections
 - **Visual similarity** - SSIM-based image comparison using [SSIM](https://en.wikipedia.org/wiki/Structural_similarity_index_measure)
 - **Report generation** - Text, JSON, HTML, and side-by-side PNG outputs
@@ -253,6 +241,7 @@ The eval system performs:
 #### Visual Comparison
 
 The `--pngs` flag generates side-by-side comparison images showing Selkie output next to the Mermaid.js reference. This requires:
+
 1. Building with `--features png` for PNG generation
 2. Playwright with Chromium for rendering Mermaid.js references (`cd tools/validation && npm install && npx playwright install chromium`)
 
@@ -309,7 +298,7 @@ Additional output formats require feature flags:
 
 | Feature | Format | Dependencies |
 |---------|--------|--------------|
-| *(none)* | SVG | *(built-in)* |
+| _(none)_ | SVG | _(built-in)_ |
 | `png` | PNG | [resvg](https://crates.io/crates/resvg) |
 | `pdf` | PDF | [svg2pdf](https://crates.io/crates/svg2pdf), resvg |
 | `kitty` | Terminal inline | resvg, [image](https://crates.io/crates/image), [base64](https://crates.io/crates/base64), libc, atty |
@@ -405,7 +394,3 @@ cargo run -- eval
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-*Built with Claude Code*
