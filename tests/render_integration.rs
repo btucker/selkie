@@ -856,7 +856,7 @@ fn test_gantt_task_labels_inside_bars() {
 
 #[test]
 fn test_gantt_task_bar_uses_mermaid_colors() {
-    // Issue: mermaid-rs-055 - Gantt task bars should use mermaid.js default purple (#8a90dd)
+    // Issue: selkie-055 - Gantt task bars should use mermaid.js default purple (#8a90dd)
     // mermaid.js uses #8a90dd fill with #534fbc stroke for task bars
     let input = r#"gantt
     title Test
@@ -879,7 +879,7 @@ fn test_gantt_task_bar_uses_mermaid_colors() {
 
 #[test]
 fn test_gantt_has_vertical_grid_lines() {
-    // Issue: mermaid-rs-yn3 - Gantt chart should have vertical grid lines
+    // Issue: selkie-yn3 - Gantt chart should have vertical grid lines
     let input = r#"gantt
     title Test
     dateFormat YYYY-MM-DD
@@ -900,7 +900,7 @@ fn test_gantt_has_vertical_grid_lines() {
 
 #[test]
 fn test_pie_chart_has_outer_circle() {
-    // Issue: mermaid-rs-vsx - Pie chart should have outer circle like mermaid.js
+    // Issue: selkie-vsx - Pie chart should have outer circle like mermaid.js
     let input = r#"pie
     "A" : 50
     "B" : 50"#;
@@ -970,7 +970,7 @@ fn test_parallelogram_renders_as_polygon() {
 
 #[test]
 fn test_class_inheritance_arrow_is_hollow_triangle() {
-    // Issue mermaid-rs-cq5: Inheritance arrows should be hollow triangular heads
+    // Issue selkie-cq5: Inheritance arrows should be hollow triangular heads
     // <|-- means "extends" and the triangle points to the parent (left side)
     let input = r#"classDiagram
     Animal <|-- Dog
@@ -1008,7 +1008,7 @@ fn test_class_inheritance_arrow_is_hollow_triangle() {
 
 #[test]
 fn test_flowchart_tb_layout_vertical_ordering() {
-    // Issue mermaid-rs-agi: In TB (top-to-bottom) layout, nodes should be laid out
+    // Issue selkie-agi: In TB (top-to-bottom) layout, nodes should be laid out
     // vertically with the first node at the top.
     // A -> B -> C should result in A at top, B in middle, C at bottom
     let input = r#"flowchart TB
@@ -1082,7 +1082,7 @@ fn test_flowchart_tb_layout_vertical_ordering() {
 
 #[test]
 fn test_flowchart_tb_layout_with_diamond_ordering() {
-    // Issue mermaid-rs-agi: In TB layout with a diamond decision node,
+    // Issue selkie-agi: In TB layout with a diamond decision node,
     // the diamond should appear BELOW the node pointing to it, not above.
     // This mirrors the issue in flowchart_full where C (Diamond Decision)
     // appears above A (Rectangle) when it should be below A and B.
@@ -1224,7 +1224,7 @@ fn test_flowchart_tb_layout_with_diamond_ordering() {
 
 #[test]
 fn test_flowchart_tb_subgraph_internal_layout() {
-    // Issue mermaid-rs-agi: When a flowchart has subgraphs, nodes within
+    // Issue selkie-agi: When a flowchart has subgraphs, nodes within
     // a subgraph should still follow the TB layout direction.
     // In flowchart_full, the "Main Flow" subgraph has nodes that should
     // be laid out vertically, but they appear horizontally.
@@ -1314,7 +1314,7 @@ fn test_flowchart_tb_subgraph_internal_layout() {
     assert!(
         y_a < y_c,
         "Within subgraph, A should be above C (Diamond): A.y={} should be < C.y={}. \
-        This is mermaid-rs-agi: nodes in subgraph not respecting TB direction.",
+        This is selkie-agi: nodes in subgraph not respecting TB direction.",
         y_a,
         y_c
     );
@@ -1325,7 +1325,7 @@ fn test_flowchart_tb_subgraph_internal_layout() {
 
 #[test]
 fn test_flowchart_full_tb_layout() {
-    // Issue mermaid-rs-agi: This is the exact flowchart_full input that shows
+    // Issue selkie-agi: This is the exact flowchart_full input that shows
     // incorrect layout - C (Diamond) appears above A (Rectangle) instead of below.
     let input = r#"flowchart TB
     subgraph main [Main Flow]
@@ -1428,7 +1428,7 @@ fn test_flowchart_full_tb_layout() {
     // In the fixed version, A.y < C.y (A is above C, which is correct for A --> B --> C)
     assert!(
         y_a < y_c,
-        "BUG mermaid-rs-agi: In flowchart_full, A (Rectangle) should be ABOVE C (Diamond). \
+        "BUG selkie-agi: In flowchart_full, A (Rectangle) should be ABOVE C (Diamond). \
         Instead, C is at y={} and A is at y={}. The Diamond Decision is being placed \
         above the Rectangle when it should be below it.",
         y_c,

@@ -1,4 +1,4 @@
-//! SVG comparison tool - analyzes differences between mermaid-rs and mermaid.js outputs
+//! SVG comparison tool - analyzes differences between selkie and mermaid.js outputs
 
 use std::collections::{HashMap, HashSet};
 use std::fs;
@@ -390,7 +390,7 @@ fn generate_html_report(results: &[ComparisonResult], output_path: &Path) -> std
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVG Comparison Report - mermaid-rs vs mermaid.js</title>
+    <title>SVG Comparison Report - selkie vs mermaid.js</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -511,7 +511,7 @@ fn generate_html_report(results: &[ComparisonResult], output_path: &Path) -> std
 </head>
 <body>
     <h1>SVG Comparison Report</h1>
-    <p>mermaid-rs vs mermaid.js (reference)</p>
+    <p>selkie vs mermaid.js (reference)</p>
 "#,
     );
 
@@ -582,7 +582,7 @@ fn generate_html_report(results: &[ComparisonResult], output_path: &Path) -> std
                 <object type="image/svg+xml" data="{}_ref.svg" width="100%">Reference SVG</object>
             </div>
             <div class="svg-panel">
-                <h4>mermaid-rs (ours)</h4>
+                <h4>selkie (ours)</h4>
                 <object type="image/svg+xml" data="{}_rs.svg" width="100%">Our SVG</object>
             </div>
         </div>
@@ -650,7 +650,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let separator = "=".repeat(70);
     println!("{}", separator);
-    println!("SVG COMPARISON: mermaid-rs vs mermaid.js");
+    println!("SVG COMPARISON: selkie vs mermaid.js");
     println!("{}", separator);
     println!();
 
@@ -671,7 +671,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let ref_path = output_dir.join(format!("{}_ref.svg", name));
 
         if !rs_path.exists() {
-            println!("{}: mermaid-rs output missing!", name);
+            println!("{}: selkie output missing!", name);
             continue;
         }
         if !ref_path.exists() {

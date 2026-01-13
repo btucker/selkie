@@ -412,39 +412,24 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
             let edge_dx = end_point.x - start_point.x;
             let edge_dy = end_point.y - start_point.y;
             let edge_len = (edge_dx * edge_dx + edge_dy * edge_dy).sqrt();
-            let offset = edge_len * 0.4; // 40% of edge length for more pronounced curves
+            let offset = edge_len * 0.35; // Control point distance
 
-            // Create 4 control points for a smooth S-curve:
-            // 1. First point: extend from start in exit perpendicular direction
+            // Create 2 control points for S-curve:
+            // cp1: extends from start in exit perpendicular direction
+            // cp2: extends from end in entry perpendicular direction
+            // This creates a smooth curve that leaves perpendicular and enters perpendicular
             let cp1 = super::graph::Point {
                 x: start_point.x + exit_nx * offset,
                 y: start_point.y + exit_ny * offset,
             };
 
-            // 2. Second point: halfway, biased toward exit direction
-            let mid_x = (start_point.x + end_point.x) / 2.0;
-            let mid_y = (start_point.y + end_point.y) / 2.0;
             let cp2 = super::graph::Point {
-                x: mid_x + exit_nx * offset * 0.3,
-                y: mid_y + exit_ny * offset * 0.3,
-            };
-
-            // 3. Third point: halfway, biased toward entry direction
-            let cp3 = super::graph::Point {
-                x: mid_x + entry_nx * offset * 0.3,
-                y: mid_y + entry_ny * offset * 0.3,
-            };
-
-            // 4. Fourth point: extend from end in entry perpendicular direction
-            let cp4 = super::graph::Point {
                 x: end_point.x + entry_nx * offset,
                 y: end_point.y + entry_ny * offset,
             };
 
             points.insert(1, cp1);
             points.insert(2, cp2);
-            points.insert(3, cp3);
-            points.insert(4, cp4);
         }
 
         // Update edge with new points

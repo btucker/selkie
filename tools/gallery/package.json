@@ -2,7 +2,7 @@
   "name": "mermaid-gallery",
   "version": "1.0.0",
   "type": "module",
-  "description": "Comparison gallery generator for mermaid-rs vs mermaid.js",
+  "description": "Comparison gallery generator for selkie vs mermaid.js",
   "scripts": {
     "generate": "node render_reference.mjs"
   },

@@ -1,8 +1,8 @@
-//! Error types for mermaid-rs
+//! Error types for selkie
 
 use thiserror::Error;
 
-/// Main error type for mermaid-rs operations
+/// Main error type for selkie operations
 #[derive(Error, Debug)]
 pub enum MermaidError {
     #[error("Parse error: {0}")]
