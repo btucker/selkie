@@ -530,12 +530,10 @@ fn parse_arrow_type(arrow: &str) -> (LineType, bool, bool) {
         } else {
             LineType::SolidOpen
         }
+    } else if is_dotted {
+        LineType::DottedOpen
     } else {
-        if is_dotted {
-            LineType::DottedOpen
-        } else {
-            LineType::SolidOpen
-        }
+        LineType::SolidOpen
     };
 
     (line_type, activate, deactivate)

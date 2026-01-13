@@ -14,6 +14,7 @@ pub enum Cardinality {
 }
 
 impl Cardinality {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_uppercase().as_str() {
             "ZERO_OR_ONE" | "ZERO OR ONE" | "|o" | "o|" => Self::ZeroOrOne,
@@ -45,6 +46,7 @@ pub enum Identification {
 }
 
 impl Identification {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_uppercase().as_str() {
             "IDENTIFYING" | "--" => Self::Identifying,
@@ -69,6 +71,7 @@ pub enum AttributeKey {
 }
 
 impl AttributeKey {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_uppercase().as_str() {
             "PK" => Some(Self::PrimaryKey),
@@ -208,6 +211,7 @@ pub enum Direction {
 }
 
 impl Direction {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_uppercase().as_str() {
             "BT" => Self::BottomToTop,

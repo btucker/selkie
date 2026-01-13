@@ -11,7 +11,9 @@
 //! # References
 //! - <https://sw.kovidgoyal.net/kitty/graphics-protocol/>
 
-use std::io::{self, Read, Write};
+#[cfg(unix)]
+use std::io::Read;
+use std::io::{self, Write};
 use std::sync::OnceLock;
 
 use base64::Engine;
@@ -229,6 +231,7 @@ fn query_terminal_color(osc_code: u8) -> Option<BackgroundColor> {
 }
 
 /// Parse RGB color from terminal response.
+#[cfg(unix)]
 fn parse_rgb_response(response: &str) -> Option<BackgroundColor> {
     // Look for rgb:RRRR/GGGG/BBBB pattern
     let rgb_start = response.find("rgb:")?;
@@ -254,6 +257,7 @@ fn parse_rgb_response(response: &str) -> Option<BackgroundColor> {
 }
 
 /// Try to read background color from Ghostty config file.
+#[cfg(unix)]
 fn get_ghostty_background() -> Option<BackgroundColor> {
     let home = std::env::var("HOME").ok()?;
     let config_path = format!("{}/.config/ghostty/config", home);
@@ -514,6 +518,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(unix)]
     fn test_parse_rgb_response_standard() {
         // Standard 16-bit response format
         let response = "\x1b]11;rgb:1e1e/1e1e/1e1e\x1b\\";
@@ -524,6 +529,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(unix)]
     fn test_parse_rgb_response_white() {
         let response = "\x1b]11;rgb:ffff/ffff/ffff\x1b\\";
         let color = parse_rgb_response(response).unwrap();
@@ -533,6 +539,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(unix)]
     fn test_parse_rgb_response_invalid() {
         // No rgb: prefix
         assert!(parse_rgb_response("invalid response").is_none());

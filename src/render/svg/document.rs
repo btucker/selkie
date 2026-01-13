@@ -1,6 +1,7 @@
 //! SVG document builder
 
 use super::elements::{Attrs, SvgElement};
+use std::fmt;
 
 /// SVG document builder
 #[derive(Debug, Clone)]
@@ -92,13 +93,18 @@ impl SvgDocument {
     pub fn add_node(&mut self, element: SvgElement) {
         self.nodes.push(element);
     }
+}
 
-    /// Convert to SVG string
-    pub fn to_string(&self) -> String {
-        let mut result = String::new();
+impl Default for SvgDocument {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
+impl fmt::Display for SvgDocument {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // XML declaration
-        result.push_str("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        writeln!(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")?;
 
         // SVG opening tag
         let view_box_str = self
@@ -106,63 +112,51 @@ impl SvgDocument {
             .map(|(x, y, w, h)| format!(" viewBox=\"{} {} {} {}\"", x, y, w, h))
             .unwrap_or_default();
 
-        result.push_str(&format!(
-            "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{}\" height=\"{}\"{} class=\"mermaid\">\n",
+        writeln!(
+            f,
+            "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{}\" height=\"{}\"{} class=\"mermaid\">",
             self.width, self.height, view_box_str
-        ));
+        )?;
 
         // Styles
         if !self.styles.is_empty() {
-            result.push_str("  <style>\n");
+            writeln!(f, "  <style>")?;
             for style in &self.styles {
-                result.push_str(style);
-                result.push('\n');
+                writeln!(f, "{}", style)?;
             }
-            result.push_str("  </style>\n");
+            writeln!(f, "  </style>")?;
         }
 
         // Defs
         if !self.defs.is_empty() {
-            result.push_str("  <defs>\n");
+            writeln!(f, "  <defs>")?;
             for def in &self.defs {
-                result.push_str(&def.to_svg(2));
-                result.push('\n');
+                writeln!(f, "{}", def.to_svg(2))?;
             }
-            result.push_str("  </defs>\n");
+            writeln!(f, "  </defs>")?;
         }
 
         // Content group (root)
-        result.push_str("  <g class=\"root\">\n");
+        writeln!(f, "  <g class=\"root\">")?;
 
-        // Container groups in mermaid.js order: clusters, edgePaths, edgeLabels, nodes
-        // This ensures proper layering (clusters behind, nodes on top)
-        self.render_container_group(&mut result, "clusters", &self.clusters);
-        self.render_container_group(&mut result, "edgePaths", &self.edge_paths);
-        self.render_container_group(&mut result, "edgeLabels", &self.edge_labels);
-        self.render_container_group(&mut result, "nodes", &self.nodes);
-
-        // Legacy elements (for backwards compatibility)
-        for element in &self.elements {
-            result.push_str(&element.to_svg(2));
-            result.push('\n');
+        // Container groups in mermaid.js order
+        for (class, elements) in [
+            ("clusters", &self.clusters),
+            ("edgePaths", &self.edge_paths),
+            ("edgeLabels", &self.edge_labels),
+            ("nodes", &self.nodes),
+        ] {
+            let group =
+                SvgElement::group(elements.to_vec()).with_attrs(Attrs::new().with_class(class));
+            writeln!(f, "{}", group.to_svg(2))?;
         }
 
-        result.push_str("  </g>\n");
-        result.push_str("</svg>\n");
+        // Legacy elements
+        for element in &self.elements {
+            writeln!(f, "{}", element.to_svg(2))?;
+        }
 
-        result
-    }
-
-    /// Render a container group with elements
-    fn render_container_group(&self, result: &mut String, class: &str, elements: &[SvgElement]) {
-        let group = SvgElement::group(elements.to_vec()).with_attrs(Attrs::new().with_class(class));
-        result.push_str(&group.to_svg(2));
-        result.push('\n');
-    }
-}
-
-impl Default for SvgDocument {
-    fn default() -> Self {
-        Self::new()
+        writeln!(f, "  </g>")?;
+        writeln!(f, "</svg>")
     }
 }

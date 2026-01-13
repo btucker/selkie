@@ -67,7 +67,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_person_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     C4ShapeType::Person,
@@ -78,7 +78,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_person_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     C4ShapeType::PersonExt,
@@ -90,7 +90,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_system_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     C4ShapeType::System,
@@ -101,7 +101,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_system_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     C4ShapeType::SystemDb,
@@ -112,7 +112,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_system_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     C4ShapeType::SystemQueue,
@@ -123,7 +123,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_system_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     C4ShapeType::SystemExt,
@@ -134,7 +134,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_system_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     C4ShapeType::SystemDbExt,
@@ -145,7 +145,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_system_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     C4ShapeType::SystemQueueExt,
@@ -157,7 +157,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_container_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -169,7 +169,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_container_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -181,7 +181,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_container_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -193,7 +193,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_container_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -205,7 +205,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_container_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -217,7 +217,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_container_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -230,7 +230,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_component_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -242,7 +242,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_component_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -254,7 +254,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_component_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -266,7 +266,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_component_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -278,7 +278,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_component_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -290,7 +290,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if !attrs.is_empty() {
                 db.add_component_with_type(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -316,7 +316,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             let attrs = extract_all_attributes(pair);
             if attrs.len() >= 2 {
                 db.add_relationship(
-                    &attrs.get(0).cloned().unwrap_or_default(),
+                    &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
                     &attrs.get(3).cloned().unwrap_or_default(),
@@ -349,7 +349,7 @@ fn process_boundary(
     }
 
     // Start the boundary
-    let alias = attrs.get(0).cloned().unwrap_or_default();
+    let alias = attrs.first().cloned().unwrap_or_default();
     let label = attrs.get(1).cloned().unwrap_or_default();
     db.start_boundary(&alias, &label, boundary_type);
 

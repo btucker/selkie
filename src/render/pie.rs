@@ -54,7 +54,7 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
     // sorted by value descending. Legend stays in original order.
 
     // Step 1: Create color mapping based on original order
-    let sections_vec: Vec<_> = sections.iter().cloned().collect();
+    let sections_vec: Vec<_> = sections.to_vec();
     let label_to_color_index: std::collections::HashMap<_, _> = sections_vec
         .iter()
         .enumerate()

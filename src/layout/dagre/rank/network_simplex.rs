@@ -35,6 +35,12 @@ pub struct TreeNode {
     pub parent: Option<String>,
 }
 
+impl Default for SpanningTree {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SpanningTree {
     pub fn new() -> Self {
         Self {
@@ -240,7 +246,7 @@ fn dfs_assign(tree: &mut SpanningTree, v: &str, parent: Option<&str>, counter: &
     // Visit children
     let neighbors: Vec<String> = tree.neighbors(v);
     for w in neighbors {
-        if parent.map_or(true, |p| p != w) {
+        if parent.is_none_or(|p| p != w) {
             dfs_assign(tree, &w, Some(v), counter);
         }
     }
@@ -337,7 +343,7 @@ fn is_descendant(tree: &SpanningTree, v: &str, u: &str) -> bool {
 pub fn leave_edge(tree: &SpanningTree) -> Option<(String, String)> {
     for (v, w) in tree.edges_list() {
         if let Some(edge) = tree.edge(v, w) {
-            if edge.cutvalue.map_or(false, |cv| cv < 0) {
+            if edge.cutvalue.is_some_and(|cv| cv < 0) {
                 return Some((v.to_string(), w.to_string()));
             }
         }

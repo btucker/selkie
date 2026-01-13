@@ -137,11 +137,8 @@ pub fn undo(graph: &mut DagreGraph) {
         // Collect points from dummy nodes
         let mut points = Vec::new();
 
-        loop {
-            let node = match graph.node(&current) {
-                Some(n) => n.clone(),
-                None => break,
-            };
+        while let Some(n) = graph.node(&current) {
+            let node = n.clone();
 
             // Check if this is still a dummy node
             if node.dummy.is_none() {
@@ -202,7 +199,7 @@ pub fn intersect_node(node: &NodeLabel, p: &super::graph::Point) -> super::graph
 pub fn intersect_rect(node: &NodeLabel, p: &super::graph::Point) -> super::graph::Point {
     let (cx, cy) = match (node.x, node.y) {
         (Some(x), Some(y)) => (x, y),
-        _ => return p.clone(),
+        _ => return *p,
     };
 
     let w = node.width / 2.0;
@@ -239,7 +236,7 @@ pub fn intersect_rect(node: &NodeLabel, p: &super::graph::Point) -> super::graph
 pub fn intersect_diamond(node: &NodeLabel, p: &super::graph::Point) -> super::graph::Point {
     let (cx, cy) = match (node.x, node.y) {
         (Some(x), Some(y)) => (x, y),
-        _ => return p.clone(),
+        _ => return *p,
     };
 
     let w = node.width / 2.0;
@@ -271,7 +268,7 @@ pub fn intersect_diamond(node: &NodeLabel, p: &super::graph::Point) -> super::gr
 pub fn intersect_circle(node: &NodeLabel, p: &super::graph::Point) -> super::graph::Point {
     let (cx, cy) = match (node.x, node.y) {
         (Some(x), Some(y)) => (x, y),
-        _ => return p.clone(),
+        _ => return *p,
     };
 
     // For circles, use the smaller of width/height as diameter
@@ -296,7 +293,7 @@ pub fn intersect_circle(node: &NodeLabel, p: &super::graph::Point) -> super::gra
 pub fn intersect_ellipse(node: &NodeLabel, p: &super::graph::Point) -> super::graph::Point {
     let (cx, cy) = match (node.x, node.y) {
         (Some(x), Some(y)) => (x, y),
-        _ => return p.clone(),
+        _ => return *p,
     };
 
     let rx = node.width / 2.0;
@@ -382,62 +379,72 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
         let end_point = intersect_node(&node_w, &p2);
 
         // Add start and end points
-        points.insert(0, start_point.clone());
-        points.push(end_point.clone());
+        points.insert(0, start_point);
+        points.push(end_point);
 
         // For edges with only 2 points (no intermediate dummy nodes),
         // add intermediate points to create smooth curved edges like mermaid.js
-        // mermaid.js uses "elbow" style routing with L-shaped waypoints that get
-        // smoothed by d3's curveBasis into flowing S-curves
+        // Edges should leave perpendicular to their exit side and enter perpendicular to entry side
         if points.len() == 2 {
-            let dx = end_point.x - start_point.x;
-            let dy = end_point.y - start_point.y;
+            // Get node centers
+            let src_cx = node_v.x.unwrap_or(0.0);
+            let src_cy = node_v.y.unwrap_or(0.0);
+            let tgt_cx = node_w.x.unwrap_or(0.0);
+            let tgt_cy = node_w.y.unwrap_or(0.0);
 
-            // For diagonal edges, create elbow-style waypoints
-            // The B-spline interpolation will smooth these into flowing curves
-            // mermaid.js curves approach the target horizontally - this creates the S-curve
-            if dx.abs() > 10.0 && dy.abs() > 10.0 {
-                // First intermediate: slight diagonal from start (easing out)
-                let cp1 = super::graph::Point {
-                    x: start_point.x + dx * 0.15,
-                    y: start_point.y + dy * 0.08,
-                };
+            // Compute exit direction (from source center to intersection point)
+            // This gives us the perpendicular direction to the exit side
+            let exit_dx = start_point.x - src_cx;
+            let exit_dy = start_point.y - src_cy;
+            let exit_len = (exit_dx * exit_dx + exit_dy * exit_dy).sqrt().max(1.0);
+            let exit_nx = exit_dx / exit_len;
+            let exit_ny = exit_dy / exit_len;
 
-                // Second intermediate: middle of the curve (steeper diagonal)
-                let cp2 = super::graph::Point {
-                    x: start_point.x + dx * 0.45,
-                    y: start_point.y + dy * 0.5,
-                };
+            // Compute entry direction (from target center to intersection point)
+            // This gives us the perpendicular direction to the entry side
+            let entry_dx = end_point.x - tgt_cx;
+            let entry_dy = end_point.y - tgt_cy;
+            let entry_len = (entry_dx * entry_dx + entry_dy * entry_dy).sqrt().max(1.0);
+            let entry_nx = entry_dx / entry_len;
+            let entry_ny = entry_dy / entry_len;
 
-                // Third intermediate: transition toward horizontal
-                let cp3 = super::graph::Point {
-                    x: start_point.x + dx * 0.75,
-                    y: start_point.y + dy * 0.92,
-                };
+            // Distance for control point offset (proportional to edge length)
+            let edge_dx = end_point.x - start_point.x;
+            let edge_dy = end_point.y - start_point.y;
+            let edge_len = (edge_dx * edge_dx + edge_dy * edge_dy).sqrt();
+            let offset = edge_len * 0.4; // 40% of edge length for more pronounced curves
 
-                // Fourth intermediate: approach end nearly horizontally
-                let cp4 = super::graph::Point {
-                    x: end_point.x - dx * 0.08,
-                    y: end_point.y,
-                };
+            // Create 4 control points for a smooth S-curve:
+            // 1. First point: extend from start in exit perpendicular direction
+            let cp1 = super::graph::Point {
+                x: start_point.x + exit_nx * offset,
+                y: start_point.y + exit_ny * offset,
+            };
 
-                points.insert(1, cp1);
-                points.insert(2, cp2);
-                points.insert(3, cp3);
-                points.insert(4, cp4);
-            } else {
-                // For mostly straight edges, add collinear intermediate points
-                let cp1 = super::graph::Point {
-                    x: start_point.x + dx * 0.33,
-                    y: start_point.y + dy * 0.33,
-                };
-                let cp2 = super::graph::Point {
-                    x: start_point.x + dx * 0.67,
-                    y: start_point.y + dy * 0.67,
-                };
-                points.insert(1, cp1);
-                points.insert(2, cp2);
-            }
+            // 2. Second point: halfway, biased toward exit direction
+            let mid_x = (start_point.x + end_point.x) / 2.0;
+            let mid_y = (start_point.y + end_point.y) / 2.0;
+            let cp2 = super::graph::Point {
+                x: mid_x + exit_nx * offset * 0.3,
+                y: mid_y + exit_ny * offset * 0.3,
+            };
+
+            // 3. Third point: halfway, biased toward entry direction
+            let cp3 = super::graph::Point {
+                x: mid_x + entry_nx * offset * 0.3,
+                y: mid_y + entry_ny * offset * 0.3,
+            };
+
+            // 4. Fourth point: extend from end in entry perpendicular direction
+            let cp4 = super::graph::Point {
+                x: end_point.x + entry_nx * offset,
+                y: end_point.y + entry_ny * offset,
+            };
+
+            points.insert(1, cp1);
+            points.insert(2, cp2);
+            points.insert(3, cp3);
+            points.insert(4, cp4);
         }
 
         // Update edge with new points

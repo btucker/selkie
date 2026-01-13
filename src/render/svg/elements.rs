@@ -61,6 +61,7 @@ impl Attrs {
     }
 
     /// Convert to SVG attribute string
+    #[allow(clippy::inherent_to_string)]
     pub fn to_string(&self) -> String {
         let mut result = String::new();
 

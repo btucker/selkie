@@ -351,15 +351,15 @@ fn parse_arrow(arrow: &str) -> (String, EdgeStroke, u32) {
             // Count consecutive dashes or tildes
             let dash_count = arrow.chars().filter(|&c| c == '-' || c == '~').count();
             // Minimum length is 1, max is 3 for display purposes
-            (dash_count.saturating_sub(1).max(1).min(3)) as u32
+            (dash_count.saturating_sub(1).clamp(1, 3)) as u32
         }
         EdgeStroke::Thick => {
             let eq_count = arrow.chars().filter(|&c| c == '=').count();
-            (eq_count.saturating_sub(1).max(1).min(3)) as u32
+            (eq_count.saturating_sub(1).clamp(1, 3)) as u32
         }
         EdgeStroke::Dotted => {
             let dot_count = arrow.chars().filter(|&c| c == '.').count();
-            (dot_count.max(1).min(3)) as u32
+            (dot_count.clamp(1, 3)) as u32
         }
     };
 
@@ -412,6 +412,7 @@ impl FlowchartDb {
     }
 
     /// Add a vertex to the flowchart
+    #[allow(clippy::too_many_arguments)]
     pub fn add_vertex(
         &mut self,
         id: &str,
@@ -677,7 +678,7 @@ impl FlowchartDb {
         text: Option<&str>,
         vertex_type: Option<FlowVertexType>,
     ) {
-        let text_obj = text.map(|t| FlowText::new(t));
+        let text_obj = text.map(FlowText::new);
         self.add_vertex(
             id,
             text_obj,
@@ -710,7 +711,7 @@ impl FlowchartDb {
         let (edge_type, stroke, length) = parse_arrow(arrow);
 
         let flow_link = FlowLink {
-            text: text.map(|t| FlowText::new(t)),
+            text: text.map(FlowText::new),
             id: link_id.map(String::from),
             link_type: Some(edge_type),
             stroke,

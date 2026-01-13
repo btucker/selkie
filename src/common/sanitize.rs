@@ -168,7 +168,7 @@ fn process_set(input: &str) -> String {
 
     // If there is an odd number of tildes, and the input starts with a tilde,
     // we need to remove it and add it back in later
-    if tilde_count % 2 != 0 && input.starts_with('~') {
+    if !tilde_count.is_multiple_of(2) && input.starts_with('~') {
         input = input[1..].to_string();
         has_starting_tilde = true;
     }

@@ -254,6 +254,7 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
 }
 
 /// Render an entity box with attributes
+#[allow(clippy::too_many_arguments)]
 fn render_entity(
     entity: &Entity,
     x: f64,
@@ -351,6 +352,7 @@ fn render_entity(
 }
 
 /// Render a relationship line between two entities
+#[allow(clippy::too_many_arguments)]
 fn render_relationship(
     x1: f64,
     y1: f64,

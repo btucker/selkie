@@ -154,7 +154,7 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
                             Some(Point::new((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0));
                     } else {
                         // Use the middle point if odd number
-                        edge.label_position = Some(edge.bend_points[mid_idx].clone());
+                        edge.label_position = Some(edge.bend_points[mid_idx]);
                     }
                 }
             }

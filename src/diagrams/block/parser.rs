@@ -334,7 +334,7 @@ fn process_class_def(db: &mut BlockDb, pair: pest::iterators::Pair<Rule>) -> Res
                 // Split by semicolon or comma
                 styles = inner
                     .as_str()
-                    .split(|c| c == ';' || c == ',')
+                    .split([';', ','])
                     .map(|s| s.trim().to_string())
                     .filter(|s| !s.is_empty())
                     .collect();
@@ -518,7 +518,7 @@ mod tests {
             assert!(result.is_ok(), "Parse error: {:?}", result.err());
             let db = result.unwrap();
             // Should have the composite and the inner block
-            assert!(db.get_blocks().len() >= 1);
+            assert!(!db.get_blocks().is_empty());
         }
 
         #[test]

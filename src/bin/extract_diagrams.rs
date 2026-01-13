@@ -99,8 +99,7 @@ fn extract_diagrams_from_file(filepath: &Path) -> Vec<DiagramEntry> {
         let pos = cap.get(0).unwrap().start();
         let test_name = test_positions
             .iter()
-            .filter(|(p, _)| *p < pos)
-            .last()
+            .rfind(|(p, _)| *p < pos)
             .map(|(_, name)| name.clone())
             .unwrap_or_else(|| "unknown".to_string());
 

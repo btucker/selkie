@@ -15,6 +15,7 @@ pub enum DurationUnit {
 
 impl DurationUnit {
     /// Parse a duration unit from a string suffix
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             "ms" => Some(Self::Milliseconds),
@@ -409,8 +410,7 @@ impl GanttDb {
             ("m", "m"),
             ("s", "s"),
         ] {
-            if s.ends_with(suffix) {
-                let num_str = &s[..s.len() - suffix.len()];
+            if let Some(num_str) = s.strip_suffix(suffix) {
                 if let Ok(value) = num_str.parse::<f64>() {
                     return (value, unit);
                 }
@@ -450,7 +450,7 @@ impl GanttDb {
         }
 
         if let Ok(date) = NaiveDate::parse_from_str(s, &chrono_format) {
-            return Some(date.and_hms_opt(0, 0, 0)?);
+            return date.and_hms_opt(0, 0, 0);
         }
 
         None
@@ -512,7 +512,7 @@ impl GanttDb {
                                 .and_hms_opt(0, 0, 0);
                             latest_end = Some(match latest_end {
                                 Some(current) => today.map(|t| current.max(t)).unwrap_or(current),
-                                None => today.unwrap_or_else(|| NaiveDateTime::default()),
+                                None => today.unwrap_or_default(),
                             });
                         }
                     }
@@ -526,13 +526,11 @@ impl GanttDb {
                 }
 
                 // If no start time yet and no after deps, use previous task's end
-                if self.tasks[i].start_time.is_none() && after_ids.is_empty() {
-                    if i > 0 {
-                        // Find the previous task in the same section or overall
-                        if let Some(prev_end) = self.tasks[i - 1].end_time {
-                            self.tasks[i].start_time = Some(prev_end);
-                            changed = true;
-                        }
+                if self.tasks[i].start_time.is_none() && after_ids.is_empty() && i > 0 {
+                    // Find the previous task in the same section or overall
+                    if let Some(prev_end) = self.tasks[i - 1].end_time {
+                        self.tasks[i].start_time = Some(prev_end);
+                        changed = true;
                     }
                 }
 
@@ -642,17 +640,11 @@ impl GanttDb {
                 "milestone" => result.flags.milestone = true,
                 _ => {
                     // Check if it's an "after" reference
-                    if part.starts_with("after ") {
-                        let deps = part[6..]
-                            .split_whitespace()
-                            .map(|s| s.to_string())
-                            .collect();
+                    if let Some(stripped) = part.strip_prefix("after ") {
+                        let deps = stripped.split_whitespace().map(|s| s.to_string()).collect();
                         result.after = deps;
-                    } else if part.starts_with("until ") {
-                        let deps = part[6..]
-                            .split_whitespace()
-                            .map(|s| s.to_string())
-                            .collect();
+                    } else if let Some(stripped) = part.strip_prefix("until ") {
+                        let deps = stripped.split_whitespace().map(|s| s.to_string()).collect();
                         result.until = deps;
                     } else if self.looks_like_date(part) {
                         // It's a date
@@ -708,8 +700,7 @@ impl GanttDb {
 
         // Check for duration patterns: 1d, 2w, 3h, 4m, 5s, 6ms
         for suffix in ["ms", "w", "d", "h", "m", "s"] {
-            if s.ends_with(suffix) {
-                let num_part = &s[..s.len() - suffix.len()];
+            if let Some(num_part) = s.strip_suffix(suffix) {
                 if num_part.parse::<f64>().is_ok() {
                     return true;
                 }
