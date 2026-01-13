@@ -1,0 +1,18 @@
+#!/bin/sh
+# Pre-commit hook to run rustfmt and clippy checks
+
+set -e
+
+echo "Running cargo fmt --check..."
+if ! cargo fmt --check; then
+    echo "Error: Code is not formatted. Run 'cargo fmt' to fix."
+    exit 1
+fi
+
+echo "Running cargo clippy..."
+if ! cargo clippy --features all-formats -- -D warnings; then
+    echo "Error: Clippy found warnings. Fix them before committing."
+    exit 1
+fi
+
+echo "Pre-commit checks passed!"
