@@ -294,7 +294,6 @@ pub fn write_comparison_pngs(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     #[cfg(feature = "png")]
