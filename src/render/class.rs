@@ -307,10 +307,18 @@ fn render_class_box(
     let mut children = Vec::new();
 
     // Background shape (path to match mermaid structure)
+    let box_path = rounded_rect_path(x, y, width, height, 3.0, 3.0);
     children.push(SvgElement::Path {
-        d: rounded_rect_path(x, y, width, height, 3.0, 3.0),
+        d: box_path.clone(),
         attrs: Attrs::new()
             .with_fill("#ECECFF")
+            .with_stroke("none")
+            .with_class("class-box-bg"),
+    });
+    children.push(SvgElement::Path {
+        d: box_path,
+        attrs: Attrs::new()
+            .with_fill("none")
             .with_stroke("#333333")
             .with_stroke_width(1.0)
             .with_class("class-box"),
@@ -371,19 +379,22 @@ fn render_class_box(
         "font-weight: bolder;",
     ));
 
-    current_y = y + header_height;
+    let divider1_y = y + header_height;
+    let members_section_height = (class.members.len().max(1) as f64) * member_height + padding;
+    let divider2_y = divider1_y + members_section_height;
 
-    // Separator line after name
-    if !class.members.is_empty() || !class.methods.is_empty() {
-        children.push(SvgElement::Path {
-            d: line_path(x, current_y, x + width, current_y),
-            attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
-        });
-    }
+    // Divider after name (always present)
+    children.push(SvgElement::Path {
+        d: line_path(x, divider1_y, x + width, divider1_y),
+        attrs: Attrs::new()
+            .with_stroke("#333333")
+            .with_stroke_width(1.0)
+            .with_class("class-divider"),
+    });
 
     // Attributes section
     if !class.members.is_empty() {
-        current_y += padding;
+        current_y = divider1_y + padding;
         for member in &class.members {
             current_y += member_height;
             let display = member.get_display_details();
@@ -405,20 +416,18 @@ fn render_class_box(
         }
     }
 
-    // Separator line between attributes and methods
-    if !class.members.is_empty() && !class.methods.is_empty() {
-        current_y += padding / 2.0;
-        children.push(SvgElement::Path {
-            d: line_path(x, current_y, x + width, current_y),
-            attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
-        });
-    }
+    // Divider between attributes and methods (always present)
+    children.push(SvgElement::Path {
+        d: line_path(x, divider2_y, x + width, divider2_y),
+        attrs: Attrs::new()
+            .with_stroke("#333333")
+            .with_stroke_width(1.0)
+            .with_class("class-divider"),
+    });
 
     // Methods section
     if !class.methods.is_empty() {
-        if class.members.is_empty() {
-            current_y += padding;
-        }
+        current_y = divider2_y + padding;
         for method in &class.methods {
             current_y += member_height;
             let display = method.get_display_details();
@@ -926,7 +935,14 @@ fn create_marker_pair(
 fn generate_class_css() -> String {
     r#"
 .class-box {
+  stroke: #333333;
+}
+
+.class-box-bg {
   fill: #ECECFF;
+}
+
+.class-divider {
   stroke: #333333;
 }
 
@@ -1126,5 +1142,23 @@ mod tests {
         assert!(svg.contains("<svg"), "Should be valid SVG");
         assert!(svg.contains("class-node"), "Should contain class nodes");
         assert!(svg.contains("relation"), "Should contain relations");
+    }
+
+    #[test]
+    fn test_empty_class_has_background_and_dividers() {
+        let mut db = ClassDb::new();
+        db.add_class("Solo");
+
+        let config = RenderConfig::default();
+        let svg = render_class(&db, &config).expect("Render failed");
+
+        assert!(
+            svg.contains("class-box-bg"),
+            "Should render background path for class box"
+        );
+        assert!(
+            svg.matches("class-divider").count() >= 2,
+            "Should render two divider paths for empty class"
+        );
     }
 }
