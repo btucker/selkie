@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="605.5999999999999" height="206.8" viewBox="-20 -20 605.5999999999999 206.8" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="575.5999999999999" height="206.8" viewBox="-20 -20 575.5999999999999 206.8" class="mermaid">
   <style>
 
 .mermaid {
@@ -109,51 +109,51 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 80.00 63.40 C 88.33 63.40, 96.67 63.40, 105.00 63.40 C 113.33 63.40, 121.67 63.40, 130.00 63.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 80 63.400000000000006 L 130 63.400000000000006" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 232.36 50.56 C 249.97 45.51, 267.59 40.45, 286.26 36.04 C 304.93 31.63, 324.67 27.86, 344.40 24.09" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 232.2502543234995 50.45025432349949 L 314.4 26.6246719160105" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-B-D-0">
-        <path d="M 232.36 76.24 C 249.97 81.29, 267.59 86.35, 283.06 90.15 C 298.53 93.95, 311.87 96.49, 325.20 99.04" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 232.2502543234995 76.34974567650052 L 295.2 94.60682414698164" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-C-E-0">
-        <path d="M 395.60 25.14 C 410.33 28.56, 425.07 31.98, 436.60 35.80 C 448.13 39.61, 456.47 43.82, 464.80 48.04" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 365.6 28.237699680511188 L 434.79999999999995 52.667731629392975" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-D-E-0">
-        <path d="M 414.80 97.20 C 423.13 95.27, 431.47 93.33, 439.80 90.26 C 448.13 87.19, 456.47 82.98, 464.80 78.76" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 384.8 91.78402555910543 L 434.79999999999995 74.13226837060704" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-B-C-0">
-        <rect x="269.2" y="55.400000000000006" width="32" height="20" class="edge-label-bg" fill-opacity="0.8"/>
-        <text x="285.2" y="65.4" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+        <rect x="257.3251271617497" y="28.537463119754996" width="32" height="20" class="edge-label-bg" fill-opacity="0.8"/>
+        <text x="273.3251271617497" y="38.537463119754996" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-B-D-0">
-        <rect x="273.2" y="107.4" width="24" height="20" class="edge-label-bg" fill-opacity="0.8"/>
-        <text x="285.2" y="117.4" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <rect x="251.72512716174975" y="75.47828491174107" width="24" height="20" class="edge-label-bg" fill-opacity="0.8"/>
+        <text x="263.72512716174975" y="85.47828491174107" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-A">
         <rect x="0" y="44.2" width="80" height="38.4"/>
-        <text x="40" y="63.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">Start</text>
+        <text x="40" y="63.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Start</text>
       </g>
       <g class="node" id="node-B">
         <polygon points="187.6,5.800000000000011 245.2,63.400000000000006 187.6,121 130,63.400000000000006"/>
         <text x="187.6" y="63.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Decision</text>
       </g>
       <g class="node" id="node-C">
-        <rect x="344.4" y="0" width="51.2" height="38.4"/>
-        <text x="370" y="19.2" class="label" text-anchor="middle" dominant-baseline="central">OK</text>
+        <rect x="314.4" y="0" width="51.2" height="38.4"/>
+        <text x="340" y="19.2" class="label" text-anchor="middle" dominant-baseline="central">OK</text>
       </g>
       <g class="node" id="node-D">
-        <rect x="325.2" y="88.4" width="89.6" height="38.4"/>
-        <text x="370" y="107.60000000000001" class="label" text-anchor="middle" dominant-baseline="central">Cancel</text>
+        <rect x="295.2" y="88.4" width="89.6" height="38.4"/>
+        <text x="340" y="107.60000000000001" class="label" dominant-baseline="central" text-anchor="middle">Cancel</text>
       </g>
       <g class="node" id="node-E">
-        <rect x="464.79999999999995" y="44.2" width="60.8" height="38.4"/>
-        <text x="495.19999999999993" y="63.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">End</text>
+        <rect x="434.79999999999995" y="44.2" width="60.8" height="38.4"/>
+        <text x="465.19999999999993" y="63.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">End</text>
       </g>
     </g>
   </g>
