@@ -1957,6 +1957,65 @@ fn test_sequence_diagram_uses_theme_colors() {
 }
 
 #[test]
+fn test_sequence_open_arrow_has_no_marker() {
+    let input = r#"sequenceDiagram
+    participant A
+    participant B
+    A->B: Open
+    A->>B: Filled"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    assert_eq!(
+        svg.matches("marker-end=").count(),
+        1,
+        "Only filled arrows should get marker-end"
+    );
+}
+
+#[test]
+fn test_sequence_activation_renders_box() {
+    let input = r#"sequenceDiagram
+    participant A
+    participant C
+    A->>+C: Login request
+    C-->>-A: Token"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    assert!(
+        svg.contains("class=\"activation\""),
+        "Activation box should render for + activation"
+    );
+}
+
+#[test]
+fn test_sequence_loop_label_renders() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: start
+    loop Every minute
+    Alice->>Bob: ping
+    end"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    assert!(
+        svg.contains("loop Every minute"),
+        "Loop label should render in SVG"
+    );
+    assert!(
+        svg.contains("labelBox") || svg.contains("loopLine"),
+        "Loop framing should render in SVG"
+    );
+}
+
+#[test]
 fn test_theme_override_appears_in_svg() {
     // Override primary color to a distinctive red
     let svg = render_text(

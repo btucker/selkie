@@ -395,14 +395,50 @@ impl SvgElement {
                 content,
                 attrs,
             } => {
-                format!(
-                    "{}<text x=\"{}\" y=\"{}\"{}>{}</text>",
-                    indent_str,
-                    x,
-                    y,
-                    attrs.to_string(),
-                    escape_xml(content)
-                )
+                let normalized = content
+                    .replace("<br />", "\n")
+                    .replace("<br/>", "\n")
+                    .replace("<br>", "\n");
+                if normalized.contains('\n') {
+                    let tspans = normalized
+                        .split('\n')
+                        .enumerate()
+                        .map(|(idx, line)| {
+                            if idx == 0 {
+                                format!(
+                                    "<tspan x=\"{}\" y=\"{}\">{}</tspan>",
+                                    x,
+                                    y,
+                                    escape_xml(line)
+                                )
+                            } else {
+                                format!(
+                                    "<tspan x=\"{}\" dy=\"1.2em\">{}</tspan>",
+                                    x,
+                                    escape_xml(line)
+                                )
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                        .join("");
+                    format!(
+                        "{}<text x=\"{}\" y=\"{}\"{}>{}</text>",
+                        indent_str,
+                        x,
+                        y,
+                        attrs.to_string(),
+                        tspans
+                    )
+                } else {
+                    format!(
+                        "{}<text x=\"{}\" y=\"{}\"{}>{}</text>",
+                        indent_str,
+                        x,
+                        y,
+                        attrs.to_string(),
+                        escape_xml(&normalized)
+                    )
+                }
             }
             Self::Group { children, attrs } => {
                 let children_str: String = children
@@ -461,5 +497,25 @@ impl SvgElement {
                 format!("{}{}", indent_str, content)
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Attrs, SvgElement};
+
+    #[test]
+    fn text_br_splits_into_tspans() {
+        let element = SvgElement::Text {
+            x: 10.0,
+            y: 20.0,
+            content: "Line 1<br/>Line 2".to_string(),
+            attrs: Attrs::new(),
+        };
+        let svg = element.to_svg(0);
+
+        assert!(svg.contains("<tspan x=\"10\" y=\"20\">Line 1</tspan>"));
+        assert!(svg.contains("<tspan x=\"10\" dy=\"1.2em\">Line 2</tspan>"));
+        assert!(!svg.contains("<br/>"));
     }
 }
