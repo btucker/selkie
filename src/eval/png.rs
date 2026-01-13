@@ -234,7 +234,7 @@ pub fn write_comparison_pngs(
         let png_data = create_comparison_png(selkie_svg, reference_svg, name)?;
 
         // Write PNG file
-        let png_filename = format!("{}.png", name.replace('/', "_").replace(' ', "_"));
+        let png_filename = format!("{}.png", name.replace(['/', ' '], "_"));
         let png_path = output_dir.join(&png_filename);
         fs::write(&png_path, &png_data)
             .map_err(|e| format!("Failed to write PNG {}: {}", png_path.display(), e))?;
