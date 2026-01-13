@@ -6,11 +6,11 @@ A 100% Rust implementation of the [Mermaid](https://mermaid.js.org/) diagram par
 
 Selkie aims to provide a fast, native alternative to Mermaid.js for parsing and rendering diagrams. The entire implementation is written in Rust, with no JavaScript dependencies at runtime.
 
-This project is being built entirely by [Claude Code](https://docs.anthropic.com/en/docs/claude-code), Anthropic's agentic coding tool. Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, ensuring visual and structural parity.
+This project has been built entirely by [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, ensuring visual and structural parity.
 
 ## Credits
 
-Selkie stands on the shoulders of these excellent projects:
+Selkie could not exist without all the human effort that has gone into these excellent projects:
 
 - **[Mermaid](https://github.com/mermaid-js/mermaid)** - The original JavaScript diagramming library that defines the syntax and rendering we aim to match
 - **[Dagre](https://github.com/dagrejs/dagre)** - Graph layout algorithms that inspire our layout engine
