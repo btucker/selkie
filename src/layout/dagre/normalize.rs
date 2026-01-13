@@ -340,7 +340,7 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
     // Calculate graph center from actual node positions (more reliable than graph.width/height)
     let (mut min_x, mut max_x, mut min_y, mut max_y) = (f64::MAX, f64::MIN, f64::MAX, f64::MIN);
     for node_id in graph.nodes() {
-        if let Some(node) = graph.node(&node_id) {
+        if let Some(node) = graph.node(node_id) {
             let x = node.x.unwrap_or(0.0);
             let y = node.y.unwrap_or(0.0);
             min_x = min_x.min(x);
@@ -349,11 +349,11 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
             max_y = max_y.max(y);
         }
     }
-    let graph_center_x = (min_x + max_x) / 2.0;
-    let graph_center_y = (min_y + max_y) / 2.0;
+    let _graph_center_x = (min_x + max_x) / 2.0;
+    let _graph_center_y = (min_y + max_y) / 2.0;
 
     let rankdir = graph.graph().rankdir.as_str();
-    let is_horizontal = rankdir == "LR" || rankdir == "RL";
+    let _is_horizontal = rankdir == "LR" || rankdir == "RL";
 
     // Collect edge data (v, w, points) upfront to avoid borrow issues
     let edge_data: Vec<_> = graph

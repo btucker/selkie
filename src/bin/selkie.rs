@@ -10,7 +10,7 @@
 
 use std::fs;
 use std::io::{self, Read, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process;
 
 use clap::{Parser, Subcommand, ValueEnum};
@@ -526,7 +526,7 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /// Load diagrams from a directory of .mmd files
-fn load_directory(dir: &PathBuf) -> Result<Vec<DiagramInput>, Box<dyn std::error::Error>> {
+fn load_directory(dir: &Path) -> Result<Vec<DiagramInput>, Box<dyn std::error::Error>> {
     let pattern = dir.join("**/*.mmd").to_string_lossy().to_string();
     let mut inputs = Vec::new();
 

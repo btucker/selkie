@@ -17,7 +17,7 @@ use super::{
 use crate::render::svg::SvgStructure;
 
 /// Configuration for the evaluation runner
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct EvalConfig {
     /// Filter by diagram type (None = all types)
     pub diagram_type_filter: Option<String>,
@@ -27,17 +27,6 @@ pub struct EvalConfig {
     pub force_refresh: bool,
     /// Structural check configuration
     pub check_config: CheckConfig,
-}
-
-impl Default for EvalConfig {
-    fn default() -> Self {
-        Self {
-            diagram_type_filter: None,
-            skip_visual: false,
-            force_refresh: false,
-            check_config: CheckConfig::default(),
-        }
-    }
 }
 
 /// Input diagram for evaluation
