@@ -1397,3 +1397,29 @@ fn test_class_diagram_parent_centered_over_children() {
         animal_x, duck_x, zebra_x
     );
 }
+
+#[test]
+fn test_gantt_uses_css_classes_not_hardcoded_colors() {
+    // Issue mermaid-rs-lg2: Gantt charts should use CSS classes for colors,
+    // not hardcoded inline fill/stroke attributes. This enables theme switching.
+    let input = r#"gantt
+    title Test
+    dateFormat YYYY-MM-DD
+    section S1
+    Task :a1, 2024-01-01, 3d"#;
+
+    let diagram = parse(input).expect("Failed to parse Gantt chart");
+    let svg = render(&diagram).expect("Failed to render Gantt chart");
+
+    // Task bars should NOT have hardcoded inline fill colors
+    // They should use CSS classes like "task" or "task-bar" that get
+    // their colors from the embedded stylesheet
+    assert!(
+        !svg.contains("fill=\"#8a90dd\""),
+        "Gantt task bars should not have hardcoded fill='#8a90dd', should use CSS class. SVG:\n{}", svg
+    );
+    assert!(
+        !svg.contains("stroke=\"#534fbc\""),
+        "Gantt task bars should not have hardcoded stroke='#534fbc', should use CSS class. SVG:\n{}", svg
+    );
+}

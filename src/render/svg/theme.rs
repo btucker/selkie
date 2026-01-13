@@ -66,6 +66,36 @@ pub struct Theme {
     pub label_box_bkg_color: String,
     /// Loop/box label border color
     pub label_box_border_color: String,
+
+    // === Gantt chart colors ===
+    /// Section background color (odd rows)
+    pub section_bkg_color: String,
+    /// Section background color (even rows)
+    pub section_bkg_color2: String,
+    /// Task bar background color
+    pub task_bkg_color: String,
+    /// Task bar border color
+    pub task_border_color: String,
+    /// Task text color (light, for dark backgrounds)
+    pub task_text_light_color: String,
+    /// Task text color (dark, for light backgrounds)
+    pub task_text_dark_color: String,
+    /// Active task background color
+    pub active_task_bkg_color: String,
+    /// Active task border color
+    pub active_task_border_color: String,
+    /// Done task background color
+    pub done_task_bkg_color: String,
+    /// Done task border color
+    pub done_task_border_color: String,
+    /// Critical task background color
+    pub crit_bkg_color: String,
+    /// Critical task border color
+    pub crit_border_color: String,
+    /// Grid line color
+    pub grid_color: String,
+    /// Today line color
+    pub today_line_color: String,
 }
 
 impl Default for Theme {
@@ -114,6 +144,21 @@ impl Default for Theme {
             activation_border_color: "#333333".to_string(),
             label_box_bkg_color: "#fff5ad".to_string(),
             label_box_border_color: "#aaaa33".to_string(),
+            // Gantt chart - default theme (mermaid.js purple palette)
+            section_bkg_color: "#fff400".to_string(),
+            section_bkg_color2: "#ffffff".to_string(),
+            task_bkg_color: "#8a90dd".to_string(),
+            task_border_color: "#534fbc".to_string(),
+            task_text_light_color: "#ffffff".to_string(),
+            task_text_dark_color: "#000000".to_string(),
+            active_task_bkg_color: "#bfc7ff".to_string(),
+            active_task_border_color: "#534fbc".to_string(),
+            done_task_bkg_color: "#d3d3d3".to_string(),
+            done_task_border_color: "#808080".to_string(),
+            crit_bkg_color: "#ff0000".to_string(),
+            crit_border_color: "#ff8888".to_string(),
+            grid_color: "#d3d3d3".to_string(),
+            today_line_color: "#ff0000".to_string(),
         }
     }
 }
@@ -164,6 +209,21 @@ impl Theme {
             activation_border_color: "#81B1DB".to_string(),
             label_box_bkg_color: "#2d2d2d".to_string(),
             label_box_border_color: "#81B1DB".to_string(),
+            // Gantt chart - dark theme
+            section_bkg_color: "#3d3d3d".to_string(),
+            section_bkg_color2: "#2d2d2d".to_string(),
+            task_bkg_color: "#4a5568".to_string(),
+            task_border_color: "#81B1DB".to_string(),
+            task_text_light_color: "#ffffff".to_string(),
+            task_text_dark_color: "#ccc".to_string(),
+            active_task_bkg_color: "#5a6a7a".to_string(),
+            active_task_border_color: "#81B1DB".to_string(),
+            done_task_bkg_color: "#555555".to_string(),
+            done_task_border_color: "#666666".to_string(),
+            crit_bkg_color: "#8b0000".to_string(),
+            crit_border_color: "#ff6666".to_string(),
+            grid_color: "#444444".to_string(),
+            today_line_color: "#ff6666".to_string(),
         }
     }
 
@@ -212,6 +272,21 @@ impl Theme {
             activation_border_color: "#666666".to_string(),
             label_box_bkg_color: "#f5f5f5".to_string(),
             label_box_border_color: "#999999".to_string(),
+            // Gantt chart - neutral theme (grayscale)
+            section_bkg_color: "#e8e8e8".to_string(),
+            section_bkg_color2: "#f8f8f8".to_string(),
+            task_bkg_color: "#a0a0a0".to_string(),
+            task_border_color: "#666666".to_string(),
+            task_text_light_color: "#ffffff".to_string(),
+            task_text_dark_color: "#333333".to_string(),
+            active_task_bkg_color: "#c0c0c0".to_string(),
+            active_task_border_color: "#666666".to_string(),
+            done_task_bkg_color: "#d0d0d0".to_string(),
+            done_task_border_color: "#909090".to_string(),
+            crit_bkg_color: "#606060".to_string(),
+            crit_border_color: "#404040".to_string(),
+            grid_color: "#cccccc".to_string(),
+            today_line_color: "#333333".to_string(),
         }
     }
 
@@ -261,6 +336,21 @@ impl Theme {
             activation_border_color: "#13540c".to_string(),
             label_box_bkg_color: "#cdffb2".to_string(),
             label_box_border_color: "#6eaa49".to_string(),
+            // Gantt chart - forest theme (green palette from mermaid.js)
+            section_bkg_color: "#6eaa49".to_string(),
+            section_bkg_color2: "#ffffff".to_string(),
+            task_bkg_color: "#487e3a".to_string(),
+            task_border_color: "#13540c".to_string(),
+            task_text_light_color: "#ffffff".to_string(),
+            task_text_dark_color: "#333333".to_string(),
+            active_task_bkg_color: "#cde498".to_string(),
+            active_task_border_color: "#13540c".to_string(),
+            done_task_bkg_color: "#d3d3d3".to_string(),
+            done_task_border_color: "#808080".to_string(),
+            crit_bkg_color: "#ff0000".to_string(),
+            crit_border_color: "#ff8888".to_string(),
+            grid_color: "#6eaa49".to_string(),
+            today_line_color: "#ff0000".to_string(),
         }
     }
 
@@ -312,6 +402,21 @@ impl Theme {
             activation_border_color: "#9370DB".to_string(),
             label_box_bkg_color: "#f4ffdd".to_string(),
             label_box_border_color: "#9370DB".to_string(),
+            // Gantt chart - base theme (warm neutral palette)
+            section_bkg_color: "#fff4dd".to_string(),
+            section_bkg_color2: "#ffffff".to_string(),
+            task_bkg_color: "#dde4ff".to_string(),
+            task_border_color: "#9370DB".to_string(),
+            task_text_light_color: "#ffffff".to_string(),
+            task_text_dark_color: "#333333".to_string(),
+            active_task_bkg_color: "#f4ffdd".to_string(),
+            active_task_border_color: "#9370DB".to_string(),
+            done_task_bkg_color: "#d3d3d3".to_string(),
+            done_task_border_color: "#808080".to_string(),
+            crit_bkg_color: "#ff0000".to_string(),
+            crit_border_color: "#ff8888".to_string(),
+            grid_color: "#cccccc".to_string(),
+            today_line_color: "#9370DB".to_string(),
         }
     }
 
