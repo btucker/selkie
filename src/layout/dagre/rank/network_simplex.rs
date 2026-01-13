@@ -9,6 +9,9 @@
 use crate::layout::dagre::graph::{DagreGraph, EdgeKey};
 use std::collections::{HashMap, HashSet};
 
+/// Type alias for tracking edge exchanges during network simplex iteration
+type EdgeExchange = ((String, String), (String, String));
+
 /// A spanning tree used for network simplex
 #[derive(Debug, Clone)]
 pub struct SpanningTree {
@@ -121,11 +124,20 @@ impl SpanningTree {
 
 /// Run the network simplex algorithm
 pub fn run(g: &mut DagreGraph) {
+    // Collect compound nodes (nodes with children) - these are excluded from ranking
+    // because their position is determined by their children, not by edges
+    let compound_nodes: HashSet<String> = g
+        .nodes()
+        .iter()
+        .filter(|v| !g.children(v).is_empty())
+        .map(|v| (*v).clone())
+        .collect();
+
     // Step 1: Initialize with longest path ranking
     super::longest_path::run(g);
 
-    // Build feasible spanning tree
-    let mut tree = feasible_tree(g);
+    // Build feasible spanning tree (excluding compound nodes)
+    let mut tree = feasible_tree(g, &compound_nodes);
 
     // Initialize low/lim values for tree traversal
     let root = tree.root.clone();
@@ -136,7 +148,10 @@ pub fn run(g: &mut DagreGraph) {
 
     // Iterate: find leaving edge, find entering edge, exchange
     let mut iterations = 0;
-    let max_iterations = g.node_count() * g.node_count();
+    let max_iterations = g.node_count() * g.edge_count() + 1; // dagre.js uses this formula
+
+    // Track exchanges for cycle detection - count how many times each exchange occurs
+    let mut exchange_counts: HashMap<EdgeExchange, usize> = HashMap::new();
 
     while let Some(leave) = leave_edge(&tree) {
         if iterations >= max_iterations {
@@ -145,6 +160,28 @@ pub fn run(g: &mut DagreGraph) {
         iterations += 1;
 
         if let Some(enter) = enter_edge(&tree, g, &leave) {
+            // Create normalized exchange record for cycle detection
+            let exchange = (
+                if leave.0 < leave.1 {
+                    leave.clone()
+                } else {
+                    (leave.1.clone(), leave.0.clone())
+                },
+                if enter.v < enter.w {
+                    (enter.v.clone(), enter.w.clone())
+                } else {
+                    (enter.w.clone(), enter.v.clone())
+                },
+            );
+
+            // Check for repeated exchanges (cycle detection)
+            let count = exchange_counts.entry(exchange.clone()).or_insert(0);
+            *count += 1;
+            if *count > 2 {
+                // Seen this exchange more than twice = definitely cycling
+                break;
+            }
+
             exchange_edges(&mut tree, g, &leave, &enter);
         } else {
             break;
@@ -153,30 +190,38 @@ pub fn run(g: &mut DagreGraph) {
 }
 
 /// Build an initial feasible spanning tree using tight edges
-fn feasible_tree(g: &DagreGraph) -> SpanningTree {
+/// compound_nodes are excluded from the tree
+fn feasible_tree(g: &DagreGraph, compound_nodes: &HashSet<String>) -> SpanningTree {
     let mut tree = SpanningTree::new();
 
-    // Add all nodes to tree
+    // Add all non-compound nodes to tree
     for v in g.nodes() {
-        tree.set_node(v, TreeNode::default());
+        if !compound_nodes.contains(v.as_str()) {
+            tree.set_node(v, TreeNode::default());
+        }
     }
 
     // Find tight edges (slack = 0) and build tree
     let mut in_tree: HashSet<String> = HashSet::new();
 
-    // Start with first node
-    if let Some(first) = g.nodes().first() {
+    // Start with first non-compound node
+    if let Some(first) = g.nodes().iter().find(|v| !compound_nodes.contains(**v)) {
         in_tree.insert((*first).clone());
         tree.root = Some((*first).clone());
     }
 
-    // Greedily add tight edges
+    // Greedily add tight edges (skip edges involving compound nodes)
     let mut changed = true;
     while changed {
         changed = false;
         for edge_key in g.edges() {
             let v = &edge_key.v;
             let w = &edge_key.w;
+
+            // Skip edges involving compound nodes
+            if compound_nodes.contains(v) || compound_nodes.contains(w) {
+                continue;
+            }
 
             let v_in = in_tree.contains(v);
             let w_in = in_tree.contains(w);
@@ -194,21 +239,29 @@ fn feasible_tree(g: &DagreGraph) -> SpanningTree {
         }
     }
 
-    // If not all nodes are connected, add non-tight edges and adjust ranks
+    // If not all non-compound nodes are connected, add non-tight edges
     for v in g.nodes() {
-        if !in_tree.contains(v) {
+        // Skip compound nodes
+        if compound_nodes.contains(v.as_str()) {
+            continue;
+        }
+        if !in_tree.contains(v.as_str()) {
             // Find an edge connecting this node to the tree
             for edge_key in g.in_edges(v).iter().chain(g.out_edges(v).iter()) {
-                let other = if edge_key.v == *v {
+                let other = if edge_key.v == **v {
                     &edge_key.w
                 } else {
                     &edge_key.v
                 };
+                // Skip if other is a compound node
+                if compound_nodes.contains(other) {
+                    continue;
+                }
                 if in_tree.contains(other) {
                     tree.set_edge(v, other, TreeEdge::default());
-                    in_tree.insert(v.clone());
+                    in_tree.insert((*v).clone());
                     // Adjust rank to make edge tight
-                    if edge_key.v == *v {
+                    if edge_key.v == **v {
                         // v -> other, so v.rank = other.rank - minlen
                         let _other_rank = g.node(other).and_then(|n| n.rank).unwrap_or(0);
                         let _minlen = g.edge_by_key(edge_key).map(|e| e.minlen).unwrap_or(1);
@@ -235,6 +288,15 @@ pub fn init_low_lim_values(tree: &mut SpanningTree, root: Option<String>) {
 }
 
 fn dfs_assign(tree: &mut SpanningTree, v: &str, parent: Option<&str>, counter: &mut i32) {
+    // Check recursion depth to detect infinite recursion
+    if *counter > 1000 {
+        eprintln!(
+            "[dfs_assign] OVERFLOW: counter={}, v={}, parent={:?}",
+            counter, v, parent
+        );
+        panic!("dfs_assign recursion overflow");
+    }
+
     *counter += 1;
     let low = *counter;
 
@@ -357,7 +419,26 @@ pub fn enter_edge(
     g: &DagreGraph,
     leave: &(String, String),
 ) -> Option<EdgeKey> {
-    let (tail, _head) = (&leave.0, &leave.1);
+    enter_edge_with_exclusion(tree, g, leave, None)
+}
+
+/// Find an edge to enter the tree, optionally excluding a specific edge
+pub fn enter_edge_with_exclusion(
+    tree: &SpanningTree,
+    g: &DagreGraph,
+    leave: &(String, String),
+    exclude: Option<&(String, String)>,
+) -> Option<EdgeKey> {
+    // Determine which side is the tail (child in tree edge)
+    // The tail is the node whose parent is the other node
+    let tail = {
+        let v_parent = tree.node(&leave.0).and_then(|n| n.parent.as_ref());
+        if v_parent.map(|p| p == &leave.1).unwrap_or(false) {
+            &leave.0 // leave.0's parent is leave.1, so leave.0 is the child (tail)
+        } else {
+            &leave.1 // Otherwise, leave.1 is the child (tail)
+        }
+    };
 
     // Find the non-tree edge with minimum slack that crosses the cut
     let mut best_edge: Option<EdgeKey> = None;
@@ -367,6 +448,15 @@ pub fn enter_edge(
         // Skip tree edges
         if tree.has_edge(&edge_key.v, &edge_key.w) {
             continue;
+        }
+
+        // Skip excluded edge (anti-cycling)
+        if let Some(ex) = exclude {
+            if (edge_key.v == ex.0 && edge_key.w == ex.1)
+                || (edge_key.v == ex.1 && edge_key.w == ex.0)
+            {
+                continue;
+            }
         }
 
         let v_in_tail = is_descendant(tree, &edge_key.v, tail);
@@ -393,6 +483,25 @@ pub fn exchange_edges(
     leave: &(String, String),
     enter: &EdgeKey,
 ) {
+    // Determine which side is the tail (child in tree edge) BEFORE modifying tree
+    // The tail is the node whose parent is the other node
+    let tail = {
+        let v_parent = tree.node(&leave.0).and_then(|n| n.parent.as_ref());
+        if v_parent.map(|p| p == &leave.1).unwrap_or(false) {
+            leave.0.clone() // leave.0's parent is leave.1, so leave.0 is the child (tail)
+        } else {
+            leave.1.clone() // Otherwise, leave.1 is the child (tail)
+        }
+    };
+
+    // Collect nodes in the tail component BEFORE modifying tree
+    let tail_nodes: Vec<String> = g
+        .nodes()
+        .iter()
+        .filter(|v| is_descendant(tree, v, &tail))
+        .map(|v| (*v).clone())
+        .collect();
+
     // Remove leaving edge from tree
     tree.remove_edge(&leave.0, &leave.1);
 
@@ -402,20 +511,16 @@ pub fn exchange_edges(
     // Update ranks based on slack of entering edge
     if let Some(slack) = super::util::slack(g, &enter.v, &enter.w) {
         if slack != 0 {
-            // Determine which side to adjust
-            let v_in_tail = is_descendant(tree, &enter.v, &leave.0);
+            // Determine which direction to adjust based on whether enter.v is in tail
+            let v_in_tail = tail_nodes.contains(&enter.v);
 
-            // Adjust ranks in the appropriate component
+            // Adjust ranks in the tail component
             let delta = if v_in_tail { slack } else { -slack };
 
-            // Update all nodes in the tail component
-            let nodes: Vec<String> = g.nodes().into_iter().cloned().collect();
-            for v in nodes {
-                if is_descendant(tree, &v, &leave.0) {
-                    if let Some(node) = g.node_mut(&v) {
-                        if let Some(rank) = node.rank {
-                            node.rank = Some(rank + delta);
-                        }
+            for v in &tail_nodes {
+                if let Some(node) = g.node_mut(v) {
+                    if let Some(rank) = node.rank {
+                        node.rank = Some(rank + delta);
                     }
                 }
             }

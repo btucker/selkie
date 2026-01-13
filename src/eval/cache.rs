@@ -27,10 +27,16 @@ impl ReferenceCache {
         }
     }
 
-    /// Create a cache using default paths
+    /// Create a cache using default paths.
     ///
-    /// Cache directory: ~/.cache/selkie/references/
+    /// Cache directory: Platform-specific cache location + selkie/references/
+    /// - macOS: ~/Library/Caches/selkie/references/
+    /// - Linux: ~/.cache/selkie/references/
+    /// - Windows: %LOCALAPPDATA%/selkie/references/
+    ///
     /// Validator path: tools/validation/ (relative to cwd)
+    ///
+    /// Use `selkie eval --cache-info` to see the actual cache location.
     pub fn with_defaults() -> Self {
         let cache_dir = dirs::cache_dir()
             .unwrap_or_else(|| PathBuf::from(".cache"))
@@ -42,6 +48,11 @@ impl ReferenceCache {
             .join("tools/validation");
 
         Self::new(cache_dir, validator_path)
+    }
+
+    /// Get the cache directory path
+    pub fn cache_dir(&self) -> &Path {
+        &self.cache_dir
     }
 
     /// Ensure the cache directory exists
@@ -92,9 +103,12 @@ impl ReferenceCache {
         Ok(svg)
     }
 
-    /// Render a diagram using mermaid.js via Node
+    /// Render a diagram using mermaid.js via Playwright
+    ///
+    /// Uses Playwright for accurate text measurements via real browser rendering.
     pub fn render_with_mermaid(&self, diagram: &str) -> Result<String, String> {
-        let script = self.validator_path.join("render_mermaid.mjs");
+        // Prefer Playwright renderer for accurate getBBox measurements
+        let script = self.validator_path.join("render_mermaid_playwright.mjs");
 
         if !script.exists() {
             return Err(format!(
@@ -131,8 +145,7 @@ impl ReferenceCache {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
 
-        // The render_mermaid.mjs script returns raw SVG by default
-        // or JSON if --analyze flag is used
+        // The renderer returns raw SVG by default
         if stdout.starts_with('<') {
             Ok(stdout.to_string())
         } else {

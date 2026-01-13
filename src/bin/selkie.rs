@@ -3,9 +3,10 @@
 //! CLI interface compatible with mermaid-cli (mmdc) for easy migration.
 //!
 //! Usage:
-//!   selkie render -i input.mmd -o output.svg
-//!   selkie -i input.mmd -o output.svg          # implicit render
-//!   selkie eval                                 # evaluate with gallery samples
+//!   selkie input.mmd -o output.svg             # render is the default
+//!   selkie -i input.mmd -o output.svg          # -i flag also works
+//!   selkie render input.mmd -o output.svg      # explicit render subcommand
+//!   selkie eval                                # evaluate with gallery samples
 //!   selkie eval --type flowchart --html report.html
 
 use std::fs;
@@ -75,7 +76,11 @@ enum Commands {
 #[derive(Parser, Debug, Default)]
 struct RenderArgs {
     /// Input file (.mmd, .md) or - for stdin
-    #[arg(short, long)]
+    #[arg(value_name = "INPUT")]
+    input_positional: Option<String>,
+
+    /// Input file (.mmd, .md) or - for stdin (alternative to positional)
+    #[arg(short, long, value_name = "FILE")]
     input: Option<String>,
 
     /// Output file (.svg) or - for stdout
@@ -155,6 +160,14 @@ struct EvalArgs {
     /// Re-render all reference SVGs (ignore cache)
     #[arg(long)]
     force_refresh: bool,
+
+    /// Clear the reference SVG cache before running
+    #[arg(long)]
+    clear_cache: bool,
+
+    /// Show cache location and statistics, then exit
+    #[arg(long)]
+    cache_info: bool,
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
@@ -213,24 +226,18 @@ fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
     match args.command {
         Some(Commands::Render(render_args)) => run_render(render_args),
         Some(Commands::Eval(eval_args)) => run_eval(eval_args),
-        None => {
-            // Backwards compatibility: if -i is provided without subcommand, run render
-            if args.render.input.is_some() {
-                run_render(args.render)
-            } else {
-                // No input and no subcommand - show help
-                eprintln!("Usage: selkie [render] -i <INPUT> -o <OUTPUT>");
-                eprintln!("       selkie eval [OPTIONS] [TARGET]");
-                eprintln!();
-                eprintln!("Run 'selkie --help' for more information.");
-                process::exit(1);
-            }
-        }
+        // Default to render when no subcommand is specified
+        None => run_render(args.render),
     }
 }
 
 fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
-    let input_path = args.input.as_ref().ok_or("Input file is required")?;
+    // Positional input takes precedence over -i flag
+    let input_path = args
+        .input_positional
+        .as_ref()
+        .or(args.input.as_ref())
+        .ok_or("Input file is required. Usage: selkie <INPUT> [-o OUTPUT]")?;
 
     // Read input
     let input = read_input(input_path)?;
@@ -437,15 +444,53 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let cache = eval::cache::ReferenceCache::with_defaults();
+
+    // Handle --clear-cache: clear cache before anything else
+    if args.clear_cache {
+        let cache_dir = cache.cache_dir();
+        if cache_dir.exists() {
+            let stats = cache.stats();
+            cache.clear()?;
+            eprintln!(
+                "Cleared {} cached files ({:.2} KB) from {}",
+                stats.count,
+                stats.total_size as f64 / 1024.0,
+                cache_dir.display()
+            );
+        } else {
+            eprintln!("Cache directory does not exist: {}", cache_dir.display());
+        }
+    }
+
+    // Handle --cache-info: show cache info and exit
+    if args.cache_info {
+        let stats = cache.stats();
+        println!("Reference SVG Cache");
+        println!("===================");
+        println!("Location: {}", cache.cache_dir().display());
+        println!("Files:    {}", stats.count);
+        println!("Size:     {:.2} KB", stats.total_size as f64 / 1024.0);
+        if stats.count == 0 {
+            println!();
+            println!("Cache is empty. Run 'selkie eval' to populate.");
+        }
+        return Ok(());
+    }
+
     // Build evaluation config
+    // Enable visual comparison when png feature is available
+    #[cfg(feature = "png")]
+    let skip_visual = false;
+    #[cfg(not(feature = "png"))]
+    let skip_visual = true;
+
     let eval_config = eval::runner::EvalConfig {
         diagram_type_filter: args.diagram_type.clone(),
-        skip_visual: true, // TODO: enable when PNG rendering is ready
+        skip_visual,
         force_refresh: args.force_refresh,
         ..Default::default()
     };
-
-    let cache = eval::cache::ReferenceCache::with_defaults();
     let runner = eval::runner::EvalRunner::new(eval_config, cache);
 
     // Get diagrams to evaluate
@@ -512,9 +557,32 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Write PNGs if requested
-    if let Some(ref _path) = args.pngs {
-        eprintln!("PNG generation not yet implemented (requires 'png' feature)");
-        // TODO: Implement when resvg is available
+    if let Some(ref path) = args.pngs {
+        #[cfg(feature = "png")]
+        {
+            let svg_pairs = runner.take_svg_pairs();
+            if !svg_pairs.is_empty() {
+                match eval::png::write_comparison_pngs(path, &svg_pairs) {
+                    Ok(manifest) => {
+                        eprintln!(
+                            "Wrote {} comparison PNGs to {}",
+                            manifest.diagrams.len(),
+                            path.display()
+                        );
+                    }
+                    Err(e) => {
+                        eprintln!("Warning: Failed to generate PNGs: {}", e);
+                    }
+                }
+            }
+        }
+        #[cfg(not(feature = "png"))]
+        {
+            eprintln!(
+                "PNG generation requires the 'png' feature. Build with: cargo build --features png"
+            );
+            let _ = path; // Suppress unused warning
+        }
     }
 
     // Exit with error code if there are failures

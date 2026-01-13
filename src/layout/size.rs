@@ -20,9 +20,12 @@ impl Default for CharacterSizeEstimator {
     fn default() -> Self {
         Self {
             // Approximate ratio for proportional fonts like trebuchet ms
-            // Using 0.6 produces compact layouts; actual trebuchet ms is ~0.79
+            // Calibrated to match mermaid.js foreignObject text rendering
+            // Mermaid.js uses actual browser getBBox which varies by font/platform
             char_width_ratio: 0.6,
-            line_height_ratio: 1.4,
+            // HTML text in foreignObject has ~2.3x line-height due to
+            // default line-height:1.5 plus <p> element margins
+            line_height_ratio: 2.3,
         }
     }
 }

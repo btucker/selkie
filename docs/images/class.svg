@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="580" height="414" viewBox="0 0 580 414" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 12px;
+}
+
+.edge-label-bg {
+  fill: #ffffff;
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.class-box {
+  fill: #ECECFF;
+  stroke: #333333;
+}
+
+.class-name {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.class-annotation {
+  fill: #666666;
+  font-style: italic;
+}
+
+.class-member {
+  fill: #333333;
+}
+
+.class-method {
+  fill: #333333;
+}
+
+.relation-line {
+  stroke: #333333;
+}
+
+.relation-label {
+  fill: #333333;
+}
+
+.note-box {
+  fill: #FFFFCC;
+  stroke: #333333;
+}
+
+.note-text {
+  fill: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="inheritance" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 1 7 L 18 13 V 1 Z" stroke-width="1" fill="none" stroke="#333333"/>
+    </marker>
+    <marker id="aggregation" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" fill="none" stroke="#333333"/>
+    </marker>
+    <marker id="composition" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke-width="1" stroke="#333333"/>
+    </marker>
+    <marker id="dependency" viewBox="0 0 20 20" refX="20" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 20 10 L 0 20" fill="none" stroke="#333333" stroke-width="1"/>
+    </marker>
+    <marker id="lollipop" viewBox="0 0 20 20" refX="10" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+      <circle cx="10" cy="10" r="8" stroke="#333333" stroke-width="1" fill="#FFFFFF"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="class-node" id="class-Cat">
+      <rect x="290" y="216" width="180" height="68" rx="3" ry="3" class="class-box" stroke-width="1" stroke="#333333" fill="#ECECFF"/>
+      <text x="380" y="236" class="class-name" text-anchor="middle" font-weight="bold" font-size="14">Cat</text>
+      <line x1="290" y1="246" x2="470" y2="246" stroke="#333333" stroke-width="1"/>
+      <text x="300" y="270" class="class-method" font-size="12" text-anchor="start">+meow()</text>
+    </g>
+    <g class="class-node" id="class-Animal">
+      <rect x="170" y="50" width="180" height="86" rx="3" ry="3" class="class-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
+      <text x="260" y="70" class="class-name" font-weight="bold" font-size="14" text-anchor="middle">Animal</text>
+      <line x1="170" y1="80" x2="350" y2="80" stroke="#333333" stroke-width="1"/>
+      <text x="180" y="104" class="class-member" font-size="12" text-anchor="start">+String name</text>
+      <line x1="170" y1="113" x2="350" y2="113" stroke-width="1" stroke="#333333"/>
+      <text x="180" y="127" class="class-method" text-anchor="start" font-size="12">+eat()</text>
+    </g>
+    <g class="class-node" id="class-Dog">
+      <rect x="50" y="216" width="180" height="68" rx="3" ry="3" class="class-box" fill="#ECECFF" stroke-width="1" stroke="#333333"/>
+      <text x="140" y="236" class="class-name" font-size="14" font-weight="bold" text-anchor="middle">Dog</text>
+      <line x1="50" y1="246" x2="230" y2="246" stroke="#333333" stroke-width="1"/>
+      <text x="60" y="270" class="class-method" font-size="12" text-anchor="start">+bark()</text>
+    </g>
+    <g class="relation">
+      <line x1="260" y1="136" x2="140" y2="216" class="relation-line" marker-start="url(#inheritance)" stroke-width="1" fill="none" stroke="#333333"/>
+    </g>
+    <g class="relation">
+      <line x1="260" y1="136" x2="380" y2="216" class="relation-line" stroke="#333333" marker-start="url(#inheritance)" fill="none" stroke-width="1"/>
+    </g>
+  </g>
+</svg>

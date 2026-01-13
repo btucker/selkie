@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="179.2" height="404.8" viewBox="0 0 179.2 404.8" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 12px;
+}
+
+.edge-label-bg {
+  fill: #ffffff;
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.state-title {
+  fill: #333333;
+}
+
+.state-box {
+  fill: #ECECFF;
+  stroke: #333333;
+}
+
+.state-label {
+  fill: #333333;
+}
+
+.state-description {
+  fill: #666666;
+}
+
+.state-start {
+  fill: #333333;
+}
+
+.state-end-outer {
+  stroke: #333333;
+}
+
+.state-end-inner {
+  fill: #333333;
+}
+
+.state-fork-join {
+  fill: #333333;
+}
+
+.state-choice {
+  fill: #ECECFF;
+  stroke: #333333;
+}
+
+.state-divider {
+  stroke: #333333;
+  stroke-dasharray: 5, 5;
+}
+
+.transition-line {
+  stroke: #333333;
+}
+
+.transition-label {
+  fill: #333333;
+}
+
+.note-box {
+  fill: #FFFFCC;
+  stroke: #333333;
+}
+
+.note-text {
+  fill: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" stroke="#333333" stroke-width="1" fill="#333333"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="state-node" id="state-Idle">
+      <rect x="14.399999999999991" y="84" width="70.4" height="38.4" rx="10" ry="10" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#333333"/>
+      <text x="49.599999999999994" y="108.2" class="state-label" text-anchor="middle" font-size="12">Idle</text>
+    </g>
+    <g class="state-node" id="state-Running">
+      <rect x="-0.000000000000007105427357601002" y="202.4" width="99.2" height="38.4" rx="10" ry="10" class="state-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
+      <text x="49.599999999999994" y="226.6" class="state-label" text-anchor="middle" font-size="12">Running</text>
+    </g>
+    <g class="state-node" id="state-[*]_end_0">
+      <circle cx="49.599999999999994" cy="312.8" r="12" class="state-end-outer" fill="none" stroke="#333333" stroke-width="2"/>
+      <circle cx="49.599999999999994" cy="312.8" r="7.199999999999999" class="state-end-inner" fill="#333333"/>
+    </g>
+    <g class="state-node" id="state-[*]_start_0">
+      <circle cx="49.599999999999994" cy="12" r="12" class="state-start" fill="#333333"/>
+    </g>
+    <g class="transition">
+      <line x1="46.40532214028728" y1="23.566937078270175" x2="26.39999999999999" y2="84" class="transition-line" stroke="#333333" stroke-width="1" marker-end="url(#arrow)"/>
+    </g>
+    <g class="transition">
+      <line x1="49.599999999999994" y1="122.4" x2="35.199999999999996" y2="202.4" class="transition-line" stroke="#333333" stroke-width="1" marker-end="url(#arrow)"/>
+      <text x="42.39999999999999" y="157.4" class="transition-label" text-anchor="middle" font-size="11">start</text>
+    </g>
+    <g class="transition">
+      <line x1="49.599999999999994" y1="202.4" x2="63.99999999999999" y2="122.4" class="transition-line" stroke-width="1" stroke="#333333" marker-end="url(#arrow)"/>
+      <text x="56.8" y="157.4" class="transition-label" font-size="11" text-anchor="middle">stop</text>
+    </g>
+    <g class="transition">
+      <line x1="49.599999999999994" y1="240.8" x2="82.9166890379843" y2="308.79048407812917" class="transition-line" marker-end="url(#arrow)" stroke="#333333" stroke-width="1"/>
+    </g>
+  </g>
+</svg>

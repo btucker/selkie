@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="578" viewBox="0 0 320 578" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 12px;
+}
+
+.edge-label-bg {
+  fill: #ffffff;
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.er-title {
+  fill: #333333;
+}
+
+.entity-box {
+  fill: #ECECFF;
+  stroke: #333333;
+}
+
+.entity-header {
+  fill: #9370DB;
+  stroke: #333333;
+}
+
+.entity-name {
+  fill: #FFFFFF;
+  font-weight: bold;
+}
+
+.entity-attr {
+  fill: #333333;
+}
+
+.relationship-line {
+  stroke: #333333;
+}
+
+.relationship-label {
+  fill: #333333;
+}
+
+.cardinality {
+  stroke: #333333;
+}
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="entity-node" id="entity-CUSTOMER-0">
+      <rect x="0" y="0" width="160" height="86" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke-width="1" stroke="#333333"/>
+      <rect x="0" y="0" width="160" height="30" rx="0" ry="0" class="entity-header" stroke-width="1" fill="#9370DB" stroke="#333333"/>
+      <text x="80" y="20" class="entity-name" fill="#FFFFFF" font-weight="bold" font-size="14" text-anchor="middle">CUSTOMER</text>
+      <text x="8" y="54" class="entity-attr" text-anchor="start" font-size="11">string name</text>
+      <text x="8" y="74" class="entity-attr" font-size="11" text-anchor="start">string email</text>
+    </g>
+    <g class="entity-node" id="entity-ITEM-2">
+      <rect x="0" y="372" width="160" height="46" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke-width="1" stroke="#333333"/>
+      <rect x="0" y="372" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" fill="#9370DB" stroke-width="1"/>
+      <text x="80" y="392" class="entity-name" font-weight="bold" font-size="14" text-anchor="middle" fill="#FFFFFF">ITEM</text>
+    </g>
+    <g class="entity-node" id="entity-ORDER-1">
+      <rect x="0" y="186" width="160" height="86" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke-width="1" stroke="#333333"/>
+      <rect x="0" y="186" width="160" height="30" rx="0" ry="0" class="entity-header" stroke-width="1" fill="#9370DB" stroke="#333333"/>
+      <text x="80" y="206" class="entity-name" font-size="14" font-weight="bold" text-anchor="middle" fill="#FFFFFF">ORDER</text>
+      <text x="8" y="240" class="entity-attr" text-anchor="start" font-size="11">int id</text>
+      <text x="8" y="260" class="entity-attr" text-anchor="start" font-size="11">date created</text>
+    </g>
+    <g class="relationship">
+      <line x1="80" y1="86" x2="80" y2="186" class="relationship-line" stroke-width="1" fill="none" stroke="#333333"/>
+      <g class="cardinality">
+        <circle cx="80" cy="56" r="5" stroke="#333333" fill="none" stroke-width="1"/>
+        <path d="M 80 86 L 88 66 M 80 86 L 72 66" fill="none" stroke="#333333" stroke-width="1"/>
+      </g>
+      <g class="cardinality">
+        <line x1="72" y1="196" x2="88" y2="196" stroke-width="1" stroke="#333333"/>
+        <line x1="72" y1="206" x2="88" y2="206" stroke="#333333" stroke-width="1"/>
+      </g>
+      <rect x="55" y="126" width="50" height="16" rx="2" ry="2" stroke="#333333" stroke-width="0.5" fill="#FFFFFF"/>
+      <text x="80" y="139" class="relationship-label" font-size="10" text-anchor="middle">places</text>
+    </g>
+    <g class="relationship">
+      <line x1="80" y1="272" x2="80" y2="372" class="relationship-line" fill="none" stroke-width="1" stroke="#333333"/>
+      <g class="cardinality">
+        <line x1="88" y1="257" x2="72" y2="257" stroke-width="1" stroke="#333333"/>
+        <path d="M 80 272 L 88 252 M 80 272 L 72 252" fill="none" stroke="#333333" stroke-width="1"/>
+      </g>
+      <g class="cardinality">
+        <line x1="72" y1="382" x2="88" y2="382" stroke-width="1" stroke="#333333"/>
+        <line x1="72" y1="392" x2="88" y2="392" stroke="#333333" stroke-width="1"/>
+      </g>
+      <rect x="48" y="312" width="64" height="16" rx="2" ry="2" stroke="#333333" fill="#FFFFFF" stroke-width="0.5"/>
+      <text x="80" y="325" class="relationship-label" font-size="10" text-anchor="middle">contains</text>
+    </g>
+  </g>
+</svg>

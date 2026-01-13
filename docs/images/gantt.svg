@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="305" viewBox="0 0 860 305" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 12px;
+}
+
+.edge-label-bg {
+  fill: #ffffff;
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.titleText {
+  text-anchor: middle;
+  font-size: 18px;
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.section {
+  stroke: none;
+  opacity: 0.2;
+}
+
+.section0, .section2 {
+  fill: #fff400;
+}
+
+.section1, .section3 {
+  fill: #ffffff;
+}
+
+.sectionTitle {
+  text-anchor: start;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  fill: #333333;
+}
+
+.task {
+  stroke-width: 2;
+}
+
+.task0, .task1, .task2, .task3 {
+  fill: #8a90dd;
+  stroke: #534fbc;
+}
+
+.taskText {
+  text-anchor: middle;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.taskText0, .taskText1, .taskText2, .taskText3 {
+  fill: #ffffff;
+}
+
+.active0, .active1, .active2, .active3 {
+  fill: #bfc7ff;
+  stroke: #534fbc;
+}
+
+.activeText0, .activeText1, .activeText2, .activeText3 {
+  fill: #000000 !important;
+}
+
+.done0, .done1, .done2, .done3 {
+  fill: #d3d3d3;
+  stroke: #808080;
+  stroke-width: 2;
+}
+
+.doneText0, .doneText1, .doneText2, .doneText3 {
+  fill: #000000 !important;
+}
+
+.crit0, .crit1, .crit2, .crit3 {
+  fill: #ff0000;
+  stroke: #ff8888;
+  stroke-width: 2;
+}
+
+.milestone {
+  fill: #8a90dd;
+  stroke: #534fbc;
+}
+
+.grid .tick {
+  stroke: #d3d3d3;
+  opacity: 0.8;
+  shape-rendering: crispEdges;
+}
+
+.tick-mark {
+  stroke: #333333;
+  stroke-width: 1;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.timeline-bg {
+  fill: #ffffff;
+  stroke: #d3d3d3;
+  stroke-width: 1;
+}
+
+.axis-line {
+  stroke: #333333;
+  stroke-width: 1;
+}
+
+.axis-label {
+  fill: #333333;
+}
+
+.today-line {
+  stroke: #ff0000;
+  stroke-width: 2;
+}
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <text x="430" y="70" class="gantt-title" text-anchor="middle" font-size="18" font-weight="bold">Project Plan</text>
+    <g class="timeline-axis">
+      <rect x="150" y="90" width="660" height="40" class="timeline-bg"/>
+      <line x1="150" y1="130" x2="810" y2="130" class="axis-line"/>
+      <line x1="150" y1="125" x2="150" y2="130" class="tick-mark"/>
+      <text x="150" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-01</text>
+      <line x1="210" y1="125" x2="210" y2="130" class="tick-mark"/>
+      <text x="210" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-03</text>
+      <line x1="270" y1="125" x2="270" y2="130" class="tick-mark"/>
+      <text x="270" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-05</text>
+      <line x1="330" y1="125" x2="330" y2="130" class="tick-mark"/>
+      <text x="330" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-07</text>
+      <line x1="390" y1="125" x2="390" y2="130" class="tick-mark"/>
+      <text x="390" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-09</text>
+      <line x1="450" y1="125" x2="450" y2="130" class="tick-mark"/>
+      <text x="450" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-11</text>
+      <line x1="510" y1="125" x2="510" y2="130" class="tick-mark"/>
+      <text x="510" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-13</text>
+      <line x1="570" y1="125" x2="570" y2="130" class="tick-mark"/>
+      <text x="570" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-15</text>
+      <line x1="630" y1="125" x2="630" y2="130" class="tick-mark"/>
+      <text x="630" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-17</text>
+      <line x1="690" y1="125" x2="690" y2="130" class="tick-mark"/>
+      <text x="690" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-19</text>
+      <line x1="750" y1="125" x2="750" y2="130" class="tick-mark"/>
+      <text x="750" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-21</text>
+      <line x1="810" y1="125" x2="810" y2="130" class="tick-mark"/>
+      <text x="810" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-23</text>
+      <g class="grid">
+        <line x1="150" y1="130" x2="150" y2="255" class="tick"/>
+        <line x1="210" y1="130" x2="210" y2="255" class="tick"/>
+        <line x1="270" y1="130" x2="270" y2="255" class="tick"/>
+        <line x1="330" y1="130" x2="330" y2="255" class="tick"/>
+        <line x1="390" y1="130" x2="390" y2="255" class="tick"/>
+        <line x1="450" y1="130" x2="450" y2="255" class="tick"/>
+        <line x1="510" y1="130" x2="510" y2="255" class="tick"/>
+        <line x1="570" y1="130" x2="570" y2="255" class="tick"/>
+        <line x1="630" y1="130" x2="630" y2="255" class="tick"/>
+        <line x1="690" y1="130" x2="690" y2="255" class="tick"/>
+        <line x1="750" y1="130" x2="750" y2="255" class="tick"/>
+        <line x1="810" y1="130" x2="810" y2="255" class="tick"/>
+      </g>
+    </g>
+    <text x="60" y="146.5" class="section-label" font-size="12" font-weight="bold" text-anchor="start">Phase 1</text>
+    <rect x="150" y="157.5" width="210" height="20" rx="3" ry="3" class="task task-bar task1"/>
+    <text x="255" y="171.5" class="taskText taskText1" font-size="11" text-anchor="middle">Task A</text>
+    <rect x="360" y="182.5" width="150" height="20" rx="3" ry="3" class="task task-bar task1"/>
+    <text x="435" y="196.5" class="taskText taskText1" font-size="11" text-anchor="middle">Task B</text>
+    <rect x="50" y="130" width="760" height="75" class="section section0"/>
+    <text x="60" y="221.5" class="section-label" font-size="12" font-weight="bold" text-anchor="start">Phase 2</text>
+    <rect x="510" y="232.5" width="300" height="20" rx="3" ry="3" class="task task-bar task2"/>
+    <text x="660" y="246.5" class="taskText taskText2" font-size="11" text-anchor="middle">Task C</text>
+    <rect x="50" y="205" width="760" height="50" class="section section1"/>
+  </g>
+</svg>

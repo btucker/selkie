@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="605.5999999999999" height="206.8" viewBox="-20 -20 605.5999999999999 206.8" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 12px;
+}
+
+.edge-label-bg {
+  fill: #ffffff;
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 9 5 L 1 9" fill="none" stroke-width="1.5"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="double_arrow_point_start" viewBox="0 0 10 10" refX="0" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="double_arrow_point_end" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-A-B-0">
+        <path d="M 80.00 63.40 C 88.33 63.40, 96.67 63.40, 105.00 63.40 C 113.33 63.40, 121.67 63.40, 130.00 63.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-B-C-0">
+        <path d="M 232.36 50.56 C 249.97 45.51, 267.59 40.45, 286.26 36.04 C 304.93 31.63, 324.67 27.86, 344.40 24.09" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-B-D-0">
+        <path d="M 232.36 76.24 C 249.97 81.29, 267.59 86.35, 283.06 90.15 C 298.53 93.95, 311.87 96.49, 325.20 99.04" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-C-E-0">
+        <path d="M 395.60 25.14 C 410.33 28.56, 425.07 31.98, 436.60 35.80 C 448.13 39.61, 456.47 43.82, 464.80 48.04" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-D-E-0">
+        <path d="M 414.80 97.20 C 423.13 95.27, 431.47 93.33, 439.80 90.26 C 448.13 87.19, 456.47 82.98, 464.80 78.76" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-B-C-0">
+        <rect x="269.2" y="55.400000000000006" width="32" height="20" class="edge-label-bg" fill-opacity="0.8"/>
+        <text x="285.2" y="65.4" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-B-D-0">
+        <rect x="273.2" y="107.4" width="24" height="20" class="edge-label-bg" fill-opacity="0.8"/>
+        <text x="285.2" y="117.4" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-A">
+        <rect x="0" y="44.2" width="80" height="38.4"/>
+        <text x="40" y="63.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">Start</text>
+      </g>
+      <g class="node" id="node-B">
+        <polygon points="187.6,5.800000000000011 245.2,63.400000000000006 187.6,121 130,63.400000000000006"/>
+        <text x="187.6" y="63.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Decision</text>
+      </g>
+      <g class="node" id="node-C">
+        <rect x="344.4" y="0" width="51.2" height="38.4"/>
+        <text x="370" y="19.2" class="label" text-anchor="middle" dominant-baseline="central">OK</text>
+      </g>
+      <g class="node" id="node-D">
+        <rect x="325.2" y="88.4" width="89.6" height="38.4"/>
+        <text x="370" y="107.60000000000001" class="label" text-anchor="middle" dominant-baseline="central">Cancel</text>
+      </g>
+      <g class="node" id="node-E">
+        <rect x="464.79999999999995" y="44.2" width="60.8" height="38.4"/>
+        <text x="495.19999999999993" y="63.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">End</text>
+      </g>
+    </g>
+  </g>
+</svg>

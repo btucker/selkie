@@ -176,10 +176,9 @@ impl LayoutGraph {
         });
 
         if min_x != f64::MAX {
-            self.width =
-                Some(max_x - min_x + self.options.padding.left + self.options.padding.right);
-            self.height =
-                Some(max_y - min_y + self.options.padding.top + self.options.padding.bottom);
+            // Content bounds only - padding is applied in the renderer
+            self.width = Some(max_x - min_x);
+            self.height = Some(max_y - min_y);
         }
     }
 

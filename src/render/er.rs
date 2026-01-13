@@ -315,34 +315,60 @@ fn render_entity(
             .with_fill("#FFFFFF"),
     });
 
-    // Attributes
+    // Attributes - rendered as separate text elements per mermaid.js format
+    // Column positions within the entity box
+    let type_x = x + padding;
+    let name_x = x + padding + 50.0; // After type column
+    let keys_x = x + width - padding - 20.0; // Right-aligned
+
     let mut attr_y = y + header_height + padding;
     for attr in &entity.attributes {
         attr_y += attr_row_height;
+        let text_y = attr_y - 4.0;
 
-        // Key indicators (PK, FK, UK)
-        let key_str = attr
-            .keys
-            .iter()
-            .map(|k| k.as_str())
-            .collect::<Vec<_>>()
-            .join(",");
-
-        let attr_text = if !key_str.is_empty() {
-            format!("{} {} {}", attr.attr_type, attr.name, key_str)
-        } else {
-            format!("{} {}", attr.attr_type, attr.name)
-        };
-
+        // Type column (e.g., "string", "int", "date")
         children.push(SvgElement::Text {
-            x: x + padding,
-            y: attr_y - 4.0,
-            content: attr_text,
+            x: type_x,
+            y: text_y,
+            content: attr.attr_type.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
                 .with_class("entity-attr")
+                .with_class("attribute-type")
                 .with_attr("font-size", "11"),
         });
+
+        // Name column (e.g., "name", "email", "id")
+        children.push(SvgElement::Text {
+            x: name_x,
+            y: text_y,
+            content: attr.name.clone(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "start")
+                .with_class("entity-attr")
+                .with_class("attribute-name")
+                .with_attr("font-size", "11"),
+        });
+
+        // Keys column (e.g., "PK", "FK", "UK" - if present)
+        if !attr.keys.is_empty() {
+            let key_str = attr
+                .keys
+                .iter()
+                .map(|k| k.as_str())
+                .collect::<Vec<_>>()
+                .join(",");
+            children.push(SvgElement::Text {
+                x: keys_x,
+                y: text_y,
+                content: key_str,
+                attrs: Attrs::new()
+                    .with_attr("text-anchor", "start")
+                    .with_class("entity-attr")
+                    .with_class("attribute-key")
+                    .with_attr("font-size", "11"),
+            });
+        }
     }
 
     SvgElement::Group {
@@ -666,4 +692,62 @@ fn generate_er_css() -> String {
 }
 "#
     .to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::diagrams::er::parse;
+    use crate::render::svg::SvgStructure;
+
+    #[test]
+    fn test_attribute_labels_rendered_separately() {
+        // Create an ER diagram with attributes
+        let input = r#"erDiagram
+    CUSTOMER {
+        string name
+        string email PK
+        int id
+    }
+"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // Parse the SVG structure to extract labels
+        let structure = SvgStructure::from_svg(&svg).unwrap();
+
+        // Mermaid.js renders each attribute component as a separate text element
+        // So we should see "string", "name", "email", "PK", "int", "id" as separate labels
+        assert!(
+            structure.labels.iter().any(|l| l == "string"),
+            "Should have 'string' as a separate label. Got: {:?}",
+            structure.labels
+        );
+        assert!(
+            structure.labels.iter().any(|l| l == "name"),
+            "Should have 'name' as a separate label. Got: {:?}",
+            structure.labels
+        );
+        assert!(
+            structure.labels.iter().any(|l| l == "email"),
+            "Should have 'email' as a separate label. Got: {:?}",
+            structure.labels
+        );
+        assert!(
+            structure.labels.iter().any(|l| l == "PK"),
+            "Should have 'PK' as a separate label. Got: {:?}",
+            structure.labels
+        );
+        assert!(
+            structure.labels.iter().any(|l| l == "int"),
+            "Should have 'int' as a separate label. Got: {:?}",
+            structure.labels
+        );
+        assert!(
+            structure.labels.iter().any(|l| l == "id"),
+            "Should have 'id' as a separate label. Got: {:?}",
+            structure.labels
+        );
+    }
 }

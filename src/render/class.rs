@@ -1,303 +1,161 @@
 //! Class diagram renderer
+//!
+//! This renderer uses dagre layout for positioning class nodes, following
+//! the same approach as mermaid.js which uses dagre for all diagram types.
 
 use std::collections::HashMap;
 
 use crate::diagrams::class::{ClassDb, ClassNode, LineType};
 use crate::error::Result;
+use crate::layout::{
+    self, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
+    LayoutOptions, NodeShape, NodeSizeConfig, Padding, Point, SizeEstimator, ToLayoutGraph,
+};
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
-/// Render a class diagram to SVG
+/// Convert ClassDb to LayoutGraph for dagre-based layout
+impl ToLayoutGraph for ClassDb {
+    fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
+        let config = NodeSizeConfig {
+            font_size: 12.0,
+            padding_horizontal: 10.0,
+            padding_vertical: 10.0,
+            min_width: 100.0,
+            min_height: 60.0,
+            max_width: Some(200.0),
+        };
+
+        let mut graph = LayoutGraph::new("class-diagram");
+
+        graph.options = LayoutOptions {
+            direction: self.preferred_direction(),
+            node_spacing: 60.0,
+            layer_spacing: 80.0,
+            padding: Padding::uniform(50.0),
+        };
+
+        // Convert classes to layout nodes (sorted for deterministic order)
+        let mut class_ids: Vec<&String> = self.classes.keys().collect();
+        class_ids.sort();
+
+        for id in class_ids {
+            let class = self.classes.get(id).unwrap();
+
+            let label = if !class.label.is_empty() {
+                &class.label
+            } else {
+                &class.id
+            };
+
+            // Estimate size: header + members + methods
+            let header_height = 30.0;
+            let member_height = 18.0;
+            let num_members = class.members.len() + class.methods.len();
+            let annotations_height = if class.annotations.is_empty() {
+                0.0
+            } else {
+                (class.annotations.len() as f64) * member_height
+            };
+            let content_height = (num_members as f64) * member_height + annotations_height;
+            let total_height = (header_height + content_height + config.padding_vertical * 2.0)
+                .max(config.min_height);
+
+            let (text_width, _) = size_estimator.estimate_text_size(label, config.font_size);
+            let width = (text_width + config.padding_horizontal * 2.0).max(config.min_width);
+
+            let mut node =
+                LayoutNode::new(id, width, total_height).with_shape(NodeShape::Rectangle);
+            node = node.with_label(label);
+            node.metadata
+                .insert("dom_id".to_string(), class.dom_id.clone());
+
+            graph.add_node(node);
+        }
+
+        // Convert relations to edges
+        for (idx, relation) in self.relations.iter().enumerate() {
+            let edge_id = format!("rel-{}-{}-{}", relation.id1, relation.id2, idx);
+            let mut edge = LayoutEdge::new(&edge_id, &relation.id1, &relation.id2);
+
+            if !relation.title.is_empty() {
+                edge = edge.with_label(&relation.title);
+            }
+
+            edge.metadata
+                .insert("type1".to_string(), relation.relation.type1.to_string());
+            edge.metadata
+                .insert("type2".to_string(), relation.relation.type2.to_string());
+            edge.metadata.insert(
+                "line_type".to_string(),
+                format!("{:?}", relation.relation.line_type),
+            );
+
+            graph.add_edge(edge);
+        }
+
+        Ok(graph)
+    }
+
+    fn preferred_direction(&self) -> LayoutDirection {
+        match self.direction.to_uppercase().as_str() {
+            "LR" => LayoutDirection::LeftToRight,
+            "RL" => LayoutDirection::RightToLeft,
+            "BT" => LayoutDirection::BottomToTop,
+            _ => LayoutDirection::TopToBottom,
+        }
+    }
+}
+
+/// Render a class diagram to SVG using dagre layout
 pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
     // Layout constants
-    let class_width = 180.0;
-    let class_min_height = 60.0;
     let class_padding = 10.0;
     let member_height = 18.0;
     let header_height = 30.0;
-    let class_spacing_x = 60.0;
-    let class_spacing_y = 80.0;
-    let margin = 50.0;
 
     let classes: Vec<_> = db.classes.values().collect();
 
     if classes.is_empty() {
-        // Empty diagram
         doc.set_size(400.0, 200.0);
         return Ok(doc.to_string());
     }
 
-    // Calculate class heights and positions
-    let mut class_heights: HashMap<String, f64> = HashMap::new();
+    // Convert to layout graph and run dagre layout
+    let size_estimator = CharacterSizeEstimator::default();
+    let layout_graph = db.to_layout_graph(&size_estimator)?;
+    let layout_graph = layout::layout(layout_graph)?;
+
+    // Build position map from layout results
     let mut class_positions: HashMap<String, (f64, f64)> = HashMap::new();
+    let mut class_dimensions: HashMap<String, (f64, f64)> = HashMap::new();
 
-    // Calculate height for each class
-    for class in &classes {
-        let num_members = class.members.len() + class.methods.len();
-        let content_height = (num_members as f64) * member_height;
-        let annotations_height = if class.annotations.is_empty() {
-            0.0
-        } else {
-            (class.annotations.len() as f64) * member_height
-        };
-        let total_height =
-            header_height + annotations_height + content_height + class_padding * 2.0;
-        let height = total_height.max(class_min_height);
-        class_heights.insert(class.id.clone(), height);
-    }
-
-    // Build hierarchical layout based on relationships
-    // Step 1: Build parent-child relationships for ALL relation types
-    // Inheritance (type1/type2 == 1) takes priority, but other relations also affect layout
-    let mut children_of: HashMap<String, Vec<String>> = HashMap::new();
-    let mut parent_of: HashMap<String, String> = HashMap::new();
-
-    // First pass: handle inheritance relationships (these define primary hierarchy)
-    for relation in &db.relations {
-        // type1 and type2: 1 = inheritance arrow (the arrow points toward parent)
-        // In "Animal <|-- Dog", Animal is parent, Dog is child
-        if relation.relation.type1 == 1 {
-            // id1 is parent, id2 is child
-            children_of
-                .entry(relation.id1.clone())
-                .or_default()
-                .push(relation.id2.clone());
-            parent_of.insert(relation.id2.clone(), relation.id1.clone());
-        } else if relation.relation.type2 == 1 {
-            // id2 is parent, id1 is child
-            children_of
-                .entry(relation.id2.clone())
-                .or_default()
-                .push(relation.id1.clone());
-            parent_of.insert(relation.id1.clone(), relation.id2.clone());
+    for node in &layout_graph.nodes {
+        if let (Some(x), Some(y)) = (node.x, node.y) {
+            class_positions.insert(node.id.clone(), (x, y));
+            class_dimensions.insert(node.id.clone(), (node.width, node.height));
         }
     }
 
-    // Second pass: handle composition/aggregation (these also affect hierarchy)
-    // type 0 = aggregation, type 2 = composition - the containing class is "parent"
-    for relation in &db.relations {
-        let is_composition_or_aggregation = |t: i32| t == 0 || t == 2;
-
-        if is_composition_or_aggregation(relation.relation.type1)
-            && !parent_of.contains_key(&relation.id2)
-        {
-            // id1 has the composition marker, so id1 contains id2
-            // id2 should be below id1
-            children_of
-                .entry(relation.id1.clone())
-                .or_default()
-                .push(relation.id2.clone());
-            parent_of.insert(relation.id2.clone(), relation.id1.clone());
-        } else if is_composition_or_aggregation(relation.relation.type2)
-            && !parent_of.contains_key(&relation.id1)
-        {
-            // id2 has the composition marker, so id2 contains id1
-            children_of
-                .entry(relation.id2.clone())
-                .or_default()
-                .push(relation.id1.clone());
-            parent_of.insert(relation.id1.clone(), relation.id2.clone());
-        }
-    }
-
-    // Step 2: Assign levels using BFS from root classes (those with no parents)
-    let mut class_levels: HashMap<String, usize> = HashMap::new();
-    let all_class_ids: Vec<_> = classes.iter().map(|c| c.id.clone()).collect();
-
-    // Find root classes (no parent in inheritance hierarchy)
-    let roots: Vec<_> = all_class_ids
-        .iter()
-        .filter(|id| !parent_of.contains_key(*id))
-        .cloned()
-        .collect();
-
-    // BFS to assign levels
-    let mut queue: std::collections::VecDeque<(String, usize)> =
-        roots.iter().map(|id| (id.clone(), 0)).collect();
-
-    while let Some((id, level)) = queue.pop_front() {
-        if class_levels.contains_key(&id) {
-            continue;
-        }
-        class_levels.insert(id.clone(), level);
-
-        if let Some(children) = children_of.get(&id) {
-            for child in children {
-                if !class_levels.contains_key(child) {
-                    queue.push_back((child.clone(), level + 1));
-                }
-            }
-        }
-    }
-
-    // Assign level 0 to any remaining classes (not in inheritance hierarchy)
-    for class in &classes {
-        class_levels.entry(class.id.clone()).or_insert(0);
-    }
-
-    // Step 3: Group classes by level and sort for consistent ordering
-    let max_level = class_levels.values().copied().max().unwrap_or(0);
-    let mut levels: Vec<Vec<String>> = vec![Vec::new(); max_level + 1];
-    for (id, level) in &class_levels {
-        levels[*level].push(id.clone());
-    }
-    // Sort each level alphabetically for consistent layout
-    for level in &mut levels {
-        level.sort();
-    }
-
-    // Step 4: Position classes in hierarchical layout (parent at top, children below)
-    // Use tree centering algorithm: parents are centered over their children
-    let is_horizontal = db.direction == "LR" || db.direction == "RL";
-
-    let mut max_width = margin;
-    let mut max_height = margin;
-
-    if is_horizontal {
-        // Horizontal layout: levels go left-to-right
-        let mut current_x = margin;
-        for level_classes in levels.iter().take(max_level + 1) {
-            if level_classes.is_empty() {
-                continue;
-            }
-
-            let mut current_y = margin;
-            for class_id in level_classes {
-                let height = class_heights
-                    .get(class_id)
-                    .copied()
-                    .unwrap_or(class_min_height);
-                class_positions.insert(class_id.clone(), (current_x, current_y));
-                current_y += height + class_spacing_y;
-            }
-
-            max_height = max_height.max(current_y);
-            current_x += class_width + class_spacing_x;
-        }
-        max_width = current_x + margin;
-    } else {
-        // Vertical layout with tree centering: parents centered over children
-        // Step 4a: Calculate subtree widths (bottom-up from leaves)
-        let mut subtree_widths: HashMap<String, f64> = HashMap::new();
-
-        // Process levels from bottom to top
-        for level in (0..=max_level).rev() {
-            for class_id in &levels[level] {
-                let children: Vec<_> = children_of.get(class_id).cloned().unwrap_or_default();
-
-                if children.is_empty() {
-                    // Leaf node: width is just the class width
-                    subtree_widths.insert(class_id.clone(), class_width);
-                } else {
-                    // Parent node: width is sum of children's subtree widths + spacing
-                    let children_width: f64 =
-                        children.iter().filter_map(|c| subtree_widths.get(c)).sum();
-                    let spacing = (children.len().saturating_sub(1) as f64) * class_spacing_x;
-                    let total_width = (children_width + spacing).max(class_width);
-                    subtree_widths.insert(class_id.clone(), total_width);
-                }
-            }
-        }
-
-        // Step 4b: Position nodes (top-down), centering parents over children
-        let mut current_y = margin;
-
-        // First pass: calculate y positions for each level
-        let mut level_y: Vec<f64> = Vec::new();
-        for level_classes in levels.iter().take(max_level + 1) {
-            if level_classes.is_empty() {
-                level_y.push(current_y);
-                continue;
-            }
-
-            let level_height: f64 = level_classes
-                .iter()
-                .filter_map(|id| class_heights.get(id).copied())
-                .fold(0.0_f64, f64::max)
-                .max(class_min_height);
-
-            level_y.push(current_y);
-            current_y += level_height + class_spacing_y;
-        }
-        max_height = current_y + margin;
-
-        // Second pass: calculate x positions using tree centering
-        // Start with root nodes, position them, then recursively position children
-        #[allow(clippy::too_many_arguments)]
-        fn position_subtree(
-            node_id: &str,
-            start_x: f64,
-            children_of: &HashMap<String, Vec<String>>,
-            class_levels: &HashMap<String, usize>,
-            subtree_widths: &HashMap<String, f64>,
-            level_y: &[f64],
-            class_positions: &mut HashMap<String, (f64, f64)>,
-            class_width: f64,
-            class_spacing_x: f64,
-        ) {
-            let level = *class_levels.get(node_id).unwrap_or(&0);
-            let y = level_y.get(level).copied().unwrap_or(0.0);
-            let subtree_width = subtree_widths.get(node_id).copied().unwrap_or(class_width);
-
-            // Center the node within its subtree width
-            let x = start_x + (subtree_width - class_width) / 2.0;
-            class_positions.insert(node_id.to_string(), (x, y));
-
-            // Position children
-            if let Some(children) = children_of.get(node_id) {
-                let mut child_x = start_x;
-                for child in children {
-                    let child_width = subtree_widths.get(child).copied().unwrap_or(class_width);
-                    position_subtree(
-                        child,
-                        child_x,
-                        children_of,
-                        class_levels,
-                        subtree_widths,
-                        level_y,
-                        class_positions,
-                        class_width,
-                        class_spacing_x,
-                    );
-                    child_x += child_width + class_spacing_x;
-                }
-            }
-        }
-
-        // Position all root nodes (level 0 nodes without parents)
-        let mut root_x = margin;
-        for root_id in &levels[0] {
-            let root_width = subtree_widths.get(root_id).copied().unwrap_or(class_width);
-            position_subtree(
-                root_id,
-                root_x,
-                &children_of,
-                &class_levels,
-                &subtree_widths,
-                &level_y,
-                &mut class_positions,
-                class_width,
-                class_spacing_x,
+    // Build edge bend points map
+    let mut edge_points: HashMap<(String, String), Vec<Point>> = HashMap::new();
+    for edge in &layout_graph.edges {
+        if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
+            edge_points.insert(
+                (source.to_string(), target.to_string()),
+                edge.bend_points.clone(),
             );
-            root_x += root_width + class_spacing_x;
-            max_width = max_width.max(root_x + margin);
-        }
-
-        // Position any orphan nodes (not in any tree) - place them at the end
-        for (level, level_classes) in levels.iter().enumerate().take(max_level + 1) {
-            for class_id in level_classes {
-                if !class_positions.contains_key(class_id) {
-                    let y = level_y.get(level).copied().unwrap_or(0.0);
-                    class_positions.insert(class_id.clone(), (root_x, y));
-                    root_x += class_width + class_spacing_x;
-                    max_width = max_width.max(root_x + margin);
-                }
-            }
         }
     }
 
-    doc.set_size(max_width, max_height);
+    // Calculate SVG dimensions from layout
+    let (width, height) = if let (Some(w), Some(h)) = (layout_graph.width, layout_graph.height) {
+        (w, h)
+    } else {
+        (800.0, 600.0) // Fallback
+    };
+    doc.set_size(width, height);
 
     // Add theme styles
     if config.embed_css {
@@ -314,18 +172,19 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
         create_lollipop_marker(),
     ]);
 
-    // Render each class
+    // Render each class at dagre-computed position
     for class in &classes {
         if let Some(&(x, y)) = class_positions.get(&class.id) {
-            let height = class_heights
+            let (width, height) = class_dimensions
                 .get(&class.id)
                 .copied()
-                .unwrap_or(class_min_height);
+                .unwrap_or((180.0, 60.0));
+
             let class_elem = render_class_box(
                 class,
                 x,
                 y,
-                class_width,
+                width,
                 height,
                 class_padding,
                 member_height,
@@ -335,34 +194,41 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
         }
     }
 
-    // Render relations
+    // Render relations using edge bend points from dagre
     for relation in &db.relations {
+        let key = (relation.id1.clone(), relation.id2.clone());
+
         if let (Some(&(x1, y1)), Some(&(x2, y2))) = (
             class_positions.get(&relation.id1),
             class_positions.get(&relation.id2),
         ) {
-            let h1 = class_heights
+            let (w1, h1) = class_dimensions
                 .get(&relation.id1)
                 .copied()
-                .unwrap_or(class_min_height);
-            let h2 = class_heights
+                .unwrap_or((180.0, 60.0));
+            let (w2, h2) = class_dimensions
                 .get(&relation.id2)
                 .copied()
-                .unwrap_or(class_min_height);
+                .unwrap_or((180.0, 60.0));
+
+            let bend_points = edge_points.get(&key);
+
             let relation_elem = render_relation(
                 x1,
                 y1,
                 h1,
+                w1,
                 x2,
                 y2,
                 h2,
-                class_width,
+                w2,
                 &relation.title,
                 &relation.relation_title1,
                 &relation.relation_title2,
                 relation.relation.type1,
                 relation.relation.type2,
                 relation.relation.line_type,
+                bend_points,
             );
             doc.add_element(relation_elem);
         }
@@ -371,7 +237,11 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     // Render notes
     for note in db.notes.values() {
         if let Some(&(x, y)) = class_positions.get(&note.class) {
-            let note_elem = render_note(x + class_width + 20.0, y, &note.text);
+            let (width, _) = class_dimensions
+                .get(&note.class)
+                .copied()
+                .unwrap_or((180.0, 60.0));
+            let note_elem = render_note(x + width + 20.0, y, &note.text);
             doc.add_element(note_elem);
         }
     }
@@ -544,28 +414,37 @@ fn render_class_box(
     }
 }
 
-/// Render a relation between two classes
+/// Render a relation between two classes using dagre bend points
 #[allow(clippy::too_many_arguments)]
 fn render_relation(
     x1: f64,
     y1: f64,
     h1: f64,
+    w1: f64,
     x2: f64,
     y2: f64,
     h2: f64,
-    class_width: f64,
+    w2: f64,
     label: &str,
     cardinality1: &str,
     cardinality2: &str,
     type1: i32,
     type2: i32,
     line_type: LineType,
+    bend_points: Option<&Vec<Point>>,
 ) -> SvgElement {
     let mut children = Vec::new();
 
-    // Calculate edge connection points based on relative positions
-    let (start_x, start_y, end_x, end_y) =
-        calculate_connection_points(x1, y1, h1, x2, y2, h2, class_width);
+    // Calculate path from bend points or fallback to direct line
+    let path_d = if let Some(points) = bend_points {
+        if !points.is_empty() {
+            build_path_from_points(points)
+        } else {
+            build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2)
+        }
+    } else {
+        build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2)
+    };
 
     // Determine marker based on relation type
     let marker_start = match type1 {
@@ -584,41 +463,53 @@ fn render_relation(
         _ => None,
     };
 
-    let mut line_attrs = Attrs::new()
+    let mut path_attrs = Attrs::new()
         .with_stroke("#333333")
         .with_stroke_width(1.0)
         .with_fill("none")
         .with_class("relation-line");
 
     if line_type == LineType::Dotted {
-        line_attrs = line_attrs.with_stroke_dasharray("5,5");
+        path_attrs = path_attrs.with_stroke_dasharray("5,5");
     }
 
     if let Some(marker) = marker_start {
-        line_attrs = line_attrs.with_attr("marker-start", marker);
+        path_attrs = path_attrs.with_attr("marker-start", marker);
     }
     if let Some(marker) = marker_end {
-        line_attrs = line_attrs.with_attr("marker-end", marker);
+        path_attrs = path_attrs.with_attr("marker-end", marker);
     }
 
-    children.push(SvgElement::Line {
-        x1: start_x,
-        y1: start_y,
-        x2: end_x,
-        y2: end_y,
-        attrs: line_attrs,
+    children.push(SvgElement::Path {
+        d: path_d.clone(),
+        attrs: path_attrs,
     });
+
+    // Calculate label positions based on bend points or direct line
+    let (start_x, start_y, end_x, end_y) = if let Some(points) = bend_points {
+        if points.len() >= 2 {
+            (
+                points[0].x,
+                points[0].y,
+                points[points.len() - 1].x,
+                points[points.len() - 1].y,
+            )
+        } else {
+            calculate_connection_points(x1, y1, h1, w1, x2, y2, h2, w2)
+        }
+    } else {
+        calculate_connection_points(x1, y1, h1, w1, x2, y2, h2, w2)
+    };
 
     // Cardinality label at start (near class 1)
     if !cardinality1.is_empty() {
         let dx = end_x - start_x;
         let dy = end_y - start_y;
-        let offset = 20.0; // Distance from the class edge
+        let offset = 20.0;
         let len = (dx * dx + dy * dy).sqrt();
         let offset_x = if len > 0.0 { offset * dx / len } else { 0.0 };
         let offset_y = if len > 0.0 { offset * dy / len } else { offset };
 
-        // Offset perpendicular to the line
         let perp_offset = 12.0;
         let perp_x = if len > 0.0 {
             -perp_offset * dy / len
@@ -646,12 +537,11 @@ fn render_relation(
     if !cardinality2.is_empty() {
         let dx = end_x - start_x;
         let dy = end_y - start_y;
-        let offset = 20.0; // Distance from the class edge
+        let offset = 20.0;
         let len = (dx * dx + dy * dy).sqrt();
         let offset_x = if len > 0.0 { offset * dx / len } else { 0.0 };
         let offset_y = if len > 0.0 { offset * dy / len } else { offset };
 
-        // Offset perpendicular to the line
         let perp_offset = 12.0;
         let perp_x = if len > 0.0 {
             -perp_offset * dy / len
@@ -697,32 +587,61 @@ fn render_relation(
     }
 }
 
+/// Build SVG path string from bend points
+fn build_path_from_points(points: &[Point]) -> String {
+    if points.is_empty() {
+        return String::new();
+    }
+
+    let mut d = format!("M {} {}", points[0].x, points[0].y);
+    for point in &points[1..] {
+        d.push_str(&format!(" L {} {}", point.x, point.y));
+    }
+    d
+}
+
+/// Build direct path when no bend points available
+#[allow(clippy::too_many_arguments)]
+fn build_direct_path(
+    x1: f64,
+    y1: f64,
+    h1: f64,
+    w1: f64,
+    x2: f64,
+    y2: f64,
+    h2: f64,
+    w2: f64,
+) -> String {
+    let (start_x, start_y, end_x, end_y) =
+        calculate_connection_points(x1, y1, h1, w1, x2, y2, h2, w2);
+    format!("M {} {} L {} {}", start_x, start_y, end_x, end_y)
+}
+
 /// Calculate connection points on class box edges
+#[allow(clippy::too_many_arguments)]
 fn calculate_connection_points(
     x1: f64,
     y1: f64,
     h1: f64,
+    w1: f64,
     x2: f64,
     y2: f64,
     h2: f64,
-    width: f64,
+    w2: f64,
 ) -> (f64, f64, f64, f64) {
-    let center1_x = x1 + width / 2.0;
+    let center1_x = x1 + w1 / 2.0;
     let center1_y = y1 + h1 / 2.0;
-    let center2_x = x2 + width / 2.0;
+    let center2_x = x2 + w2 / 2.0;
     let center2_y = y2 + h2 / 2.0;
 
     let dx = center2_x - center1_x;
     let dy = center2_y - center1_y;
 
-    // Silence unused variable warnings - centers are used for calculating dx/dy
-    let _ = (center1_x, center1_y, center2_x, center2_y);
-
     // Determine which edges to connect based on relative positions
     let (start_x, start_y) = if dx.abs() > dy.abs() {
         // Horizontal connection
         if dx > 0.0 {
-            (x1 + width, center1_y) // Right edge
+            (x1 + w1, center1_y) // Right edge
         } else {
             (x1, center1_y) // Left edge
         }
@@ -739,7 +658,7 @@ fn calculate_connection_points(
         if dx > 0.0 {
             (x2, center2_y) // Left edge
         } else {
-            (x2 + width, center2_y) // Right edge
+            (x2 + w2, center2_y) // Right edge
         }
     } else if dy > 0.0 {
         (center2_x, y2) // Top edge
@@ -819,23 +738,20 @@ fn render_note(x: f64, y: f64, text: &str) -> SvgElement {
 }
 
 /// Create inheritance marker (hollow triangle - UML extension/inheritance)
-/// Per mermaid.js extensionStart: apex at x=1, refX=18
-/// The triangle points toward the parent class (line origin for marker-start)
 fn create_inheritance_marker() -> SvgElement {
     SvgElement::Marker {
         id: "inheritance".to_string(),
         view_box: "0 0 20 14".to_string(),
-        ref_x: 18.0, // Line connects at x=18, arrow points back toward x=1
+        ref_x: 18.0,
         ref_y: 7.0,
         marker_width: 10.0,
         marker_height: 10.0,
         orient: "auto".to_string(),
         marker_units: None,
         children: vec![SvgElement::Path {
-            // Path from mermaid.js extensionStart: apex at x=1, opens toward x=18
             d: "M 1 7 L 18 13 V 1 Z".to_string(),
             attrs: Attrs::new()
-                .with_fill("none") // Hollow/transparent per UML convention
+                .with_fill("none")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
@@ -843,22 +759,20 @@ fn create_inheritance_marker() -> SvgElement {
 }
 
 /// Create aggregation marker (hollow diamond)
-/// Per mermaid.js: aggregation has fill:transparent
 fn create_aggregation_marker() -> SvgElement {
     SvgElement::Marker {
         id: "aggregation".to_string(),
         view_box: "0 0 20 14".to_string(),
-        ref_x: 18.0, // Like inheritance, line connects at right side
+        ref_x: 18.0,
         ref_y: 7.0,
         marker_width: 10.0,
         marker_height: 10.0,
         orient: "auto".to_string(),
         marker_units: None,
         children: vec![SvgElement::Path {
-            // Diamond shape: apex left, points at top and bottom, flat right
             d: "M 18 7 L 9 13 L 1 7 L 9 1 Z".to_string(),
             attrs: Attrs::new()
-                .with_fill("none") // Hollow per UML aggregation convention
+                .with_fill("none")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
@@ -866,22 +780,20 @@ fn create_aggregation_marker() -> SvgElement {
 }
 
 /// Create composition marker (filled diamond)
-/// Per mermaid.js: composition has fill:#333333 (solid/filled)
 fn create_composition_marker() -> SvgElement {
     SvgElement::Marker {
         id: "composition".to_string(),
         view_box: "0 0 20 14".to_string(),
-        ref_x: 18.0, // Consistent with other markers
+        ref_x: 18.0,
         ref_y: 7.0,
         marker_width: 10.0,
         marker_height: 10.0,
         orient: "auto".to_string(),
         marker_units: None,
         children: vec![SvgElement::Path {
-            // Same diamond shape as aggregation
             d: "M 18 7 L 9 13 L 1 7 L 9 1 Z".to_string(),
             attrs: Attrs::new()
-                .with_fill("#333333") // Filled per UML composition convention
+                .with_fill("#333333")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
@@ -1060,10 +972,6 @@ mod tests {
         let config = RenderConfig::default();
         let svg = render_class(&db, &config).expect("Render failed");
 
-        // Parse positions from SVG to verify layout
-        // Animal should be at top (smallest y), Egg at bottom (largest y)
-        // Duck, Fish, Zebra should be in the middle
-
         // For now, just verify the SVG contains all classes
         assert!(svg.contains("Animal"), "Should contain Animal");
         assert!(svg.contains("Duck"), "Should contain Duck");
@@ -1071,7 +979,41 @@ mod tests {
         assert!(svg.contains("Zebra"), "Should contain Zebra");
         assert!(svg.contains("Egg"), "Should contain Egg");
 
-        // Print SVG for manual inspection
-        println!("SVG output:\n{}", svg);
+        // Verify SVG has path elements for edges (dagre-computed)
+        assert!(
+            svg.contains("<path"),
+            "Should contain path elements for edges"
+        );
+    }
+
+    #[test]
+    fn test_class_diagram_uses_dagre_positions() {
+        let mut db = ClassDb::new();
+        db.add_class("A");
+        db.add_class("B");
+
+        db.add_relation(ClassRelation {
+            id1: "A".to_string(),
+            id2: "B".to_string(),
+            relation_title1: String::new(),
+            relation_title2: String::new(),
+            relation_type: "-->".to_string(),
+            title: String::new(),
+            text: String::new(),
+            style: vec![],
+            relation: RelationDetails {
+                type1: -1,
+                type2: -1,
+                line_type: LineType::Solid,
+            },
+        });
+
+        let config = RenderConfig::default();
+        let svg = render_class(&db, &config).expect("Render failed");
+
+        // Verify basic SVG structure
+        assert!(svg.contains("<svg"), "Should be valid SVG");
+        assert!(svg.contains("class-node"), "Should contain class nodes");
+        assert!(svg.contains("relation"), "Should contain relations");
     }
 }

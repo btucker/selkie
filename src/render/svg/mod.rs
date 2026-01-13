@@ -50,7 +50,8 @@ impl Default for RenderConfig {
     fn default() -> Self {
         Self {
             theme: Theme::default(),
-            padding: 20.0,
+            // Match mermaid.js default: flowchart?.diagramPadding ?? 8
+            padding: 8.0,
             embed_css: true,
             theme_css: None,
         }
