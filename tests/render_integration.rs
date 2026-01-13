@@ -82,6 +82,29 @@ fn test_render_with_dark_theme() {
 }
 
 #[test]
+fn test_render_with_forest_theme() {
+    let input = r#"flowchart LR
+    A --> B"#;
+
+    let diagram = parse(input).expect("Failed to parse flowchart");
+    let config = RenderConfig {
+        theme: Theme::forest(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with forest theme");
+
+    // Verify SVG generated with forest theme
+    assert!(svg.contains("<svg"), "SVG should have opening tag");
+    assert!(svg.contains("<style>"), "SVG should contain embedded styles");
+    // Forest theme should have green colors in styles
+    assert!(
+        svg.contains("#cde498") || svg.contains("#cdffb2") || svg.contains("#13540c"),
+        "Forest theme should have green color palette, got: {}",
+        &svg[..500.min(svg.len())]
+    );
+}
+
+#[test]
 fn test_render_with_custom_padding() {
     let input = r#"flowchart LR
     A --> B"#;

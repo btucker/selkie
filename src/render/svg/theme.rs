@@ -76,6 +76,23 @@ impl Theme {
         }
     }
 
+    /// Create a forest theme (nature-inspired green palette)
+    pub fn forest() -> Self {
+        Self {
+            // Green nature-inspired palette from mermaid.js theme-forest.js
+            primary_color: "#cde498".to_string(),      // Light green (mainBkg)
+            primary_text_color: "#333333".to_string(), // Dark text on light background
+            primary_border_color: "#13540c".to_string(), // Dark green (border1)
+            secondary_color: "#cdffb2".to_string(),    // Mint green (secondBkg)
+            tertiary_color: "#e0f2c8".to_string(),     // Lighter green
+            cluster_border_color: "#6eaa49".to_string(), // Medium green (border2)
+            line_color: "#008000".to_string(),         // Green for edges
+            background: "#ffffff".to_string(),
+            font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
+            font_size: "16px".to_string(),
+        }
+    }
+
     /// Generate CSS for embedding in SVG
     pub fn generate_css(&self) -> String {
         format!(
