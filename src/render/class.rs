@@ -306,14 +306,9 @@ fn render_class_box(
 ) -> SvgElement {
     let mut children = Vec::new();
 
-    // Background rectangle
-    children.push(SvgElement::Rect {
-        x,
-        y,
-        width,
-        height,
-        rx: Some(3.0),
-        ry: Some(3.0),
+    // Background shape (path to match mermaid structure)
+    children.push(SvgElement::Path {
+        d: rounded_rect_path(x, y, width, height, 3.0, 3.0),
         attrs: Attrs::new()
             .with_fill("#ECECFF")
             .with_stroke("#333333")
@@ -380,11 +375,8 @@ fn render_class_box(
 
     // Separator line after name
     if !class.members.is_empty() || !class.methods.is_empty() {
-        children.push(SvgElement::Line {
-            x1: x,
-            y1: current_y,
-            x2: x + width,
-            y2: current_y,
+        children.push(SvgElement::Path {
+            d: line_path(x, current_y, x + width, current_y),
             attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
         });
     }
@@ -416,11 +408,8 @@ fn render_class_box(
     // Separator line between attributes and methods
     if !class.members.is_empty() && !class.methods.is_empty() {
         current_y += padding / 2.0;
-        children.push(SvgElement::Line {
-            x1: x,
-            y1: current_y,
-            x2: x + width,
-            y2: current_y,
+        children.push(SvgElement::Path {
+            d: line_path(x, current_y, x + width, current_y),
             attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
         });
     }
@@ -457,6 +446,40 @@ fn render_class_box(
             .with_class("class-node")
             .with_id(&format!("class-{}", class.id)),
     }
+}
+
+fn line_path(x1: f64, y1: f64, x2: f64, y2: f64) -> String {
+    format!("M {} {} L {} {}", x1, y1, x2, y2)
+}
+
+fn rounded_rect_path(x: f64, y: f64, width: f64, height: f64, rx: f64, ry: f64) -> String {
+    let right = x + width;
+    let bottom = y + height;
+    format!(
+        "M {} {} H {} A {} {} 0 0 1 {} {} V {} A {} {} 0 0 1 {} {} H {} A {} {} 0 0 1 {} {} V {} A {} {} 0 0 1 {} {} Z",
+        x + rx,
+        y,
+        right - rx,
+        rx,
+        ry,
+        right,
+        y + ry,
+        bottom - ry,
+        rx,
+        ry,
+        right - rx,
+        bottom,
+        x + rx,
+        rx,
+        ry,
+        x,
+        bottom - ry,
+        y + ry,
+        rx,
+        ry,
+        x + rx,
+        y
+    )
 }
 
 /// Render a relation between two classes using dagre bend points
