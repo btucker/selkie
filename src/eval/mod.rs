@@ -193,11 +193,7 @@ impl Issue {
     }
 
     /// Add expected/actual values
-    pub fn with_values(
-        mut self,
-        expected: impl Into<String>,
-        actual: impl Into<String>,
-    ) -> Self {
+    pub fn with_values(mut self, expected: impl Into<String>, actual: impl Into<String>) -> Self {
         self.expected = Some(expected.into());
         self.actual = Some(actual.into());
         self
@@ -244,7 +240,11 @@ impl EvalResult {
     /// Compute summary statistics from diagram results
     pub fn compute_stats(&mut self) {
         self.total = self.diagrams.len();
-        self.matching = self.diagrams.iter().filter(|d| d.status == Status::Match).count();
+        self.matching = self
+            .diagrams
+            .iter()
+            .filter(|d| d.status == Status::Match)
+            .count();
         self.parity_percent = if self.total > 0 {
             100.0 * self.matching as f64 / self.total as f64
         } else {
@@ -252,7 +252,8 @@ impl EvalResult {
         };
 
         // Compute average SSIM
-        let ssim_values: Vec<f64> = self.diagrams
+        let ssim_values: Vec<f64> = self
+            .diagrams
             .iter()
             .filter_map(|d| d.visual_similarity)
             .collect();
@@ -285,7 +286,8 @@ impl EvalResult {
         // Group by type
         self.by_type.clear();
         for diagram in &self.diagrams {
-            let entry = self.by_type
+            let entry = self
+                .by_type
                 .entry(diagram.diagram_type.clone())
                 .or_insert(TypeStats {
                     total: 0,
@@ -308,7 +310,8 @@ impl EvalResult {
             };
 
             // Compute per-type average SSIM
-            let type_ssim: Vec<f64> = self.diagrams
+            let type_ssim: Vec<f64> = self
+                .diagrams
                 .iter()
                 .filter(|d| &d.diagram_type == dtype)
                 .filter_map(|d| d.visual_similarity)

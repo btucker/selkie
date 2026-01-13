@@ -471,7 +471,8 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
                 let content = fs::read_to_string(&path)
                     .map_err(|e| format!("Failed to read {}: {}", target, e))?;
                 vec![DiagramInput {
-                    name: path.file_stem()
+                    name: path
+                        .file_stem()
                         .map(|s| s.to_string_lossy().to_string())
                         .unwrap_or_else(|| "diagram".to_string()),
                     source: Some(target.clone()),
@@ -533,7 +534,8 @@ fn load_directory(dir: &PathBuf) -> Result<Vec<DiagramInput>, Box<dyn std::error
         let path = entry?;
         let content = fs::read_to_string(&path)?;
         inputs.push(DiagramInput {
-            name: path.file_stem()
+            name: path
+                .file_stem()
                 .map(|s| s.to_string_lossy().to_string())
                 .unwrap_or_else(|| "diagram".to_string()),
             source: Some(path.to_string_lossy().to_string()),

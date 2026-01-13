@@ -99,7 +99,10 @@ pub fn text_detailed(result: &EvalResult) -> String {
         .collect();
 
     if !problem_diagrams.is_empty() {
-        output.push_str(&format!("\nDiagrams with Issues ({}):\n", problem_diagrams.len()));
+        output.push_str(&format!(
+            "\nDiagrams with Issues ({}):\n",
+            problem_diagrams.len()
+        ));
         output.push_str(&"-".repeat(60));
         output.push('\n');
 
@@ -121,7 +124,10 @@ pub fn text_detailed(result: &EvalResult) -> String {
                     Level::Warning => "WARN",
                     Level::Info => "INFO",
                 };
-                output.push_str(&format!("  [{}] {}: {}\n", level_str, issue.check, issue.message));
+                output.push_str(&format!(
+                    "  [{}] {}: {}\n",
+                    level_str, issue.check, issue.message
+                ));
             }
         }
 
@@ -258,10 +264,7 @@ fn generate_html(result: &EvalResult) -> String {
         </div>
     </div>
 "#,
-        result.total,
-        result.parity_percent,
-        result.matching,
-        result.issue_counts.errors
+        result.total, result.parity_percent, result.matching, result.issue_counts.errors
     ));
 
     // Individual diagram cards
@@ -354,8 +357,8 @@ pub struct PngManifestEntry {
 pub fn write_pngs(
     _result: &EvalResult,
     _output_dir: &Path,
-    _selkie_svgs: &[(String, String)],      // (name, svg)
-    _reference_svgs: &[(String, String)],   // (name, svg)
+    _selkie_svgs: &[(String, String)],    // (name, svg)
+    _reference_svgs: &[(String, String)], // (name, svg)
 ) -> std::io::Result<()> {
     // TODO: Implement PNG generation when resvg is available
     // For now, this is a placeholder

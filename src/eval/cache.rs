@@ -169,7 +169,12 @@ impl ReferenceCache {
 
         if let Ok(entries) = fs::read_dir(&self.cache_dir) {
             for entry in entries.flatten() {
-                if entry.path().extension().map(|e| e == "svg").unwrap_or(false) {
+                if entry
+                    .path()
+                    .extension()
+                    .map(|e| e == "svg")
+                    .unwrap_or(false)
+                {
                     stats.count += 1;
                     if let Ok(metadata) = entry.metadata() {
                         stats.total_size += metadata.len();

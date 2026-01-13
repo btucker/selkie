@@ -5,8 +5,8 @@
 //! - Warning: Significant differences (dimensions >20% off, shape counts differ)
 //! - Info: Acceptable variations (styling, minor dimension differences)
 
-use crate::render::svg::SvgStructure;
 use super::Issue;
+use crate::render::svg::SvgStructure;
 use std::collections::HashSet;
 
 /// Configuration for structural checks
@@ -90,11 +90,7 @@ fn check_edge_count(selkie: &SvgStructure, reference: &SvgStructure, issues: &mu
 }
 
 /// Check for missing labels - ERROR if labels from reference are missing
-fn check_missing_labels(
-    selkie: &SvgStructure,
-    reference: &SvgStructure,
-    issues: &mut Vec<Issue>,
-) {
+fn check_missing_labels(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
     let selkie_labels: HashSet<_> = selkie.labels.iter().collect();
     let reference_labels: HashSet<_> = reference.labels.iter().collect();
 
@@ -105,21 +101,16 @@ fn check_missing_labels(
 
     if !missing.is_empty() {
         issues.push(
-            Issue::error(
-                "labels_missing",
-                format!("Missing labels: {:?}", missing),
-            )
-            .with_values(format!("{:?}", reference.labels), format!("{:?}", selkie.labels)),
+            Issue::error("labels_missing", format!("Missing labels: {:?}", missing)).with_values(
+                format!("{:?}", reference.labels),
+                format!("{:?}", selkie.labels),
+            ),
         );
     }
 }
 
 /// Check for extra labels - INFO (acceptable variation)
-fn check_extra_labels(
-    selkie: &SvgStructure,
-    reference: &SvgStructure,
-    issues: &mut Vec<Issue>,
-) {
+fn check_extra_labels(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
     let selkie_labels: HashSet<_> = selkie.labels.iter().collect();
     let reference_labels: HashSet<_> = reference.labels.iter().collect();
 
@@ -161,7 +152,10 @@ fn check_dimensions(
                     selkie.width
                 ),
             )
-            .with_values(format!("{:.0}", reference.width), format!("{:.0}", selkie.width)),
+            .with_values(
+                format!("{:.0}", reference.width),
+                format!("{:.0}", selkie.width),
+            ),
         );
     } else if width_diff > config.dimension_info_threshold {
         issues.push(Issue::info(
@@ -193,7 +187,10 @@ fn check_dimensions(
                     selkie.height
                 ),
             )
-            .with_values(format!("{:.0}", reference.height), format!("{:.0}", selkie.height)),
+            .with_values(
+                format!("{:.0}", reference.height),
+                format!("{:.0}", selkie.height),
+            ),
         );
     } else if height_diff > config.dimension_info_threshold {
         issues.push(Issue::info(
@@ -209,11 +206,7 @@ fn check_dimensions(
 }
 
 /// Check shape counts - WARNING if significantly different
-fn check_shape_counts(
-    selkie: &SvgStructure,
-    reference: &SvgStructure,
-    issues: &mut Vec<Issue>,
-) {
+fn check_shape_counts(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
     let shape_checks = [
         ("rect", selkie.shapes.rect, reference.shapes.rect),
         ("circle", selkie.shapes.circle, reference.shapes.circle),
@@ -221,7 +214,11 @@ fn check_shape_counts(
         ("polygon", selkie.shapes.polygon, reference.shapes.polygon),
         ("path", selkie.shapes.path, reference.shapes.path),
         ("line", selkie.shapes.line, reference.shapes.line),
-        ("polyline", selkie.shapes.polyline, reference.shapes.polyline),
+        (
+            "polyline",
+            selkie.shapes.polyline,
+            reference.shapes.polyline,
+        ),
     ];
 
     for (name, selkie_count, ref_count) in shape_checks {
@@ -297,7 +294,8 @@ pub fn calculate_similarity(selkie: &SvgStructure, reference: &SvgStructure) -> 
         score_parts.push(width_ratio);
     }
     if reference.height > 0.0 {
-        let height_ratio = selkie.height.min(reference.height) / selkie.height.max(reference.height);
+        let height_ratio =
+            selkie.height.min(reference.height) / selkie.height.max(reference.height);
         score_parts.push(height_ratio);
     }
 
@@ -336,7 +334,10 @@ mod tests {
 
         let issues = check_structure(&s1, &s2, &CheckConfig::default());
         let errors: Vec<_> = issues.iter().filter(|i| i.level == Level::Error).collect();
-        assert!(errors.is_empty(), "Should have no errors for identical structures");
+        assert!(
+            errors.is_empty(),
+            "Should have no errors for identical structures"
+        );
     }
 
     #[test]
@@ -346,7 +347,10 @@ mod tests {
 
         let issues = check_structure(&selkie, &reference, &CheckConfig::default());
         let errors: Vec<_> = issues.iter().filter(|i| i.level == Level::Error).collect();
-        assert!(!errors.is_empty(), "Should have error for node count mismatch");
+        assert!(
+            !errors.is_empty(),
+            "Should have error for node count mismatch"
+        );
     }
 
     #[test]
@@ -358,7 +362,10 @@ mod tests {
         let has_missing_label_error = issues
             .iter()
             .any(|i| i.level == Level::Error && i.check == "labels_missing");
-        assert!(has_missing_label_error, "Should have error for missing labels");
+        assert!(
+            has_missing_label_error,
+            "Should have error for missing labels"
+        );
     }
 
     #[test]
@@ -367,7 +374,10 @@ mod tests {
         let s2 = make_structure(3, 2, vec!["A", "B", "C"]);
 
         let sim = calculate_similarity(&s1, &s2);
-        assert!((sim - 1.0).abs() < 0.01, "Identical structures should have 1.0 similarity");
+        assert!(
+            (sim - 1.0).abs() < 0.01,
+            "Identical structures should have 1.0 similarity"
+        );
     }
 
     #[test]
@@ -376,6 +386,9 @@ mod tests {
         let s2 = make_structure(6, 4, vec!["A", "B", "C", "D", "E", "F"]);
 
         let sim = calculate_similarity(&s1, &s2);
-        assert!(sim < 0.8, "Different structures should have lower similarity");
+        assert!(
+            sim < 0.8,
+            "Different structures should have lower similarity"
+        );
     }
 }

@@ -168,7 +168,6 @@ pub fn all_samples() -> Vec<Sample> {
     Unit Tests  :c1, after b2, 3d
     QA          :c2, after b3, 5d"#,
         },
-
         // Examples from mermaid.js documentation
         Sample {
             name: "example_pie_netflix",
@@ -307,10 +306,7 @@ pub fn samples_by_type(diagram_type: &str) -> Vec<Sample> {
 
 /// Get available diagram types
 pub fn available_types() -> Vec<&'static str> {
-    let mut types: Vec<&'static str> = all_samples()
-        .iter()
-        .map(|s| s.diagram_type)
-        .collect();
+    let mut types: Vec<&'static str> = all_samples().iter().map(|s| s.diagram_type).collect();
     types.sort();
     types.dedup();
     types

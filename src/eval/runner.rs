@@ -99,7 +99,12 @@ impl EvalRunner {
 
         // Evaluate each diagram
         for (i, input) in filtered.iter().enumerate() {
-            eprint!("\rEvaluating {}/{}: {}...", i + 1, filtered.len(), input.name);
+            eprint!(
+                "\rEvaluating {}/{}: {}...",
+                i + 1,
+                filtered.len(),
+                input.name
+            );
             let diagram_result = self.evaluate_single(input);
             result.diagrams.push(diagram_result);
         }
@@ -140,10 +145,9 @@ impl EvalRunner {
             Ok(_) => result.parse_result.selkie_success = true,
             Err(e) => {
                 result.parse_result.selkie_error = Some(e.to_string());
-                result.issues.push(Issue::error(
-                    "parse",
-                    format!("Selkie parse failed: {}", e),
-                ));
+                result
+                    .issues
+                    .push(Issue::error("parse", format!("Selkie parse failed: {}", e)));
             }
         }
 
@@ -185,8 +189,13 @@ impl EvalRunner {
         };
 
         // Step 4: Extract structures and compare
-        let selkie_structure = selkie_svg.as_ref().and_then(|svg| SvgStructure::from_svg(svg).ok());
-        let reference_structure = reference_svg.as_ref().ok().and_then(|svg| SvgStructure::from_svg(svg).ok());
+        let selkie_structure = selkie_svg
+            .as_ref()
+            .and_then(|svg| SvgStructure::from_svg(svg).ok());
+        let reference_structure = reference_svg
+            .as_ref()
+            .ok()
+            .and_then(|svg| SvgStructure::from_svg(svg).ok());
 
         // Update render result
         result.render_result = Some(RenderResult {
@@ -197,7 +206,9 @@ impl EvalRunner {
                 None
             },
             reference_success: reference_structure.is_some(),
-            reference_error: if reference_structure.is_none() && result.parse_result.reference_success {
+            reference_error: if reference_structure.is_none()
+                && result.parse_result.reference_success
+            {
                 Some("Structure extraction failed".to_string())
             } else {
                 None
@@ -213,10 +224,9 @@ impl EvalRunner {
         });
 
         // Step 5: Structural comparison
-        if let (Some(selkie_struct), Some(ref_struct)) =
-            (&selkie_structure, &reference_structure)
-        {
-            let check_issues = check_structure(selkie_struct, ref_struct, &self.config.check_config);
+        if let (Some(selkie_struct), Some(ref_struct)) = (&selkie_structure, &reference_structure) {
+            let check_issues =
+                check_structure(selkie_struct, ref_struct, &self.config.check_config);
             result.structural_match = !check_issues.iter().any(|i| i.level == Level::Error);
             result.issues.extend(check_issues);
         }
@@ -286,7 +296,10 @@ fn detect_diagram_type(text: &str) -> String {
         return "flowchart".to_string();
     }
     // "graph" followed by whitespace indicates flowchart
-    if text_lower.starts_with("graph ") || text_lower.starts_with("graph\t") || text_lower.starts_with("graph\n") {
+    if text_lower.starts_with("graph ")
+        || text_lower.starts_with("graph\t")
+        || text_lower.starts_with("graph\n")
+    {
         return "flowchart".to_string();
     }
 
@@ -301,7 +314,10 @@ mod tests {
     fn test_detect_diagram_type() {
         assert_eq!(detect_diagram_type("flowchart LR\nA-->B"), "flowchart");
         assert_eq!(detect_diagram_type("graph TD\nA-->B"), "flowchart");
-        assert_eq!(detect_diagram_type("sequenceDiagram\nA->>B: Hi"), "sequence");
+        assert_eq!(
+            detect_diagram_type("sequenceDiagram\nA->>B: Hi"),
+            "sequence"
+        );
         assert_eq!(detect_diagram_type("pie\n\"A\": 50"), "pie");
     }
 

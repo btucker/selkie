@@ -154,7 +154,10 @@ mod tests {
     fn test_identical_images() {
         let img = vec![100u8; 100];
         let ssim = calculate_ssim(&img, &img, 10, 10);
-        assert!((ssim - 1.0).abs() < 0.001, "Identical images should have SSIM ~1.0");
+        assert!(
+            (ssim - 1.0).abs() < 0.001,
+            "Identical images should have SSIM ~1.0"
+        );
     }
 
     #[test]
@@ -162,7 +165,10 @@ mod tests {
         let img1 = vec![0u8; 100];
         let img2 = vec![255u8; 100];
         let ssim = calculate_ssim(&img1, &img2, 10, 10);
-        assert!(ssim < 0.1, "Completely different images should have low SSIM");
+        assert!(
+            ssim < 0.1,
+            "Completely different images should have low SSIM"
+        );
     }
 
     #[test]
