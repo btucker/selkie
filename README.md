@@ -18,17 +18,127 @@ Selkie could not exist without all the human effort that has gone into these exc
 
 ## Supported Diagram Types
 
-Selkie supports parsing and rendering for all major Mermaid diagram types:
+Selkie supports parsing for all major Mermaid diagram types. Rendering is complete for core diagram types, with others in progress.
+
+### Flowchart
+
+Flow diagrams with nodes, edges, and subgraphs.
+
+```mermaid
+flowchart LR
+    A[Start] --> B{Decision}
+    B -->|Yes| C[OK]
+    B -->|No| D[Cancel]
+    C --> E[End]
+    D --> E
+```
+
+![Flowchart Example](docs/images/flowchart.svg)
+
+### Sequence Diagram
+
+Sequence diagrams for modeling interactions between participants.
+
+```mermaid
+sequenceDiagram
+    Alice->>Bob: Hello Bob!
+    Bob-->>Alice: Hi Alice!
+    Alice->>Bob: How are you?
+    Bob-->>Alice: Great!
+```
+
+![Sequence Example](docs/images/sequence.svg)
+
+### Class Diagram
+
+UML class diagrams showing relationships and structure.
+
+```mermaid
+classDiagram
+    Animal <|-- Dog
+    Animal <|-- Cat
+    Animal : +String name
+    Animal : +eat()
+    class Dog{
+        +bark()
+    }
+    class Cat{
+        +meow()
+    }
+```
+
+![Class Example](docs/images/class.svg)
+
+### State Diagram
+
+State machine diagrams for modeling system states.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Running : start
+    Running --> Idle : stop
+    Running --> [*]
+```
+
+![State Example](docs/images/state.svg)
+
+### Entity Relationship Diagram
+
+ER diagrams for data modeling.
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ ITEM : contains
+    CUSTOMER {
+        string name
+        string email
+    }
+    ORDER {
+        int id
+        date created
+    }
+```
+
+![ER Example](docs/images/er.svg)
+
+### Gantt Chart
+
+Project timeline and scheduling charts.
+
+```mermaid
+gantt
+    title Project Plan
+    dateFormat YYYY-MM-DD
+    section Phase 1
+    Task A :a1, 2024-01-01, 7d
+    Task B :a2, after a1, 5d
+    section Phase 2
+    Task C :b1, after a2, 10d
+```
+
+![Gantt Example](docs/images/gantt.svg)
+
+### Pie Chart
+
+Pie charts for proportional data.
+
+```mermaid
+pie title Languages
+    "Rust" : 45
+    "TypeScript" : 30
+    "Python" : 25
+```
+
+![Pie Example](docs/images/pie.svg)
+
+### Additional Diagram Types (Parser Only)
+
+The following diagram types have parser support and rendering is in progress:
 
 | Diagram Type | Description |
 |--------------|-------------|
-| Flowchart | Flow diagrams with nodes and edges |
-| Sequence | Sequence diagrams for interactions |
-| Class | UML class diagrams |
-| State | State machine diagrams |
-| Entity Relationship | ER diagrams for data modeling |
-| Gantt | Project timeline charts |
-| Pie | Pie charts |
 | Git Graph | Git branch visualization |
 | Mindmap | Hierarchical mindmaps |
 | Timeline | Timeline visualizations |
