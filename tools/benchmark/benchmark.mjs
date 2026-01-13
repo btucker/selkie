@@ -163,7 +163,65 @@ const testCases = [
     "Meetings" : 10
     "Other" : 5`,
   },
+  {
+    name: 'Large flowchart (100 nodes)',
+    diagram: generateLargeFlowchart(100, 200),
+  },
 ];
+
+// Generate a large flowchart with N nodes and approximately M edges
+function generateLargeFlowchart(nodeCount, edgeCount) {
+  const lines = ['flowchart TB'];
+
+  // Create nodes in groups (like layers in a neural network)
+  const layerSize = 10;
+  const layers = Math.ceil(nodeCount / layerSize);
+
+  // Generate node definitions
+  for (let i = 0; i < nodeCount; i++) {
+    const layer = Math.floor(i / layerSize);
+    const shapes = ['[', '(', '{', '([', '[['];
+    const closeShapes = [']', ')', '}', '])', ']]'];
+    const shapeIdx = i % shapes.length;
+    lines.push(`    N${i}${shapes[shapeIdx]}Node ${i}${closeShapes[shapeIdx]}`);
+  }
+
+  // Generate edges - connect nodes between adjacent layers
+  let edgesAdded = 0;
+
+  // Connect each node to 2-3 nodes in the next layer
+  for (let layer = 0; layer < layers - 1 && edgesAdded < edgeCount; layer++) {
+    const layerStart = layer * layerSize;
+    const layerEnd = Math.min(layerStart + layerSize, nodeCount);
+    const nextLayerStart = (layer + 1) * layerSize;
+    const nextLayerEnd = Math.min(nextLayerStart + layerSize, nodeCount);
+
+    for (let i = layerStart; i < layerEnd && edgesAdded < edgeCount; i++) {
+      // Connect to 2-3 nodes in the next layer
+      const connections = 2 + (i % 2);
+      for (let c = 0; c < connections && edgesAdded < edgeCount; c++) {
+        const targetIdx = nextLayerStart + ((i - layerStart + c) % (nextLayerEnd - nextLayerStart));
+        if (targetIdx < nodeCount) {
+          const edgeTypes = ['-->', '---', '-.->', '===>', '-.->'];
+          const edgeType = edgeTypes[edgesAdded % edgeTypes.length];
+          lines.push(`    N${i} ${edgeType} N${targetIdx}`);
+          edgesAdded++;
+        }
+      }
+    }
+  }
+
+  // Add some cross-layer connections to reach edge target
+  for (let i = 0; edgesAdded < edgeCount && i < nodeCount - 2; i++) {
+    const target = Math.min(i + 2 + (i % 3), nodeCount - 1);
+    if (target !== i) {
+      lines.push(`    N${i} --> N${target}`);
+      edgesAdded++;
+    }
+  }
+
+  return lines.join('\n');
+}
 
 const WARMUP_RUNS = 3;
 const BENCHMARK_RUNS = 10;
