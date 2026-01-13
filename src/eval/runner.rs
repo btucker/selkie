@@ -126,6 +126,8 @@ impl EvalRunner {
                 reference_error: None,
             },
             render_result: None,
+            selkie_svg: None,
+            reference_svg: None,
         };
 
         // Step 1: Parse with selkie
@@ -154,6 +156,7 @@ impl EvalRunner {
                 // Not necessarily an error - mermaid.js might legitimately reject it
             }
         }
+        result.reference_svg = reference_svg.as_ref().ok().cloned();
 
         // If neither parser succeeded, we're done
         if !result.parse_result.selkie_success && !result.parse_result.reference_success {
@@ -176,6 +179,7 @@ impl EvalRunner {
         } else {
             None
         };
+        result.selkie_svg = selkie_svg.clone();
 
         // Step 4: Extract structures and compare
         let selkie_structure = selkie_svg

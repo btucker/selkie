@@ -231,6 +231,61 @@ fn generate_html(result: &EvalResult) -> String {
         .issue-warning { background: #fff3cd; }
         .issue-info { background: #d1ecf1; }
         .no-issues { color: #28a745; font-style: italic; }
+        .diagram-compare {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            padding: 16px 20px 0;
+        }
+        .diagram-panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .panel-header {
+            padding: 8px 12px;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        .panel-header.rs { background: #fef3c7; color: #92400e; }
+        .panel-header.ref { background: #dbeafe; color: #1e40af; }
+        .panel-content {
+            padding: 12px;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+        .panel-content svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .panel-error {
+            color: #dc2626;
+            font-style: italic;
+        }
+        details.diagram-source {
+            padding: 0 20px 16px;
+        }
+        details.diagram-source summary {
+            cursor: pointer;
+            color: #374151;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        details.diagram-source pre {
+            margin-top: 10px;
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
@@ -292,6 +347,31 @@ fn generate_html(result: &EvalResult) -> String {
             status_text
         ));
 
+        html.push_str(r#"<div class="diagram-compare">"#);
+        html.push_str(&render_svg_panel(
+            "selkie",
+            "rs",
+            diagram.selkie_svg.as_deref(),
+        ));
+        html.push_str(&render_svg_panel(
+            "mermaid.js",
+            "ref",
+            diagram.reference_svg.as_deref(),
+        ));
+        html.push_str("</div>");
+
+        if let Some(ref source) = diagram.diagram_text {
+            html.push_str(&format!(
+                r#"
+        <details class="diagram-source">
+            <summary>Source</summary>
+            <pre>{}</pre>
+        </details>
+"#,
+                html_escape(source)
+            ));
+        }
+
         // Issues
         html.push_str(r#"        <div class="issues-panel">"#);
         if diagram.issues.is_empty() {
@@ -330,6 +410,36 @@ fn html_escape(s: &str) -> String {
         .replace('<', "&lt;")
         .replace('>', "&gt;")
         .replace('"', "&quot;")
+}
+
+fn render_svg_panel(label: &str, class_name: &str, svg: Option<&str>) -> String {
+    let content = if let Some(svg) = svg {
+        let fragment = svg_fragment(svg);
+        format!(r#"<div class="panel-content">{}</div>"#, fragment)
+    } else {
+        r#"<div class="panel-content"><span class="panel-error">SVG not available</span></div>"#
+            .to_string()
+    };
+
+    format!(
+        r#"
+        <div class="diagram-panel">
+            <div class="panel-header {}">{}</div>
+            {}
+        </div>
+"#,
+        class_name,
+        html_escape(label),
+        content
+    )
+}
+
+fn svg_fragment(svg: &str) -> &str {
+    if let Some(pos) = svg.find("<svg") {
+        &svg[pos..]
+    } else {
+        svg
+    }
 }
 
 /// PNG manifest for AI review

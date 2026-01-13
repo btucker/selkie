@@ -675,6 +675,10 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
   stroke: {signal_color};
 }}
 
+.message-line {{
+  stroke: {signal_color};
+}}
+
 .messageText {{
   fill: {signal_text_color};
   stroke: none;
