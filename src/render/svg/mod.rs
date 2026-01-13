@@ -1,5 +1,6 @@
 //! SVG rendering for mermaid diagrams
 
+pub mod color;
 mod document;
 mod edges;
 mod elements;
@@ -8,6 +9,7 @@ mod shapes;
 pub mod structure;
 mod theme;
 
+pub use color::Color;
 pub use document::SvgDocument;
 pub use elements::{Attrs, SvgElement};
 pub use structure::{CompareConfig, ComparisonResult, SvgStructure};
