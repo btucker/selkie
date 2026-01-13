@@ -153,6 +153,23 @@ fn count_nodes_and_edges(doc: &roxmltree::Document) -> (usize, usize) {
     let mut node_count = 0;
     let mut edge_count = 0;
 
+    // Node class patterns used by different diagram types in selkie and mermaid.js
+    const NODE_CLASSES: &[&str] = &[
+        "node",           // flowchart (selkie)
+        "flowchart-node", // flowchart (mermaid.js)
+        "class-node",     // class diagram (selkie)
+        "state-node",     // state diagram (selkie)
+        "entity-node",    // ER diagram (selkie)
+    ];
+
+    // Edge class patterns used by different diagram types
+    const EDGE_CLASSES: &[&str] = &[
+        "edge",         // flowchart (selkie)
+        "relation",     // class diagram (selkie)
+        "transition",   // state diagram (selkie)
+        "relationship", // ER diagram (selkie)
+    ];
+
     for node in doc.descendants() {
         // Check for data-edge attribute (mermaid.js uses this)
         if node.attribute("data-edge").is_some() {
@@ -163,19 +180,15 @@ fn count_nodes_and_edges(doc: &roxmltree::Document) -> (usize, usize) {
         if let Some(class) = node.attribute("class") {
             let classes: Vec<&str> = class.split_whitespace().collect();
 
-            // Count nodes - elements with "node" class (both implementations)
-            if classes
-                .iter()
-                .any(|c| *c == "node" || *c == "flowchart-node")
-            {
+            // Count nodes - elements with any node class pattern
+            if classes.iter().any(|c| NODE_CLASSES.contains(c)) {
                 node_count += 1;
             }
 
             // Count edges - only count edge group containers, not child elements
-            // selkie uses "edge" class on <g> elements
             // mermaid.js uses "flowchart-link" on <path> elements with data-edge
-            // We only count "edge" here since data-edge is handled above
-            if node.tag_name().name() == "g" && classes.contains(&"edge") {
+            // (handled above with data-edge attribute check)
+            if node.tag_name().name() == "g" && classes.iter().any(|c| EDGE_CLASSES.contains(c)) {
                 edge_count += 1;
             }
         }

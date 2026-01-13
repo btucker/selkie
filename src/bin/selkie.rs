@@ -160,6 +160,14 @@ struct EvalArgs {
     /// Re-render all reference SVGs (ignore cache)
     #[arg(long)]
     force_refresh: bool,
+
+    /// Clear the reference SVG cache before running
+    #[arg(long)]
+    clear_cache: bool,
+
+    /// Show cache location and statistics, then exit
+    #[arg(long)]
+    cache_info: bool,
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
@@ -436,6 +444,40 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let cache = eval::cache::ReferenceCache::with_defaults();
+
+    // Handle --clear-cache: clear cache before anything else
+    if args.clear_cache {
+        let cache_dir = cache.cache_dir();
+        if cache_dir.exists() {
+            let stats = cache.stats();
+            cache.clear()?;
+            eprintln!(
+                "Cleared {} cached files ({:.2} KB) from {}",
+                stats.count,
+                stats.total_size as f64 / 1024.0,
+                cache_dir.display()
+            );
+        } else {
+            eprintln!("Cache directory does not exist: {}", cache_dir.display());
+        }
+    }
+
+    // Handle --cache-info: show cache info and exit
+    if args.cache_info {
+        let stats = cache.stats();
+        println!("Reference SVG Cache");
+        println!("===================");
+        println!("Location: {}", cache.cache_dir().display());
+        println!("Files:    {}", stats.count);
+        println!("Size:     {:.2} KB", stats.total_size as f64 / 1024.0);
+        if stats.count == 0 {
+            println!();
+            println!("Cache is empty. Run 'selkie eval' to populate.");
+        }
+        return Ok(());
+    }
+
     // Build evaluation config
     // Enable visual comparison when png feature is available
     #[cfg(feature = "png")]
@@ -449,8 +491,6 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         force_refresh: args.force_refresh,
         ..Default::default()
     };
-
-    let cache = eval::cache::ReferenceCache::with_defaults();
     let runner = eval::runner::EvalRunner::new(eval_config, cache);
 
     // Get diagrams to evaluate

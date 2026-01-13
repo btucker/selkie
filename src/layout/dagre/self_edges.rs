@@ -173,6 +173,7 @@ pub fn position_self_edges(g: &mut DagreGraph) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::layout::dagre::graph::EdgeLabel;
 
     fn create_test_graph() -> DagreGraph {
         let mut g = DagreGraph::new();
