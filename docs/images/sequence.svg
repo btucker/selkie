@@ -188,33 +188,33 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="actor">
       <rect x="50" y="10" width="150" height="65" rx="3" ry="3" class="activation actor actor-box" stroke="#666" stroke-width="1"/>
-      <text x="125" y="42.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Alice</text>
+      <text x="125" y="42.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Alice</text>
     </g>
-    <line x1="125" y1="75" x2="125" y2="315" class="actor-line" stroke="#999" stroke-width="0.5"/>
+    <line x1="125" y1="75" x2="125" y2="315" class="actor-line" stroke-width="0.5" stroke="#999"/>
     <g class="actor">
       <rect x="50" y="315" width="150" height="65" rx="3" ry="3" class="activation actor actor-box" stroke="#666" stroke-width="1"/>
-      <text x="125" y="347.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Alice</text>
+      <text x="125" y="347.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Alice</text>
     </g>
     <g class="actor">
       <rect x="250" y="10" width="150" height="65" rx="3" ry="3" class="activation actor actor-box" stroke-width="1" stroke="#666"/>
-      <text x="325" y="42.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Bob</text>
+      <text x="325" y="42.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Bob</text>
     </g>
     <line x1="325" y1="75" x2="325" y2="315" class="actor-line" stroke="#999" stroke-width="0.5"/>
     <g class="actor">
       <rect x="250" y="315" width="150" height="65" rx="3" ry="3" class="activation actor actor-box" stroke="#666" stroke-width="1"/>
-      <text x="325" y="347.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Bob</text>
+      <text x="325" y="347.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Bob</text>
     </g>
     <g class="message">
       <line x1="125" y1="119" x2="325" y2="119" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
-      <text x="225" y="109" class="message-label" text-anchor="middle" font-size="11">Hello Bob!</text>
+      <text x="225" y="109" class="message-label" font-size="11" text-anchor="middle">Hello Bob!</text>
     </g>
     <g class="message">
-      <line x1="325" y1="163" x2="125" y2="163" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1"/>
-      <text x="225" y="153" class="message-label" text-anchor="middle" font-size="11">Hi Alice!</text>
+      <line x1="325" y1="163" x2="125" y2="163" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
+      <text x="225" y="153" class="message-label" font-size="11" text-anchor="middle">Hi Alice!</text>
     </g>
     <g class="message">
-      <line x1="125" y1="207" x2="325" y2="207" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
-      <text x="225" y="197" class="message-label" font-size="11" text-anchor="middle">How are you?</text>
+      <line x1="125" y1="207" x2="325" y2="207" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1"/>
+      <text x="225" y="197" class="message-label" text-anchor="middle" font-size="11">How are you?</text>
     </g>
     <g class="message">
       <line x1="325" y1="251" x2="125" y2="251" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1"/>

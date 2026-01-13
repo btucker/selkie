@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="580" height="414" viewBox="0 0 580 414" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="234" viewBox="0 0 260 234" class="mermaid">
   <style>
 
 .mermaid {
@@ -123,19 +123,19 @@ marker path {
   </style>
   <defs>
     <marker id="inheritance" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 1 7 L 18 13 V 1 Z" stroke-width="1" fill="none" stroke="#333333"/>
+      <path d="M 1 7 L 18 13 V 1 Z" fill="none" stroke="#333333" stroke-width="1"/>
     </marker>
     <marker id="aggregation" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" fill="none" stroke="#333333"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="none" stroke="#333333" stroke-width="1"/>
     </marker>
     <marker id="composition" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke-width="1" stroke="#333333"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke="#333333" fill="#333333" stroke-width="1"/>
     </marker>
     <marker id="dependency" viewBox="0 0 20 20" refX="20" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 0 0 L 20 10 L 0 20" fill="none" stroke="#333333" stroke-width="1"/>
+      <path d="M 0 0 L 20 10 L 0 20" stroke="#333333" stroke-width="1" fill="none"/>
     </marker>
     <marker id="lollipop" viewBox="0 0 20 20" refX="10" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <circle cx="10" cy="10" r="8" stroke="#333333" stroke-width="1" fill="#FFFFFF"/>
+      <circle cx="10" cy="10" r="8" stroke-width="1" fill="#FFFFFF" stroke="#333333"/>
     </marker>
   </defs>
   <g class="root">
@@ -151,31 +151,31 @@ marker path {
     <g class="nodes">
 
     </g>
-    <g class="class-node" id="class-Cat">
-      <rect x="290" y="216" width="180" height="68" rx="3" ry="3" class="class-box" stroke-width="1" stroke="#333333" fill="#ECECFF"/>
-      <text x="380" y="236" class="class-name" text-anchor="middle" font-weight="bold" font-size="14">Cat</text>
-      <line x1="290" y1="246" x2="470" y2="246" stroke="#333333" stroke-width="1"/>
-      <text x="300" y="270" class="class-method" font-size="12" text-anchor="start">+meow()</text>
-    </g>
     <g class="class-node" id="class-Animal">
-      <rect x="170" y="50" width="180" height="86" rx="3" ry="3" class="class-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
-      <text x="260" y="70" class="class-name" font-weight="bold" font-size="14" text-anchor="middle">Animal</text>
-      <line x1="170" y1="80" x2="350" y2="80" stroke="#333333" stroke-width="1"/>
-      <text x="180" y="104" class="class-member" font-size="12" text-anchor="start">+String name</text>
-      <line x1="170" y1="113" x2="350" y2="113" stroke-width="1" stroke="#333333"/>
-      <text x="180" y="127" class="class-method" text-anchor="start" font-size="12">+eat()</text>
+      <rect x="80" y="0" width="100" height="86" rx="3" ry="3" class="class-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
+      <text x="130" y="20" class="class-name" font-size="14" font-weight="bold" text-anchor="middle">Animal</text>
+      <line x1="80" y1="30" x2="180" y2="30" stroke-width="1" stroke="#333333"/>
+      <text x="90" y="54" class="class-member" font-size="12" text-anchor="start">+String name</text>
+      <line x1="80" y1="63" x2="180" y2="63" stroke-width="1" stroke="#333333"/>
+      <text x="90" y="77" class="class-method" font-size="12" text-anchor="start">+eat()</text>
+    </g>
+    <g class="class-node" id="class-Cat">
+      <rect x="0" y="166" width="100" height="68" rx="3" ry="3" class="class-box" stroke-width="1" fill="#ECECFF" stroke="#333333"/>
+      <text x="50" y="186" class="class-name" text-anchor="middle" font-size="14" font-weight="bold">Cat</text>
+      <line x1="0" y1="196" x2="100" y2="196" stroke-width="1" stroke="#333333"/>
+      <text x="10" y="220" class="class-method" text-anchor="start" font-size="12">+meow()</text>
     </g>
     <g class="class-node" id="class-Dog">
-      <rect x="50" y="216" width="180" height="68" rx="3" ry="3" class="class-box" fill="#ECECFF" stroke-width="1" stroke="#333333"/>
-      <text x="140" y="236" class="class-name" font-size="14" font-weight="bold" text-anchor="middle">Dog</text>
-      <line x1="50" y1="246" x2="230" y2="246" stroke="#333333" stroke-width="1"/>
-      <text x="60" y="270" class="class-method" font-size="12" text-anchor="start">+bark()</text>
+      <rect x="160" y="166" width="100" height="68" rx="3" ry="3" class="class-box" stroke="#333333" fill="#ECECFF" stroke-width="1"/>
+      <text x="210" y="186" class="class-name" text-anchor="middle" font-size="14" font-weight="bold">Dog</text>
+      <line x1="160" y1="196" x2="260" y2="196" stroke="#333333" stroke-width="1"/>
+      <text x="170" y="220" class="class-method" text-anchor="start" font-size="12">+bark()</text>
     </g>
     <g class="relation">
-      <line x1="260" y1="136" x2="140" y2="216" class="relation-line" marker-start="url(#inheritance)" stroke-width="1" fill="none" stroke="#333333"/>
+      <path d="M 171.44578313253012 86 L 210 126 L 210 166" class="relation-line" fill="none" marker-start="url(#inheritance)" stroke="#333333" stroke-width="1"/>
     </g>
     <g class="relation">
-      <line x1="260" y1="136" x2="380" y2="216" class="relation-line" stroke="#333333" marker-start="url(#inheritance)" fill="none" stroke-width="1"/>
+      <path d="M 88.55421686746988 86 L 50 126 L 50 166" class="relation-line" fill="none" stroke-width="1" stroke="#333333" marker-start="url(#inheritance)"/>
     </g>
   </g>
 </svg>

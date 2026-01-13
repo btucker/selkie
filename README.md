@@ -44,118 +44,48 @@ Selkie could not exist without all the human effort that has gone into these exc
 
 Selkie supports parsing for all major Mermaid diagram types. Rendering is complete for core diagram types, with others in progress.
 
-### Flowchart
-
-Flow diagrams with nodes, edges, and subgraphs.
-
-```mermaid
-flowchart LR
-    A[Start] --> B{Decision}
-    B -->|Yes| C[OK]
-    B -->|No| D[Cancel]
-    C --> E[End]
-    D --> E
-```
-
-![Flowchart Example](docs/images/flowchart.svg)
-
-### Sequence Diagram
-
-Sequence diagrams for modeling interactions between participants.
-
-```mermaid
-sequenceDiagram
-    Alice->>Bob: Hello Bob!
-    Bob-->>Alice: Hi Alice!
-    Alice->>Bob: How are you?
-    Bob-->>Alice: Great!
-```
-
-![Sequence Example](docs/images/sequence.svg)
-
-### Class Diagram
-
-UML class diagrams showing relationships and structure.
-
-```mermaid
-classDiagram
-    Animal <|-- Dog
-    Animal <|-- Cat
-    Animal : +String name
-    Animal : +eat()
-    class Dog{
-        +bark()
-    }
-    class Cat{
-        +meow()
-    }
-```
-
-![Class Example](docs/images/class.svg)
-
-### State Diagram
-
-State machine diagrams for modeling system states.
-
-```mermaid
-stateDiagram-v2
-    [*] --> Idle
-    Idle --> Running : start
-    Running --> Idle : stop
-    Running --> [*]
-```
-
-![State Example](docs/images/state.svg)
-
-### Entity Relationship Diagram
-
-ER diagrams for data modeling.
-
-```mermaid
-erDiagram
-    CUSTOMER ||--o{ ORDER : places
-    ORDER ||--|{ ITEM : contains
-    CUSTOMER {
-        string name
-        string email
-    }
-    ORDER {
-        int id
-        date created
-    }
-```
-
-![ER Example](docs/images/er.svg)
-
-### Gantt Chart
-
-Project timeline and scheduling charts.
-
-```mermaid
-gantt
-    title Project Plan
-    dateFormat YYYY-MM-DD
-    section Phase 1
-    Task A :a1, 2024-01-01, 7d
-    Task B :a2, after a1, 5d
-    section Phase 2
-    Task C :b1, after a2, 10d
-```
-
-![Gantt Example](docs/images/gantt.svg)
-
-### Pie Chart
-
-Pie charts for proportional data.
-
-```mermaid
-pie title Languages
-    "Rust" : 45
-    "TypeScript" : 30
-    "Python" : 25
-```
-
-![Pie Example](docs/images/pie.svg)
+<table>
+<tr>
+<th>Diagram Type</th>
+<th>Mermaid.js</th>
+<th>Selkie</th>
+</tr>
+<tr>
+<td><strong>Flowchart</strong><br><sub>Nodes, edges, subgraphs</sub></td>
+<td><img src="docs/images/flowchart_mermaid.svg" alt="Flowchart Mermaid" width="350"></td>
+<td><img src="docs/images/flowchart.svg" alt="Flowchart Selkie" width="350"></td>
+</tr>
+<tr>
+<td><strong>Sequence</strong><br><sub>Participant interactions</sub></td>
+<td><img src="docs/images/sequence_mermaid.svg" alt="Sequence Mermaid" width="350"></td>
+<td><img src="docs/images/sequence.svg" alt="Sequence Selkie" width="350"></td>
+</tr>
+<tr>
+<td><strong>Class</strong><br><sub>UML relationships</sub></td>
+<td><img src="docs/images/class_mermaid.svg" alt="Class Mermaid" width="350"></td>
+<td><img src="docs/images/class.svg" alt="Class Selkie" width="350"></td>
+</tr>
+<tr>
+<td><strong>State</strong><br><sub>State machines</sub></td>
+<td><img src="docs/images/state_mermaid.svg" alt="State Mermaid" width="350"></td>
+<td><img src="docs/images/state.svg" alt="State Selkie" width="350"></td>
+</tr>
+<tr>
+<td><strong>ER Diagram</strong><br><sub>Data modeling</sub></td>
+<td><img src="docs/images/er_mermaid.svg" alt="ER Mermaid" width="350"></td>
+<td><img src="docs/images/er.svg" alt="ER Selkie" width="350"></td>
+</tr>
+<tr>
+<td><strong>Gantt</strong><br><sub>Project timelines</sub></td>
+<td><img src="docs/images/gantt_mermaid.svg" alt="Gantt Mermaid" width="350"></td>
+<td><img src="docs/images/gantt.svg" alt="Gantt Selkie" width="350"></td>
+</tr>
+<tr>
+<td><strong>Pie Chart</strong><br><sub>Proportional data</sub></td>
+<td><img src="docs/images/pie_mermaid.svg" alt="Pie Mermaid" width="350"></td>
+<td><img src="docs/images/pie.svg" alt="Pie Selkie" width="350"></td>
+</tr>
+</table>
 
 ### Additional Diagram Types (Parser Only)
 
