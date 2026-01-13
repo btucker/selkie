@@ -62,7 +62,7 @@ path = "src/bin/selkie.rs"
 required-features = ["cli"]
 
 [features]
-default = ["cli"]
+default = ["cli", "png"]
 cli = ["clap"]
 png = ["resvg"]
 pdf = ["svg2pdf", "resvg"]

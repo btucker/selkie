@@ -3,9 +3,10 @@
 //! CLI interface compatible with mermaid-cli (mmdc) for easy migration.
 //!
 //! Usage:
-//!   selkie render -i input.mmd -o output.svg
-//!   selkie -i input.mmd -o output.svg          # implicit render
-//!   selkie eval                                 # evaluate with gallery samples
+//!   selkie input.mmd -o output.svg             # render is the default
+//!   selkie -i input.mmd -o output.svg          # -i flag also works
+//!   selkie render input.mmd -o output.svg      # explicit render subcommand
+//!   selkie eval                                # evaluate with gallery samples
 //!   selkie eval --type flowchart --html report.html
 
 use std::fs;
@@ -75,7 +76,11 @@ enum Commands {
 #[derive(Parser, Debug, Default)]
 struct RenderArgs {
     /// Input file (.mmd, .md) or - for stdin
-    #[arg(short, long)]
+    #[arg(value_name = "INPUT")]
+    input_positional: Option<String>,
+
+    /// Input file (.mmd, .md) or - for stdin (alternative to positional)
+    #[arg(short, long, value_name = "FILE")]
     input: Option<String>,
 
     /// Output file (.svg) or - for stdout
@@ -213,24 +218,18 @@ fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
     match args.command {
         Some(Commands::Render(render_args)) => run_render(render_args),
         Some(Commands::Eval(eval_args)) => run_eval(eval_args),
-        None => {
-            // Backwards compatibility: if -i is provided without subcommand, run render
-            if args.render.input.is_some() {
-                run_render(args.render)
-            } else {
-                // No input and no subcommand - show help
-                eprintln!("Usage: selkie [render] -i <INPUT> -o <OUTPUT>");
-                eprintln!("       selkie eval [OPTIONS] [TARGET]");
-                eprintln!();
-                eprintln!("Run 'selkie --help' for more information.");
-                process::exit(1);
-            }
-        }
+        // Default to render when no subcommand is specified
+        None => run_render(args.render),
     }
 }
 
 fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
-    let input_path = args.input.as_ref().ok_or("Input file is required")?;
+    // Positional input takes precedence over -i flag
+    let input_path = args
+        .input_positional
+        .as_ref()
+        .or(args.input.as_ref())
+        .ok_or("Input file is required. Usage: selkie <INPUT> [-o OUTPUT]")?;
 
     // Read input
     let input = read_input(input_path)?;

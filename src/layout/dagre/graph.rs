@@ -81,6 +81,15 @@ pub struct GraphLabel {
     pub max_rank: Option<i32>,
 }
 
+/// Stored self-edge information on a node
+#[derive(Debug, Clone)]
+pub struct SelfEdgeInfo {
+    /// The edge key (v, w, name)
+    pub edge_key: EdgeKey,
+    /// The edge label (dimensions, etc.)
+    pub label: EdgeLabel,
+}
+
 /// Label/attributes for a node
 #[derive(Debug, Clone, Default)]
 pub struct NodeLabel {
@@ -122,6 +131,10 @@ pub struct NodeLabel {
     pub max_rank: Option<i32>,
     /// Type of border node ("borderLeft" or "borderRight")
     pub border_type: Option<String>,
+    /// Self-edges stored during layout (removed before ranking, restored after positioning)
+    pub self_edges: Vec<SelfEdgeInfo>,
+    /// For self-edge dummy nodes: stores the original edge info
+    pub self_edge_info: Option<SelfEdgeInfo>,
 }
 
 /// Label/attributes for an edge

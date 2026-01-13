@@ -27,6 +27,8 @@ pub mod order;
 pub mod parent_dummy_chains;
 pub mod position;
 pub mod rank;
+pub mod self_edges;
+mod util;
 
 use graph::DagreGraph;
 
@@ -106,6 +108,9 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     // Phase 1: Make space for edge labels (halve ranksep, double minlen)
     edge_labels::make_space_for_edge_labels(graph, config.rankdir);
 
+    // Phase 1.5: Remove self-edges (store on nodes before ranking)
+    self_edges::remove_self_edges(graph);
+
     // Phase 2: Make the graph acyclic
     acyclic::run(graph, config.acyclicer);
 
@@ -152,8 +157,14 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     // Phase 12: Order nodes within ranks (crossing minimization)
     order::order(graph);
 
+    // Phase 12.5: Insert self-edge dummy nodes (after ordering)
+    self_edges::insert_self_edges(graph);
+
     // Phase 13: Assign coordinates
     position::position(graph);
+
+    // Phase 13.5: Position self-edges and restore to graph
+    self_edges::position_self_edges(graph);
 
     // Phase 14: Remove border nodes and calculate compound node dimensions
     if is_compound {
