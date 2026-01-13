@@ -412,8 +412,14 @@ struct FragmentState {
 
 impl FragmentState {
     fn update_bounds(&mut self, min_idx: usize, max_idx: usize) {
-        self.min_actor_idx = Some(self.min_actor_idx.map_or(min_idx, |value| value.min(min_idx)));
-        self.max_actor_idx = Some(self.max_actor_idx.map_or(max_idx, |value| value.max(max_idx)));
+        self.min_actor_idx = Some(
+            self.min_actor_idx
+                .map_or(min_idx, |value| value.min(min_idx)),
+        );
+        self.max_actor_idx = Some(
+            self.max_actor_idx
+                .map_or(max_idx, |value| value.max(max_idx)),
+        );
     }
 }
 
@@ -721,17 +727,16 @@ fn fragment_bounds_for_state(
     actor_centers: &[f64],
     actor_width: f64,
 ) -> (f64, f64) {
-    let (mut frame_x, mut frame_width) = if let (Some(min_idx), Some(max_idx)) =
-        (fragment.min_actor_idx, fragment.max_actor_idx)
-    {
-        let min_center = actor_centers[min_idx];
-        let max_center = actor_centers[max_idx];
-        let left = min_center - actor_width / 2.0 - 10.0;
-        let right = max_center + actor_width / 2.0 + 10.0;
-        (left, (right - left).max(20.0))
-    } else {
-        fragment_bounds(left, width, 0)
-    };
+    let (mut frame_x, mut frame_width) =
+        if let (Some(min_idx), Some(max_idx)) = (fragment.min_actor_idx, fragment.max_actor_idx) {
+            let min_center = actor_centers[min_idx];
+            let max_center = actor_centers[max_idx];
+            let left = min_center - actor_width / 2.0 - 10.0;
+            let right = max_center + actor_width / 2.0 + 10.0;
+            (left, (right - left).max(20.0))
+        } else {
+            fragment_bounds(left, width, 0)
+        };
 
     let inset = depth as f64 * 10.0;
     frame_x += inset;
