@@ -1,4 +1,4 @@
-//! Gallery generator - renders sample diagrams with mermaid-rs
+//! Gallery generator - renders sample diagrams with selkie
 
 use std::fs;
 use std::path::Path;

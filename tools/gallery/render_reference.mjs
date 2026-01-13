@@ -159,12 +159,12 @@ function generateGallery(sources) {
   </style>
 </head>
 <body>
-  <h1>Mermaid-RS Rendering Gallery</h1>
+  <h1>Selkie Rendering Gallery</h1>
 
   <div class="legend">
     <div class="legend-item">
       <div class="legend-color rs"></div>
-      <span>mermaid-rs (Rust)</span>
+      <span>selkie (Rust)</span>
     </div>
     <div class="legend-item">
       <div class="legend-color ref"></div>
@@ -177,7 +177,7 @@ function generateGallery(sources) {
     <div class="diagram-header">${name} Diagram</div>
     <div class="diagram-content">
       <div class="diagram-panel">
-        <div class="panel-header rs">mermaid-rs</div>
+        <div class="panel-header rs">selkie</div>
         <div class="panel-content">
           <object type="image/svg+xml" data="${name}_rs.svg" width="100%">
             <p class="error">SVG not available</p>

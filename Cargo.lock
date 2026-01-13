@@ -1152,32 +1152,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mermaid-rs"
-version = "0.1.0"
-dependencies = [
- "ammonia",
- "atty",
- "base64",
- "chrono",
- "clap",
- "glob",
- "image",
- "libc",
- "log",
- "pest",
- "pest_derive",
- "pretty_assertions",
- "regex",
- "resvg",
- "roxmltree",
- "serde",
- "serde_json",
- "svg2pdf",
- "thiserror 1.0.69",
- "uuid",
-]
-
-[[package]]
 name = "miniz_oxide"
 version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1796,6 +1770,32 @@ name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
+
+[[package]]
+name = "selkie"
+version = "0.1.0"
+dependencies = [
+ "ammonia",
+ "atty",
+ "base64",
+ "chrono",
+ "clap",
+ "glob",
+ "image",
+ "libc",
+ "log",
+ "pest",
+ "pest_derive",
+ "pretty_assertions",
+ "regex",
+ "resvg",
+ "roxmltree",
+ "serde",
+ "serde_json",
+ "svg2pdf",
+ "thiserror 1.0.69",
+ "uuid",
+]
 
 [[package]]
 name = "serde"

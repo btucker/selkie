@@ -1,4 +1,4 @@
-//! mermaid-rs - A Rust port of mermaid.js
+//! selkie - A Rust port of mermaid.js
 //!
 //! This library provides parsing, layout, and rendering for mermaid diagram syntax.
 //! It supports multiple diagram types including flowcharts, sequence diagrams,
