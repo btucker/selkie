@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "jsdom": "^27.4.0",
-    "mermaid": "^11.0.0"
+    "mermaid": "^11.0.0",
+    "playwright": "^1.57.0"
   }
 }

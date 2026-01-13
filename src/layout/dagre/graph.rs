@@ -73,6 +73,12 @@ pub struct GraphLabel {
     pub height: Option<f64>,
     /// Tracks first dummy node in each edge chain (for normalize undo)
     pub dummy_chains: Vec<String>,
+    /// Root node for nesting graph (compound graph support)
+    pub nesting_root: Option<String>,
+    /// Multiplier for node ranks to create space for border nodes
+    pub node_rank_factor: Option<i32>,
+    /// Maximum rank in the graph
+    pub max_rank: Option<i32>,
 }
 
 /// Label/attributes for a node
@@ -102,6 +108,20 @@ pub struct NodeLabel {
     pub edge_label: Option<Box<EdgeLabel>>,
     /// Original edge object (v, w, name) for dummy nodes
     pub edge_obj: Option<(String, String, Option<String>)>,
+    /// Border top node id (for compound nodes)
+    pub border_top: Option<String>,
+    /// Border bottom node id (for compound nodes)
+    pub border_bottom: Option<String>,
+    /// Border left nodes by rank index (for compound nodes)
+    pub border_left: Vec<Option<String>>,
+    /// Border right nodes by rank index (for compound nodes)
+    pub border_right: Vec<Option<String>>,
+    /// Minimum rank of this compound node's contents
+    pub min_rank: Option<i32>,
+    /// Maximum rank of this compound node's contents
+    pub max_rank: Option<i32>,
+    /// Type of border node ("borderLeft" or "borderRight")
+    pub border_type: Option<String>,
 }
 
 /// Label/attributes for an edge
@@ -133,6 +153,8 @@ pub struct EdgeLabel {
     pub cutvalue: Option<i32>,
     /// Rank where label should be placed (for normalization)
     pub label_rank: Option<i32>,
+    /// Whether this is a nesting edge (compound graph support)
+    pub nesting_edge: bool,
 }
 
 impl Default for EdgeLabel {
@@ -151,6 +173,7 @@ impl Default for EdgeLabel {
             forward_name: None,
             cutvalue: None,
             label_rank: None,
+            nesting_edge: false,
         }
     }
 }
@@ -178,6 +201,9 @@ impl DagreGraph {
                 width: None,
                 height: None,
                 dummy_chains: Vec::new(),
+                nesting_root: None,
+                node_rank_factor: None,
+                max_rank: None,
             },
             nodes: HashMap::new(),
             edges: HashMap::new(),
@@ -517,6 +543,22 @@ impl DagreGraph {
             .unwrap_or_default();
         children.sort();
         children
+    }
+
+    /// Get root-level nodes (nodes without parents, sorted for deterministic iteration)
+    pub fn root_children(&self) -> Vec<&String> {
+        let mut roots: Vec<&String> = self
+            .nodes
+            .keys()
+            .filter(|v| !self.parent.contains_key(*v))
+            .collect();
+        roots.sort();
+        roots
+    }
+
+    /// Check if this is a compound graph (any node has children)
+    pub fn is_compound(&self) -> bool {
+        self.children.values().any(|c| !c.is_empty())
     }
 
     // --- Utility ---

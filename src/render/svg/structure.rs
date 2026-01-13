@@ -113,7 +113,7 @@ fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64) {
 
 fn count_shapes(doc: &roxmltree::Document) -> ShapeCounts {
     ShapeCounts {
-        rect: count_elements(doc, "rect"),
+        rect: count_visible_rects(doc),
         circle: count_elements(doc, "circle"),
         ellipse: count_elements(doc, "ellipse"),
         polygon: count_elements(doc, "polygon"),
@@ -121,6 +121,26 @@ fn count_shapes(doc: &roxmltree::Document) -> ShapeCounts {
         line: count_elements(doc, "line"),
         polyline: count_elements(doc, "polyline"),
     }
+}
+
+/// Count only visible rects (those with width and height > 0)
+/// This excludes helper/placeholder rects used by mermaid.js for sizing
+fn count_visible_rects(doc: &roxmltree::Document) -> usize {
+    doc.descendants()
+        .filter(|n| n.tag_name().name() == "rect")
+        .filter(|n| {
+            // Check if rect has non-zero dimensions
+            let width = n
+                .attribute("width")
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(0.0);
+            let height = n
+                .attribute("height")
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(0.0);
+            width > 0.0 && height > 0.0
+        })
+        .count()
 }
 
 fn count_elements(doc: &roxmltree::Document, tag: &str) -> usize {
@@ -170,7 +190,21 @@ fn extract_labels(doc: &roxmltree::Document) -> Vec<String> {
 
     for node in doc.descendants() {
         let tag = node.tag_name().name();
-        if tag == "text" || tag == "tspan" {
+
+        // For text elements, get the combined text content of all children
+        // This handles mermaid.js splitting words into separate tspan elements
+        if tag == "text" {
+            let combined = collect_text_content(&node);
+            // Normalize whitespace: collapse multiple spaces/newlines into single space
+            let combined: String = combined.split_whitespace().collect::<Vec<_>>().join(" ");
+            if !combined.is_empty() && !seen.contains(&combined) {
+                seen.insert(combined.clone());
+                labels.push(combined);
+            }
+        }
+        // For p/span (mermaid.js foreignObject HTML), get direct text content
+        else if tag == "p" || tag == "span" {
+            // Only get direct text, not combined content, to avoid duplicates
             if let Some(text) = node.text() {
                 let text = text.trim();
                 if !text.is_empty() && !seen.contains(text) {
@@ -185,9 +219,91 @@ fn extract_labels(doc: &roxmltree::Document) -> Vec<String> {
     labels
 }
 
+/// Recursively collect all text content from a node and its descendants
+fn collect_text_content(node: &roxmltree::Node) -> String {
+    let mut result = String::new();
+
+    for child in node.children() {
+        if child.is_text() {
+            if let Some(text) = child.text() {
+                result.push_str(text);
+            }
+        } else {
+            result.push_str(&collect_text_content(&child));
+        }
+    }
+
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_extract_labels_combines_tspans() {
+        // Mermaid.js splits multi-word text into separate tspan elements
+        let mermaid_style_svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <text>
+                <tspan>Main</tspan>
+                <tspan> Flow</tspan>
+            </text>
+        </svg>"#;
+
+        let structure = SvgStructure::from_svg(mermaid_style_svg).unwrap();
+
+        // Should extract "Main Flow" as a single label, not ["Main", " Flow"]
+        assert!(
+            structure.labels.contains(&"Main Flow".to_string()),
+            "Should combine tspans into single label. Got: {:?}",
+            structure.labels
+        );
+        assert!(
+            !structure.labels.iter().any(|l| l == "Main" || l == " Flow"),
+            "Should not have separate tspan fragments. Got: {:?}",
+            structure.labels
+        );
+    }
+
+    #[test]
+    fn test_count_visible_rects_only() {
+        // Mermaid.js style SVG with helper rects (empty rects inside labels)
+        let mermaid_style_svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <g class="nodes">
+                <g class="node">
+                    <rect class="label-container" x="10" y="10" width="80" height="40"/>
+                    <g class="label">
+                        <rect></rect>
+                        <text>Label</text>
+                    </g>
+                </g>
+            </g>
+            <g class="edgeLabels">
+                <g><rect class="background" style="stroke: none"></rect></g>
+            </g>
+        </svg>"#;
+
+        // Our clean SVG with just the visible rect
+        let clean_svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <g class="nodes">
+                <g class="node">
+                    <rect x="10" y="10" width="80" height="40"/>
+                    <text>Label</text>
+                </g>
+            </g>
+        </svg>"#;
+
+        let mermaid_structure = SvgStructure::from_svg(mermaid_style_svg).unwrap();
+        let clean_structure = SvgStructure::from_svg(clean_svg).unwrap();
+
+        // Both should report the same number of VISIBLE rects (1)
+        // Currently this will fail because we count all rects
+        assert_eq!(
+            mermaid_structure.shapes.rect, clean_structure.shapes.rect,
+            "Should count only visible rects, not helper elements. Mermaid has {} rects, clean has {}",
+            mermaid_structure.shapes.rect, clean_structure.shapes.rect
+        );
+    }
 
     #[test]
     fn test_parse_simple_svg() {

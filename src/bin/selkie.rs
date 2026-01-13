@@ -438,9 +438,15 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
 
 fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     // Build evaluation config
+    // Enable visual comparison when png feature is available
+    #[cfg(feature = "png")]
+    let skip_visual = false;
+    #[cfg(not(feature = "png"))]
+    let skip_visual = true;
+
     let eval_config = eval::runner::EvalConfig {
         diagram_type_filter: args.diagram_type.clone(),
-        skip_visual: true, // TODO: enable when PNG rendering is ready
+        skip_visual,
         force_refresh: args.force_refresh,
         ..Default::default()
     };
@@ -512,9 +518,32 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Write PNGs if requested
-    if let Some(ref _path) = args.pngs {
-        eprintln!("PNG generation not yet implemented (requires 'png' feature)");
-        // TODO: Implement when resvg is available
+    if let Some(ref path) = args.pngs {
+        #[cfg(feature = "png")]
+        {
+            let svg_pairs = runner.take_svg_pairs();
+            if !svg_pairs.is_empty() {
+                match eval::png::write_comparison_pngs(path, &svg_pairs) {
+                    Ok(manifest) => {
+                        eprintln!(
+                            "Wrote {} comparison PNGs to {}",
+                            manifest.diagrams.len(),
+                            path.display()
+                        );
+                    }
+                    Err(e) => {
+                        eprintln!("Warning: Failed to generate PNGs: {}", e);
+                    }
+                }
+            }
+        }
+        #[cfg(not(feature = "png"))]
+        {
+            eprintln!(
+                "PNG generation requires the 'png' feature. Build with: cargo build --features png"
+            );
+            let _ = path; // Suppress unused warning
+        }
     }
 
     // Exit with error code if there are failures

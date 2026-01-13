@@ -8,6 +8,7 @@
 
 pub mod cache;
 pub mod checks;
+pub mod png;
 pub mod report;
 pub mod runner;
 pub mod samples;

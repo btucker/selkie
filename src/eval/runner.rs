@@ -57,17 +57,28 @@ impl From<Sample> for DiagramInput {
 pub struct EvalRunner {
     config: EvalConfig,
     cache: ReferenceCache,
+    /// SVG pairs collected during evaluation (for PNG generation)
+    svg_pairs: std::cell::RefCell<Vec<(String, String, String)>>, // (name, selkie_svg, reference_svg)
 }
 
 impl EvalRunner {
     /// Create a new runner with configuration
     pub fn new(config: EvalConfig, cache: ReferenceCache) -> Self {
-        Self { config, cache }
+        Self {
+            config,
+            cache,
+            svg_pairs: std::cell::RefCell::new(Vec::new()),
+        }
     }
 
     /// Create a runner with default configuration
     pub fn with_defaults() -> Self {
         Self::new(EvalConfig::default(), ReferenceCache::with_defaults())
+    }
+
+    /// Get collected SVG pairs for PNG generation
+    pub fn take_svg_pairs(&self) -> Vec<(String, String, String)> {
+        self.svg_pairs.borrow_mut().drain(..).collect()
     }
 
     /// Evaluate a list of diagrams
@@ -220,9 +231,28 @@ impl EvalRunner {
             result.issues.extend(check_issues);
         }
 
-        // Step 6: Visual similarity (SSIM) - TODO when PNG rendering is available
-        // For now, we'll skip this and rely on structural comparison
-        // result.visual_similarity = Some(calculate_visual_similarity(&selkie_svg, &reference_svg));
+        // Step 6: Visual similarity (SSIM) and collect SVG pairs
+        if let (Some(selkie), Ok(reference)) = (&selkie_svg, &reference_svg) {
+            // Store SVG pair for PNG generation
+            self.svg_pairs.borrow_mut().push((
+                input.name.clone(),
+                selkie.clone(),
+                reference.clone(),
+            ));
+
+            // Calculate visual similarity if not skipped
+            if !self.config.skip_visual {
+                match super::png::compare_svgs(selkie, reference) {
+                    Ok(comparison) => {
+                        result.visual_similarity = Some(comparison.ssim);
+                    }
+                    Err(_e) => {
+                        // Visual comparison failed (e.g., png feature not enabled)
+                        // This is not a structural error, so we don't add an issue
+                    }
+                }
+            }
+        }
 
         // Determine final status
         result.status = result.determine_status();
