@@ -13,7 +13,7 @@ pub use color::Color;
 pub use document::SvgDocument;
 pub use elements::{Attrs, SvgElement};
 pub use structure::{CompareConfig, ComparisonResult, SvgStructure};
-pub use theme::Theme;
+pub use theme::{Theme, ThemeBuilder};
 
 use crate::diagrams::flowchart::{FlowchartDb, FlowSubGraph};
 use crate::error::Result;

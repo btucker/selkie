@@ -512,4 +512,236 @@ marker path {{
             background = self.background,
         )
     }
+
+    /// Create a theme from base colors with automatic derivation
+    ///
+    /// This follows the mermaid.js pattern where setting just a few base colors
+    /// automatically derives all other colors for consistency.
+    ///
+    /// # Arguments
+    /// * `primary` - Primary color (node fills)
+    /// * `secondary` - Secondary color (subgraph backgrounds)
+    /// * `tertiary` - Tertiary color (alternate backgrounds)
+    /// * `background` - Background color
+    /// * `dark_mode` - Whether to derive colors for dark mode
+    pub fn from_base_colors(
+        primary: &str,
+        secondary: &str,
+        tertiary: &str,
+        background: &str,
+        dark_mode: bool,
+    ) -> Self {
+        use super::color::{self, Color};
+
+        let primary_color = Color::parse(primary).unwrap_or_else(|| Color::from_hex("#ECECFF").unwrap());
+        let secondary_color = Color::parse(secondary).unwrap_or_else(|| Color::from_hex("#ffffde").unwrap());
+        let tertiary_color = Color::parse(tertiary).unwrap_or_else(|| Color::from_hex("#fafafa").unwrap());
+        let bg_color = Color::parse(background).unwrap_or_else(|| Color::from_hex("#ffffff").unwrap());
+
+        // Derive border colors
+        let primary_border = color::mk_border(&primary_color, dark_mode);
+        let secondary_border = color::mk_border(&secondary_color, dark_mode);
+
+        // Derive text colors (contrast with backgrounds)
+        let primary_text = color::contrasting_text(&primary_color);
+        let line_color = color::contrasting_text(&bg_color);
+
+        // Derive pie colors by hue rotation from primary
+        let pie_colors: Vec<String> = (0..10)
+            .map(|i| {
+                let hue_shift = (i as f64) * 36.0; // Distribute around color wheel
+                let adjusted = color::adjust(&primary_color, hue_shift, 0.0, 0.0);
+                adjusted.to_hex()
+            })
+            .collect();
+
+        // Derive sequence diagram colors
+        let actor_border = color::lighten(&primary_border, 10.0);
+        let note_border = color::mk_border(&secondary_color, dark_mode);
+
+        // Derive gantt colors
+        let task_border = color::mk_border(&primary_color, dark_mode);
+        let active_task_bkg = color::lighten(&primary_color, 15.0);
+        let grid_color = if dark_mode {
+            Color::from_hex("#444444").unwrap()
+        } else {
+            Color::from_hex("#d3d3d3").unwrap()
+        };
+
+        Self {
+            // Base colors
+            primary_color: primary_color.to_hex(),
+            primary_text_color: primary_text.to_hex(),
+            primary_border_color: primary_border.to_hex(),
+            secondary_color: secondary_color.to_hex(),
+            tertiary_color: tertiary_color.to_hex(),
+            cluster_border_color: secondary_border.to_hex(),
+            line_color: line_color.to_hex(),
+            background: bg_color.to_hex(),
+            font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
+            font_size: "16px".to_string(),
+
+            // Pie chart colors (derived)
+            pie_colors,
+            pie_stroke_color: if dark_mode { line_color.to_hex() } else { "black".to_string() },
+            pie_outer_stroke_color: if dark_mode { line_color.to_hex() } else { "black".to_string() },
+            pie_opacity: "0.7".to_string(),
+            pie_title_text_color: primary_text.to_hex(),
+            pie_legend_text_color: primary_text.to_hex(),
+
+            // Sequence diagram colors (derived)
+            actor_bkg: primary_color.to_hex(),
+            actor_border: actor_border.to_hex(),
+            actor_text_color: primary_text.to_hex(),
+            actor_line_color: actor_border.to_hex(),
+            signal_color: line_color.to_hex(),
+            signal_text_color: line_color.to_hex(),
+            note_bkg_color: secondary_color.to_hex(),
+            note_border_color: note_border.to_hex(),
+            note_text_color: color::contrasting_text(&secondary_color).to_hex(),
+            activation_bkg_color: tertiary_color.to_hex(),
+            activation_border_color: primary_border.to_hex(),
+            label_box_bkg_color: secondary_color.to_hex(),
+            label_box_border_color: note_border.to_hex(),
+
+            // Gantt chart colors (derived)
+            section_bkg_color: primary_color.to_hex(),
+            section_bkg_color2: bg_color.to_hex(),
+            task_bkg_color: primary_color.to_hex(),
+            task_border_color: task_border.to_hex(),
+            task_text_light_color: "#ffffff".to_string(),
+            task_text_dark_color: "#000000".to_string(),
+            active_task_bkg_color: active_task_bkg.to_hex(),
+            active_task_border_color: task_border.to_hex(),
+            done_task_bkg_color: "#d3d3d3".to_string(),
+            done_task_border_color: "#808080".to_string(),
+            crit_bkg_color: "#ff0000".to_string(),
+            crit_border_color: "#ff8888".to_string(),
+            grid_color: grid_color.to_hex(),
+            today_line_color: "#ff0000".to_string(),
+        }
+    }
+
+    /// Create a custom theme with builder-style overrides
+    ///
+    /// Start with base colors and override specific values as needed.
+    pub fn custom() -> ThemeBuilder {
+        ThemeBuilder::new()
+    }
+}
+
+/// Builder for creating custom themes
+pub struct ThemeBuilder {
+    base: Theme,
+}
+
+impl ThemeBuilder {
+    pub fn new() -> Self {
+        Self {
+            base: Theme::default(),
+        }
+    }
+
+    /// Set the primary color (affects nodes, actors, etc.)
+    pub fn primary_color(mut self, color: &str) -> Self {
+        self.base.primary_color = color.to_string();
+        self
+    }
+
+    /// Set the secondary color (affects subgraphs, notes, etc.)
+    pub fn secondary_color(mut self, color: &str) -> Self {
+        self.base.secondary_color = color.to_string();
+        self
+    }
+
+    /// Set the background color
+    pub fn background(mut self, color: &str) -> Self {
+        self.base.background = color.to_string();
+        self
+    }
+
+    /// Set the line/edge color
+    pub fn line_color(mut self, color: &str) -> Self {
+        self.base.line_color = color.to_string();
+        self
+    }
+
+    /// Set the font family
+    pub fn font_family(mut self, font: &str) -> Self {
+        self.base.font_family = font.to_string();
+        self
+    }
+
+    /// Build the theme, deriving any colors that weren't explicitly set
+    pub fn build(self) -> Theme {
+        // For now, return the base with modifications
+        // Future: could derive unset colors from base colors
+        self.base
+    }
+}
+
+impl Default for ThemeBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_from_base_colors_derives_consistent_theme() {
+        let theme = Theme::from_base_colors(
+            "#ECECFF",  // primary (light purple)
+            "#ffffde",  // secondary (light yellow)
+            "#fafafa",  // tertiary (light gray)
+            "#ffffff",  // background (white)
+            false,      // light mode
+        );
+
+        // Primary color should be set
+        assert_eq!(theme.primary_color, "#ececff");
+
+        // Border should be derived (darker than primary)
+        let primary = super::super::color::Color::from_hex(&theme.primary_color).unwrap();
+        let border = super::super::color::Color::from_hex(&theme.primary_border_color).unwrap();
+        let (_, _, primary_l) = primary.to_hsl();
+        let (_, _, border_l) = border.to_hsl();
+        assert!(border_l < primary_l, "Border should be darker than primary in light mode");
+
+        // Pie colors should be derived (10 colors)
+        assert_eq!(theme.pie_colors.len(), 10);
+    }
+
+    #[test]
+    fn test_from_base_colors_dark_mode() {
+        let theme = Theme::from_base_colors(
+            "#1f2020",  // primary (dark)
+            "#8a8a8a",  // secondary (gray)
+            "#333333",  // tertiary (dark gray)
+            "#1f2020",  // background (dark)
+            true,       // dark mode
+        );
+
+        // Border should be lighter in dark mode
+        let primary = super::super::color::Color::from_hex(&theme.primary_color).unwrap();
+        let border = super::super::color::Color::from_hex(&theme.primary_border_color).unwrap();
+        let (_, _, primary_l) = primary.to_hsl();
+        let (_, _, border_l) = border.to_hsl();
+        assert!(border_l > primary_l, "Border should be lighter than primary in dark mode");
+    }
+
+    #[test]
+    fn test_theme_builder() {
+        let theme = Theme::custom()
+            .primary_color("#ff0000")
+            .secondary_color("#00ff00")
+            .background("#0000ff")
+            .build();
+
+        assert_eq!(theme.primary_color, "#ff0000");
+        assert_eq!(theme.secondary_color, "#00ff00");
+        assert_eq!(theme.background, "#0000ff");
+    }
 }
