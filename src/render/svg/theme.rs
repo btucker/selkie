@@ -38,6 +38,34 @@ pub struct Theme {
     pub pie_title_text_color: String,
     /// Pie chart legend text color
     pub pie_legend_text_color: String,
+
+    // === Sequence diagram colors ===
+    /// Actor box background color
+    pub actor_bkg: String,
+    /// Actor box border color
+    pub actor_border: String,
+    /// Actor text color
+    pub actor_text_color: String,
+    /// Actor lifeline color
+    pub actor_line_color: String,
+    /// Signal/message line color
+    pub signal_color: String,
+    /// Signal/message text color
+    pub signal_text_color: String,
+    /// Note background color
+    pub note_bkg_color: String,
+    /// Note border color
+    pub note_border_color: String,
+    /// Note text color
+    pub note_text_color: String,
+    /// Activation box background color
+    pub activation_bkg_color: String,
+    /// Activation box border color
+    pub activation_border_color: String,
+    /// Loop/box label background color
+    pub label_box_bkg_color: String,
+    /// Loop/box label border color
+    pub label_box_border_color: String,
 }
 
 impl Default for Theme {
@@ -72,6 +100,20 @@ impl Default for Theme {
             pie_opacity: "0.7".to_string(),
             pie_title_text_color: "#333333".to_string(),
             pie_legend_text_color: "#333333".to_string(),
+            // Sequence diagram - default theme
+            actor_bkg: "#ECECFF".to_string(),
+            actor_border: "#9370DB".to_string(),
+            actor_text_color: "#333333".to_string(),
+            actor_line_color: "#333333".to_string(),
+            signal_color: "#333333".to_string(),
+            signal_text_color: "#333333".to_string(),
+            note_bkg_color: "#FFFFCC".to_string(),
+            note_border_color: "#aaaa33".to_string(),
+            note_text_color: "#333333".to_string(),
+            activation_bkg_color: "#eaeaea".to_string(),
+            activation_border_color: "#333333".to_string(),
+            label_box_bkg_color: "#fff5ad".to_string(),
+            label_box_border_color: "#aaaa33".to_string(),
         }
     }
 }
@@ -108,6 +150,20 @@ impl Theme {
             pie_opacity: "0.7".to_string(),
             pie_title_text_color: "#ccc".to_string(),
             pie_legend_text_color: "#ccc".to_string(),
+            // Sequence diagram - dark theme
+            actor_bkg: "#1f2020".to_string(),
+            actor_border: "#81B1DB".to_string(),
+            actor_text_color: "#ccc".to_string(),
+            actor_line_color: "#81B1DB".to_string(),
+            signal_color: "#81B1DB".to_string(),
+            signal_text_color: "#ccc".to_string(),
+            note_bkg_color: "#3d3d3d".to_string(),
+            note_border_color: "#81B1DB".to_string(),
+            note_text_color: "#ccc".to_string(),
+            activation_bkg_color: "#333333".to_string(),
+            activation_border_color: "#81B1DB".to_string(),
+            label_box_bkg_color: "#2d2d2d".to_string(),
+            label_box_border_color: "#81B1DB".to_string(),
         }
     }
 
@@ -142,6 +198,20 @@ impl Theme {
             pie_opacity: "0.7".to_string(),
             pie_title_text_color: "#333333".to_string(),
             pie_legend_text_color: "#333333".to_string(),
+            // Sequence diagram - neutral theme (grayscale)
+            actor_bkg: "#f0f0f0".to_string(),
+            actor_border: "#666666".to_string(),
+            actor_text_color: "#333333".to_string(),
+            actor_line_color: "#666666".to_string(),
+            signal_color: "#666666".to_string(),
+            signal_text_color: "#333333".to_string(),
+            note_bkg_color: "#fafafa".to_string(),
+            note_border_color: "#999999".to_string(),
+            note_text_color: "#333333".to_string(),
+            activation_bkg_color: "#e0e0e0".to_string(),
+            activation_border_color: "#666666".to_string(),
+            label_box_bkg_color: "#f5f5f5".to_string(),
+            label_box_border_color: "#999999".to_string(),
         }
     }
 
@@ -177,6 +247,20 @@ impl Theme {
             pie_opacity: "0.7".to_string(),
             pie_title_text_color: "#333333".to_string(),
             pie_legend_text_color: "#333333".to_string(),
+            // Sequence diagram - forest theme (green palette)
+            actor_bkg: "#cde498".to_string(),
+            actor_border: "#13540c".to_string(),
+            actor_text_color: "#333333".to_string(),
+            actor_line_color: "#008000".to_string(),
+            signal_color: "#008000".to_string(),
+            signal_text_color: "#333333".to_string(),
+            note_bkg_color: "#cdffb2".to_string(),
+            note_border_color: "#6eaa49".to_string(),
+            note_text_color: "#333333".to_string(),
+            activation_bkg_color: "#e0f2c8".to_string(),
+            activation_border_color: "#13540c".to_string(),
+            label_box_bkg_color: "#cdffb2".to_string(),
+            label_box_border_color: "#6eaa49".to_string(),
         }
     }
 
@@ -214,6 +298,20 @@ impl Theme {
             pie_opacity: "0.7".to_string(),
             pie_title_text_color: "#333333".to_string(),
             pie_legend_text_color: "#333333".to_string(),
+            // Sequence diagram - base theme (warm pastels)
+            actor_bkg: "#fff4dd".to_string(),
+            actor_border: "#9370DB".to_string(),
+            actor_text_color: "#333333".to_string(),
+            actor_line_color: "#333333".to_string(),
+            signal_color: "#333333".to_string(),
+            signal_text_color: "#333333".to_string(),
+            note_bkg_color: "#fff5ad".to_string(),
+            note_border_color: "#9370DB".to_string(),
+            note_text_color: "#333333".to_string(),
+            activation_bkg_color: "#dde4ff".to_string(),
+            activation_border_color: "#9370DB".to_string(),
+            label_box_bkg_color: "#f4ffdd".to_string(),
+            label_box_border_color: "#9370DB".to_string(),
         }
     }
 
