@@ -323,7 +323,10 @@ fn test_render_with_forest_theme() {
 
     // Verify SVG generated with forest theme
     assert!(svg.contains("<svg"), "SVG should have opening tag");
-    assert!(svg.contains("<style>"), "SVG should contain embedded styles");
+    assert!(
+        svg.contains("<style>"),
+        "SVG should contain embedded styles"
+    );
     // Forest theme should have green colors in styles
     assert!(
         svg.contains("#cde498") || svg.contains("#cdffb2") || svg.contains("#13540c"),
@@ -346,7 +349,10 @@ fn test_render_with_base_theme() {
 
     // Verify SVG generated with base theme
     assert!(svg.contains("<svg"), "SVG should have opening tag");
-    assert!(svg.contains("<style>"), "SVG should contain embedded styles");
+    assert!(
+        svg.contains("<style>"),
+        "SVG should contain embedded styles"
+    );
     // Base theme should have neutral warm colors
     assert!(
         svg.contains("#fff4dd") || svg.contains("#f4f4f4"),
@@ -1733,7 +1739,8 @@ fn test_gantt_uses_css_classes_not_hardcoded_colors() {
     // their colors from the embedded stylesheet
     assert!(
         !svg.contains("fill=\"#8a90dd\""),
-        "Gantt task bars should not have hardcoded fill='#8a90dd', should use CSS class. SVG:\n{}", svg
+        "Gantt task bars should not have hardcoded fill='#8a90dd', should use CSS class. SVG:\n{}",
+        svg
     );
     assert!(
         !svg.contains("stroke=\"#534fbc\""),
@@ -1755,7 +1762,10 @@ flowchart LR
     let svg = render_text(input).expect("Failed to render with directive");
 
     // Dark theme has dark background color
-    assert!(svg.contains("#1f2020"), "Dark theme should have #1f2020 color");
+    assert!(
+        svg.contains("#1f2020"),
+        "Dark theme should have #1f2020 color"
+    );
 }
 
 #[test]
@@ -1800,7 +1810,10 @@ flowchart LR
     let svg = render_text(input).expect("Failed to render with single quote directive");
 
     // Dark theme colors should be present
-    assert!(svg.contains("#1f2020"), "Dark theme should be applied with single quote syntax");
+    assert!(
+        svg.contains("#1f2020"),
+        "Dark theme should be applied with single quote syntax"
+    );
 }
 
 #[test]
@@ -2002,10 +2015,7 @@ flowchart TD
     .expect("Failed to render with themeCSS");
 
     // Custom CSS should appear in output
-    assert!(
-        svg.contains("rx: 20"),
-        "Custom themeCSS should be applied"
-    );
+    assert!(svg.contains("rx: 20"), "Custom themeCSS should be applied");
     // Custom CSS marker should indicate it comes after theme CSS
     assert!(
         svg.contains("/* Custom CSS */"),
@@ -2024,7 +2034,10 @@ flowchart TD
     .expect("Failed to render with invalid theme");
 
     // Should still produce valid SVG
-    assert!(svg.contains("<svg"), "Should produce SVG even with invalid theme");
+    assert!(
+        svg.contains("<svg"),
+        "Should produce SVG even with invalid theme"
+    );
 
     // Default theme primary color #ECECFF should be present
     assert!(

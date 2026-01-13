@@ -20,7 +20,12 @@ impl Color {
 
     /// Create a new color from RGBA values
     pub fn rgba(r: u8, g: u8, b: u8, a: f64) -> Self {
-        Self { r, g, b, a: a.clamp(0.0, 1.0) }
+        Self {
+            r,
+            g,
+            b,
+            a: a.clamp(0.0, 1.0),
+        }
     }
 
     /// Parse a color from a hex string (supports #RGB, #RRGGBB, #RRGGBBAA)
@@ -63,7 +68,7 @@ impl Color {
 
         // rgba() format
         if s.starts_with("rgba(") && s.ends_with(')') {
-            let inner = &s[5..s.len()-1];
+            let inner = &s[5..s.len() - 1];
             let parts: Vec<&str> = inner.split(',').map(|p| p.trim()).collect();
             if parts.len() == 4 {
                 let r = parts[0].parse().ok()?;
@@ -76,7 +81,7 @@ impl Color {
 
         // rgb() format
         if s.starts_with("rgb(") && s.ends_with(')') {
-            let inner = &s[4..s.len()-1];
+            let inner = &s[4..s.len() - 1];
             let parts: Vec<&str> = inner.split(',').map(|p| p.trim()).collect();
             if parts.len() == 3 {
                 let r = parts[0].parse().ok()?;
@@ -184,8 +189,12 @@ impl Color {
         let p = 2.0 * l - q;
 
         let hue_to_rgb = |p: f64, q: f64, mut t: f64| -> f64 {
-            if t < 0.0 { t += 1.0; }
-            if t > 1.0 { t -= 1.0; }
+            if t < 0.0 {
+                t += 1.0;
+            }
+            if t > 1.0 {
+                t -= 1.0;
+            }
             if t < 1.0 / 6.0 {
                 return p + (q - p) * 6.0 * t;
             }

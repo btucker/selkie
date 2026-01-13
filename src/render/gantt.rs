@@ -144,8 +144,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
                     height: current_y - section_start_y,
                     rx: None,
                     ry: None,
-                    attrs: Attrs::new()
-                        .with_class(&format!("section section{}", color_idx)),
+                    attrs: Attrs::new().with_class(&format!("section section{}", color_idx)),
                 };
                 doc.add_element(section_bg);
             }
@@ -203,8 +202,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
                 height: task_height,
                 rx: Some(3.0),
                 ry: Some(3.0),
-                attrs: Attrs::new()
-                    .with_class(&bar_class),
+                attrs: Attrs::new().with_class(&bar_class),
             };
             doc.add_element(bar_elem);
 
@@ -241,8 +239,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
                             y: task_y + task_height,
                         },
                     ],
-                    attrs: Attrs::new()
-                        .with_class("milestone"),
+                    attrs: Attrs::new().with_class("milestone"),
                 };
                 doc.add_element(milestone);
             }
@@ -261,8 +258,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
             height: current_y - section_start_y,
             rx: None,
             ry: None,
-            attrs: Attrs::new()
-                .with_class(&format!("section section{}", color_idx)),
+            attrs: Attrs::new().with_class(&format!("section section{}", color_idx)),
         };
         // Insert at beginning so it's behind tasks
         doc.add_element(section_bg);
@@ -293,8 +289,7 @@ fn render_timeline_axis(
         height,
         rx: None,
         ry: None,
-        attrs: Attrs::new()
-            .with_class("timeline-bg"),
+        attrs: Attrs::new().with_class("timeline-bg"),
     });
 
     // Axis line - styled via CSS .axis-line class
@@ -303,8 +298,7 @@ fn render_timeline_axis(
         y1: y + height,
         x2: x + width,
         y2: y + height,
-        attrs: Attrs::new()
-            .with_class("axis-line"),
+        attrs: Attrs::new().with_class("axis-line"),
     });
 
     // Grid lines and day markers
@@ -331,8 +325,7 @@ fn render_timeline_axis(
                 y1: y + height,
                 x2: tick_x,
                 y2: y + height + chart_height,
-                attrs: Attrs::new()
-                    .with_class("tick"),
+                attrs: Attrs::new().with_class("tick"),
             });
 
             // Tick mark on axis
@@ -341,8 +334,7 @@ fn render_timeline_axis(
                 y1: y + height - 5.0,
                 x2: tick_x,
                 y2: y + height,
-                attrs: Attrs::new()
-                    .with_class("tick-mark"),
+                attrs: Attrs::new().with_class("tick-mark"),
             });
 
             // Date label (YYYY-MM-DD format like mermaid.js)

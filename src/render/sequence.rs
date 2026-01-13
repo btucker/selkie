@@ -242,9 +242,7 @@ fn render_actor(
                 cx: center_x,
                 cy: top_y + head_radius,
                 r: head_radius,
-                attrs: Attrs::new()
-                    .with_fill("none")
-                                        .with_stroke_width(2.0),
+                attrs: Attrs::new().with_fill("none").with_stroke_width(2.0),
             });
 
             // Body
@@ -253,7 +251,8 @@ fn render_actor(
                 y1: top_y + head_radius * 2.0,
                 x2: center_x,
                 y2: top_y + head_radius * 2.0 + body_length,
-                attrs: Attrs::new()/* stroke via CSS */.with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             });
 
             // Arms
@@ -262,7 +261,8 @@ fn render_actor(
                 y1: top_y + head_radius * 2.0 + 5.0,
                 x2: center_x + arm_length,
                 y2: top_y + head_radius * 2.0 + 5.0,
-                attrs: Attrs::new()/* stroke via CSS */.with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             });
 
             // Left leg
@@ -271,7 +271,8 @@ fn render_actor(
                 y1: top_y + head_radius * 2.0 + body_length,
                 x2: center_x - 8.0,
                 y2: top_y + head_radius * 2.0 + body_length + leg_length,
-                attrs: Attrs::new()/* stroke via CSS */.with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             });
 
             // Right leg
@@ -280,7 +281,8 @@ fn render_actor(
                 y1: top_y + head_radius * 2.0 + body_length,
                 x2: center_x + 8.0,
                 y2: top_y + head_radius * 2.0 + body_length + leg_length,
-                attrs: Attrs::new()/* stroke via CSS */.with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             });
 
             // Label below
@@ -322,7 +324,7 @@ fn render_actor(
                 d: path,
                 attrs: Attrs::new()
                     .with_class("actor-box")
-                                        .with_stroke_width(1.0)
+                    .with_stroke_width(1.0)
                     .with_class("actor-box"),
             });
 
@@ -332,9 +334,7 @@ fn render_actor(
                 cy: top_y + ellipse_ry,
                 rx: (width - padding * 2.0) / 2.0,
                 ry: ellipse_ry,
-                attrs: Attrs::new()
-                    .with_class("actor-box")
-                                        .with_stroke_width(1.0),
+                attrs: Attrs::new().with_class("actor-box").with_stroke_width(1.0),
             });
 
             // Label
@@ -410,7 +410,7 @@ fn render_message(from_x: f64, to_x: f64, y: f64, label: &str, msg_type: LineTyp
 
     // Message line
     let mut line_attrs = Attrs::new()
-                .with_stroke_width(1.0)
+        .with_stroke_width(1.0)
         .with_class("message-line")
         .with_attr("marker-end", &format!("url(#{})", marker_id));
 
@@ -466,7 +466,7 @@ fn render_self_message(x: f64, y: f64, label: &str, is_dotted: bool) -> SvgEleme
 
     let mut path_attrs = Attrs::new()
         .with_fill("none")
-                .with_stroke_width(1.0)
+        .with_stroke_width(1.0)
         .with_class("message-line")
         .with_attr("marker-end", "url(#arrow-filled)");
 
@@ -535,7 +535,7 @@ fn render_note(
         d: path,
         attrs: Attrs::new()
             .with_class("note")
-                        .with_stroke_width(1.0)
+            .with_stroke_width(1.0)
             .with_class("note-box"),
     });
 
@@ -552,9 +552,7 @@ fn render_note(
 
     children.push(SvgElement::Path {
         d: fold_path,
-        attrs: Attrs::new()
-            .with_fill("none")
-                        .with_stroke_width(1.0),
+        attrs: Attrs::new().with_fill("none").with_stroke_width(1.0),
     });
 
     // Note text
@@ -583,7 +581,11 @@ fn create_arrow_marker(id: &str, filled: bool) -> SvgElement {
     };
 
     // Use class for theming - fill handled by CSS .sequence-marker rule
-    let class_name = if filled { "sequence-marker-filled" } else { "sequence-marker-open" };
+    let class_name = if filled {
+        "sequence-marker-filled"
+    } else {
+        "sequence-marker-open"
+    };
 
     SvgElement::Marker {
         id: id.to_string(),
@@ -596,9 +598,7 @@ fn create_arrow_marker(id: &str, filled: bool) -> SvgElement {
         marker_units: None,
         children: vec![SvgElement::Path {
             d: path.to_string(),
-            attrs: Attrs::new()
-                .with_class(class_name)
-                .with_stroke_width(1.0),
+            attrs: Attrs::new().with_class(class_name).with_stroke_width(1.0),
         }],
     }
 }
@@ -620,14 +620,16 @@ fn create_cross_marker() -> SvgElement {
                 y1: 0.0,
                 x2: 10.0,
                 y2: 10.0,
-                attrs: Attrs::new()/* stroke via CSS */.with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             },
             SvgElement::Line {
                 x1: 10.0,
                 y1: 0.0,
                 x2: 0.0,
                 y2: 10.0,
-                attrs: Attrs::new()/* stroke via CSS */.with_stroke_width(2.0),
+                attrs: Attrs::new() /* stroke via CSS */
+                    .with_stroke_width(2.0),
             },
         ],
     }

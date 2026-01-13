@@ -372,7 +372,7 @@ mod tests {
         // This test verifies that the edge label background does NOT have
         // a hardcoded fill color, allowing CSS theme styling to work.
         // Hardcoded inline fill attributes override CSS rules.
-        use crate::diagrams::flowchart::{FlowEdge, EdgeStroke, FlowTextType};
+        use crate::diagrams::flowchart::{EdgeStroke, FlowEdge, FlowTextType};
         use std::collections::HashMap;
 
         let layout_edge = LayoutEdge {
@@ -380,10 +380,7 @@ mod tests {
             sources: vec!["a".to_string()],
             targets: vec!["b".to_string()],
             label: Some("label".to_string()),
-            bend_points: vec![
-                Point::new(0.0, 0.0),
-                Point::new(100.0, 100.0),
-            ],
+            bend_points: vec![Point::new(0.0, 0.0), Point::new(100.0, 100.0)],
             label_position: Some(Point::new(50.0, 50.0)),
             weight: 1,
             reversed: false,

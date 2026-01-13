@@ -542,7 +542,10 @@ mod tests {
         assert_eq!(sanitize_css("background: url(data:text/html,<script>)"), "");
 
         // SVG in data URL (can contain scripts)
-        assert_eq!(sanitize_css("background: url(data:image/svg+xml,<svg>)"), "");
+        assert_eq!(
+            sanitize_css("background: url(data:image/svg+xml,<svg>)"),
+            ""
+        );
 
         // Safe data URLs should be allowed
         let safe = "background: url(data:image/png;base64,abc)";

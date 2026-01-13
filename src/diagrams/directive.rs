@@ -86,7 +86,10 @@ pub fn detect_directives(text: &str) -> Vec<Directive> {
     let mut directives = Vec::new();
 
     for cap in DIRECTIVE_REGEX.captures_iter(text) {
-        let directive_type = cap.get(1).map(|m| m.as_str().to_lowercase()).unwrap_or_default();
+        let directive_type = cap
+            .get(1)
+            .map(|m| m.as_str().to_lowercase())
+            .unwrap_or_default();
         let json_content = cap.get(2).map(|m| m.as_str().trim()).unwrap_or("");
 
         // Try to parse as JSON (handle both single and double quotes)
@@ -209,7 +212,9 @@ fn is_safe_key(key: &str) -> bool {
 /// Check if a theme name is safe
 fn is_safe_theme_name(theme: &str) -> bool {
     // Only allow alphanumeric and hyphens
-    theme.chars().all(|c| c.is_alphanumeric() || c == '-' || c == '_')
+    theme
+        .chars()
+        .all(|c| c.is_alphanumeric() || c == '-' || c == '_')
 }
 
 /// Check if a CSS value is safe for theme variables
@@ -228,7 +233,9 @@ fn is_safe_css_value(value: &str) -> bool {
             || c == ';'
             || c == '-'
             || c == '_'
-    }) && !value.contains('<') && !value.contains('>') && !value.to_lowercase().contains("url(data:")
+    }) && !value.contains('<')
+        && !value.contains('>')
+        && !value.to_lowercase().contains("url(data:")
 }
 
 /// Sanitize a JSON value recursively
@@ -319,13 +326,20 @@ flowchart TD
 
         let config = detect_init(text).expect("Should parse directive");
         assert_eq!(config.theme, Some("default".to_string()));
-        assert_eq!(config.theme_variables.get("primaryColor"), Some(&"#ff0000".to_string()));
-        assert_eq!(config.theme_variables.get("lineColor"), Some(&"#00ff00".to_string()));
+        assert_eq!(
+            config.theme_variables.get("primaryColor"),
+            Some(&"#ff0000".to_string())
+        );
+        assert_eq!(
+            config.theme_variables.get("lineColor"),
+            Some(&"#00ff00".to_string())
+        );
     }
 
     #[test]
     fn test_sanitize_rejects_xss() {
-        let text = r#"%%{init: {"themeVariables": {"primaryColor": "<script>alert(1)</script>"}}}%%"#;
+        let text =
+            r#"%%{init: {"themeVariables": {"primaryColor": "<script>alert(1)</script>"}}}%%"#;
 
         let config = detect_init(text).expect("Should parse directive");
         // XSS value should be filtered out
@@ -361,7 +375,10 @@ flowchart TD
 
         let config = detect_init(text).expect("Should parse directives");
         assert_eq!(config.theme, Some("default".to_string()));
-        assert_eq!(config.theme_variables.get("primaryColor"), Some(&"#ff0000".to_string()));
+        assert_eq!(
+            config.theme_variables.get("primaryColor"),
+            Some(&"#ff0000".to_string())
+        );
     }
 
     #[test]

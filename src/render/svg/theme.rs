@@ -533,10 +533,14 @@ marker path {{
     ) -> Self {
         use super::color::{self, Color};
 
-        let primary_color = Color::parse(primary).unwrap_or_else(|| Color::from_hex("#ECECFF").unwrap());
-        let secondary_color = Color::parse(secondary).unwrap_or_else(|| Color::from_hex("#ffffde").unwrap());
-        let tertiary_color = Color::parse(tertiary).unwrap_or_else(|| Color::from_hex("#fafafa").unwrap());
-        let bg_color = Color::parse(background).unwrap_or_else(|| Color::from_hex("#ffffff").unwrap());
+        let primary_color =
+            Color::parse(primary).unwrap_or_else(|| Color::from_hex("#ECECFF").unwrap());
+        let secondary_color =
+            Color::parse(secondary).unwrap_or_else(|| Color::from_hex("#ffffde").unwrap());
+        let tertiary_color =
+            Color::parse(tertiary).unwrap_or_else(|| Color::from_hex("#fafafa").unwrap());
+        let bg_color =
+            Color::parse(background).unwrap_or_else(|| Color::from_hex("#ffffff").unwrap());
 
         // Derive border colors
         let primary_border = color::mk_border(&primary_color, dark_mode);
@@ -583,8 +587,16 @@ marker path {{
 
             // Pie chart colors (derived)
             pie_colors,
-            pie_stroke_color: if dark_mode { line_color.to_hex() } else { "black".to_string() },
-            pie_outer_stroke_color: if dark_mode { line_color.to_hex() } else { "black".to_string() },
+            pie_stroke_color: if dark_mode {
+                line_color.to_hex()
+            } else {
+                "black".to_string()
+            },
+            pie_outer_stroke_color: if dark_mode {
+                line_color.to_hex()
+            } else {
+                "black".to_string()
+            },
             pie_opacity: "0.7".to_string(),
             pie_title_text_color: primary_text.to_hex(),
             pie_legend_text_color: primary_text.to_hex(),
@@ -662,60 +674,198 @@ marker path {{
     pub fn set_variable(&mut self, name: &str, value: &str) -> bool {
         match name {
             // Common colors
-            "primaryColor" => { self.primary_color = value.to_string(); true }
-            "primaryTextColor" => { self.primary_text_color = value.to_string(); true }
-            "primaryBorderColor" => { self.primary_border_color = value.to_string(); true }
-            "secondaryColor" => { self.secondary_color = value.to_string(); true }
-            "tertiaryColor" => { self.tertiary_color = value.to_string(); true }
-            "clusterBorderColor" | "clusterBorder" => { self.cluster_border_color = value.to_string(); true }
-            "lineColor" => { self.line_color = value.to_string(); true }
-            "background" => { self.background = value.to_string(); true }
-            "fontFamily" => { self.font_family = value.to_string(); true }
-            "fontSize" => { self.font_size = value.to_string(); true }
+            "primaryColor" => {
+                self.primary_color = value.to_string();
+                true
+            }
+            "primaryTextColor" => {
+                self.primary_text_color = value.to_string();
+                true
+            }
+            "primaryBorderColor" => {
+                self.primary_border_color = value.to_string();
+                true
+            }
+            "secondaryColor" => {
+                self.secondary_color = value.to_string();
+                true
+            }
+            "tertiaryColor" => {
+                self.tertiary_color = value.to_string();
+                true
+            }
+            "clusterBorderColor" | "clusterBorder" => {
+                self.cluster_border_color = value.to_string();
+                true
+            }
+            "lineColor" => {
+                self.line_color = value.to_string();
+                true
+            }
+            "background" => {
+                self.background = value.to_string();
+                true
+            }
+            "fontFamily" => {
+                self.font_family = value.to_string();
+                true
+            }
+            "fontSize" => {
+                self.font_size = value.to_string();
+                true
+            }
 
             // Flowchart aliases (mermaid.js compatibility)
-            "nodeBkg" | "mainBkg" => { self.primary_color = value.to_string(); true }
-            "nodeBorder" | "border1" => { self.primary_border_color = value.to_string(); true }
-            "clusterBkg" | "secondBkg" => { self.secondary_color = value.to_string(); true }
-            "edgeLabelBackground" | "labelBackground" => { self.background = value.to_string(); true }
+            "nodeBkg" | "mainBkg" => {
+                self.primary_color = value.to_string();
+                true
+            }
+            "nodeBorder" | "border1" => {
+                self.primary_border_color = value.to_string();
+                true
+            }
+            "clusterBkg" | "secondBkg" => {
+                self.secondary_color = value.to_string();
+                true
+            }
+            "edgeLabelBackground" | "labelBackground" => {
+                self.background = value.to_string();
+                true
+            }
 
             // Pie chart colors
-            "pieStrokeColor" => { self.pie_stroke_color = value.to_string(); true }
-            "pieOuterStrokeColor" => { self.pie_outer_stroke_color = value.to_string(); true }
-            "pieOpacity" => { self.pie_opacity = value.to_string(); true }
-            "pieTitleTextColor" => { self.pie_title_text_color = value.to_string(); true }
-            "pieLegendTextColor" => { self.pie_legend_text_color = value.to_string(); true }
+            "pieStrokeColor" => {
+                self.pie_stroke_color = value.to_string();
+                true
+            }
+            "pieOuterStrokeColor" => {
+                self.pie_outer_stroke_color = value.to_string();
+                true
+            }
+            "pieOpacity" => {
+                self.pie_opacity = value.to_string();
+                true
+            }
+            "pieTitleTextColor" => {
+                self.pie_title_text_color = value.to_string();
+                true
+            }
+            "pieLegendTextColor" => {
+                self.pie_legend_text_color = value.to_string();
+                true
+            }
 
             // Sequence diagram colors
-            "actorBkg" => { self.actor_bkg = value.to_string(); true }
-            "actorBorder" => { self.actor_border = value.to_string(); true }
-            "actorTextColor" => { self.actor_text_color = value.to_string(); true }
-            "actorLineColor" => { self.actor_line_color = value.to_string(); true }
-            "signalColor" => { self.signal_color = value.to_string(); true }
-            "signalTextColor" => { self.signal_text_color = value.to_string(); true }
-            "noteBkgColor" => { self.note_bkg_color = value.to_string(); true }
-            "noteBorderColor" => { self.note_border_color = value.to_string(); true }
-            "noteTextColor" => { self.note_text_color = value.to_string(); true }
-            "activationBkgColor" => { self.activation_bkg_color = value.to_string(); true }
-            "activationBorderColor" => { self.activation_border_color = value.to_string(); true }
-            "labelBoxBkgColor" => { self.label_box_bkg_color = value.to_string(); true }
-            "labelBoxBorderColor" => { self.label_box_border_color = value.to_string(); true }
+            "actorBkg" => {
+                self.actor_bkg = value.to_string();
+                true
+            }
+            "actorBorder" => {
+                self.actor_border = value.to_string();
+                true
+            }
+            "actorTextColor" => {
+                self.actor_text_color = value.to_string();
+                true
+            }
+            "actorLineColor" => {
+                self.actor_line_color = value.to_string();
+                true
+            }
+            "signalColor" => {
+                self.signal_color = value.to_string();
+                true
+            }
+            "signalTextColor" => {
+                self.signal_text_color = value.to_string();
+                true
+            }
+            "noteBkgColor" => {
+                self.note_bkg_color = value.to_string();
+                true
+            }
+            "noteBorderColor" => {
+                self.note_border_color = value.to_string();
+                true
+            }
+            "noteTextColor" => {
+                self.note_text_color = value.to_string();
+                true
+            }
+            "activationBkgColor" => {
+                self.activation_bkg_color = value.to_string();
+                true
+            }
+            "activationBorderColor" => {
+                self.activation_border_color = value.to_string();
+                true
+            }
+            "labelBoxBkgColor" => {
+                self.label_box_bkg_color = value.to_string();
+                true
+            }
+            "labelBoxBorderColor" => {
+                self.label_box_border_color = value.to_string();
+                true
+            }
 
             // Gantt chart colors
-            "sectionBkgColor" => { self.section_bkg_color = value.to_string(); true }
-            "sectionBkgColor2" | "altSectionBkgColor" => { self.section_bkg_color2 = value.to_string(); true }
-            "taskBkgColor" => { self.task_bkg_color = value.to_string(); true }
-            "taskBorderColor" => { self.task_border_color = value.to_string(); true }
-            "taskTextLightColor" => { self.task_text_light_color = value.to_string(); true }
-            "taskTextDarkColor" => { self.task_text_dark_color = value.to_string(); true }
-            "activeTaskBkgColor" => { self.active_task_bkg_color = value.to_string(); true }
-            "activeTaskBorderColor" => { self.active_task_border_color = value.to_string(); true }
-            "doneTaskBkgColor" => { self.done_task_bkg_color = value.to_string(); true }
-            "doneTaskBorderColor" => { self.done_task_border_color = value.to_string(); true }
-            "critBkgColor" => { self.crit_bkg_color = value.to_string(); true }
-            "critBorderColor" => { self.crit_border_color = value.to_string(); true }
-            "gridColor" => { self.grid_color = value.to_string(); true }
-            "todayLineColor" => { self.today_line_color = value.to_string(); true }
+            "sectionBkgColor" => {
+                self.section_bkg_color = value.to_string();
+                true
+            }
+            "sectionBkgColor2" | "altSectionBkgColor" => {
+                self.section_bkg_color2 = value.to_string();
+                true
+            }
+            "taskBkgColor" => {
+                self.task_bkg_color = value.to_string();
+                true
+            }
+            "taskBorderColor" => {
+                self.task_border_color = value.to_string();
+                true
+            }
+            "taskTextLightColor" => {
+                self.task_text_light_color = value.to_string();
+                true
+            }
+            "taskTextDarkColor" => {
+                self.task_text_dark_color = value.to_string();
+                true
+            }
+            "activeTaskBkgColor" => {
+                self.active_task_bkg_color = value.to_string();
+                true
+            }
+            "activeTaskBorderColor" => {
+                self.active_task_border_color = value.to_string();
+                true
+            }
+            "doneTaskBkgColor" => {
+                self.done_task_bkg_color = value.to_string();
+                true
+            }
+            "doneTaskBorderColor" => {
+                self.done_task_border_color = value.to_string();
+                true
+            }
+            "critBkgColor" => {
+                self.crit_bkg_color = value.to_string();
+                true
+            }
+            "critBorderColor" => {
+                self.crit_border_color = value.to_string();
+                true
+            }
+            "gridColor" => {
+                self.grid_color = value.to_string();
+                true
+            }
+            "todayLineColor" => {
+                self.today_line_color = value.to_string();
+                true
+            }
 
             // Pie colors (pie1-pie12)
             name if name.starts_with("pie") && name.len() <= 5 => {
@@ -728,7 +878,7 @@ marker path {{
                 false
             }
 
-            _ => false
+            _ => false,
         }
     }
 
@@ -864,11 +1014,11 @@ mod tests {
     #[test]
     fn test_from_base_colors_derives_consistent_theme() {
         let theme = Theme::from_base_colors(
-            "#ECECFF",  // primary (light purple)
-            "#ffffde",  // secondary (light yellow)
-            "#fafafa",  // tertiary (light gray)
-            "#ffffff",  // background (white)
-            false,      // light mode
+            "#ECECFF", // primary (light purple)
+            "#ffffde", // secondary (light yellow)
+            "#fafafa", // tertiary (light gray)
+            "#ffffff", // background (white)
+            false,     // light mode
         );
 
         // Primary color should be set
@@ -879,7 +1029,10 @@ mod tests {
         let border = super::super::color::Color::from_hex(&theme.primary_border_color).unwrap();
         let (_, _, primary_l) = primary.to_hsl();
         let (_, _, border_l) = border.to_hsl();
-        assert!(border_l < primary_l, "Border should be darker than primary in light mode");
+        assert!(
+            border_l < primary_l,
+            "Border should be darker than primary in light mode"
+        );
 
         // Pie colors should be derived (10 colors)
         assert_eq!(theme.pie_colors.len(), 10);
@@ -888,11 +1041,11 @@ mod tests {
     #[test]
     fn test_from_base_colors_dark_mode() {
         let theme = Theme::from_base_colors(
-            "#1f2020",  // primary (dark)
-            "#8a8a8a",  // secondary (gray)
-            "#333333",  // tertiary (dark gray)
-            "#1f2020",  // background (dark)
-            true,       // dark mode
+            "#1f2020", // primary (dark)
+            "#8a8a8a", // secondary (gray)
+            "#333333", // tertiary (dark gray)
+            "#1f2020", // background (dark)
+            true,      // dark mode
         );
 
         // Border should be lighter in dark mode
@@ -900,7 +1053,10 @@ mod tests {
         let border = super::super::color::Color::from_hex(&theme.primary_border_color).unwrap();
         let (_, _, primary_l) = primary.to_hsl();
         let (_, _, border_l) = border.to_hsl();
-        assert!(border_l > primary_l, "Border should be lighter than primary in dark mode");
+        assert!(
+            border_l > primary_l,
+            "Border should be lighter than primary in dark mode"
+        );
     }
 
     #[test]
@@ -1037,8 +1193,12 @@ mod tests {
 
         let mut config = DiagramConfig::default();
         config.theme = Some("default".to_string());
-        config.theme_variables.insert("primaryColor".to_string(), "#ff0000".to_string());
-        config.theme_variables.insert("lineColor".to_string(), "#00ff00".to_string());
+        config
+            .theme_variables
+            .insert("primaryColor".to_string(), "#ff0000".to_string());
+        config
+            .theme_variables
+            .insert("lineColor".to_string(), "#00ff00".to_string());
 
         let theme = Theme::from_directive(&config);
 
