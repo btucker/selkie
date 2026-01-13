@@ -249,14 +249,23 @@ The CLI is enabled by default. To build only the library without CLI:
 cargo build --release --no-default-features
 ```
 
-### Output Format Features
+### Output Formats
 
-| Feature | Description | Dependencies |
-|---------|-------------|--------------|
-| `png` | PNG raster output | [resvg](https://crates.io/crates/resvg) |
-| `pdf` | PDF document output | [svg2pdf](https://crates.io/crates/svg2pdf), resvg |
-| `kitty` | Terminal inline images | resvg, [image](https://crates.io/crates/image), [base64](https://crates.io/crates/base64), libc, atty |
-| `all-formats` | Enable png, pdf, and kitty | All of the above |
+SVG output is always available with no additional dependencies:
+
+```bash
+selkie -i diagram.mmd -o output.svg
+```
+
+Additional output formats require feature flags:
+
+| Feature | Format | Dependencies |
+|---------|--------|--------------|
+| *(none)* | SVG | *(built-in)* |
+| `png` | PNG | [resvg](https://crates.io/crates/resvg) |
+| `pdf` | PDF | [svg2pdf](https://crates.io/crates/svg2pdf), resvg |
+| `kitty` | Terminal inline | resvg, [image](https://crates.io/crates/image), [base64](https://crates.io/crates/base64), libc, atty |
+| `all-formats` | All of the above | All of the above |
 
 ### Usage Examples
 
