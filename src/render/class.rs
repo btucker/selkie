@@ -11,7 +11,7 @@ use crate::layout::{
     self, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
     LayoutOptions, NodeShape, NodeSizeConfig, Padding, Point, SizeEstimator, ToLayoutGraph,
 };
-use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
+use crate::render::svg::{edges, Attrs, RenderConfig, SvgDocument, SvgElement};
 
 /// Convert ClassDb to LayoutGraph for dagre-based layout
 impl ToLayoutGraph for ClassDb {
@@ -31,7 +31,12 @@ impl ToLayoutGraph for ClassDb {
             direction: self.preferred_direction(),
             node_spacing: 60.0,
             layer_spacing: 80.0,
-            padding: Padding::uniform(50.0),
+            padding: Padding {
+                top: 58.0,
+                right: 33.0,
+                bottom: 58.0,
+                left: 33.0,
+            },
         };
 
         // Convert classes to layout nodes (sorted for deterministic order)
@@ -60,8 +65,40 @@ impl ToLayoutGraph for ClassDb {
             let total_height = (header_height + content_height + config.padding_vertical * 2.0)
                 .max(config.min_height);
 
-            let (text_width, _) = size_estimator.estimate_text_size(label, config.font_size);
-            let width = (text_width + config.padding_horizontal * 2.0).max(config.min_width);
+            let type_suffix = if !class.type_param.is_empty() {
+                format!("<{}>", class.type_param)
+            } else {
+                String::new()
+            };
+            let class_text = format!("{}{}", label, type_suffix);
+
+            let mut max_text_width = size_estimator.estimate_text_size(&class_text, 14.0).0;
+
+            for annotation in &class.annotations {
+                let text = format!("<<{}>>", annotation);
+                max_text_width =
+                    max_text_width.max(size_estimator.estimate_text_size(&text, 11.0).0);
+            }
+
+            for member in &class.members {
+                let display = member.get_display_details();
+                max_text_width = max_text_width.max(
+                    size_estimator
+                        .estimate_text_size(&display.display_text, 12.0)
+                        .0,
+                );
+            }
+
+            for method in &class.methods {
+                let display = method.get_display_details();
+                max_text_width = max_text_width.max(
+                    size_estimator
+                        .estimate_text_size(&display.display_text, 12.0)
+                        .0,
+                );
+            }
+
+            let width = (max_text_width + config.padding_horizontal * 2.0).max(config.min_width);
 
             let mut node =
                 LayoutNode::new(id, width, total_height).with_shape(NodeShape::Rectangle);
@@ -114,6 +151,9 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     let class_padding = 10.0;
     let member_height = 18.0;
     let header_height = 30.0;
+    let annotation_font_size = 11.0;
+    let class_name_font_size = 14.0;
+    let member_font_size = 12.0;
 
     let classes: Vec<_> = db.classes.values().collect();
 
@@ -164,13 +204,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     }
 
     // Add marker definitions for relations
-    doc.add_defs(vec![
-        create_inheritance_marker(),
-        create_aggregation_marker(),
-        create_composition_marker(),
-        create_dependency_marker(),
-        create_lollipop_marker(),
-    ]);
+    doc.add_defs(create_class_markers());
 
     // Render each class at dagre-computed position
     for class in &classes {
@@ -189,6 +223,10 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
                 class_padding,
                 member_height,
                 header_height,
+                annotation_font_size,
+                class_name_font_size,
+                member_font_size,
+                &size_estimator,
             );
             doc.add_element(class_elem);
         }
@@ -229,6 +267,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
                 relation.relation.type2,
                 relation.relation.line_type,
                 bend_points,
+                &size_estimator,
             );
             doc.add_element(relation_elem);
         }
@@ -260,6 +299,10 @@ fn render_class_box(
     padding: f64,
     member_height: f64,
     header_height: f64,
+    annotation_font_size: f64,
+    class_name_font_size: f64,
+    member_font_size: f64,
+    size_estimator: &dyn SizeEstimator,
 ) -> SvgElement {
     let mut children = Vec::new();
 
@@ -284,16 +327,22 @@ fn render_class_box(
     if !class.annotations.is_empty() {
         for annotation in &class.annotations {
             current_y += member_height;
-            children.push(SvgElement::Text {
-                x: x + width / 2.0,
-                y: current_y,
-                content: format!("<<{}>>", annotation),
-                attrs: Attrs::new()
-                    .with_attr("text-anchor", "middle")
-                    .with_class("class-annotation")
-                    .with_attr("font-size", "11")
-                    .with_attr("font-style", "italic"),
-            });
+            let annotation_text = format!("<<{}>>", annotation);
+            let text_width = size_estimator
+                .estimate_text_size(&annotation_text, annotation_font_size)
+                .0;
+            let text_x = x + (width - text_width) / 2.0;
+            let available_width = width - padding * 2.0;
+            children.push(foreign_object_label(
+                text_x,
+                current_y,
+                text_width,
+                annotation_font_size,
+                available_width,
+                &annotation_text,
+                "center",
+                "font-style: italic;",
+            ));
         }
     }
 
@@ -310,16 +359,22 @@ fn render_class_box(
         String::new()
     };
 
-    children.push(SvgElement::Text {
-        x: x + width / 2.0,
-        y: current_y,
-        content: format!("{}{}", class_label, type_suffix),
-        attrs: Attrs::new()
-            .with_attr("text-anchor", "middle")
-            .with_class("class-name")
-            .with_attr("font-size", "14")
-            .with_attr("font-weight", "bold"),
-    });
+    let class_text = format!("{}{}", class_label, type_suffix);
+    let text_width = size_estimator
+        .estimate_text_size(&class_text, class_name_font_size)
+        .0;
+    let text_x = x + (width - text_width) / 2.0;
+    let available_width = width - padding * 2.0;
+    children.push(foreign_object_label(
+        text_x,
+        current_y,
+        text_width,
+        class_name_font_size,
+        available_width,
+        &class_text,
+        "center",
+        "font-weight: bolder;",
+    ));
 
     current_y = y + header_height;
 
@@ -340,26 +395,21 @@ fn render_class_box(
         for member in &class.members {
             current_y += member_height;
             let display = member.get_display_details();
-            let mut text_attrs = Attrs::new()
-                .with_attr("text-anchor", "start")
-                .with_class("class-member")
-                .with_attr("font-size", "12");
-
-            if !display.css_style.is_empty() {
-                if display.css_style.contains("underline") {
-                    text_attrs = text_attrs.with_attr("text-decoration", "underline");
-                }
-                if display.css_style.contains("italic") {
-                    text_attrs = text_attrs.with_attr("font-style", "italic");
-                }
-            }
-
-            children.push(SvgElement::Text {
-                x: x + padding,
-                y: current_y - 4.0,
-                content: display.display_text,
-                attrs: text_attrs,
-            });
+            let text_width = size_estimator
+                .estimate_text_size(&display.display_text, member_font_size)
+                .0;
+            let text_x = x + (width - text_width) / 2.0;
+            let available_width = width - padding * 2.0;
+            children.push(foreign_object_label(
+                text_x,
+                current_y - 4.0,
+                text_width,
+                member_font_size,
+                available_width,
+                &display.display_text,
+                "center",
+                &display.css_style,
+            ));
         }
     }
 
@@ -383,26 +433,21 @@ fn render_class_box(
         for method in &class.methods {
             current_y += member_height;
             let display = method.get_display_details();
-            let mut text_attrs = Attrs::new()
-                .with_attr("text-anchor", "start")
-                .with_class("class-method")
-                .with_attr("font-size", "12");
-
-            if !display.css_style.is_empty() {
-                if display.css_style.contains("underline") {
-                    text_attrs = text_attrs.with_attr("text-decoration", "underline");
-                }
-                if display.css_style.contains("italic") {
-                    text_attrs = text_attrs.with_attr("font-style", "italic");
-                }
-            }
-
-            children.push(SvgElement::Text {
-                x: x + padding,
-                y: current_y - 4.0,
-                content: display.display_text,
-                attrs: text_attrs,
-            });
+            let text_width = size_estimator
+                .estimate_text_size(&display.display_text, member_font_size)
+                .0;
+            let text_x = x + (width - text_width) / 2.0;
+            let available_width = width - padding * 2.0;
+            children.push(foreign_object_label(
+                text_x,
+                current_y - 4.0,
+                text_width,
+                member_font_size,
+                available_width,
+                &display.display_text,
+                "center",
+                &display.css_style,
+            ));
         }
     }
 
@@ -432,13 +477,14 @@ fn render_relation(
     type2: i32,
     line_type: LineType,
     bend_points: Option<&Vec<Point>>,
+    size_estimator: &dyn SizeEstimator,
 ) -> SvgElement {
     let mut children = Vec::new();
 
     // Calculate path from bend points or fallback to direct line
     let path_d = if let Some(points) = bend_points {
         if !points.is_empty() {
-            build_path_from_points(points)
+            edges::build_curved_path(points)
         } else {
             build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2)
         }
@@ -448,18 +494,20 @@ fn render_relation(
 
     // Determine marker based on relation type
     let marker_start = match type1 {
-        0 => Some("url(#aggregation)"),
-        1 => Some("url(#inheritance)"),
-        2 => Some("url(#composition)"),
-        4 => Some("url(#lollipop)"),
+        0 => Some("url(#aggregation-start)"),
+        1 => Some("url(#inheritance-start)"),
+        2 => Some("url(#composition-start)"),
+        3 => Some("url(#dependency-start)"),
+        4 => Some("url(#lollipop-start)"),
         _ => None,
     };
 
     let marker_end = match type2 {
-        0 => Some("url(#aggregation)"),
-        1 => Some("url(#inheritance)"),
-        2 => Some("url(#composition)"),
-        4 => Some("url(#lollipop)"),
+        0 => Some("url(#aggregation-end)"),
+        1 => Some("url(#inheritance-end)"),
+        2 => Some("url(#composition-end)"),
+        3 => Some("url(#dependency-end)"),
+        4 => Some("url(#lollipop-end)"),
         _ => None,
     };
 
@@ -569,14 +617,31 @@ fn render_relation(
     if !label.is_empty() {
         let mid_x = (start_x + end_x) / 2.0;
         let mid_y = (start_y + end_y) / 2.0;
+        let font_size = 11.0;
+        let text_width = size_estimator.estimate_text_size(label, font_size).0;
+        let text_height = font_size * 1.5;
+        let padding = 4.0;
+
+        children.push(SvgElement::Rect {
+            x: mid_x - text_width / 2.0 - padding,
+            y: mid_y - text_height / 2.0 - padding / 2.0,
+            width: text_width + padding * 2.0,
+            height: text_height + padding,
+            rx: None,
+            ry: None,
+            attrs: Attrs::new()
+                .with_class("edge-label-bg")
+                .with_attr("fill-opacity", "0.8"),
+        });
 
         children.push(SvgElement::Text {
             x: mid_x,
-            y: mid_y - 5.0,
+            y: mid_y,
             content: label.to_string(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
                 .with_class("relation-label")
+                .with_attr("dominant-baseline", "central")
                 .with_attr("font-size", "11"),
         });
     }
@@ -585,19 +650,6 @@ fn render_relation(
         children,
         attrs: Attrs::new().with_class("relation"),
     }
-}
-
-/// Build SVG path string from bend points
-fn build_path_from_points(points: &[Point]) -> String {
-    if points.is_empty() {
-        return String::new();
-    }
-
-    let mut d = format!("M {} {}", points[0].x, points[0].y);
-    for point in &points[1..] {
-        d.push_str(&format!(" L {} {}", point.x, point.y));
-    }
-    d
 }
 
 /// Build direct path when no bend points available
@@ -737,102 +789,71 @@ fn render_note(x: f64, y: f64, text: &str) -> SvgElement {
     }
 }
 
-/// Create inheritance marker (hollow triangle - UML extension/inheritance)
-fn create_inheritance_marker() -> SvgElement {
-    SvgElement::Marker {
-        id: "inheritance".to_string(),
-        view_box: "0 0 20 14".to_string(),
-        ref_x: 18.0,
-        ref_y: 7.0,
-        marker_width: 10.0,
-        marker_height: 10.0,
-        orient: "auto".to_string(),
-        marker_units: None,
-        children: vec![SvgElement::Path {
+fn create_class_markers() -> Vec<SvgElement> {
+    let mut markers = Vec::new();
+    markers.extend(create_marker_pair(
+        "aggregation",
+        "0 0 20 14",
+        18.0,
+        1.0,
+        7.0,
+        vec![SvgElement::Path {
+            d: "M 18 7 L 9 13 L 1 7 L 9 1 Z".to_string(),
+            attrs: Attrs::new()
+                .with_fill("none")
+                .with_stroke("#333333")
+                .with_stroke_width(1.0),
+        }],
+    ));
+    markers.extend(create_marker_pair(
+        "inheritance",
+        "0 0 20 14",
+        18.0,
+        1.0,
+        7.0,
+        vec![SvgElement::Path {
             d: "M 1 7 L 18 13 V 1 Z".to_string(),
             attrs: Attrs::new()
                 .with_fill("none")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
-    }
-}
-
-/// Create aggregation marker (hollow diamond)
-fn create_aggregation_marker() -> SvgElement {
-    SvgElement::Marker {
-        id: "aggregation".to_string(),
-        view_box: "0 0 20 14".to_string(),
-        ref_x: 18.0,
-        ref_y: 7.0,
-        marker_width: 10.0,
-        marker_height: 10.0,
-        orient: "auto".to_string(),
-        marker_units: None,
-        children: vec![SvgElement::Path {
-            d: "M 18 7 L 9 13 L 1 7 L 9 1 Z".to_string(),
-            attrs: Attrs::new()
-                .with_fill("none")
-                .with_stroke("#333333")
-                .with_stroke_width(1.0),
-        }],
-    }
-}
-
-/// Create composition marker (filled diamond)
-fn create_composition_marker() -> SvgElement {
-    SvgElement::Marker {
-        id: "composition".to_string(),
-        view_box: "0 0 20 14".to_string(),
-        ref_x: 18.0,
-        ref_y: 7.0,
-        marker_width: 10.0,
-        marker_height: 10.0,
-        orient: "auto".to_string(),
-        marker_units: None,
-        children: vec![SvgElement::Path {
+    ));
+    markers.extend(create_marker_pair(
+        "composition",
+        "0 0 20 14",
+        18.0,
+        1.0,
+        7.0,
+        vec![SvgElement::Path {
             d: "M 18 7 L 9 13 L 1 7 L 9 1 Z".to_string(),
             attrs: Attrs::new()
                 .with_fill("#333333")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
-    }
-}
-
-/// Create dependency marker (open arrow)
-fn create_dependency_marker() -> SvgElement {
-    SvgElement::Marker {
-        id: "dependency".to_string(),
-        view_box: "0 0 20 20".to_string(),
-        ref_x: 20.0,
-        ref_y: 10.0,
-        marker_width: 10.0,
-        marker_height: 10.0,
-        orient: "auto".to_string(),
-        marker_units: None,
-        children: vec![SvgElement::Path {
+    ));
+    markers.extend(create_marker_pair(
+        "dependency",
+        "0 0 20 20",
+        18.0,
+        1.0,
+        10.0,
+        vec![SvgElement::Path {
             d: "M 0 0 L 20 10 L 0 20".to_string(),
             attrs: Attrs::new()
                 .with_fill("none")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
-    }
-}
-
-/// Create lollipop marker (circle for interface realization)
-fn create_lollipop_marker() -> SvgElement {
-    SvgElement::Marker {
-        id: "lollipop".to_string(),
-        view_box: "0 0 20 20".to_string(),
-        ref_x: 10.0,
-        ref_y: 10.0,
-        marker_width: 10.0,
-        marker_height: 10.0,
-        orient: "auto".to_string(),
-        marker_units: None,
-        children: vec![SvgElement::Circle {
+    ));
+    markers.extend(create_marker_pair(
+        "lollipop",
+        "0 0 20 20",
+        13.0,
+        1.0,
+        10.0,
+        vec![SvgElement::Circle {
             cx: 10.0,
             cy: 10.0,
             r: 8.0,
@@ -841,7 +862,42 @@ fn create_lollipop_marker() -> SvgElement {
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
-    }
+    ));
+    markers
+}
+
+fn create_marker_pair(
+    name: &str,
+    view_box: &str,
+    start_ref_x: f64,
+    end_ref_x: f64,
+    ref_y: f64,
+    children: Vec<SvgElement>,
+) -> Vec<SvgElement> {
+    vec![
+        SvgElement::Marker {
+            id: format!("{}-start", name),
+            view_box: view_box.to_string(),
+            ref_x: start_ref_x,
+            ref_y,
+            marker_width: 10.0,
+            marker_height: 10.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: children.clone(),
+        },
+        SvgElement::Marker {
+            id: format!("{}-end", name),
+            view_box: view_box.to_string(),
+            ref_x: end_ref_x,
+            ref_y,
+            marker_width: 10.0,
+            marker_height: 10.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children,
+        },
+    ]
 }
 
 fn generate_class_css() -> String {
@@ -887,6 +943,38 @@ fn generate_class_css() -> String {
 }
 "#
     .to_string()
+}
+
+#[allow(clippy::too_many_arguments)]
+fn foreign_object_label(
+    x: f64,
+    y: f64,
+    width: f64,
+    font_size: f64,
+    max_width: f64,
+    text: &str,
+    align: &str,
+    style: &str,
+) -> SvgElement {
+    let line_height = font_size * 1.5;
+    let height = line_height;
+    let y_top = y - line_height + (line_height - font_size) / 2.0;
+    let text = escape_html(text);
+    let html = format!(
+        "<foreignObject x=\"{x}\" y=\"{y_top}\" width=\"{width}\" height=\"{height}\">\
+<div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: {max_width}px; text-align: {align}; font-size: {font_size}px;\">\
+<span class=\"nodeLabel markdown-node-label\" style=\"{style}\"><p style=\"margin:0;\">{text}</p></span>\
+</div></foreignObject>"
+    );
+    SvgElement::Raw { content: html }
+}
+
+fn escape_html(text: &str) -> String {
+    text.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&apos;")
 }
 
 #[cfg(test)]
