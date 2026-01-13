@@ -14,22 +14,27 @@ Selkie provides significant performance improvements for complex diagrams compar
 
 | Diagram | Mermaid.js | Selkie | Speedup |
 |---------|------------|--------|---------|
-| Simple flowchart (5 nodes) | 29.6ms | 17.4ms | **1.7x** |
-| Medium flowchart (15 nodes) | 54.7ms | 17.8ms | **3.1x** |
-| Sequence diagram (4 actors) | 9.4ms | 15.1ms | 0.6x |
-| Class diagram (5 classes) | 47.9ms | 16.1ms | **3.0x** |
-| State diagram (8 states) | 54.8ms | 17.8ms | **3.1x** |
-| ER diagram (4 entities) | 52.9ms | 17.0ms | **3.1x** |
-| Gantt chart (10 tasks) | 8.8ms | 16.4ms | 0.5x |
-| Pie chart (6 segments) | 4.5ms | 17.5ms | 0.3x |
+| Simple flowchart (5 nodes) | 32.6ms | 21.7ms | **1.5x** |
+| Medium flowchart (15 nodes) | 62.0ms | 22.8ms | **2.7x** |
+| Sequence diagram (4 actors) | 10.4ms | 18.7ms | 0.6x |
+| Class diagram (5 classes) | 50.3ms | 19.3ms | **2.6x** |
+| State diagram (8 states) | 61.1ms | 18.5ms | **3.3x** |
+| ER diagram (4 entities) | 57.8ms | 18.6ms | **3.1x** |
+| Gantt chart (10 tasks) | 9.4ms | 18.9ms | 0.5x |
+| Pie chart (6 segments) | 4.4ms | 20.2ms | 0.2x |
+| **Large flowchart (100 nodes)** | **844.5ms** | **30.7ms** | **27.5x** |
 
 _Mermaid.js v11 in Node.js/JSDOM. Median of 10 runs after 3 warmup runs._
 
-**Notes:**
-- Selkie's CLI has ~15ms startup overhead per invocation. When used as a library (avoiding process spawn), pure render times are much faster.
-- Complex diagrams with graph layout (flowchart, class, state, ER) show the largest speedups (2-3x).
-- Simple diagrams show Mermaid.js ahead due to Selkie's process startup cost.
-- For batch processing or server use, the library API eliminates startup overhead.
+**Key findings:**
+- **Large diagrams**: Selkie is **27x faster** for complex flowcharts with 100 nodes and 200+ edges
+- **Graph layout diagrams** (flowchart, class, state, ER): Consistent **2-3x speedup**
+- **Simple diagrams**: Mermaid.js appears faster due to Selkie's ~18ms CLI startup overhead
+
+**Addressing startup overhead:**
+- The CLI spawns a new process per render, adding ~18ms overhead
+- Use the **library API** for batch processing or server scenarios to eliminate this
+- Pure render time (excluding startup) is much faster than shown above
 
 Run the benchmark yourself:
 ```bash
