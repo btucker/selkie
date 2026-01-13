@@ -1976,6 +1976,198 @@ fn test_sequence_diagram_uses_theme_colors() {
 }
 
 #[test]
+fn test_sequence_open_arrow_has_no_marker() {
+    let input = r#"sequenceDiagram
+    participant A
+    participant B
+    A->B: Open
+    A->>B: Filled"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    assert_eq!(
+        svg.matches("marker-end=").count(),
+        1,
+        "Only filled arrows should get marker-end"
+    );
+}
+
+#[test]
+fn test_sequence_activation_renders_box() {
+    let input = r#"sequenceDiagram
+    participant A
+    participant C
+    A->>+C: Login request
+    C-->>-A: Token"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    assert!(
+        svg.contains("class=\"activation\""),
+        "Activation box should render for + activation"
+    );
+}
+
+#[test]
+fn test_sequence_loop_label_renders() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: start
+    loop Every minute
+    Alice->>Bob: ping
+    end"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    assert!(svg.contains(">loop<"), "Loop label should render in SVG");
+    assert!(
+        svg.contains("[Every minute]"),
+        "Loop condition label should render in SVG"
+    );
+    assert!(
+        svg.contains("labelBox") || svg.contains("loopLine"),
+        "Loop framing should render in SVG"
+    );
+}
+
+#[test]
+fn test_sequence_loop_condition_sits_near_top_line() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: start
+    loop Daily query
+    Alice->>Bob: ping
+    end"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    let label_y = svg
+        .split("<polygon")
+        .find_map(|chunk| {
+            if !chunk.contains("class=\"labelBox\"") {
+                return None;
+            }
+            let points = chunk.split("points=\"").nth(1)?.split('"').next()?;
+            let first_point = points.split_whitespace().next()?;
+            let y = first_point.split(',').nth(1)?;
+            y.parse::<f64>().ok()
+        })
+        .expect("Failed to parse label box y");
+
+    let loop_text_y = svg
+        .split("<text")
+        .find_map(|chunk| {
+            if !chunk.contains("class=\"loopText\"") {
+                return None;
+            }
+            let y = chunk.split("y=\"").nth(1)?.split('"').next()?;
+            y.parse::<f64>().ok()
+        })
+        .expect("Failed to parse loop text y");
+
+    assert!(
+        loop_text_y <= label_y + 20.0,
+        "Loop condition should sit just below the top line (label_y={}, loop_text_y={})",
+        label_y,
+        loop_text_y
+    );
+}
+
+#[test]
+fn test_sequence_fragment_uses_actor_theme_colors() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: start
+    loop Daily query
+    Alice->>Bob: ping
+    end"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let theme = Theme::forest();
+    let svg = render_with_config(
+        &diagram,
+        &RenderConfig {
+            theme: theme.clone(),
+            ..Default::default()
+        },
+    )
+    .expect("Failed to render sequence diagram");
+
+    assert!(
+        svg.contains(&format!("stroke: {};", theme.actor_border)),
+        "Fragment stroke should use actor border color"
+    );
+    assert!(
+        svg.contains(&format!("fill: {};", theme.actor_bkg)),
+        "Fragment fill should use actor background color"
+    );
+}
+
+#[test]
+fn test_sequence_fragment_frames_render_behind_text() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: start
+    loop Daily query
+    Alice->>Bob: ping
+    end"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    let frame_idx = svg
+        .find("class=\"loopLine\"")
+        .expect("Missing fragment frame");
+    let text_idx = svg
+        .find("class=\"loopText\"")
+        .expect("Missing fragment text");
+
+    assert!(
+        frame_idx < text_idx,
+        "Fragment frames should render before text"
+    );
+}
+
+#[test]
+fn test_sequence_loop_scopes_to_single_actor() {
+    let input = r#"sequenceDiagram
+    participant Alice
+    participant Bob
+    participant John
+    Alice->>John: Hello John, how are you?
+    loop HealthCheck
+        John->>John: Fight against hypochondria
+    end
+    John-->>Alice: Great!"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    let loop_width = svg
+        .split("<rect")
+        .find_map(|chunk| {
+            if !chunk.contains("class=\"loopLine\"") {
+                return None;
+            }
+            let width = chunk.split("width=\"").nth(1)?.split('"').next()?;
+            width.parse::<f64>().ok()
+        })
+        .expect("Failed to parse loop frame width");
+
+    assert!(
+        loop_width < 300.0,
+        "Loop frame should scope to a single actor, got width {}",
+        loop_width
+    );
+}
+
+#[test]
 fn test_theme_override_appears_in_svg() {
     // Override primary color to a distinctive red
     let svg = render_text(

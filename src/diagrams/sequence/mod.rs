@@ -146,11 +146,12 @@ mod tests {
         fn should_add_note() {
             let mut db = SequenceDb::new();
             db.add_actor("Alice", None, ParticipantType::Participant);
-            db.add_note("Alice", Placement::RightOf, "This is a note");
+            db.add_note("Alice", Placement::RightOf, "This is a note", None);
 
             let notes = db.get_notes();
             assert_eq!(notes.len(), 1);
             assert_eq!(notes[0].actor, "Alice");
+            assert_eq!(notes[0].actor_to, None);
             assert_eq!(notes[0].message, "This is a note");
             assert_eq!(notes[0].placement, Placement::RightOf);
         }
@@ -348,7 +349,7 @@ mod tests {
             let mut db = SequenceDb::new();
             db.add_actor("Alice", None, ParticipantType::Participant);
             db.add_message("Alice", "Bob", "Hello", LineType::Solid, false);
-            db.add_note("Alice", Placement::RightOf, "Note");
+            db.add_note("Alice", Placement::RightOf, "Note", None);
             db.set_autonumber(true, None, None);
             db.acc_title = "Title".to_string();
 

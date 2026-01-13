@@ -79,6 +79,12 @@ pub struct DiagramResult {
     pub parse_result: ParseResult,
     /// Render result (if parsed successfully)
     pub render_result: Option<RenderResult>,
+    /// Selkie-rendered SVG for HTML reports
+    #[serde(skip_serializing, skip_deserializing)]
+    pub selkie_svg: Option<String>,
+    /// Reference SVG for HTML reports
+    #[serde(skip_serializing, skip_deserializing)]
+    pub reference_svg: Option<String>,
 }
 
 /// Parse result for a diagram
