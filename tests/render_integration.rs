@@ -105,6 +105,29 @@ fn test_render_with_forest_theme() {
 }
 
 #[test]
+fn test_render_with_base_theme() {
+    let input = r#"flowchart LR
+    A --> B"#;
+
+    let diagram = parse(input).expect("Failed to parse flowchart");
+    let config = RenderConfig {
+        theme: Theme::base(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with base theme");
+
+    // Verify SVG generated with base theme
+    assert!(svg.contains("<svg"), "SVG should have opening tag");
+    assert!(svg.contains("<style>"), "SVG should contain embedded styles");
+    // Base theme should have neutral warm colors
+    assert!(
+        svg.contains("#fff4dd") || svg.contains("#f4f4f4"),
+        "Base theme should have neutral warm color palette, got: {}",
+        &svg[..500.min(svg.len())]
+    );
+}
+
+#[test]
 fn test_render_with_custom_padding() {
     let input = r#"flowchart LR
     A --> B"#;

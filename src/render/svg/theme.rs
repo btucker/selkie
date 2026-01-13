@@ -93,6 +93,25 @@ impl Theme {
         }
     }
 
+    /// Create a base theme (neutral foundation for customization)
+    /// This theme provides neutral starting points that can be fully
+    /// customized via themeVariables overrides.
+    pub fn base() -> Self {
+        Self {
+            // Neutral warm palette from mermaid.js theme-base.js
+            primary_color: "#fff4dd".to_string(),      // Light warm cream
+            primary_text_color: "#333333".to_string(), // Dark text
+            primary_border_color: "#9370DB".to_string(), // Muted purple border
+            secondary_color: "#dde4ff".to_string(),    // Light blue-purple
+            tertiary_color: "#f4ffdd".to_string(),     // Light yellow-green
+            cluster_border_color: "#9370DB".to_string(), // Muted purple
+            line_color: "#333333".to_string(),         // Dark lines
+            background: "#f4f4f4".to_string(),         // Light gray background
+            font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
+            font_size: "16px".to_string(),
+        }
+    }
+
     /// Generate CSS for embedding in SVG
     pub fn generate_css(&self) -> String {
         format!(
