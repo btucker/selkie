@@ -123,12 +123,7 @@ fn postorder(g: &DagreGraph) -> HashMap<String, PostorderNums> {
     let mut result = HashMap::new();
     let mut lim = 0;
 
-    fn dfs(
-        g: &DagreGraph,
-        v: &str,
-        lim: &mut i32,
-        result: &mut HashMap<String, PostorderNums>,
-    ) {
+    fn dfs(g: &DagreGraph, v: &str, lim: &mut i32, result: &mut HashMap<String, PostorderNums>) {
         let low = *lim;
         let children: Vec<String> = g.children(v).into_iter().cloned().collect();
         for child in children {
@@ -138,7 +133,10 @@ fn postorder(g: &DagreGraph) -> HashMap<String, PostorderNums> {
             v.to_string(),
             PostorderNums {
                 low,
-                lim: { *lim += 1; *lim - 1 },
+                lim: {
+                    *lim += 1;
+                    *lim - 1
+                },
             },
         );
     }

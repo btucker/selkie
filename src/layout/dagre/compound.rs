@@ -114,7 +114,9 @@ fn add_border_node(g: &mut DagreGraph, prop: &str, prefix: &str, sg: &str, rank:
     // Get the previous border node id if it exists
     let prev_id = if idx > 0 {
         match prop {
-            "borderLeft" => g.node(sg).and_then(|n| n.border_left.get(idx - 1).cloned().flatten()),
+            "borderLeft" => g
+                .node(sg)
+                .and_then(|n| n.border_left.get(idx - 1).cloned().flatten()),
             "borderRight" => g
                 .node(sg)
                 .and_then(|n| n.border_right.get(idx - 1).cloned().flatten()),
