@@ -317,7 +317,13 @@ impl ErDb {
     }
 
     /// Add a relationship between entities
-    pub fn add_relationship(&mut self, entity_a: &str, role_a: &str, entity_b: &str, rel_spec: RelSpec) {
+    pub fn add_relationship(
+        &mut self,
+        entity_a: &str,
+        role_a: &str,
+        entity_b: &str,
+        rel_spec: RelSpec,
+    ) {
         // Only add relationship if both entities exist
         let entity_a_id = self.entities.get(entity_a).map(|e| e.id.clone());
         let entity_b_id = self.entities.get(entity_b).map(|e| e.id.clone());
@@ -357,9 +363,10 @@ impl ErDb {
     /// Add a style class definition
     pub fn add_class(&mut self, ids: &[&str], styles: &[&str]) {
         for id in ids {
-            let class_node = self.classes.entry(id.to_string()).or_insert_with(|| {
-                EntityClass::new(id.to_string())
-            });
+            let class_node = self
+                .classes
+                .entry(id.to_string())
+                .or_insert_with(|| EntityClass::new(id.to_string()));
 
             for style in styles {
                 // If style contains "color", also add to textStyles with "fill" -> "bgFill"

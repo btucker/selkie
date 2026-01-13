@@ -10,7 +10,9 @@ mod util;
 use super::graph::DagreGraph;
 use super::Ranker;
 
-pub use network_simplex::{init_low_lim_values, init_cut_values, calc_cut_value, leave_edge, enter_edge, exchange_edges};
+pub use network_simplex::{
+    calc_cut_value, enter_edge, exchange_edges, init_cut_values, init_low_lim_values, leave_edge,
+};
 
 /// Assign ranks to all nodes in the graph
 pub fn assign_ranks(g: &mut DagreGraph, method: Ranker) {
@@ -73,7 +75,14 @@ mod tests {
         let mut g = DagreGraph::new();
         g.set_path(&["a", "b", "d"]);
         g.set_edge("a", "c", EdgeLabel::default());
-        g.set_edge("c", "d", EdgeLabel { minlen: 2, ..Default::default() });
+        g.set_edge(
+            "c",
+            "d",
+            EdgeLabel {
+                minlen: 2,
+                ..Default::default()
+            },
+        );
 
         // Use LongestPath - NetworkSimplex has a bug in exchange_edges
         // that can create negative slack. TODO: Fix network simplex.

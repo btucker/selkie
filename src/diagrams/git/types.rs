@@ -205,7 +205,13 @@ impl GitGraphDb {
     }
 
     /// Create a new commit
-    pub fn commit(&mut self, id: Option<String>, message: String, commit_type: CommitType, tags: Vec<String>) {
+    pub fn commit(
+        &mut self,
+        id: Option<String>,
+        message: String,
+        commit_type: CommitType,
+        tags: Vec<String>,
+    ) {
         let custom_id = id.is_some();
         let commit_id = id.unwrap_or_else(|| self.generate_commit_id());
 
@@ -224,7 +230,8 @@ impl GitGraphDb {
 
         self.seq += 1;
         self.head = Some(commit_id.clone());
-        self.branches.insert(self.current_branch.clone(), Some(commit_id.clone()));
+        self.branches
+            .insert(self.current_branch.clone(), Some(commit_id.clone()));
         self.commits.insert(commit_id, commit);
     }
 
@@ -233,7 +240,8 @@ impl GitGraphDb {
         // New branch points to the same commit as current branch
         let current_head = self.branches.get(&self.current_branch).cloned().flatten();
         self.branches.insert(name.clone(), current_head);
-        self.branch_config.insert(name.clone(), BranchConfig { name, order });
+        self.branch_config
+            .insert(name.clone(), BranchConfig { name, order });
     }
 
     /// Checkout/switch to a branch
@@ -245,7 +253,13 @@ impl GitGraphDb {
     }
 
     /// Merge a branch into the current branch
-    pub fn merge(&mut self, branch: &str, id: Option<String>, commit_type: CommitType, tags: Vec<String>) {
+    pub fn merge(
+        &mut self,
+        branch: &str,
+        id: Option<String>,
+        commit_type: CommitType,
+        tags: Vec<String>,
+    ) {
         let source_head = self.branches.get(branch).cloned().flatten();
         let current_head = self.branches.get(&self.current_branch).cloned().flatten();
 
@@ -272,12 +286,19 @@ impl GitGraphDb {
 
         self.seq += 1;
         self.head = Some(commit_id.clone());
-        self.branches.insert(self.current_branch.clone(), Some(commit_id.clone()));
+        self.branches
+            .insert(self.current_branch.clone(), Some(commit_id.clone()));
         self.commits.insert(commit_id, commit);
     }
 
     /// Cherry-pick a commit
-    pub fn cherry_pick(&mut self, source_id: &str, id: Option<String>, parent: Option<String>, tags: Vec<String>) {
+    pub fn cherry_pick(
+        &mut self,
+        source_id: &str,
+        id: Option<String>,
+        parent: Option<String>,
+        tags: Vec<String>,
+    ) {
         if !self.commits.contains_key(source_id) {
             return;
         }
@@ -285,9 +306,8 @@ impl GitGraphDb {
         let custom_id = id.is_some();
         let commit_id = id.unwrap_or_else(|| self.generate_commit_id());
 
-        let parent_id = parent.or_else(|| {
-            self.branches.get(&self.current_branch).cloned().flatten()
-        });
+        let parent_id =
+            parent.or_else(|| self.branches.get(&self.current_branch).cloned().flatten());
 
         let mut commit = Commit::new(commit_id.clone(), self.current_branch.clone(), self.seq);
         commit.commit_type = CommitType::CherryPick;
@@ -297,7 +317,8 @@ impl GitGraphDb {
 
         self.seq += 1;
         self.head = Some(commit_id.clone());
-        self.branches.insert(self.current_branch.clone(), Some(commit_id.clone()));
+        self.branches
+            .insert(self.current_branch.clone(), Some(commit_id.clone()));
         self.commits.insert(commit_id, commit);
     }
 

@@ -13,8 +13,8 @@ pub struct XYChartParser;
 pub fn parse(input: &str) -> Result<XYChartDb, String> {
     let mut db = XYChartDb::new();
 
-    let pairs = XYChartParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        XYChartParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -40,20 +40,14 @@ pub fn parse(input: &str) -> Result<XYChartDb, String> {
     Ok(db)
 }
 
-fn process_document(
-    db: &mut XYChartDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_document(db: &mut XYChartDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for stmt in pair.into_inner() {
         process_statement(db, stmt)?;
     }
     Ok(())
 }
 
-fn process_statement(
-    db: &mut XYChartDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_statement(db: &mut XYChartDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     match pair.as_rule() {
         Rule::statement => {
             for inner in pair.into_inner() {
@@ -88,10 +82,7 @@ fn process_statement(
     Ok(())
 }
 
-fn process_x_axis(
-    db: &mut XYChartDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_x_axis(db: &mut XYChartDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut title = String::new();
     let mut categories: Vec<String> = Vec::new();
     let mut range: Option<(f64, f64)> = None;
@@ -122,10 +113,7 @@ fn process_x_axis(
     Ok(())
 }
 
-fn process_y_axis(
-    db: &mut XYChartDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_y_axis(db: &mut XYChartDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut title = String::new();
     let mut range: Option<(f64, f64)> = None;
 
@@ -150,10 +138,7 @@ fn process_y_axis(
     Ok(())
 }
 
-fn process_line(
-    db: &mut XYChartDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_line(db: &mut XYChartDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut title = String::new();
     let mut values: Vec<f64> = Vec::new();
 
@@ -174,7 +159,11 @@ fn process_line(
         .iter()
         .enumerate()
         .map(|(i, v)| DataPoint {
-            label: if title.is_empty() { format!("{}", i) } else { title.clone() },
+            label: if title.is_empty() {
+                format!("{}", i)
+            } else {
+                title.clone()
+            },
             value: *v,
         })
         .collect();
@@ -183,10 +172,7 @@ fn process_line(
     Ok(())
 }
 
-fn process_bar(
-    db: &mut XYChartDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_bar(db: &mut XYChartDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut title = String::new();
     let mut values: Vec<f64> = Vec::new();
 
@@ -207,7 +193,11 @@ fn process_bar(
         .iter()
         .enumerate()
         .map(|(i, v)| DataPoint {
-            label: if title.is_empty() { format!("{}", i) } else { title.clone() },
+            label: if title.is_empty() {
+                format!("{}", i)
+            } else {
+                title.clone()
+            },
             value: *v,
         })
         .collect();
@@ -297,7 +287,9 @@ fn extract_range(pair: pest::iterators::Pair<Rule>) -> Result<(f64, f64), String
 
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::number {
-            let num: f64 = inner.as_str().parse()
+            let num: f64 = inner
+                .as_str()
+                .parse()
                 .map_err(|_| format!("Invalid number: {}", inner.as_str()))?;
             numbers.push(num);
         }
@@ -318,7 +310,8 @@ fn extract_data_array(pair: pest::iterators::Pair<Rule>) -> Result<Vec<f64>, Str
             for num_pair in inner.into_inner() {
                 if num_pair.as_rule() == Rule::signed_number {
                     let num_str = num_pair.as_str().trim();
-                    let num: f64 = num_str.parse()
+                    let num: f64 = num_str
+                        .parse()
                         .map_err(|_| format!("Invalid number: {}", num_str))?;
                     values.push(num);
                 }
@@ -332,7 +325,7 @@ fn extract_data_array(pair: pest::iterators::Pair<Rule>) -> Result<Vec<f64>, Str
 /// Remove surrounding quotes from a string
 fn unquote(s: &str) -> String {
     if s.len() >= 2 && s.starts_with('"') && s.ends_with('"') {
-        s[1..s.len()-1].to_string()
+        s[1..s.len() - 1].to_string()
     } else {
         s.to_string()
     }
@@ -479,7 +472,8 @@ mod tests {
 
         #[test]
         fn should_parse_line_data() {
-            let result = parse("xychart\nx-axis xAxisName\ny-axis yAxisName\nline lineTitle [23, 45, 56.6]");
+            let result =
+                parse("xychart\nx-axis xAxisName\ny-axis yAxisName\nline lineTitle [23, 45, 56.6]");
             assert!(result.is_ok(), "Parse error: {:?}", result.err());
             let db = result.unwrap();
             let plots = db.get_plots();

@@ -71,9 +71,8 @@ impl StyleClass {
 
     pub fn add_style(&mut self, style: &str) {
         // Check if it's a label/text style
-        let is_text = style.starts_with("color:")
-            || style.starts_with("font-")
-            || style.starts_with("text-");
+        let is_text =
+            style.starts_with("color:") || style.starts_with("font-") || style.starts_with("text-");
         if is_text {
             self.text_styles.push(style.to_string());
         }
@@ -154,7 +153,11 @@ impl TreemapDb {
 
     /// Add a class definition
     pub fn add_class(&mut self, class_name: &str, style_text: &str) {
-        let mut style_class = self.classes.get(class_name).cloned().unwrap_or_else(|| StyleClass::new(class_name));
+        let mut style_class = self
+            .classes
+            .get(class_name)
+            .cloned()
+            .unwrap_or_else(|| StyleClass::new(class_name));
 
         // Parse styles (comma or semicolon separated)
         let normalized = style_text
@@ -182,7 +185,8 @@ impl TreemapDb {
 
     /// Get styles for a class
     pub fn get_styles_for_class(&self, class_selector: &str) -> Vec<String> {
-        self.classes.get(class_selector)
+        self.classes
+            .get(class_selector)
             .map(|c| c.styles.clone())
             .unwrap_or_default()
     }
@@ -197,9 +201,7 @@ impl TreemapDb {
 }
 
 /// Build hierarchy from flat items with indentation levels
-pub fn build_hierarchy(
-    items: Vec<(usize, TreemapNode)>,
-) -> Vec<TreemapNode> {
+pub fn build_hierarchy(items: Vec<(usize, TreemapNode)>) -> Vec<TreemapNode> {
     if items.is_empty() {
         return Vec::new();
     }

@@ -12,7 +12,7 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
         SvgElement::Marker {
             id: "arrow_point".to_string(),
             view_box: "0 0 10 10".to_string(),
-            ref_x: 10.0,  // Tip of arrow at line endpoint
+            ref_x: 10.0, // Tip of arrow at line endpoint
             ref_y: 5.0,
             marker_width: 8.0,
             marker_height: 8.0,
@@ -25,7 +25,7 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
         SvgElement::Marker {
             id: "arrow_open".to_string(),
             view_box: "0 0 10 10".to_string(),
-            ref_x: 9.0,  // Tip of arrow at line endpoint
+            ref_x: 9.0, // Tip of arrow at line endpoint
             ref_y: 5.0,
             marker_width: 8.0,
             marker_height: 8.0,
@@ -41,11 +41,11 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
         // Arrow cross (X shape) - like mermaid.js cross marker
         SvgElement::Marker {
             id: "arrow_cross".to_string(),
-            view_box: "0 0 11 11".to_string(),  // mermaid.js uses 11x11
-            ref_x: 12.0,  // mermaid.js uses refX: 12
-            ref_y: 5.2,   // mermaid.js uses refY: 5.2
-            marker_width: 11.0,  // mermaid.js uses 11
-            marker_height: 11.0, // mermaid.js uses 11
+            view_box: "0 0 11 11".to_string(), // mermaid.js uses 11x11
+            ref_x: 12.0,                       // mermaid.js uses refX: 12
+            ref_y: 5.2,                        // mermaid.js uses refY: 5.2
+            marker_width: 11.0,                // mermaid.js uses 11
+            marker_height: 11.0,               // mermaid.js uses 11
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
             children: vec![SvgElement::Path {
@@ -59,19 +59,19 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
         SvgElement::Marker {
             id: "arrow_circle".to_string(),
             view_box: "0 0 10 10".to_string(),
-            ref_x: 11.0,  // mermaid.js uses refX: 11 for circleEnd
+            ref_x: 11.0, // mermaid.js uses refX: 11 for circleEnd
             ref_y: 5.0,
             marker_width: 11.0,  // mermaid.js uses 11
             marker_height: 11.0, // mermaid.js uses 11
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
-            children: vec![SvgElement::circle(5.0, 5.0, 5.0)],  // mermaid.js uses r=5
+            children: vec![SvgElement::circle(5.0, 5.0, 5.0)], // mermaid.js uses r=5
         },
         // Arrow circle start (filled circle) - like mermaid.js circleStart marker
         SvgElement::Marker {
             id: "arrow_circle_start".to_string(),
             view_box: "0 0 10 10".to_string(),
-            ref_x: -1.0,  // mermaid.js uses refX: -1 for circleStart
+            ref_x: -1.0, // mermaid.js uses refX: -1 for circleStart
             ref_y: 5.0,
             marker_width: 11.0,
             marker_height: 11.0,
@@ -84,7 +84,7 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
         SvgElement::Marker {
             id: "double_arrow_point_start".to_string(),
             view_box: "0 0 10 10".to_string(),
-            ref_x: 0.0,  // Tip at x=0 should be at line start
+            ref_x: 0.0, // Tip at x=0 should be at line start
             ref_y: 5.0,
             marker_width: 8.0,
             marker_height: 8.0,
@@ -97,7 +97,7 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
         SvgElement::Marker {
             id: "double_arrow_point_end".to_string(),
             view_box: "0 0 10 10".to_string(),
-            ref_x: 10.0,  // Tip at x=10 should be at line end
+            ref_x: 10.0, // Tip at x=10 should be at line end
             ref_y: 5.0,
             marker_width: 8.0,
             marker_height: 8.0,

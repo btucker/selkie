@@ -13,8 +13,8 @@ pub struct BlockParser;
 pub fn parse(input: &str) -> Result<BlockDb, String> {
     let mut db = BlockDb::new();
 
-    let pairs = BlockParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        BlockParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -99,7 +99,9 @@ fn process_statement(
     Ok(())
 }
 
-fn extract_block_info(pair: pest::iterators::Pair<Rule>) -> Result<(String, Option<String>, BlockType, Option<usize>), String> {
+fn extract_block_info(
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<(String, Option<String>, BlockType, Option<usize>), String> {
     let mut id = String::new();
     let mut label: Option<String> = None;
     let mut block_type = BlockType::Square;
@@ -211,7 +213,7 @@ fn extract_label(pair: pest::iterators::Pair<Rule>) -> String {
                     Rule::md_string => {
                         let s = label_inner.as_str();
                         if s.starts_with("\"`") && s.ends_with("`\"") {
-                            return s[2..s.len()-2].to_string();
+                            return s[2..s.len() - 2].to_string();
                         }
                         return s.to_string();
                     }
@@ -270,10 +272,7 @@ fn process_composite(
     Ok(())
 }
 
-fn process_edge(
-    db: &mut BlockDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_edge(db: &mut BlockDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut blocks: Vec<(String, Option<String>, BlockType, Option<usize>)> = Vec::new();
     let mut edge_label: Option<String> = None;
 
@@ -322,10 +321,7 @@ fn process_edge(
     Ok(())
 }
 
-fn process_class_def(
-    db: &mut BlockDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_class_def(db: &mut BlockDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut class_name = String::new();
     let mut styles: Vec<String> = Vec::new();
 
@@ -336,7 +332,8 @@ fn process_class_def(
             }
             Rule::style_list => {
                 // Split by semicolon or comma
-                styles = inner.as_str()
+                styles = inner
+                    .as_str()
                     .split(|c| c == ';' || c == ',')
                     .map(|s| s.trim().to_string())
                     .filter(|s| !s.is_empty())
@@ -384,10 +381,7 @@ fn process_class_assignment(
     Ok(())
 }
 
-fn process_style(
-    db: &mut BlockDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_style(db: &mut BlockDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut ids: Vec<String> = Vec::new();
     let mut styles: Vec<String> = Vec::new();
 
@@ -401,7 +395,8 @@ fn process_style(
                 }
             }
             Rule::style_list => {
-                styles = inner.as_str()
+                styles = inner
+                    .as_str()
                     .split(',')
                     .map(|s| s.trim().to_string())
                     .filter(|s| !s.is_empty())
@@ -421,7 +416,7 @@ fn process_style(
 /// Remove surrounding quotes from a string
 fn unquote(s: &str) -> String {
     if s.len() >= 2 && s.starts_with('"') && s.ends_with('"') {
-        s[1..s.len()-1].to_string()
+        s[1..s.len() - 1].to_string()
     } else {
         s.to_string()
     }
@@ -540,7 +535,8 @@ mod tests {
 
         #[test]
         fn should_parse_space() {
-            let result = parse("block\n    columns 3\n    space\n    middle[\"In the middle\"]\n    space");
+            let result =
+                parse("block\n    columns 3\n    space\n    middle[\"In the middle\"]\n    space");
             assert!(result.is_ok(), "Parse error: {:?}", result.err());
             let db = result.unwrap();
             // Should have 3 blocks (2 spaces + 1 named)
@@ -562,7 +558,9 @@ mod tests {
 
         #[test]
         fn should_parse_style_statement() {
-            let result = parse("block\n    columns 1\n    B[\"A wide one\"]\n    style B fill:#f9F,stroke:#333");
+            let result = parse(
+                "block\n    columns 1\n    B[\"A wide one\"]\n    style B fill:#f9F,stroke:#333",
+            );
             assert!(result.is_ok(), "Parse error: {:?}", result.err());
             let db = result.unwrap();
             let block = db.get_blocks().get("B").unwrap();
@@ -591,7 +589,8 @@ mod tests {
 
         #[test]
         fn should_parse_width_spec() {
-            let result = parse("block\n    columns 3\n    one[\"One Slot\"]\n    two[\"Two slots\"]:2");
+            let result =
+                parse("block\n    columns 3\n    one[\"One Slot\"]\n    two[\"Two slots\"]:2");
             assert!(result.is_ok(), "Parse error: {:?}", result.err());
             let db = result.unwrap();
             let two = db.get_blocks().get("two").unwrap();

@@ -31,7 +31,10 @@ pub fn position_x(g: &DagreGraph) -> HashMap<String, f64> {
 
         for horiz in ["l", "r"] {
             let aligned_layers: Vec<Vec<String>> = if horiz == "r" {
-                adjusted_layers.iter().map(|layer| layer.iter().rev().cloned().collect()).collect()
+                adjusted_layers
+                    .iter()
+                    .map(|layer| layer.iter().rev().cloned().collect())
+                    .collect()
             } else {
                 adjusted_layers.clone()
             };
@@ -40,7 +43,15 @@ pub fn position_x(g: &DagreGraph) -> HashMap<String, f64> {
             let (root, align) = vertical_alignment(g, &aligned_layers, vert == "u");
 
             // Compact horizontally
-            let mut xs = horizontal_compaction(g, &aligned_layers, &root, &align, nodesep, edgesep, horiz == "r");
+            let mut xs = horizontal_compaction(
+                g,
+                &aligned_layers,
+                &root,
+                &align,
+                nodesep,
+                edgesep,
+                horiz == "r",
+            );
 
             // Flip for right alignment
             if horiz == "r" {
@@ -68,7 +79,8 @@ pub fn position_x(g: &DagreGraph) -> HashMap<String, f64> {
 
 /// Build a matrix of nodes organized by layer
 fn build_layer_matrix(g: &DagreGraph) -> Vec<Vec<String>> {
-    let max_rank = g.nodes()
+    let max_rank = g
+        .nodes()
         .iter()
         .filter_map(|v| g.node(v).and_then(|n| n.rank))
         .max()
@@ -87,7 +99,8 @@ fn build_layer_matrix(g: &DagreGraph) -> Vec<Vec<String>> {
     }
 
     // Sort each layer by order and extract just the node IDs
-    layers.iter_mut()
+    layers
+        .iter_mut()
         .map(|layer| {
             layer.sort_by_key(|(_, order)| *order);
             layer.iter().map(|(v, _)| v.clone()).collect()
@@ -231,7 +244,8 @@ fn resolve_overlaps_ordered(
     }
 
     // Get current positions and widths
-    let mut positions: Vec<(String, f64, f64)> = layer.iter()
+    let mut positions: Vec<(String, f64, f64)> = layer
+        .iter()
         .filter_map(|v| {
             let x = xs.get(v)?;
             let width = g.node(v).map(|n| n.width).unwrap_or(0.0);
@@ -248,10 +262,20 @@ fn resolve_overlaps_ordered(
         let prev_width = positions[i - 1].2;
         let curr_width = positions[i].2;
 
-        let prev_is_dummy = g.node(&positions[i - 1].0).map(|n| n.dummy.is_some()).unwrap_or(false);
-        let curr_is_dummy = g.node(&positions[i].0).map(|n| n.dummy.is_some()).unwrap_or(false);
+        let prev_is_dummy = g
+            .node(&positions[i - 1].0)
+            .map(|n| n.dummy.is_some())
+            .unwrap_or(false);
+        let curr_is_dummy = g
+            .node(&positions[i].0)
+            .map(|n| n.dummy.is_some())
+            .unwrap_or(false);
 
-        let sep = if prev_is_dummy || curr_is_dummy { edgesep } else { nodesep };
+        let sep = if prev_is_dummy || curr_is_dummy {
+            edgesep
+        } else {
+            nodesep
+        };
         let min_x = prev_x + prev_width / 2.0 + sep + curr_width / 2.0;
 
         if positions[i].1 < min_x {
@@ -276,8 +300,9 @@ fn balance(
     let mut align_to: Option<&str> = None;
 
     for (&name, xs) in xss {
-        let (min_x, max_x) = xs.values()
-            .fold((f64::MAX, f64::MIN), |(min, max), &x| (min.min(x), max.max(x)));
+        let (min_x, max_x) = xs.values().fold((f64::MAX, f64::MIN), |(min, max), &x| {
+            (min.min(x), max.max(x))
+        });
         let width = max_x - min_x;
         if width < min_width {
             min_width = width;
@@ -316,7 +341,8 @@ fn balance(
 
     // Take median of four alignments for each node
     for v in all_nodes {
-        let mut coords: Vec<f64> = aligned_xss.values()
+        let mut coords: Vec<f64> = aligned_xss
+            .values()
             .filter_map(|xs| xs.get(v).copied())
             .collect();
 
@@ -342,15 +368,22 @@ fn balance(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{NodeLabel, EdgeLabel};
-    use crate::layout::dagre::rank;
+    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
     use crate::layout::dagre::order;
+    use crate::layout::dagre::rank;
     use crate::layout::dagre::Ranker;
 
     #[test]
     fn test_position_x_single_node() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { width: 50.0, height: 100.0, ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                width: 50.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
         rank::assign_ranks(&mut g, Ranker::LongestPath);
         order::order(&mut g);
 
@@ -366,8 +399,26 @@ mod tests {
     fn test_position_x_two_nodes_same_rank() {
         let mut g = DagreGraph::new();
         g.graph_mut().nodesep = 50.0;
-        g.set_node("a", NodeLabel { width: 50.0, height: 100.0, rank: Some(0), order: Some(0), ..Default::default() });
-        g.set_node("b", NodeLabel { width: 50.0, height: 100.0, rank: Some(0), order: Some(1), ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                width: 50.0,
+                height: 100.0,
+                rank: Some(0),
+                order: Some(0),
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            NodeLabel {
+                width: 50.0,
+                height: 100.0,
+                rank: Some(0),
+                order: Some(1),
+                ..Default::default()
+            },
+        );
 
         let xs = position_x(&g);
 
@@ -375,19 +426,42 @@ mod tests {
         assert!(xs.contains_key("b"));
 
         // b should be to the right of a
-        assert!(xs["b"] > xs["a"], "b ({}) should be to the right of a ({})", xs["b"], xs["a"]);
+        assert!(
+            xs["b"] > xs["a"],
+            "b ({}) should be to the right of a ({})",
+            xs["b"],
+            xs["a"]
+        );
 
         // They should be separated appropriately (no overlap)
         let half_widths = 25.0 + 25.0; // Each node is 50 wide, half = 25
         let actual_sep = xs["b"] - xs["a"] - half_widths;
-        assert!(actual_sep >= 0.0, "Nodes should not overlap, separation = {}", actual_sep);
+        assert!(
+            actual_sep >= 0.0,
+            "Nodes should not overlap, separation = {}",
+            actual_sep
+        );
     }
 
     #[test]
     fn test_position_x_chain() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { width: 50.0, height: 40.0, ..Default::default() });
-        g.set_node("b", NodeLabel { width: 50.0, height: 40.0, ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                width: 50.0,
+                height: 40.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            NodeLabel {
+                width: 50.0,
+                height: 40.0,
+                ..Default::default()
+            },
+        );
         g.set_edge("a", "b", EdgeLabel::default());
         rank::assign_ranks(&mut g, Ranker::LongestPath);
         order::order(&mut g);
@@ -401,7 +475,8 @@ mod tests {
         assert!(
             (xs["a"] - xs["b"]).abs() < 100.0,
             "a ({}) and b ({}) should be vertically aligned",
-            xs["a"], xs["b"]
+            xs["a"],
+            xs["b"]
         );
     }
 
@@ -411,7 +486,14 @@ mod tests {
         let mut g = DagreGraph::new();
         g.graph_mut().nodesep = 50.0;
         for v in ["a", "b", "c", "d"] {
-            g.set_node(v, NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
+            g.set_node(
+                v,
+                NodeLabel {
+                    width: 50.0,
+                    height: 50.0,
+                    ..Default::default()
+                },
+            );
         }
         g.set_edge("a", "b", EdgeLabel::default());
         g.set_edge("a", "c", EdgeLabel::default());
@@ -433,7 +515,8 @@ mod tests {
         assert!(
             (xs["b"] - xs["c"]).abs() >= 50.0,
             "b ({}) and c ({}) should be separated",
-            xs["b"], xs["c"]
+            xs["b"],
+            xs["c"]
         );
     }
 }

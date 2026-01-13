@@ -13,8 +13,8 @@ pub struct TimelineParser;
 pub fn parse(input: &str) -> Result<TimelineDb, String> {
     let mut db = TimelineDb::new();
 
-    let pairs = TimelineParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        TimelineParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -29,20 +29,14 @@ pub fn parse(input: &str) -> Result<TimelineDb, String> {
     Ok(db)
 }
 
-fn process_document(
-    db: &mut TimelineDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_document(db: &mut TimelineDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for stmt in pair.into_inner() {
         process_statement(db, stmt)?;
     }
     Ok(())
 }
 
-fn process_statement(
-    db: &mut TimelineDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_statement(db: &mut TimelineDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     match pair.as_rule() {
         Rule::statement => {
             for inner in pair.into_inner() {
@@ -83,10 +77,7 @@ fn process_statement(
     Ok(())
 }
 
-fn process_task(
-    db: &mut TimelineDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_task(db: &mut TimelineDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut task_name = String::new();
     let mut events_str = String::new();
 
@@ -170,7 +161,8 @@ mod tests {
 
         #[test]
         fn should_handle_task_with_events() {
-            let input = "timeline\n    section abc-123\n      task1: event1\n      task2: event2: event3";
+            let input =
+                "timeline\n    section abc-123\n      task1: event1\n      task2: event2: event3";
             let result = parse(input);
             assert!(result.is_ok(), "Parse error: {:?}", result.err());
             let db = result.unwrap();
@@ -215,7 +207,9 @@ mod tests {
             for task in tasks {
                 match task.task.trim() {
                     "task1" => assert_eq!(task.events, vec!["event1"]),
-                    "task2" => assert_eq!(task.events, vec!["event2", "event3", "event4", "event5"]),
+                    "task2" => {
+                        assert_eq!(task.events, vec!["event2", "event3", "event4", "event5"])
+                    }
                     _ => {}
                 }
             }

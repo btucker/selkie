@@ -35,13 +35,25 @@ pub fn slack(g: &DagreGraph, v: &str, w: &str) -> Option<i32> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{NodeLabel, EdgeLabel};
+    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
 
     #[test]
     fn test_normalize_ranks() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { rank: Some(2), ..Default::default() });
-        g.set_node("b", NodeLabel { rank: Some(4), ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                rank: Some(2),
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            NodeLabel {
+                rank: Some(4),
+                ..Default::default()
+            },
+        );
 
         normalize_ranks(&mut g);
 
@@ -52,9 +64,28 @@ mod tests {
     #[test]
     fn test_slack() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { rank: Some(0), ..Default::default() });
-        g.set_node("b", NodeLabel { rank: Some(3), ..Default::default() });
-        g.set_edge("a", "b", EdgeLabel { minlen: 1, ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                rank: Some(0),
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            NodeLabel {
+                rank: Some(3),
+                ..Default::default()
+            },
+        );
+        g.set_edge(
+            "a",
+            "b",
+            EdgeLabel {
+                minlen: 1,
+                ..Default::default()
+            },
+        );
 
         assert_eq!(slack(&g, "a", "b"), Some(2)); // 3 - 0 - 1 = 2
     }

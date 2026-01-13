@@ -17,7 +17,8 @@ pub fn init_order(g: &DagreGraph) -> Vec<Vec<String>> {
     let mut visited = HashSet::new();
 
     // Find max rank
-    let max_rank = g.nodes()
+    let max_rank = g
+        .nodes()
         .iter()
         .filter_map(|v| g.node(v).and_then(|n| n.rank))
         .max()
@@ -27,12 +28,7 @@ pub fn init_order(g: &DagreGraph) -> Vec<Vec<String>> {
     let mut layers: Vec<Vec<String>> = (0..=max_rank).map(|_| Vec::new()).collect();
 
     // DFS function to visit nodes
-    fn dfs(
-        g: &DagreGraph,
-        v: &str,
-        visited: &mut HashSet<String>,
-        layers: &mut Vec<Vec<String>>
-    ) {
+    fn dfs(g: &DagreGraph, v: &str, visited: &mut HashSet<String>, layers: &mut Vec<Vec<String>>) {
         if visited.contains(v) {
             return;
         }
@@ -85,7 +81,13 @@ mod tests {
     #[test]
     fn test_init_order_single_node() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { rank: Some(0), ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                rank: Some(0),
+                ..Default::default()
+            },
+        );
 
         let layers = init_order(&g);
 

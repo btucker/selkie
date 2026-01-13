@@ -31,7 +31,8 @@ fn two_layer_cross_count(g: &DagreGraph, north_layer: &[String], south_layer: &[
     // Collect all edges from north to south with their positions and weights
     let mut south_entries: Vec<(usize, i32)> = Vec::new();
     for v in north_layer {
-        let mut edges_for_v: Vec<(usize, i32)> = g.out_edges(v)
+        let mut edges_for_v: Vec<(usize, i32)> = g
+            .out_edges(v)
             .iter()
             .filter_map(|e| {
                 south_pos.get(e.w.as_str()).map(|&pos| {
@@ -131,7 +132,14 @@ mod tests {
     fn test_weighted_crossing() {
         // Same as one_crossing but with weight 3 on one edge
         let mut g = DagreGraph::new();
-        g.set_edge("a", "d", EdgeLabel { weight: 3, ..Default::default() });
+        g.set_edge(
+            "a",
+            "d",
+            EdgeLabel {
+                weight: 3,
+                ..Default::default()
+            },
+        );
         g.set_edge("b", "c", EdgeLabel::default());
 
         let layering = vec![

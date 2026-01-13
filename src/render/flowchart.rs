@@ -1,10 +1,10 @@
 //! Flowchart adapter for layout
 
-use crate::diagrams::flowchart::{Direction, FlowchartDb, FlowVertexType};
+use crate::diagrams::flowchart::{Direction, FlowVertexType, FlowchartDb};
 use crate::error::Result;
 use crate::layout::{
-    LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode, LayoutOptions,
-    NodeShape, NodeSizeConfig, Padding, SizeEstimator, ToLayoutGraph,
+    LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode, LayoutOptions, NodeShape, NodeSizeConfig,
+    Padding, SizeEstimator, ToLayoutGraph,
 };
 
 impl ToLayoutGraph for FlowchartDb {
@@ -34,17 +34,18 @@ impl ToLayoutGraph for FlowchartDb {
             let label = vertex.text.as_deref();
             let (width, height) = size_estimator.estimate_node_size(label, shape, &config);
 
-            let mut node = LayoutNode::new(id, width, height)
-                .with_shape(shape);
+            let mut node = LayoutNode::new(id, width, height).with_shape(shape);
 
             if let Some(label) = label {
                 node = node.with_label(label);
             }
 
             // Store original metadata
-            node.metadata.insert("dom_id".to_string(), vertex.dom_id.clone());
+            node.metadata
+                .insert("dom_id".to_string(), vertex.dom_id.clone());
             if let Some(vt) = &vertex.vertex_type {
-                node.metadata.insert("vertex_type".to_string(), format!("{:?}", vt));
+                node.metadata
+                    .insert("vertex_type".to_string(), format!("{:?}", vt));
             }
 
             graph.add_node(node);
@@ -52,9 +53,10 @@ impl ToLayoutGraph for FlowchartDb {
 
         // Convert edges
         for edge in self.edges() {
-            let edge_id = edge.id.clone().unwrap_or_else(|| {
-                format!("{}-{}", edge.start, edge.end)
-            });
+            let edge_id = edge
+                .id
+                .clone()
+                .unwrap_or_else(|| format!("{}-{}", edge.start, edge.end));
 
             let mut layout_edge = LayoutEdge::new(&edge_id, &edge.start, &edge.end);
 
@@ -69,9 +71,13 @@ impl ToLayoutGraph for FlowchartDb {
 
             // Store edge type for rendering
             if let Some(et) = &edge.edge_type {
-                layout_edge.metadata.insert("edge_type".to_string(), et.clone());
+                layout_edge
+                    .metadata
+                    .insert("edge_type".to_string(), et.clone());
             }
-            layout_edge.metadata.insert("stroke".to_string(), format!("{:?}", edge.stroke));
+            layout_edge
+                .metadata
+                .insert("stroke".to_string(), format!("{:?}", edge.stroke));
 
             graph.add_edge(layout_edge);
         }
@@ -172,15 +178,28 @@ mod tests {
         let graph = db.to_layout_graph(&estimator).unwrap();
 
         eprintln!("Before layout:");
-        eprintln!("  Nodes: {:?}", graph.nodes.iter().map(|n| &n.id).collect::<Vec<_>>());
-        eprintln!("  Edges: {:?}", graph.edges.iter().map(|e| (&e.id, &e.sources, &e.targets)).collect::<Vec<_>>());
+        eprintln!(
+            "  Nodes: {:?}",
+            graph.nodes.iter().map(|n| &n.id).collect::<Vec<_>>()
+        );
+        eprintln!(
+            "  Edges: {:?}",
+            graph
+                .edges
+                .iter()
+                .map(|e| (&e.id, &e.sources, &e.targets))
+                .collect::<Vec<_>>()
+        );
 
         // Run layout
         let graph = layout::layout(graph).unwrap();
 
         eprintln!("\nAfter layout:");
         for edge in &graph.edges {
-            eprintln!("  Edge {} ({:?} -> {:?}):", edge.id, edge.sources, edge.targets);
+            eprintln!(
+                "  Edge {} ({:?} -> {:?}):",
+                edge.id, edge.sources, edge.targets
+            );
             eprintln!("    bend_points: {:?}", edge.bend_points);
             eprintln!("    label_position: {:?}", edge.label_position);
         }

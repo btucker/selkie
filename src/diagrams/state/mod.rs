@@ -3,11 +3,11 @@
 //! State diagrams model finite state machines with states, transitions,
 //! notes, and nested composite states.
 
-mod types;
 pub mod parser;
+mod types;
 
-pub use types::*;
 pub use parser::parse;
+pub use types::*;
 
 #[cfg(test)]
 mod tests {
@@ -64,7 +64,10 @@ mod tests {
                 state.state_type = StateType::Choice;
             }
 
-            assert_eq!(db.get_state("state1").unwrap().state_type, StateType::Choice);
+            assert_eq!(
+                db.get_state("state1").unwrap().state_type,
+                StateType::Choice
+            );
         }
     }
 
@@ -138,7 +141,10 @@ mod tests {
             db.add_relation("state1", "state2", Some("transition label"));
 
             let relations = db.get_relations();
-            assert_eq!(relations[0].description, Some("transition label".to_string()));
+            assert_eq!(
+                relations[0].description,
+                Some("transition label".to_string())
+            );
         }
 
         #[test]

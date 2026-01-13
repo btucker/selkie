@@ -141,30 +141,82 @@ fn validate_with_rust(text: &str) -> (bool, String, String) {
     };
 
     let result: Result<(), String> = match dtype {
-        "sequence" => mermaid::diagrams::sequence::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "flowchart" => mermaid::diagrams::flowchart::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "class" => mermaid::diagrams::class::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "state" => mermaid::diagrams::state::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "er" => mermaid::diagrams::er::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "gantt" => mermaid::diagrams::gantt::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "pie" => mermaid::diagrams::pie::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "mindmap" => mermaid::diagrams::mindmap::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "timeline" => mermaid::diagrams::timeline::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "journey" => mermaid::diagrams::journey::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "quadrant" => mermaid::diagrams::quadrant::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "xychart" => mermaid::diagrams::xychart::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "sankey" => mermaid::diagrams::sankey::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "packet" => mermaid::diagrams::packet::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "block" => mermaid::diagrams::block::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "architecture" => mermaid::diagrams::architecture::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "c4" => mermaid::diagrams::c4::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "git" => mermaid::diagrams::git::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "requirement" => mermaid::diagrams::requirement::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "kanban" => mermaid::diagrams::kanban::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "info" => mermaid::diagrams::info::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "radar" => mermaid::diagrams::radar::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        "treemap" => mermaid::diagrams::treemap::parse(&clean_text).map(|_| ()).map_err(|e| e.to_string()),
-        _ => return (false, format!("No Rust parser for type: {}", dtype), dtype.to_string()),
+        "sequence" => mermaid::diagrams::sequence::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "flowchart" => mermaid::diagrams::flowchart::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "class" => mermaid::diagrams::class::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "state" => mermaid::diagrams::state::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "er" => mermaid::diagrams::er::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "gantt" => mermaid::diagrams::gantt::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "pie" => mermaid::diagrams::pie::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "mindmap" => mermaid::diagrams::mindmap::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "timeline" => mermaid::diagrams::timeline::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "journey" => mermaid::diagrams::journey::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "quadrant" => mermaid::diagrams::quadrant::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "xychart" => mermaid::diagrams::xychart::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "sankey" => mermaid::diagrams::sankey::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "packet" => mermaid::diagrams::packet::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "block" => mermaid::diagrams::block::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "architecture" => mermaid::diagrams::architecture::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "c4" => mermaid::diagrams::c4::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "git" => mermaid::diagrams::git::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "requirement" => mermaid::diagrams::requirement::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "kanban" => mermaid::diagrams::kanban::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "info" => mermaid::diagrams::info::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "radar" => mermaid::diagrams::radar::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        "treemap" => mermaid::diagrams::treemap::parse(&clean_text)
+            .map(|_| ())
+            .map_err(|e| e.to_string()),
+        _ => {
+            return (
+                false,
+                format!("No Rust parser for type: {}", dtype),
+                dtype.to_string(),
+            )
+        }
     };
 
     match result {
@@ -214,7 +266,11 @@ fn validate_with_typescript(text: &str, validator_path: &Path) -> (bool, String,
                 (false, result.error.unwrap_or_default(), String::new())
             }
         }
-        Err(e) => (false, format!("Invalid JSON: {} - {}", e, stdout), String::new()),
+        Err(e) => (
+            false,
+            format!("Invalid JSON: {} - {}", e, stdout),
+            String::new(),
+        ),
     }
 }
 
@@ -314,12 +370,17 @@ fn print_report(report: &ValidationReport, verbose: bool) {
     println!("TypeScript only:    {}", report.ts_only);
 
     // Show discrepancies
-    let discrepancies: Vec<&ValidationResult> = report.results.iter().filter(|r| !r.matches).collect();
+    let discrepancies: Vec<&ValidationResult> =
+        report.results.iter().filter(|r| !r.matches).collect();
     if !discrepancies.is_empty() {
         println!("\nDiscrepancies ({}):", discrepancies.len());
         println!("{}", "-".repeat(60));
         for r in discrepancies.iter().take(20) {
-            let status = if r.rust_valid { "RS✓ TS✗" } else { "RS✗ TS✓" };
+            let status = if r.rust_valid {
+                "RS✓ TS✗"
+            } else {
+                "RS✗ TS✓"
+            };
             println!("\n[{}] {}", status, r.test_name);
             println!("  Source: {}", r.source_file);
             if !r.rust_error.is_empty() {

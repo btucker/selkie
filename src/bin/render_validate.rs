@@ -192,11 +192,7 @@ fn render_with_typescript(diagram: &str, validator_path: &Path) -> RenderResult 
     }
 }
 
-fn validate_diagram(
-    diagram: &str,
-    name: &str,
-    validator_path: &Path,
-) -> ValidationEntry {
+fn validate_diagram(diagram: &str, name: &str, validator_path: &Path) -> ValidationEntry {
     let rust_result = render_with_rust(diagram);
     let ts_result = render_with_typescript(diagram, validator_path);
 
@@ -296,12 +292,7 @@ fn print_report(report: &ValidationReport) {
     let mismatches: Vec<_> = report
         .entries
         .iter()
-        .filter(|e| {
-            e.comparison
-                .as_ref()
-                .map(|c| !c.matches)
-                .unwrap_or(false)
-        })
+        .filter(|e| e.comparison.as_ref().map(|c| !c.matches).unwrap_or(false))
         .collect();
 
     if !mismatches.is_empty() {
@@ -425,7 +416,11 @@ fn main() {
     } else {
         // Single file
         let content = fs::read_to_string(&input_path).expect("Failed to read input file");
-        let name = input_path.file_stem().unwrap().to_string_lossy().to_string();
+        let name = input_path
+            .file_stem()
+            .unwrap()
+            .to_string_lossy()
+            .to_string();
         vec![(name, content)]
     };
 

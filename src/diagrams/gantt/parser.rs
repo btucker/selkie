@@ -13,8 +13,8 @@ pub struct GanttParser;
 pub fn parse(input: &str) -> Result<GanttDb, String> {
     let mut db = GanttDb::new();
 
-    let pairs = GanttParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        GanttParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -29,20 +29,14 @@ pub fn parse(input: &str) -> Result<GanttDb, String> {
     Ok(db)
 }
 
-fn process_document(
-    db: &mut GanttDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_document(db: &mut GanttDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for stmt in pair.into_inner() {
         process_statement(db, stmt)?;
     }
     Ok(())
 }
 
-fn process_statement(
-    db: &mut GanttDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_statement(db: &mut GanttDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     match pair.as_rule() {
         Rule::statement => {
             for inner in pair.into_inner() {
@@ -149,10 +143,7 @@ fn process_statement(
     Ok(())
 }
 
-fn process_acc_descr(
-    db: &mut GanttDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_acc_descr(db: &mut GanttDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for inner in pair.into_inner() {
         match inner.as_rule() {
             Rule::acc_descr_single => {
@@ -175,10 +166,7 @@ fn process_acc_descr(
     Ok(())
 }
 
-fn process_click_stmt(
-    db: &mut GanttDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_click_stmt(db: &mut GanttDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut task_id = String::new();
     let mut href: Option<String> = None;
     let mut callback: Option<String> = None;
@@ -197,7 +185,7 @@ fn process_click_stmt(
                                 if href_inner.as_rule() == Rule::quoted_string {
                                     // Remove quotes
                                     let s = href_inner.as_str();
-                                    href = Some(s[1..s.len()-1].to_string());
+                                    href = Some(s[1..s.len() - 1].to_string());
                                 }
                             }
                         }
@@ -236,10 +224,7 @@ fn process_click_stmt(
     Ok(())
 }
 
-fn process_task_stmt(
-    db: &mut GanttDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_task_stmt(db: &mut GanttDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut task_name = String::new();
     let mut task_data = String::new();
 
@@ -402,7 +387,10 @@ mod tests {
             let result = parse("gantt\nsection Planning\nsection Development\nsection Testing");
             assert!(result.is_ok());
             let db = result.unwrap();
-            assert_eq!(db.get_sections(), vec!["Planning", "Development", "Testing"]);
+            assert_eq!(
+                db.get_sections(),
+                vec!["Planning", "Development", "Testing"]
+            );
         }
     }
 
@@ -411,7 +399,8 @@ mod tests {
 
         #[test]
         fn should_parse_simple_task() {
-            let result = parse("gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: 2023-01-01, 2023-01-10");
+            let result =
+                parse("gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: 2023-01-01, 2023-01-10");
             assert!(result.is_ok());
             let mut db = result.unwrap();
             let tasks = db.get_tasks();
@@ -421,7 +410,9 @@ mod tests {
 
         #[test]
         fn should_parse_task_with_id() {
-            let result = parse("gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: task1, 2023-01-01, 2023-01-10");
+            let result = parse(
+                "gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: task1, 2023-01-01, 2023-01-10",
+            );
             assert!(result.is_ok());
             let mut db = result.unwrap();
             let tasks = db.get_tasks();
@@ -431,7 +422,8 @@ mod tests {
 
         #[test]
         fn should_parse_task_with_duration() {
-            let result = parse("gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: task1, 2023-01-01, 5d");
+            let result =
+                parse("gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: task1, 2023-01-01, 5d");
             assert!(result.is_ok());
             let mut db = result.unwrap();
             let tasks = db.get_tasks();
@@ -449,7 +441,9 @@ mod tests {
 
         #[test]
         fn should_parse_critical_task() {
-            let result = parse("gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: crit, task1, 2023-01-01, 5d");
+            let result = parse(
+                "gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: crit, task1, 2023-01-01, 5d",
+            );
             assert!(result.is_ok());
             let mut db = result.unwrap();
             let tasks = db.get_tasks();
@@ -458,7 +452,9 @@ mod tests {
 
         #[test]
         fn should_parse_active_task() {
-            let result = parse("gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: active, task1, 2023-01-01, 5d");
+            let result = parse(
+                "gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: active, task1, 2023-01-01, 5d",
+            );
             assert!(result.is_ok());
             let mut db = result.unwrap();
             let tasks = db.get_tasks();
@@ -467,7 +463,9 @@ mod tests {
 
         #[test]
         fn should_parse_done_task() {
-            let result = parse("gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: done, task1, 2023-01-01, 5d");
+            let result = parse(
+                "gantt\ndateFormat YYYY-MM-DD\nsection Test\nTask 1: done, task1, 2023-01-01, 5d",
+            );
             assert!(result.is_ok());
             let mut db = result.unwrap();
             let tasks = db.get_tasks();
@@ -495,7 +493,9 @@ mod tests {
 
         #[test]
         fn should_parse_click_with_call() {
-            let result = parse("gantt\nsection Test\nTask 1: task1, 2023-01-01, 5d\nclick task1 call myFunction()");
+            let result = parse(
+                "gantt\nsection Test\nTask 1: task1, 2023-01-01, 5d\nclick task1 call myFunction()",
+            );
             assert!(result.is_ok());
         }
 

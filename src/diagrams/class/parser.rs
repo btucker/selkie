@@ -13,8 +13,8 @@ pub struct ClassParser;
 pub fn parse(input: &str) -> Result<ClassDb, String> {
     let mut db = ClassDb::new();
 
-    let pairs = ClassParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        ClassParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -926,7 +926,10 @@ foo()
                 class.members[1].get_display_details().display_text,
                 "string fooMember"
             );
-            assert_eq!(class.methods[0].get_display_details().display_text, "test()");
+            assert_eq!(
+                class.methods[0].get_display_details().display_text,
+                "test()"
+            );
             assert_eq!(class.methods[1].get_display_details().display_text, "foo()");
         }
 
@@ -1046,7 +1049,10 @@ Class09 -- Class1",
             assert!(result.is_ok());
             let db = result.unwrap();
             assert_eq!(db.relations.len(), 1);
-            assert_eq!(db.relations[0].relation.type1, RelationType::Extension as i32);
+            assert_eq!(
+                db.relations[0].relation.type1,
+                RelationType::Extension as i32
+            );
             assert_eq!(db.relations[0].relation.type2, -1);
             assert_eq!(db.relations[0].relation.line_type, LineType::Solid);
         }
@@ -1394,8 +1400,16 @@ cssClass \"C1,C2\" styleClass",
             );
             assert!(result.is_ok());
             let db = result.unwrap();
-            assert!(db.get_class("C1").unwrap().css_classes.contains("styleClass"));
-            assert!(db.get_class("C2").unwrap().css_classes.contains("styleClass"));
+            assert!(db
+                .get_class("C1")
+                .unwrap()
+                .css_classes
+                .contains("styleClass"));
+            assert!(db
+                .get_class("C2")
+                .unwrap()
+                .css_classes
+                .contains("styleClass"));
         }
     }
 
@@ -1589,10 +1603,7 @@ Class1 : someMethod()*",
             assert_eq!(class.methods.len(), 1);
             let method = &class.methods[0];
             assert_eq!(method.get_display_details().display_text, "someMethod()");
-            assert_eq!(
-                method.get_display_details().css_style,
-                "font-style:italic;"
-            );
+            assert_eq!(method.get_display_details().css_style, "font-style:italic;");
         }
 
         #[test]

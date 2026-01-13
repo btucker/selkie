@@ -12,9 +12,9 @@ mod sort;
 
 use crate::layout::dagre::graph::DagreGraph;
 
-pub use cross_count::cross_count;
-pub use init_order::{init_order, assign_order};
 pub use barycenter::{barycenter, barycenter_down, BarycenterEntry};
+pub use cross_count::cross_count;
+pub use init_order::{assign_order, init_order};
 pub use sort::{sort, SortResult};
 
 /// Assign order to nodes to minimize edge crossings
@@ -24,7 +24,8 @@ pub fn order(g: &mut DagreGraph) {
     assign_order(g, &layering);
 
     // Find max rank for iteration
-    let max_rank = g.nodes()
+    let max_rank = g
+        .nodes()
         .iter()
         .filter_map(|v| g.node(v).and_then(|n| n.rank))
         .max()
@@ -40,7 +41,8 @@ pub fn order(g: &mut DagreGraph) {
 
     // Iterate: alternate between down sweep and up sweep
     let mut last_best = 0;
-    for i in 0..24 {  // Max 24 iterations like dagre.js
+    for i in 0..24 {
+        // Max 24 iterations like dagre.js
         if last_best >= 4 {
             break; // Stop if no improvement in 4 iterations
         }
@@ -76,7 +78,8 @@ pub fn order(g: &mut DagreGraph) {
 fn sweep_down(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
     for rank in 1..=max_rank {
         // Collect nodes and sort by current order to preserve stable ordering
-        let mut layer: Vec<(String, usize)> = g.nodes()
+        let mut layer: Vec<(String, usize)> = g
+            .nodes()
             .iter()
             .filter_map(|v| {
                 let node = g.node(v)?;
@@ -108,7 +111,8 @@ fn sweep_down(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
 fn sweep_up(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
     for rank in (0..max_rank).rev() {
         // Collect nodes and sort by current order to preserve stable ordering
-        let mut layer: Vec<(String, usize)> = g.nodes()
+        let mut layer: Vec<(String, usize)> = g
+            .nodes()
             .iter()
             .filter_map(|v| {
                 let node = g.node(v)?;
@@ -155,7 +159,8 @@ fn build_layer_matrix(g: &DagreGraph, max_rank: usize) -> Vec<Vec<String>> {
         layer.sort_by_key(|(_, order)| *order);
     }
 
-    layers.into_iter()
+    layers
+        .into_iter()
         .map(|layer| layer.into_iter().map(|(v, _)| v).collect())
         .collect()
 }
@@ -228,10 +233,18 @@ mod tests {
         rank::assign_ranks(&mut g, Ranker::LongestPath);
 
         // Force initial order with crossing
-        if let Some(node) = g.node_mut("a") { node.order = Some(0); }
-        if let Some(node) = g.node_mut("b") { node.order = Some(1); }
-        if let Some(node) = g.node_mut("c") { node.order = Some(0); }
-        if let Some(node) = g.node_mut("d") { node.order = Some(1); }
+        if let Some(node) = g.node_mut("a") {
+            node.order = Some(0);
+        }
+        if let Some(node) = g.node_mut("b") {
+            node.order = Some(1);
+        }
+        if let Some(node) = g.node_mut("c") {
+            node.order = Some(0);
+        }
+        if let Some(node) = g.node_mut("d") {
+            node.order = Some(1);
+        }
 
         let initial_layering = vec![
             vec!["a".to_string(), "b".to_string()],
@@ -259,8 +272,8 @@ mod tests {
         let mut g = DagreGraph::new();
 
         // Add edges in specific order - C first, then D
-        g.set_edge("B", "C", EdgeLabel::default());  // "Yes" branch
-        g.set_edge("B", "D", EdgeLabel::default());  // "No" branch
+        g.set_edge("B", "C", EdgeLabel::default()); // "Yes" branch
+        g.set_edge("B", "D", EdgeLabel::default()); // "No" branch
 
         rank::assign_ranks(&mut g, Ranker::LongestPath);
         order(&mut g);

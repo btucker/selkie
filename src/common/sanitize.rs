@@ -6,9 +6,8 @@ use std::sync::LazyLock;
 use crate::config::{Config, SecurityLevel};
 
 // Script tag patterns
-static SCRIPT_BLOCK_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?is)<script[^>]*>.*?</script>").unwrap()
-});
+static SCRIPT_BLOCK_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?is)<script[^>]*>.*?</script>").unwrap());
 
 static SCRIPT_SRC_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r#"(?i)<script[^>]*src\s*=\s*["'][^"']*["'][^>]*>\s*</script>"#).unwrap()
@@ -22,21 +21,17 @@ static JAVASCRIPT_COLON_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r#"(?i)<a[^>]*href\s*=\s*["']javascript&colon;[^"']*["'][^>]*>(.*?)</a>"#).unwrap()
 });
 
-static IMG_ONERROR_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r#"(?i)<img\s*[^>]*onerror\s*=\s*["'][^"']*["'][^>]*>"#).unwrap()
-});
+static IMG_ONERROR_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"(?i)<img\s*[^>]*onerror\s*=\s*["'][^"']*["'][^>]*>"#).unwrap());
 
-static IFRAME_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?is)<iframe[^>]*>.*?</iframe>").unwrap()
-});
+static IFRAME_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?is)<iframe[^>]*>.*?</iframe>").unwrap());
 
-static TARGET_BLANK_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r#"(?i)<a([^>]*target\s*=\s*["']_blank["'][^>]*)>"#).unwrap()
-});
+static TARGET_BLANK_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"(?i)<a([^>]*target\s*=\s*["']_blank["'][^>]*)>"#).unwrap());
 
-static HAS_REL_NOOPENER_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r#"(?i)rel\s*=\s*["'][^"']*noopener[^"']*["']"#).unwrap()
-});
+static HAS_REL_NOOPENER_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"(?i)rel\s*=\s*["'][^"']*noopener[^"']*["']"#).unwrap());
 
 /// Remove script tags and dangerous patterns from HTML
 pub fn remove_script(text: &str) -> String {
@@ -49,10 +44,14 @@ pub fn remove_script(text: &str) -> String {
     result = SCRIPT_SRC_RE.replace_all(&result, "").to_string();
 
     // Remove javascript: URLs
-    result = JAVASCRIPT_URL_RE.replace_all(&result, "<a>$1</a>").to_string();
+    result = JAVASCRIPT_URL_RE
+        .replace_all(&result, "<a>$1</a>")
+        .to_string();
 
     // Remove javascript&colon; URLs
-    result = JAVASCRIPT_COLON_RE.replace_all(&result, "<a>$1</a>").to_string();
+    result = JAVASCRIPT_COLON_RE
+        .replace_all(&result, "<a>$1</a>")
+        .to_string();
 
     // Remove onerror handlers from images
     result = IMG_ONERROR_RE.replace_all(&result, "<img>").to_string();
@@ -61,14 +60,16 @@ pub fn remove_script(text: &str) -> String {
     result = IFRAME_RE.replace_all(&result, "").to_string();
 
     // Add rel="noopener" to target="_blank" links that don't have it
-    result = TARGET_BLANK_RE.replace_all(&result, |caps: &regex::Captures| {
-        let attrs = &caps[1];
-        if HAS_REL_NOOPENER_RE.is_match(attrs) {
-            format!("<a{}>", attrs)
-        } else {
-            format!("<a{} rel=\"noopener\">", attrs)
-        }
-    }).to_string();
+    result = TARGET_BLANK_RE
+        .replace_all(&result, |caps: &regex::Captures| {
+            let attrs = &caps[1];
+            if HAS_REL_NOOPENER_RE.is_match(attrs) {
+                format!("<a{}>", attrs)
+            } else {
+                format!("<a{} rel=\"noopener\">", attrs)
+            }
+        })
+        .to_string();
 
     result
 }
@@ -92,9 +93,7 @@ pub fn sanitize_text(text: &str, config: &Config) -> String {
             // In sandbox mode, allow HTML but remove scripts
             remove_script(text)
         }
-        SecurityLevel::Loose | SecurityLevel::Antiscript => {
-            remove_script(text)
-        }
+        SecurityLevel::Loose | SecurityLevel::Antiscript => remove_script(text),
     }
 }
 
@@ -326,14 +325,25 @@ mod tests {
             let test_cases = vec![
                 ("test~T~", "test<T>"),
                 ("test~Array~Array~string~~~", "test<Array<Array<string>>>"),
-                ("test~Array~Array~string[]~~~", "test<Array<Array<string[]>>>"),
-                ("test ~Array~Array~string[]~~~", "test <Array<Array<string[]>>>"),
+                (
+                    "test~Array~Array~string[]~~~",
+                    "test<Array<Array<string[]>>>",
+                ),
+                (
+                    "test ~Array~Array~string[]~~~",
+                    "test <Array<Array<string[]>>>",
+                ),
                 ("~test", "~test"),
                 ("~test~T~", "~test<T>"),
             ];
 
             for (input, expected) in test_cases {
-                assert_eq!(parse_generic_types(input), expected, "Failed for input: {}", input);
+                assert_eq!(
+                    parse_generic_types(input),
+                    expected,
+                    "Failed for input: {}",
+                    input
+                );
             }
         }
     }

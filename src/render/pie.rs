@@ -11,12 +11,12 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
     // Default pie chart dimensions (sized to match mermaid.js)
-    let radius = 185.0;  // mermaid.js uses 185
+    let radius = 185.0; // mermaid.js uses 185
     let pie_diameter = radius * 2.0;
-    let pie_width = pie_diameter + 50.0;  // Space for pie + padding
-    let legend_width = 180.0;  // Space for legend
+    let pie_width = pie_diameter + 50.0; // Space for pie + padding
+    let legend_width = 180.0; // Space for legend
     let width = pie_width + legend_width;
-    let height = 450.0;  // mermaid.js uses 450
+    let height = 450.0; // mermaid.js uses 450
     let cx = pie_width / 2.0; // center x (in pie area)
     let cy = height / 2.0; // center y
 
@@ -71,14 +71,18 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
     let mut start_angle = -PI / 2.0; // Start at top (12 o'clock)
 
     // Title offset
-    let title_height = if db.get_diagram_title().is_some() { 40.0 } else { 0.0 };
+    let title_height = if db.get_diagram_title().is_some() {
+        40.0
+    } else {
+        0.0
+    };
     let pie_cy = cy + title_height / 2.0;
 
     // Legend dimensions (positioned to the right of the pie)
     let legend_x = pie_width + 10.0;
-    let legend_y = height / 2.0 - 50.0;  // Vertically centered
+    let legend_y = height / 2.0 - 50.0; // Vertically centered
     let legend_item_height = 22.0;
-    let legend_box_size = 18.0;  // mermaid.js uses 18x18
+    let legend_box_size = 18.0; // mermaid.js uses 18x18
 
     // Render title
     if let Some(title) = db.get_diagram_title() {
@@ -127,11 +131,15 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
         // Create pie slice path
         let path = format!(
             "M {} {} L {} {} A {} {} 0 {} 1 {} {} Z",
-            cx, pie_cy, // Move to center
-            x1, y1,     // Line to start of arc
-            radius, radius, // Arc radii
-            large_arc,  // Large arc flag
-            x2, y2      // End of arc
+            cx,
+            pie_cy, // Move to center
+            x1,
+            y1, // Line to start of arc
+            radius,
+            radius,    // Arc radii
+            large_arc, // Large arc flag
+            x2,
+            y2 // End of arc
         );
 
         // Use color based on ORIGINAL input order, not sorted order
@@ -149,9 +157,10 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
         doc.add_element(slice);
 
         // Add percentage label inside slice (for larger slices)
-        if percentage >= 0.05 {  // Only show if slice is at least 5%
+        if percentage >= 0.05 {
+            // Only show if slice is at least 5%
             let mid_angle = start_angle + angle / 2.0;
-            let label_radius = radius * 0.75;  // Position inside slice (mermaid.js uses ~0.75)
+            let label_radius = radius * 0.75; // Position inside slice (mermaid.js uses ~0.75)
             let label_x = cx + label_radius * mid_angle.cos();
             let label_y = pie_cy + label_radius * mid_angle.sin();
 
@@ -183,7 +192,13 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
         .collect();
 
     // Render legend
-    let legend_group = render_legend(&legend_items, legend_x, legend_y, legend_item_height, legend_box_size);
+    let legend_group = render_legend(
+        &legend_items,
+        legend_x,
+        legend_y,
+        legend_item_height,
+        legend_box_size,
+    );
     doc.add_element(legend_group);
 
     Ok(doc.to_string())
@@ -191,7 +206,7 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
 
 /// Render a legend for the pie chart
 fn render_legend(
-    items: &[(String, String, f64)],  // (color, label, percentage)
+    items: &[(String, String, f64)], // (color, label, percentage)
     x: f64,
     y: f64,
     item_height: f64,
@@ -220,7 +235,7 @@ fn render_legend(
         // mermaid.js uses x="22" relative to rect x (i.e., box_size + 4)
         children.push(SvgElement::Text {
             x: x + box_size + 4.0,
-            y: item_y + 14.0,  // mermaid.js uses y="14" relative to rect
+            y: item_y + 14.0, // mermaid.js uses y="14" relative to rect
             content: label.clone(),
             attrs: Attrs::new()
                 .with_class("legend")

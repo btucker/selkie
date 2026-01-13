@@ -13,8 +13,7 @@ pub struct C4Parser;
 pub fn parse(input: &str) -> Result<C4Db, String> {
     let mut db = C4Db::new();
 
-    let pairs = C4Parser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs = C4Parser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -36,20 +35,14 @@ pub fn parse(input: &str) -> Result<C4Db, String> {
     Ok(db)
 }
 
-fn process_document(
-    db: &mut C4Db,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_document(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for stmt in pair.into_inner() {
         process_statement(db, stmt)?;
     }
     Ok(())
 }
 
-fn process_statement(
-    db: &mut C4Db,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     match pair.as_rule() {
         Rule::statement => {
             for inner in pair.into_inner() {
@@ -418,7 +411,7 @@ fn extract_attribute(pair: pest::iterators::Pair<Rule>) -> String {
 /// Remove surrounding quotes from a string
 fn unquote(s: &str) -> String {
     if s.len() >= 2 && s.starts_with('"') && s.ends_with('"') {
-        s[1..s.len()-1].to_string()
+        s[1..s.len() - 1].to_string()
     } else {
         s.to_string()
     }
@@ -473,7 +466,10 @@ Person(customerA, "Banking Customer A", "A customer of the bank, with personal b
             assert_eq!(elements.len(), 1);
             assert_eq!(elements[0].alias, "customerA");
             assert_eq!(elements[0].label, "Banking Customer A");
-            assert_eq!(elements[0].description, "A customer of the bank, with personal bank accounts.");
+            assert_eq!(
+                elements[0].description,
+                "A customer of the bank, with personal bank accounts."
+            );
             assert_eq!(elements[0].shape_type, C4ShapeType::Person);
         }
 

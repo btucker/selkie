@@ -1,7 +1,211 @@
 //! Integration tests for the rendering engine
 
-use mermaid::{parse, render, render_with_config};
 use mermaid::render::{RenderConfig, Theme};
+use mermaid::{parse, render, render_with_config};
+
+// ============================================================================
+// Output Format Tests (PNG/PDF)
+// ============================================================================
+
+#[cfg(feature = "png")]
+mod png_output_tests {
+    use super::*;
+
+    /// Test that SVG can be converted to valid PNG
+    #[test]
+    fn test_svg_to_png_produces_valid_png() {
+        let input = r#"flowchart LR
+            A[Start] --> B[End]"#;
+
+        let diagram = parse(input).expect("Failed to parse");
+        let svg = render(&diagram).expect("Failed to render");
+
+        // Convert to PNG using resvg
+        use resvg::tiny_skia;
+        use resvg::usvg;
+
+        let mut opt = usvg::Options::default();
+        opt.fontdb_mut().load_system_fonts();
+
+        let tree = usvg::Tree::from_str(&svg, &opt).expect("Failed to parse SVG");
+
+        let size = tree.size();
+        let mut pixmap = tiny_skia::Pixmap::new(size.width() as u32, size.height() as u32)
+            .expect("Failed to create pixmap");
+
+        resvg::render(&tree, tiny_skia::Transform::default(), &mut pixmap.as_mut());
+
+        let png_data = pixmap.encode_png().expect("Failed to encode PNG");
+
+        // Verify PNG header (magic bytes)
+        assert!(
+            png_data.starts_with(&[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]),
+            "Output should be valid PNG (check magic bytes)"
+        );
+
+        // Should have reasonable size
+        assert!(png_data.len() > 100, "PNG should have content");
+    }
+
+    /// Test that PNG output respects scaling
+    #[test]
+    fn test_png_scaling() {
+        let input = r#"flowchart LR
+            A --> B --> C"#;
+
+        let diagram = parse(input).expect("Failed to parse");
+        let svg = render(&diagram).expect("Failed to render");
+
+        use resvg::tiny_skia;
+        use resvg::usvg;
+
+        let mut opt = usvg::Options::default();
+        opt.fontdb_mut().load_system_fonts();
+
+        let tree = usvg::Tree::from_str(&svg, &opt).expect("Failed to parse SVG");
+
+        // Render at 2x scale
+        let size = tree.size();
+        let scale = 2.0;
+        let width = (size.width() * scale) as u32;
+        let height = (size.height() * scale) as u32;
+
+        let mut pixmap = tiny_skia::Pixmap::new(width, height).expect("Failed to create pixmap");
+
+        let transform = tiny_skia::Transform::from_scale(scale, scale);
+        resvg::render(&tree, transform, &mut pixmap.as_mut());
+
+        assert_eq!(pixmap.width(), width);
+        assert_eq!(pixmap.height(), height);
+    }
+
+    /// Test PNG output with dark theme
+    #[test]
+    fn test_png_with_dark_theme() {
+        let input = r#"flowchart TB
+            A[Start] --> B{Decision}
+            B -->|Yes| C[End]"#;
+
+        let diagram = parse(input).expect("Failed to parse");
+        let config = RenderConfig {
+            theme: Theme::dark(),
+            ..Default::default()
+        };
+        let svg = render_with_config(&diagram, &config).expect("Failed to render");
+
+        use resvg::tiny_skia;
+        use resvg::usvg;
+
+        let mut opt = usvg::Options::default();
+        opt.fontdb_mut().load_system_fonts();
+
+        let tree = usvg::Tree::from_str(&svg, &opt).expect("Failed to parse SVG");
+
+        let size = tree.size();
+        let mut pixmap = tiny_skia::Pixmap::new(size.width() as u32, size.height() as u32)
+            .expect("Failed to create pixmap");
+
+        resvg::render(&tree, tiny_skia::Transform::default(), &mut pixmap.as_mut());
+
+        let png_data = pixmap.encode_png().expect("Failed to encode PNG");
+        assert!(
+            png_data.starts_with(&[0x89, 0x50, 0x4E, 0x47]),
+            "Dark theme should produce valid PNG"
+        );
+    }
+}
+
+#[cfg(feature = "pdf")]
+mod pdf_output_tests {
+    use super::*;
+
+    /// Test that SVG can be converted to valid PDF
+    #[test]
+    fn test_svg_to_pdf_produces_valid_pdf() {
+        let input = r#"flowchart LR
+            A[Start] --> B[End]"#;
+
+        let diagram = parse(input).expect("Failed to parse");
+        let svg = render(&diagram).expect("Failed to render");
+
+        use resvg::usvg;
+
+        let mut opt = usvg::Options::default();
+        opt.fontdb_mut().load_system_fonts();
+
+        let tree = usvg::Tree::from_str(&svg, &opt).expect("Failed to parse SVG");
+
+        let pdf_data = svg2pdf::to_pdf(
+            &tree,
+            svg2pdf::ConversionOptions::default(),
+            svg2pdf::PageOptions::default(),
+        )
+        .expect("Failed to convert to PDF");
+
+        // Verify PDF header
+        assert!(
+            pdf_data.starts_with(b"%PDF-"),
+            "Output should be valid PDF (check header)"
+        );
+
+        // Should have reasonable size
+        assert!(pdf_data.len() > 100, "PDF should have content");
+    }
+
+    /// Test PDF output with various diagram types
+    #[test]
+    fn test_pdf_with_different_diagrams() {
+        let diagrams = [
+            (
+                "flowchart",
+                r#"flowchart TB
+                A --> B --> C"#,
+            ),
+            (
+                "pie",
+                r#"pie title Test
+                "A" : 50
+                "B" : 50"#,
+            ),
+            (
+                "state",
+                r#"stateDiagram-v2
+                [*] --> Active
+                Active --> [*]"#,
+            ),
+        ];
+
+        for (name, input) in diagrams {
+            let diagram = parse(input).expect(&format!("Failed to parse {}", name));
+            let svg = render(&diagram).expect(&format!("Failed to render {}", name));
+
+            use resvg::usvg;
+
+            let mut opt = usvg::Options::default();
+            opt.fontdb_mut().load_system_fonts();
+
+            let tree =
+                usvg::Tree::from_str(&svg, &opt).expect(&format!("Failed to parse {} SVG", name));
+
+            let pdf_data = svg2pdf::to_pdf(
+                &tree,
+                svg2pdf::ConversionOptions::default(),
+                svg2pdf::PageOptions::default(),
+            )
+            .expect(&format!("Failed to convert {} to PDF", name));
+
+            assert!(
+                pdf_data.starts_with(b"%PDF-"),
+                "{} should produce valid PDF",
+                name
+            );
+        }
+    }
+}
+
+// ============================================================================
+// Original Integration Tests
+// ============================================================================
 
 #[test]
 fn test_simple_flowchart_renders_to_svg() {
@@ -15,11 +219,17 @@ fn test_simple_flowchart_renders_to_svg() {
     // Verify basic SVG structure
     assert!(svg.contains("<svg"), "SVG should have opening tag");
     assert!(svg.contains("</svg>"), "SVG should have closing tag");
-    assert!(svg.contains("xmlns=\"http://www.w3.org/2000/svg\""), "SVG should have namespace");
+    assert!(
+        svg.contains("xmlns=\"http://www.w3.org/2000/svg\""),
+        "SVG should have namespace"
+    );
 
     // Verify node labels are present
     assert!(svg.contains("Start"), "SVG should contain 'Start' label");
-    assert!(svg.contains("Process"), "SVG should contain 'Process' label");
+    assert!(
+        svg.contains("Process"),
+        "SVG should contain 'Process' label"
+    );
     assert!(svg.contains("End"), "SVG should contain 'End' label");
 }
 
@@ -34,11 +244,17 @@ fn test_flowchart_with_decision_diamond() {
     let svg = render(&diagram).expect("Failed to render flowchart");
 
     // Verify diamond shape (polygon) is rendered
-    assert!(svg.contains("<polygon"), "SVG should contain polygon for diamond shape");
+    assert!(
+        svg.contains("<polygon"),
+        "SVG should contain polygon for diamond shape"
+    );
 
     // Verify all labels present
     assert!(svg.contains("Start"), "SVG should contain 'Start' label");
-    assert!(svg.contains("Decision"), "SVG should contain 'Decision' label");
+    assert!(
+        svg.contains("Decision"),
+        "SVG should contain 'Decision' label"
+    );
     assert!(svg.contains("Action"), "SVG should contain 'Action' label");
 }
 
@@ -57,9 +273,18 @@ fn test_flowchart_with_various_shapes() {
     assert!(svg.contains("<svg"), "SVG should have opening tag");
 
     // Verify labels
-    assert!(svg.contains("Stadium"), "SVG should contain 'Stadium' label");
-    assert!(svg.contains("Subroutine"), "SVG should contain 'Subroutine' label");
-    assert!(svg.contains("Database"), "SVG should contain 'Database' label");
+    assert!(
+        svg.contains("Stadium"),
+        "SVG should contain 'Stadium' label"
+    );
+    assert!(
+        svg.contains("Subroutine"),
+        "SVG should contain 'Subroutine' label"
+    );
+    assert!(
+        svg.contains("Database"),
+        "SVG should contain 'Database' label"
+    );
     assert!(svg.contains("Circle"), "SVG should contain 'Circle' label");
 }
 
@@ -78,7 +303,10 @@ fn test_render_with_dark_theme() {
     // Verify SVG generated with dark theme
     assert!(svg.contains("<svg"), "SVG should have opening tag");
     // Dark theme should have dark background color in styles
-    assert!(svg.contains("<style>"), "SVG should contain embedded styles");
+    assert!(
+        svg.contains("<style>"),
+        "SVG should contain embedded styles"
+    );
 }
 
 #[test]
@@ -160,10 +388,18 @@ fn test_flowchart_all_directions() {
 
     for dir in &directions {
         let input = format!("flowchart {}\n    A --> B", dir);
-        let diagram = parse(&input).expect(&format!("Failed to parse flowchart with direction {}", dir));
-        let svg = render(&diagram).expect(&format!("Failed to render flowchart with direction {}", dir));
+        let diagram =
+            parse(&input).expect(&format!("Failed to parse flowchart with direction {}", dir));
+        let svg = render(&diagram).expect(&format!(
+            "Failed to render flowchart with direction {}",
+            dir
+        ));
 
-        assert!(svg.contains("<svg"), "SVG should have opening tag for direction {}", dir);
+        assert!(
+            svg.contains("<svg"),
+            "SVG should have opening tag for direction {}",
+            dir
+        );
     }
 }
 
@@ -195,7 +431,10 @@ fn test_arrow_markers_are_defined() {
 
     // Verify arrow markers are defined in defs section
     assert!(svg.contains("<defs>"), "SVG should have defs section");
-    assert!(svg.contains("<marker"), "SVG should define markers for arrows");
+    assert!(
+        svg.contains("<marker"),
+        "SVG should define markers for arrows"
+    );
 }
 
 #[test]
@@ -207,7 +446,10 @@ fn test_edges_use_path_elements() {
     let svg = render(&diagram).expect("Failed to render flowchart");
 
     // Verify edges are rendered as path elements
-    assert!(svg.contains("<path"), "SVG should contain path elements for edges");
+    assert!(
+        svg.contains("<path"),
+        "SVG should contain path elements for edges"
+    );
 }
 
 #[test]
@@ -336,13 +578,15 @@ fn test_state_diagram_both_start_and_end_states() {
     // Check for start state (filled circle)
     assert!(
         svg.contains("state-start"),
-        "State diagram should have a start state with class 'state-start'. SVG:\n{}", svg
+        "State diagram should have a start state with class 'state-start'. SVG:\n{}",
+        svg
     );
 
     // Check for end state (bullseye with outer and inner circles)
     assert!(
         svg.contains("state-end-outer") && svg.contains("state-end-inner"),
-        "State diagram should have an end state with bullseye (outer and inner circles). SVG:\n{}", svg
+        "State diagram should have an end state with bullseye (outer and inner circles). SVG:\n{}",
+        svg
     );
 
     // Should have at least 3 circles total: 1 for start, 2 for end (bullseye)
@@ -368,7 +612,8 @@ fn test_pie_chart_has_legend() {
     // Should have a legend with colored rectangles
     assert!(
         svg.contains("pie-legend") || svg.contains("legend"),
-        "Pie chart should have a legend. SVG:\n{}", svg
+        "Pie chart should have a legend. SVG:\n{}",
+        svg
     );
 }
 
@@ -447,14 +692,16 @@ fn test_flowchart_edge_stroke_width() {
     // (Note: markers like cross may still use stroke-width: 2 for their internal paths)
     assert!(
         svg.contains("stroke-width: 1px") || svg.contains("stroke-width=\"1\""),
-        "Edge stroke-width should be 1px. SVG:\n{}", svg
+        "Edge stroke-width should be 1px. SVG:\n{}",
+        svg
     );
 
     // The edge path element specifically should have stroke-width 1
     assert!(
-        svg.contains(r#"class="edge-path""#) &&
-        (svg.contains("stroke-width=\"1\"") || svg.contains("stroke-width: 1px")),
-        "Edge path should have stroke-width 1. SVG:\n{}", svg
+        svg.contains(r#"class="edge-path""#)
+            && (svg.contains("stroke-width=\"1\"") || svg.contains("stroke-width: 1px")),
+        "Edge path should have stroke-width 1. SVG:\n{}",
+        svg
     );
 }
 
@@ -470,24 +717,46 @@ fn test_flowchart_arrow_marker_size() {
     // Arrow point markers should be 8x8, not 12x12
     assert!(
         svg.contains("markerWidth=\"8\"") || svg.contains("markerWidth: 8"),
-        "Arrow markers should be 8x8. SVG:\n{}", svg
+        "Arrow markers should be 8x8. SVG:\n{}",
+        svg
     );
 }
 
 #[test]
-fn test_flowchart_subroutine_has_vertical_lines() {
-    // Subroutine shape should have visible vertical lines
+fn test_flowchart_subroutine_uses_polygon() {
+    // Subroutine shape is rendered as a polygon (matching mermaid.js)
+    // The polygon traces inner rect → outer rect to create vertical bar effect
     let input = r#"flowchart LR
     A[[Subroutine]]"#;
 
     let diagram = parse(input).expect("Failed to parse flowchart");
     let svg = render(&diagram).expect("Failed to render flowchart");
 
-    // Lines should have stroke attribute to be visible
+    // Should use polygon element (not separate rect + lines)
     assert!(
-        svg.contains("<line") && svg.contains("stroke"),
-        "Subroutine should have visible vertical lines with stroke. SVG:\n{}", svg
+        svg.contains("<polygon"),
+        "Subroutine should use polygon element. SVG:\n{}",
+        svg
     );
+
+    // The polygon should have points for both inner and outer rectangles
+    let points_re = regex::Regex::new(r#"<polygon points="([^"]+)""#).unwrap();
+    if let Some(caps) = points_re.captures(&svg) {
+        let points = caps.get(1).unwrap().as_str();
+        let point_count = points.split_whitespace().count();
+        // Should have 10 points for subroutine shape (inner rect 5 + outer rect 5)
+        assert!(
+            point_count >= 8,
+            "Subroutine polygon should have at least 8 points (got {}). Points: {}",
+            point_count,
+            points
+        );
+    } else {
+        panic!(
+            "Subroutine should have polygon with points attribute. SVG:\n{}",
+            svg
+        );
+    }
 }
 
 #[test]
@@ -511,7 +780,8 @@ fn test_flowchart_has_circle_markers() {
     // Verify marker definitions exist
     assert!(
         svg.contains("marker") && svg.contains("circle"),
-        "Flowchart should have circle markers defined. SVG:\n{}", svg
+        "Flowchart should have circle markers defined. SVG:\n{}",
+        svg
     );
 }
 
@@ -527,20 +797,23 @@ fn test_er_diagram_has_crow_foot_notation() {
     // Should have cardinality symbols rendered
     assert!(
         svg.contains("cardinality"),
-        "ER diagram should have cardinality symbols. SVG:\n{}", svg
+        "ER diagram should have cardinality symbols. SVG:\n{}",
+        svg
     );
 
     // The ZeroOrMore cardinality (o{) should have both a circle and crow's foot paths
     // Circle for the "zero" part
     assert!(
         svg.contains("<circle"),
-        "ER diagram ZeroOrMore cardinality should include a circle. SVG:\n{}", svg
+        "ER diagram ZeroOrMore cardinality should include a circle. SVG:\n{}",
+        svg
     );
 
     // Crow's foot path for the "many" part
     assert!(
         svg.contains("<path") && svg.contains("cardinality"),
-        "ER diagram should have crow's foot paths in cardinality group. SVG:\n{}", svg
+        "ER diagram should have crow's foot paths in cardinality group. SVG:\n{}",
+        svg
     );
 }
 
@@ -564,7 +837,9 @@ fn test_gantt_task_labels_inside_bars() {
 
     // Task label should have class that indicates it's inside the bar (mermaid.js uses taskText)
     assert!(
-        svg.contains("taskText") || svg.contains("task-label-inside") || svg.contains(r#"class="task-label""#),
+        svg.contains("taskText")
+            || svg.contains("task-label-inside")
+            || svg.contains(r#"class="task-label""#),
         "Gantt chart should have task labels"
     );
 
@@ -590,9 +865,11 @@ fn test_gantt_task_bar_uses_mermaid_colors() {
 
     // Task bar should use mermaid.js default purple color
     assert!(
-        svg.contains("fill=\"#8a90dd\"") || svg.contains("fill: #8a90dd") ||
-        svg.contains("fill=\"#8A90DD\""),
-        "Gantt task bars should use mermaid.js purple (#8a90dd), not light blue. SVG:\n{}", svg
+        svg.contains("fill=\"#8a90dd\"")
+            || svg.contains("fill: #8a90dd")
+            || svg.contains("fill=\"#8A90DD\""),
+        "Gantt task bars should use mermaid.js purple (#8a90dd), not light blue. SVG:\n{}",
+        svg
     );
 }
 
@@ -612,7 +889,8 @@ fn test_gantt_has_vertical_grid_lines() {
     // mermaid.js renders these with class="grid" containing tick marks
     assert!(
         svg.contains("grid") || svg.contains("tick"),
-        "Gantt chart should have vertical grid lines. SVG:\n{}", svg
+        "Gantt chart should have vertical grid lines. SVG:\n{}",
+        svg
     );
 }
 
@@ -629,9 +907,11 @@ fn test_pie_chart_has_outer_circle() {
     // mermaid.js renders a pieOuterCircle around the pie
     // This is a circle with no fill, just a stroke around the pie
     assert!(
-        svg.contains("pieOuterCircle") || svg.contains("pie-outer") ||
-        (svg.contains("<circle") && svg.contains("fill=\"none\"")),
-        "Pie chart should have an outer circle. SVG:\n{}", svg
+        svg.contains("pieOuterCircle")
+            || svg.contains("pie-outer")
+            || (svg.contains("<circle") && svg.contains("fill=\"none\"")),
+        "Pie chart should have an outer circle. SVG:\n{}",
+        svg
     );
 }
 
@@ -662,7 +942,10 @@ fn test_diamond_edges_exit_from_sides_not_corners() {
 
     // The test will be more specific once we fix the implementation
     // For now, verify the diamond is rendered correctly
-    assert!(svg.contains("<polygon"), "Diamond should be rendered as polygon");
+    assert!(
+        svg.contains("<polygon"),
+        "Diamond should be rendered as polygon"
+    );
 }
 
 #[test]
@@ -674,7 +957,11 @@ fn test_parallelogram_renders_as_polygon() {
     let svg = render(&diagram).expect("Failed to render flowchart");
 
     // Parallelogram (LeanRight) should render as a polygon, not a rect
-    assert!(svg.contains("<polygon"), "Parallelogram should render as polygon, got:\n{}", svg);
+    assert!(
+        svg.contains("<polygon"),
+        "Parallelogram should render as polygon, got:\n{}",
+        svg
+    );
 }
 
 #[test]
@@ -690,11 +977,17 @@ fn test_class_inheritance_arrow_is_hollow_triangle() {
 
     // Inheritance relation should use a marker
     let has_inheritance_marker = svg.contains("url(#inheritance)");
-    assert!(has_inheritance_marker, "Inheritance relation should use url(#inheritance) marker");
+    assert!(
+        has_inheritance_marker,
+        "Inheritance relation should use url(#inheritance) marker"
+    );
 
     // The inheritance marker should exist and be hollow (fill="none")
     let has_inheritance_def = svg.contains(r#"id="inheritance""#);
-    assert!(has_inheritance_def, "SVG should contain inheritance marker definition");
+    assert!(
+        has_inheritance_def,
+        "SVG should contain inheritance marker definition"
+    );
 
     // The marker path should have fill="none" for hollow triangle (not filled)
     // Extract the marker section and check it has fill="none"
@@ -770,12 +1063,16 @@ fn test_flowchart_tb_layout_vertical_ordering() {
     assert!(
         y_a < y_b,
         "In TB layout, A should be above B (A.y={} should be < B.y={}). SVG:\n{}",
-        y_a, y_b, svg
+        y_a,
+        y_b,
+        svg
     );
     assert!(
         y_b < y_c,
         "In TB layout, B should be above C (B.y={} should be < C.y={}). SVG:\n{}",
-        y_b, y_c, svg
+        y_b,
+        y_c,
+        svg
     );
 }
 
@@ -912,7 +1209,8 @@ fn test_flowchart_tb_layout_with_diamond_ordering() {
     assert!(
         (y_d - y_e).abs() < 20.0,
         "D and E should be on same level: D.y={}, E.y={}",
-        y_d, y_e
+        y_d,
+        y_e
     );
 
     // F should be below D and E
@@ -1013,7 +1311,8 @@ fn test_flowchart_tb_subgraph_internal_layout() {
         y_a < y_c,
         "Within subgraph, A should be above C (Diamond): A.y={} should be < C.y={}. \
         This is mermaid-rs-agi: nodes in subgraph not respecting TB direction.",
-        y_a, y_c
+        y_a,
+        y_c
     );
 
     assert!(y_a < y_b, "A should be above B: A.y={} < B.y={}", y_a, y_b);
@@ -1128,7 +1427,8 @@ fn test_flowchart_full_tb_layout() {
         "BUG mermaid-rs-agi: In flowchart_full, A (Rectangle) should be ABOVE C (Diamond). \
         Instead, C is at y={} and A is at y={}. The Diamond Decision is being placed \
         above the Rectangle when it should be below it.",
-        y_c, y_a
+        y_c,
+        y_a
     );
 }
 
@@ -1188,7 +1488,8 @@ fn test_state_diagram_vertical_layout() {
     assert!(
         y_idle < y_running,
         "In vertical layout, Idle should be above Running. Idle.y={} vs Running.y={}",
-        y_idle, y_running
+        y_idle,
+        y_running
     );
 
     // Also verify the diagram is taller than it is wide (vertical orientation)
@@ -1208,7 +1509,8 @@ fn test_state_diagram_vertical_layout() {
         assert!(
             height > width * 0.8, // Allow some tolerance, but should be roughly taller
             "State diagram should be roughly vertical. Got {}x{} (width x height)",
-            width, height
+            width,
+            height
         );
     }
 }
@@ -1226,11 +1528,13 @@ fn test_class_diagram_cardinality_labels() {
     // Should contain both cardinality labels
     assert!(
         svg.contains("1"),
-        "Class diagram should contain cardinality '1'. SVG:\n{}", svg
+        "Class diagram should contain cardinality '1'. SVG:\n{}",
+        svg
     );
     assert!(
         svg.contains("many"),
-        "Class diagram should contain cardinality 'many'. SVG:\n{}", svg
+        "Class diagram should contain cardinality 'many'. SVG:\n{}",
+        svg
     );
 }
 
@@ -1303,14 +1607,16 @@ fn test_er_diagram_vertical_layout() {
     assert!(
         y_customer < y_order,
         "CUSTOMER should be above ORDER. CUSTOMER.y={} vs ORDER.y={}",
-        y_customer, y_order
+        y_customer,
+        y_order
     );
 
     // LINE-ITEM should be below ORDER (because ORDER ||--|{ LINE-ITEM)
     assert!(
         y_order < y_line_item,
         "ORDER should be above LINE-ITEM. ORDER.y={} vs LINE-ITEM.y={}",
-        y_order, y_line_item
+        y_order,
+        y_line_item
     );
 
     // Verify the diagram is taller than a simple grid would produce
@@ -1353,33 +1659,42 @@ fn test_class_diagram_parent_centered_over_children() {
     // Children span from ~92 to ~488, so parent should be near middle (~290)
 
     // Parse Animal's x position
-    let animal_x = svg.find(r#"id="class-Animal""#).and_then(|start| {
-        let remaining = &svg[start..];
-        remaining.find(r#"<rect x=""#).and_then(|rect_start| {
-            let after_x = &remaining[rect_start + 9..];
-            let end = after_x.find('"')?;
-            after_x[..end].parse::<f64>().ok()
+    let animal_x = svg
+        .find(r#"id="class-Animal""#)
+        .and_then(|start| {
+            let remaining = &svg[start..];
+            remaining.find(r#"<rect x=""#).and_then(|rect_start| {
+                let after_x = &remaining[rect_start + 9..];
+                let end = after_x.find('"')?;
+                after_x[..end].parse::<f64>().ok()
+            })
         })
-    }).expect("Could not find Animal class x position");
+        .expect("Could not find Animal class x position");
 
     // Parse children's x positions
-    let duck_x = svg.find(r#"id="class-Duck""#).and_then(|start| {
-        let remaining = &svg[start..];
-        remaining.find(r#"<rect x=""#).and_then(|rect_start| {
-            let after_x = &remaining[rect_start + 9..];
-            let end = after_x.find('"')?;
-            after_x[..end].parse::<f64>().ok()
+    let duck_x = svg
+        .find(r#"id="class-Duck""#)
+        .and_then(|start| {
+            let remaining = &svg[start..];
+            remaining.find(r#"<rect x=""#).and_then(|rect_start| {
+                let after_x = &remaining[rect_start + 9..];
+                let end = after_x.find('"')?;
+                after_x[..end].parse::<f64>().ok()
+            })
         })
-    }).expect("Could not find Duck class x position");
+        .expect("Could not find Duck class x position");
 
-    let zebra_x = svg.find(r#"id="class-Zebra""#).and_then(|start| {
-        let remaining = &svg[start..];
-        remaining.find(r#"<rect x=""#).and_then(|rect_start| {
-            let after_x = &remaining[rect_start + 9..];
-            let end = after_x.find('"')?;
-            after_x[..end].parse::<f64>().ok()
+    let zebra_x = svg
+        .find(r#"id="class-Zebra""#)
+        .and_then(|start| {
+            let remaining = &svg[start..];
+            remaining.find(r#"<rect x=""#).and_then(|rect_start| {
+                let after_x = &remaining[rect_start + 9..];
+                let end = after_x.find('"')?;
+                after_x[..end].parse::<f64>().ok()
+            })
         })
-    }).expect("Could not find Zebra class x position");
+        .expect("Could not find Zebra class x position");
 
     // Class width is 180, so we need to account for that when calculating centers
     let class_width = 180.0;
@@ -1393,8 +1708,12 @@ fn test_class_diagram_parent_centered_over_children() {
         "Animal (parent) should be horizontally centered over children. \
          Animal center={}, children center={}, diff={}. \
          Animal x={}, Duck x={}, Zebra x={}",
-        animal_center, children_center, (animal_center - children_center).abs(),
-        animal_x, duck_x, zebra_x
+        animal_center,
+        children_center,
+        (animal_center - children_center).abs(),
+        animal_x,
+        duck_x,
+        zebra_x
     );
 }
 

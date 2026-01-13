@@ -2,11 +2,11 @@
 
 use std::collections::HashMap;
 
-use crate::diagrams::er::{Cardinality, Direction, ErDb, Entity, Identification};
+use crate::diagrams::er::{Cardinality, Direction, Entity, ErDb, Identification};
 use crate::error::Result;
 use crate::layout::{
-    layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph,
-    LayoutNode, LayoutOptions, NodeShape, Padding, SizeEstimator, ToLayoutGraph,
+    layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
+    LayoutOptions, NodeShape, Padding, SizeEstimator, ToLayoutGraph,
 };
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
@@ -58,7 +58,8 @@ impl ToLayoutGraph for ErDb {
             let edge_id = format!("relationship-{}", i);
 
             // Create edge from source (entity_a) to target (entity_b)
-            let mut edge = LayoutEdge::new(&edge_id, &relationship.entity_a, &relationship.entity_b);
+            let mut edge =
+                LayoutEdge::new(&edge_id, &relationship.entity_a, &relationship.entity_b);
 
             if !relationship.role_a.is_empty() {
                 edge = edge.with_label(&relationship.role_a);
@@ -115,8 +116,13 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     // Calculate entity heights
     let mut entity_heights: HashMap<String, f64> = HashMap::new();
     for (name, entity) in entities {
-        let height = entity_header_height + (entity.attributes.len() as f64) * attr_row_height + padding * 2.0;
-        entity_heights.insert(name.clone(), height.max(entity_header_height + padding * 2.0));
+        let height = entity_header_height
+            + (entity.attributes.len() as f64) * attr_row_height
+            + padding * 2.0;
+        entity_heights.insert(
+            name.clone(),
+            height.max(entity_header_height + padding * 2.0),
+        );
     }
 
     // Sort entities for consistent ordering
@@ -147,7 +153,11 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     }
 
     // Title offset
-    let title_offset = if !db.diagram_title.is_empty() { 40.0 } else { 0.0 };
+    let title_offset = if !db.diagram_title.is_empty() {
+        40.0
+    } else {
+        0.0
+    };
 
     // Calculate diagram bounds from layout
     let max_width = layout_result.width.unwrap_or(400.0) + margin * 2.0;
@@ -179,7 +189,10 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     // Render each entity
     for (name, entity) in &sorted_entities {
         if let Some(&(x, y)) = entity_positions.get(*name) {
-            let height = entity_heights.get(*name).copied().unwrap_or(entity_header_height);
+            let height = entity_heights
+                .get(*name)
+                .copied()
+                .unwrap_or(entity_header_height);
             let entity_elem = render_entity(
                 entity,
                 x,
@@ -207,12 +220,17 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
         let entity_b_name = entity_id_to_name.get(&relationship.entity_b);
 
         if let (Some(a_name), Some(b_name)) = (entity_a_name, entity_b_name) {
-            if let (Some(&(x1, y1)), Some(&(x2, y2))) = (
-                entity_positions.get(a_name),
-                entity_positions.get(b_name),
-            ) {
-                let h1 = entity_heights.get(a_name).copied().unwrap_or(entity_header_height);
-                let h2 = entity_heights.get(b_name).copied().unwrap_or(entity_header_height);
+            if let (Some(&(x1, y1)), Some(&(x2, y2))) =
+                (entity_positions.get(a_name), entity_positions.get(b_name))
+            {
+                let h1 = entity_heights
+                    .get(a_name)
+                    .copied()
+                    .unwrap_or(entity_header_height);
+                let h2 = entity_heights
+                    .get(b_name)
+                    .copied()
+                    .unwrap_or(entity_header_height);
 
                 let rel_elem = render_relationship(
                     x1,
@@ -328,9 +346,7 @@ fn render_entity(
 
     SvgElement::Group {
         children,
-        attrs: Attrs::new()
-            .with_class("entity-node")
-            .with_id(&entity.id),
+        attrs: Attrs::new().with_class("entity-node").with_id(&entity.id),
     }
 }
 
@@ -457,9 +473,7 @@ fn render_cardinality(x: f64, y: f64, angle: f64, card: Cardinality, at_end: boo
                     y1: ly + perp_sin,
                     x2: lx - perp_cos,
                     y2: ly - perp_sin,
-                    attrs: Attrs::new()
-                        .with_stroke("#333333")
-                        .with_stroke_width(1.0),
+                    attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
                 });
             }
         }
@@ -481,9 +495,7 @@ fn render_cardinality(x: f64, y: f64, angle: f64, card: Cardinality, at_end: boo
                 y1: base_y + perp_sin,
                 x2: base_x - perp_cos,
                 y2: base_y - perp_sin,
-                attrs: Attrs::new()
-                    .with_stroke("#333333")
-                    .with_stroke_width(1.0),
+                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
             });
         }
         Cardinality::ZeroOrMore => {
@@ -505,8 +517,14 @@ fn render_cardinality(x: f64, y: f64, angle: f64, card: Cardinality, at_end: boo
             children.push(SvgElement::Path {
                 d: format!(
                     "M {} {} L {} {} M {} {} L {} {}",
-                    x, y, foot_x + perp_cos, foot_y + perp_sin,
-                    x, y, foot_x - perp_cos, foot_y - perp_sin
+                    x,
+                    y,
+                    foot_x + perp_cos,
+                    foot_y + perp_sin,
+                    x,
+                    y,
+                    foot_x - perp_cos,
+                    foot_y - perp_sin
                 ),
                 attrs: Attrs::new()
                     .with_fill("none")
@@ -521,9 +539,7 @@ fn render_cardinality(x: f64, y: f64, angle: f64, card: Cardinality, at_end: boo
                 y1: base_y + perp_sin,
                 x2: base_x - perp_cos,
                 y2: base_y - perp_sin,
-                attrs: Attrs::new()
-                    .with_stroke("#333333")
-                    .with_stroke_width(1.0),
+                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
             });
             // Crow's foot
             let foot_x = base_x + 5.0 * cos_a;
@@ -531,8 +547,14 @@ fn render_cardinality(x: f64, y: f64, angle: f64, card: Cardinality, at_end: boo
             children.push(SvgElement::Path {
                 d: format!(
                     "M {} {} L {} {} M {} {} L {} {}",
-                    x, y, foot_x + perp_cos, foot_y + perp_sin,
-                    x, y, foot_x - perp_cos, foot_y - perp_sin
+                    x,
+                    y,
+                    foot_x + perp_cos,
+                    foot_y + perp_sin,
+                    x,
+                    y,
+                    foot_x - perp_cos,
+                    foot_y - perp_sin
                 ),
                 attrs: Attrs::new()
                     .with_fill("none")
@@ -547,9 +569,7 @@ fn render_cardinality(x: f64, y: f64, angle: f64, card: Cardinality, at_end: boo
                 y1: base_y + perp_sin,
                 x2: base_x - perp_cos,
                 y2: base_y - perp_sin,
-                attrs: Attrs::new()
-                    .with_stroke("#333333")
-                    .with_stroke_width(2.0),
+                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(2.0),
             });
         }
     }

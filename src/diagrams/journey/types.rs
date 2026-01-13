@@ -98,10 +98,7 @@ impl JourneyDb {
     /// Task data format: `:score:actor1, actor2, ...`
     /// Example: `:5:Dad` or `:3:Dad, Mum, Child#1`
     pub fn add_task(&mut self, task_name: &str, task_data: &str) {
-        let mut task = JourneyTask::new(
-            task_name.trim().to_string(),
-            self.current_section.clone(),
-        );
+        let mut task = JourneyTask::new(task_name.trim().to_string(), self.current_section.clone());
 
         // Parse task data format: :score:actor1, actor2
         // Or: score: actor1, actor2 (without leading colon)
@@ -222,7 +219,10 @@ mod tests {
         db.add_task("Go shopping", ":5:Mum");
 
         assert_eq!(db.get_acc_title(), "Shopping");
-        assert_eq!(db.get_acc_description(), "A user journey for family shopping");
+        assert_eq!(
+            db.get_acc_description(),
+            "A user journey for family shopping"
+        );
 
         let tasks = db.get_tasks();
         assert_eq!(tasks.len(), 4);

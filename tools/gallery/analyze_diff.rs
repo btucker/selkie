@@ -84,7 +84,10 @@ fn parse_dimension(value: &str) -> f64 {
         return 0.0;
     }
     // Extract numeric part
-    let numeric: String = value.chars().take_while(|c| c.is_ascii_digit() || *c == '.').collect();
+    let numeric: String = value
+        .chars()
+        .take_while(|c| c.is_ascii_digit() || *c == '.')
+        .collect();
     numeric.parse().unwrap_or(0.0)
 }
 
@@ -155,7 +158,8 @@ fn extract_metrics(svg_content: &str) -> SvgMetrics {
                     }
                 } else {
                     // Otherwise collect from tspans only
-                    let text: String = node.children()
+                    let text: String = node
+                        .children()
                         .filter(|n| n.is_element() && n.tag_name().name() == "tspan")
                         .filter_map(|n| n.text())
                         .map(|s| s.trim())
@@ -360,7 +364,8 @@ fn calculate_similarity(rs: &SvgMetrics, ref_metrics: &SvgMetrics) -> f64 {
         rs.rect_count + rs.circle_count + rs.path_count + rs.text_count + rs.line_count;
 
     if total_ref_elems > 0 {
-        let elem_diff = (total_rs_elems as f64 - total_ref_elems as f64).abs() / total_ref_elems as f64;
+        let elem_diff =
+            (total_rs_elems as f64 - total_ref_elems as f64).abs() / total_ref_elems as f64;
         score -= (elem_diff * 0.4).min(0.4);
     }
 
@@ -514,7 +519,11 @@ fn generate_html_report(results: &[ComparisonResult], output_path: &Path) -> std
     let high_similarity = results.iter().filter(|r| r.similarity_score >= 0.9).count();
     let has_critical = results
         .iter()
-        .filter(|r| r.differences.iter().any(|d| matches!(d.severity, Severity::Critical)))
+        .filter(|r| {
+            r.differences
+                .iter()
+                .any(|d| matches!(d.severity, Severity::Critical))
+        })
         .count();
     let avg_similarity: f64 =
         results.iter().map(|r| r.similarity_score).sum::<f64>() / total.max(1) as f64;
@@ -644,7 +653,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("{}", separator);
     println!();
 
-    let diagrams = ["flowchart", "pie", "sequence", "class", "state", "er", "gantt"];
+    let diagrams = [
+        "flowchart",
+        "pie",
+        "sequence",
+        "class",
+        "state",
+        "er",
+        "gantt",
+    ];
 
     let mut results = Vec::new();
 
@@ -677,7 +694,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("  No significant differences detected");
         } else {
             for diff in &differences {
-                println!("  [{}] {}: {}", diff.severity.label(), diff.category, diff.description);
+                println!(
+                    "  [{}] {}: {}",
+                    diff.severity.label(),
+                    diff.category,
+                    diff.description
+                );
             }
         }
 
@@ -703,7 +725,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let total = results.len();
     let with_diffs = results.iter().filter(|r| !r.differences.is_empty()).count();
-    let avg_sim: f64 = results.iter().map(|r| r.similarity_score).sum::<f64>() / total.max(1) as f64;
+    let avg_sim: f64 =
+        results.iter().map(|r| r.similarity_score).sum::<f64>() / total.max(1) as f64;
 
     println!("\nDiagrams with differences: {}/{}", with_diffs, total);
     println!("Average similarity: {:.0}%", avg_sim * 100.0);

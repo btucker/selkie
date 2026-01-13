@@ -29,11 +29,7 @@ mod tests {
         #[test]
         fn mmp_2_should_handle_hierarchical_mindmap_definition() {
             let mut db = setup();
-            parse_into(
-                "mindmap\n    root\n      child1\n      child2\n ",
-                &mut db,
-            )
-            .unwrap();
+            parse_into("mindmap\n    root\n      child1\n      child2\n ", &mut db).unwrap();
 
             let mm = db.get_mindmap().unwrap();
             assert_eq!(mm.descr, "root");
@@ -201,11 +197,7 @@ mod tests {
         #[test]
         fn mmp_14_should_set_classes_for_node() {
             let mut db = setup();
-            parse_into(
-                "mindmap\n    root[The root]\n    :::m-4 p-8\n    ",
-                &mut db,
-            )
-            .unwrap();
+            parse_into("mindmap\n    root[The root]\n    :::m-4 p-8\n    ", &mut db).unwrap();
 
             let mm = db.get_mindmap().unwrap();
             assert_eq!(mm.node_id.as_deref(), Some("root"));

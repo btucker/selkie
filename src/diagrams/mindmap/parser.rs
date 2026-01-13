@@ -86,7 +86,8 @@ pub fn parse_into(input: &str, db: &mut MindmapDb) -> Result<()> {
         // Check for icon decoration
         if let Some(caps) = ICON_RE.captures(content) {
             let icon = caps.get(1).unwrap().as_str();
-            if let Some(target_idx) = pending_decorations.or_else(|| stack.last().map(|_| stack.len() - 1))
+            if let Some(target_idx) =
+                pending_decorations.or_else(|| stack.last().map(|_| stack.len() - 1))
             {
                 if let Some((_, node)) = stack.get_mut(target_idx) {
                     node.set_icon(icon);
@@ -99,7 +100,8 @@ pub fn parse_into(input: &str, db: &mut MindmapDb) -> Result<()> {
         // Check for class decoration
         if let Some(caps) = CLASS_RE.captures(content) {
             let class = caps.get(1).unwrap().as_str();
-            if let Some(target_idx) = pending_decorations.or_else(|| stack.last().map(|_| stack.len() - 1))
+            if let Some(target_idx) =
+                pending_decorations.or_else(|| stack.last().map(|_| stack.len() - 1))
             {
                 if let Some((_, node)) = stack.get_mut(target_idx) {
                     node.set_class(class);

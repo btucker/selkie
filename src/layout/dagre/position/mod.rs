@@ -27,7 +27,8 @@ fn position_y(g: &mut DagreGraph) {
     let ranksep = g.graph().ranksep;
 
     // Build layer matrix
-    let max_rank = g.nodes()
+    let max_rank = g
+        .nodes()
         .iter()
         .filter_map(|v| g.node(v).and_then(|n| n.rank))
         .max()
@@ -50,7 +51,8 @@ fn position_y(g: &mut DagreGraph) {
 
     for layer in &layers {
         // Find max height in this layer
-        let max_height = layer.iter()
+        let max_height = layer
+            .iter()
             .filter_map(|v| g.node(v).map(|n| n.height))
             .fold(0.0_f64, f64::max);
 
@@ -70,15 +72,22 @@ fn position_y(g: &mut DagreGraph) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{NodeLabel, EdgeLabel};
-    use crate::layout::dagre::rank;
+    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
     use crate::layout::dagre::order;
+    use crate::layout::dagre::rank;
     use crate::layout::dagre::Ranker;
 
     #[test]
     fn test_position_single_node() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { width: 50.0, height: 100.0, ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                width: 50.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
         rank::assign_ranks(&mut g, Ranker::LongestPath);
         order::order(&mut g);
 
@@ -94,8 +103,22 @@ mod tests {
     fn test_position_chain() {
         let mut g = DagreGraph::new();
         g.graph_mut().ranksep = 100.0;
-        g.set_node("a", NodeLabel { width: 50.0, height: 40.0, ..Default::default() });
-        g.set_node("b", NodeLabel { width: 50.0, height: 60.0, ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                width: 50.0,
+                height: 40.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            NodeLabel {
+                width: 50.0,
+                height: 60.0,
+                ..Default::default()
+            },
+        );
         g.set_edge("a", "b", EdgeLabel::default());
         rank::assign_ranks(&mut g, Ranker::LongestPath);
         order::order(&mut g);
@@ -114,9 +137,30 @@ mod tests {
     #[test]
     fn test_position_parallel_nodes() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { width: 50.0, height: 40.0, ..Default::default() });
-        g.set_node("b", NodeLabel { width: 50.0, height: 40.0, ..Default::default() });
-        g.set_node("c", NodeLabel { width: 50.0, height: 40.0, ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                width: 50.0,
+                height: 40.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            NodeLabel {
+                width: 50.0,
+                height: 40.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "c",
+            NodeLabel {
+                width: 50.0,
+                height: 40.0,
+                ..Default::default()
+            },
+        );
         g.set_edge("a", "b", EdgeLabel::default());
         g.set_edge("a", "c", EdgeLabel::default());
         rank::assign_ranks(&mut g, Ranker::LongestPath);

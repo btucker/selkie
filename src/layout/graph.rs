@@ -144,7 +144,9 @@ impl LayoutGraph {
         for edge in &self.edges {
             for source in &edge.sources {
                 for target in &edge.targets {
-                    adj.entry(source.as_str()).or_default().push(target.as_str());
+                    adj.entry(source.as_str())
+                        .or_default()
+                        .push(target.as_str());
                 }
             }
         }
@@ -174,8 +176,10 @@ impl LayoutGraph {
         });
 
         if min_x != f64::MAX {
-            self.width = Some(max_x - min_x + self.options.padding.left + self.options.padding.right);
-            self.height = Some(max_y - min_y + self.options.padding.top + self.options.padding.bottom);
+            self.width =
+                Some(max_x - min_x + self.options.padding.left + self.options.padding.right);
+            self.height =
+                Some(max_y - min_y + self.options.padding.top + self.options.padding.bottom);
         }
     }
 

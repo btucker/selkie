@@ -314,9 +314,13 @@ fn parse_arrow(arrow: &str) -> (String, EdgeStroke, u32) {
     };
 
     // Determine edge type based on start/end markers
-    let has_start_arrow = arrow.starts_with('<') || arrow.starts_with("x-") || arrow.starts_with("o-")
-        || arrow.starts_with("x=") || arrow.starts_with("o=")
-        || arrow.starts_with("<-") || arrow.starts_with("<=");
+    let has_start_arrow = arrow.starts_with('<')
+        || arrow.starts_with("x-")
+        || arrow.starts_with("o-")
+        || arrow.starts_with("x=")
+        || arrow.starts_with("o=")
+        || arrow.starts_with("<-")
+        || arrow.starts_with("<=");
     let has_end_arrow = arrow.ends_with('>');
     let has_end_cross = arrow.ends_with('x') && !arrow.starts_with('x');
     let has_end_circle = arrow.ends_with('o') && !arrow.starts_with('o');
@@ -397,7 +401,9 @@ impl FlowchartDb {
 
     /// Check if a node exists in any of the given subgraphs
     pub fn exists(&self, subgraphs: &[FlowSubGraph], node_id: &str) -> bool {
-        subgraphs.iter().any(|sg| sg.nodes.iter().any(|n| n == node_id))
+        subgraphs
+            .iter()
+            .any(|sg| sg.nodes.iter().any(|n| n == node_id))
     }
 
     /// Remove nodes from a subgraph that already exist in other subgraphs
@@ -454,7 +460,13 @@ impl FlowchartDb {
     }
 
     /// Add an edge between nodes
-    fn add_single_link(&mut self, start: &str, end: &str, link_data: Option<&FlowLink>, id: Option<&str>) {
+    fn add_single_link(
+        &mut self,
+        start: &str,
+        end: &str,
+        link_data: Option<&FlowLink>,
+        id: Option<&str>,
+    ) {
         let mut edge = FlowEdge::new(start, end);
         edge.interpolate.clone_from(&self.default_interpolate);
 
@@ -611,7 +623,11 @@ impl FlowchartDb {
             label_type: "text".to_string(),
             nodes,
             classes: Vec::new(),
-            dir: if dir.is_empty() { None } else { Some(dir.to_string()) },
+            dir: if dir.is_empty() {
+                None
+            } else {
+                Some(dir.to_string())
+            },
         };
 
         let idx = self.subgraphs.len();
@@ -655,13 +671,33 @@ impl FlowchartDb {
     }
 
     /// Simplified add_vertex for parser - just id, optional text and type
-    pub fn add_vertex_simple(&mut self, id: &str, text: Option<&str>, vertex_type: Option<FlowVertexType>) {
+    pub fn add_vertex_simple(
+        &mut self,
+        id: &str,
+        text: Option<&str>,
+        vertex_type: Option<FlowVertexType>,
+    ) {
         let text_obj = text.map(|t| FlowText::new(t));
-        self.add_vertex(id, text_obj, vertex_type, Vec::new(), Vec::new(), None, None);
+        self.add_vertex(
+            id,
+            text_obj,
+            vertex_type,
+            Vec::new(),
+            Vec::new(),
+            None,
+            None,
+        );
     }
 
     /// Add an edge between two nodes (simplified for parser)
-    pub fn add_edge(&mut self, start: &str, end: &str, arrow: &str, text: Option<&str>, link_id: Option<&str>) {
+    pub fn add_edge(
+        &mut self,
+        start: &str,
+        end: &str,
+        arrow: &str,
+        text: Option<&str>,
+        link_id: Option<&str>,
+    ) {
         // Ensure vertices exist
         if !self.vertices.contains_key(start) {
             self.add_vertex_simple(start, None, None);

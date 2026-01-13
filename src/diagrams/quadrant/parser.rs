@@ -13,8 +13,8 @@ pub struct QuadrantParser;
 pub fn parse(input: &str) -> Result<QuadrantDb, String> {
     let mut db = QuadrantDb::new();
 
-    let pairs = QuadrantParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        QuadrantParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -29,20 +29,14 @@ pub fn parse(input: &str) -> Result<QuadrantDb, String> {
     Ok(db)
 }
 
-fn process_document(
-    db: &mut QuadrantDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_document(db: &mut QuadrantDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for stmt in pair.into_inner() {
         process_statement(db, stmt)?;
     }
     Ok(())
 }
 
-fn process_statement(
-    db: &mut QuadrantDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_statement(db: &mut QuadrantDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     match pair.as_rule() {
         Rule::statement => {
             for inner in pair.into_inner() {
@@ -108,10 +102,7 @@ fn process_statement(
     Ok(())
 }
 
-fn process_x_axis(
-    db: &mut QuadrantDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_x_axis(db: &mut QuadrantDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut texts: Vec<String> = Vec::new();
     let mut has_arrow = false;
 
@@ -137,10 +128,7 @@ fn process_x_axis(
     Ok(())
 }
 
-fn process_y_axis(
-    db: &mut QuadrantDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_y_axis(db: &mut QuadrantDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut texts: Vec<String> = Vec::new();
     let mut has_arrow = false;
 
@@ -196,10 +184,7 @@ fn extract_label_text(pair: pest::iterators::Pair<Rule>) -> String {
     String::new()
 }
 
-fn process_class_def(
-    db: &mut QuadrantDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_class_def(db: &mut QuadrantDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut class_name = String::new();
     let mut styles: Vec<String> = Vec::new();
 
@@ -222,10 +207,7 @@ fn process_class_def(
     Ok(())
 }
 
-fn process_point(
-    db: &mut QuadrantDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_point(db: &mut QuadrantDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut point_name = String::new();
     let mut class_name = String::new();
     let mut x = String::new();
@@ -292,7 +274,7 @@ fn extract_point_name(pair: pest::iterators::Pair<Rule>) -> String {
 /// Remove surrounding quotes from a string
 fn unquote(s: &str) -> String {
     if s.len() >= 2 && s.starts_with('"') && s.ends_with('"') {
-        s[1..s.len()-1].to_string()
+        s[1..s.len() - 1].to_string()
     } else {
         s.to_string()
     }

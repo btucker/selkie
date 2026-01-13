@@ -13,8 +13,8 @@ pub struct StateParser;
 pub fn parse(input: &str) -> Result<StateDb, String> {
     let mut db = StateDb::new();
 
-    let pairs = StateParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        StateParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -110,10 +110,7 @@ fn process_statement(
     Ok(())
 }
 
-fn process_acc_descr(
-    db: &mut StateDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_acc_descr(db: &mut StateDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for inner in pair.into_inner() {
         match inner.as_rule() {
             Rule::acc_descr_single => {
@@ -143,10 +140,7 @@ fn process_acc_descr(
     Ok(())
 }
 
-fn process_class_def(
-    db: &mut StateDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_class_def(db: &mut StateDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut class_name = String::new();
     let mut styles = String::new();
 
@@ -229,7 +223,7 @@ fn process_state_def(
                         }
                         Rule::quoted_string => {
                             let s = body_inner.as_str();
-                            state_id = s[1..s.len()-1].to_string(); // Remove quotes
+                            state_id = s[1..s.len() - 1].to_string(); // Remove quotes
                             db.add_state(&state_id);
                             if let Some(p) = parent {
                                 db.set_parent(&state_id, p);
@@ -280,7 +274,7 @@ fn process_state_def(
                         }
                         Rule::quoted_string => {
                             let s = alias_inner.as_str();
-                            alias = s[1..s.len()-1].to_string();
+                            alias = s[1..s.len() - 1].to_string();
                         }
                         _ => {}
                     }
@@ -328,10 +322,7 @@ fn process_state_def(
     Ok(())
 }
 
-fn process_note(
-    db: &mut StateDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_note(db: &mut StateDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut placement = NotePosition::RightOf;
     let mut state_id = String::new();
     let mut note_text = String::new();
@@ -382,10 +373,7 @@ fn process_note(
     Ok(())
 }
 
-fn process_transition(
-    db: &mut StateDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_transition(db: &mut StateDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut from = String::new();
     let mut to = String::new();
     let mut label: Option<String> = None;
@@ -493,28 +481,30 @@ mod tests {
         #[test]
         fn should_parse_transition_stmt_directly() {
             // Test parsing just the transition_stmt rule
-            let test_cases = [
-                "State1 --> State2",
-                "[*] --> State1",
-                "State1 --> [*]",
-            ];
+            let test_cases = ["State1 --> State2", "[*] --> State1", "State1 --> [*]"];
             for input in &test_cases {
                 let result = StateParser::parse(Rule::transition_stmt, input);
-                assert!(result.is_ok(), "Failed to parse transition_stmt '{}': {:?}", input, result.err());
+                assert!(
+                    result.is_ok(),
+                    "Failed to parse transition_stmt '{}': {:?}",
+                    input,
+                    result.err()
+                );
             }
         }
 
         #[test]
         fn should_parse_statement_as_transition() {
             // Test parsing statement rule - should match transition_stmt
-            let test_cases = [
-                "State1 --> State2",
-                "[*] --> State1",
-                "State1 --> [*]",
-            ];
+            let test_cases = ["State1 --> State2", "[*] --> State1", "State1 --> [*]"];
             for input in &test_cases {
                 let result = StateParser::parse(Rule::statement, input);
-                assert!(result.is_ok(), "Failed to parse statement '{}': {:?}", input, result.err());
+                assert!(
+                    result.is_ok(),
+                    "Failed to parse statement '{}': {:?}",
+                    input,
+                    result.err()
+                );
                 // Verify it was parsed as transition_stmt
                 let pairs = result.unwrap();
                 let first = pairs.into_iter().next().unwrap();
@@ -589,7 +579,8 @@ mod tests {
 
         #[test]
         fn should_parse_multiline_acc_descr() {
-            let result = parse("stateDiagram\naccDescr {\na simple description\nusing multiple lines\n}");
+            let result =
+                parse("stateDiagram\naccDescr {\na simple description\nusing multiple lines\n}");
             assert!(result.is_ok());
             let db = result.unwrap();
             assert!(db.acc_descr.contains("a simple description"));
@@ -642,7 +633,8 @@ mod tests {
 
         #[test]
         fn should_parse_composite_state() {
-            let result = parse("stateDiagram\nstate CompositeState {\n[*] --> First\nFirst --> [*]\n}");
+            let result =
+                parse("stateDiagram\nstate CompositeState {\n[*] --> First\nFirst --> [*]\n}");
             assert!(result.is_ok());
             let db = result.unwrap();
             assert!(db.get_states().contains_key("CompositeState"));
@@ -663,7 +655,8 @@ mod tests {
 
         #[test]
         fn should_apply_class_to_state() {
-            let result = parse("stateDiagram\nclassDef myClass fill:#f00\nState1\nclass State1 myClass");
+            let result =
+                parse("stateDiagram\nclassDef myClass fill:#f00\nState1\nclass State1 myClass");
             assert!(result.is_ok(), "Parse error: {:?}", result.err());
             let db = result.unwrap();
             let state = db.get_state("State1").unwrap();

@@ -9,7 +9,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Sample diagrams - complex examples to exercise more features
     let diagrams = vec![
-        ("flowchart", r#"flowchart LR
+        (
+            "flowchart",
+            r#"flowchart LR
     A[Start] --> B{Decision}
     B -->|Yes| C[Action 1]
     B -->|No| D[Action 2]
@@ -18,8 +20,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     E --> F([Round])
     F --> G[[Subroutine]]
     G --> H[(Database)]
-    H o--o I((Circle))"#),
-        ("flowchart_full", r#"flowchart TB
+    H o--o I((Circle))"#,
+        ),
+        (
+            "flowchart_full",
+            r#"flowchart TB
     subgraph main [Main Flow]
         A[Rectangle] --> B(Rounded)
         B --> C{Diamond Decision}
@@ -48,13 +53,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         O o--o W
     end
     F --> G
-    N --> O"#),
-        ("pie", r#"pie title Project Distribution
+    N --> O"#,
+        ),
+        (
+            "pie",
+            r#"pie title Project Distribution
     "Development" : 40
     "Testing" : 25
     "Documentation" : 15
-    "Design" : 20"#),
-        ("sequence", r#"sequenceDiagram
+    "Design" : 20"#,
+        ),
+        (
+            "sequence",
+            r#"sequenceDiagram
     participant A as Alice
     participant B as Bob
     participant C as Server
@@ -65,8 +76,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     C-->>-A: Token
     A->>B: How are you?
     B-->>A: I'm good, thanks!
-    Note right of B: Bob thinks"#),
-        ("class", r#"classDiagram
+    Note right of B: Bob thinks"#,
+        ),
+        (
+            "class",
+            r#"classDiagram
     Animal <|-- Duck
     Animal <|-- Fish
     Animal <|-- Zebra
@@ -87,15 +101,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         +bool is_wild
         +run()
     }
-    Duck "1" *-- "many" Egg : has"#),
-        ("state", r#"stateDiagram-v2
+    Duck "1" *-- "many" Egg : has"#,
+        ),
+        (
+            "state",
+            r#"stateDiagram-v2
     [*] --> Idle
     Idle --> Running : start
     Running --> Idle : stop
     Running --> Error : error
     Error --> Idle : reset
-    Error --> [*]"#),
-        ("er", r#"erDiagram
+    Error --> [*]"#,
+        ),
+        (
+            "er",
+            r#"erDiagram
     CUSTOMER ||--o{ ORDER : places
     ORDER ||--|{ LINE-ITEM : contains
     PRODUCT ||--o{ LINE-ITEM : includes
@@ -113,8 +133,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         int id PK
         string name
         float price
-    }"#),
-        ("gantt", r#"gantt
+    }"#,
+        ),
+        (
+            "gantt",
+            r#"gantt
     title Project Timeline
     dateFormat YYYY-MM-DD
     section Planning
@@ -126,19 +149,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     API Integration :b3, after b1, 3d
     section Testing
     Unit Tests  :c1, after b2, 3d
-    QA          :c2, after b3, 5d"#),
+    QA          :c2, after b3, 5d"#,
+        ),
         // ========================================
         // Examples from mermaid.js documentation
         // https://mermaid.ai/open-source/syntax/examples.html
         // ========================================
-        ("example_pie_netflix", r#"pie title NETFLIX
+        (
+            "example_pie_netflix",
+            r#"pie title NETFLIX
          "Time spent looking for movie" : 90
-         "Time spent watching it" : 10"#),
-        ("example_pie_voldemort", r#"pie title What Voldemort doesn't have?
+         "Time spent watching it" : 10"#,
+        ),
+        (
+            "example_pie_voldemort",
+            r#"pie title What Voldemort doesn't have?
          "FRIENDS" : 2
          "FAMILY" : 3
-         "NOSE" : 45"#),
-        ("example_sequence_basic", r#"sequenceDiagram
+         "NOSE" : 45"#,
+        ),
+        (
+            "example_sequence_basic",
+            r#"sequenceDiagram
     Alice ->> Bob: Hello Bob, how are you?
     Bob-->>John: How about you John?
     Bob--x Alice: I am good thanks!
@@ -146,13 +178,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
 
     Bob-->Alice: Checking with John...
-    Alice->John: Yes... John, how are you?"#),
-        ("example_flowchart_basic", r#"graph LR
+    Alice->John: Yes... John, how are you?"#,
+        ),
+        (
+            "example_flowchart_basic",
+            r#"graph LR
     A[Square Rect] -- Link text --> B((Circle))
     A --> C(Round Rect)
     B --> D{Rhombus}
-    C --> D"#),
-        ("example_flowchart_styled", r#"graph TB
+    C --> D"#,
+        ),
+        (
+            "example_flowchart_styled",
+            r#"graph TB
     sq[Square shape] --> ci((Circle shape))
 
     subgraph A
@@ -170,8 +208,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
      classDef green fill:#9f6,stroke:#333,stroke-width:2px
      classDef orange fill:#f96,stroke:#333,stroke-width:4px
      class sq,e green
-     class di orange"#),
-        ("example_sequence_loops", r#"sequenceDiagram
+     class di orange"#,
+        ),
+        (
+            "example_sequence_loops",
+            r#"sequenceDiagram
     loop Daily query
         Alice->>Bob: Hello Bob, how are you?
         alt is sick
@@ -183,8 +224,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         opt Extra response
             Bob->>Alice: Thanks for asking
         end
-    end"#),
-        ("example_sequence_self_loop", r#"sequenceDiagram
+    end"#,
+        ),
+        (
+            "example_sequence_self_loop",
+            r#"sequenceDiagram
     participant Alice
     participant Bob
     Alice->>John: Hello John, how are you?
@@ -194,8 +238,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Note right of John: Rational thoughts<br/>prevail...
     John-->>Alice: Great!
     John->>Bob: How about you?
-    Bob-->>John: Jolly good!"#),
-        ("example_sequence_blogging", r#"sequenceDiagram
+    Bob-->>John: Jolly good!"#,
+        ),
+        (
+            "example_sequence_blogging",
+            r#"sequenceDiagram
     participant web as Web Browser
     participant blog as Blog Service
     participant account as Account Service
@@ -222,7 +269,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         and Response
             blog-->>-web: Successfully posted
         end
-    end"#),
+    end"#,
+        ),
     ];
 
     println!("Generating {} diagram SVGs...", diagrams.len());

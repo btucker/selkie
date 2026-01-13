@@ -41,7 +41,8 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
         } else {
             (class.annotations.len() as f64) * member_height
         };
-        let total_height = header_height + annotations_height + content_height + class_padding * 2.0;
+        let total_height =
+            header_height + annotations_height + content_height + class_padding * 2.0;
         let height = total_height.max(class_min_height);
         class_heights.insert(class.id.clone(), height);
     }
@@ -78,7 +79,9 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     for relation in &db.relations {
         let is_composition_or_aggregation = |t: i32| t == 0 || t == 2;
 
-        if is_composition_or_aggregation(relation.relation.type1) && !parent_of.contains_key(&relation.id2) {
+        if is_composition_or_aggregation(relation.relation.type1)
+            && !parent_of.contains_key(&relation.id2)
+        {
             // id1 has the composition marker, so id1 contains id2
             // id2 should be below id1
             children_of
@@ -86,7 +89,9 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
                 .or_default()
                 .push(relation.id2.clone());
             parent_of.insert(relation.id2.clone(), relation.id1.clone());
-        } else if is_composition_or_aggregation(relation.relation.type2) && !parent_of.contains_key(&relation.id1) {
+        } else if is_composition_or_aggregation(relation.relation.type2)
+            && !parent_of.contains_key(&relation.id1)
+        {
             // id2 has the composition marker, so id2 contains id1
             children_of
                 .entry(relation.id2.clone())
@@ -108,10 +113,8 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
         .collect();
 
     // BFS to assign levels
-    let mut queue: std::collections::VecDeque<(String, usize)> = roots
-        .iter()
-        .map(|id| (id.clone(), 0))
-        .collect();
+    let mut queue: std::collections::VecDeque<(String, usize)> =
+        roots.iter().map(|id| (id.clone(), 0)).collect();
 
     while let Some((id, level)) = queue.pop_front() {
         if class_levels.contains_key(&id) {
@@ -162,7 +165,10 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
 
             let mut current_y = margin;
             for class_id in level_classes {
-                let height = class_heights.get(class_id).copied().unwrap_or(class_min_height);
+                let height = class_heights
+                    .get(class_id)
+                    .copied()
+                    .unwrap_or(class_min_height);
                 class_positions.insert(class_id.clone(), (current_x, current_y));
                 current_y += height + class_spacing_y;
             }
@@ -179,7 +185,8 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
         // Process levels from bottom to top
         for level in (0..=max_level).rev() {
             for class_id in &levels[level] {
-                let children: Vec<_> = children_of.get(class_id)
+                let children: Vec<_> = children_of
+                    .get(class_id)
                     .map(|c| c.clone())
                     .unwrap_or_default();
 
@@ -188,9 +195,8 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
                     subtree_widths.insert(class_id.clone(), class_width);
                 } else {
                     // Parent node: width is sum of children's subtree widths + spacing
-                    let children_width: f64 = children.iter()
-                        .filter_map(|c| subtree_widths.get(c))
-                        .sum();
+                    let children_width: f64 =
+                        children.iter().filter_map(|c| subtree_widths.get(c)).sum();
                     let spacing = (children.len().saturating_sub(1) as f64) * class_spacing_x;
                     let total_width = (children_width + spacing).max(class_width);
                     subtree_widths.insert(class_id.clone(), total_width);
@@ -315,8 +321,20 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     // Render each class
     for class in &classes {
         if let Some(&(x, y)) = class_positions.get(&class.id) {
-            let height = class_heights.get(&class.id).copied().unwrap_or(class_min_height);
-            let class_elem = render_class_box(class, x, y, class_width, height, class_padding, member_height, header_height);
+            let height = class_heights
+                .get(&class.id)
+                .copied()
+                .unwrap_or(class_min_height);
+            let class_elem = render_class_box(
+                class,
+                x,
+                y,
+                class_width,
+                height,
+                class_padding,
+                member_height,
+                header_height,
+            );
             doc.add_element(class_elem);
         }
     }
@@ -327,8 +345,14 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
             class_positions.get(&relation.id1),
             class_positions.get(&relation.id2),
         ) {
-            let h1 = class_heights.get(&relation.id1).copied().unwrap_or(class_min_height);
-            let h2 = class_heights.get(&relation.id2).copied().unwrap_or(class_min_height);
+            let h1 = class_heights
+                .get(&relation.id1)
+                .copied()
+                .unwrap_or(class_min_height);
+            let h2 = class_heights
+                .get(&relation.id2)
+                .copied()
+                .unwrap_or(class_min_height);
             let relation_elem = render_relation(
                 x1,
                 y1,
@@ -542,9 +566,8 @@ fn render_relation(
     let mut children = Vec::new();
 
     // Calculate edge connection points based on relative positions
-    let (start_x, start_y, end_x, end_y) = calculate_connection_points(
-        x1, y1, h1, x2, y2, h2, class_width,
-    );
+    let (start_x, start_y, end_x, end_y) =
+        calculate_connection_points(x1, y1, h1, x2, y2, h2, class_width);
 
     // Determine marker based on relation type
     let marker_start = match type1 {
@@ -599,8 +622,16 @@ fn render_relation(
 
         // Offset perpendicular to the line
         let perp_offset = 12.0;
-        let perp_x = if len > 0.0 { -perp_offset * dy / len } else { perp_offset };
-        let perp_y = if len > 0.0 { perp_offset * dx / len } else { 0.0 };
+        let perp_x = if len > 0.0 {
+            -perp_offset * dy / len
+        } else {
+            perp_offset
+        };
+        let perp_y = if len > 0.0 {
+            perp_offset * dx / len
+        } else {
+            0.0
+        };
 
         children.push(SvgElement::Text {
             x: start_x + offset_x + perp_x,
@@ -624,8 +655,16 @@ fn render_relation(
 
         // Offset perpendicular to the line
         let perp_offset = 12.0;
-        let perp_x = if len > 0.0 { -perp_offset * dy / len } else { perp_offset };
-        let perp_y = if len > 0.0 { perp_offset * dx / len } else { 0.0 };
+        let perp_x = if len > 0.0 {
+            -perp_offset * dy / len
+        } else {
+            perp_offset
+        };
+        let perp_y = if len > 0.0 {
+            perp_offset * dx / len
+        } else {
+            0.0
+        };
 
         children.push(SvgElement::Text {
             x: end_x - offset_x + perp_x,
@@ -790,7 +829,7 @@ fn create_inheritance_marker() -> SvgElement {
     SvgElement::Marker {
         id: "inheritance".to_string(),
         view_box: "0 0 20 14".to_string(),
-        ref_x: 18.0,  // Line connects at x=18, arrow points back toward x=1
+        ref_x: 18.0, // Line connects at x=18, arrow points back toward x=1
         ref_y: 7.0,
         marker_width: 10.0,
         marker_height: 10.0,
@@ -800,7 +839,7 @@ fn create_inheritance_marker() -> SvgElement {
             // Path from mermaid.js extensionStart: apex at x=1, opens toward x=18
             d: "M 1 7 L 18 13 V 1 Z".to_string(),
             attrs: Attrs::new()
-                .with_fill("none")  // Hollow/transparent per UML convention
+                .with_fill("none") // Hollow/transparent per UML convention
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
@@ -813,7 +852,7 @@ fn create_aggregation_marker() -> SvgElement {
     SvgElement::Marker {
         id: "aggregation".to_string(),
         view_box: "0 0 20 14".to_string(),
-        ref_x: 18.0,  // Like inheritance, line connects at right side
+        ref_x: 18.0, // Like inheritance, line connects at right side
         ref_y: 7.0,
         marker_width: 10.0,
         marker_height: 10.0,
@@ -823,7 +862,7 @@ fn create_aggregation_marker() -> SvgElement {
             // Diamond shape: apex left, points at top and bottom, flat right
             d: "M 18 7 L 9 13 L 1 7 L 9 1 Z".to_string(),
             attrs: Attrs::new()
-                .with_fill("none")  // Hollow per UML aggregation convention
+                .with_fill("none") // Hollow per UML aggregation convention
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
@@ -836,7 +875,7 @@ fn create_composition_marker() -> SvgElement {
     SvgElement::Marker {
         id: "composition".to_string(),
         view_box: "0 0 20 14".to_string(),
-        ref_x: 18.0,  // Consistent with other markers
+        ref_x: 18.0, // Consistent with other markers
         ref_y: 7.0,
         marker_width: 10.0,
         marker_height: 10.0,
@@ -846,7 +885,7 @@ fn create_composition_marker() -> SvgElement {
             // Same diamond shape as aggregation
             d: "M 18 7 L 9 13 L 1 7 L 9 1 Z".to_string(),
             attrs: Attrs::new()
-                .with_fill("#333333")  // Filled per UML composition convention
+                .with_fill("#333333") // Filled per UML composition convention
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
@@ -945,7 +984,7 @@ fn generate_class_css() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::diagrams::class::{ClassDb, ClassRelation, RelationDetails, LineType};
+    use crate::diagrams::class::{ClassDb, ClassRelation, LineType, RelationDetails};
 
     #[test]
     fn test_hierarchical_layout_levels() {
@@ -969,7 +1008,11 @@ mod tests {
             title: String::new(),
             text: String::new(),
             style: vec![],
-            relation: RelationDetails { type1: 1, type2: -1, line_type: LineType::Solid },
+            relation: RelationDetails {
+                type1: 1,
+                type2: -1,
+                line_type: LineType::Solid,
+            },
         });
         db.add_relation(ClassRelation {
             id1: "Animal".to_string(),
@@ -980,7 +1023,11 @@ mod tests {
             title: String::new(),
             text: String::new(),
             style: vec![],
-            relation: RelationDetails { type1: 1, type2: -1, line_type: LineType::Solid },
+            relation: RelationDetails {
+                type1: 1,
+                type2: -1,
+                line_type: LineType::Solid,
+            },
         });
         db.add_relation(ClassRelation {
             id1: "Animal".to_string(),
@@ -991,7 +1038,11 @@ mod tests {
             title: String::new(),
             text: String::new(),
             style: vec![],
-            relation: RelationDetails { type1: 1, type2: -1, line_type: LineType::Solid },
+            relation: RelationDetails {
+                type1: 1,
+                type2: -1,
+                line_type: LineType::Solid,
+            },
         });
         // Composition: Duck *-- Egg
         db.add_relation(ClassRelation {
@@ -1003,7 +1054,11 @@ mod tests {
             title: "has".to_string(),
             text: String::new(),
             style: vec![],
-            relation: RelationDetails { type1: 2, type2: -1, line_type: LineType::Solid },
+            relation: RelationDetails {
+                type1: 2,
+                type2: -1,
+                line_type: LineType::Solid,
+            },
         });
 
         let config = RenderConfig::default();

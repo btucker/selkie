@@ -7,30 +7,38 @@ use super::elements::{Attrs, SvgElement};
 use super::markers;
 use super::theme::Theme;
 
-/// Render an edge
-pub fn render_edge(layout_edge: &LayoutEdge, flow_edge: &FlowEdge, _theme: &Theme) -> SvgElement {
-    let mut elements = Vec::new();
+/// Result of rendering an edge - separate path and label for container groups
+pub struct EdgeRenderResult {
+    /// The edge path element (goes in edgePaths container)
+    pub path: Option<SvgElement>,
+    /// The edge label element (goes in edgeLabels container)
+    pub label: Option<SvgElement>,
+}
 
-    // Build path from bend points - use curved path for smooth corners
-    if !layout_edge.bend_points.is_empty() {
+/// Render an edge with separate path and label for container groups
+pub fn render_edge_parts(
+    layout_edge: &LayoutEdge,
+    flow_edge: &FlowEdge,
+    _theme: &Theme,
+) -> EdgeRenderResult {
+    let edge_id = &layout_edge.id;
+
+    // Build edge path
+    let path = if !layout_edge.bend_points.is_empty() {
         let path_d = build_curved_path(&layout_edge.bend_points);
 
-        let mut attrs = Attrs::new()
-            .with_class("edge-path")
-            .with_fill("none");
+        let mut attrs = Attrs::new().with_class("edge-path").with_fill("none");
 
         // Apply stroke style
         match flow_edge.stroke {
             EdgeStroke::Normal => {
-                attrs = attrs.with_stroke_width(1.0);  // mermaid.js uses 1px
+                attrs = attrs.with_stroke_width(1.0);
             }
             EdgeStroke::Thick => {
                 attrs = attrs.with_stroke_width(3.5);
             }
             EdgeStroke::Dotted => {
-                attrs = attrs
-                    .with_stroke_width(2.0)
-                    .with_stroke_dasharray("3,3");
+                attrs = attrs.with_stroke_width(2.0).with_stroke_dasharray("3,3");
             }
             EdgeStroke::Invisible => {
                 attrs = attrs.with_stroke_width(0.0);
@@ -41,28 +49,37 @@ pub fn render_edge(layout_edge: &LayoutEdge, flow_edge: &FlowEdge, _theme: &Them
         if let Some(marker_url) = markers::get_marker_url(flow_edge.edge_type.as_deref()) {
             attrs = attrs.with_attr("marker-end", &marker_url);
         }
-        if let Some(start_marker_url) = markers::get_start_marker_url(flow_edge.edge_type.as_deref()) {
+        if let Some(start_marker_url) =
+            markers::get_start_marker_url(flow_edge.edge_type.as_deref())
+        {
             attrs = attrs.with_attr("marker-start", &start_marker_url);
         }
 
-        elements.push(SvgElement::path(path_d).with_attrs(attrs));
-    }
+        let path_element = SvgElement::path(path_d).with_attrs(attrs);
+        let group_attrs = Attrs::new()
+            .with_class("edge")
+            .with_id(&format!("edge-{}", edge_id));
+        Some(SvgElement::group(vec![path_element]).with_attrs(group_attrs))
+    } else {
+        None
+    };
 
-    // Add label if present
-    if !flow_edge.text.is_empty() {
+    // Build edge label
+    let label = if !flow_edge.text.is_empty() {
         if let Some(label_pos) = &layout_edge.label_position {
-            // Estimate text width (approximately 8px per character for typical fonts)
-            let text_width = flow_edge.text.len() as f64 * 8.0;
-            let text_height = 16.0; // Typical line height
-            let padding = 4.0; // Padding around the text
+            let mut label_elements = Vec::new();
 
-            // Add background rect first - uses CSS class for theming
-            // The fill color comes from .edge-label-bg CSS rule
+            // Estimate text width
+            let text_width = flow_edge.text.len() as f64 * 8.0;
+            let text_height = 16.0;
+            let padding = 4.0;
+
+            // Background rect - uses CSS class for theming
             let bg_attrs = Attrs::new()
                 .with_class("edge-label-bg")
                 .with_attr("fill-opacity", "0.8");
 
-            elements.push(
+            label_elements.push(
                 SvgElement::rect(
                     label_pos.x - text_width / 2.0 - padding,
                     label_pos.y - text_height / 2.0 - padding / 2.0,
@@ -72,24 +89,28 @@ pub fn render_edge(layout_edge: &LayoutEdge, flow_edge: &FlowEdge, _theme: &Them
                 .with_attrs(bg_attrs),
             );
 
-            // Then add the text on top
+            // Text element
             let label_attrs = Attrs::new()
                 .with_class("edge-label")
                 .with_attr("text-anchor", "middle")
                 .with_attr("dominant-baseline", "central");
 
-            elements.push(
-                SvgElement::text(label_pos.x, label_pos.y, &flow_edge.text)
-                    .with_attrs(label_attrs),
+            label_elements.push(
+                SvgElement::text(label_pos.x, label_pos.y, &flow_edge.text).with_attrs(label_attrs),
             );
+
+            let group_attrs = Attrs::new()
+                .with_class("edgeLabel")
+                .with_id(&format!("edge-label-{}", edge_id));
+            Some(SvgElement::group(label_elements).with_attrs(group_attrs))
+        } else {
+            None
         }
-    }
+    } else {
+        None
+    };
 
-    let group_attrs = Attrs::new()
-        .with_class("edge")
-        .with_id(&format!("edge-{}", layout_edge.id));
-
-    SvgElement::group(elements).with_attrs(group_attrs)
+    EdgeRenderResult { path, label }
 }
 
 /// Build SVG path from bend points (straight lines)
@@ -125,7 +146,10 @@ fn build_curved_path(points: &[crate::layout::Point]) -> String {
 
     if points.len() == 2 {
         // For 2 points, use a straight line
-        return format!("M {} {} L {} {}", points[0].x, points[0].y, points[1].x, points[1].y);
+        return format!(
+            "M {} {} L {} {}",
+            points[0].x, points[0].y, points[1].x, points[1].y
+        );
     }
 
     // Use basis spline interpolation (like d3's curveBasis)
@@ -163,14 +187,20 @@ fn build_basis_path(points: &[crate::layout::Point]) -> String {
         let y2 = (points[0].y + 2.0 * points[1].y) / 3.0;
         let x3 = (points[0].x + 4.0 * points[1].x + points[2].x) / 6.0;
         let y3 = (points[0].y + 4.0 * points[1].y + points[2].y) / 6.0;
-        d.push_str(&format!(" C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}", x1, y1, x2, y2, x3, y3));
+        d.push_str(&format!(
+            " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
+            x1, y1, x2, y2, x3, y3
+        ));
 
         // Finish to end point
         let x4 = (2.0 * points[1].x + points[2].x) / 3.0;
         let y4 = (2.0 * points[1].y + points[2].y) / 3.0;
         let x5 = (points[1].x + 2.0 * points[2].x) / 3.0;
         let y5 = (points[1].y + 2.0 * points[2].y) / 3.0;
-        d.push_str(&format!(" C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}", x4, y4, x5, y5, points[2].x, points[2].y));
+        d.push_str(&format!(
+            " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
+            x4, y4, x5, y5, points[2].x, points[2].y
+        ));
         return d;
     }
 
@@ -182,7 +212,10 @@ fn build_basis_path(points: &[crate::layout::Point]) -> String {
     let y2 = (points[0].y + 2.0 * points[1].y) / 3.0;
     let x3 = (points[0].x + 4.0 * points[1].x + points[2].x) / 6.0;
     let y3 = (points[0].y + 4.0 * points[1].y + points[2].y) / 6.0;
-    d.push_str(&format!(" C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}", x1, y1, x2, y2, x3, y3));
+    d.push_str(&format!(
+        " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
+        x1, y1, x2, y2, x3, y3
+    ));
 
     // Middle segments (cubic)
     for i in 2..n - 1 {
@@ -198,7 +231,10 @@ fn build_basis_path(points: &[crate::layout::Point]) -> String {
         let x3 = (p1.x + 4.0 * p2.x + p3.x) / 6.0;
         let y3 = (p1.y + 4.0 * p2.y + p3.y) / 6.0;
 
-        d.push_str(&format!(" C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}", x1, y1, x2, y2, x3, y3));
+        d.push_str(&format!(
+            " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
+            x1, y1, x2, y2, x3, y3
+        ));
     }
 
     // Last segment (end at final point)
@@ -206,8 +242,10 @@ fn build_basis_path(points: &[crate::layout::Point]) -> String {
     let p_prev = &points[n - 2];
     let x1 = (p_prev.x + 2.0 * p_last.x) / 3.0;
     let y1 = (p_prev.y + 2.0 * p_last.y) / 3.0;
-    d.push_str(&format!(" C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
-                       x1, y1, p_last.x, p_last.y, p_last.x, p_last.y));
+    d.push_str(&format!(
+        " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
+        x1, y1, p_last.x, p_last.y, p_last.x, p_last.y
+    ));
 
     d
 }
@@ -258,16 +296,16 @@ mod tests {
         );
         // Should NOT be all straight lines
         let l_count = path.matches(" L ").count();
-        assert!(l_count < points.len() - 1, "Curved path should not use only L commands");
+        assert!(
+            l_count < points.len() - 1,
+            "Curved path should not use only L commands"
+        );
     }
 
     #[test]
     fn test_build_curved_path_two_points() {
         // With only two points, should be a straight line (no curve possible)
-        let points = vec![
-            Point::new(0.0, 0.0),
-            Point::new(100.0, 100.0),
-        ];
+        let points = vec![Point::new(0.0, 0.0), Point::new(100.0, 100.0)];
 
         let path = build_curved_path(&points);
         assert!(path.starts_with("M"));
@@ -276,7 +314,7 @@ mod tests {
 
     #[test]
     fn test_edge_label_has_background_rect() {
-        use crate::diagrams::flowchart::{FlowEdge, EdgeStroke, FlowTextType};
+        use crate::diagrams::flowchart::{EdgeStroke, FlowEdge, FlowTextType};
         use std::collections::HashMap;
 
         let layout_edge = LayoutEdge {
@@ -284,10 +322,7 @@ mod tests {
             sources: vec!["a".to_string()],
             targets: vec!["b".to_string()],
             label: Some("label".to_string()),
-            bend_points: vec![
-                Point::new(0.0, 0.0),
-                Point::new(100.0, 100.0),
-            ],
+            bend_points: vec![Point::new(0.0, 0.0), Point::new(100.0, 100.0)],
             label_position: Some(Point::new(50.0, 50.0)),
             weight: 1,
             reversed: false,
@@ -312,19 +347,22 @@ mod tests {
         };
 
         let theme = Theme::default();
-        let edge_element = render_edge(&layout_edge, &flow_edge, &theme);
-        let svg = edge_element.to_svg(0);
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+
+        // The label should exist
+        assert!(result.label.is_some(), "Edge should have a label element");
+        let label_svg = result.label.unwrap().to_svg(0);
 
         // Edge label should have a background rect before the text
         assert!(
-            svg.contains("<rect") && svg.contains("<text"),
+            label_svg.contains("<rect") && label_svg.contains("<text"),
             "Edge label should have background rect, got: {}",
-            svg
+            label_svg
         );
 
         // The rect should have some opacity for the translucent background
         assert!(
-            svg.contains("opacity") || svg.contains("fill-opacity"),
+            label_svg.contains("opacity") || label_svg.contains("fill-opacity"),
             "Edge label background should have opacity for translucent effect"
         );
     }
@@ -370,8 +408,11 @@ mod tests {
         };
 
         let theme = Theme::default();
-        let edge_element = render_edge(&layout_edge, &flow_edge, &theme);
-        let svg = edge_element.to_svg(0);
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+
+        // Get the label SVG to check for hardcoded colors
+        assert!(result.label.is_some(), "Edge should have a label element");
+        let svg = result.label.unwrap().to_svg(0);
 
         // The edge-label-bg rect should NOT have a hardcoded fill color
         // It should use the CSS class for theming

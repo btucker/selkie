@@ -5,7 +5,7 @@
 use pest::Parser;
 use pest_derive::Parser;
 
-use super::types::{FlowVertexType, FlowchartDb, FlowText};
+use super::types::{FlowText, FlowVertexType, FlowchartDb};
 use crate::error::{MermaidError, Result};
 
 #[derive(Parser)]
@@ -160,7 +160,10 @@ fn process_node(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> Resu
     Ok(node_ids)
 }
 
-fn process_styled_vertex(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> Result<(String, Option<String>)> {
+fn process_styled_vertex(
+    pair: pest::iterators::Pair<Rule>,
+    db: &mut FlowchartDb,
+) -> Result<(String, Option<String>)> {
     let mut vertex_id = String::new();
     let mut class_name = None;
 
@@ -265,7 +268,9 @@ fn process_text(pair: pest::iterators::Pair<Rule>) -> Result<FlowText> {
     Ok(FlowText::new(""))
 }
 
-fn process_link(pair: pest::iterators::Pair<Rule>) -> Result<(String, Option<String>, Option<String>)> {
+fn process_link(
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<(String, Option<String>, Option<String>)> {
     let mut arrow = String::new();
     let mut text = None;
     let mut link_id = None;
@@ -280,7 +285,8 @@ fn process_link(pair: pest::iterators::Pair<Rule>) -> Result<(String, Option<Str
                         }
                         Rule::link_id => {
                             let id_str = link_inner.as_str();
-                            link_id = Some(id_str[..id_str.len() - 1].to_string()); // Remove @
+                            link_id = Some(id_str[..id_str.len() - 1].to_string());
+                            // Remove @
                         }
                         _ => {}
                     }
@@ -503,7 +509,7 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                                         for t in a.into_inner() {
                                             if t.as_rule() == Rule::quoted_string {
                                                 let s = t.as_str();
-                                                tooltip = Some(s[1..s.len()-1].to_string());
+                                                tooltip = Some(s[1..s.len() - 1].to_string());
                                             }
                                         }
                                     }
@@ -516,7 +522,7 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                                 match a.as_rule() {
                                     Rule::quoted_string => {
                                         let s = a.as_str();
-                                        href = Some(s[1..s.len()-1].to_string());
+                                        href = Some(s[1..s.len() - 1].to_string());
                                     }
                                     Rule::link_target => {
                                         for t in a.into_inner() {
@@ -527,7 +533,7 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                                         for t in a.into_inner() {
                                             if t.as_rule() == Rule::quoted_string {
                                                 let s = t.as_str();
-                                                tooltip = Some(s[1..s.len()-1].to_string());
+                                                tooltip = Some(s[1..s.len() - 1].to_string());
                                             }
                                         }
                                     }
@@ -591,7 +597,8 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
     }
 
     // Find vertices that were added during subgraph processing
-    let new_vertices: Vec<String> = db.vertices()
+    let new_vertices: Vec<String> = db
+        .vertices()
         .keys()
         .filter(|k| !existing_vertices.contains(*k))
         .cloned()
@@ -660,7 +667,11 @@ mod tests {
         assert!(result.is_ok(), "Failed to parse: {:?}", result);
         let db = result.unwrap();
         let vertex = db.get_vertices().get("A").unwrap();
-        assert!(vertex.styles.len() > 0, "Vertex A should have styles: {:?}", vertex);
+        assert!(
+            vertex.styles.len() > 0,
+            "Vertex A should have styles: {:?}",
+            vertex
+        );
     }
 
     #[test]
@@ -669,7 +680,10 @@ mod tests {
         let result = parse(input);
         assert!(result.is_ok(), "Failed to parse: {:?}", result);
         let db = result.unwrap();
-        assert!(db.get_classes().contains_key("myClass"), "myClass should be defined");
+        assert!(
+            db.get_classes().contains_key("myClass"),
+            "myClass should be defined"
+        );
     }
 
     #[test]
@@ -690,7 +704,11 @@ end"#;
         let result = parse(input);
         assert!(result.is_ok(), "Failed to parse: {:?}", result);
         let db = result.unwrap();
-        assert_eq!(db.get_direction(), "TB", "Direction should be changed to TB");
+        assert_eq!(
+            db.get_direction(),
+            "TB",
+            "Direction should be changed to TB"
+        );
     }
 
     #[test]
@@ -732,7 +750,11 @@ click A myCallback"#;
     fn test_parse_graph_keyword() {
         let input = "graph TD\nA --> B";
         let result = parse(input);
-        assert!(result.is_ok(), "Failed to parse with 'graph' keyword: {:?}", result);
+        assert!(
+            result.is_ok(),
+            "Failed to parse with 'graph' keyword: {:?}",
+            result
+        );
     }
 
     #[test]
@@ -787,7 +809,11 @@ A["Node with spaces"]"#;
     fn test_parse_semicolon_newline() {
         let input = "flowchart LR;A --> B;C --> D";
         let result = parse(input);
-        assert!(result.is_ok(), "Failed to parse semicolon-separated: {:?}", result);
+        assert!(
+            result.is_ok(),
+            "Failed to parse semicolon-separated: {:?}",
+            result
+        );
         let db = result.unwrap();
         assert_eq!(db.get_edges().len(), 2);
     }
@@ -796,7 +822,11 @@ A["Node with spaces"]"#;
     fn test_parse_bidirectional_arrow() {
         let input = "flowchart LR\nA <--> B";
         let result = parse(input);
-        assert!(result.is_ok(), "Failed to parse bidirectional: {:?}", result);
+        assert!(
+            result.is_ok(),
+            "Failed to parse bidirectional: {:?}",
+            result
+        );
     }
 
     #[test]
@@ -818,7 +848,11 @@ subgraph outer
     end
 end"#;
         let result = parse(input);
-        assert!(result.is_ok(), "Failed to parse nested subgraph: {:?}", result);
+        assert!(
+            result.is_ok(),
+            "Failed to parse nested subgraph: {:?}",
+            result
+        );
         let db = result.unwrap();
         assert_eq!(db.subgraphs().len(), 2);
     }
@@ -976,7 +1010,10 @@ A[Hard] -->|Text| B(Round)"#;
             assert!(result.is_ok(), "Failed to parse: {:?}", result);
             let db = result.unwrap();
             assert_eq!(db.get_acc_title(), Some("Big decisions"));
-            assert_eq!(db.get_acc_description(), Some("Flow chart of the decision making process"));
+            assert_eq!(
+                db.get_acc_description(),
+                Some("Flow chart of the decision making process")
+            );
         }
 
         #[test]
@@ -1145,14 +1182,22 @@ A[Hard] -->|Text| B(Round)"#;
         fn should_handle_double_arrow_circle() {
             let input = "graph TD;\nA o--o B;";
             let result = parse(input);
-            assert!(result.is_ok(), "Failed to parse double circle: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Failed to parse double circle: {:?}",
+                result
+            );
         }
 
         #[test]
         fn should_handle_thick_double_arrow_point() {
             let input = "graph TD;\nA <==> B;";
             let result = parse(input);
-            assert!(result.is_ok(), "Failed to parse thick double arrow: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Failed to parse thick double arrow: {:?}",
+                result
+            );
             let db = result.unwrap();
             assert_eq!(db.get_edges().len(), 1);
         }
@@ -1161,7 +1206,11 @@ A[Hard] -->|Text| B(Round)"#;
         fn should_handle_dotted_double_arrow_point() {
             let input = "graph TD;\nA <-.-> B;";
             let result = parse(input);
-            assert!(result.is_ok(), "Failed to parse dotted double arrow: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Failed to parse dotted double arrow: {:?}",
+                result
+            );
             let db = result.unwrap();
             assert_eq!(db.get_edges().len(), 1);
         }
@@ -1170,7 +1219,11 @@ A[Hard] -->|Text| B(Round)"#;
         fn should_handle_edge_with_text_normal() {
             let input = "graph TD;\nA -- text --> B;";
             let result = parse(input);
-            assert!(result.is_ok(), "Failed to parse edge with text: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Failed to parse edge with text: {:?}",
+                result
+            );
             let db = result.unwrap();
             let edges = db.get_edges();
             assert_eq!(edges.len(), 1);
@@ -1181,7 +1234,11 @@ A[Hard] -->|Text| B(Round)"#;
         fn should_handle_edge_with_text_thick() {
             let input = "graph TD;\nA == text ==> B;";
             let result = parse(input);
-            assert!(result.is_ok(), "Failed to parse thick edge with text: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Failed to parse thick edge with text: {:?}",
+                result
+            );
             let db = result.unwrap();
             let edges = db.get_edges();
             assert_eq!(edges.len(), 1);
@@ -1192,7 +1249,11 @@ A[Hard] -->|Text| B(Round)"#;
         fn should_handle_edge_with_text_dotted() {
             let input = "graph TD;\nA -. text .-> B;";
             let result = parse(input);
-            assert!(result.is_ok(), "Failed to parse dotted edge with text: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Failed to parse dotted edge with text: {:?}",
+                result
+            );
             let db = result.unwrap();
             let edges = db.get_edges();
             assert_eq!(edges.len(), 1);
@@ -1204,7 +1265,11 @@ A[Hard] -->|Text| B(Round)"#;
             // This is the mermaid.js syntax: -->|Yes|
             let input = "flowchart LR\n    B -->|Yes| C\n    B -->|No| D";
             let result = parse(input);
-            assert!(result.is_ok(), "Failed to parse pipe text edge: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Failed to parse pipe text edge: {:?}",
+                result
+            );
             let db = result.unwrap();
             let edges = db.get_edges();
             assert_eq!(edges.len(), 2, "Should have 2 edges");
@@ -1362,15 +1427,28 @@ A[Hard] -->|Text| B(Round)"#;
                 ("flowchart LR\nA([Stadium])", FlowVertexType::Stadium),
                 ("flowchart LR\nA{{Hexagon}}", FlowVertexType::Hexagon),
                 ("flowchart LR\nA[[Subroutine]]", FlowVertexType::Subroutine),
-                ("flowchart LR\nA(((DoubleCircle)))", FlowVertexType::DoubleCircle),
+                (
+                    "flowchart LR\nA(((DoubleCircle)))",
+                    FlowVertexType::DoubleCircle,
+                ),
             ];
 
             for (input, expected_type) in inputs {
                 let result = parse(input);
-                assert!(result.is_ok(), "Failed to parse shape: {:?} for input: {}", result, input);
+                assert!(
+                    result.is_ok(),
+                    "Failed to parse shape: {:?} for input: {}",
+                    result,
+                    input
+                );
                 let db = result.unwrap();
                 let vertex = db.get_vertices().get("A").unwrap();
-                assert_eq!(vertex.vertex_type, Some(expected_type), "Wrong shape type for input: {}", input);
+                assert_eq!(
+                    vertex.vertex_type,
+                    Some(expected_type),
+                    "Wrong shape type for input: {}",
+                    input
+                );
             }
         }
 
@@ -1392,7 +1470,11 @@ A[/Trapezoid\]"#;
             let input = r#"flowchart LR
 A[\InvTrapezoid/]"#;
             let result = parse(input);
-            assert!(result.is_ok(), "Failed to parse inv trapezoid: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Failed to parse inv trapezoid: {:?}",
+                result
+            );
             let db = result.unwrap();
             let vertex = db.get_vertices().get("A").unwrap();
             assert_eq!(vertex.vertex_type, Some(FlowVertexType::InvTrapezoid));
@@ -1430,10 +1512,17 @@ A[\LeanLeft\]"#;
         #[test]
         fn should_parse_link_arrow_directly() {
             // Test parsing just the link_arrow rule
-            let test_cases = ["-->", "---", "-.->", "===", "--->", "-.", "--", ".->", "<.->", ".-"];
+            let test_cases = [
+                "-->", "---", "-.->", "===", "--->", "-.", "--", ".->", "<.->", ".-",
+            ];
             for input in &test_cases {
                 let result = FlowchartParser::parse(Rule::link_arrow, input);
-                assert!(result.is_ok(), "Failed to parse link_arrow '{}': {:?}", input, result.err());
+                assert!(
+                    result.is_ok(),
+                    "Failed to parse link_arrow '{}': {:?}",
+                    input,
+                    result.err()
+                );
             }
         }
 
@@ -1443,7 +1532,12 @@ A[\LeanLeft\]"#;
             let test_cases = ["-->", "---", "-.->", "==="];
             for input in &test_cases {
                 let result = FlowchartParser::parse(Rule::simple_link, input);
-                assert!(result.is_ok(), "Failed to parse simple_link '{}': {:?}", input, result.err());
+                assert!(
+                    result.is_ok(),
+                    "Failed to parse simple_link '{}': {:?}",
+                    input,
+                    result.err()
+                );
             }
         }
 
@@ -1453,7 +1547,12 @@ A[\LeanLeft\]"#;
             let test_cases = ["-->", "---", "-.->", "==="];
             for input in &test_cases {
                 let result = FlowchartParser::parse(Rule::link, input);
-                assert!(result.is_ok(), "Failed to parse link '{}': {:?}", input, result.err());
+                assert!(
+                    result.is_ok(),
+                    "Failed to parse link '{}': {:?}",
+                    input,
+                    result.err()
+                );
             }
         }
 
@@ -1462,7 +1561,12 @@ A[\LeanLeft\]"#;
             let test_cases = ["L1 --- L2", "L2 --- C", "A --- B"];
             for input in &test_cases {
                 let result = FlowchartParser::parse(Rule::vertex_statement, input);
-                assert!(result.is_ok(), "Failed to parse vertex_statement '{}': {:?}", input, result.err());
+                assert!(
+                    result.is_ok(),
+                    "Failed to parse vertex_statement '{}': {:?}",
+                    input,
+                    result.err()
+                );
             }
         }
 
@@ -1563,14 +1667,22 @@ A[\LeanLeft\]"#;
         fn should_work_with_constructor_node_id() {
             let input = "graph LR\nconstructor --> A;";
             let result = parse(input);
-            assert!(result.is_ok(), "Should handle constructor node: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Should handle constructor node: {:?}",
+                result
+            );
         }
 
         #[test]
         fn should_work_with_proto_subgraph_id() {
             let input = "graph LR\n__proto__ --> A;\nsubgraph __proto__\n    C --> D;\nend;";
             let result = parse(input);
-            assert!(result.is_ok(), "Should handle __proto__ subgraph: {:?}", result);
+            assert!(
+                result.is_ok(),
+                "Should handle __proto__ subgraph: {:?}",
+                result
+            );
         }
     }
 }

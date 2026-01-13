@@ -279,7 +279,10 @@ mod tests {
 
         let classes = db.get_classes();
         assert!(classes.contains_key("highlight"));
-        assert_eq!(classes.get("highlight").unwrap().styles, vec!["fill: yellow"]);
+        assert_eq!(
+            classes.get("highlight").unwrap().styles,
+            vec!["fill: yellow"]
+        );
     }
 
     #[test]
@@ -290,7 +293,11 @@ mod tests {
         db.apply_class("a", "highlight");
 
         let blocks = db.get_blocks();
-        assert!(blocks.get("a").unwrap().classes.contains(&"highlight".to_string()));
+        assert!(blocks
+            .get("a")
+            .unwrap()
+            .classes
+            .contains(&"highlight".to_string()));
     }
 
     #[test]

@@ -65,7 +65,10 @@ pub enum ArchitectureAlignment {
 }
 
 /// Get alignment between two directions
-pub fn get_direction_alignment(a: ArchitectureDirection, b: ArchitectureDirection) -> ArchitectureAlignment {
+pub fn get_direction_alignment(
+    a: ArchitectureDirection,
+    b: ArchitectureDirection,
+) -> ArchitectureAlignment {
     if (a.is_x() && b.is_y()) || (a.is_y() && b.is_x()) {
         ArchitectureAlignment::Bend
     } else if a.is_x() {
@@ -106,17 +109,33 @@ impl DirectionPair {
     /// Shift a position based on this direction pair
     pub fn shift_position(&self, x: i32, y: i32) -> (i32, i32) {
         if self.source.is_x() {
-            let dx = if self.source == ArchitectureDirection::Left { -1 } else { 1 };
+            let dx = if self.source == ArchitectureDirection::Left {
+                -1
+            } else {
+                1
+            };
             if self.target.is_y() {
-                let dy = if self.target == ArchitectureDirection::Top { 1 } else { -1 };
+                let dy = if self.target == ArchitectureDirection::Top {
+                    1
+                } else {
+                    -1
+                };
                 (x + dx, y + dy)
             } else {
                 (x + dx, y)
             }
         } else {
-            let dy = if self.source == ArchitectureDirection::Top { 1 } else { -1 };
+            let dy = if self.source == ArchitectureDirection::Top {
+                1
+            } else {
+                -1
+            };
             if self.target.is_x() {
-                let dx = if self.target == ArchitectureDirection::Left { 1 } else { -1 };
+                let dx = if self.target == ArchitectureDirection::Left {
+                    1
+                } else {
+                    -1
+                };
                 (x + dx, y + dy)
             } else {
                 (x, y + dy)
@@ -322,7 +341,11 @@ pub enum ArchitectureError {
     /// Node not found for edge
     NodeNotFound { id: String },
     /// Invalid direction
-    InvalidDirection { lhs_id: String, rhs_id: String, dir: String },
+    InvalidDirection {
+        lhs_id: String,
+        rhs_id: String,
+        dir: String,
+    },
     /// Group boundary traversal error
     InvalidGroupBoundary { id: String },
 }
@@ -331,22 +354,42 @@ impl std::fmt::Display for ArchitectureError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ArchitectureError::DuplicateId { id, used_by } => {
-                write!(f, "The id [{}] is already in use by another {}", id, used_by)
+                write!(
+                    f,
+                    "The id [{}] is already in use by another {}",
+                    id, used_by
+                )
             }
             ArchitectureError::SelfReference { id } => {
                 write!(f, "The element [{}] cannot be placed within itself", id)
             }
             ArchitectureError::ParentNotFound { id, parent } => {
-                write!(f, "The element [{}]'s parent [{}] does not exist", id, parent)
+                write!(
+                    f,
+                    "The element [{}]'s parent [{}] does not exist",
+                    id, parent
+                )
             }
             ArchitectureError::ParentNotGroup { id, parent } => {
-                write!(f, "The element [{}]'s parent [{}] is not a group", id, parent)
+                write!(
+                    f,
+                    "The element [{}]'s parent [{}] is not a group",
+                    id, parent
+                )
             }
             ArchitectureError::NodeNotFound { id } => {
                 write!(f, "The node [{}] does not exist", id)
             }
-            ArchitectureError::InvalidDirection { lhs_id, rhs_id, dir } => {
-                write!(f, "Invalid direction [{}] for edge {}--{}", dir, lhs_id, rhs_id)
+            ArchitectureError::InvalidDirection {
+                lhs_id,
+                rhs_id,
+                dir,
+            } => {
+                write!(
+                    f,
+                    "Invalid direction [{}] for edge {}--{}",
+                    dir, lhs_id, rhs_id
+                )
             }
             ArchitectureError::InvalidGroupBoundary { id } => {
                 write!(f, "The id [{}] has invalid group boundary modifier", id)
@@ -445,14 +488,18 @@ impl ArchitectureDb {
                 return Err(ArchitectureError::SelfReference { id });
             }
             match self.registry.get(parent) {
-                None => return Err(ArchitectureError::ParentNotFound {
-                    id,
-                    parent: parent.clone(),
-                }),
-                Some(RegistryEntry::Node) => return Err(ArchitectureError::ParentNotGroup {
-                    id,
-                    parent: parent.clone(),
-                }),
+                None => {
+                    return Err(ArchitectureError::ParentNotFound {
+                        id,
+                        parent: parent.clone(),
+                    })
+                }
+                Some(RegistryEntry::Node) => {
+                    return Err(ArchitectureError::ParentNotGroup {
+                        id,
+                        parent: parent.clone(),
+                    })
+                }
                 Some(RegistryEntry::Group) => {}
             }
         }
@@ -463,7 +510,10 @@ impl ArchitectureDb {
     }
 
     /// Add a junction
-    pub fn add_junction(&mut self, junction: ArchitectureJunction) -> Result<(), ArchitectureError> {
+    pub fn add_junction(
+        &mut self,
+        junction: ArchitectureJunction,
+    ) -> Result<(), ArchitectureError> {
         let id = junction.id.clone();
 
         // Check for duplicate ID
@@ -483,14 +533,18 @@ impl ArchitectureDb {
                 return Err(ArchitectureError::SelfReference { id });
             }
             match self.registry.get(parent) {
-                None => return Err(ArchitectureError::ParentNotFound {
-                    id,
-                    parent: parent.clone(),
-                }),
-                Some(RegistryEntry::Node) => return Err(ArchitectureError::ParentNotGroup {
-                    id,
-                    parent: parent.clone(),
-                }),
+                None => {
+                    return Err(ArchitectureError::ParentNotFound {
+                        id,
+                        parent: parent.clone(),
+                    })
+                }
+                Some(RegistryEntry::Node) => {
+                    return Err(ArchitectureError::ParentNotGroup {
+                        id,
+                        parent: parent.clone(),
+                    })
+                }
                 Some(RegistryEntry::Group) => {}
             }
         }
@@ -521,14 +575,18 @@ impl ArchitectureDb {
                 return Err(ArchitectureError::SelfReference { id });
             }
             match self.registry.get(parent) {
-                None => return Err(ArchitectureError::ParentNotFound {
-                    id,
-                    parent: parent.clone(),
-                }),
-                Some(RegistryEntry::Node) => return Err(ArchitectureError::ParentNotGroup {
-                    id,
-                    parent: parent.clone(),
-                }),
+                None => {
+                    return Err(ArchitectureError::ParentNotFound {
+                        id,
+                        parent: parent.clone(),
+                    })
+                }
+                Some(RegistryEntry::Node) => {
+                    return Err(ArchitectureError::ParentNotGroup {
+                        id,
+                        parent: parent.clone(),
+                    })
+                }
                 Some(RegistryEntry::Group) => {}
             }
         }
@@ -542,10 +600,14 @@ impl ArchitectureDb {
     pub fn add_edge(&mut self, edge: ArchitectureEdge) -> Result<(), ArchitectureError> {
         // Validate that both nodes exist
         if !self.nodes.contains_key(&edge.lhs_id) && !self.groups.contains_key(&edge.lhs_id) {
-            return Err(ArchitectureError::NodeNotFound { id: edge.lhs_id.clone() });
+            return Err(ArchitectureError::NodeNotFound {
+                id: edge.lhs_id.clone(),
+            });
         }
         if !self.nodes.contains_key(&edge.rhs_id) && !self.groups.contains_key(&edge.rhs_id) {
-            return Err(ArchitectureError::NodeNotFound { id: edge.rhs_id.clone() });
+            return Err(ArchitectureError::NodeNotFound {
+                id: edge.rhs_id.clone(),
+            });
         }
 
         // Validate group boundary constraints
@@ -555,7 +617,9 @@ impl ArchitectureDb {
         if edge.lhs_group {
             if let (Some(lhs_g), Some(rhs_g)) = (lhs_group_id, rhs_group_id) {
                 if lhs_g == rhs_g {
-                    return Err(ArchitectureError::InvalidGroupBoundary { id: edge.lhs_id.clone() });
+                    return Err(ArchitectureError::InvalidGroupBoundary {
+                        id: edge.lhs_id.clone(),
+                    });
                 }
             }
         }
@@ -563,7 +627,9 @@ impl ArchitectureDb {
         if edge.rhs_group {
             if let (Some(lhs_g), Some(rhs_g)) = (lhs_group_id, rhs_group_id) {
                 if lhs_g == rhs_g {
-                    return Err(ArchitectureError::InvalidGroupBoundary { id: edge.rhs_id.clone() });
+                    return Err(ArchitectureError::InvalidGroupBoundary {
+                        id: edge.rhs_id.clone(),
+                    });
                 }
             }
         }
@@ -717,7 +783,10 @@ mod tests {
         let group = ArchitectureGroup::new("cloud".to_string()).with_parent("cloud");
         let result = db.add_group(group);
 
-        assert!(matches!(result, Err(ArchitectureError::SelfReference { .. })));
+        assert!(matches!(
+            result,
+            Err(ArchitectureError::SelfReference { .. })
+        ));
     }
 
     #[test]
@@ -727,7 +796,10 @@ mod tests {
         let service = ArchitectureService::new("db".to_string()).with_parent("nonexistent");
         let result = db.add_service(service);
 
-        assert!(matches!(result, Err(ArchitectureError::ParentNotFound { .. })));
+        assert!(matches!(
+            result,
+            Err(ArchitectureError::ParentNotFound { .. })
+        ));
     }
 
     #[test]
@@ -740,7 +812,10 @@ mod tests {
         let service2 = ArchitectureService::new("api".to_string()).with_parent("db");
         let result = db.add_service(service2);
 
-        assert!(matches!(result, Err(ArchitectureError::ParentNotGroup { .. })));
+        assert!(matches!(
+            result,
+            Err(ArchitectureError::ParentNotGroup { .. })
+        ));
     }
 
     #[test]
@@ -781,24 +856,51 @@ mod tests {
         );
         let result = db.add_edge(edge);
 
-        assert!(matches!(result, Err(ArchitectureError::NodeNotFound { .. })));
+        assert!(matches!(
+            result,
+            Err(ArchitectureError::NodeNotFound { .. })
+        ));
     }
 
     #[test]
     fn test_direction_from_char() {
-        assert_eq!(ArchitectureDirection::from_char('L'), Some(ArchitectureDirection::Left));
-        assert_eq!(ArchitectureDirection::from_char('r'), Some(ArchitectureDirection::Right));
-        assert_eq!(ArchitectureDirection::from_char('T'), Some(ArchitectureDirection::Top));
-        assert_eq!(ArchitectureDirection::from_char('b'), Some(ArchitectureDirection::Bottom));
+        assert_eq!(
+            ArchitectureDirection::from_char('L'),
+            Some(ArchitectureDirection::Left)
+        );
+        assert_eq!(
+            ArchitectureDirection::from_char('r'),
+            Some(ArchitectureDirection::Right)
+        );
+        assert_eq!(
+            ArchitectureDirection::from_char('T'),
+            Some(ArchitectureDirection::Top)
+        );
+        assert_eq!(
+            ArchitectureDirection::from_char('b'),
+            Some(ArchitectureDirection::Bottom)
+        );
         assert_eq!(ArchitectureDirection::from_char('X'), None);
     }
 
     #[test]
     fn test_direction_opposite() {
-        assert_eq!(ArchitectureDirection::Left.opposite(), ArchitectureDirection::Right);
-        assert_eq!(ArchitectureDirection::Right.opposite(), ArchitectureDirection::Left);
-        assert_eq!(ArchitectureDirection::Top.opposite(), ArchitectureDirection::Bottom);
-        assert_eq!(ArchitectureDirection::Bottom.opposite(), ArchitectureDirection::Top);
+        assert_eq!(
+            ArchitectureDirection::Left.opposite(),
+            ArchitectureDirection::Right
+        );
+        assert_eq!(
+            ArchitectureDirection::Right.opposite(),
+            ArchitectureDirection::Left
+        );
+        assert_eq!(
+            ArchitectureDirection::Top.opposite(),
+            ArchitectureDirection::Bottom
+        );
+        assert_eq!(
+            ArchitectureDirection::Bottom.opposite(),
+            ArchitectureDirection::Top
+        );
     }
 
     #[test]
@@ -814,10 +916,12 @@ mod tests {
 
     #[test]
     fn test_direction_pair_is_xy() {
-        let xy = DirectionPair::new(ArchitectureDirection::Left, ArchitectureDirection::Top).unwrap();
+        let xy =
+            DirectionPair::new(ArchitectureDirection::Left, ArchitectureDirection::Top).unwrap();
         assert!(xy.is_xy());
 
-        let not_xy = DirectionPair::new(ArchitectureDirection::Left, ArchitectureDirection::Right).unwrap();
+        let not_xy =
+            DirectionPair::new(ArchitectureDirection::Left, ArchitectureDirection::Right).unwrap();
         assert!(!not_xy.is_xy());
     }
 

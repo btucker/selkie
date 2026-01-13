@@ -401,7 +401,14 @@ impl GanttDb {
         let s = s.trim();
 
         // Check for multi-char units first
-        for (suffix, unit) in [("ms", "ms"), ("w", "w"), ("d", "d"), ("h", "h"), ("m", "m"), ("s", "s")] {
+        for (suffix, unit) in [
+            ("ms", "ms"),
+            ("w", "w"),
+            ("d", "d"),
+            ("h", "h"),
+            ("m", "m"),
+            ("s", "s"),
+        ] {
             if s.ends_with(suffix) {
                 let num_str = &s[..s.len() - suffix.len()];
                 if let Ok(value) = num_str.parse::<f64>() {
@@ -499,7 +506,10 @@ impl GanttDb {
                             }
                         } else {
                             // Unknown dependency - use today
-                            let today = chrono::Local::now().naive_local().date().and_hms_opt(0, 0, 0);
+                            let today = chrono::Local::now()
+                                .naive_local()
+                                .date()
+                                .and_hms_opt(0, 0, 0);
                             latest_end = Some(match latest_end {
                                 Some(current) => today.map(|t| current.max(t)).unwrap_or(current),
                                 None => today.unwrap_or_else(|| NaiveDateTime::default()),
@@ -633,10 +643,16 @@ impl GanttDb {
                 _ => {
                     // Check if it's an "after" reference
                     if part.starts_with("after ") {
-                        let deps = part[6..].split_whitespace().map(|s| s.to_string()).collect();
+                        let deps = part[6..]
+                            .split_whitespace()
+                            .map(|s| s.to_string())
+                            .collect();
                         result.after = deps;
                     } else if part.starts_with("until ") {
-                        let deps = part[6..].split_whitespace().map(|s| s.to_string()).collect();
+                        let deps = part[6..]
+                            .split_whitespace()
+                            .map(|s| s.to_string())
+                            .collect();
                         result.until = deps;
                     } else if self.looks_like_date(part) {
                         // It's a date
@@ -1098,11 +1114,20 @@ mod tests {
 
         assert_eq!(tasks[0].start_time.unwrap().and_utc().timestamp_millis(), 0);
         assert_eq!(tasks[0].end_time.unwrap().and_utc().timestamp_millis(), 20);
-        assert_eq!(tasks[1].start_time.unwrap().and_utc().timestamp_millis(), 20);
+        assert_eq!(
+            tasks[1].start_time.unwrap().and_utc().timestamp_millis(),
+            20
+        );
         assert_eq!(tasks[1].end_time.unwrap().and_utc().timestamp_millis(), 25);
-        assert_eq!(tasks[2].start_time.unwrap().and_utc().timestamp_millis(), 20);
+        assert_eq!(
+            tasks[2].start_time.unwrap().and_utc().timestamp_millis(),
+            20
+        );
         assert_eq!(tasks[2].end_time.unwrap().and_utc().timestamp_millis(), 30);
-        assert_eq!(tasks[3].start_time.unwrap().and_utc().timestamp_millis(), 30);
+        assert_eq!(
+            tasks[3].start_time.unwrap().and_utc().timestamp_millis(),
+            30
+        );
         assert_eq!(tasks[3].end_time.unwrap().and_utc().timestamp_millis(), 35);
     }
 
@@ -1142,7 +1167,10 @@ mod tests {
     fn test_today_marker_style() {
         let mut db = GanttDb::new();
         db.set_today_marker("stoke:stroke-width:5px,stroke:#00f,opacity:0.5");
-        assert_eq!(db.get_today_marker(), "stoke:stroke-width:5px,stroke:#00f,opacity:0.5");
+        assert_eq!(
+            db.get_today_marker(),
+            "stoke:stroke-width:5px,stroke:#00f,opacity:0.5"
+        );
     }
 
     // ==================

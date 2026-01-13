@@ -13,8 +13,8 @@ pub struct GitGraphParser;
 pub fn parse(input: &str) -> Result<GitGraphDb, String> {
     let mut db = GitGraphDb::new();
 
-    let pairs = GitGraphParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        GitGraphParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -36,20 +36,14 @@ pub fn parse(input: &str) -> Result<GitGraphDb, String> {
     Ok(db)
 }
 
-fn process_document(
-    db: &mut GitGraphDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_document(db: &mut GitGraphDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for stmt in pair.into_inner() {
         process_statement(db, stmt)?;
     }
     Ok(())
 }
 
-fn process_statement(
-    db: &mut GitGraphDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_statement(db: &mut GitGraphDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     match pair.as_rule() {
         Rule::statement => {
             for inner in pair.into_inner() {
@@ -89,10 +83,7 @@ fn process_statement(
     Ok(())
 }
 
-fn process_acc_descr(
-    db: &mut GitGraphDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_acc_descr(db: &mut GitGraphDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for inner in pair.into_inner() {
         match inner.as_rule() {
             Rule::acc_descr_single => {
@@ -121,10 +112,7 @@ fn process_acc_descr(
     Ok(())
 }
 
-fn process_commit(
-    db: &mut GitGraphDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_commit(db: &mut GitGraphDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut id: Option<String> = None;
     let mut message = String::new();
     let mut commit_type = CommitType::Normal;
@@ -172,10 +160,7 @@ fn process_commit(
     Ok(())
 }
 
-fn process_branch(
-    db: &mut GitGraphDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_branch(db: &mut GitGraphDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut name = String::new();
     let mut order: Option<i32> = None;
 
@@ -203,10 +188,7 @@ fn process_branch(
     Ok(())
 }
 
-fn process_checkout(
-    db: &mut GitGraphDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_checkout(db: &mut GitGraphDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::branch_name {
             db.checkout(inner.as_str());
@@ -215,10 +197,7 @@ fn process_checkout(
     Ok(())
 }
 
-fn process_merge(
-    db: &mut GitGraphDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_merge(db: &mut GitGraphDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut branch = String::new();
     let mut id: Option<String> = None;
     let mut commit_type = CommitType::Normal;
@@ -317,7 +296,7 @@ fn process_cherry_pick(
 /// Remove surrounding quotes from a string
 fn unquote(s: &str) -> String {
     if s.len() >= 2 && s.starts_with('"') && s.ends_with('"') {
-        s[1..s.len()-1].to_string()
+        s[1..s.len() - 1].to_string()
     } else {
         s.to_string()
     }
@@ -474,7 +453,9 @@ mod tests {
 
         #[test]
         fn should_handle_commit_with_all_params() {
-            let result = parse("gitGraph:\ncommit id:\"1111\" type: REVERSE tag:\"test tag\" msg:\"test msg\"\n");
+            let result = parse(
+                "gitGraph:\ncommit id:\"1111\" type: REVERSE tag:\"test tag\" msg:\"test msg\"\n",
+            );
             assert!(result.is_ok());
             let db = result.unwrap();
             let commit = db.get_commits().get("1111").unwrap();
@@ -509,7 +490,8 @@ mod tests {
 
         #[test]
         fn should_generate_branches_array() {
-            let result = parse("gitGraph:\ncommit\nbranch b1\ncheckout b1\ncommit\ncommit\nbranch b2\n");
+            let result =
+                parse("gitGraph:\ncommit\nbranch b1\ncheckout b1\ncommit\ncommit\nbranch b2\n");
             assert!(result.is_ok());
             let db = result.unwrap();
             let branches = db.get_branches();

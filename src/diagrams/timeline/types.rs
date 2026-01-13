@@ -96,11 +96,8 @@ impl TimelineDb {
         let parts: Vec<&str> = period.splitn(2, ": ").collect();
         let task_name = parts[0].trim().to_string();
 
-        let mut task = TimelineTask::new(
-            self.task_counter,
-            self.current_section.clone(),
-            task_name,
-        );
+        let mut task =
+            TimelineTask::new(self.task_counter, self.current_section.clone(), task_name);
 
         // Add event from period if present
         if parts.len() > 1 {
@@ -265,7 +262,10 @@ mod tests {
         assert_eq!(tasks[0].events, vec!["event1"]);
 
         assert_eq!(tasks[1].task, "task2");
-        assert_eq!(tasks[1].events, vec!["event2", "event3", "event4", "event5"]);
+        assert_eq!(
+            tasks[1].events,
+            vec!["event2", "event3", "event4", "event5"]
+        );
     }
 
     // ==================
@@ -299,7 +299,10 @@ mod tests {
         db.task_counter = 1;
 
         let tasks = db.get_tasks();
-        assert_eq!(tasks[0].events, vec![";ev;ent1; ", ";ev;ent2; ", ";ev;ent3;"]);
+        assert_eq!(
+            tasks[0].events,
+            vec![";ev;ent1; ", ";ev;ent2; ", ";ev;ent3;"]
+        );
     }
 
     #[test]
@@ -330,7 +333,10 @@ mod tests {
 
         let tasks = db.get_tasks();
         assert_eq!(tasks[0].task, "task1");
-        assert_eq!(tasks[0].events, vec!["#ev#ent1# ", "#ev#ent2# ", "#ev#ent3#"]);
+        assert_eq!(
+            tasks[0].events,
+            vec!["#ev#ent1# ", "#ev#ent2# ", "#ev#ent3#"]
+        );
     }
 
     // ==================

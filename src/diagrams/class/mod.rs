@@ -3,11 +3,11 @@
 //! The class diagram shows the structure of classes, their attributes,
 //! methods, and relationships between them.
 
-mod types;
 pub mod parser;
+mod types;
 
-pub use types::*;
 pub use parser::parse;
+pub use types::*;
 
 #[cfg(test)]
 mod tests {
@@ -780,8 +780,10 @@ mod tests {
 
         #[test]
         fn member_name_should_handle_generic_type() {
-            let member =
-                ClassMember::new("getTime~T~(this T, int seconds)$ DateTime", MemberType::Method);
+            let member = ClassMember::new(
+                "getTime~T~(this T, int seconds)$ DateTime",
+                MemberType::Method,
+            );
             let details = member.get_display_details();
             assert_eq!(
                 details.display_text,

@@ -138,8 +138,8 @@ pub struct EdgeLabel {
 impl Default for EdgeLabel {
     fn default() -> Self {
         Self {
-            minlen: 1,  // dagre.js defaults to 1
-            weight: 1,  // dagre.js defaults to 1
+            minlen: 1, // dagre.js defaults to 1
+            weight: 1, // dagre.js defaults to 1
             width: 0.0,
             height: 0.0,
             x: None,
@@ -405,7 +405,8 @@ impl DagreGraph {
 
     /// Get outgoing edges from a node (sorted for deterministic iteration)
     pub fn out_edges(&self, v: &str) -> Vec<&EdgeKey> {
-        let mut edges: Vec<&EdgeKey> = self.out_edges
+        let mut edges: Vec<&EdgeKey> = self
+            .out_edges
             .get(v)
             .map(|edges| edges.iter().collect())
             .unwrap_or_default();
@@ -415,7 +416,8 @@ impl DagreGraph {
 
     /// Get outgoing edges from v to w specifically (sorted for deterministic iteration)
     pub fn out_edges_to(&self, v: &str, w: &str) -> Vec<&EdgeKey> {
-        let mut edges: Vec<&EdgeKey> = self.out_edges
+        let mut edges: Vec<&EdgeKey> = self
+            .out_edges
             .get(v)
             .map(|edges| edges.iter().filter(|e| e.w == w).collect())
             .unwrap_or_default();
@@ -425,7 +427,8 @@ impl DagreGraph {
 
     /// Get incoming edges to a node (sorted for deterministic iteration)
     pub fn in_edges(&self, w: &str) -> Vec<&EdgeKey> {
-        let mut edges: Vec<&EdgeKey> = self.in_edges
+        let mut edges: Vec<&EdgeKey> = self
+            .in_edges
             .get(w)
             .map(|edges| edges.iter().collect())
             .unwrap_or_default();
@@ -435,7 +438,8 @@ impl DagreGraph {
 
     /// Get predecessor nodes (sorted for deterministic iteration)
     pub fn predecessors(&self, v: &str) -> Vec<&String> {
-        let mut preds: Vec<&String> = self.in_edges
+        let mut preds: Vec<&String> = self
+            .in_edges
             .get(v)
             .map(|edges| edges.iter().map(|e| &e.v).collect())
             .unwrap_or_default();
@@ -445,7 +449,8 @@ impl DagreGraph {
 
     /// Get successor nodes (sorted for deterministic iteration)
     pub fn successors(&self, v: &str) -> Vec<&String> {
-        let mut succs: Vec<&String> = self.out_edges
+        let mut succs: Vec<&String> = self
+            .out_edges
             .get(v)
             .map(|edges| edges.iter().map(|e| &e.w).collect())
             .unwrap_or_default();
@@ -495,10 +500,7 @@ impl DagreGraph {
 
         // Set new parent
         self.parent.insert(v.clone(), parent.clone());
-        self.children
-            .entry(parent)
-            .or_default()
-            .insert(v);
+        self.children.entry(parent).or_default().insert(v);
     }
 
     /// Get parent of a node
@@ -508,7 +510,8 @@ impl DagreGraph {
 
     /// Get children of a node (sorted for deterministic iteration)
     pub fn children(&self, v: &str) -> Vec<&String> {
-        let mut children: Vec<&String> = self.children
+        let mut children: Vec<&String> = self
+            .children
             .get(v)
             .map(|c| c.iter().collect())
             .unwrap_or_default();
@@ -545,7 +548,14 @@ mod tests {
     #[test]
     fn test_set_and_get_node() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { width: 100.0, height: 50.0, ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                width: 100.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
 
         assert!(g.has_node("a"));
         assert!(!g.has_node("b"));
@@ -558,7 +568,15 @@ mod tests {
     #[test]
     fn test_set_and_get_edge() {
         let mut g = DagreGraph::new();
-        g.set_edge("a", "b", EdgeLabel { minlen: 2, weight: 3, ..Default::default() });
+        g.set_edge(
+            "a",
+            "b",
+            EdgeLabel {
+                minlen: 2,
+                weight: 3,
+                ..Default::default()
+            },
+        );
 
         assert!(g.has_edge("a", "b"));
         assert!(!g.has_edge("b", "a"));
@@ -572,7 +590,15 @@ mod tests {
     fn test_multigraph() {
         let mut g = DagreGraph::new();
         g.set_edge("a", "b", EdgeLabel::default());
-        g.set_edge_with_name("a", "b", EdgeLabel { weight: 5, ..Default::default() }, "edge2");
+        g.set_edge_with_name(
+            "a",
+            "b",
+            EdgeLabel {
+                weight: 5,
+                ..Default::default()
+            },
+            "edge2",
+        );
 
         // Should have 2 edges from a to b
         let out = g.out_edges("a");

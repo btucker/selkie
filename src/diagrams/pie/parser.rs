@@ -7,29 +7,22 @@ use super::types::PieDb;
 use crate::error::{MermaidError, Result};
 
 // Regex patterns for pie chart parsing
-static PIE_HEADER_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?i)^\s*pie\s*(showData)?(?:\s+title\s+(.+))?$").unwrap()
-});
+static PIE_HEADER_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*pie\s*(showData)?(?:\s+title\s+(.+))?$").unwrap());
 
-static SECTION_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r#"^\s*"([^"]+)"\s*:\s*(-?\d+(?:\.\d+)?)\s*$"#).unwrap()
-});
+static SECTION_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^\s*"([^"]+)"\s*:\s*(-?\d+(?:\.\d+)?)\s*$"#).unwrap());
 
-static ACC_TITLE_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?i)^\s*accTitle\s*:\s*(.+)$").unwrap()
-});
+static ACC_TITLE_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*accTitle\s*:\s*(.+)$").unwrap());
 
-static ACC_DESCR_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?i)^\s*accDescr\s*:\s*(.+)$").unwrap()
-});
+static ACC_DESCR_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*accDescr\s*:\s*(.+)$").unwrap());
 
-static ACC_DESCR_MULTILINE_START_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?i)^\s*accDescr\s*\{").unwrap()
-});
+static ACC_DESCR_MULTILINE_START_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*accDescr\s*\{").unwrap());
 
-static COMMENT_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"^\s*%%").unwrap()
-});
+static COMMENT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*%%").unwrap());
 
 /// Parse a pie chart diagram
 pub fn parse(input: &str) -> Result<PieDb> {

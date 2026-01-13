@@ -22,7 +22,11 @@ pub type PacketWord = Vec<PacketBlock>;
 #[derive(Debug, Clone, PartialEq)]
 pub enum PacketError {
     /// Block is not contiguous with previous block
-    NotContiguous { start: usize, end: usize, expected: usize },
+    NotContiguous {
+        start: usize,
+        end: usize,
+        expected: usize,
+    },
     /// End bit is less than start bit
     InvalidRange { start: usize, end: usize },
     /// Bit count is zero
@@ -32,7 +36,11 @@ pub enum PacketError {
 impl std::fmt::Display for PacketError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            PacketError::NotContiguous { start, end, expected } => {
+            PacketError::NotContiguous {
+                start,
+                end,
+                expected,
+            } => {
                 write!(
                     f,
                     "Packet block {} - {} is not contiguous. It should start from {}.",
@@ -313,19 +321,19 @@ mod tests {
 
         assert_eq!(packet[0][1].start, 11);
         assert_eq!(packet[0][1].end, 31);
-        assert_eq!(packet[0][1].bits, 21);  // 31-11+1 = 21 bits
+        assert_eq!(packet[0][1].bits, 21); // 31-11+1 = 21 bits
         assert_eq!(packet[0][1].label, "multiple");
 
         // Second row
         assert_eq!(packet[1][0].start, 32);
         assert_eq!(packet[1][0].end, 63);
-        assert_eq!(packet[1][0].bits, 32);  // 63-32+1 = 32 bits (full row)
+        assert_eq!(packet[1][0].bits, 32); // 63-32+1 = 32 bits (full row)
         assert_eq!(packet[1][0].label, "multiple");
 
         // Third row
         assert_eq!(packet[2][0].start, 64);
         assert_eq!(packet[2][0].end, 90);
-        assert_eq!(packet[2][0].bits, 27);  // 90-64+1 = 27 bits
+        assert_eq!(packet[2][0].bits, 27); // 90-64+1 = 27 bits
         assert_eq!(packet[2][0].label, "multiple");
     }
 
@@ -345,13 +353,13 @@ mod tests {
 
         assert_eq!(packet[0][1].start, 17);
         assert_eq!(packet[0][1].end, 31);
-        assert_eq!(packet[0][1].bits, 15);  // 31-17+1 = 15 bits
+        assert_eq!(packet[0][1].bits, 15); // 31-17+1 = 15 bits
         assert_eq!(packet[0][1].label, "multiple");
 
         // Second row (exactly fills the row)
         assert_eq!(packet[1][0].start, 32);
         assert_eq!(packet[1][0].end, 63);
-        assert_eq!(packet[1][0].bits, 32);  // 63-32+1 = 32 bits (full row)
+        assert_eq!(packet[1][0].bits, 32); // 63-32+1 = 32 bits (full row)
         assert_eq!(packet[1][0].label, "multiple");
     }
 
@@ -362,7 +370,12 @@ mod tests {
         let result = db.add_block(18, 20, "error");
 
         assert!(result.is_err());
-        if let Err(PacketError::NotContiguous { start, end, expected }) = result {
+        if let Err(PacketError::NotContiguous {
+            start,
+            end,
+            expected,
+        }) = result
+        {
             assert_eq!(start, 18);
             assert_eq!(end, 20);
             assert_eq!(expected, 17);
@@ -378,7 +391,12 @@ mod tests {
         let result = db.add_block(18, 20, "error");
 
         assert!(result.is_err());
-        if let Err(PacketError::NotContiguous { start, end, expected }) = result {
+        if let Err(PacketError::NotContiguous {
+            start,
+            end,
+            expected,
+        }) = result
+        {
             assert_eq!(start, 18);
             assert_eq!(end, 20);
             assert_eq!(expected, 16);
@@ -394,7 +412,12 @@ mod tests {
         let result = db.add_single_bit(18, "error");
 
         assert!(result.is_err());
-        if let Err(PacketError::NotContiguous { start, end, expected }) = result {
+        if let Err(PacketError::NotContiguous {
+            start,
+            end,
+            expected,
+        }) = result
+        {
             assert_eq!(start, 18);
             assert_eq!(end, 18);
             assert_eq!(expected, 17);
@@ -444,7 +467,11 @@ mod tests {
 
     #[test]
     fn test_error_display() {
-        let err = PacketError::NotContiguous { start: 18, end: 20, expected: 17 };
+        let err = PacketError::NotContiguous {
+            start: 18,
+            end: 20,
+            expected: 17,
+        };
         assert_eq!(
             err.to_string(),
             "Packet block 18 - 20 is not contiguous. It should start from 17."

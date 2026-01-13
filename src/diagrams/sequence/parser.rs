@@ -27,8 +27,8 @@ pub fn parse(input: &str) -> Result<SequenceDb, String> {
     let mut db = SequenceDb::new();
     let mut block_stack: Vec<BlockType> = Vec::new();
 
-    let pairs = SequenceParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        SequenceParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -369,10 +369,7 @@ fn process_create_stmt(
     Ok(())
 }
 
-fn process_note_stmt(
-    db: &mut SequenceDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_note_stmt(db: &mut SequenceDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut placement = Placement::RightOf;
     let mut actors: Vec<String> = Vec::new();
     let mut text = String::new();
@@ -619,7 +616,11 @@ mod tests {
         fn should_handle_numeric_participant_name() {
             // Test numeric participant name
             let result = parse("sequenceDiagram\nparticipant 1");
-            assert!(result.is_ok(), "Failed to parse numeric participant: {:?}", result.err());
+            assert!(
+                result.is_ok(),
+                "Failed to parse numeric participant: {:?}",
+                result.err()
+            );
         }
 
         #[test]
@@ -774,8 +775,10 @@ User->>AuthService: Login"#,
         #[test]
         fn should_handle_half_arrow_solid_top() {
             // Half arrow: -|\ (solid half arrow top)
-            let result = parse(r"sequenceDiagram
-Alice-|\Bob:Hello");
+            let result = parse(
+                r"sequenceDiagram
+Alice-|\Bob:Hello",
+            );
             assert!(result.is_ok(), "Failed to parse: {:?}", result.err());
         }
 
@@ -789,32 +792,40 @@ Alice-|\Bob:Hello");
         #[test]
         fn should_handle_half_arrow_stick_top() {
             // Half arrow: -\\ (stick half arrow top - double backslash)
-            let result = parse(r"sequenceDiagram
-Alice-\\Bob:Hello");
+            let result = parse(
+                r"sequenceDiagram
+Alice-\\Bob:Hello",
+            );
             assert!(result.is_ok(), "Failed to parse: {:?}", result.err());
         }
 
         #[test]
         fn should_handle_half_arrow_with_spaces() {
             // Half arrow with spaces around it - like in mermaid tests
-            let result = parse(r"sequenceDiagram
-      Alice -|\  John: Hello John, how are you?");
+            let result = parse(
+                r"sequenceDiagram
+      Alice -|\  John: Hello John, how are you?",
+            );
             assert!(result.is_ok(), "Failed to parse: {:?}", result.err());
         }
 
         #[test]
         fn should_handle_half_arrow_reverse() {
             // Half arrow reverse: \|- (solid half arrow bottom reverse)
-            let result = parse(r"sequenceDiagram
-Alice\|-Bob:Hello");
+            let result = parse(
+                r"sequenceDiagram
+Alice\|-Bob:Hello",
+            );
             assert!(result.is_ok(), "Failed to parse: {:?}", result.err());
         }
 
         #[test]
         fn should_handle_half_arrow_reverse_with_spaces() {
             // Half arrow reverse with spaces
-            let result = parse(r"sequenceDiagram
-        Alice \|- John: Hello");
+            let result = parse(
+                r"sequenceDiagram
+        Alice \|- John: Hello",
+            );
             assert!(result.is_ok(), "Failed to parse: {:?}", result.err());
         }
     }

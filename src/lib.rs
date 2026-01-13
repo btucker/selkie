@@ -11,6 +11,9 @@ pub mod error;
 pub mod layout;
 pub mod render;
 
+#[cfg(feature = "kitty")]
+pub mod kitty;
+
 pub use config::Config;
 pub use error::{MermaidError, Result};
 pub use render::{render, render_with_config, RenderConfig, Theme};

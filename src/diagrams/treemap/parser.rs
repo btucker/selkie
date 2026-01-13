@@ -148,7 +148,9 @@ fn process_row(
     Ok(())
 }
 
-fn process_item(pair: pest::iterators::Pair<Rule>) -> Result<TreemapNode, Box<dyn std::error::Error>> {
+fn process_item(
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<TreemapNode, Box<dyn std::error::Error>> {
     for inner in pair.into_inner() {
         match inner.as_rule() {
             Rule::leaf_item => return process_leaf_item(inner),
@@ -159,7 +161,9 @@ fn process_item(pair: pest::iterators::Pair<Rule>) -> Result<TreemapNode, Box<dy
     Ok(TreemapNode::section(""))
 }
 
-fn process_leaf_item(pair: pest::iterators::Pair<Rule>) -> Result<TreemapNode, Box<dyn std::error::Error>> {
+fn process_leaf_item(
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<TreemapNode, Box<dyn std::error::Error>> {
     let mut name = String::new();
     let mut value: f64 = 0.0;
     let mut class_selector: Option<String> = None;
@@ -190,7 +194,9 @@ fn process_leaf_item(pair: pest::iterators::Pair<Rule>) -> Result<TreemapNode, B
     Ok(node)
 }
 
-fn process_section_item(pair: pest::iterators::Pair<Rule>) -> Result<TreemapNode, Box<dyn std::error::Error>> {
+fn process_section_item(
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<TreemapNode, Box<dyn std::error::Error>> {
     let mut name = String::new();
     let mut class_selector: Option<String> = None;
 
@@ -433,6 +439,9 @@ classDef secondary fill:#6cf,stroke:#333;
 "#;
         let result = parse(input).unwrap();
         let root_nodes = result.get_root_nodes();
-        assert_eq!(root_nodes[0].children[0].children[0].children[0].name, "Level 4");
+        assert_eq!(
+            root_nodes[0].children[0].children[0].children[0].name,
+            "Level 4"
+        );
     }
 }

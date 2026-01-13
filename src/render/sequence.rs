@@ -10,12 +10,12 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
 
     // Layout constants (matching mermaid.js default theme)
     let actor_spacing = 200.0;
-    let actor_width = 150.0;  // mermaid.js uses 150
-    let actor_height = 65.0;  // mermaid.js uses 65
-    let message_spacing = 44.0;  // mermaid.js uses ~44px
-    let margin_top = 10.0;  // Small top margin (viewBox offset handles visual padding)
-    let _margin_left = 0.0;  // No left margin (handled by viewBox offset)
-    let actor_box_padding = 0.0;  // No padding - full width box
+    let actor_width = 150.0; // mermaid.js uses 150
+    let actor_height = 65.0; // mermaid.js uses 65
+    let message_spacing = 44.0; // mermaid.js uses ~44px
+    let margin_top = 10.0; // Small top margin (viewBox offset handles visual padding)
+    let _margin_left = 0.0; // No left margin (handled by viewBox offset)
+    let actor_box_padding = 0.0; // No padding - full width box
 
     // Get actors in order
     let actors = db.get_actors_in_order();
@@ -47,11 +47,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         + message_spacing  // Gap before first message
         + (messages.len() as f64) * message_spacing  // Messages
         + 20.0  // Gap after last message to bottom actor
-        + actor_height;  // Bottom actor
+        + actor_height; // Bottom actor
 
     // Add visual padding via width/viewBox (mermaid.js style)
-    let width = content_width + 100.0;  // Total viewBox width with padding
-    let height = content_height + 20.0;  // Total viewBox height with padding
+    let width = content_width + 100.0; // Total viewBox width with padding
+    let height = content_height + 20.0; // Total viewBox height with padding
 
     doc.set_size(width, height);
 
@@ -69,7 +69,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     ]);
 
     // Title offset
-    let title_offset = if !db.diagram_title.is_empty() { 40.0 } else { 0.0 };
+    let title_offset = if !db.diagram_title.is_empty() {
+        40.0
+    } else {
+        0.0
+    };
 
     // Render title
     if !db.diagram_title.is_empty() {
@@ -87,17 +91,19 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     }
 
     // Calculate actor positions (with padding offset for visual alignment)
-    let padding_x = 50.0;  // Horizontal padding offset
-    let padding_y = margin_top;  // Vertical padding offset
+    let padding_x = 50.0; // Horizontal padding offset
+    let padding_y = margin_top; // Vertical padding offset
 
     let actor_y = padding_y + title_offset;
     let lifeline_start_y = actor_y + actor_height;
     // Bottom actor position: after all messages + 20px gap
-    let bottom_actor_y = lifeline_start_y + message_spacing + (messages.len() as f64) * message_spacing + 20.0;
+    let bottom_actor_y =
+        lifeline_start_y + message_spacing + (messages.len() as f64) * message_spacing + 20.0;
     let lifeline_end_y = bottom_actor_y;
 
     // Create actor position map
-    let mut actor_positions: std::collections::HashMap<String, f64> = std::collections::HashMap::new();
+    let mut actor_positions: std::collections::HashMap<String, f64> =
+        std::collections::HashMap::new();
     for (i, actor) in actors.iter().enumerate() {
         let x = padding_x + (i as f64) * actor_spacing + actor_width / 2.0;
         actor_positions.insert(actor.name.clone(), x);
@@ -156,7 +162,9 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         }
 
         if let (Some(from), Some(to)) = (&message.from, &message.to) {
-            if let (Some(&from_x), Some(&to_x)) = (actor_positions.get(from), actor_positions.get(to)) {
+            if let (Some(&from_x), Some(&to_x)) =
+                (actor_positions.get(from), actor_positions.get(to))
+            {
                 let msg_element = render_message(
                     from_x,
                     to_x,
@@ -350,8 +358,8 @@ fn render_actor(
                 rx: Some(3.0),
                 ry: Some(3.0),
                 attrs: Attrs::new()
-                    .with_class("activation")  // mermaid.js gray
-                    .with_stroke("#666")    // mermaid.js stroke
+                    .with_class("activation")
+                    .with_stroke("#666")
                     .with_stroke_width(1.0)
                     .with_class("actor actor-box"),
             });
@@ -377,13 +385,7 @@ fn render_actor(
 }
 
 /// Render a message between two actors
-fn render_message(
-    from_x: f64,
-    to_x: f64,
-    y: f64,
-    label: &str,
-    msg_type: LineType,
-) -> SvgElement {
+fn render_message(from_x: f64, to_x: f64, y: f64, label: &str, msg_type: LineType) -> SvgElement {
     let mut children = Vec::new();
 
     let (is_dotted, marker_id) = match msg_type {

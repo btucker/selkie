@@ -13,8 +13,8 @@ pub struct JourneyParser;
 pub fn parse(input: &str) -> Result<JourneyDb, String> {
     let mut db = JourneyDb::new();
 
-    let pairs = JourneyParser::parse(Rule::diagram, input)
-        .map_err(|e| format!("Parse error: {}", e))?;
+    let pairs =
+        JourneyParser::parse(Rule::diagram, input).map_err(|e| format!("Parse error: {}", e))?;
 
     for pair in pairs {
         if pair.as_rule() == Rule::diagram {
@@ -29,20 +29,14 @@ pub fn parse(input: &str) -> Result<JourneyDb, String> {
     Ok(db)
 }
 
-fn process_document(
-    db: &mut JourneyDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_document(db: &mut JourneyDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for stmt in pair.into_inner() {
         process_statement(db, stmt)?;
     }
     Ok(())
 }
 
-fn process_statement(
-    db: &mut JourneyDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_statement(db: &mut JourneyDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     match pair.as_rule() {
         Rule::statement => {
             for inner in pair.into_inner() {
@@ -84,10 +78,7 @@ fn process_statement(
     Ok(())
 }
 
-fn process_acc_descr(
-    db: &mut JourneyDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_acc_descr(db: &mut JourneyDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     for inner in pair.into_inner() {
         match inner.as_rule() {
             Rule::acc_descr_single => {
@@ -116,10 +107,7 @@ fn process_acc_descr(
     Ok(())
 }
 
-fn process_task(
-    db: &mut JourneyDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_task(db: &mut JourneyDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut task_name = String::new();
     let mut task_data = String::new();
 
@@ -179,7 +167,10 @@ mod tests {
             let result = parse("journey\naccDescr: A user journey for family shopping\ntitle Adding journey\nsection Order from website");
             assert!(result.is_ok(), "Parse error: {:?}", result.err());
             let db = result.unwrap();
-            assert_eq!(db.get_acc_description(), "A user journey for family shopping");
+            assert_eq!(
+                db.get_acc_description(),
+                "A user journey for family shopping"
+            );
         }
 
         #[test]
@@ -196,9 +187,15 @@ section Order from website"#;
             let result = parse(input);
             assert!(result.is_ok(), "Parse error: {:?}", result.err());
             let db = result.unwrap();
-            assert_eq!(db.get_acc_description(), "A user journey for\nfamily shopping");
+            assert_eq!(
+                db.get_acc_description(),
+                "A user journey for\nfamily shopping"
+            );
             assert_eq!(db.title, "Adding journey diagram functionality to mermaid");
-            assert_eq!(db.get_acc_title(), "Adding acc journey diagram functionality to mermaid");
+            assert_eq!(
+                db.get_acc_title(),
+                "Adding acc journey diagram functionality to mermaid"
+            );
         }
 
         #[test]

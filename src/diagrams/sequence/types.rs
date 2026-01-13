@@ -216,7 +216,13 @@ pub struct Message {
 }
 
 impl Message {
-    pub fn new(id: String, from: Option<String>, to: Option<String>, message: String, message_type: LineType) -> Self {
+    pub fn new(
+        id: String,
+        from: Option<String>,
+        to: Option<String>,
+        message: String,
+        message_type: LineType,
+    ) -> Self {
         Self {
             id,
             from,
@@ -331,7 +337,12 @@ impl SequenceDb {
     }
 
     /// Add an actor to the diagram
-    pub fn add_actor(&mut self, name: &str, description: Option<&str>, actor_type: ParticipantType) {
+    pub fn add_actor(
+        &mut self,
+        name: &str,
+        description: Option<&str>,
+        actor_type: ParticipantType,
+    ) {
         if self.actors.contains_key(name) {
             return;
         }
@@ -467,15 +478,22 @@ impl SequenceDb {
     }
 
     /// Create an actor (tracks when created)
-    pub fn create_actor(&mut self, name: &str, description: Option<&str>, actor_type: ParticipantType) {
+    pub fn create_actor(
+        &mut self,
+        name: &str,
+        description: Option<&str>,
+        actor_type: ParticipantType,
+    ) {
         self.add_actor(name, description, actor_type);
-        self.created_actors.insert(name.to_string(), self.messages.len());
+        self.created_actors
+            .insert(name.to_string(), self.messages.len());
     }
 
     /// Destroy an actor
     pub fn destroy_actor(&mut self, name: &str) {
         if self.actors.contains_key(name) {
-            self.destroyed_actors.insert(name.to_string(), self.messages.len());
+            self.destroyed_actors
+                .insert(name.to_string(), self.messages.len());
         }
     }
 

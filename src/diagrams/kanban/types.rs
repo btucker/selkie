@@ -125,7 +125,9 @@ impl KanbanDb {
     ///
     /// Level 0 = section, Level > 0 = item
     pub fn add_node(&mut self, level: usize, id: Option<&str>, label: &str, shape: NodeShape) {
-        let id = id.map(|s| s.to_string()).unwrap_or_else(|| label.to_string());
+        let id = id
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| label.to_string());
         let label = label.to_string();
 
         if level == 0 {

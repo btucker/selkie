@@ -33,7 +33,8 @@ impl Attrs {
     }
 
     pub fn with_transform(mut self, transform: &str) -> Self {
-        self.attrs.insert("transform".to_string(), transform.to_string());
+        self.attrs
+            .insert("transform".to_string(), transform.to_string());
         self
     }
 
@@ -48,12 +49,14 @@ impl Attrs {
     }
 
     pub fn with_stroke_width(mut self, width: f64) -> Self {
-        self.attrs.insert("stroke-width".to_string(), format!("{}", width));
+        self.attrs
+            .insert("stroke-width".to_string(), format!("{}", width));
         self
     }
 
     pub fn with_stroke_dasharray(mut self, dasharray: &str) -> Self {
-        self.attrs.insert("stroke-dasharray".to_string(), dasharray.to_string());
+        self.attrs
+            .insert("stroke-dasharray".to_string(), dasharray.to_string());
         self
     }
 
@@ -111,15 +114,9 @@ pub enum SvgElement {
         attrs: Attrs,
     },
     /// Polygon element
-    Polygon {
-        points: Vec<Point>,
-        attrs: Attrs,
-    },
+    Polygon { points: Vec<Point>, attrs: Attrs },
     /// Path element
-    Path {
-        d: String,
-        attrs: Attrs,
-    },
+    Path { d: String, attrs: Attrs },
     /// Line element
     Line {
         x1: f64,
@@ -129,10 +126,7 @@ pub enum SvgElement {
         attrs: Attrs,
     },
     /// Polyline element
-    Polyline {
-        points: Vec<Point>,
-        attrs: Attrs,
-    },
+    Polyline { points: Vec<Point>, attrs: Attrs },
     /// Text element
     Text {
         x: f64,
@@ -146,9 +140,7 @@ pub enum SvgElement {
         attrs: Attrs,
     },
     /// Definitions element
-    Defs {
-        children: Vec<SvgElement>,
-    },
+    Defs { children: Vec<SvgElement> },
     /// Marker element
     Marker {
         id: String,
@@ -162,13 +154,9 @@ pub enum SvgElement {
         children: Vec<SvgElement>,
     },
     /// Style element (for embedded CSS)
-    Style {
-        content: String,
-    },
+    Style { content: String },
     /// Raw SVG content
-    Raw {
-        content: String,
-    },
+    Raw { content: String },
 }
 
 impl SvgElement {
@@ -253,33 +241,48 @@ impl SvgElement {
     /// Add attributes
     pub fn with_attrs(self, attrs: Attrs) -> Self {
         match self {
-            Self::Rect { x, y, width, height, rx, ry, .. } => {
-                Self::Rect { x, y, width, height, rx, ry, attrs }
-            }
-            Self::Circle { cx, cy, r, .. } => {
-                Self::Circle { cx, cy, r, attrs }
-            }
-            Self::Ellipse { cx, cy, rx, ry, .. } => {
-                Self::Ellipse { cx, cy, rx, ry, attrs }
-            }
-            Self::Polygon { points, .. } => {
-                Self::Polygon { points, attrs }
-            }
-            Self::Path { d, .. } => {
-                Self::Path { d, attrs }
-            }
-            Self::Line { x1, y1, x2, y2, .. } => {
-                Self::Line { x1, y1, x2, y2, attrs }
-            }
-            Self::Polyline { points, .. } => {
-                Self::Polyline { points, attrs }
-            }
-            Self::Text { x, y, content, .. } => {
-                Self::Text { x, y, content, attrs }
-            }
-            Self::Group { children, .. } => {
-                Self::Group { children, attrs }
-            }
+            Self::Rect {
+                x,
+                y,
+                width,
+                height,
+                rx,
+                ry,
+                ..
+            } => Self::Rect {
+                x,
+                y,
+                width,
+                height,
+                rx,
+                ry,
+                attrs,
+            },
+            Self::Circle { cx, cy, r, .. } => Self::Circle { cx, cy, r, attrs },
+            Self::Ellipse { cx, cy, rx, ry, .. } => Self::Ellipse {
+                cx,
+                cy,
+                rx,
+                ry,
+                attrs,
+            },
+            Self::Polygon { points, .. } => Self::Polygon { points, attrs },
+            Self::Path { d, .. } => Self::Path { d, attrs },
+            Self::Line { x1, y1, x2, y2, .. } => Self::Line {
+                x1,
+                y1,
+                x2,
+                y2,
+                attrs,
+            },
+            Self::Polyline { points, .. } => Self::Polyline { points, attrs },
+            Self::Text { x, y, content, .. } => Self::Text {
+                x,
+                y,
+                content,
+                attrs,
+            },
+            Self::Group { children, .. } => Self::Group { children, attrs },
             other => other,
         }
     }
@@ -289,24 +292,54 @@ impl SvgElement {
         let indent_str = "  ".repeat(indent);
 
         match self {
-            Self::Rect { x, y, width, height, rx, ry, attrs } => {
+            Self::Rect {
+                x,
+                y,
+                width,
+                height,
+                rx,
+                ry,
+                attrs,
+            } => {
                 let rx_str = rx.map(|v| format!(" rx=\"{}\"", v)).unwrap_or_default();
                 let ry_str = ry.map(|v| format!(" ry=\"{}\"", v)).unwrap_or_default();
                 format!(
                     "{}<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"{}{}{}/>",
-                    indent_str, x, y, width, height, rx_str, ry_str, attrs.to_string()
+                    indent_str,
+                    x,
+                    y,
+                    width,
+                    height,
+                    rx_str,
+                    ry_str,
+                    attrs.to_string()
                 )
             }
             Self::Circle { cx, cy, r, attrs } => {
                 format!(
                     "{}<circle cx=\"{}\" cy=\"{}\" r=\"{}\"{}/>",
-                    indent_str, cx, cy, r, attrs.to_string()
+                    indent_str,
+                    cx,
+                    cy,
+                    r,
+                    attrs.to_string()
                 )
             }
-            Self::Ellipse { cx, cy, rx, ry, attrs } => {
+            Self::Ellipse {
+                cx,
+                cy,
+                rx,
+                ry,
+                attrs,
+            } => {
                 format!(
                     "{}<ellipse cx=\"{}\" cy=\"{}\" rx=\"{}\" ry=\"{}\"{}/>",
-                    indent_str, cx, cy, rx, ry, attrs.to_string()
+                    indent_str,
+                    cx,
+                    cy,
+                    rx,
+                    ry,
+                    attrs.to_string()
                 )
             }
             Self::Polygon { points, attrs } => {
@@ -317,19 +350,29 @@ impl SvgElement {
                     .join(" ");
                 format!(
                     "{}<polygon points=\"{}\"{}/>",
-                    indent_str, points_str, attrs.to_string()
+                    indent_str,
+                    points_str,
+                    attrs.to_string()
                 )
             }
             Self::Path { d, attrs } => {
-                format!(
-                    "{}<path d=\"{}\"{}/>",
-                    indent_str, d, attrs.to_string()
-                )
+                format!("{}<path d=\"{}\"{}/>", indent_str, d, attrs.to_string())
             }
-            Self::Line { x1, y1, x2, y2, attrs } => {
+            Self::Line {
+                x1,
+                y1,
+                x2,
+                y2,
+                attrs,
+            } => {
                 format!(
                     "{}<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\"{}/>",
-                    indent_str, x1, y1, x2, y2, attrs.to_string()
+                    indent_str,
+                    x1,
+                    y1,
+                    x2,
+                    y2,
+                    attrs.to_string()
                 )
             }
             Self::Polyline { points, attrs } => {
@@ -340,13 +383,24 @@ impl SvgElement {
                     .join(" ");
                 format!(
                     "{}<polyline points=\"{}\"{}/>",
-                    indent_str, points_str, attrs.to_string()
+                    indent_str,
+                    points_str,
+                    attrs.to_string()
                 )
             }
-            Self::Text { x, y, content, attrs } => {
+            Self::Text {
+                x,
+                y,
+                content,
+                attrs,
+            } => {
                 format!(
                     "{}<text x=\"{}\" y=\"{}\"{}>{}</text>",
-                    indent_str, x, y, attrs.to_string(), escape_xml(content)
+                    indent_str,
+                    x,
+                    y,
+                    attrs.to_string(),
+                    escape_xml(content)
                 )
             }
             Self::Group { children, attrs } => {
@@ -357,7 +411,10 @@ impl SvgElement {
                     .join("\n");
                 format!(
                     "{}<g{}>\n{}\n{}</g>",
-                    indent_str, attrs.to_string(), children_str, indent_str
+                    indent_str,
+                    attrs.to_string(),
+                    children_str,
+                    indent_str
                 )
             }
             Self::Defs { children } => {

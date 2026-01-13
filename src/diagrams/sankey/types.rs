@@ -94,7 +94,11 @@ impl SankeyDb {
     /// Get the graph structure for rendering
     pub fn get_graph(&self) -> SankeyGraph {
         SankeyGraph {
-            nodes: self.nodes.iter().map(|n| GraphNode { id: n.id.clone() }).collect(),
+            nodes: self
+                .nodes
+                .iter()
+                .map(|n| GraphNode { id: n.id.clone() })
+                .collect(),
             links: self
                 .links
                 .iter()

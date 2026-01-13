@@ -398,7 +398,13 @@ mod tests {
     #[test]
     fn test_add_point_with_class() {
         let mut db = QuadrantDb::new();
-        db.add_point("Salesforce", "class1", "0.55", "0.60", &["radius: 10", "color: #ff0000"]);
+        db.add_point(
+            "Salesforce",
+            "class1",
+            "0.55",
+            "0.60",
+            &["radius: 10", "color: #ff0000"],
+        );
 
         let points = db.get_points();
         assert_eq!(points.len(), 1);
@@ -453,7 +459,12 @@ mod tests {
             "",
             "0.75",
             "0.75",
-            &["stroke-color: #ff00ff", "stroke-width: 10px", "color: #ff0000", "radius: 10"],
+            &[
+                "stroke-color: #ff00ff",
+                "stroke-width: 10px",
+                "color: #ff0000",
+                "radius: 10",
+            ],
         );
         db.add_point(
             "Salesforce",

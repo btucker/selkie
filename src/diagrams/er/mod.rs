@@ -3,11 +3,11 @@
 //! ER diagrams model database schemas with entities, attributes,
 //! and relationships with cardinality and identification.
 
-mod types;
 pub mod parser;
+mod types;
 
-pub use types::*;
 pub use parser::parse;
+pub use types::*;
 
 #[cfg(test)]
 mod tests {
@@ -169,7 +169,11 @@ mod tests {
                 "Customer",
                 "places",
                 "Order",
-                RelSpec::new(Cardinality::OnlyOne, Cardinality::ZeroOrMore, Identification::Identifying),
+                RelSpec::new(
+                    Cardinality::OnlyOne,
+                    Cardinality::ZeroOrMore,
+                    Identification::Identifying,
+                ),
             );
 
             assert_eq!(db.get_relationships().len(), 1);
@@ -185,7 +189,11 @@ mod tests {
                 "Customer",
                 "places",
                 "Order",
-                RelSpec::new(Cardinality::OnlyOne, Cardinality::ZeroOrMore, Identification::Identifying),
+                RelSpec::new(
+                    Cardinality::OnlyOne,
+                    Cardinality::ZeroOrMore,
+                    Identification::Identifying,
+                ),
             );
 
             assert_eq!(db.get_relationships().len(), 0);
@@ -204,7 +212,11 @@ mod tests {
                 "Customer",
                 "places",
                 "Order",
-                RelSpec::new(Cardinality::OnlyOne, Cardinality::ZeroOrMore, Identification::Identifying),
+                RelSpec::new(
+                    Cardinality::OnlyOne,
+                    Cardinality::ZeroOrMore,
+                    Identification::Identifying,
+                ),
             );
 
             let rel = &db.get_relationships()[0];
@@ -219,7 +231,10 @@ mod tests {
         #[test]
         fn should_parse_cardinality() {
             assert_eq!(Cardinality::from_str("ZERO_OR_ONE"), Cardinality::ZeroOrOne);
-            assert_eq!(Cardinality::from_str("ZERO_OR_MORE"), Cardinality::ZeroOrMore);
+            assert_eq!(
+                Cardinality::from_str("ZERO_OR_MORE"),
+                Cardinality::ZeroOrMore
+            );
             assert_eq!(Cardinality::from_str("ONE_OR_MORE"), Cardinality::OneOrMore);
             assert_eq!(Cardinality::from_str("ONLY_ONE"), Cardinality::OnlyOne);
         }
@@ -238,10 +253,19 @@ mod tests {
 
         #[test]
         fn should_parse_identification() {
-            assert_eq!(Identification::from_str("IDENTIFYING"), Identification::Identifying);
-            assert_eq!(Identification::from_str("NON_IDENTIFYING"), Identification::NonIdentifying);
+            assert_eq!(
+                Identification::from_str("IDENTIFYING"),
+                Identification::Identifying
+            );
+            assert_eq!(
+                Identification::from_str("NON_IDENTIFYING"),
+                Identification::NonIdentifying
+            );
             assert_eq!(Identification::from_str("--"), Identification::Identifying);
-            assert_eq!(Identification::from_str(".."), Identification::NonIdentifying);
+            assert_eq!(
+                Identification::from_str(".."),
+                Identification::NonIdentifying
+            );
         }
 
         #[test]
@@ -365,7 +389,11 @@ mod tests {
                 "Customer",
                 "places",
                 "Order",
-                RelSpec::new(Cardinality::OnlyOne, Cardinality::ZeroOrMore, Identification::Identifying),
+                RelSpec::new(
+                    Cardinality::OnlyOne,
+                    Cardinality::ZeroOrMore,
+                    Identification::Identifying,
+                ),
             );
             db.add_class(&["highlight"], &["fill:#ff0"]);
             db.set_direction(Direction::LeftToRight);

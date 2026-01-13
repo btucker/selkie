@@ -190,7 +190,10 @@ mod tests {
     #[test]
     fn test_x_axis_band() {
         let mut db = XYChartDb::new();
-        db.set_x_axis_band("Categories", vec!["A".to_string(), "B".to_string(), "C".to_string()]);
+        db.set_x_axis_band(
+            "Categories",
+            vec!["A".to_string(), "B".to_string(), "C".to_string()],
+        );
 
         if let Some(XAxisData::Band(axis)) = &db.x_axis {
             assert_eq!(axis.title, "Categories");
@@ -232,8 +235,14 @@ mod tests {
     fn test_add_line_plot() {
         let mut db = XYChartDb::new();
         let data = vec![
-            DataPoint { label: "A".to_string(), value: 10.0 },
-            DataPoint { label: "B".to_string(), value: 20.0 },
+            DataPoint {
+                label: "A".to_string(),
+                value: 10.0,
+            },
+            DataPoint {
+                label: "B".to_string(),
+                value: 20.0,
+            },
         ];
         db.add_line_plot(data);
 
@@ -247,9 +256,18 @@ mod tests {
     fn test_add_bar_plot() {
         let mut db = XYChartDb::new();
         let data = vec![
-            DataPoint { label: "Q1".to_string(), value: 100.0 },
-            DataPoint { label: "Q2".to_string(), value: 150.0 },
-            DataPoint { label: "Q3".to_string(), value: 200.0 },
+            DataPoint {
+                label: "Q1".to_string(),
+                value: 100.0,
+            },
+            DataPoint {
+                label: "Q2".to_string(),
+                value: 150.0,
+            },
+            DataPoint {
+                label: "Q3".to_string(),
+                value: 200.0,
+            },
         ];
         db.add_bar_plot(data);
 
@@ -262,8 +280,14 @@ mod tests {
     #[test]
     fn test_multiple_plots() {
         let mut db = XYChartDb::new();
-        db.add_line_plot(vec![DataPoint { label: "A".to_string(), value: 10.0 }]);
-        db.add_bar_plot(vec![DataPoint { label: "B".to_string(), value: 20.0 }]);
+        db.add_line_plot(vec![DataPoint {
+            label: "A".to_string(),
+            value: 10.0,
+        }]);
+        db.add_bar_plot(vec![DataPoint {
+            label: "B".to_string(),
+            value: 20.0,
+        }]);
 
         let plots = db.get_plots();
         assert_eq!(plots.len(), 2);
@@ -275,7 +299,10 @@ mod tests {
     fn test_clear() {
         let mut db = XYChartDb::new();
         db.set_title("Test");
-        db.add_line_plot(vec![DataPoint { label: "A".to_string(), value: 10.0 }]);
+        db.add_line_plot(vec![DataPoint {
+            label: "A".to_string(),
+            value: 10.0,
+        }]);
         db.clear();
 
         assert_eq!(db.title, "");

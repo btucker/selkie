@@ -104,7 +104,14 @@ mod tests {
     #[test]
     fn test_respects_minlen() {
         let mut g = DagreGraph::new();
-        g.set_edge("a", "b", EdgeLabel { minlen: 3, ..Default::default() });
+        g.set_edge(
+            "a",
+            "b",
+            EdgeLabel {
+                minlen: 3,
+                ..Default::default()
+            },
+        );
 
         run(&mut g);
 

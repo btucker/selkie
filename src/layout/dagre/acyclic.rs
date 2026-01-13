@@ -36,7 +36,10 @@ pub fn run(g: &mut DagreGraph, method: Acyclicer) {
             let rev_key = EdgeKey::with_name(&edge_key.w, &edge_key.v, &rev_name);
 
             g.edges.insert(rev_key.clone(), label);
-            g.out_edges.get_mut(&edge_key.w).unwrap().push(rev_key.clone());
+            g.out_edges
+                .get_mut(&edge_key.w)
+                .unwrap()
+                .push(rev_key.clone());
             g.in_edges.get_mut(&edge_key.v).unwrap().push(rev_key);
         }
     }
@@ -271,7 +274,14 @@ mod tests {
 
         for v in g.nodes() {
             if !visited.contains(v) {
-                dfs(g, v, &mut visited, &mut rec_stack, &mut rec_set, &mut cycles);
+                dfs(
+                    g,
+                    v,
+                    &mut visited,
+                    &mut rec_stack,
+                    &mut rec_set,
+                    &mut cycles,
+                );
             }
         }
 
@@ -328,7 +338,15 @@ mod tests {
     #[test]
     fn test_undo_does_not_change_acyclic_graph() {
         let mut g = DagreGraph::new();
-        g.set_edge("a", "b", EdgeLabel { minlen: 2, weight: 3, ..Default::default() });
+        g.set_edge(
+            "a",
+            "b",
+            EdgeLabel {
+                minlen: 2,
+                weight: 3,
+                ..Default::default()
+            },
+        );
 
         run(&mut g, Acyclicer::Dfs);
         undo(&mut g);
@@ -342,8 +360,24 @@ mod tests {
     #[test]
     fn test_undo_restores_reversed_edges() {
         let mut g = DagreGraph::new();
-        g.set_edge("a", "b", EdgeLabel { minlen: 2, weight: 3, ..Default::default() });
-        g.set_edge("b", "a", EdgeLabel { minlen: 3, weight: 4, ..Default::default() });
+        g.set_edge(
+            "a",
+            "b",
+            EdgeLabel {
+                minlen: 2,
+                weight: 3,
+                ..Default::default()
+            },
+        );
+        g.set_edge(
+            "b",
+            "a",
+            EdgeLabel {
+                minlen: 3,
+                weight: 4,
+                ..Default::default()
+            },
+        );
 
         run(&mut g, Acyclicer::Dfs);
         undo(&mut g);
@@ -360,10 +394,42 @@ mod tests {
     fn test_greedy_prefers_low_weight_edges() {
         let mut g = DagreGraph::new();
         // Set default weight to 2
-        g.set_edge("a", "b", EdgeLabel { minlen: 1, weight: 2, ..Default::default() });
-        g.set_edge("b", "c", EdgeLabel { minlen: 1, weight: 2, ..Default::default() });
-        g.set_edge("c", "d", EdgeLabel { minlen: 1, weight: 1, ..Default::default() }); // Low weight
-        g.set_edge("d", "a", EdgeLabel { minlen: 1, weight: 2, ..Default::default() });
+        g.set_edge(
+            "a",
+            "b",
+            EdgeLabel {
+                minlen: 1,
+                weight: 2,
+                ..Default::default()
+            },
+        );
+        g.set_edge(
+            "b",
+            "c",
+            EdgeLabel {
+                minlen: 1,
+                weight: 2,
+                ..Default::default()
+            },
+        );
+        g.set_edge(
+            "c",
+            "d",
+            EdgeLabel {
+                minlen: 1,
+                weight: 1,
+                ..Default::default()
+            },
+        ); // Low weight
+        g.set_edge(
+            "d",
+            "a",
+            EdgeLabel {
+                minlen: 1,
+                weight: 2,
+                ..Default::default()
+            },
+        );
 
         run(&mut g, Acyclicer::Greedy);
 

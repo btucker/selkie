@@ -462,7 +462,8 @@ impl ClassDb {
     /// Add a class to the database
     pub fn add_class(&mut self, id: &str) {
         if !self.classes.contains_key(id) {
-            self.classes.insert(id.to_string(), ClassNode::new(id.to_string()));
+            self.classes
+                .insert(id.to_string(), ClassNode::new(id.to_string()));
         }
     }
 
@@ -487,9 +488,13 @@ impl ClassDb {
         if let Some(class) = self.classes.get_mut(class_name) {
             // Determine if it's a method or attribute
             if member.contains('(') {
-                class.methods.push(ClassMember::new(member, MemberType::Method));
+                class
+                    .methods
+                    .push(ClassMember::new(member, MemberType::Method));
             } else {
-                class.members.push(ClassMember::new(member, MemberType::Attribute));
+                class
+                    .members
+                    .push(ClassMember::new(member, MemberType::Attribute));
             }
         }
     }
@@ -554,7 +559,8 @@ impl ClassDb {
     /// Add a namespace
     pub fn add_namespace(&mut self, id: &str) {
         if !self.namespaces.contains_key(id) {
-            self.namespaces.insert(id.to_string(), NamespaceNode::new(id.to_string()));
+            self.namespaces
+                .insert(id.to_string(), NamespaceNode::new(id.to_string()));
         }
     }
 

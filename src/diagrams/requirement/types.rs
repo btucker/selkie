@@ -388,7 +388,10 @@ mod tests {
         let element = db.get_elements().get("element").unwrap();
 
         assert_eq!(requirement.css_styles, vec!["color:red"]);
-        assert_eq!(element.css_styles, vec!["stroke-width:4px", "stroke: yellow"]);
+        assert_eq!(
+            element.css_styles,
+            vec!["stroke-width:4px", "stroke: yellow"]
+        );
     }
 
     #[test]
@@ -419,7 +422,10 @@ mod tests {
         let element = db.get_elements().get("element").unwrap();
 
         assert_eq!(requirement.css_styles, vec!["color:red"]);
-        assert_eq!(element.css_styles, vec!["stroke-width:4px", "stroke: yellow"]);
+        assert_eq!(
+            element.css_styles,
+            vec!["stroke-width:4px", "stroke: yellow"]
+        );
     }
 
     #[test]

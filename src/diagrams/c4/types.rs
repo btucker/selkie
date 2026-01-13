@@ -3,7 +3,6 @@
 //! C4 diagrams show software architecture using the C4 model
 //! (Context, Containers, Components, Code).
 
-
 /// C4 element shape type
 #[derive(Debug, Clone, PartialEq)]
 pub enum C4ShapeType {
@@ -72,7 +71,12 @@ impl C4Element {
         }
     }
 
-    pub fn new_container(alias: String, label: String, technology: String, description: String) -> Self {
+    pub fn new_container(
+        alias: String,
+        label: String,
+        technology: String,
+        description: String,
+    ) -> Self {
         Self {
             alias,
             label,
@@ -86,7 +90,12 @@ impl C4Element {
         }
     }
 
-    pub fn new_component(alias: String, label: String, technology: String, description: String) -> Self {
+    pub fn new_component(
+        alias: String,
+        label: String,
+        technology: String,
+        description: String,
+    ) -> Self {
         Self {
             alias,
             label,
@@ -152,14 +161,28 @@ impl C4Db {
 
     /// Add a person element
     pub fn add_person(&mut self, alias: &str, label: &str, description: &str) {
-        let mut elem = C4Element::new_person(alias.to_string(), label.to_string(), description.to_string());
+        let mut elem = C4Element::new_person(
+            alias.to_string(),
+            label.to_string(),
+            description.to_string(),
+        );
         elem.parent_boundary = self.current_boundary();
         self.elements.push(elem);
     }
 
     /// Add a person element with specific shape type
-    pub fn add_person_with_type(&mut self, alias: &str, label: &str, description: &str, shape_type: C4ShapeType) {
-        let mut elem = C4Element::new_person(alias.to_string(), label.to_string(), description.to_string());
+    pub fn add_person_with_type(
+        &mut self,
+        alias: &str,
+        label: &str,
+        description: &str,
+        shape_type: C4ShapeType,
+    ) {
+        let mut elem = C4Element::new_person(
+            alias.to_string(),
+            label.to_string(),
+            description.to_string(),
+        );
         elem.shape_type = shape_type;
         elem.parent_boundary = self.current_boundary();
         self.elements.push(elem);
@@ -167,14 +190,28 @@ impl C4Db {
 
     /// Add a system element
     pub fn add_system(&mut self, alias: &str, label: &str, description: &str) {
-        let mut elem = C4Element::new_system(alias.to_string(), label.to_string(), description.to_string());
+        let mut elem = C4Element::new_system(
+            alias.to_string(),
+            label.to_string(),
+            description.to_string(),
+        );
         elem.parent_boundary = self.current_boundary();
         self.elements.push(elem);
     }
 
     /// Add a system element with specific shape type
-    pub fn add_system_with_type(&mut self, alias: &str, label: &str, description: &str, shape_type: C4ShapeType) {
-        let mut elem = C4Element::new_system(alias.to_string(), label.to_string(), description.to_string());
+    pub fn add_system_with_type(
+        &mut self,
+        alias: &str,
+        label: &str,
+        description: &str,
+        shape_type: C4ShapeType,
+    ) {
+        let mut elem = C4Element::new_system(
+            alias.to_string(),
+            label.to_string(),
+            description.to_string(),
+        );
         elem.shape_type = shape_type;
         elem.parent_boundary = self.current_boundary();
         self.elements.push(elem);
@@ -193,7 +230,14 @@ impl C4Db {
     }
 
     /// Add a container element with specific shape type
-    pub fn add_container_with_type(&mut self, alias: &str, label: &str, technology: &str, description: &str, shape_type: C4ShapeType) {
+    pub fn add_container_with_type(
+        &mut self,
+        alias: &str,
+        label: &str,
+        technology: &str,
+        description: &str,
+        shape_type: C4ShapeType,
+    ) {
         let mut elem = C4Element::new_container(
             alias.to_string(),
             label.to_string(),
@@ -218,7 +262,14 @@ impl C4Db {
     }
 
     /// Add a component element with specific shape type
-    pub fn add_component_with_type(&mut self, alias: &str, label: &str, technology: &str, description: &str, shape_type: C4ShapeType) {
+    pub fn add_component_with_type(
+        &mut self,
+        alias: &str,
+        label: &str,
+        technology: &str,
+        description: &str,
+        shape_type: C4ShapeType,
+    ) {
         let mut elem = C4Element::new_component(
             alias.to_string(),
             label.to_string(),

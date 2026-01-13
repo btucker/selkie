@@ -43,8 +43,8 @@ pub struct ShapeCounts {
 impl SvgStructure {
     /// Parse an SVG string and extract its structure
     pub fn from_svg(svg: &str) -> Result<Self, String> {
-        let doc = roxmltree::Document::parse(svg)
-            .map_err(|e| format!("Failed to parse SVG: {}", e))?;
+        let doc =
+            roxmltree::Document::parse(svg).map_err(|e| format!("Failed to parse SVG: {}", e))?;
 
         let root = doc.root_element();
         if root.tag_name().name() != "svg" {
@@ -232,7 +232,12 @@ impl SvgStructure {
 
         // Compare shape counts (if strict)
         if config.strict_shape_counts {
-            compare_shape_counts(&self.shapes, &expected.shapes, &mut differences, &mut score_parts);
+            compare_shape_counts(
+                &self.shapes,
+                &expected.shapes,
+                &mut differences,
+                &mut score_parts,
+            );
         }
 
         // Check for defs and style
@@ -324,7 +329,10 @@ fn count_nodes_and_edges(doc: &roxmltree::Document) -> (usize, usize) {
             let classes: Vec<&str> = class.split_whitespace().collect();
 
             // Count nodes - elements with "node" class (both implementations)
-            if classes.iter().any(|c| *c == "node" || *c == "flowchart-node") {
+            if classes
+                .iter()
+                .any(|c| *c == "node" || *c == "flowchart-node")
+            {
                 node_count += 1;
             }
 

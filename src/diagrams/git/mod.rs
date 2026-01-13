@@ -3,11 +3,11 @@
 //! The git graph diagram visualizes git repository history with
 //! commits, branches, merges, and cherry-picks.
 
-mod types;
 pub mod parser;
+mod types;
 
-pub use types::*;
 pub use parser::parse;
+pub use types::*;
 
 #[cfg(test)]
 mod tests {
@@ -133,7 +133,12 @@ mod tests {
         #[test]
         fn should_handle_commit_with_custom_id() {
             let mut db = GitGraphDb::new();
-            db.commit(Some("1111".to_string()), String::new(), CommitType::Normal, vec![]);
+            db.commit(
+                Some("1111".to_string()),
+                String::new(),
+                CommitType::Normal,
+                vec![],
+            );
 
             let commits = db.get_commits();
             assert_eq!(commits.len(), 1);
@@ -148,7 +153,12 @@ mod tests {
         #[test]
         fn should_handle_commit_with_tag() {
             let mut db = GitGraphDb::new();
-            db.commit(None, String::new(), CommitType::Normal, vec!["test".to_string()]);
+            db.commit(
+                None,
+                String::new(),
+                CommitType::Normal,
+                vec!["test".to_string()],
+            );
 
             let commits = db.get_commits();
             assert_eq!(commits.len(), 1);

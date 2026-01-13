@@ -53,7 +53,11 @@ impl PieDb {
     }
 
     /// Add a section to the pie chart
-    pub fn add_section(&mut self, label: impl Into<String>, value: f64) -> Result<(), crate::error::MermaidError> {
+    pub fn add_section(
+        &mut self,
+        label: impl Into<String>,
+        value: f64,
+    ) -> Result<(), crate::error::MermaidError> {
         let label = label.into();
         if value < 0.0 {
             return Err(crate::error::MermaidError::InvalidValue {
@@ -79,7 +83,8 @@ impl PieDb {
 
     /// Get a section value by label
     pub fn get_section(&self, label: &str) -> Option<f64> {
-        self.sections.iter()
+        self.sections
+            .iter()
             .find(|(l, _)| l == label)
             .map(|(_, v)| *v)
     }

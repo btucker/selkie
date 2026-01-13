@@ -133,10 +133,12 @@ fn process_entity_stmt(pair: pest::iterators::Pair<Rule>, db: &mut ErDb) -> Resu
                     if a.as_rule() == Rule::alias_quoted {
                         // Strip quotes from alias
                         let raw = a.as_str();
-                        alias = Some(raw.strip_prefix('"')
-                            .and_then(|s| s.strip_suffix('"'))
-                            .unwrap_or(raw)
-                            .to_string());
+                        alias = Some(
+                            raw.strip_prefix('"')
+                                .and_then(|s| s.strip_suffix('"'))
+                                .unwrap_or(raw)
+                                .to_string(),
+                        );
                     }
                 }
             }
@@ -173,10 +175,12 @@ fn process_entity_with_attrs(pair: pest::iterators::Pair<Rule>, db: &mut ErDb) -
                     if a.as_rule() == Rule::alias_quoted {
                         // Strip quotes from alias
                         let raw = a.as_str();
-                        alias = Some(raw.strip_prefix('"')
-                            .and_then(|s| s.strip_suffix('"'))
-                            .unwrap_or(raw)
-                            .to_string());
+                        alias = Some(
+                            raw.strip_prefix('"')
+                                .and_then(|s| s.strip_suffix('"'))
+                                .unwrap_or(raw)
+                                .to_string(),
+                        );
                     }
                 }
             }
@@ -593,7 +597,9 @@ mod tests {
         let db = result.unwrap();
         let entity = db.get_entity("BOOK").unwrap();
         assert_eq!(entity.attributes.len(), 1);
-        assert!(entity.attributes[0].keys.contains(&AttributeKey::PrimaryKey));
+        assert!(entity.attributes[0]
+            .keys
+            .contains(&AttributeKey::PrimaryKey));
     }
 
     #[test]
@@ -615,7 +621,9 @@ mod tests {
 
         let db = result.unwrap();
         let entity = db.get_entity("BOOK").unwrap();
-        assert!(entity.attributes[0].keys.contains(&AttributeKey::PrimaryKey));
+        assert!(entity.attributes[0]
+            .keys
+            .contains(&AttributeKey::PrimaryKey));
         assert_eq!(entity.attributes[0].comment, "comment");
     }
 
@@ -627,8 +635,12 @@ mod tests {
 
         let db = result.unwrap();
         let entity = db.get_entity("CUSTOMER").unwrap();
-        assert!(entity.attributes[0].keys.contains(&AttributeKey::PrimaryKey));
-        assert!(entity.attributes[0].keys.contains(&AttributeKey::ForeignKey));
+        assert!(entity.attributes[0]
+            .keys
+            .contains(&AttributeKey::PrimaryKey));
+        assert!(entity.attributes[0]
+            .keys
+            .contains(&AttributeKey::ForeignKey));
     }
 
     #[test]
@@ -950,8 +962,16 @@ mod tests {
         assert!(result.is_ok(), "Failed to parse: {:?}", result);
 
         let db = result.unwrap();
-        assert!(db.get_entity("CUSTOMER").unwrap().css_classes.contains("myClass"));
-        assert!(db.get_entity("PERSON").unwrap().css_classes.contains("myClass"));
+        assert!(db
+            .get_entity("CUSTOMER")
+            .unwrap()
+            .css_classes
+            .contains("myClass"));
+        assert!(db
+            .get_entity("PERSON")
+            .unwrap()
+            .css_classes
+            .contains("myClass"));
     }
 
     // Cypress test diagrams

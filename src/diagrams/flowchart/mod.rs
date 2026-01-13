@@ -5,8 +5,8 @@ mod types;
 
 pub use parser::parse;
 pub use types::{
-    Direction, EdgeStroke, FlowchartDb, FlowClass, FlowEdge, FlowSubGraph, FlowText, FlowTextType,
-    FlowVertex, FlowVertexType,
+    Direction, EdgeStroke, FlowClass, FlowEdge, FlowSubGraph, FlowText, FlowTextType, FlowVertex,
+    FlowVertexType, FlowchartDb,
 };
 
 #[cfg(test)]
@@ -24,7 +24,12 @@ mod tests {
             vec![
                 FlowSubGraph {
                     id: "sg1".to_string(),
-                    nodes: vec!["a".to_string(), "b".to_string(), "c".to_string(), "e".to_string()],
+                    nodes: vec![
+                        "a".to_string(),
+                        "b".to_string(),
+                        "c".to_string(),
+                        "e".to_string(),
+                    ],
                     ..Default::default()
                 },
                 FlowSubGraph {

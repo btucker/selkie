@@ -45,7 +45,8 @@ impl SpanningTree {
     }
 
     pub fn set_edge(&mut self, v: &str, w: &str, edge: TreeEdge) {
-        self.edges.insert((v.to_string(), w.to_string()), edge.clone());
+        self.edges
+            .insert((v.to_string(), w.to_string()), edge.clone());
         self.edges.insert((w.to_string(), v.to_string()), edge);
     }
 
@@ -101,7 +102,8 @@ impl SpanningTree {
 
     /// Get neighbors of a node in the tree
     pub fn neighbors(&self, v: &str) -> Vec<String> {
-        let mut neighbors: Vec<String> = self.edges
+        let mut neighbors: Vec<String> = self
+            .edges
             .keys()
             .filter(|(a, _)| a == v)
             .map(|(_, b)| b.clone())
@@ -191,7 +193,11 @@ fn feasible_tree(g: &DagreGraph) -> SpanningTree {
         if !in_tree.contains(v) {
             // Find an edge connecting this node to the tree
             for edge_key in g.in_edges(v).iter().chain(g.out_edges(v).iter()) {
-                let other = if edge_key.v == *v { &edge_key.w } else { &edge_key.v };
+                let other = if edge_key.v == *v {
+                    &edge_key.w
+                } else {
+                    &edge_key.v
+                };
                 if in_tree.contains(other) {
                     tree.set_edge(v, other, TreeEdge::default());
                     in_tree.insert(v.clone());
@@ -251,7 +257,11 @@ fn dfs_assign(tree: &mut SpanningTree, v: &str, parent: Option<&str>, counter: &
 
 /// Initialize cut values for all tree edges
 pub fn init_cut_values(tree: &mut SpanningTree, g: &DagreGraph) {
-    let edges: Vec<(String, String)> = tree.edges_list().iter().map(|(v, w)| (v.to_string(), w.to_string())).collect();
+    let edges: Vec<(String, String)> = tree
+        .edges_list()
+        .iter()
+        .map(|(v, w)| (v.to_string(), w.to_string()))
+        .collect();
 
     for (v, w) in edges {
         let cutvalue = calc_cut_value(tree, g, &v, &w);
@@ -336,7 +346,11 @@ pub fn leave_edge(tree: &SpanningTree) -> Option<(String, String)> {
 }
 
 /// Find an edge to enter the tree
-pub fn enter_edge(tree: &SpanningTree, g: &DagreGraph, leave: &(String, String)) -> Option<EdgeKey> {
+pub fn enter_edge(
+    tree: &SpanningTree,
+    g: &DagreGraph,
+    leave: &(String, String),
+) -> Option<EdgeKey> {
     let (tail, _head) = (&leave.0, &leave.1);
 
     // Find the non-tree edge with minimum slack that crosses the cut
@@ -367,7 +381,12 @@ pub fn enter_edge(tree: &SpanningTree, g: &DagreGraph, leave: &(String, String))
 }
 
 /// Exchange edges in the tree and update the graph
-pub fn exchange_edges(tree: &mut SpanningTree, g: &mut DagreGraph, leave: &(String, String), enter: &EdgeKey) {
+pub fn exchange_edges(
+    tree: &mut SpanningTree,
+    g: &mut DagreGraph,
+    leave: &(String, String),
+    enter: &EdgeKey,
+) {
     // Remove leaving edge from tree
     tree.remove_edge(&leave.0, &leave.1);
 
@@ -407,7 +426,7 @@ pub fn exchange_edges(tree: &mut SpanningTree, g: &mut DagreGraph, leave: &(Stri
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{NodeLabel, EdgeLabel};
+    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
 
     #[test]
     fn test_single_node() {

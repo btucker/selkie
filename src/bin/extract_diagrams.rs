@@ -117,7 +117,12 @@ fn extract_diagrams_from_file(filepath: &Path) -> Vec<DiagramEntry> {
 fn extract_from_directory(directory: &Path) -> Vec<DiagramEntry> {
     let mut all_diagrams = Vec::new();
 
-    let patterns = ["**/*.spec.ts", "**/*.spec.js", "**/*.test.ts", "**/*.test.js"];
+    let patterns = [
+        "**/*.spec.ts",
+        "**/*.spec.js",
+        "**/*.test.ts",
+        "**/*.test.js",
+    ];
 
     for pattern in patterns {
         let full_pattern = directory.join(pattern);
@@ -176,7 +181,11 @@ fn main() {
 
     if let Some(output) = output_path {
         fs::write(&output, &json).expect("Failed to write output file");
-        eprintln!("Extracted {} diagrams to {}", result.count, output.display());
+        eprintln!(
+            "Extracted {} diagrams to {}",
+            result.count,
+            output.display()
+        );
     } else {
         println!("{}", json);
     }

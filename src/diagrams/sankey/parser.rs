@@ -193,7 +193,9 @@ District heating,"Heating and cooling, homes",46.184
         let nodes = result.get_nodes();
 
         // Find the nodes with commas
-        let has_commercial = nodes.iter().any(|n| n.id == "Heating and cooling, commercial");
+        let has_commercial = nodes
+            .iter()
+            .any(|n| n.id == "Heating and cooling, commercial");
         let has_homes = nodes.iter().any(|n| n.id == "Heating and cooling, homes");
         assert!(has_commercial);
         assert!(has_homes);

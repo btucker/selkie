@@ -3,11 +3,11 @@
 //! Sequence diagrams show interactions between actors/participants
 //! with messages, notes, and control structures (loops, alternatives, etc.)
 
-mod types;
 pub mod parser;
+mod types;
 
-pub use types::*;
 pub use parser::parse;
+pub use types::*;
 
 #[cfg(test)]
 mod tests {
@@ -199,13 +199,28 @@ mod tests {
 
         #[test]
         fn should_parse_participant_types() {
-            assert_eq!(ParticipantType::from_str("participant"), ParticipantType::Participant);
+            assert_eq!(
+                ParticipantType::from_str("participant"),
+                ParticipantType::Participant
+            );
             assert_eq!(ParticipantType::from_str("actor"), ParticipantType::Actor);
-            assert_eq!(ParticipantType::from_str("boundary"), ParticipantType::Boundary);
-            assert_eq!(ParticipantType::from_str("control"), ParticipantType::Control);
+            assert_eq!(
+                ParticipantType::from_str("boundary"),
+                ParticipantType::Boundary
+            );
+            assert_eq!(
+                ParticipantType::from_str("control"),
+                ParticipantType::Control
+            );
             assert_eq!(ParticipantType::from_str("entity"), ParticipantType::Entity);
-            assert_eq!(ParticipantType::from_str("database"), ParticipantType::Database);
-            assert_eq!(ParticipantType::from_str("collections"), ParticipantType::Collections);
+            assert_eq!(
+                ParticipantType::from_str("database"),
+                ParticipantType::Database
+            );
+            assert_eq!(
+                ParticipantType::from_str("collections"),
+                ParticipantType::Collections
+            );
             assert_eq!(ParticipantType::from_str("queue"), ParticipantType::Queue);
         }
 

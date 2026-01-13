@@ -150,10 +150,8 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
                         // Average the two middle points if even number of points
                         let p1 = &edge.bend_points[mid_idx - 1];
                         let p2 = &edge.bend_points[mid_idx];
-                        edge.label_position = Some(Point::new(
-                            (p1.x + p2.x) / 2.0,
-                            (p1.y + p2.y) / 2.0,
-                        ));
+                        edge.label_position =
+                            Some(Point::new((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0));
                     } else {
                         // Use the middle point if odd number
                         edge.label_position = Some(edge.bend_points[mid_idx].clone());
@@ -293,7 +291,11 @@ mod tests {
 
         // Check that edge points exist for LR layout
         let edge = result.edges.first().expect("Should have an edge");
-        eprintln!("LR Edge {} has {} bend points:", edge.id, edge.bend_points.len());
+        eprintln!(
+            "LR Edge {} has {} bend points:",
+            edge.id,
+            edge.bend_points.len()
+        );
         for (i, p) in edge.bend_points.iter().enumerate() {
             eprintln!("  Point {}: ({:.1}, {:.1})", i, p.x, p.y);
         }
@@ -358,7 +360,9 @@ mod tests {
         assert!(
             label_pos.x > a_right && label_pos.x < b_left,
             "Label x ({}) should be between A right edge ({}) and B left edge ({})",
-            label_pos.x, a_right, b_left
+            label_pos.x,
+            a_right,
+            b_left
         );
     }
 }

@@ -71,7 +71,11 @@ pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
 
     SortResult {
         vs,
-        barycenter: if weight > 0.0 { Some(sum / weight) } else { None },
+        barycenter: if weight > 0.0 {
+            Some(sum / weight)
+        } else {
+            None
+        },
         weight,
     }
 }
@@ -79,7 +83,7 @@ pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
 fn consume_unsortable(
     vs: &mut Vec<String>,
     unsortable: &mut Vec<(usize, BarycenterEntry)>,
-    index: &mut usize
+    index: &mut usize,
 ) {
     while let Some((i, _)) = unsortable.last() {
         if *i <= *index {
@@ -99,9 +103,21 @@ mod tests {
     #[test]
     fn test_sort_by_barycenter() {
         let entries = vec![
-            BarycenterEntry { v: "a".to_string(), barycenter: Some(2.0), weight: 1.0 },
-            BarycenterEntry { v: "b".to_string(), barycenter: Some(1.0), weight: 1.0 },
-            BarycenterEntry { v: "c".to_string(), barycenter: Some(3.0), weight: 1.0 },
+            BarycenterEntry {
+                v: "a".to_string(),
+                barycenter: Some(2.0),
+                weight: 1.0,
+            },
+            BarycenterEntry {
+                v: "b".to_string(),
+                barycenter: Some(1.0),
+                weight: 1.0,
+            },
+            BarycenterEntry {
+                v: "c".to_string(),
+                barycenter: Some(3.0),
+                weight: 1.0,
+            },
         ];
 
         let result = sort(entries, false);
@@ -112,9 +128,21 @@ mod tests {
     #[test]
     fn test_sort_preserves_order_for_equal_barycenter() {
         let entries = vec![
-            BarycenterEntry { v: "a".to_string(), barycenter: Some(1.0), weight: 1.0 },
-            BarycenterEntry { v: "b".to_string(), barycenter: Some(1.0), weight: 1.0 },
-            BarycenterEntry { v: "c".to_string(), barycenter: Some(1.0), weight: 1.0 },
+            BarycenterEntry {
+                v: "a".to_string(),
+                barycenter: Some(1.0),
+                weight: 1.0,
+            },
+            BarycenterEntry {
+                v: "b".to_string(),
+                barycenter: Some(1.0),
+                weight: 1.0,
+            },
+            BarycenterEntry {
+                v: "c".to_string(),
+                barycenter: Some(1.0),
+                weight: 1.0,
+            },
         ];
 
         let result = sort(entries, false);
@@ -125,8 +153,16 @@ mod tests {
     #[test]
     fn test_sort_bias_right() {
         let entries = vec![
-            BarycenterEntry { v: "a".to_string(), barycenter: Some(1.0), weight: 1.0 },
-            BarycenterEntry { v: "b".to_string(), barycenter: Some(1.0), weight: 1.0 },
+            BarycenterEntry {
+                v: "a".to_string(),
+                barycenter: Some(1.0),
+                weight: 1.0,
+            },
+            BarycenterEntry {
+                v: "b".to_string(),
+                barycenter: Some(1.0),
+                weight: 1.0,
+            },
         ];
 
         let result = sort(entries, true);
@@ -137,9 +173,21 @@ mod tests {
     #[test]
     fn test_sort_handles_no_barycenter() {
         let entries = vec![
-            BarycenterEntry { v: "a".to_string(), barycenter: Some(2.0), weight: 1.0 },
-            BarycenterEntry { v: "b".to_string(), barycenter: None, weight: 0.0 },
-            BarycenterEntry { v: "c".to_string(), barycenter: Some(1.0), weight: 1.0 },
+            BarycenterEntry {
+                v: "a".to_string(),
+                barycenter: Some(2.0),
+                weight: 1.0,
+            },
+            BarycenterEntry {
+                v: "b".to_string(),
+                barycenter: None,
+                weight: 0.0,
+            },
+            BarycenterEntry {
+                v: "c".to_string(),
+                barycenter: Some(1.0),
+                weight: 1.0,
+            },
         ];
 
         let result = sort(entries, false);

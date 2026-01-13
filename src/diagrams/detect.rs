@@ -34,32 +34,42 @@ pub enum DiagramType {
 }
 
 // Regex patterns for detecting diagram types
-static FLOWCHART_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?i)^\s*(flowchart|graph)\s*(TB|BT|RL|LR|TD)?").unwrap()
-});
+static FLOWCHART_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*(flowchart|graph)\s*(TB|BT|RL|LR|TD)?").unwrap());
 
 static PIE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*pie").unwrap());
 static MINDMAP_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*mindmap").unwrap());
 static INFO_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*info").unwrap());
-static SEQUENCE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*sequenceDiagram").unwrap());
+static SEQUENCE_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*sequenceDiagram").unwrap());
 static CLASS_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*classDiagram").unwrap());
 static STATE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*stateDiagram").unwrap());
 static ER_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*erDiagram").unwrap());
 static GANTT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*gantt").unwrap());
-static JOURNEY_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*(journey|user-journey)").unwrap());
+static JOURNEY_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*(journey|user-journey)").unwrap());
 static GIT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*gitGraph").unwrap());
-static REQUIREMENT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*requirementDiagram").unwrap());
-static QUADRANT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*quadrantChart").unwrap());
-static C4_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*C4(Context|Container|Component|Dynamic|Deployment)").unwrap());
+static REQUIREMENT_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*requirementDiagram").unwrap());
+static QUADRANT_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*quadrantChart").unwrap());
+static C4_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?i)^\s*C4(Context|Container|Component|Dynamic|Deployment)").unwrap()
+});
 static TIMELINE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*timeline").unwrap());
-static SANKEY_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*sankey(-beta)?").unwrap());
-static XYCHART_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*xychart(-beta)?").unwrap());
+static SANKEY_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*sankey(-beta)?").unwrap());
+static XYCHART_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*xychart(-beta)?").unwrap());
 static BLOCK_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*block(-beta)?").unwrap());
-static PACKET_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*packet(-beta)?").unwrap());
-static ARCHITECTURE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*architecture(-beta)?").unwrap());
+static PACKET_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*packet(-beta)?").unwrap());
+static ARCHITECTURE_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*architecture(-beta)?").unwrap());
 static KANBAN_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*kanban").unwrap());
 static RADAR_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*radar(-beta)?").unwrap());
-static TREEMAP_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)^\s*treemap(-beta)?").unwrap());
+static TREEMAP_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*treemap(-beta)?").unwrap());
 
 /// Detect the type of diagram from input text
 pub fn detect_type(input: &str) -> Result<DiagramType> {

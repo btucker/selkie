@@ -139,7 +139,8 @@ fn reverse_points_for_reversed_edges(graph: &mut DagreGraph) {
     let edge_keys: Vec<graph::EdgeKey> = graph.edges().into_iter().cloned().collect();
 
     // Second pass: find which ones need reversal
-    let keys_to_reverse: Vec<graph::EdgeKey> = edge_keys.into_iter()
+    let keys_to_reverse: Vec<graph::EdgeKey> = edge_keys
+        .into_iter()
         .filter(|key| graph.edge_by_key(key).map(|e| e.reversed).unwrap_or(false))
         .collect();
 
@@ -321,7 +322,14 @@ mod tests {
     #[test]
     fn can_layout_single_node() {
         let mut g = new_graph();
-        g.set_node("a", graph::NodeLabel { width: 50.0, height: 100.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
 
         layout(&mut g, &DagreConfig::default());
 
@@ -334,10 +342,30 @@ mod tests {
     fn can_layout_two_nodes_same_rank() {
         let mut g = new_graph();
         g.graph_mut().nodesep = 200.0;
-        g.set_node("a", graph::NodeLabel { width: 50.0, height: 100.0, ..Default::default() });
-        g.set_node("b", graph::NodeLabel { width: 75.0, height: 200.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            graph::NodeLabel {
+                width: 75.0,
+                height: 200.0,
+                ..Default::default()
+            },
+        );
 
-        layout(&mut g, &DagreConfig { nodesep: 200.0, ..Default::default() });
+        layout(
+            &mut g,
+            &DagreConfig {
+                nodesep: 200.0,
+                ..Default::default()
+            },
+        );
 
         let a = g.node("a").unwrap();
         let b = g.node("b").unwrap();
@@ -352,7 +380,9 @@ mod tests {
         // Nodes should be separated by at least nodesep
         let a_right = a.x.unwrap() + a.width / 2.0;
         let b_left = b.x.unwrap() - b.width / 2.0;
-        let separation = (b_left - a_right).abs().min((a.x.unwrap() - b.x.unwrap()).abs() - (a.width + b.width) / 2.0);
+        let _separation = (b_left - a_right)
+            .abs()
+            .min((a.x.unwrap() - b.x.unwrap()).abs() - (a.width + b.width) / 2.0);
         // Note: disconnected nodes may be placed closer than nodesep - just verify they don't overlap
         assert!(a.x != b.x, "Nodes should have different x positions");
     }
@@ -361,11 +391,31 @@ mod tests {
     fn can_layout_two_nodes_connected_by_edge() {
         let mut g = new_graph();
         g.graph_mut().ranksep = 300.0;
-        g.set_node("a", graph::NodeLabel { width: 50.0, height: 100.0, ..Default::default() });
-        g.set_node("b", graph::NodeLabel { width: 75.0, height: 200.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            graph::NodeLabel {
+                width: 75.0,
+                height: 200.0,
+                ..Default::default()
+            },
+        );
         g.set_edge("a", "b", graph::EdgeLabel::default());
 
-        layout(&mut g, &DagreConfig { ranksep: 300.0, ..Default::default() });
+        layout(
+            &mut g,
+            &DagreConfig {
+                ranksep: 300.0,
+                ..Default::default()
+            },
+        );
 
         let a = g.node("a").unwrap();
         let b = g.node("b").unwrap();
@@ -383,23 +433,60 @@ mod tests {
     fn can_layout_short_cycle() {
         let mut g = new_graph();
         g.graph_mut().ranksep = 200.0;
-        g.set_node("a", graph::NodeLabel { width: 100.0, height: 100.0, ..Default::default() });
-        g.set_node("b", graph::NodeLabel { width: 100.0, height: 100.0, ..Default::default() });
-        g.set_edge("a", "b", graph::EdgeLabel { weight: 2, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 100.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            graph::NodeLabel {
+                width: 100.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
+        g.set_edge(
+            "a",
+            "b",
+            graph::EdgeLabel {
+                weight: 2,
+                ..Default::default()
+            },
+        );
         g.set_edge("b", "a", graph::EdgeLabel::default());
 
-        layout(&mut g, &DagreConfig { ranksep: 200.0, ..Default::default() });
+        layout(
+            &mut g,
+            &DagreConfig {
+                ranksep: 200.0,
+                ..Default::default()
+            },
+        );
 
         let a = g.node("a").unwrap();
         let b = g.node("b").unwrap();
 
         // Both should have positions
-        assert!(a.x.is_some() && a.y.is_some(), "Node a should have position");
-        assert!(b.x.is_some() && b.y.is_some(), "Node b should have position");
+        assert!(
+            a.x.is_some() && a.y.is_some(),
+            "Node a should have position"
+        );
+        assert!(
+            b.x.is_some() && b.y.is_some(),
+            "Node b should have position"
+        );
 
         // Nodes should be close in x (vertically aligned or nearly so)
         let x_diff = (a.x.unwrap() - b.x.unwrap()).abs();
-        assert!(x_diff < 50.0, "Nodes should be roughly vertically aligned, x diff = {}", x_diff);
+        assert!(
+            x_diff < 50.0,
+            "Nodes should be roughly vertically aligned, x diff = {}",
+            x_diff
+        );
 
         // Nodes should be vertically separated (on different ranks)
         let y_diff = (a.y.unwrap() - b.y.unwrap()).abs();
@@ -418,14 +505,28 @@ mod tests {
         g.graph_mut().nodesep = 50.0;
 
         for v in ["a", "b", "c", "d"] {
-            g.set_node(v, graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
+            g.set_node(
+                v,
+                graph::NodeLabel {
+                    width: 50.0,
+                    height: 50.0,
+                    ..Default::default()
+                },
+            );
         }
         g.set_edge("a", "b", graph::EdgeLabel::default());
         g.set_edge("a", "c", graph::EdgeLabel::default());
         g.set_edge("b", "d", graph::EdgeLabel::default());
         g.set_edge("c", "d", graph::EdgeLabel::default());
 
-        layout(&mut g, &DagreConfig { ranksep: 50.0, nodesep: 50.0, ..Default::default() });
+        layout(
+            &mut g,
+            &DagreConfig {
+                ranksep: 50.0,
+                nodesep: 50.0,
+                ..Default::default()
+            },
+        );
 
         let a = g.node("a").unwrap();
         let b = g.node("b").unwrap();
@@ -448,7 +549,14 @@ mod tests {
     #[test]
     fn can_layout_with_subgraphs() {
         let mut g = new_graph();
-        g.set_node("a", graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
         g.set_node("sg1", graph::NodeLabel::default());
         g.set_parent("a", "sg1");
 
@@ -463,49 +571,118 @@ mod tests {
     fn layout_respects_rankdir_lr() {
         let mut g = new_graph();
         g.graph_mut().rankdir = "LR".to_string();
-        g.set_node("a", graph::NodeLabel { width: 50.0, height: 100.0, ..Default::default() });
-        g.set_node("b", graph::NodeLabel { width: 75.0, height: 200.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            graph::NodeLabel {
+                width: 75.0,
+                height: 200.0,
+                ..Default::default()
+            },
+        );
         g.set_edge("a", "b", graph::EdgeLabel::default());
 
-        layout(&mut g, &DagreConfig { rankdir: RankDir::LR, ..Default::default() });
+        layout(
+            &mut g,
+            &DagreConfig {
+                rankdir: RankDir::LR,
+                ..Default::default()
+            },
+        );
 
         let a = g.node("a").unwrap();
         let b = g.node("b").unwrap();
 
         // In LR, nodes should be horizontally arranged
-        assert!(b.x.unwrap() > a.x.unwrap(), "B should be to the right of A in LR layout");
+        assert!(
+            b.x.unwrap() > a.x.unwrap(),
+            "B should be to the right of A in LR layout"
+        );
     }
 
     #[test]
     fn layout_respects_rankdir_bt() {
         let mut g = new_graph();
-        g.set_node("a", graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
-        g.set_node("b", graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
         g.set_edge("a", "b", graph::EdgeLabel::default());
 
-        layout(&mut g, &DagreConfig { rankdir: RankDir::BT, ..Default::default() });
+        layout(
+            &mut g,
+            &DagreConfig {
+                rankdir: RankDir::BT,
+                ..Default::default()
+            },
+        );
 
         let a = g.node("a").unwrap();
         let b = g.node("b").unwrap();
 
         // In BT, A (source) should be below B (target)
-        assert!(a.y.unwrap() > b.y.unwrap(), "A should be below B in BT layout");
+        assert!(
+            a.y.unwrap() > b.y.unwrap(),
+            "A should be below B in BT layout"
+        );
     }
 
     #[test]
     fn layout_respects_rankdir_rl() {
         let mut g = new_graph();
-        g.set_node("a", graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
-        g.set_node("b", graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
         g.set_edge("a", "b", graph::EdgeLabel::default());
 
-        layout(&mut g, &DagreConfig { rankdir: RankDir::RL, ..Default::default() });
+        layout(
+            &mut g,
+            &DagreConfig {
+                rankdir: RankDir::RL,
+                ..Default::default()
+            },
+        );
 
         let a = g.node("a").unwrap();
         let b = g.node("b").unwrap();
 
         // In RL, A (source) should be to the right of B (target)
-        assert!(a.x.unwrap() > b.x.unwrap(), "A should be to the right of B in RL layout");
+        assert!(
+            a.x.unwrap() > b.x.unwrap(),
+            "A should be to the right of B in RL layout"
+        );
     }
 
     #[test]
@@ -513,11 +690,32 @@ mod tests {
     fn minimizes_height_of_subgraphs() {
         let mut g = new_graph();
         for v in ["a", "b", "c", "d", "x", "y"] {
-            g.set_node(v, graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
+            g.set_node(
+                v,
+                graph::NodeLabel {
+                    width: 50.0,
+                    height: 50.0,
+                    ..Default::default()
+                },
+            );
         }
         g.set_path(&["a", "b", "c", "d"]);
-        g.set_edge("a", "x", graph::EdgeLabel { weight: 100, ..Default::default() });
-        g.set_edge("y", "d", graph::EdgeLabel { weight: 100, ..Default::default() });
+        g.set_edge(
+            "a",
+            "x",
+            graph::EdgeLabel {
+                weight: 100,
+                ..Default::default()
+            },
+        );
+        g.set_edge(
+            "y",
+            "d",
+            graph::EdgeLabel {
+                weight: 100,
+                ..Default::default()
+            },
+        );
         g.set_node("sg", graph::NodeLabel::default());
         g.set_parent("x", "sg");
         g.set_parent("y", "sg");
@@ -533,7 +731,14 @@ mod tests {
     #[test]
     fn adds_dimensions_to_graph() {
         let mut g = new_graph();
-        g.set_node("a", graph::NodeLabel { width: 100.0, height: 50.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 100.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
 
         layout(&mut g, &DagreConfig::default());
 
@@ -547,11 +752,24 @@ mod tests {
         g.graph_mut().ranksep = 50.0;
 
         for v in ["a", "b", "c", "d", "e"] {
-            g.set_node(v, graph::NodeLabel { width: 50.0, height: 30.0, ..Default::default() });
+            g.set_node(
+                v,
+                graph::NodeLabel {
+                    width: 50.0,
+                    height: 30.0,
+                    ..Default::default()
+                },
+            );
         }
         g.set_path(&["a", "b", "c", "d", "e"]);
 
-        layout(&mut g, &DagreConfig { ranksep: 50.0, ..Default::default() });
+        layout(
+            &mut g,
+            &DagreConfig {
+                ranksep: 50.0,
+                ..Default::default()
+            },
+        );
 
         // All nodes should be vertically aligned
         let a = g.node("a").unwrap();
@@ -564,8 +782,22 @@ mod tests {
     #[test]
     fn handles_disconnected_nodes() {
         let mut g = new_graph();
-        g.set_node("a", graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
-        g.set_node("b", graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
         // No edges - disconnected
 
         layout(&mut g, &DagreConfig::default());
@@ -581,8 +813,22 @@ mod tests {
     #[test]
     fn handles_multigraph_edges() {
         let mut g = new_graph();
-        g.set_node("a", graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
-        g.set_node("b", graph::NodeLabel { width: 50.0, height: 50.0, ..Default::default() });
+        g.set_node(
+            "a",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            graph::NodeLabel {
+                width: 50.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
         g.set_edge("a", "b", graph::EdgeLabel::default());
         g.set_edge_with_name("a", "b", graph::EdgeLabel::default(), "edge2");
 
@@ -604,7 +850,14 @@ mod tests {
         g.graph_mut().nodesep = 50.0;
 
         for v in ["A", "B", "C", "D", "E", "F"] {
-            g.set_node(v, graph::NodeLabel { width: 100.0, height: 50.0, ..Default::default() });
+            g.set_node(
+                v,
+                graph::NodeLabel {
+                    width: 100.0,
+                    height: 50.0,
+                    ..Default::default()
+                },
+            );
         }
 
         // Set edges exactly as flowchart would
@@ -615,7 +868,14 @@ mod tests {
         g.set_edge("D", "F", graph::EdgeLabel::default());
         g.set_edge("E", "F", graph::EdgeLabel::default());
 
-        layout(&mut g, &DagreConfig { ranksep: 50.0, nodesep: 50.0, ..Default::default() });
+        layout(
+            &mut g,
+            &DagreConfig {
+                ranksep: 50.0,
+                nodesep: 50.0,
+                ..Default::default()
+            },
+        );
 
         let a = g.node("A").unwrap();
         let b = g.node("B").unwrap();
@@ -633,15 +893,43 @@ mod tests {
         eprintln!("  F: y={:?}", f.y);
 
         // A should be above B
-        assert!(a.y.unwrap() < b.y.unwrap(), "A should be above B: A.y={:?}, B.y={:?}", a.y, b.y);
+        assert!(
+            a.y.unwrap() < b.y.unwrap(),
+            "A should be above B: A.y={:?}, B.y={:?}",
+            a.y,
+            b.y
+        );
         // B should be above C
-        assert!(b.y.unwrap() < c.y.unwrap(), "B should be above C: B.y={:?}, C.y={:?}", b.y, c.y);
+        assert!(
+            b.y.unwrap() < c.y.unwrap(),
+            "B should be above C: B.y={:?}, C.y={:?}",
+            b.y,
+            c.y
+        );
         // C should be above D and E
-        assert!(c.y.unwrap() < d.y.unwrap(), "C should be above D: C.y={:?}, D.y={:?}", c.y, d.y);
-        assert!(c.y.unwrap() < e.y.unwrap(), "C should be above E: C.y={:?}, E.y={:?}", c.y, e.y);
+        assert!(
+            c.y.unwrap() < d.y.unwrap(),
+            "C should be above D: C.y={:?}, D.y={:?}",
+            c.y,
+            d.y
+        );
+        assert!(
+            c.y.unwrap() < e.y.unwrap(),
+            "C should be above E: C.y={:?}, E.y={:?}",
+            c.y,
+            e.y
+        );
         // D and E should be on the same level
-        assert!((d.y.unwrap() - e.y.unwrap()).abs() < 1.0, "D and E should be on same level");
+        assert!(
+            (d.y.unwrap() - e.y.unwrap()).abs() < 1.0,
+            "D and E should be on same level"
+        );
         // F should be below D and E
-        assert!(d.y.unwrap() < f.y.unwrap(), "D should be above F: D.y={:?}, F.y={:?}", d.y, f.y);
+        assert!(
+            d.y.unwrap() < f.y.unwrap(),
+            "D should be above F: D.y={:?}, F.y={:?}",
+            d.y,
+            f.y
+        );
     }
 }

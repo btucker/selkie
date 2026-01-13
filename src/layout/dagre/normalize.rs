@@ -71,7 +71,14 @@ pub fn run(graph: &mut DagreGraph) {
             graph.set_node(&dummy_id, dummy_label);
 
             // Connect previous node to this dummy
-            graph.set_edge(&prev_node, &dummy_id, EdgeLabel { weight, ..Default::default() });
+            graph.set_edge(
+                &prev_node,
+                &dummy_id,
+                EdgeLabel {
+                    weight,
+                    ..Default::default()
+                },
+            );
 
             if first_dummy.is_none() {
                 first_dummy = Some(dummy_id.clone());
@@ -81,7 +88,14 @@ pub fn run(graph: &mut DagreGraph) {
         }
 
         // Connect last dummy to the target
-        graph.set_edge(&prev_node, &w, EdgeLabel { weight, ..Default::default() });
+        graph.set_edge(
+            &prev_node,
+            &w,
+            EdgeLabel {
+                weight,
+                ..Default::default()
+            },
+        );
 
         // Track the first dummy in this chain
         if let Some(dummy) = first_dummy {
@@ -112,7 +126,11 @@ pub fn undo(graph: &mut DagreGraph) {
                 None => continue,
             };
 
-            let label = node.edge_label.as_ref().map(|b| (**b).clone()).unwrap_or_default();
+            let label = node
+                .edge_label
+                .as_ref()
+                .map(|b| (**b).clone())
+                .unwrap_or_default();
             (edge_obj.0, edge_obj.1, edge_obj.2, label)
         };
 
@@ -210,7 +228,10 @@ pub fn intersect_rect(node: &NodeLabel, p: &super::graph::Point) -> super::graph
         (sx, sy)
     };
 
-    super::graph::Point { x: cx + sx, y: cy + sy }
+    super::graph::Point {
+        x: cx + sx,
+        y: cy + sy,
+    }
 }
 
 /// Compute intersection point for a diamond (rhombus) shape
@@ -301,24 +322,35 @@ pub fn intersect_ellipse(node: &NodeLabel, p: &super::graph::Point) -> super::gr
 }
 
 fn sy_for_sx(dx: f64, dy: f64, sx: f64) -> f64 {
-    if dx == 0.0 { 0.0 } else { dy * sx / dx }
+    if dx == 0.0 {
+        0.0
+    } else {
+        dy * sx / dx
+    }
 }
 
 fn sx_for_sy(dx: f64, dy: f64, sy: f64) -> f64 {
-    if dy == 0.0 { 0.0 } else { dx * sy / dy }
+    if dy == 0.0 {
+        0.0
+    } else {
+        dx * sy / dy
+    }
 }
 
 /// Assign node intersection points to edges
 /// This adds the start and end points where edges meet node boundaries
 pub fn assign_node_intersects(graph: &mut DagreGraph) {
     // Collect edge data (v, w, points) upfront to avoid borrow issues
-    let edge_data: Vec<_> = graph.edges().iter()
+    let edge_data: Vec<_> = graph
+        .edges()
+        .iter()
         .filter_map(|key| {
             let v = key.v.clone();
             let w = key.w.clone();
             let node_v = graph.node(&v)?.clone();
             let node_w = graph.node(&w)?.clone();
-            let points = graph.edge(&v, &w)
+            let points = graph
+                .edge(&v, &w)
                 .map(|e| e.points.clone())
                 .unwrap_or_default();
             Some((v, w, node_v, node_w, points))
@@ -331,11 +363,11 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
             // No intermediate points - use node centers
             let p1 = super::graph::Point {
                 x: node_w.x.unwrap_or(0.0),
-                y: node_w.y.unwrap_or(0.0)
+                y: node_w.y.unwrap_or(0.0),
             };
             let p2 = super::graph::Point {
                 x: node_v.x.unwrap_or(0.0),
-                y: node_v.y.unwrap_or(0.0)
+                y: node_v.y.unwrap_or(0.0),
             };
             (p1, p2)
         } else {
@@ -354,26 +386,58 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
         points.push(end_point.clone());
 
         // For edges with only 2 points (no intermediate dummy nodes),
-        // add intermediate control points for smooth B-spline interpolation
-        // These points are collinear - the B-spline will create natural smoothing
+        // add intermediate points to create smooth curved edges like mermaid.js
+        // mermaid.js uses "elbow" style routing with L-shaped waypoints that get
+        // smoothed by d3's curveBasis into flowing S-curves
         if points.len() == 2 {
-            // Calculate direction vector
             let dx = end_point.x - start_point.x;
             let dy = end_point.y - start_point.y;
 
-            // Add two intermediate points at 1/3 and 2/3 along the edge
-            // These help the B-spline create smooth entry/exit at node boundaries
-            let cp1 = super::graph::Point {
-                x: start_point.x + dx * 0.33,
-                y: start_point.y + dy * 0.33,
-            };
-            let cp2 = super::graph::Point {
-                x: start_point.x + dx * 0.67,
-                y: start_point.y + dy * 0.67,
-            };
+            // For diagonal edges, create elbow-style waypoints
+            // The B-spline interpolation will smooth these into flowing curves
+            // mermaid.js curves approach the target horizontally - this creates the S-curve
+            if dx.abs() > 10.0 && dy.abs() > 10.0 {
+                // First intermediate: slight diagonal from start (easing out)
+                let cp1 = super::graph::Point {
+                    x: start_point.x + dx * 0.15,
+                    y: start_point.y + dy * 0.08,
+                };
 
-            points.insert(1, cp1);
-            points.insert(2, cp2);
+                // Second intermediate: middle of the curve (steeper diagonal)
+                let cp2 = super::graph::Point {
+                    x: start_point.x + dx * 0.45,
+                    y: start_point.y + dy * 0.5,
+                };
+
+                // Third intermediate: transition toward horizontal
+                let cp3 = super::graph::Point {
+                    x: start_point.x + dx * 0.75,
+                    y: start_point.y + dy * 0.92,
+                };
+
+                // Fourth intermediate: approach end nearly horizontally
+                let cp4 = super::graph::Point {
+                    x: end_point.x - dx * 0.08,
+                    y: end_point.y,
+                };
+
+                points.insert(1, cp1);
+                points.insert(2, cp2);
+                points.insert(3, cp3);
+                points.insert(4, cp4);
+            } else {
+                // For mostly straight edges, add collinear intermediate points
+                let cp1 = super::graph::Point {
+                    x: start_point.x + dx * 0.33,
+                    y: start_point.y + dy * 0.33,
+                };
+                let cp2 = super::graph::Point {
+                    x: start_point.x + dx * 0.67,
+                    y: start_point.y + dy * 0.67,
+                };
+                points.insert(1, cp1);
+                points.insert(2, cp2);
+            }
         }
 
         // Update edge with new points
@@ -443,8 +507,16 @@ mod tests {
         let intersection = intersect_diamond(&node, &p);
 
         // Should intersect at right vertex (125, 100)
-        assert!((intersection.x - 125.0).abs() < 0.01, "x={}", intersection.x);
-        assert!((intersection.y - 100.0).abs() < 0.01, "y={}", intersection.y);
+        assert!(
+            (intersection.x - 125.0).abs() < 0.01,
+            "x={}",
+            intersection.x
+        );
+        assert!(
+            (intersection.y - 100.0).abs() < 0.01,
+            "y={}",
+            intersection.y
+        );
     }
 
     #[test]
@@ -463,8 +535,16 @@ mod tests {
         let intersection = intersect_diamond(&node, &p);
 
         // Should intersect at bottom vertex (100, 125)
-        assert!((intersection.x - 100.0).abs() < 0.01, "x={}", intersection.x);
-        assert!((intersection.y - 125.0).abs() < 0.01, "y={}", intersection.y);
+        assert!(
+            (intersection.x - 100.0).abs() < 0.01,
+            "x={}",
+            intersection.x
+        );
+        assert!(
+            (intersection.y - 125.0).abs() < 0.01,
+            "y={}",
+            intersection.y
+        );
     }
 
     #[test]
@@ -490,8 +570,16 @@ mod tests {
         // Wait, w = width/2 = 25, h = height/2 = 25
         // t = 1/(100/25 + 100/25) = 1/(4+4) = 1/8
         // point = (100 + 100/8, 100 + 100/8) = (112.5, 112.5)
-        assert!((intersection.x - 112.5).abs() < 0.01, "x={}", intersection.x);
-        assert!((intersection.y - 112.5).abs() < 0.01, "y={}", intersection.y);
+        assert!(
+            (intersection.x - 112.5).abs() < 0.01,
+            "x={}",
+            intersection.x
+        );
+        assert!(
+            (intersection.y - 112.5).abs() < 0.01,
+            "y={}",
+            intersection.y
+        );
     }
 
     #[test]
@@ -510,8 +598,16 @@ mod tests {
         let intersection = intersect_circle(&node, &p);
 
         // Should intersect at (125, 100) - radius 25 from center
-        assert!((intersection.x - 125.0).abs() < 0.01, "x={}", intersection.x);
-        assert!((intersection.y - 100.0).abs() < 0.01, "y={}", intersection.y);
+        assert!(
+            (intersection.x - 125.0).abs() < 0.01,
+            "x={}",
+            intersection.x
+        );
+        assert!(
+            (intersection.y - 100.0).abs() < 0.01,
+            "y={}",
+            intersection.y
+        );
     }
 
     #[test]
@@ -560,7 +656,15 @@ mod tests {
         // Diamond should intersect differently
         // t = 1/(|dx|/w + |dy|/h) = 1/(100/25 + 50/25) = 1/(4+2) = 1/6
         // intersection = (100 + 100/6, 100 + 50/6) = (116.67, 108.33)
-        assert!((diamond_diag.x - 116.67).abs() < 0.1, "diamond x={}", diamond_diag.x);
-        assert!((diamond_diag.y - 108.33).abs() < 0.1, "diamond y={}", diamond_diag.y);
+        assert!(
+            (diamond_diag.x - 116.67).abs() < 0.1,
+            "diamond x={}",
+            diamond_diag.x
+        );
+        assert!(
+            (diamond_diag.y - 108.33).abs() < 0.1,
+            "diamond y={}",
+            diamond_diag.y
+        );
     }
 }

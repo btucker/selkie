@@ -57,9 +57,7 @@ fn default_text_position() -> f64 {
 
 impl Default for PieConfig {
     fn default() -> Self {
-        Self {
-            text_position: 0.5,
-        }
+        Self { text_position: 0.5 }
     }
 }
 

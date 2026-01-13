@@ -19,7 +19,8 @@ pub struct CharacterSizeEstimator {
 impl Default for CharacterSizeEstimator {
     fn default() -> Self {
         Self {
-            // Approximate ratio for proportional fonts like Verdana/Arial
+            // Approximate ratio for proportional fonts like trebuchet ms
+            // Using 0.6 produces compact layouts; actual trebuchet ms is ~0.79
             char_width_ratio: 0.6,
             line_height_ratio: 1.4,
         }
@@ -178,27 +179,18 @@ mod tests {
         let estimator = CharacterSizeEstimator::default();
         let config = NodeSizeConfig::default();
 
-        let (rect_w, rect_h) = estimator.estimate_node_size(
-            Some("Test"),
-            NodeShape::Rectangle,
-            &config,
-        );
+        let (rect_w, rect_h) =
+            estimator.estimate_node_size(Some("Test"), NodeShape::Rectangle, &config);
 
         // Diamond should be larger than rectangle for same text
-        let (diamond_w, diamond_h) = estimator.estimate_node_size(
-            Some("Test"),
-            NodeShape::Diamond,
-            &config,
-        );
+        let (diamond_w, diamond_h) =
+            estimator.estimate_node_size(Some("Test"), NodeShape::Diamond, &config);
         assert!(diamond_w > rect_w);
         assert!(diamond_h > rect_h);
 
         // Circle should have equal width and height
-        let (circle_w, circle_h) = estimator.estimate_node_size(
-            Some("Test"),
-            NodeShape::Circle,
-            &config,
-        );
+        let (circle_w, circle_h) =
+            estimator.estimate_node_size(Some("Test"), NodeShape::Circle, &config);
         assert!((circle_w - circle_h).abs() < 0.001);
     }
 

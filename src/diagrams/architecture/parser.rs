@@ -706,7 +706,10 @@ mod tests {
 
         assert_eq!(result.get_title(), "My Architecture");
         assert_eq!(result.get_acc_title(), "Architecture Diagram");
-        assert_eq!(result.get_acc_description(), "Shows the system architecture");
+        assert_eq!(
+            result.get_acc_description(),
+            "Shows the system architecture"
+        );
 
         assert_eq!(result.get_groups().len(), 1);
         assert_eq!(result.get_services().len(), 3);

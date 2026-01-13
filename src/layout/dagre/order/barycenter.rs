@@ -18,46 +18,50 @@ pub struct BarycenterEntry {
 /// For each node, the barycenter is the weighted average of the order positions
 /// of its predecessors.
 pub fn barycenter(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
-    movable.iter().map(|v| {
-        let in_edges = g.in_edges(v);
-        if in_edges.is_empty() {
-            return BarycenterEntry {
-                v: v.clone(),
-                barycenter: None,
-                weight: 0.0,
-            };
-        }
+    movable
+        .iter()
+        .map(|v| {
+            let in_edges = g.in_edges(v);
+            if in_edges.is_empty() {
+                return BarycenterEntry {
+                    v: v.clone(),
+                    barycenter: None,
+                    weight: 0.0,
+                };
+            }
 
-        let mut sum = 0.0;
-        let mut weight = 0.0;
+            let mut sum = 0.0;
+            let mut weight = 0.0;
 
-        for e in &in_edges {
-            let edge_weight = g.edge_by_key(e)
-                .map(|edge| edge.weight as f64)
-                .unwrap_or(1.0);
+            for e in &in_edges {
+                let edge_weight = g
+                    .edge_by_key(e)
+                    .map(|edge| edge.weight as f64)
+                    .unwrap_or(1.0);
 
-            if let Some(node_u) = g.node(&e.v) {
-                if let Some(order) = node_u.order {
-                    sum += edge_weight * (order as f64);
-                    weight += edge_weight;
+                if let Some(node_u) = g.node(&e.v) {
+                    if let Some(order) = node_u.order {
+                        sum += edge_weight * (order as f64);
+                        weight += edge_weight;
+                    }
                 }
             }
-        }
 
-        if weight > 0.0 {
-            BarycenterEntry {
-                v: v.clone(),
-                barycenter: Some(sum / weight),
-                weight,
+            if weight > 0.0 {
+                BarycenterEntry {
+                    v: v.clone(),
+                    barycenter: Some(sum / weight),
+                    weight,
+                }
+            } else {
+                BarycenterEntry {
+                    v: v.clone(),
+                    barycenter: None,
+                    weight: 0.0,
+                }
             }
-        } else {
-            BarycenterEntry {
-                v: v.clone(),
-                barycenter: None,
-                weight: 0.0,
-            }
-        }
-    }).collect()
+        })
+        .collect()
 }
 
 /// Calculate barycenters for movable nodes based on out-edges
@@ -65,58 +69,74 @@ pub fn barycenter(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
 /// For each node, the barycenter is the weighted average of the order positions
 /// of its successors.
 pub fn barycenter_down(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
-    movable.iter().map(|v| {
-        let out_edges = g.out_edges(v);
-        if out_edges.is_empty() {
-            return BarycenterEntry {
-                v: v.clone(),
-                barycenter: None,
-                weight: 0.0,
-            };
-        }
+    movable
+        .iter()
+        .map(|v| {
+            let out_edges = g.out_edges(v);
+            if out_edges.is_empty() {
+                return BarycenterEntry {
+                    v: v.clone(),
+                    barycenter: None,
+                    weight: 0.0,
+                };
+            }
 
-        let mut sum = 0.0;
-        let mut weight = 0.0;
+            let mut sum = 0.0;
+            let mut weight = 0.0;
 
-        for e in &out_edges {
-            let edge_weight = g.edge_by_key(e)
-                .map(|edge| edge.weight as f64)
-                .unwrap_or(1.0);
+            for e in &out_edges {
+                let edge_weight = g
+                    .edge_by_key(e)
+                    .map(|edge| edge.weight as f64)
+                    .unwrap_or(1.0);
 
-            if let Some(node_w) = g.node(&e.w) {
-                if let Some(order) = node_w.order {
-                    sum += edge_weight * (order as f64);
-                    weight += edge_weight;
+                if let Some(node_w) = g.node(&e.w) {
+                    if let Some(order) = node_w.order {
+                        sum += edge_weight * (order as f64);
+                        weight += edge_weight;
+                    }
                 }
             }
-        }
 
-        if weight > 0.0 {
-            BarycenterEntry {
-                v: v.clone(),
-                barycenter: Some(sum / weight),
-                weight,
+            if weight > 0.0 {
+                BarycenterEntry {
+                    v: v.clone(),
+                    barycenter: Some(sum / weight),
+                    weight,
+                }
+            } else {
+                BarycenterEntry {
+                    v: v.clone(),
+                    barycenter: None,
+                    weight: 0.0,
+                }
             }
-        } else {
-            BarycenterEntry {
-                v: v.clone(),
-                barycenter: None,
-                weight: 0.0,
-            }
-        }
-    }).collect()
+        })
+        .collect()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{NodeLabel, EdgeLabel};
+    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
 
     #[test]
     fn test_barycenter_single_predecessor() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { order: Some(0), ..Default::default() });
-        g.set_node("b", NodeLabel { order: Some(2), ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                order: Some(0),
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            NodeLabel {
+                order: Some(2),
+                ..Default::default()
+            },
+        );
         g.set_node("c", NodeLabel::default());
         g.set_edge("a", "c", EdgeLabel::default());
 
@@ -130,8 +150,20 @@ mod tests {
     #[test]
     fn test_barycenter_multiple_predecessors() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { order: Some(0), ..Default::default() });
-        g.set_node("b", NodeLabel { order: Some(2), ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                order: Some(0),
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            NodeLabel {
+                order: Some(2),
+                ..Default::default()
+            },
+        );
         g.set_node("c", NodeLabel::default());
         g.set_edge("a", "c", EdgeLabel::default());
         g.set_edge("b", "c", EdgeLabel::default());
@@ -147,11 +179,37 @@ mod tests {
     #[test]
     fn test_barycenter_weighted() {
         let mut g = DagreGraph::new();
-        g.set_node("a", NodeLabel { order: Some(0), ..Default::default() });
-        g.set_node("b", NodeLabel { order: Some(2), ..Default::default() });
+        g.set_node(
+            "a",
+            NodeLabel {
+                order: Some(0),
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "b",
+            NodeLabel {
+                order: Some(2),
+                ..Default::default()
+            },
+        );
         g.set_node("c", NodeLabel::default());
-        g.set_edge("a", "c", EdgeLabel { weight: 3, ..Default::default() });
-        g.set_edge("b", "c", EdgeLabel { weight: 1, ..Default::default() });
+        g.set_edge(
+            "a",
+            "c",
+            EdgeLabel {
+                weight: 3,
+                ..Default::default()
+            },
+        );
+        g.set_edge(
+            "b",
+            "c",
+            EdgeLabel {
+                weight: 1,
+                ..Default::default()
+            },
+        );
 
         let result = barycenter(&g, &["c".to_string()]);
 

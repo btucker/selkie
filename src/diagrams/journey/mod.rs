@@ -4,8 +4,8 @@
 //! User journey diagrams show user experiences as a series of tasks
 //! with satisfaction scores and actors involved.
 
-mod types;
 pub mod parser;
+mod types;
 
-pub use types::{JourneyDb, JourneyTask};
 pub use parser::parse;
+pub use types::{JourneyDb, JourneyTask};

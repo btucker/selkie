@@ -277,10 +277,7 @@ fn process_relationship(
     Ok(())
 }
 
-fn process_style(
-    db: &mut RequirementDb,
-    pair: pest::iterators::Pair<Rule>,
-) -> Result<(), String> {
+fn process_style(db: &mut RequirementDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
     let mut ids: Vec<String> = Vec::new();
     let mut styles: Vec<String> = Vec::new();
 
@@ -291,7 +288,9 @@ fn process_style(
             }
             Rule::style_list => {
                 // Split styles by comma
-                styles = inner.as_str().trim()
+                styles = inner
+                    .as_str()
+                    .trim()
                     .split(',')
                     .map(|s| s.trim().to_string())
                     .collect();
@@ -320,7 +319,9 @@ fn process_class_def(
             }
             Rule::style_list => {
                 // Split styles by comma
-                styles = inner.as_str().trim()
+                styles = inner
+                    .as_str()
+                    .trim()
                     .split(',')
                     .map(|s| s.trim().to_string())
                     .collect();
@@ -428,7 +429,7 @@ fn extract_id_list(pair: pest::iterators::Pair<Rule>) -> Vec<String> {
 /// Remove surrounding quotes from a string
 fn unquote(s: &str) -> String {
     if s.len() >= 2 && s.starts_with('"') && s.ends_with('"') {
-        s[1..s.len()-1].to_string()
+        s[1..s.len() - 1].to_string()
     } else {
         s.to_string()
     }
@@ -494,7 +495,10 @@ id: test_id
             let db = result.unwrap();
 
             let req = db.get_requirements().get("test_req").unwrap();
-            assert_eq!(req.req_type, crate::diagrams::requirement::RequirementType::FunctionalRequirement);
+            assert_eq!(
+                req.req_type,
+                crate::diagrams::requirement::RequirementType::FunctionalRequirement
+            );
         }
 
         #[test]
@@ -728,7 +732,10 @@ style test_req fill:#f9f,stroke:#333,stroke-width:4px
             let db = result.unwrap();
 
             let req = db.get_requirements().get("test_req").unwrap();
-            assert_eq!(req.css_styles, vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]);
+            assert_eq!(
+                req.css_styles,
+                vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]
+            );
         }
 
         #[test]
@@ -744,7 +751,10 @@ style test_element fill:#f9f,stroke:#333,stroke-width:4px
             let db = result.unwrap();
 
             let elem = db.get_elements().get("test_element").unwrap();
-            assert_eq!(elem.css_styles, vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]);
+            assert_eq!(
+                elem.css_styles,
+                vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]
+            );
         }
 
         #[test]
@@ -762,10 +772,16 @@ style test_requirement,test_element fill:#f9f,stroke:#333,stroke-width:4px
             let db = result.unwrap();
 
             let req = db.get_requirements().get("test_requirement").unwrap();
-            assert_eq!(req.css_styles, vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]);
+            assert_eq!(
+                req.css_styles,
+                vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]
+            );
 
             let elem = db.get_elements().get("test_element").unwrap();
-            assert_eq!(elem.css_styles, vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]);
+            assert_eq!(
+                elem.css_styles,
+                vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]
+            );
         }
     }
 
@@ -783,7 +799,10 @@ classDef myClass fill:#f9f,stroke:#333,stroke-width:4px
             let db = result.unwrap();
 
             let class = db.get_classes().get("myClass").unwrap();
-            assert_eq!(class.styles, vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]);
+            assert_eq!(
+                class.styles,
+                vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]
+            );
         }
 
         #[test]
@@ -797,10 +816,16 @@ classDef firstClass,secondClass fill:#f9f,stroke:#333,stroke-width:4px
             let db = result.unwrap();
 
             let first = db.get_classes().get("firstClass").unwrap();
-            assert_eq!(first.styles, vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]);
+            assert_eq!(
+                first.styles,
+                vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]
+            );
 
             let second = db.get_classes().get("secondClass").unwrap();
-            assert_eq!(second.styles, vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]);
+            assert_eq!(
+                second.styles,
+                vec!["fill:#f9f", "stroke:#333", "stroke-width:4px"]
+            );
         }
 
         #[test]

@@ -307,7 +307,13 @@ fn render_timeline_axis(
     });
 
     // Grid lines and day markers
-    let tick_interval = if days > 30 { 7 } else if days > 14 { 2 } else { 1 };
+    let tick_interval = if days > 30 {
+        7
+    } else if days > 14 {
+        2
+    } else {
+        1
+    };
 
     if let Some(start) = start_date {
         use chrono::Datelike;

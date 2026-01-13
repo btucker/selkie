@@ -121,7 +121,9 @@ fn process_node(
     Ok(())
 }
 
-fn process_node_inner(pair: pest::iterators::Pair<Rule>) -> (Option<String>, Option<String>, NodeShape) {
+fn process_node_inner(
+    pair: pest::iterators::Pair<Rule>,
+) -> (Option<String>, Option<String>, NodeShape) {
     let mut id: Option<String> = None;
     let mut label: Option<String> = None;
     let mut shape = NodeShape::Default;

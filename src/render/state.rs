@@ -5,8 +5,8 @@ use std::collections::HashMap;
 use crate::diagrams::state::{Direction, NotePosition, State, StateDb, StateType};
 use crate::error::Result;
 use crate::layout::{
-    layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph,
-    LayoutNode, LayoutOptions, NodeShape, NodeSizeConfig, Padding, SizeEstimator, ToLayoutGraph,
+    layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
+    LayoutOptions, NodeShape, NodeSizeConfig, Padding, SizeEstimator, ToLayoutGraph,
 };
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
@@ -62,7 +62,9 @@ impl ToLayoutGraph for StateDb {
             };
 
             let label_text = label.unwrap_or(if id.starts_with("[*]") { "" } else { &state.id });
-            let (width, height) = if id.starts_with("[*]") || matches!(state.state_type, StateType::Start | StateType::End) {
+            let (width, height) = if id.starts_with("[*]")
+                || matches!(state.state_type, StateType::Start | StateType::End)
+            {
                 // Small fixed size for start/end circles
                 (24.0, 24.0)
             } else if matches!(state.state_type, StateType::Fork | StateType::Join) {
@@ -78,7 +80,8 @@ impl ToLayoutGraph for StateDb {
             }
 
             // Store state type in metadata
-            node.metadata.insert("state_type".to_string(), format!("{:?}", state.state_type));
+            node.metadata
+                .insert("state_type".to_string(), format!("{:?}", state.state_type));
 
             graph.add_node(node);
         }
@@ -154,7 +157,11 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     }
 
     // Title offset
-    let title_offset = if !db.diagram_title.is_empty() { 40.0 } else { 0.0 };
+    let title_offset = if !db.diagram_title.is_empty() {
+        40.0
+    } else {
+        0.0
+    };
 
     // Calculate diagram bounds
     let max_width = layout_result.width.unwrap_or(400.0) + margin * 2.0;
@@ -273,9 +280,7 @@ fn render_state_node(
                 cx: x + width / 2.0,
                 cy: y + height / 2.0,
                 r: start_end_radius,
-                attrs: Attrs::new()
-                    .with_fill("#333333")
-                    .with_class("state-start"),
+                attrs: Attrs::new().with_fill("#333333").with_class("state-start"),
             });
         }
         StateType::End => {
@@ -303,10 +308,22 @@ fn render_state_node(
 
             children.push(SvgElement::Polygon {
                 points: vec![
-                    crate::layout::Point { x: cx, y: cy - size },
-                    crate::layout::Point { x: cx + size, y: cy },
-                    crate::layout::Point { x: cx, y: cy + size },
-                    crate::layout::Point { x: cx - size, y: cy },
+                    crate::layout::Point {
+                        x: cx,
+                        y: cy - size,
+                    },
+                    crate::layout::Point {
+                        x: cx + size,
+                        y: cy,
+                    },
+                    crate::layout::Point {
+                        x: cx,
+                        y: cy + size,
+                    },
+                    crate::layout::Point {
+                        x: cx - size,
+                        y: cy,
+                    },
                 ],
                 attrs: Attrs::new()
                     .with_fill("#ECECFF")
@@ -341,9 +358,7 @@ fn render_state_node(
                         cx: x + width / 2.0,
                         cy: y + height / 2.0,
                         r: start_end_radius,
-                        attrs: Attrs::new()
-                            .with_fill("#333333")
-                            .with_class("state-start"),
+                        attrs: Attrs::new().with_fill("#333333").with_class("state-start"),
                     });
                 }
             } else {
@@ -499,7 +514,10 @@ fn calculate_exit_point(
             let dy = target_y - cy;
             let dist = (dx * dx + dy * dy).sqrt();
             if dist > 0.0 {
-                (cx + dx / dist * start_end_radius, cy + dy / dist * start_end_radius)
+                (
+                    cx + dx / dist * start_end_radius,
+                    cy + dy / dist * start_end_radius,
+                )
             } else {
                 (cx + start_end_radius, cy)
             }
@@ -545,7 +563,10 @@ fn calculate_entry_point(
             let dy = source_y - cy;
             let dist = (dx * dx + dy * dy).sqrt();
             if dist > 0.0 {
-                (cx + dx / dist * start_end_radius, cy + dy / dist * start_end_radius)
+                (
+                    cx + dx / dist * start_end_radius,
+                    cy + dy / dist * start_end_radius,
+                )
             } else {
                 (cx - start_end_radius, cy)
             }
@@ -683,7 +704,12 @@ fn determine_start_end_states(db: &StateDb) -> HashMap<&str, StartEndInfo> {
             let is_target = relations.iter().any(|r| r.state2 == "[*]");
 
             // Start if it's only a source, end if it's only a target or both
-            result.insert("[*]", StartEndInfo { is_start: is_source && !is_target });
+            result.insert(
+                "[*]",
+                StartEndInfo {
+                    is_start: is_source && !is_target,
+                },
+            );
         }
     }
 
