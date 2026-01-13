@@ -26,18 +26,21 @@ Selkie provides significant performance improvements for complex diagrams compar
 
 _Mermaid.js v11 in Node.js/JSDOM. Median of 10 runs after 3 warmup runs._
 
-**Methodology note:** This comparison favors Mermaid.js - it measures warm render time (library already loaded), while Selkie times include full process startup (~18ms). Despite this handicap, Selkie still wins significantly on complex diagrams.
+**Methodology note:** The table above compares Selkie CLI (cold start) against Mermaid.js library (warm, pre-loaded). For a fairer CLI-to-CLI comparison, benchmark against [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) (`mmdc`), which has similar startup costs (Node.js + Puppeteer + browser).
 
 **Key findings:**
-- **Large diagrams**: Selkie is **27x faster** even including startup overhead
+- **Large diagrams**: Selkie is **27x faster** even with cold start overhead
 - **Graph layout diagrams** (flowchart, class, state, ER): Consistent **2-3x speedup**
-- **Simple diagrams**: Mermaid.js appears faster because Selkie's ~18ms startup dominates
-
-**For fair comparison:** Subtract ~18ms from Selkie times to compare pure render performance. This makes Selkie faster across nearly all diagram types.
+- **Simple diagrams**: Startup overhead (~18ms) dominates render time
 
 Run the benchmark yourself:
 ```bash
 cd tools/benchmark && npm install && node benchmark.mjs
+
+# For CLI-to-CLI comparison (requires mermaid-cli):
+npm install -g @mermaid-js/mermaid-cli
+time mmdc -i diagram.mmd -o out.svg   # Compare against:
+time selkie -i diagram.mmd -o out.svg
 ```
 
 ## Credits
