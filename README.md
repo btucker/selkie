@@ -1,4 +1,4 @@
-# Selkie (Still actively under development)
+# Selkie
 
 A 100% Rust implementation of the [Mermaid](https://mermaid.js.org/) diagram parser and renderer.
 
@@ -6,31 +6,7 @@ A 100% Rust implementation of the [Mermaid](https://mermaid.js.org/) diagram par
 
 Selkie aims to provide a fast, native alternative to Mermaid.js for parsing and rendering diagrams. The entire implementation is written in Rust, with no JavaScript dependencies at runtime.
 
-This project has been built entirely by [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, toward visual and structural parity.
-
-## Performance
-
-Selkie provides significant performance improvements compared to [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) (`mmdc`).
-
-### Benchmark Results
-
-| Diagram | mmdc | Selkie | Speedup |
-|---------|------|--------|---------|
-| Simple flowchart (5 nodes) | 3.21s | 7ms | **476x** |
-| Medium flowchart (15 nodes) | 4.89s | 8ms | **641x** |
-| Large flowchart (100 nodes) | 3.67s | 18ms | **203x** |
-| Sequence diagram (4 actors) | 2.86s | 6ms | **509x** |
-| Class diagram (5 classes) | 4.10s | 5ms | **797x** |
-
-_CLI-to-CLI comparison. Median of 5 runs after 2 warmup runs._
-
-### Why Selkie is Faster
-
-- **No JavaScript runtime**: Selkie is a native binary with ~5-20ms execution time
-- **No browser**: mermaid-cli spawns Puppeteer + Chromium for each render (~3-5 seconds)
-- **Efficient layout**: Rust implementation of graph layout algorithms
-
-For simple diagrams, expect **200-800x speedup**. For complex diagrams (100+ nodes), the gap narrows to ~200x but Selkie remains dramatically faster.
+This project has been built entirely by [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, ensuring visual and structural parity.
 
 ## Credits
 
@@ -42,142 +18,17 @@ Selkie could not exist without all the human effort that has gone into these exc
 
 ## Supported Diagram Types
 
-Selkie supports parsing for all major Mermaid diagram types. Rendering is complete for core diagram types, with others in progress.
-
-<table>
-<tr>
-<th>Diagram Type</th>
-<th>Mermaid.js (GitHub)</th>
-<th>Selkie</th>
-</tr>
-<tr>
-<td><strong>Flowchart</strong><br><sub>Nodes, edges, subgraphs</sub></td>
-<td>
-
-```mermaid
-flowchart LR
-    A[Start] --> B{Decision}
-    B -->|Yes| C[OK]
-    B -->|No| D[Cancel]
-    C --> E[End]
-    D --> E
-```
-
-</td>
-<td><img src="docs/images/flowchart.svg" alt="Flowchart" width="350"></td>
-</tr>
-<tr>
-<td><strong>Sequence</strong><br><sub>Participant interactions</sub></td>
-<td>
-
-```mermaid
-sequenceDiagram
-    Alice->>Bob: Hello Bob!
-    Bob-->>Alice: Hi Alice!
-    Alice->>Bob: How are you?
-    Bob-->>Alice: Great!
-```
-
-</td>
-<td><img src="docs/images/sequence.svg" alt="Sequence" width="350"></td>
-</tr>
-<tr>
-<td><strong>Class</strong><br><sub>UML relationships</sub></td>
-<td>
-
-```mermaid
-classDiagram
-    Animal <|-- Dog
-    Animal <|-- Cat
-    Animal : +String name
-    Animal : +eat()
-    class Dog{
-        +bark()
-    }
-    class Cat{
-        +meow()
-    }
-```
-
-</td>
-<td><img src="docs/images/class.svg" alt="Class" width="350"></td>
-</tr>
-<tr>
-<td><strong>State</strong><br><sub>State machines</sub></td>
-<td>
-
-```mermaid
-stateDiagram-v2
-    [*] --> Idle
-    Idle --> Running : start
-    Running --> Idle : stop
-    Running --> [*]
-```
-
-</td>
-<td><img src="docs/images/state.svg" alt="State" width="350"></td>
-</tr>
-<tr>
-<td><strong>ER Diagram</strong><br><sub>Data modeling</sub></td>
-<td>
-
-```mermaid
-erDiagram
-    CUSTOMER ||--o{ ORDER : places
-    ORDER ||--|{ ITEM : contains
-    CUSTOMER {
-        string name
-        string email
-    }
-    ORDER {
-        int id
-        date created
-    }
-```
-
-</td>
-<td><img src="docs/images/er.svg" alt="ER" width="350"></td>
-</tr>
-<tr>
-<td><strong>Gantt</strong><br><sub>Project timelines</sub></td>
-<td>
-
-```mermaid
-gantt
-    title Project Plan
-    dateFormat YYYY-MM-DD
-    section Phase 1
-    Task A :a1, 2024-01-01, 7d
-    Task B :a2, after a1, 5d
-    section Phase 2
-    Task C :b1, after a2, 10d
-```
-
-</td>
-<td><img src="docs/images/gantt.svg" alt="Gantt" width="350"></td>
-</tr>
-<tr>
-<td><strong>Pie Chart</strong><br><sub>Proportional data</sub></td>
-<td>
-
-```mermaid
-pie title Languages
-    "Rust" : 45
-    "TypeScript" : 30
-    "Python" : 25
-```
-
-</td>
-<td><img src="docs/images/pie.svg" alt="Pie" width="350"></td>
-</tr>
-</table>
-
-### Additional Diagram Types (Parser Only)
-
-The following diagram types have parser support and rendering is in progress:
+Selkie supports parsing and rendering for all major Mermaid diagram types:
 
 | Diagram Type | Description |
 |--------------|-------------|
+| Flowchart | Flow diagrams with nodes and edges |
+| Sequence | Sequence diagrams for interactions |
+| Class | UML class diagrams |
+| State | State machine diagrams |
+| Entity Relationship | ER diagrams for data modeling |
+| Gantt | Project timeline charts |
+| Pie | Pie charts |
 | Git Graph | Git branch visualization |
 | Mindmap | Hierarchical mindmaps |
 | Timeline | Timeline visualizations |
@@ -231,7 +82,7 @@ selkie -i diagram.mmd -o output.png
 
 ### Evaluation System
 
-Selkie includes a built-in evaluation system that compares output against Mermaid.js. See [EVAL.md](EVAL.md) for detailed documentation.
+Selkie includes a built-in evaluation system that compares output against Mermaid.js:
 
 ```bash
 # Run evaluation with built-in samples
@@ -243,26 +94,14 @@ selkie eval --type flowchart
 # Generate HTML comparison report
 selkie eval --html report.html
 
-# Generate side-by-side comparison PNGs (requires 'png' feature and Playwright)
-selkie eval --pngs comparison_output/
+# Evaluate a directory of .mmd files
+selkie eval ./diagrams/
 ```
 
 The eval system performs:
-
 - **Structural comparison** - Node/edge counts, labels, connections
-- **Visual similarity** - SSIM-based image comparison using [SSIM](https://en.wikipedia.org/wiki/Structural_similarity_index_measure)
-- **Report generation** - Text, JSON, HTML, and side-by-side PNG outputs
-
-#### Visual Comparison
-
-The `--pngs` flag generates side-by-side comparison images showing Selkie output next to the Mermaid.js reference. This requires:
-
-1. Building with `--features png` for PNG generation
-2. Playwright with Chromium for rendering Mermaid.js references (`cd tools/validation && npm install && npx playwright install chromium`)
-
-Each comparison PNG places Selkie's output on the left and Mermaid.js on the right, making differences easy to spot.
-
-Current status: **100% parity** on built-in test samples (16/16 diagrams match reference).
+- **Visual similarity** - SSIM-based image comparison
+- **Report generation** - Text, JSON, and HTML outputs
 
 ### As a Library
 
@@ -285,111 +124,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## Feature Flags
+## Features
 
-Selkie uses Cargo feature flags to enable optional functionality. This keeps the core library lightweight while allowing additional capabilities when needed.
-
-### Default Features
-
-| Feature | Description | Dependencies |
-|---------|-------------|--------------|
-| `cli` | Command line interface | [clap](https://crates.io/crates/clap) |
-
-The CLI is enabled by default. To build only the library without CLI:
+- `cli` - Command line interface (enabled by default)
+- `png` - PNG output support via resvg
+- `pdf` - PDF output support via svg2pdf
+- `kitty` - Terminal image display for kitty/ghostty terminals
+- `all-formats` - Enable all output formats
 
 ```bash
-cargo build --release --no-default-features
-```
-
-### Output Formats
-
-SVG output is always available with no additional dependencies:
-
-```bash
-selkie -i diagram.mmd -o output.svg
-```
-
-Additional output formats require feature flags:
-
-| Feature | Format | Dependencies |
-|---------|--------|--------------|
-| _(none)_ | SVG | _(built-in)_ |
-| `png` | PNG | [resvg](https://crates.io/crates/resvg) |
-| `pdf` | PDF | [svg2pdf](https://crates.io/crates/svg2pdf), resvg |
-| `kitty` | Terminal inline | resvg, [image](https://crates.io/crates/image), [base64](https://crates.io/crates/base64), libc, atty |
-| `all-formats` | All of the above | All of the above |
-
-### Usage Examples
-
-```bash
-# Build with PNG support
-cargo build --release --features png
-
-# Build with all output formats
+# Build with all features
 cargo build --release --features all-formats
-
-# Install with PDF support
-cargo install selkie --features pdf
-
-# Library only (no CLI, minimal dependencies)
-cargo build --release --no-default-features
-```
-
-### Feature Details
-
-#### `cli`
-
-Provides the `selkie` command-line binary with subcommands for rendering and evaluation. Without this feature, only the library is built.
-
-#### `png`
-
-Enables PNG output via the `resvg` crate, a high-quality SVG rendering library. Use with:
-
-```bash
-selkie -i diagram.mmd -o output.png
-```
-
-#### `pdf`
-
-Enables PDF output via `svg2pdf`. Useful for generating print-ready documents:
-
-```bash
-selkie -i diagram.mmd -o output.pdf
-```
-
-#### `kitty`
-
-Enables inline image display in terminals that support the Kitty graphics protocol (Kitty, Ghostty, WezTerm). When enabled, diagrams can be rendered directly in the terminal:
-
-```bash
-selkie -i diagram.mmd  # Displays inline if terminal supports it
-```
-
-#### `all-formats`
-
-Convenience feature that enables `png`, `pdf`, and `kitty` together. Best for development or when you need maximum flexibility:
-
-```bash
-cargo install selkie --features all-formats
-```
-
-## Issue Tracking
-
-This project uses [Beads](https://github.com/steveyegge/beads) for issue tracking - an AI-native issue tracker that lives directly in the repository. Issues are stored in `.beads/` and sync with git, making them accessible to both humans and AI coding agents.
-
-```bash
-# View available work
-bd ready
-
-# View issue details
-bd show <issue-id>
-
-# Update issue status
-bd update <issue-id> --status in_progress
-bd close <issue-id>
-
-# Sync with remote
-bd sync
 ```
 
 ## Issue Tracking
@@ -428,3 +173,7 @@ cargo run -- eval
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+*Built with Claude Code*
