@@ -49,6 +49,9 @@ roxmltree = "0.20"
 # Testing
 pretty_assertions = "1.4"
 
+# Git hooks (auto-installs on cargo test)
+cargo-husky = { version = "1", default-features = false, features = ["precommit-hook", "run-cargo-fmt", "run-cargo-clippy"] }
+
 [[bin]]
 name = "extract-diagrams"
 path = "src/bin/extract_diagrams.rs"
