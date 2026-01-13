@@ -83,6 +83,7 @@ pub enum Placement {
 }
 
 impl Placement {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "rightof" | "right of" => Self::RightOf,
@@ -107,6 +108,7 @@ pub enum ParticipantType {
 }
 
 impl ParticipantType {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "actor" => Self::Actor,

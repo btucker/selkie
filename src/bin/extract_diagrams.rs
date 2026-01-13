@@ -100,7 +100,7 @@ fn extract_diagrams_from_file(filepath: &Path) -> Vec<DiagramEntry> {
         let test_name = test_positions
             .iter()
             .filter(|(p, _)| *p < pos)
-            .last()
+            .next_back()
             .map(|(_, name)| name.clone())
             .unwrap_or_else(|| "unknown".to_string());
 

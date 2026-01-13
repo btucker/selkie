@@ -15,6 +15,7 @@ pub enum CommitType {
 
 impl CommitType {
     /// Parse a commit type from a string
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_uppercase().as_str() {
             "REVERSE" => Self::Reverse,
@@ -41,6 +42,7 @@ pub enum DiagramOrientation {
 }
 
 impl DiagramOrientation {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_uppercase().as_str() {
             "TB" | "TD" => Self::TopToBottom,

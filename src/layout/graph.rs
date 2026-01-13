@@ -120,14 +120,14 @@ impl LayoutGraph {
     /// Get all node IDs (recursively including children)
     pub fn all_node_ids(&self) -> Vec<&str> {
         let mut ids = Vec::new();
-        self.collect_node_ids(&self.nodes, &mut ids);
+        Self::collect_node_ids(&self.nodes, &mut ids);
         ids
     }
 
-    fn collect_node_ids<'a>(&self, nodes: &'a [LayoutNode], ids: &mut Vec<&'a str>) {
+    fn collect_node_ids<'a>(nodes: &'a [LayoutNode], ids: &mut Vec<&'a str>) {
         for node in nodes {
             ids.push(&node.id);
-            self.collect_node_ids(&node.children, ids);
+            Self::collect_node_ids(&node.children, ids);
         }
     }
 
@@ -188,16 +188,16 @@ impl LayoutGraph {
     where
         F: FnMut(&LayoutNode),
     {
-        self.traverse_nodes_recursive(&self.nodes, &mut f);
+        Self::traverse_nodes_recursive(&self.nodes, &mut f);
     }
 
-    fn traverse_nodes_recursive<F>(&self, nodes: &[LayoutNode], f: &mut F)
+    fn traverse_nodes_recursive<F>(nodes: &[LayoutNode], f: &mut F)
     where
         F: FnMut(&LayoutNode),
     {
         for node in nodes {
             f(node);
-            self.traverse_nodes_recursive(&node.children, f);
+            Self::traverse_nodes_recursive(&node.children, f);
         }
     }
 
@@ -226,7 +226,7 @@ impl LayoutGraph {
         let mut rec_stack = HashSet::new();
 
         for node_id in self.all_node_ids() {
-            if self.has_cycle_dfs(node_id, &adj, &mut visited, &mut rec_stack) {
+            if Self::has_cycle_dfs(node_id, &adj, &mut visited, &mut rec_stack) {
                 return true;
             }
         }
@@ -234,7 +234,6 @@ impl LayoutGraph {
     }
 
     fn has_cycle_dfs<'a>(
-        &self,
         node_id: &'a str,
         adj: &HashMap<&'a str, Vec<&'a str>>,
         visited: &mut HashSet<&'a str>,
@@ -252,7 +251,7 @@ impl LayoutGraph {
 
         if let Some(neighbors) = adj.get(node_id) {
             for &neighbor in neighbors {
-                if self.has_cycle_dfs(neighbor, adj, visited, rec_stack) {
+                if Self::has_cycle_dfs(neighbor, adj, visited, rec_stack) {
                     return true;
                 }
             }

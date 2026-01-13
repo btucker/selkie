@@ -340,7 +340,7 @@ fn count_nodes_and_edges(doc: &roxmltree::Document) -> (usize, usize) {
             // mermaid-rs uses "edge" class on <g> elements
             // mermaid.js uses "flowchart-link" on <path> elements with data-edge
             // We only count "edge" here since data-edge is handled above
-            if node.tag_name().name() == "g" && classes.iter().any(|c| *c == "edge") {
+            if node.tag_name().name() == "g" && classes.contains(&"edge") {
                 edge_count += 1;
             }
         }

@@ -157,8 +157,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     if is_horizontal {
         // Horizontal layout: levels go left-to-right
         let mut current_x = margin;
-        for level in 0..=max_level {
-            let level_classes = &levels[level];
+        for level_classes in levels.iter().take(max_level + 1) {
             if level_classes.is_empty() {
                 continue;
             }
@@ -185,10 +184,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
         // Process levels from bottom to top
         for level in (0..=max_level).rev() {
             for class_id in &levels[level] {
-                let children: Vec<_> = children_of
-                    .get(class_id)
-                    .map(|c| c.clone())
-                    .unwrap_or_default();
+                let children: Vec<_> = children_of.get(class_id).cloned().unwrap_or_default();
 
                 if children.is_empty() {
                     // Leaf node: width is just the class width
@@ -209,8 +205,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
 
         // First pass: calculate y positions for each level
         let mut level_y: Vec<f64> = Vec::new();
-        for level in 0..=max_level {
-            let level_classes = &levels[level];
+        for level_classes in levels.iter().take(max_level + 1) {
             if level_classes.is_empty() {
                 level_y.push(current_y);
                 continue;
@@ -229,6 +224,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
 
         // Second pass: calculate x positions using tree centering
         // Start with root nodes, position them, then recursively position children
+        #[allow(clippy::too_many_arguments)]
         fn position_subtree(
             node_id: &str,
             start_x: f64,
@@ -289,8 +285,8 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
         }
 
         // Position any orphan nodes (not in any tree) - place them at the end
-        for level in 0..=max_level {
-            for class_id in &levels[level] {
+        for (level, level_classes) in levels.iter().enumerate().take(max_level + 1) {
+            for class_id in level_classes {
                 if !class_positions.contains_key(class_id) {
                     let y = level_y.get(level).copied().unwrap_or(0.0);
                     class_positions.insert(class_id.clone(), (root_x, y));
@@ -384,6 +380,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
 }
 
 /// Render a class box with name, attributes, and methods
+#[allow(clippy::too_many_arguments)]
 fn render_class_box(
     class: &ClassNode,
     x: f64,
@@ -548,6 +545,7 @@ fn render_class_box(
 }
 
 /// Render a relation between two classes
+#[allow(clippy::too_many_arguments)]
 fn render_relation(
     x1: f64,
     y1: f64,
@@ -743,12 +741,10 @@ fn calculate_connection_points(
         } else {
             (x2 + width, center2_y) // Right edge
         }
+    } else if dy > 0.0 {
+        (center2_x, y2) // Top edge
     } else {
-        if dy > 0.0 {
-            (center2_x, y2) // Top edge
-        } else {
-            (center2_x, y2 + h2) // Bottom edge
-        }
+        (center2_x, y2 + h2) // Bottom edge
     };
 
     (start_x, start_y, end_x, end_y)

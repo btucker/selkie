@@ -156,9 +156,9 @@ pub fn detect_type(input: &str) -> Result<DiagramType> {
 /// Remove YAML frontmatter from input
 fn remove_frontmatter(input: &str) -> String {
     let trimmed = input.trim_start();
-    if trimmed.starts_with("---") {
-        if let Some(end_pos) = trimmed[3..].find("---") {
-            return trimmed[end_pos + 6..].to_string();
+    if let Some(after_start) = trimmed.strip_prefix("---") {
+        if let Some(end_pos) = after_start.find("---") {
+            return after_start[end_pos + 3..].to_string();
         }
     }
     input.to_string()

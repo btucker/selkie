@@ -25,13 +25,10 @@ pub fn parse_into(input: &str, db: &mut FlowchartDb) -> Result<()> {
         .map_err(|e| MermaidError::ParseError(e.to_string()))?;
 
     for pair in pairs {
-        match pair.as_rule() {
-            Rule::diagram => {
-                for inner in pair.into_inner() {
-                    process_rule(inner, db)?;
-                }
+        if pair.as_rule() == Rule::diagram {
+            for inner in pair.into_inner() {
+                process_rule(inner, db)?;
             }
-            _ => {}
         }
     }
 
@@ -668,7 +665,7 @@ mod tests {
         let db = result.unwrap();
         let vertex = db.get_vertices().get("A").unwrap();
         assert!(
-            vertex.styles.len() > 0,
+            !vertex.styles.is_empty(),
             "Vertex A should have styles: {:?}",
             vertex
         );

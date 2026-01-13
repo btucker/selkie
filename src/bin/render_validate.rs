@@ -377,12 +377,13 @@ fn main() {
     let diagrams = if input_path.is_dir() {
         // Load all .mmd files from directory
         let mut diagrams = Vec::new();
-        for entry in glob::glob(input_path.join("**/*.mmd").to_str().unwrap()).unwrap() {
-            if let Ok(path) = entry {
-                if let Ok(content) = fs::read_to_string(&path) {
-                    let name = path.file_stem().unwrap().to_string_lossy().to_string();
-                    diagrams.push((name, content));
-                }
+        for path in glob::glob(input_path.join("**/*.mmd").to_str().unwrap())
+            .unwrap()
+            .flatten()
+        {
+            if let Ok(content) = fs::read_to_string(&path) {
+                let name = path.file_stem().unwrap().to_string_lossy().to_string();
+                diagrams.push((name, content));
             }
         }
         diagrams

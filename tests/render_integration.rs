@@ -176,23 +176,23 @@ mod pdf_output_tests {
         ];
 
         for (name, input) in diagrams {
-            let diagram = parse(input).expect(&format!("Failed to parse {}", name));
-            let svg = render(&diagram).expect(&format!("Failed to render {}", name));
+            let diagram = parse(input).unwrap_or_else(|_| panic!("Failed to parse {}", name));
+            let svg = render(&diagram).unwrap_or_else(|_| panic!("Failed to render {}", name));
 
             use resvg::usvg;
 
             let mut opt = usvg::Options::default();
             opt.fontdb_mut().load_system_fonts();
 
-            let tree =
-                usvg::Tree::from_str(&svg, &opt).expect(&format!("Failed to parse {} SVG", name));
+            let tree = usvg::Tree::from_str(&svg, &opt)
+                .unwrap_or_else(|_| panic!("Failed to parse {} SVG", name));
 
             let pdf_data = svg2pdf::to_pdf(
                 &tree,
                 svg2pdf::ConversionOptions::default(),
                 svg2pdf::PageOptions::default(),
             )
-            .expect(&format!("Failed to convert {} to PDF", name));
+            .unwrap_or_else(|_| panic!("Failed to convert {} to PDF", name));
 
             assert!(
                 pdf_data.starts_with(b"%PDF-"),
@@ -342,12 +342,10 @@ fn test_flowchart_all_directions() {
 
     for dir in &directions {
         let input = format!("flowchart {}\n    A --> B", dir);
-        let diagram =
-            parse(&input).expect(&format!("Failed to parse flowchart with direction {}", dir));
-        let svg = render(&diagram).expect(&format!(
-            "Failed to render flowchart with direction {}",
-            dir
-        ));
+        let diagram = parse(&input)
+            .unwrap_or_else(|_| panic!("Failed to parse flowchart with direction {}", dir));
+        let svg = render(&diagram)
+            .unwrap_or_else(|_| panic!("Failed to render flowchart with direction {}", dir));
 
         assert!(
             svg.contains("<svg"),

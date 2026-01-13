@@ -42,6 +42,7 @@ struct Difference {
 }
 
 #[derive(Debug, Clone, Copy)]
+#[allow(dead_code)]
 enum Severity {
     Critical,
     Major,
@@ -213,7 +214,7 @@ fn extract_metrics(svg_content: &str) -> SvgMetrics {
     metrics
 }
 
-fn compare_metrics(name: &str, rs: &SvgMetrics, ref_metrics: &SvgMetrics) -> Vec<Difference> {
+fn compare_metrics(_name: &str, rs: &SvgMetrics, ref_metrics: &SvgMetrics) -> Vec<Difference> {
     let mut diffs = Vec::new();
 
     // Dimension differences

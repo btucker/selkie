@@ -137,11 +137,8 @@ pub fn undo(graph: &mut DagreGraph) {
         // Collect points from dummy nodes
         let mut points = Vec::new();
 
-        loop {
-            let node = match graph.node(&current) {
-                Some(n) => n.clone(),
-                None => break,
-            };
+        while let Some(n) = graph.node(&current) {
+            let node = n.clone();
 
             // Check if this is still a dummy node
             if node.dummy.is_none() {
@@ -202,7 +199,7 @@ pub fn intersect_node(node: &NodeLabel, p: &super::graph::Point) -> super::graph
 pub fn intersect_rect(node: &NodeLabel, p: &super::graph::Point) -> super::graph::Point {
     let (cx, cy) = match (node.x, node.y) {
         (Some(x), Some(y)) => (x, y),
-        _ => return p.clone(),
+        _ => return *p,
     };
 
     let w = node.width / 2.0;
@@ -239,7 +236,7 @@ pub fn intersect_rect(node: &NodeLabel, p: &super::graph::Point) -> super::graph
 pub fn intersect_diamond(node: &NodeLabel, p: &super::graph::Point) -> super::graph::Point {
     let (cx, cy) = match (node.x, node.y) {
         (Some(x), Some(y)) => (x, y),
-        _ => return p.clone(),
+        _ => return *p,
     };
 
     let w = node.width / 2.0;
@@ -271,7 +268,7 @@ pub fn intersect_diamond(node: &NodeLabel, p: &super::graph::Point) -> super::gr
 pub fn intersect_circle(node: &NodeLabel, p: &super::graph::Point) -> super::graph::Point {
     let (cx, cy) = match (node.x, node.y) {
         (Some(x), Some(y)) => (x, y),
-        _ => return p.clone(),
+        _ => return *p,
     };
 
     // For circles, use the smaller of width/height as diameter
@@ -296,7 +293,7 @@ pub fn intersect_circle(node: &NodeLabel, p: &super::graph::Point) -> super::gra
 pub fn intersect_ellipse(node: &NodeLabel, p: &super::graph::Point) -> super::graph::Point {
     let (cx, cy) = match (node.x, node.y) {
         (Some(x), Some(y)) => (x, y),
-        _ => return p.clone(),
+        _ => return *p,
     };
 
     let rx = node.width / 2.0;
@@ -382,8 +379,8 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
         let end_point = intersect_node(&node_w, &p2);
 
         // Add start and end points
-        points.insert(0, start_point.clone());
-        points.push(end_point.clone());
+        points.insert(0, start_point);
+        points.push(end_point);
 
         // For edges with only 2 points (no intermediate dummy nodes),
         // add intermediate points to create smooth curved edges like mermaid.js

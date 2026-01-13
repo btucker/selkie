@@ -284,6 +284,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
 }
 
 /// Render the timeline axis and vertical grid lines
+#[allow(clippy::too_many_arguments)]
 fn render_timeline_axis(
     x: f64,
     y: f64,

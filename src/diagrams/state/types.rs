@@ -18,6 +18,7 @@ pub enum StateType {
 }
 
 impl StateType {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "start" => Self::Start,
@@ -52,6 +53,7 @@ pub enum NotePosition {
 }
 
 impl NotePosition {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "left of" | "leftof" => Self::LeftOf,
@@ -163,6 +165,7 @@ pub enum Direction {
 }
 
 impl Direction {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_uppercase().as_str() {
             "BT" => Self::BottomToTop,

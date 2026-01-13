@@ -260,6 +260,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
 }
 
 /// Render a state node based on its type
+#[allow(clippy::too_many_arguments)]
 fn render_state_node(
     state: &State,
     x: f64,
@@ -417,6 +418,7 @@ fn render_state_node(
 }
 
 /// Render a transition between two states
+#[allow(clippy::too_many_arguments)]
 fn render_transition(
     x1: f64,
     y1: f64,
@@ -494,6 +496,7 @@ fn render_transition(
 }
 
 /// Calculate exit point from a state
+#[allow(clippy::too_many_arguments)]
 fn calculate_exit_point(
     x: f64,
     y: f64,
@@ -543,6 +546,7 @@ fn calculate_exit_point(
 }
 
 /// Calculate entry point into a state
+#[allow(clippy::too_many_arguments)]
 fn calculate_entry_point(
     x: f64,
     y: f64,
@@ -693,7 +697,7 @@ fn determine_start_end_states(db: &StateDb) -> HashMap<&str, StartEndInfo> {
     let relations = db.get_relations();
 
     // Classify states in the states map
-    for (id, _state) in db.get_states() {
+    for id in db.get_states().keys() {
         if id.starts_with("[*]_start") {
             result.insert(id.as_str(), StartEndInfo { is_start: true });
         } else if id.starts_with("[*]_end") {

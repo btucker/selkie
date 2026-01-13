@@ -27,13 +27,10 @@ pub fn parse_into(input: &str, db: &mut ErDb) -> Result<()> {
         .map_err(|e| MermaidError::ParseError(e.to_string()))?;
 
     for pair in pairs {
-        match pair.as_rule() {
-            Rule::diagram => {
-                for inner in pair.into_inner() {
-                    process_rule(inner, db)?;
-                }
+        if pair.as_rule() == Rule::diagram {
+            for inner in pair.into_inner() {
+                process_rule(inner, db)?;
             }
-            _ => {}
         }
     }
 
