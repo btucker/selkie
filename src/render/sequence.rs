@@ -104,9 +104,14 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     // Create actor position map
     let mut actor_positions: std::collections::HashMap<String, f64> =
         std::collections::HashMap::new();
+    let mut actor_centers: Vec<f64> = Vec::with_capacity(actors.len());
+    let mut actor_index: std::collections::HashMap<String, usize> =
+        std::collections::HashMap::new();
     for (i, actor) in actors.iter().enumerate() {
-        let x = padding_x + (i as f64) * actor_spacing + actor_width / 2.0;
-        actor_positions.insert(actor.name.clone(), x);
+        let center_x = padding_x + (i as f64) * actor_spacing + actor_width / 2.0;
+        actor_positions.insert(actor.name.clone(), center_x);
+        actor_centers.push(center_x);
+        actor_index.insert(actor.name.clone(), i);
     }
 
     // Render actors at top and bottom
@@ -170,122 +175,159 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let mut fragment_stack: Vec<FragmentState> = Vec::new();
     for (_, event) in events {
         match event {
-            TimelineEvent::Message(message) => {
-                match message.message_type {
-                    LineType::ActiveStart => {
-                        if let Some(actor) = message.message.split_whitespace().next() {
-                            let start_y = last_message_y.unwrap_or(current_y);
-                            activation_stacks
-                                .entry(actor.to_string())
-                                .or_default()
-                                .push(start_y);
-                        }
+            TimelineEvent::Message(message) => match message.message_type {
+                LineType::ActiveStart => {
+                    if let Some(actor) = message.message.split_whitespace().next() {
+                        let start_y = last_message_y.unwrap_or(current_y);
+                        activation_stacks
+                            .entry(actor.to_string())
+                            .or_default()
+                            .push(start_y);
                     }
-                    LineType::ActiveEnd => {
-                        if let Some(actor) = message.message.split_whitespace().next() {
-                            if let Some(stack) = activation_stacks.get_mut(actor) {
-                                if let Some(start_y) = stack.pop() {
-                                    if let Some(&actor_x) = actor_positions.get(actor) {
-                                        let end_y = last_message_y.unwrap_or(current_y);
-                                        let activation =
-                                            render_activation(actor_x, start_y, end_y);
-                                        doc.add_element(activation);
-                                    }
+                }
+                LineType::ActiveEnd => {
+                    if let Some(actor) = message.message.split_whitespace().next() {
+                        if let Some(stack) = activation_stacks.get_mut(actor) {
+                            if let Some(start_y) = stack.pop() {
+                                if let Some(&actor_x) = actor_positions.get(actor) {
+                                    let end_y = last_message_y.unwrap_or(current_y);
+                                    let activation = render_activation(actor_x, start_y, end_y);
+                                    doc.add_element(activation);
                                 }
                             }
                         }
                     }
-                    LineType::LoopStart
-                    | LineType::AltStart
-                    | LineType::OptStart
-                    | LineType::ParStart
-                    | LineType::CriticalStart
-                    | LineType::BreakStart
-                    | LineType::RectStart => {
-                        let kind = FragmentKind::from_message_type(message.message_type);
-                        let label =
-                            fragment_label(kind, message.message.trim());
-                        let start_y = current_y - message_spacing / 2.0;
-                        let label_elements =
-                            render_fragment_label(fragment_left, start_y, &label);
+                }
+                LineType::LoopStart
+                | LineType::AltStart
+                | LineType::OptStart
+                | LineType::ParStart
+                | LineType::CriticalStart
+                | LineType::BreakStart
+                | LineType::RectStart => {
+                    let kind = FragmentKind::from_message_type(message.message_type);
+                    let start_y = current_y - message_spacing / 2.0;
+                    fragment_stack.push(FragmentState {
+                        start_y,
+                        kind,
+                        label: message.message.trim().to_string(),
+                        min_actor_idx: None,
+                        max_actor_idx: None,
+                        color: if matches!(kind, FragmentKind::Rect) {
+                            if message.message.is_empty() {
+                                None
+                            } else {
+                                Some(message.message.clone())
+                            }
+                        } else {
+                            None
+                        },
+                    });
+                    current_y += message_spacing;
+                }
+                LineType::AltElse | LineType::ParAnd | LineType::CriticalOption => {
+                    if let Some(fragment) = fragment_stack.last() {
+                        let label = message.message.trim();
+                        let depth = fragment_stack.len().saturating_sub(1);
+                        let (frame_x, frame_width) = fragment_bounds_for_state(
+                            fragment,
+                            fragment_left,
+                            fragment_width,
+                            depth,
+                            &actor_centers,
+                            actor_width,
+                        );
+                        let divider =
+                            render_fragment_divider(frame_x, frame_width, current_y, true);
+                        doc.add_cluster(divider);
+                        let label_elements = render_fragment_label(
+                            FragmentKind::from_message_type(message.message_type),
+                            frame_x,
+                            frame_width,
+                            current_y,
+                            label,
+                        );
                         for element in label_elements {
                             doc.add_element(element);
                         }
-                        fragment_stack.push(FragmentState {
-                            start_y,
-                            color: if matches!(kind, FragmentKind::Rect) {
-                                if message.message.is_empty() {
-                                    None
-                                } else {
-                                    Some(message.message.clone())
-                                }
-                            } else {
-                                None
-                            },
-                        });
-                        current_y += message_spacing;
                     }
-                    LineType::AltElse | LineType::ParAnd | LineType::CriticalOption => {
-                        if fragment_stack.last().is_some() {
-                            let label = fragment_label(
-                                FragmentKind::from_message_type(message.message_type),
-                                message.message.trim(),
-                            );
-                            let divider = render_fragment_divider(
-                                fragment_left,
-                                fragment_width,
-                                current_y,
-                            );
-                            doc.add_element(divider);
-                            let label_elements =
-                                render_fragment_label(fragment_left, current_y, &label);
-                            for element in label_elements {
-                                doc.add_element(element);
-                            }
-                        }
-                        current_y += message_spacing;
-                    }
-                    LineType::LoopEnd
-                    | LineType::AltEnd
-                    | LineType::OptEnd
-                    | LineType::ParEnd
-                    | LineType::CriticalEnd
-                    | LineType::BreakEnd
-                    | LineType::RectEnd => {
-                        if let Some(fragment) = fragment_stack.pop() {
-                            let end_y = current_y - message_spacing / 2.0;
-                            let frame = render_fragment_frame(
-                                fragment_left,
-                                fragment_width,
-                                fragment.start_y,
-                                end_y,
-                                fragment.color.as_deref(),
-                            );
-                            doc.add_element(frame);
-                        }
-                        current_y += message_spacing;
-                    }
-                    LineType::Autonumber => {}
-                    _ => {
-                        if let (Some(from), Some(to)) = (&message.from, &message.to) {
-                            if let (Some(&from_x), Some(&to_x)) =
-                                (actor_positions.get(from), actor_positions.get(to))
-                            {
-                                let msg_element = render_message(
-                                    from_x,
-                                    to_x,
-                                    current_y,
-                                    &message.message,
-                                    message.message_type,
-                                );
-                                doc.add_element(msg_element);
-                            }
-                        }
-                        last_message_y = Some(current_y);
-                        current_y += message_spacing;
-                    }
+                    current_y += message_spacing;
                 }
-            }
+                LineType::LoopEnd
+                | LineType::AltEnd
+                | LineType::OptEnd
+                | LineType::ParEnd
+                | LineType::CriticalEnd
+                | LineType::BreakEnd
+                | LineType::RectEnd => {
+                    if let Some(fragment) = fragment_stack.pop() {
+                        let end_y = current_y - message_spacing / 2.0;
+                        let depth = fragment_stack.len();
+                        let (frame_x, frame_width) = fragment_bounds_for_state(
+                            &fragment,
+                            fragment_left,
+                            fragment_width,
+                            depth,
+                            &actor_centers,
+                            actor_width,
+                        );
+                        let frame = render_fragment_frame(
+                            frame_x,
+                            frame_width,
+                            fragment.start_y,
+                            end_y,
+                            fragment.color.as_deref(),
+                        );
+                        doc.add_cluster(frame);
+                        let label_elements = render_fragment_label(
+                            fragment.kind,
+                            frame_x,
+                            frame_width,
+                            fragment.start_y,
+                            &fragment.label,
+                        );
+                        for element in label_elements {
+                            doc.add_element(element);
+                        }
+                    }
+                    current_y += message_spacing;
+                }
+                LineType::Autonumber => {}
+                _ => {
+                    if let (Some(from), Some(to)) = (&message.from, &message.to) {
+                        if let (Some(&from_x), Some(&to_x)) =
+                            (actor_positions.get(from), actor_positions.get(to))
+                        {
+                            let msg_element = render_message(
+                                from_x,
+                                to_x,
+                                current_y,
+                                &message.message,
+                                message.message_type,
+                            );
+                            doc.add_element(msg_element);
+                        }
+                    }
+                    if let (Some(from_idx), Some(to_idx)) = (
+                        message
+                            .from
+                            .as_ref()
+                            .and_then(|name| actor_index.get(name).copied()),
+                        message
+                            .to
+                            .as_ref()
+                            .and_then(|name| actor_index.get(name).copied()),
+                    ) {
+                        let min_idx = from_idx.min(to_idx);
+                        let max_idx = from_idx.max(to_idx);
+                        for fragment in &mut fragment_stack {
+                            fragment.update_bounds(min_idx, max_idx);
+                        }
+                    }
+                    last_message_y = Some(current_y);
+                    current_y += message_spacing;
+                }
+            },
             TimelineEvent::Note(note) => {
                 if let Some(&actor_x) = actor_positions.get(&note.actor) {
                     let span_x = note
@@ -296,6 +338,21 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                     let note_element =
                         render_note(actor_x, span_x, current_y, &note.message, note.placement);
                     doc.add_element(note_element);
+                }
+                if let Some(actor_idx) = actor_index.get(&note.actor).copied() {
+                    let mut min_idx = actor_idx;
+                    let mut max_idx = actor_idx;
+                    if let Some(other) = note
+                        .actor_to
+                        .as_ref()
+                        .and_then(|name| actor_index.get(name).copied())
+                    {
+                        min_idx = min_idx.min(other);
+                        max_idx = max_idx.max(other);
+                    }
+                    for fragment in &mut fragment_stack {
+                        fragment.update_bounds(min_idx, max_idx);
+                    }
                 }
                 last_message_y = Some(current_y);
                 current_y += message_spacing;
@@ -346,7 +403,18 @@ impl FragmentKind {
 
 struct FragmentState {
     start_y: f64,
+    kind: FragmentKind,
+    label: String,
+    min_actor_idx: Option<usize>,
+    max_actor_idx: Option<usize>,
     color: Option<String>,
+}
+
+impl FragmentState {
+    fn update_bounds(&mut self, min_idx: usize, max_idx: usize) {
+        self.min_actor_idx = Some(self.min_actor_idx.map_or(min_idx, |value| value.min(min_idx)));
+        self.max_actor_idx = Some(self.max_actor_idx.map_or(max_idx, |value| value.max(max_idx)));
+    }
 }
 
 /// Render an actor (participant box or stick figure)
@@ -545,7 +613,9 @@ fn render_message(from_x: f64, to_x: f64, y: f64, label: &str, msg_type: LineTyp
     }
 
     // Message line
-    let mut line_attrs = Attrs::new().with_stroke_width(1.0).with_class("message-line");
+    let mut line_attrs = Attrs::new()
+        .with_stroke_width(1.0)
+        .with_class("message-line");
     if let Some(marker_id) = marker_id {
         line_attrs = line_attrs.with_attr("marker-end", &format!("url(#{})", marker_id));
     }
@@ -597,26 +667,6 @@ fn render_activation(actor_x: f64, start_y: f64, end_y: f64) -> SvgElement {
     }
 }
 
-fn fragment_label(kind: FragmentKind, text: &str) -> String {
-    let prefix = match kind {
-        FragmentKind::Loop => "loop",
-        FragmentKind::Alt => "alt",
-        FragmentKind::Opt => "opt",
-        FragmentKind::Par => "par",
-        FragmentKind::Critical => "critical",
-        FragmentKind::Break => "break",
-        FragmentKind::Rect => "rect",
-        FragmentKind::Else => "else",
-        FragmentKind::And => "and",
-        FragmentKind::Option => "option",
-    };
-    if text.is_empty() {
-        prefix.to_string()
-    } else {
-        format!("{} {}", prefix, text)
-    }
-}
-
 fn render_fragment_frame(
     x: f64,
     width: f64,
@@ -642,44 +692,152 @@ fn render_fragment_frame(
     }
 }
 
-fn render_fragment_divider(x: f64, width: f64, y: f64) -> SvgElement {
+fn render_fragment_divider(x: f64, width: f64, y: f64, dashed: bool) -> SvgElement {
+    let mut attrs = Attrs::new().with_class("loopLine");
+    if dashed {
+        attrs = attrs.with_stroke_dasharray("3,3");
+    }
     SvgElement::Line {
         x1: x,
         y1: y,
         x2: x + width,
         y2: y,
-        attrs: Attrs::new().with_class("loopLine"),
+        attrs,
     }
 }
 
-fn render_fragment_label(x: f64, y: f64, text: &str) -> Vec<SvgElement> {
-    let font_size = 16.0_f64;
-    let padding_x = 8.0;
-    let padding_y = 4.0;
-    let label_width = (text.len() as f64 * 7.0 + padding_x * 2.0).max(60.0);
-    let label_height = font_size + padding_y * 2.0;
+fn fragment_bounds(left: f64, width: f64, depth: usize) -> (f64, f64) {
+    let inset = depth as f64 * 10.0;
+    let frame_x = left + inset;
+    let frame_width = (width - inset * 2.0).max(20.0);
+    (frame_x, frame_width)
+}
 
-    let rect = SvgElement::Rect {
-        x: x + 10.0,
-        y: y + 5.0,
-        width: label_width,
-        height: label_height,
-        rx: Some(3.0),
-        ry: Some(3.0),
-        attrs: Attrs::new().with_class("labelBox"),
+fn fragment_bounds_for_state(
+    fragment: &FragmentState,
+    left: f64,
+    width: f64,
+    depth: usize,
+    actor_centers: &[f64],
+    actor_width: f64,
+) -> (f64, f64) {
+    let (mut frame_x, mut frame_width) = if let (Some(min_idx), Some(max_idx)) =
+        (fragment.min_actor_idx, fragment.max_actor_idx)
+    {
+        let min_center = actor_centers[min_idx];
+        let max_center = actor_centers[max_idx];
+        let left = min_center - actor_width / 2.0 - 10.0;
+        let right = max_center + actor_width / 2.0 + 10.0;
+        (left, (right - left).max(20.0))
+    } else {
+        fragment_bounds(left, width, 0)
     };
 
-    let text_element = SvgElement::Text {
-        x: x + 10.0 + label_width / 2.0,
-        y: y + 5.0 + label_height / 2.0 + 4.0,
-        content: text.to_string(),
-        attrs: Attrs::new()
-            .with_attr("text-anchor", "middle")
-            .with_class("labelText")
-            .with_attr("font-size", "16"),
+    let inset = depth as f64 * 10.0;
+    frame_x += inset;
+    frame_width = (frame_width - inset * 2.0).max(20.0);
+    (frame_x, frame_width)
+}
+
+fn render_fragment_label(
+    kind: FragmentKind,
+    x: f64,
+    width: f64,
+    y: f64,
+    text: &str,
+) -> Vec<SvgElement> {
+    let mut elements = Vec::new();
+    let label_height = 20.0;
+    let label_y = y;
+
+    let (prefix, condition) = match kind {
+        FragmentKind::Else | FragmentKind::And | FragmentKind::Option => (None, Some(text)),
+        _ => (
+            Some(fragment_prefix(kind)),
+            if text.is_empty() { None } else { Some(text) },
+        ),
     };
 
-    vec![rect, text_element]
+    if let Some(prefix) = prefix {
+        let label_width = (prefix.len() as f64 * 7.0 + 16.0).max(50.0);
+        let label_x = x + 10.0;
+        let notch_y = label_y + label_height;
+        let notch_mid_y = label_y + label_height * 0.65;
+        let notch_x = label_x + label_width * 0.84;
+        let points = vec![
+            crate::layout::Point {
+                x: label_x,
+                y: label_y,
+            },
+            crate::layout::Point {
+                x: label_x + label_width,
+                y: label_y,
+            },
+            crate::layout::Point {
+                x: label_x + label_width,
+                y: notch_mid_y,
+            },
+            crate::layout::Point {
+                x: notch_x,
+                y: notch_y,
+            },
+            crate::layout::Point {
+                x: label_x,
+                y: notch_y,
+            },
+        ];
+
+        elements.push(SvgElement::Polygon {
+            points,
+            attrs: Attrs::new().with_class("labelBox"),
+        });
+        elements.push(SvgElement::Text {
+            x: label_x + label_width / 2.0,
+            y: label_y + 13.0,
+            content: prefix.to_string(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("labelText")
+                .with_attr("font-size", "16"),
+        });
+    }
+
+    if let Some(condition) = condition {
+        let condition_text = condition.trim();
+        if !condition_text.is_empty() {
+            let wrapped = if condition_text.starts_with('[') && condition_text.ends_with(']') {
+                condition_text.to_string()
+            } else {
+                format!("[{}]", condition_text)
+            };
+            elements.push(SvgElement::Text {
+                x: x + width / 2.0,
+                y: label_y + label_height - 2.0,
+                content: wrapped,
+                attrs: Attrs::new()
+                    .with_attr("text-anchor", "middle")
+                    .with_class("loopText")
+                    .with_attr("font-size", "16"),
+            });
+        }
+    }
+
+    elements
+}
+
+fn fragment_prefix(kind: FragmentKind) -> &'static str {
+    match kind {
+        FragmentKind::Loop => "loop",
+        FragmentKind::Alt => "alt",
+        FragmentKind::Opt => "opt",
+        FragmentKind::Par => "par",
+        FragmentKind::Critical => "critical",
+        FragmentKind::Break => "break",
+        FragmentKind::Rect => "rect",
+        FragmentKind::Else => "else",
+        FragmentKind::And => "and",
+        FragmentKind::Option => "option",
+    }
 }
 
 /// Render a self-message (message to the same actor)
@@ -980,7 +1138,10 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
 }}
 
 .loopLine {{
-  stroke: {label_box_border_color};
+  stroke: {actor_border};
+  fill: none;
+  stroke-width: 2px;
+  stroke-dasharray: 2, 2;
 }}
 
 .loopText {{
@@ -988,8 +1149,8 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
 }}
 
 .labelBox {{
-  stroke: {label_box_border_color};
-  fill: {label_box_bkg_color};
+  stroke: {actor_border};
+  fill: {actor_bkg};
 }}
 
 .sequence-marker-filled {{
@@ -1017,7 +1178,5 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
         note_text_color = theme.note_text_color,
         activation_bkg_color = theme.activation_bkg_color,
         activation_border_color = theme.activation_border_color,
-        label_box_border_color = theme.label_box_border_color,
-        label_box_bkg_color = theme.label_box_bkg_color,
     )
 }
