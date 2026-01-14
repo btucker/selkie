@@ -10,7 +10,7 @@
 
 use super::cache::ReferenceCache;
 use super::checks::{check_structure, CheckConfig};
-use super::samples::Sample;
+use super::samples::{OwnedSample, Sample};
 use super::{
     DiagramResult, Dimensions, EvalResult, Issue, Level, ParseResult, RenderResult, Status,
 };
@@ -50,6 +50,17 @@ impl From<Sample> for DiagramInput {
             source: None,
             diagram_type: Some(sample.diagram_type.to_string()),
             text: sample.source.to_string(),
+        }
+    }
+}
+
+impl From<OwnedSample> for DiagramInput {
+    fn from(sample: OwnedSample) -> Self {
+        Self {
+            name: sample.name,
+            source: None,
+            diagram_type: Some(sample.diagram_type),
+            text: sample.source,
         }
     }
 }

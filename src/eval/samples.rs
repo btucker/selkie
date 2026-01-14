@@ -1,7 +1,9 @@
 //! Built-in sample diagrams for evaluation.
 //!
-//! These diagrams provide a quick way to evaluate selkie without external test files.
-//! They cover various diagram types and edge cases.
+//! Samples can be loaded from docs/sources/*.mmd files or use embedded defaults.
+
+use std::fs;
+use std::path::Path;
 
 /// A sample diagram for evaluation
 #[derive(Debug, Clone)]
@@ -14,8 +16,78 @@ pub struct Sample {
     pub source: &'static str,
 }
 
-/// Get all built-in sample diagrams
-pub fn all_samples() -> Vec<Sample> {
+/// An owned sample (for dynamically loaded files)
+#[derive(Debug, Clone)]
+pub struct OwnedSample {
+    /// Name/identifier for the sample
+    pub name: String,
+    /// Diagram type (flowchart, sequence, pie, etc.)
+    pub diagram_type: String,
+    /// The mermaid diagram source
+    pub source: String,
+}
+
+impl From<Sample> for OwnedSample {
+    fn from(s: Sample) -> Self {
+        OwnedSample {
+            name: s.name.to_string(),
+            diagram_type: s.diagram_type.to_string(),
+            source: s.source.to_string(),
+        }
+    }
+}
+
+/// Load samples from docs/sources/ directory
+pub fn load_from_docs_sources() -> Vec<OwnedSample> {
+    let sources_dir = Path::new("docs/sources");
+    if !sources_dir.exists() {
+        return Vec::new();
+    }
+
+    let mut samples = Vec::new();
+
+    if let Ok(entries) = fs::read_dir(sources_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().map(|e| e == "mmd").unwrap_or(false) {
+                if let Ok(source) = fs::read_to_string(&path) {
+                    let name = path
+                        .file_stem()
+                        .and_then(|s| s.to_str())
+                        .unwrap_or("unknown")
+                        .to_string();
+
+                    let diagram_type = detect_diagram_type(&source);
+
+                    samples.push(OwnedSample {
+                        name,
+                        diagram_type,
+                        source,
+                    });
+                }
+            }
+        }
+    }
+
+    // Sort by name for consistent ordering
+    samples.sort_by(|a, b| a.name.cmp(&b.name));
+    samples
+}
+
+/// Get all samples: docs/sources/ files first, then embedded samples
+pub fn all_samples_owned() -> Vec<OwnedSample> {
+    let mut samples = load_from_docs_sources();
+
+    // Add embedded samples
+    for s in embedded_samples() {
+        samples.push(s.into());
+    }
+
+    samples
+}
+
+/// Get embedded sample diagrams (the original hardcoded samples)
+pub fn embedded_samples() -> Vec<Sample> {
     vec![
         // Basic diagram types
         Sample {
@@ -296,17 +368,52 @@ pub fn all_samples() -> Vec<Sample> {
     ]
 }
 
+/// Detect diagram type from source content
+fn detect_diagram_type(source: &str) -> String {
+    let source_lower = source.to_lowercase();
+    let first_line = source_lower.lines().next().unwrap_or("");
+
+    if first_line.starts_with("flowchart") || first_line.starts_with("graph ") {
+        "flowchart".to_string()
+    } else if first_line.starts_with("sequencediagram") {
+        "sequence".to_string()
+    } else if first_line.starts_with("classdiagram") {
+        "class".to_string()
+    } else if first_line.starts_with("statediagram") {
+        "state".to_string()
+    } else if first_line.starts_with("erdiagram") {
+        "er".to_string()
+    } else if first_line.starts_with("gantt") {
+        "gantt".to_string()
+    } else if first_line.starts_with("pie") {
+        "pie".to_string()
+    } else if first_line.starts_with("gitgraph") {
+        "git".to_string()
+    } else if first_line.starts_with("mindmap") {
+        "mindmap".to_string()
+    } else if first_line.starts_with("timeline") {
+        "timeline".to_string()
+    } else if first_line.starts_with("journey") {
+        "journey".to_string()
+    } else {
+        "unknown".to_string()
+    }
+}
+
 /// Get samples filtered by diagram type
-pub fn samples_by_type(diagram_type: &str) -> Vec<Sample> {
-    all_samples()
+pub fn samples_by_type(diagram_type: &str) -> Vec<OwnedSample> {
+    all_samples_owned()
         .into_iter()
         .filter(|s| s.diagram_type == diagram_type)
         .collect()
 }
 
 /// Get available diagram types
-pub fn available_types() -> Vec<&'static str> {
-    let mut types: Vec<&'static str> = all_samples().iter().map(|s| s.diagram_type).collect();
+pub fn available_types() -> Vec<String> {
+    let mut types: Vec<String> = all_samples_owned()
+        .iter()
+        .map(|s| s.diagram_type.clone())
+        .collect();
     types.sort();
     types.dedup();
     types
@@ -317,16 +424,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_all_samples_not_empty() {
-        assert!(!all_samples().is_empty());
+    fn test_embedded_samples_not_empty() {
+        assert!(!embedded_samples().is_empty());
     }
 
     #[test]
     fn test_available_types() {
         let types = available_types();
-        assert!(types.contains(&"flowchart"));
-        assert!(types.contains(&"sequence"));
-        assert!(types.contains(&"pie"));
+        assert!(types.contains(&"flowchart".to_string()));
+        assert!(types.contains(&"sequence".to_string()));
+        assert!(types.contains(&"pie".to_string()));
     }
 
     #[test]
@@ -334,5 +441,17 @@ mod tests {
         let flowcharts = samples_by_type("flowchart");
         assert!(!flowcharts.is_empty());
         assert!(flowcharts.iter().all(|s| s.diagram_type == "flowchart"));
+    }
+
+    #[test]
+    fn test_detect_diagram_type() {
+        assert_eq!(detect_diagram_type("flowchart LR\n  A-->B"), "flowchart");
+        assert_eq!(detect_diagram_type("graph TD\n  A-->B"), "flowchart");
+        assert_eq!(
+            detect_diagram_type("sequenceDiagram\n  A->>B: Hi"),
+            "sequence"
+        );
+        assert_eq!(detect_diagram_type("pie\n  \"A\": 50"), "pie");
+        assert_eq!(detect_diagram_type("stateDiagram-v2\n  [*]-->A"), "state");
     }
 }

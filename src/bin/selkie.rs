@@ -494,9 +494,9 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     // Get diagrams to evaluate
     let inputs = match &args.target {
         None => {
-            // Use built-in gallery samples
-            eprintln!("Using built-in gallery samples...");
-            samples::all_samples()
+            // Use docs/sources/*.mmd files + embedded samples
+            eprintln!("Using gallery samples (docs/sources/ + embedded)...");
+            samples::all_samples_owned()
                 .into_iter()
                 .map(DiagramInput::from)
                 .collect()
