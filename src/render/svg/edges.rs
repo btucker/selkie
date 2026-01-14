@@ -69,26 +69,6 @@ pub fn render_edge_parts(
         if let Some(label_pos) = &layout_edge.label_position {
             let mut label_elements = Vec::new();
 
-            // Estimate text width
-            let text_width = flow_edge.text.len() as f64 * 8.0;
-            let text_height = 16.0;
-            let padding = 4.0;
-
-            // Background rect - uses CSS class for theming
-            let bg_attrs = Attrs::new()
-                .with_class("edge-label-bg")
-                .with_attr("fill-opacity", "0.8");
-
-            label_elements.push(
-                SvgElement::rect(
-                    label_pos.x - text_width / 2.0 - padding,
-                    label_pos.y - text_height / 2.0 - padding / 2.0,
-                    text_width + padding * 2.0,
-                    text_height + padding,
-                )
-                .with_attrs(bg_attrs),
-            );
-
             // Text element
             let label_attrs = Attrs::new()
                 .with_class("edge-label")
@@ -313,7 +293,7 @@ mod tests {
     }
 
     #[test]
-    fn test_edge_label_has_background_rect() {
+    fn test_edge_label_renders_text() {
         use crate::diagrams::flowchart::{EdgeStroke, FlowEdge, FlowTextType};
         use std::collections::HashMap;
 
@@ -353,25 +333,16 @@ mod tests {
         assert!(result.label.is_some(), "Edge should have a label element");
         let label_svg = result.label.unwrap().to_svg(0);
 
-        // Edge label should have a background rect before the text
+        // Edge label should render text content
         assert!(
-            label_svg.contains("<rect") && label_svg.contains("<text"),
-            "Edge label should have background rect, got: {}",
+            label_svg.contains("<text"),
+            "Edge label should render text, got: {}",
             label_svg
-        );
-
-        // The rect should have some opacity for the translucent background
-        assert!(
-            label_svg.contains("opacity") || label_svg.contains("fill-opacity"),
-            "Edge label background should have opacity for translucent effect"
         );
     }
 
     #[test]
-    fn test_edge_label_background_uses_css_class_not_hardcoded_color() {
-        // This test verifies that the edge label background does NOT have
-        // a hardcoded fill color, allowing CSS theme styling to work.
-        // Hardcoded inline fill attributes override CSS rules.
+    fn test_edge_label_uses_css_class_not_hardcoded_color() {
         use crate::diagrams::flowchart::{EdgeStroke, FlowEdge, FlowTextType};
         use std::collections::HashMap;
 
@@ -411,11 +382,11 @@ mod tests {
         assert!(result.label.is_some(), "Edge should have a label element");
         let svg = result.label.unwrap().to_svg(0);
 
-        // The edge-label-bg rect should NOT have a hardcoded fill color
+        // The edge-label text should NOT have a hardcoded fill color
         // It should use the CSS class for theming
         assert!(
             !svg.contains("fill=\"#e8e8e8\""),
-            "Edge label background should not have hardcoded fill '#e8e8e8', got: {}",
+            "Edge label text should not have hardcoded fill '#e8e8e8', got: {}",
             svg
         );
     }

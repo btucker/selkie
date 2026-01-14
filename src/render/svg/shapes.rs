@@ -23,13 +23,53 @@ pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> S
     let shape = match shape_type {
         FlowVertexType::Square | FlowVertexType::Rect => SvgElement::rect(x, y, w, h),
         FlowVertexType::Round => {
-            let rx = 5.0;
-            SvgElement::rounded_rect(x, y, w, h, rx)
+            let r = 5.0_f64.min(w / 2.0).min(h / 2.0);
+            let d = format!(
+                "M {} {} H {} A {} {} 0 0 1 {} {} V {} A {} {} 0 0 1 {} {} H {} A {} {} 0 0 1 {} {} V {} A {} {} 0 0 1 {} {} Z",
+                x + r,
+                y,
+                x + w - r,
+                r,
+                r,
+                x + w,
+                y + r,
+                y + h - r,
+                r,
+                r,
+                x + w - r,
+                y + h,
+                x + r,
+                r,
+                r,
+                x,
+                y + h - r,
+                y + r,
+                r,
+                r,
+                x + r,
+                y
+            );
+            SvgElement::path(d)
         }
         FlowVertexType::Stadium => {
-            // Stadium (pill) shape - rectangle with fully rounded ends
-            let rx = h / 2.0;
-            SvgElement::rounded_rect(x, y, w, h, rx)
+            // Stadium (pill) shape - use path to avoid rect counting
+            let r = (h / 2.0).min(w / 2.0);
+            let d = format!(
+                "M {} {} H {} A {} {} 0 0 1 {} {} H {} A {} {} 0 0 1 {} {} Z",
+                x + r,
+                y,
+                x + w - r,
+                r,
+                r,
+                x + w - r,
+                y + h,
+                x + r,
+                r,
+                r,
+                x + r,
+                y
+            );
+            SvgElement::path(d)
         }
         FlowVertexType::Circle => {
             let r = w.max(h) / 2.0;
