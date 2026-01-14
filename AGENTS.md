@@ -41,14 +41,15 @@ bd sync               # Sync with git
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
 
-## Development Process
+## Development Process (focus on one diagram type)
 
-1. Use `cargo run --bin selkie -- eval --verbose` evaluate where our implementation is relative to the reference
+1. Use `cargo run --bin selkie -- eval --verbose --type <diagram_type>` evaluate where our implementation is relative to the reference.
 2. Log new issues to log in bd & resolve completed ones
-3. When you resolve a rendering issue, update the svg in docs/images
-4. Follow TDD, Commit when tests are passing
-5. Follow Reference implementations:
+3. Confirm our changes in this branch are increasing scores.
+4. When you resolve a rendering issue, update the svg in docs/images
+5. Follow TDD, Commit when tests are passing
+6. Explore Reference implementations to understand how they work:
     - ~/projects/mermaid/
     - ~/projects/dagre/
     - ~/projects/elkjs/
-6. Return to step 1
+7. Return to step 1
