@@ -149,7 +149,7 @@ selkie eval --type flowchart
 # Generate HTML comparison report
 selkie eval --html report.html
 
-# Generate side-by-side comparison PNGs (requires 'png' feature and Playwright)
+# Generate side-by-side comparison PNGs
 selkie eval --pngs comparison_output/
 ```
 
@@ -164,7 +164,7 @@ The eval system performs:
 The `--pngs` flag generates side-by-side comparison images showing Selkie output next to the Mermaid.js reference. This requires:
 
 1. Building with `--features png` for PNG generation
-2. Playwright with Chromium for rendering Mermaid.js references (`cd tools/validation && npm install && npx playwright install chromium`)
+2. [Mermaid CLI](https://github.com/mermaid-js/mermaid-cli) (`npm install -g @mermaid-js/mermaid-cli`)
 
 Each comparison PNG places Selkie's output on the left and Mermaid.js on the right, making differences easy to spot.
 

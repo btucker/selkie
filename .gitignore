@@ -6,9 +6,6 @@ node_modules/
 # Playwright MCP screenshots
 .playwright-mcp/
 
-# Generated gallery output
-tools/gallery/output/
-
 # Editor/IDE
 .idea/
 .vscode/
