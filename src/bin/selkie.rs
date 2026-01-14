@@ -556,10 +556,13 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     fs::create_dir_all(&output_dir)?;
 
     // Write HTML report as index.html
+    eprint!("Writing HTML report...");
     let html_path = output_dir.join("index.html");
     eval::report::write_html(&result, &html_path)?;
+    eprintln!(" done");
 
     // Write SVGs to subdirectories organized by diagram type
+    eprint!("Writing SVG files...");
     for diagram in &result.diagrams {
         let type_dir = output_dir.join(&diagram.diagram_type);
         let safe_name = diagram.name.replace(['/', ' '], "_");
@@ -581,14 +584,22 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             fs::write(&path, svg)?;
         }
     }
+    eprintln!(" done");
 
     // Write comparison PNGs if png feature is enabled (requires both SVGs)
     let svg_pairs = runner.take_svg_pairs();
     #[cfg(feature = "png")]
     if !svg_pairs.is_empty() {
+        eprint!(
+            "Generating comparison PNGs ({} diagrams)...",
+            svg_pairs.len()
+        );
         match eval::png::write_comparison_pngs(&output_dir, &svg_pairs) {
-            Ok(_) => {}
+            Ok(_) => {
+                eprintln!(" done");
+            }
             Err(e) => {
+                eprintln!(" failed");
                 eprintln!("Warning: Failed to generate comparison PNGs: {}", e);
             }
         }
