@@ -120,7 +120,236 @@ pub fn compare_svgs(selkie_svg: &str, reference_svg: &str) -> Result<VisualCompa
     })
 }
 
+/// Render mermaid source to PNG using mmdc (for accurate text rendering)
+#[cfg(feature = "png")]
+pub fn source_to_rgba(source: &str) -> Result<(Vec<u8>, u32, u32), String> {
+    use image::GenericImageView;
+
+    // Create temp directory
+    let temp_dir = tempfile::tempdir().map_err(|e| format!("Failed to create temp dir: {}", e))?;
+
+    // Write source to markdown file
+    let md_path = temp_dir.path().join("diagram.md");
+    let md_content = format!("```mermaid\n{}\n```\n", source);
+    fs::write(&md_path, &md_content).map_err(|e| format!("Failed to write markdown: {}", e))?;
+
+    // Run mmdc with PNG output
+    let output_md = temp_dir.path().join("output.md");
+    let artefacts_dir = temp_dir.path().join("artefacts");
+
+    let output = std::process::Command::new("mmdc")
+        .args([
+            "-i",
+            md_path.to_str().unwrap(),
+            "-o",
+            output_md.to_str().unwrap(),
+            "-a",
+            artefacts_dir.to_str().unwrap(),
+            "-e",
+            "png",
+            "-q",
+        ])
+        .output()
+        .map_err(|e| format!("Failed to run mmdc: {}", e))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("mmdc failed: {}", stderr));
+    }
+
+    // Read the PNG file
+    let png_path = artefacts_dir.join("output-1.png");
+    let png_data = fs::read(&png_path).map_err(|e| format!("Failed to read PNG: {}", e))?;
+
+    // Decode PNG to RGBA
+    let img =
+        image::load_from_memory(&png_data).map_err(|e| format!("Failed to decode PNG: {}", e))?;
+
+    let (width, height) = img.dimensions();
+    let rgba = img.into_rgba8().into_raw();
+
+    Ok((rgba, width, height))
+}
+
 /// Create a side-by-side comparison PNG
+/// For reference images, uses mmdc to render from source for accurate text
+#[cfg(feature = "png")]
+pub fn create_comparison_png_with_source(
+    selkie_svg: &str,
+    reference_source: &str,
+    _label: &str,
+) -> Result<Vec<u8>, String> {
+    use resvg::tiny_skia::{self, Color, Paint, Pixmap, Rect, Transform};
+
+    // Render selkie SVG with resvg (our SVGs don't use foreignObject)
+    let (selkie_rgba, sw, sh) = svg_to_rgba(selkie_svg)?;
+
+    // Render reference from source with mmdc (handles foreignObject text)
+    let (reference_rgba, rw, rh) = source_to_rgba(reference_source)?;
+
+    // Calculate combined dimensions
+    // Layout: [Selkie] | [Divider] | [Reference]
+    let divider_width = 4u32;
+    let padding = 10u32;
+
+    let max_height = sh.max(rh);
+    let total_width = sw + rw + divider_width + padding * 4;
+    let total_height = max_height + padding * 2;
+
+    // Create combined pixmap
+    let mut combined = Pixmap::new(total_width, total_height)
+        .ok_or_else(|| "Failed to create combined pixmap".to_string())?;
+
+    // Fill with light gray background
+    combined.fill(Color::from_rgba8(245, 245, 245, 255));
+
+    // Create pixmaps from RGBA data
+    let selkie_pixmap = {
+        let mut pm = Pixmap::new(sw, sh).ok_or("Failed to create selkie pixmap")?;
+        pm.data_mut().copy_from_slice(&selkie_rgba);
+        pm
+    };
+
+    let reference_pixmap = {
+        let mut pm = Pixmap::new(rw, rh).ok_or("Failed to create reference pixmap")?;
+        pm.data_mut().copy_from_slice(&reference_rgba);
+        pm
+    };
+
+    // Draw selkie image on left
+    let selkie_x = padding as i32;
+    let selkie_y = padding as i32;
+    combined.draw_pixmap(
+        selkie_x,
+        selkie_y,
+        selkie_pixmap.as_ref(),
+        &tiny_skia::PixmapPaint::default(),
+        Transform::identity(),
+        None,
+    );
+
+    // Draw divider
+    let divider_x = (sw + padding * 2) as f32;
+    let divider_rect = Rect::from_xywh(
+        divider_x,
+        padding as f32,
+        divider_width as f32,
+        max_height as f32,
+    );
+    if let Some(rect) = divider_rect {
+        let mut paint = Paint::default();
+        paint.set_color_rgba8(100, 100, 100, 255);
+        combined.fill_rect(rect, &paint, Transform::identity(), None);
+    }
+
+    // Draw reference image on right
+    let reference_x = (sw + divider_width + padding * 3) as i32;
+    let reference_y = padding as i32;
+    combined.draw_pixmap(
+        reference_x,
+        reference_y,
+        reference_pixmap.as_ref(),
+        &tiny_skia::PixmapPaint::default(),
+        Transform::identity(),
+        None,
+    );
+
+    // Encode to PNG
+    let png_data = combined
+        .encode_png()
+        .map_err(|e| format!("Failed to encode PNG: {}", e))?;
+
+    Ok(png_data)
+}
+
+/// Create a side-by-side comparison PNG from pre-rendered RGBA data
+#[cfg(feature = "png")]
+pub fn create_comparison_png_from_rgba(
+    selkie_rgba: &[u8],
+    sw: u32,
+    sh: u32,
+    reference_rgba: &[u8],
+    rw: u32,
+    rh: u32,
+) -> Result<Vec<u8>, String> {
+    use resvg::tiny_skia::{Color, Paint, Pixmap, Rect, Transform};
+
+    // Calculate combined dimensions
+    // Layout: [Selkie] | [Divider] | [Reference]
+    let divider_width = 4u32;
+    let padding = 10u32;
+
+    let max_height = sh.max(rh);
+    let total_width = sw + rw + divider_width + padding * 4;
+    let total_height = max_height + padding * 2;
+
+    // Create combined pixmap
+    let mut combined = Pixmap::new(total_width, total_height)
+        .ok_or_else(|| "Failed to create combined pixmap".to_string())?;
+
+    // Fill with light gray background
+    combined.fill(Color::from_rgba8(245, 245, 245, 255));
+
+    // Create pixmaps from RGBA data
+    let selkie_pixmap = {
+        let mut pm = Pixmap::new(sw, sh).ok_or("Failed to create selkie pixmap")?;
+        pm.data_mut().copy_from_slice(selkie_rgba);
+        pm
+    };
+
+    let reference_pixmap = {
+        let mut pm = Pixmap::new(rw, rh).ok_or("Failed to create reference pixmap")?;
+        pm.data_mut().copy_from_slice(reference_rgba);
+        pm
+    };
+
+    // Draw selkie image on left
+    let selkie_x = padding as i32;
+    let selkie_y = padding as i32;
+    combined.draw_pixmap(
+        selkie_x,
+        selkie_y,
+        selkie_pixmap.as_ref(),
+        &resvg::tiny_skia::PixmapPaint::default(),
+        Transform::identity(),
+        None,
+    );
+
+    // Draw divider
+    let divider_x = (sw + padding * 2) as f32;
+    let divider_rect = Rect::from_xywh(
+        divider_x,
+        padding as f32,
+        divider_width as f32,
+        max_height as f32,
+    );
+    if let Some(rect) = divider_rect {
+        let mut paint = Paint::default();
+        paint.set_color_rgba8(100, 100, 100, 255);
+        combined.fill_rect(rect, &paint, Transform::identity(), None);
+    }
+
+    // Draw reference image on right
+    let reference_x = (sw + divider_width + padding * 3) as i32;
+    let reference_y = padding as i32;
+    combined.draw_pixmap(
+        reference_x,
+        reference_y,
+        reference_pixmap.as_ref(),
+        &resvg::tiny_skia::PixmapPaint::default(),
+        Transform::identity(),
+        None,
+    );
+
+    // Encode to PNG
+    let png_data = combined
+        .encode_png()
+        .map_err(|e| format!("Failed to encode PNG: {}", e))?;
+
+    Ok(png_data)
+}
+
+/// Create a side-by-side comparison PNG (legacy - both from SVG)
 #[cfg(feature = "png")]
 pub fn create_comparison_png(
     selkie_svg: &str,
@@ -214,7 +443,7 @@ pub fn create_comparison_png(
 #[cfg(feature = "png")]
 pub fn write_comparison_pngs(
     output_dir: &Path,
-    comparisons: &[(String, String, String, String)], // (name, diagram_type, selkie_svg, reference_svg)
+    comparisons: &[(String, String, String, String, String)], // (name, diagram_type, source_text, selkie_svg, reference_svg)
 ) -> Result<super::report::PngManifest, String> {
     use super::report::{PngManifest, PngManifestEntry};
 
@@ -222,17 +451,24 @@ pub fn write_comparison_pngs(
         diagrams: Vec::new(),
     };
 
-    for (name, diagram_type, selkie_svg, reference_svg) in comparisons {
+    for (name, diagram_type, source_text, selkie_svg, _reference_svg) in comparisons {
         // Create subdirectory for this diagram type
         let type_dir = output_dir.join(diagram_type);
         fs::create_dir_all(&type_dir)
             .map_err(|e| format!("Failed to create directory {}: {}", type_dir.display(), e))?;
 
-        // Calculate visual similarity
-        let comparison = compare_svgs(selkie_svg, reference_svg)?;
+        // Render both images for comparison
+        let (selkie_rgba, sw, sh) = svg_to_rgba(selkie_svg)?;
+        let (reference_rgba, rw, rh) = source_to_rgba(source_text)?;
 
-        // Create comparison PNG
-        let png_data = create_comparison_png(selkie_svg, reference_svg, name)?;
+        // Calculate visual similarity between renderings
+        let selkie_gray = rgba_to_grayscale(&selkie_rgba);
+        let reference_gray = rgba_to_grayscale(&reference_rgba);
+        let ssim = calculate_ssim_with_resize(&selkie_gray, sw, sh, &reference_gray, rw, rh);
+
+        // Create side-by-side comparison PNG from pre-rendered RGBA data
+        let png_data =
+            create_comparison_png_from_rgba(&selkie_rgba, sw, sh, &reference_rgba, rw, rh)?;
 
         // Write PNG file to type subdirectory
         let safe_name = name.replace(['/', ' '], "_");
@@ -247,7 +483,7 @@ pub fn write_comparison_pngs(
             diagram_type: diagram_type.clone(),
             png: format!("{}/{}", diagram_type, png_filename),
             structural_match: true, // Will be filled in by caller
-            visual_similarity: Some(comparison.ssim),
+            visual_similarity: Some(ssim),
             issues: Vec::new(), // Will be filled in by caller
         });
     }
@@ -290,7 +526,7 @@ pub fn create_comparison_png(
 #[cfg(not(feature = "png"))]
 pub fn write_comparison_pngs(
     _output_dir: &Path,
-    _comparisons: &[(String, String, String, String)], // (name, diagram_type, selkie_svg, reference_svg)
+    _comparisons: &[(String, String, String, String, String)], // (name, diagram_type, source_text, selkie_svg, reference_svg)
 ) -> Result<super::report::PngManifest, String> {
     Err("PNG feature not enabled. Build with --features png".to_string())
 }
