@@ -746,7 +746,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore] // TODO: Network simplex cycling issue prevents optimal subgraph height minimization
     fn minimizes_height_of_subgraphs() {
         let mut g = new_graph();
         for v in ["a", "b", "c", "d", "x", "y"] {

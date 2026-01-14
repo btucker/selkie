@@ -791,32 +791,38 @@ fn test_flowchart_has_circle_markers() {
 
 #[test]
 fn test_er_diagram_has_crow_foot_notation() {
-    // ER diagrams should render crow's foot cardinality symbols
+    // ER diagrams should render crow's foot cardinality symbols using SVG markers
     let input = r#"erDiagram
     CUSTOMER ||--o{ ORDER : places"#;
 
     let diagram = parse(input).expect("Failed to parse ER diagram");
     let svg = render(&diagram).expect("Failed to render ER diagram");
 
-    // Should have cardinality symbols rendered
+    // Should have marker definitions for ER cardinality symbols
     assert!(
-        svg.contains("cardinality"),
-        "ER diagram should have cardinality symbols. SVG:\n{}",
+        svg.contains("er-onlyOne") || svg.contains("er-zeroOrMore"),
+        "ER diagram should have cardinality marker definitions. SVG:\n{}",
         svg
     );
 
-    // The ZeroOrMore cardinality (o{) should have both a circle and crow's foot paths
-    // Circle for the "zero" part
+    // The ZeroOrMore cardinality (o{) marker should include a circle
     assert!(
         svg.contains("<circle"),
-        "ER diagram ZeroOrMore cardinality should include a circle. SVG:\n{}",
+        "ER diagram ZeroOrMore cardinality marker should include a circle. SVG:\n{}",
         svg
     );
 
-    // Crow's foot path for the "many" part
+    // Relationship lines should use marker-start and marker-end attributes
     assert!(
-        svg.contains("<path") && svg.contains("cardinality"),
-        "ER diagram should have crow's foot paths in cardinality group. SVG:\n{}",
+        svg.contains("marker-start") && svg.contains("marker-end"),
+        "ER diagram relationship paths should use marker-start and marker-end. SVG:\n{}",
+        svg
+    );
+
+    // Paths should reference ER markers
+    assert!(
+        svg.contains("url(#er-"),
+        "ER diagram paths should reference ER marker definitions. SVG:\n{}",
         svg
     );
 }
