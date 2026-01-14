@@ -6,7 +6,7 @@ A 100% Rust implementation of the [Mermaid](https://mermaid.js.org/) diagram par
 
 Selkie aims to provide a fast, native alternative to Mermaid.js for parsing and rendering diagrams. The entire implementation is written in Rust, with no JavaScript dependencies at runtime.
 
-This project has been built entirely by [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, toward visual and structural parity.
+This project has been built entirely with coding agents, mostly [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, toward visual and structural parity.
 
 ## Performance
 
@@ -44,13 +44,6 @@ For client-side rendering, Selkie compiles to WebAssembly. Both run in the same 
 _Median of 10 runs after 2 warmup runs. Chromium via Playwright._
 
 **Bundle Size:** ~350 KB (WASM + JS glue) vs ~2.5 MB for mermaid.min.js
-
-### Why Selkie is Faster
-
-- **No JavaScript runtime** (CLI): Native binary with ~5-20ms execution time
-- **Efficient WASM** (Browser): Rust compiles to compact, fast WebAssembly
-- **No D3.js dependency**: Selkie renders SVG directly without heavyweight libraries
-- **Optimized layout**: Native implementation of dagre graph layout algorithms
 
 ## Credits
 
