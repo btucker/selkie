@@ -650,6 +650,32 @@ fn test_pie_chart_preserves_section_order() {
 }
 
 #[test]
+fn test_pie_chart_renders_small_percentage_labels() {
+    // Issue: Small slices like 4% should still have percentage labels rendered
+    // The Voldemort pie chart has FRIENDS=2 (4%), FAMILY=3 (6%), NOSE=45 (90%)
+    let input = r#"pie title What Voldemort doesnt have
+         "FRIENDS" : 2
+         "FAMILY" : 3
+         "NOSE" : 45"#;
+
+    let diagram = parse(input).expect("Failed to parse pie chart");
+    let svg = render(&diagram).expect("Failed to render pie chart");
+
+    // All percentage labels should be present
+    assert!(
+        svg.contains("90%"),
+        "Should render 90% label. SVG:\n{}",
+        svg
+    );
+    assert!(svg.contains("6%"), "Should render 6% label. SVG:\n{}", svg);
+    assert!(
+        svg.contains("4%"),
+        "Should render 4% label for small slice. SVG:\n{}",
+        svg
+    );
+}
+
+#[test]
 fn test_pie_chart_uses_theme_colors() {
     // Verify pie chart uses theme colors instead of hardcoded values
     let input = r#"pie title Themed Pie

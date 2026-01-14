@@ -156,9 +156,9 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
         };
         doc.add_element(slice);
 
-        // Add percentage label inside slice (for larger slices)
-        if percentage >= 0.05 {
-            // Only show if slice is at least 5%
+        // Add percentage label inside slice
+        // Use 2% threshold to show labels for small slices like mermaid.js
+        if percentage >= 0.02 {
             let mid_angle = start_angle + angle / 2.0;
             let label_radius = radius * 0.75; // Position inside slice (mermaid.js uses ~0.75)
             let label_x = cx + label_radius * mid_angle.cos();
