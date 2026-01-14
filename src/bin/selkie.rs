@@ -7,7 +7,7 @@
 //!   selkie -i input.mmd -o output.svg          # -i flag also works
 //!   selkie render input.mmd -o output.svg      # explicit render subcommand
 //!   selkie eval                                # evaluate with gallery samples
-//!   selkie eval --type flowchart --html report.html
+//!   selkie eval -o ./reports                   # custom output directory
 
 use std::fs;
 use std::io::{self, Read, Write};
@@ -16,6 +16,7 @@ use std::process;
 
 use clap::{Parser, Subcommand, ValueEnum};
 use serde::Deserialize;
+use uuid::Uuid;
 
 use mermaid::eval::{self, runner::DiagramInput, samples};
 use mermaid::render::{RenderConfig, Theme};
@@ -141,17 +142,13 @@ struct EvalArgs {
     #[arg(short = 't', long = "type")]
     diagram_type: Option<String>,
 
-    /// Write JSON report to file
-    #[arg(short, long)]
+    /// Output directory for report (default: /tmp). Creates selkie-eval-XXXX subdirectory.
+    #[arg(short, long, value_name = "DIR")]
     output: Option<PathBuf>,
 
-    /// Generate visual comparison HTML
+    /// Write JSON report to file (in addition to HTML report)
     #[arg(long)]
-    html: Option<PathBuf>,
-
-    /// Save comparison PNGs for AI review
-    #[arg(long)]
-    pngs: Option<PathBuf>,
+    json: Option<PathBuf>,
 
     /// Show detailed diff per diagram
     #[arg(short, long)]
@@ -537,53 +534,57 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     // Run evaluation
     let result = runner.evaluate(&inputs);
 
-    // Output results
+    // Output results to stderr (verbose or summary)
     if args.verbose {
-        println!("{}", eval::report::text_detailed(&result));
+        eprintln!("{}", eval::report::text_detailed(&result));
     } else {
-        println!("{}", eval::report::text_summary(&result));
+        eprintln!("{}", eval::report::text_summary(&result));
     }
 
     // Write JSON if requested
-    if let Some(ref path) = args.output {
+    if let Some(ref path) = args.json {
         eval::report::write_json(&result, path)?;
         eprintln!("Wrote JSON report to {}", path.display());
     }
 
-    // Write HTML if requested
-    if let Some(ref path) = args.html {
-        eval::report::write_html(&result, path)?;
-        eprintln!("Wrote HTML report to {}", path.display());
+    // Create output directory with random ID
+    let base_dir = args.output.unwrap_or_else(|| PathBuf::from("/tmp"));
+    let random_id = &Uuid::new_v4().to_string()[..8];
+    let output_dir = base_dir.join(format!("selkie-eval-{}", random_id));
+
+    fs::create_dir_all(&output_dir)?;
+
+    // Write HTML report as index.html
+    let html_path = output_dir.join("index.html");
+    eval::report::write_html(&result, &html_path)?;
+
+    // Write SVGs to the output directory
+    let svg_pairs = runner.take_svg_pairs();
+    for (name, selkie_svg, reference_svg) in &svg_pairs {
+        let safe_name = name.replace(['/', ' '], "_");
+
+        // Write selkie SVG
+        let selkie_path = output_dir.join(format!("{}_selkie.svg", safe_name));
+        fs::write(&selkie_path, selkie_svg)?;
+
+        // Write reference SVG
+        let reference_path = output_dir.join(format!("{}_reference.svg", safe_name));
+        fs::write(&reference_path, reference_svg)?;
     }
 
-    // Write PNGs if requested
-    if let Some(ref path) = args.pngs {
-        #[cfg(feature = "png")]
-        {
-            let svg_pairs = runner.take_svg_pairs();
-            if !svg_pairs.is_empty() {
-                match eval::png::write_comparison_pngs(path, &svg_pairs) {
-                    Ok(manifest) => {
-                        eprintln!(
-                            "Wrote {} comparison PNGs to {}",
-                            manifest.diagrams.len(),
-                            path.display()
-                        );
-                    }
-                    Err(e) => {
-                        eprintln!("Warning: Failed to generate PNGs: {}", e);
-                    }
-                }
+    // Write comparison PNGs if png feature is enabled
+    #[cfg(feature = "png")]
+    if !svg_pairs.is_empty() {
+        match eval::png::write_comparison_pngs(&output_dir, &svg_pairs) {
+            Ok(_) => {}
+            Err(e) => {
+                eprintln!("Warning: Failed to generate comparison PNGs: {}", e);
             }
         }
-        #[cfg(not(feature = "png"))]
-        {
-            eprintln!(
-                "PNG generation requires the 'png' feature. Build with: cargo build --features png"
-            );
-            let _ = path; // Suppress unused warning
-        }
     }
+
+    // Print the output directory path to stdout
+    println!("{}", output_dir.display());
 
     // Exit with error code if there are failures
     if result.issue_counts.errors > 0 {
