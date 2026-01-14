@@ -7,6 +7,10 @@
 use std::fs;
 use std::path::Path;
 
+/// RGBA image data with dimensions: (pixels, width, height)
+#[cfg(feature = "png")]
+pub type RgbaImage = (Vec<u8>, u32, u32);
+
 #[cfg(feature = "png")]
 use super::ssim::{calculate_ssim_with_resize, rgba_to_grayscale};
 
@@ -123,21 +127,50 @@ pub fn compare_svgs(selkie_svg: &str, reference_svg: &str) -> Result<VisualCompa
 /// Render mermaid source to PNG using mmdc (for accurate text rendering)
 #[cfg(feature = "png")]
 pub fn source_to_rgba(source: &str) -> Result<(Vec<u8>, u32, u32), String> {
+    // Use batch function for single diagram
+    let results = sources_to_rgba_batch(&[source]);
+    results.into_iter().next().unwrap()
+}
+
+/// Render multiple mermaid sources to PNGs in a single mmdc invocation
+#[cfg(feature = "png")]
+pub fn sources_to_rgba_batch(sources: &[&str]) -> Vec<Result<RgbaImage, String>> {
     use image::GenericImageView;
+    use std::process::{Command, Stdio};
 
     // Create temp directory
-    let temp_dir = tempfile::tempdir().map_err(|e| format!("Failed to create temp dir: {}", e))?;
+    let temp_dir = match tempfile::tempdir() {
+        Ok(dir) => dir,
+        Err(e) => {
+            return sources
+                .iter()
+                .map(|_| Err(format!("Failed to create temp dir: {}", e)))
+                .collect();
+        }
+    };
 
-    // Write source to markdown file
-    let md_path = temp_dir.path().join("diagram.md");
-    let md_content = format!("```mermaid\n{}\n```\n", source);
-    fs::write(&md_path, &md_content).map_err(|e| format!("Failed to write markdown: {}", e))?;
+    // Create markdown file with all diagrams as fenced code blocks
+    let md_path = temp_dir.path().join("batch.md");
+    let mut md_content = String::new();
+    for (i, source) in sources.iter().enumerate() {
+        md_content.push_str(&format!(
+            "## Diagram {}\n\n```mermaid\n{}\n```\n\n",
+            i, source
+        ));
+    }
+
+    if let Err(e) = fs::write(&md_path, &md_content) {
+        return sources
+            .iter()
+            .map(|_| Err(format!("Failed to write markdown: {}", e)))
+            .collect();
+    }
 
     // Run mmdc with PNG output
     let output_md = temp_dir.path().join("output.md");
-    let artefacts_dir = temp_dir.path().join("artefacts");
+    let artefacts_dir = temp_dir.path().join("pngs");
 
-    let output = std::process::Command::new("mmdc")
+    let output = Command::new("mmdc")
         .args([
             "-i",
             md_path.to_str().unwrap(),
@@ -149,26 +182,45 @@ pub fn source_to_rgba(source: &str) -> Result<(Vec<u8>, u32, u32), String> {
             "png",
             "-q",
         ])
-        .output()
-        .map_err(|e| format!("Failed to run mmdc: {}", e))?;
+        .stderr(Stdio::piped())
+        .output();
+
+    let output = match output {
+        Ok(o) => o,
+        Err(e) => {
+            return sources
+                .iter()
+                .map(|_| Err(format!("Failed to run mmdc: {}", e)))
+                .collect();
+        }
+    };
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!("mmdc failed: {}", stderr));
+        return sources
+            .iter()
+            .map(|_| Err(format!("mmdc failed: {}", stderr)))
+            .collect();
     }
 
-    // Read the PNG file
-    let png_path = artefacts_dir.join("output-1.png");
-    let png_data = fs::read(&png_path).map_err(|e| format!("Failed to read PNG: {}", e))?;
+    // Read generated PNGs (mmdc names them output-1.png, output-2.png, etc.)
+    sources
+        .iter()
+        .enumerate()
+        .map(|(i, _)| {
+            let png_path = artefacts_dir.join(format!("output-{}.png", i + 1));
+            let png_data = fs::read(&png_path).map_err(|e| format!("Failed to read PNG: {}", e))?;
 
-    // Decode PNG to RGBA
-    let img =
-        image::load_from_memory(&png_data).map_err(|e| format!("Failed to decode PNG: {}", e))?;
+            // Decode PNG to RGBA
+            let img = image::load_from_memory(&png_data)
+                .map_err(|e| format!("Failed to decode PNG: {}", e))?;
 
-    let (width, height) = img.dimensions();
-    let rgba = img.into_rgba8().into_raw();
+            let (width, height) = img.dimensions();
+            let rgba = img.into_rgba8().into_raw();
 
-    Ok((rgba, width, height))
+            Ok((rgba, width, height))
+        })
+        .collect()
 }
 
 /// Create a side-by-side comparison PNG
@@ -451,24 +503,60 @@ pub fn write_comparison_pngs(
         diagrams: Vec::new(),
     };
 
-    for (name, diagram_type, source_text, selkie_svg, _reference_svg) in comparisons {
+    // Batch render all reference PNGs with mmdc (single process invocation)
+    let source_texts: Vec<&str> = comparisons
+        .iter()
+        .map(|(_, _, s, _, _)| s.as_str())
+        .collect();
+    eprint!(" rendering references...");
+    let reference_rgbas = sources_to_rgba_batch(&source_texts);
+
+    // Render all selkie SVGs to RGBA (fast, uses resvg in-process)
+    eprint!(" rendering selkie...");
+    let selkie_rgbas: Vec<Result<RgbaImage, String>> = comparisons
+        .iter()
+        .map(|(_, _, _, selkie_svg, _)| svg_to_rgba(selkie_svg))
+        .collect();
+
+    eprint!(" compositing...");
+
+    // Process each comparison
+    for (i, (name, diagram_type, _source_text, _selkie_svg, _reference_svg)) in
+        comparisons.iter().enumerate()
+    {
         // Create subdirectory for this diagram type
         let type_dir = output_dir.join(diagram_type);
         fs::create_dir_all(&type_dir)
             .map_err(|e| format!("Failed to create directory {}: {}", type_dir.display(), e))?;
 
-        // Render both images for comparison
-        let (selkie_rgba, sw, sh) = svg_to_rgba(selkie_svg)?;
-        let (reference_rgba, rw, rh) = source_to_rgba(source_text)?;
+        // Get pre-rendered RGBA data
+        let (selkie_rgba, sw, sh) = match &selkie_rgbas[i] {
+            Ok((rgba, w, h)) => (rgba.as_slice(), *w, *h),
+            Err(e) => {
+                eprintln!("Warning: Failed to render selkie SVG for {}: {}", name, e);
+                continue;
+            }
+        };
+
+        let (reference_rgba, rw, rh) = match &reference_rgbas[i] {
+            Ok((rgba, w, h)) => (rgba.as_slice(), *w, *h),
+            Err(e) => {
+                eprintln!(
+                    "Warning: Failed to render reference PNG for {}: {}",
+                    name, e
+                );
+                continue;
+            }
+        };
 
         // Calculate visual similarity between renderings
-        let selkie_gray = rgba_to_grayscale(&selkie_rgba);
-        let reference_gray = rgba_to_grayscale(&reference_rgba);
+        let selkie_gray = rgba_to_grayscale(selkie_rgba);
+        let reference_gray = rgba_to_grayscale(reference_rgba);
         let ssim = calculate_ssim_with_resize(&selkie_gray, sw, sh, &reference_gray, rw, rh);
 
         // Create side-by-side comparison PNG from pre-rendered RGBA data
         let png_data =
-            create_comparison_png_from_rgba(&selkie_rgba, sw, sh, &reference_rgba, rw, rh)?;
+            create_comparison_png_from_rgba(selkie_rgba, sw, sh, reference_rgba, rw, rh)?;
 
         // Write PNG file to type subdirectory
         let safe_name = name.replace(['/', ' '], "_");
