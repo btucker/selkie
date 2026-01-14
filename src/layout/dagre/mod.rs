@@ -127,6 +127,10 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     // Phase 5: Inject edge label proxies (create dummy nodes for labels)
     edge_labels::inject_edge_label_proxies(graph);
 
+    // Phase 5.5: Remove empty ranks created by nesting graph minlen multiplier
+    // This collapses sparse ranks except at border positions
+    util::remove_empty_ranks(graph);
+
     // Phase 6: Clean up nesting graph (remove nesting root and edges)
     // This keeps rank assignments but removes temporary nesting structure
     if is_compound {
