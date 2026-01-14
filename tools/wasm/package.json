@@ -1,0 +1,13 @@
+{
+  "name": "selkie-wasm-tests",
+  "type": "module",
+  "scripts": {
+    "test": "node test.mjs",
+    "benchmark": "node benchmark.mjs",
+    "build": "cd ../.. && wasm-pack build --target web --features wasm"
+  },
+  "devDependencies": {
+    "mermaid": "^11.4.0",
+    "playwright": "^1.52.0"
+  }
+}
