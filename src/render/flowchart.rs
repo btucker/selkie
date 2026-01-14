@@ -1,5 +1,7 @@
 //! Flowchart adapter for layout
 
+use std::collections::HashMap;
+
 use crate::diagrams::flowchart::{Direction, FlowVertexType, FlowchartDb};
 use crate::error::Result;
 use crate::layout::{
@@ -13,13 +15,40 @@ impl ToLayoutGraph for FlowchartDb {
         let mut graph = LayoutGraph::new("flowchart");
 
         // Set layout options from diagram direction
-        // Note: node_spacing affects horizontal distance, layer_spacing affects vertical
+        // Use dagre defaults (50/50) - compound graph support handles horizontal spread
         graph.options = LayoutOptions {
             direction: self.preferred_direction(),
-            node_spacing: 180.0,
-            layer_spacing: 100.0,
+            node_spacing: 50.0,
+            layer_spacing: 50.0,
             padding: Padding::uniform(20.0),
         };
+
+        // Build map of node_id -> subgraph_id for setting parent relationships
+        let mut node_to_subgraph: HashMap<&str, &str> = HashMap::new();
+        for subgraph in self.subgraphs() {
+            for node_id in &subgraph.nodes {
+                node_to_subgraph.insert(node_id.as_str(), subgraph.id.as_str());
+            }
+        }
+
+        // Add subgraph nodes first (compound parent nodes)
+        // These have zero dimensions initially - they're calculated from children by layout
+        for subgraph in self.subgraphs() {
+            let mut sg_node =
+                LayoutNode::new(&subgraph.id, 0.0, 0.0).with_shape(NodeShape::Rectangle);
+
+            // Use subgraph title as label if available
+            if !subgraph.title.is_empty() {
+                sg_node = sg_node.with_label(&subgraph.title);
+            }
+
+            // Mark as a subgraph/group in metadata
+            sg_node
+                .metadata
+                .insert("is_group".to_string(), "true".to_string());
+
+            graph.add_node(sg_node);
+        }
 
         // Convert vertices to layout nodes (sorted for deterministic order)
         let mut vertex_ids: Vec<&String> = self.vertices().keys().collect();
@@ -39,6 +68,11 @@ impl ToLayoutGraph for FlowchartDb {
 
             if let Some(label) = label {
                 node = node.with_label(label);
+            }
+
+            // Set parent for compound graph if this node belongs to a subgraph
+            if let Some(&subgraph_id) = node_to_subgraph.get(id.as_str()) {
+                node = node.with_parent(subgraph_id);
             }
 
             // Store original metadata
@@ -145,6 +179,77 @@ mod tests {
 
         let node_c = graph.get_node("C").unwrap();
         assert_eq!(node_c.shape, NodeShape::Diamond);
+    }
+
+    #[test]
+    fn test_compound_graph_structure() {
+        use crate::diagrams::flowchart::parse;
+        use crate::layout;
+        use crate::layout::dagre::graph::{DagreGraph, NodeLabel};
+
+        // Parse a flowchart with subgraphs
+        let input = r#"flowchart TB
+    subgraph Frontend[Frontend Layer]
+        A[React App]
+        B[Vue App]
+    end
+    subgraph API[API Layer]
+        C[REST API]
+        D[GraphQL]
+    end
+    A --> C
+    B --> D
+"#;
+
+        let db = parse(input).unwrap();
+        eprintln!(
+            "Subgraphs: {:?}",
+            db.subgraphs().iter().map(|s| &s.id).collect::<Vec<_>>()
+        );
+
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        eprintln!("\nLayout nodes:");
+        for node in &graph.nodes {
+            eprintln!(
+                "  {} - parent: {:?}, size: {}x{}",
+                node.id, node.parent_id, node.width, node.height
+            );
+        }
+
+        // Check that parent_id is set on child nodes
+        let node_a = graph.get_node("A").unwrap();
+        assert!(node_a.parent_id.is_some(), "Node A should have a parent_id");
+        eprintln!("Node A parent: {:?}", node_a.parent_id);
+
+        // Check subgraph nodes exist
+        let frontend = graph.get_node("Frontend").unwrap();
+        assert!(
+            frontend.parent_id.is_none(),
+            "Frontend subgraph should have no parent"
+        );
+        eprintln!("Frontend size: {}x{}", frontend.width, frontend.height);
+
+        // Create DagreGraph manually to test is_compound
+        let mut dg = DagreGraph::new();
+        dg.set_node("sg", NodeLabel::default());
+        dg.set_node("a", NodeLabel::default());
+        dg.set_parent("a", "sg");
+        eprintln!("\nManual DagreGraph is_compound: {}", dg.is_compound());
+        eprintln!("Children of sg: {:?}", dg.children("sg"));
+
+        // Run layout
+        let laid_out = layout::layout(graph).unwrap();
+
+        eprintln!("\nAfter layout:");
+        for node in &laid_out.nodes {
+            eprintln!(
+                "  {} - pos: ({:?}, {:?}), size: {}x{}",
+                node.id, node.x, node.y, node.width, node.height
+            );
+        }
+        eprintln!("Graph bounds: {:?}x{:?}", laid_out.width, laid_out.height);
     }
 
     #[test]

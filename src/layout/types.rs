@@ -112,6 +112,8 @@ pub struct LayoutNode {
     pub order: Option<usize>,
     /// Child nodes for compound/nested graphs (subgraphs)
     pub children: Vec<LayoutNode>,
+    /// Parent node ID for compound graph layout (alternative to nesting in children)
+    pub parent_id: Option<String>,
     /// Padding for compound nodes
     pub padding: Padding,
     /// Whether this is a dummy node for edge routing
@@ -135,11 +137,17 @@ impl LayoutNode {
             layer: None,
             order: None,
             children: Vec::new(),
+            parent_id: None,
             padding: Padding::default(),
             is_dummy: false,
             dummy_edge_id: None,
             metadata: HashMap::new(),
         }
+    }
+
+    pub fn with_parent(mut self, parent_id: impl Into<String>) -> Self {
+        self.parent_id = Some(parent_id.into());
+        self
     }
 
     pub fn with_shape(mut self, shape: NodeShape) -> Self {
@@ -176,6 +184,7 @@ impl LayoutNode {
             layer: None,
             order: None,
             children: Vec::new(),
+            parent_id: None,
             padding: Padding::default(),
             is_dummy: true,
             dummy_edge_id: Some(edge_id.into()),

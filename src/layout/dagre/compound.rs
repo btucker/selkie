@@ -193,20 +193,22 @@ pub fn remove_border_nodes(g: &mut DagreGraph) {
             .and_then(|n| n.y);
 
         // Get leftmost and rightmost positions from border arrays
-        // The last element in each array corresponds to the outermost border
+        // The LAST element in each array corresponds to the outermost border (like dagre.js)
         let left_x = border_left
             .iter()
+            .rev() // Reverse to get last element first
             .filter_map(|opt| opt.as_ref())
             .filter_map(|id| g.node(id))
             .filter_map(|n| n.x)
-            .next(); // First non-None
+            .next(); // First non-None from reversed = last element
 
         let right_x = border_right
             .iter()
+            .rev() // Reverse to get last element first
             .filter_map(|opt| opt.as_ref())
             .filter_map(|id| g.node(id))
             .filter_map(|n| n.x)
-            .next(); // First non-None
+            .next(); // First non-None from reversed = last element
 
         // Calculate and set dimensions
         if let (Some(ty), Some(by), Some(lx), Some(rx)) = (top_y, bottom_y, left_x, right_x) {

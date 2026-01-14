@@ -98,8 +98,11 @@ fn sweep_down(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
         let entries = barycenter(g, &layer);
         let sorted = sort(entries, bias_right);
 
+        // Ensure border nodes are at edges within their subgraph
+        let reordered = ensure_border_nodes_at_edges(g, sorted.vs, rank as i32);
+
         // Assign new order
-        for (i, v) in sorted.vs.iter().enumerate() {
+        for (i, v) in reordered.iter().enumerate() {
             if let Some(node) = g.node_mut(v) {
                 node.order = Some(i);
             }
@@ -131,13 +134,98 @@ fn sweep_up(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
         let entries = barycenter_down(g, &layer);
         let sorted = sort(entries, bias_right);
 
+        // Ensure border nodes are at edges within their subgraph
+        let reordered = ensure_border_nodes_at_edges(g, sorted.vs, rank as i32);
+
         // Assign new order
-        for (i, v) in sorted.vs.iter().enumerate() {
+        for (i, v) in reordered.iter().enumerate() {
             if let Some(node) = g.node_mut(v) {
                 node.order = Some(i);
             }
         }
     }
+}
+
+/// Ensure border left nodes are at the start and border right nodes are at the end
+/// within each subgraph's children for a given rank.
+/// This matches the dagre.js behavior from sort-subgraph.js
+fn ensure_border_nodes_at_edges(g: &DagreGraph, vs: Vec<String>, rank: i32) -> Vec<String> {
+    use std::collections::{HashMap, HashSet};
+
+    // Group nodes by their parent (subgraph)
+    let mut by_parent: HashMap<Option<String>, Vec<String>> = HashMap::new();
+    for v in &vs {
+        let parent = g.parent(v).map(|s| s.to_string());
+        by_parent.entry(parent).or_default().push(v.clone());
+    }
+
+    // For each parent subgraph, move border nodes to edges
+    for (parent_opt, nodes) in by_parent.iter_mut() {
+        if parent_opt.is_none() {
+            continue; // Root level nodes don't need reordering
+        }
+        let parent = parent_opt.as_ref().unwrap();
+
+        // Get border_left and border_right for this rank from the parent node
+        let (border_left, border_right) = if let Some(parent_node) = g.node(parent) {
+            let min_rank = parent_node.min_rank.unwrap_or(0);
+            if rank < min_rank {
+                (None, None)
+            } else {
+                let rank_idx = (rank - min_rank) as usize;
+                let bl = parent_node.border_left.get(rank_idx).cloned().flatten();
+                let br = parent_node.border_right.get(rank_idx).cloned().flatten();
+                (bl, br)
+            }
+        } else {
+            (None, None)
+        };
+
+        // Remove border nodes from their current positions
+        let non_border: Vec<String> = nodes
+            .iter()
+            .filter(|v| {
+                Some(v.as_str()) != border_left.as_deref()
+                    && Some(v.as_str()) != border_right.as_deref()
+            })
+            .cloned()
+            .collect();
+
+        // Reconstruct: [borderLeft, ...non_border, borderRight]
+        let mut reordered = Vec::new();
+        if let Some(ref bl) = border_left {
+            if nodes.contains(bl) {
+                reordered.push(bl.clone());
+            }
+        }
+        reordered.extend(non_border);
+        if let Some(ref br) = border_right {
+            if nodes.contains(br) {
+                reordered.push(br.clone());
+            }
+        }
+
+        *nodes = reordered;
+    }
+
+    // Flatten back to single list, preserving relative order between subgroups
+    // Track which parents we've already processed
+    let mut seen_parents: HashSet<Option<String>> = HashSet::new();
+    let mut result: Vec<String> = Vec::new();
+
+    for v in &vs {
+        let parent = g.parent(v).map(|s| s.to_string());
+        if seen_parents.contains(&parent) {
+            continue;
+        }
+        seen_parents.insert(parent.clone());
+
+        if let Some(nodes) = by_parent.get(&parent) {
+            result.extend(nodes.iter().cloned());
+        }
+    }
+
+    result
 }
 
 /// Build layer matrix from current order assignments

@@ -95,7 +95,10 @@ fn add_nodes_recursive(dg: &mut DagreGraph, nodes: &[LayoutNode], parent: Option
         dg.set_node(&node.id, label);
 
         // Set parent relationship for compound graphs
-        if let Some(parent_id) = parent {
+        // Priority: explicit parent_id field, then parent parameter (from nested children)
+        if let Some(ref parent_id) = node.parent_id {
+            dg.set_parent(&node.id, parent_id);
+        } else if let Some(parent_id) = parent {
             dg.set_parent(&node.id, parent_id);
         }
 
@@ -172,6 +175,15 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
 fn apply_results_recursive(nodes: &mut [LayoutNode], dg: &DagreGraph) {
     for node in nodes {
         if let Some(dagre_node) = dg.node(&node.id) {
+            // For compound nodes (subgraphs), dagre calculates width/height from border positions
+            // Copy these calculated dimensions back to the LayoutNode
+            if dagre_node.width > 0.0 && node.width == 0.0 {
+                node.width = dagre_node.width;
+            }
+            if dagre_node.height > 0.0 && node.height == 0.0 {
+                node.height = dagre_node.height;
+            }
+
             // Dagre returns center coordinates, convert to top-left
             if let (Some(cx), Some(cy)) = (dagre_node.x, dagre_node.y) {
                 node.x = Some(cx - node.width / 2.0);
@@ -438,16 +450,27 @@ mod tests {
         );
 
         // More strict check: label should be reasonably close to the midpoint
+        // If B and C are at the same y (range=0), this is valid - label at their y is correct
         let distance_from_midpoint = (label_pos_bc.y - midpoint_y).abs();
         let total_range = (max_y - min_y).abs();
-        assert!(
-            distance_from_midpoint < total_range * 0.6,
-            "Label y ({}) should be close to midpoint ({}), not at an extreme. Distance: {}, Range: {}",
-            label_pos_bc.y,
-            midpoint_y,
-            distance_from_midpoint,
-            total_range
-        );
+        if total_range > 0.0 {
+            assert!(
+                distance_from_midpoint < total_range * 0.6,
+                "Label y ({}) should be close to midpoint ({}), not at an extreme. Distance: {}, Range: {}",
+                label_pos_bc.y,
+                midpoint_y,
+                distance_from_midpoint,
+                total_range
+            );
+        } else {
+            // When range is 0 (B and C at same y), label at that y is correct
+            assert!(
+                distance_from_midpoint < 5.0,
+                "Label y ({}) should be at midpoint ({}) when nodes are at same y",
+                label_pos_bc.y,
+                midpoint_y
+            );
+        }
     }
 
     #[test]
