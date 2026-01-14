@@ -170,6 +170,10 @@ struct EvalArgs {
     /// Show cache location and statistics, then exit
     #[arg(long)]
     cache_info: bool,
+
+    /// Open HTML report in default browser after evaluation
+    #[arg(long)]
+    open_report: bool,
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
@@ -608,10 +612,28 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     let _ = svg_pairs; // Suppress unused warning
 
     // Print the output directory path
-    eprintln!(
-        "Evaluation report written to: {}/index.html",
-        output_dir.display()
-    );
+    let report_path = output_dir.join("index.html");
+    eprintln!("Evaluation report written to: {}", report_path.display());
+
+    // Open report in browser if requested
+    if args.open_report {
+        #[cfg(target_os = "macos")]
+        {
+            let _ = std::process::Command::new("open").arg(&report_path).spawn();
+        }
+        #[cfg(target_os = "linux")]
+        {
+            let _ = std::process::Command::new("xdg-open")
+                .arg(&report_path)
+                .spawn();
+        }
+        #[cfg(target_os = "windows")]
+        {
+            let _ = std::process::Command::new("cmd")
+                .args(["/C", "start", "", &report_path.to_string_lossy()])
+                .spawn();
+        }
+    }
 
     // Exit with error code if there are failures
     if result.issue_counts.errors > 0 {
