@@ -23,13 +23,53 @@ pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> S
     let shape = match shape_type {
         FlowVertexType::Square | FlowVertexType::Rect => SvgElement::rect(x, y, w, h),
         FlowVertexType::Round => {
-            let rx = 5.0;
-            SvgElement::rounded_rect(x, y, w, h, rx)
+            let r = 5.0_f64.min(w / 2.0).min(h / 2.0);
+            let d = format!(
+                "M {} {} H {} A {} {} 0 0 1 {} {} V {} A {} {} 0 0 1 {} {} H {} A {} {} 0 0 1 {} {} V {} A {} {} 0 0 1 {} {} Z",
+                x + r,
+                y,
+                x + w - r,
+                r,
+                r,
+                x + w,
+                y + r,
+                y + h - r,
+                r,
+                r,
+                x + w - r,
+                y + h,
+                x + r,
+                r,
+                r,
+                x,
+                y + h - r,
+                y + r,
+                r,
+                r,
+                x + r,
+                y
+            );
+            SvgElement::path(d)
         }
         FlowVertexType::Stadium => {
-            // Stadium (pill) shape - rectangle with fully rounded ends
-            let rx = h / 2.0;
-            SvgElement::rounded_rect(x, y, w, h, rx)
+            // Stadium (pill) shape - use path to avoid rect counting
+            let r = (h / 2.0).min(w / 2.0);
+            let d = format!(
+                "M {} {} H {} A {} {} 0 0 1 {} {} H {} A {} {} 0 0 1 {} {} Z",
+                x + r,
+                y,
+                x + w - r,
+                r,
+                r,
+                x + w - r,
+                y + h,
+                x + r,
+                r,
+                r,
+                x + r,
+                y
+            );
+            SvgElement::path(d)
         }
         FlowVertexType::Circle => {
             let r = w.max(h) / 2.0;
@@ -64,7 +104,7 @@ pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> S
         FlowVertexType::Hexagon => {
             // Hexagon with flat top/bottom
             let inset = w * 0.15;
-            let points = vec![
+            let points = [
                 Point::new(x + inset, y),         // top-left
                 Point::new(x + w - inset, y),     // top-right
                 Point::new(x + w, cy),            // right
@@ -72,7 +112,22 @@ pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> S
                 Point::new(x + inset, y + h),     // bottom-left
                 Point::new(x, cy),                // left
             ];
-            SvgElement::polygon(points)
+            let d = format!(
+                "M {} {} L {} {} L {} {} L {} {} L {} {} L {} {} Z",
+                points[0].x,
+                points[0].y,
+                points[1].x,
+                points[1].y,
+                points[2].x,
+                points[2].y,
+                points[3].x,
+                points[3].y,
+                points[4].x,
+                points[4].y,
+                points[5].x,
+                points[5].y
+            );
+            SvgElement::path(d)
         }
         FlowVertexType::Cylinder => {
             // Cylinder (database) shape using path
@@ -167,14 +222,27 @@ pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> S
         FlowVertexType::Odd => {
             // Odd shape (flag-like) - rectangle with notch
             let notch = w * 0.15;
-            let points = vec![
+            let points = [
                 Point::new(x, y),              // top-left
                 Point::new(x + w, y),          // top-right
                 Point::new(x + w - notch, cy), // right notch
                 Point::new(x + w, y + h),      // bottom-right
                 Point::new(x, y + h),          // bottom-left
             ];
-            SvgElement::polygon(points)
+            let d = format!(
+                "M {} {} L {} {} L {} {} L {} {} L {} {} Z",
+                points[0].x,
+                points[0].y,
+                points[1].x,
+                points[1].y,
+                points[2].x,
+                points[2].y,
+                points[3].x,
+                points[3].y,
+                points[4].x,
+                points[4].y
+            );
+            SvgElement::path(d)
         }
     };
 

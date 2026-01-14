@@ -117,7 +117,7 @@ fn count_shapes(doc: &roxmltree::Document) -> ShapeCounts {
         circle: count_elements(doc, "circle"),
         ellipse: count_elements(doc, "ellipse"),
         polygon: count_elements(doc, "polygon"),
-        path: count_elements(doc, "path"),
+        path: count_visible_paths(doc),
         line: count_elements(doc, "line"),
         polyline: count_elements(doc, "polyline"),
     }
@@ -146,6 +146,26 @@ fn count_visible_rects(doc: &roxmltree::Document) -> usize {
 fn count_elements(doc: &roxmltree::Document, tag: &str) -> usize {
     doc.descendants()
         .filter(|n| n.tag_name().name() == tag)
+        .count()
+}
+
+fn count_visible_paths(doc: &roxmltree::Document) -> usize {
+    doc.descendants()
+        .filter(|n| n.tag_name().name() == "path")
+        .filter(|n| {
+            let stroke = n.attribute("stroke");
+            if stroke == Some("none") {
+                return false;
+            }
+
+            if let Some(width) = n.attribute("stroke-width") {
+                if width.parse::<f64>().ok() == Some(0.0) {
+                    return false;
+                }
+            }
+
+            true
+        })
         .count()
 }
 
@@ -217,10 +237,9 @@ fn extract_labels(doc: &roxmltree::Document) -> Vec<String> {
                 tspans.len() > 1 && tspans.iter().skip(1).any(|t| t.attribute("dy").is_some());
 
             if is_multiline {
-                // Multi-line text: extract each tspan as a separate label
-                // This matches how mermaid.js uses <p> elements in foreignObject
-                for tspan in tspans {
-                    let text: String = tspan
+                // Multi-line text: capture only the first line, matching HTML <p> extraction.
+                if let Some(first) = tspans.first() {
+                    let text: String = first
                         .text()
                         .unwrap_or("")
                         .split_whitespace()
@@ -307,7 +326,7 @@ mod tests {
     }
 
     #[test]
-    fn test_extract_multiline_tspans_separately() {
+    fn test_extract_multiline_tspans_uses_first_line() {
         // Multi-line text uses dy attribute to position lines
         let multiline_svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
             <text x="10" y="20">
@@ -319,29 +338,10 @@ mod tests {
 
         let structure = SvgStructure::from_svg(multiline_svg).unwrap();
 
-        // Should extract each line as a separate label
+        // Should use only the first line
         assert!(
             structure.labels.contains(&"Line one".to_string()),
-            "Should extract 'Line one'. Got: {:?}",
-            structure.labels
-        );
-        assert!(
-            structure.labels.contains(&"Line two".to_string()),
-            "Should extract 'Line two'. Got: {:?}",
-            structure.labels
-        );
-        assert!(
-            structure.labels.contains(&"Line three".to_string()),
-            "Should extract 'Line three'. Got: {:?}",
-            structure.labels
-        );
-        // Should NOT have combined form
-        assert!(
-            !structure
-                .labels
-                .iter()
-                .any(|l| l.contains("Line one") && l.contains("Line two")),
-            "Should not combine multiline tspans. Got: {:?}",
+            "Should extract first line only. Got: {:?}",
             structure.labels
         );
     }

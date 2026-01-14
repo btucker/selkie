@@ -82,10 +82,6 @@ impl ToLayoutGraph for FlowchartDb {
             graph.add_edge(layout_edge);
         }
 
-        // Handle subgraphs as compound nodes
-        // For now, we'll flatten them - proper nesting would require hierarchical layout
-        // TODO: Implement proper subgraph nesting
-
         Ok(graph)
     }
 
