@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="445.20000000000005" height="171.59999999999997" viewBox="-8 -8 445.20000000000005 171.59999999999997" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="777" height="1055.32" viewBox="-8 -53 777 1055.32" class="mermaid">
   <style>
 
 .mermaid {
@@ -85,10 +85,10 @@ marker path {
       <path d="M 0 0 L 10 5 L 0 10 z"/>
     </marker>
     <marker id="arrow_open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 9 5 L 1 9" stroke-width="1.5" fill="none"/>
+      <path d="M 1 1 L 9 5 L 1 9" fill="none" stroke-width="1.5"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -105,45 +105,162 @@ marker path {
   </defs>
   <g class="root">
     <g class="clusters">
-
+      <g class="subgraph" id="subgraph-Frontend">
+        <rect x="61.599999999999994" y="-45" width="533.6" height="117.8" class="cluster"/>
+        <text x="328.4" y="-29" class="cluster-label" text-anchor="middle">Frontend Layer</text>
+      </g>
+      <g class="subgraph" id="subgraph-API">
+        <rect x="109.79999999999998" y="57.79999999999998" width="310.6" height="493.6400000000001" class="cluster"/>
+        <text x="265.1" y="73.79999999999998" class="cluster-label" text-anchor="middle">API Gateway</text>
+      </g>
+      <g class="subgraph" id="subgraph-Services">
+        <rect x="116.99999999999997" y="556.44" width="644" height="228.51999999999998" class="cluster"/>
+        <text x="439" y="572.44" class="cluster-label" text-anchor="middle">Microservices</text>
+      </g>
+      <g class="subgraph" id="subgraph-Data">
+        <rect x="79.99999999999997" y="659.24" width="647.4000000000001" height="252.27999999999997" class="cluster"/>
+        <text x="403.70000000000005" y="675.24" class="cluster-label" text-anchor="middle">Data Layer</text>
+      </g>
     </g>
     <g class="edgePaths">
-      <g class="edge" id="edge-L-A-B-0">
-        <path d="M 80.00 77.80 C 88.33 77.80, 96.67 77.80, 105.00 77.80 C 113.33 77.80, 121.67 77.80, 130.00 77.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      <g class="edge" id="edge-L-UI-Auth-0">
+        <path d="M 493.10 52.80 C 491.93 61.13, 490.77 69.47, 469.18 87.26 C 447.59 105.06, 405.58 132.31, 363.57 159.57" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
-      <g class="edge" id="edge-L-B-C-0">
-        <path d="M 238.28 56.48 C 258.72 46.45, 279.16 36.43, 299.25 31.41 C 319.33 26.40, 339.07 26.40, 358.80 26.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      <g class="edge" id="edge-L-Mobile-Auth-0">
+        <path d="M 305.63 52.80 C 306.02 61.13, 306.41 69.47, 306.61 77.80 C 306.80 86.13, 306.80 94.47, 306.80 102.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
-      <g class="edge" id="edge-L-B-D-0">
-        <path d="M 238.28 99.12 C 258.72 109.15, 279.16 119.17, 296.05 124.19 C 312.93 129.20, 326.27 129.20, 339.60 129.20" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      <g class="edge" id="edge-L-CLI-Auth-0">
+        <path d="M 140.93 52.80 C 142.49 61.13, 144.04 69.47, 162.70 86.79 C 181.36 104.11, 217.12 130.42, 252.87 156.73" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Auth-Rate-0">
+        <path d="M 281.75 264.95 C 274.43 284.97, 267.12 304.98, 258.10 320.82 C 249.08 336.67, 238.37 348.33, 227.65 360.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Auth-Reject-0">
+        <path d="M 331.85 264.95 C 339.17 284.97, 346.48 304.98, 355.50 320.82 C 364.52 336.67, 375.23 348.33, 385.95 360.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Rate-Cache-0">
+        <path d="M 232.37 412.80 C 241.51 421.13, 250.66 429.47, 255.23 437.80 C 259.80 446.13, 259.80 454.47, 259.80 462.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Cache-Response-0">
+        <path d="M 229.60 531.44 C 219.33 543.11, 209.07 554.77, 193.41 566.44 C 177.75 578.11, 156.69 589.77, 135.64 601.44" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Cache-UserSvc-0">
+        <path d="M 290.00 531.44 C 300.27 543.11, 310.53 554.77, 305.20 566.44 C 299.86 578.11, 278.92 589.77, 257.98 601.44" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-UserSvc-DB-0">
+        <path d="M 272.34 654.24 C 291.82 662.57, 311.31 670.91, 331.42 679.95 C 351.53 688.99, 372.27 698.73, 393.00 708.48" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-UserSvc-Search-0">
+        <path d="M 262.06 654.24 C 278.31 662.57, 294.55 670.91, 293.38 679.24 C 292.20 687.57, 273.60 695.91, 255.00 704.24" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-OrderSvc-DB-0">
+        <path d="M 429.57 654.24 C 430.38 662.57, 431.19 670.91, 433.35 679.24 C 435.51 687.57, 439.02 695.91, 442.54 704.24" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-OrderSvc-Queue-0">
+        <path d="M 470.04 654.24 C 483.63 662.57, 497.21 670.91, 494.67 684.96 C 492.13 699.01, 473.47 718.79, 473.47 738.56 C 473.47 758.33, 492.13 778.11, 509.77 792.16 C 544.01 814.55, 560.61 822.88, 560.61 822.88" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-PaymentSvc-DB-0">
+        <path d="M 555.40 652.34 C 523.20 661.31, 491.00 670.27, 474.77 678.92 C 458.55 687.57, 458.29 695.91, 458.04 704.24" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-PaymentSvc-NotifySvc-0">
+        <path d="M 636.00 654.24 C 633.67 662.57, 631.33 670.91, 630.17 680.56 C 629.00 690.21, 629.00 701.19, 629.00 712.16" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-NotifySvc-Queue-0">
+        <path d="M 629.00 764.96 C 629.00 775.93, 629.00 786.91, 629.00 796.56 C 629.00 806.21, 629.00 814.55, 629.00 822.88" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Queue-EmailWorker-0">
+        <path d="M 568.95 891.52 C 554.36 899.85, 539.78 908.19, 525.70 916.52 C 511.61 924.85, 498.03 933.19, 484.44 941.52" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Queue-SMSWorker-0">
+        <path d="M 629.00 891.52 C 629.00 899.85, 629.00 908.19, 629.00 916.52 C 629.00 924.85, 629.00 933.19, 629.00 941.52" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
-      <g class="edgeLabel" id="edge-label-L-B-C-0">
-        <rect x="252.93828425096035" y="31.438284250960308" width="32" height="20" class="edge-label-bg" fill-opacity="0.8"/>
-        <text x="268.93828425096035" y="41.43828425096031" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+      <g class="edgeLabel" id="edge-label-L-Auth-Rate-0">
+        <rect x="246.77380410022784" y="284.97380410022777" width="48" height="20" class="edge-label-bg" fill-opacity="0.8"/>
+        <text x="270.77380410022784" y="294.97380410022777" class="edge-label" text-anchor="middle" dominant-baseline="central">Valid</text>
       </g>
-      <g class="edgeLabel" id="edge-label-L-B-D-0">
-        <rect x="256.93828425096035" y="104.16171574903969" width="24" height="20" class="edge-label-bg" fill-opacity="0.8"/>
-        <text x="268.93828425096035" y="114.16171574903969" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+      <g class="edgeLabel" id="edge-label-L-Auth-Reject-0">
+        <rect x="310.8261958997722" y="284.97380410022777" width="64" height="20" class="edge-label-bg" fill-opacity="0.8"/>
+        <text x="342.8261958997722" y="294.97380410022777" class="edge-label" text-anchor="middle" dominant-baseline="central">Invalid</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Cache-Response-0">
+        <rect x="174.19959607616852" y="538.94" width="80" height="20" class="edge-label-bg" fill-opacity="0.8"/>
+        <text x="214.19959607616852" y="548.94" class="edge-label" dominant-baseline="central" text-anchor="middle">Cache Hit</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Cache-UserSvc-0">
+        <rect x="261.4004039238315" y="538.94" width="88" height="20" class="edge-label-bg" fill-opacity="0.8"/>
+        <text x="305.4004039238315" y="548.94" class="edge-label" text-anchor="middle" dominant-baseline="central">Cache Miss</text>
       </g>
     </g>
     <g class="nodes">
-      <g class="node" id="node-A">
-        <rect x="0" y="51.4" width="80" height="52.8"/>
-        <text x="40" y="77.8" class="label" dominant-baseline="central" text-anchor="middle">Start</text>
+      <g class="node" id="node-Auth">
+        <polygon points="306.8,102.79999999999998 400.4,196.39999999999998 306.8,290 213.20000000000002,196.39999999999998"/>
+        <text x="306.8" y="196.39999999999998" class="label" dominant-baseline="central" text-anchor="middle">Authentication</text>
       </g>
-      <g class="node" id="node-B">
-        <polygon points="194.8,13 259.6,77.8 194.8,142.6 130,77.8"/>
-        <text x="194.8" y="77.8" class="label" text-anchor="middle" dominant-baseline="central">Decision</text>
+      <g class="node" id="node-CLI">
+        <rect x="81.6" y="0" width="108.8" height="52.8"/>
+        <text x="136" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">CLI Tool</text>
       </g>
-      <g class="node" id="node-C">
-        <rect x="358.8" y="0" width="51.2" height="52.8"/>
-        <text x="384.40000000000003" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">OK</text>
+      <g class="node" id="node-Cache">
+        <path d="M 191 473.096 a 68.8 10.296 0 0 0 137.6 0 a 68.8 10.296 0 0 0 -137.6 0 l 0 48.048 a 68.8 10.296 0 0 0 137.6 0 l 0 -48.048"/>
+        <text x="259.8" y="497.12" class="label" dominant-baseline="central" text-anchor="middle">Redis Cache</text>
       </g>
-      <g class="node" id="node-D">
-        <rect x="339.6" y="102.79999999999998" width="89.6" height="52.8"/>
-        <text x="384.40000000000003" y="129.2" class="label" text-anchor="middle" dominant-baseline="central">Cancel</text>
+      <g class="node" id="node-DB">
+        <path d="M 392.99999999999994 714.5360000000001 a 64 10.296 0 0 0 128 0 a 64 10.296 0 0 0 -128 0 l 0 48.048 a 64 10.296 0 0 0 128 0 l 0 -48.048"/>
+        <text x="456.99999999999994" y="738.5600000000001" class="label" text-anchor="middle" dominant-baseline="central">PostgreSQL</text>
+      </g>
+      <g class="node" id="node-EmailWorker">
+        <rect x="367.79999999999995" y="941.52" width="147.2" height="52.8"/>
+        <text x="441.4" y="967.92" class="label" text-anchor="middle" dominant-baseline="central">Email Worker</text>
+      </g>
+      <g class="node" id="node-Mobile">
+        <rect x="240.39999999999992" y="0" width="128" height="52.8"/>
+        <text x="304.3999999999999" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">Mobile App</text>
+      </g>
+      <g class="node" id="node-NotifySvc">
+        <rect x="517" y="712.1600000000001" width="224" height="52.8"/>
+        <text x="629" y="738.5600000000001" class="label" dominant-baseline="central" text-anchor="middle">Notification Service</text>
+      </g>
+      <g class="node" id="node-OrderSvc">
+        <rect x="348.5999999999999" y="601.44" width="156.8" height="52.8"/>
+        <text x="426.9999999999999" y="627.84" class="label" text-anchor="middle" dominant-baseline="central">Order Service</text>
+      </g>
+      <g class="node" id="node-PaymentSvc">
+        <rect x="555.3999999999999" y="601.44" width="176" height="52.8"/>
+        <text x="643.3999999999999" y="627.84" class="label" text-anchor="middle" dominant-baseline="central">Payment Service</text>
+      </g>
+      <g class="node" id="node-Queue">
+        <path d="M 550.6 833.176 a 78.4 10.296 0 0 0 156.8 0 a 78.4 10.296 0 0 0 -156.8 0 l 0 48.048 a 78.4 10.296 0 0 0 156.8 0 l 0 -48.048"/>
+        <text x="629" y="857.2" class="label" text-anchor="middle" dominant-baseline="central">Message Queue</text>
+      </g>
+      <g class="node" id="node-Rate">
+        <rect x="129.79999999999998" y="360" width="147.2" height="52.8"/>
+        <text x="203.39999999999998" y="386.4" class="label" dominant-baseline="central" text-anchor="middle">Rate Limiter</text>
+      </g>
+      <g class="node" id="node-Reject">
+        <rect x="326.99999999999994" y="360" width="166.4" height="52.8"/>
+        <text x="410.19999999999993" y="386.4" class="label" dominant-baseline="central" text-anchor="middle">Reject Request</text>
+      </g>
+      <g class="node" id="node-Response">
+        <rect x="0" y="601.44" width="176" height="52.8"/>
+        <text x="88" y="627.84" class="label" dominant-baseline="central" text-anchor="middle">Return Response</text>
+      </g>
+      <g class="node" id="node-SMSWorker">
+        <rect x="565" y="941.52" width="128" height="52.8"/>
+        <text x="629" y="967.92" class="label" dominant-baseline="central" text-anchor="middle">SMS Worker</text>
+      </g>
+      <g class="node" id="node-Search">
+        <path d="M 99.99999999999997 714.5360000000001 a 78.4 10.296 0 0 0 156.8 0 a 78.4 10.296 0 0 0 -156.8 0 l 0 48.048 a 78.4 10.296 0 0 0 156.8 0 l 0 -48.048"/>
+        <text x="178.39999999999998" y="738.5600000000001" class="label" text-anchor="middle" dominant-baseline="central">Elasticsearch</text>
+      </g>
+      <g class="node" id="node-UI">
+        <rect x="418.4" y="0" width="156.8" height="52.8"/>
+        <text x="496.79999999999995" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">Web Interface</text>
+      </g>
+      <g class="node" id="node-UserSvc">
+        <rect x="136.99999999999997" y="601.44" width="147.2" height="52.8"/>
+        <text x="210.59999999999997" y="627.84" class="label" dominant-baseline="central" text-anchor="middle">User Service</text>
       </g>
     </g>
   </g>

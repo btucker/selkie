@@ -1,0 +1,40 @@
+stateDiagram-v2
+    [*] --> Idle
+
+    state Idle {
+        [*] --> Ready
+        Ready --> Processing: Start Job
+    }
+
+    state Processing {
+        [*] --> Validating
+        Validating --> Queued: Valid
+        Validating --> Failed: Invalid
+        Queued --> Running: Worker Available
+        Running --> Completed: Success
+        Running --> Failed: Error
+        Running --> Paused: Pause Request
+
+        state Running {
+            [*] --> Initializing
+            Initializing --> Executing
+            Executing --> Finalizing
+            Finalizing --> [*]
+        }
+    }
+
+    state Paused {
+        [*] --> WaitingResume
+        WaitingResume --> Timeout: 1 hour
+    }
+
+    Paused --> Running: Resume
+    Paused --> Cancelled: Cancel Request
+    Timeout --> Cancelled
+
+    Completed --> Idle: Reset
+    Failed --> Idle: Retry
+    Cancelled --> Idle: Reset
+
+    Completed --> [*]
+    Cancelled --> [*]

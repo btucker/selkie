@@ -1,0 +1,76 @@
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    CUSTOMER {
+        uuid id PK
+        string email UK
+        string name
+        string phone
+        date created_at
+        boolean active
+    }
+
+    ORDER ||--|{ ORDER_ITEM : contains
+    ORDER {
+        uuid id PK
+        uuid customer_id FK
+        decimal total
+        string status
+        date ordered_at
+        date shipped_at
+    }
+
+    ORDER_ITEM }|--|| PRODUCT : references
+    ORDER_ITEM {
+        uuid id PK
+        uuid order_id FK
+        uuid product_id FK
+        int quantity
+        decimal price
+    }
+
+    PRODUCT ||--o{ PRODUCT_CATEGORY : belongs_to
+    PRODUCT {
+        uuid id PK
+        string sku UK
+        string name
+        text description
+        decimal price
+        int stock
+        boolean available
+    }
+
+    CATEGORY ||--o{ PRODUCT_CATEGORY : contains
+    CATEGORY {
+        uuid id PK
+        string name UK
+        uuid parent_id FK
+        int sort_order
+    }
+
+    PRODUCT_CATEGORY {
+        uuid product_id PK,FK
+        uuid category_id PK,FK
+    }
+
+    CUSTOMER ||--o{ ADDRESS : has
+    ADDRESS {
+        uuid id PK
+        uuid customer_id FK
+        string type
+        string street
+        string city
+        string state
+        string zip
+        string country
+    }
+
+    ORDER ||--|| ADDRESS : ships_to
+    ORDER ||--o| PAYMENT : paid_by
+    PAYMENT {
+        uuid id PK
+        uuid order_id FK
+        string method
+        decimal amount
+        string status
+        date processed_at
+    }

@@ -55,50 +55,28 @@ Selkie could not exist without all the human effort that has gone into these exc
 
 ## Supported Diagram Types
 
-Selkie supports parsing for all major Mermaid diagram types. Rendering is complete for core diagram types, with others in progress.
+Selkie supports parsing and rendering for all major Mermaid diagram types. These examples showcase Selkie's rendering capabilities.
 
-<table>
-<tr>
-<th>Diagram Type</th>
-<th>Mermaid.js</th>
-<th>Selkie</th>
-</tr>
-<tr>
-<td><strong>Flowchart</strong><br><sub>Nodes, edges, subgraphs</sub></td>
-<td><img src="docs/images/flowchart_mermaid.svg" alt="Flowchart Mermaid" width="350"></td>
-<td><img src="docs/images/flowchart.svg" alt="Flowchart Selkie" width="350"></td>
-</tr>
-<tr>
-<td><strong>Sequence</strong><br><sub>Participant interactions</sub></td>
-<td><img src="docs/images/sequence_mermaid.svg" alt="Sequence Mermaid" width="350"></td>
-<td><img src="docs/images/sequence.svg" alt="Sequence Selkie" width="350"></td>
-</tr>
-<tr>
-<td><strong>Class</strong><br><sub>UML relationships</sub></td>
-<td><img src="docs/images/class_mermaid.svg" alt="Class Mermaid" width="350"></td>
-<td><img src="docs/images/class.svg" alt="Class Selkie" width="350"></td>
-</tr>
-<tr>
-<td><strong>State</strong><br><sub>State machines</sub></td>
-<td><img src="docs/images/state_mermaid.svg" alt="State Mermaid" width="350"></td>
-<td><img src="docs/images/state.svg" alt="State Selkie" width="350"></td>
-</tr>
-<tr>
-<td><strong>ER Diagram</strong><br><sub>Data modeling</sub></td>
-<td><img src="docs/images/er_mermaid.svg" alt="ER Mermaid" width="350"></td>
-<td><img src="docs/images/er.svg" alt="ER Selkie" width="350"></td>
-</tr>
-<tr>
-<td><strong>Gantt</strong><br><sub>Project timelines</sub></td>
-<td><img src="docs/images/gantt_mermaid.svg" alt="Gantt Mermaid" width="350"></td>
-<td><img src="docs/images/gantt.svg" alt="Gantt Selkie" width="350"></td>
-</tr>
-<tr>
-<td><strong>Pie Chart</strong><br><sub>Proportional data</sub></td>
-<td><img src="docs/images/pie_mermaid.svg" alt="Pie Mermaid" width="350"></td>
-<td><img src="docs/images/pie.svg" alt="Pie Selkie" width="350"></td>
-</tr>
-</table>
+### Flowchart
+<img src="docs/images/flowchart.svg" alt="Flowchart" width="800">
+
+### Sequence Diagram
+<img src="docs/images/sequence.svg" alt="Sequence Diagram" width="800">
+
+### Class Diagram
+<img src="docs/images/class.svg" alt="Class Diagram" width="800">
+
+### State Diagram
+<img src="docs/images/state.svg" alt="State Diagram" width="800">
+
+### ER Diagram
+<img src="docs/images/er.svg" alt="ER Diagram" width="800">
+
+### Gantt Chart
+<img src="docs/images/gantt.svg" alt="Gantt Chart" width="800">
+
+### Pie Chart
+<img src="docs/images/pie.svg" alt="Pie Chart" width="400">
 
 ### Additional Diagram Types (Parser Only)
 

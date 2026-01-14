@@ -1,0 +1,94 @@
+classDiagram
+    class Application {
+        -config: Config
+        -logger: Logger
+        +start()
+        +stop()
+        +getStatus() Status
+    }
+
+    class Config {
+        -settings: Map
+        +get(key) any
+        +set(key, value)
+        +load(path)
+    }
+
+    class Logger {
+        -level: LogLevel
+        -outputs: Output[]
+        +debug(msg)
+        +info(msg)
+        +warn(msg)
+        +error(msg)
+    }
+
+    class Router {
+        -routes: Route[]
+        -middleware: Middleware[]
+        +addRoute(route)
+        +use(middleware)
+        +handle(request) Response
+    }
+
+    class Route {
+        +path: string
+        +method: HttpMethod
+        +handler: Handler
+    }
+
+    class Middleware {
+        <<interface>>
+        +process(req, next) Response
+    }
+
+    class AuthMiddleware {
+        -tokenService: TokenService
+        +process(req, next) Response
+    }
+
+    class RateLimitMiddleware {
+        -limit: int
+        -window: Duration
+        +process(req, next) Response
+    }
+
+    class Handler {
+        <<interface>>
+        +handle(request) Response
+    }
+
+    class UserController {
+        -userService: UserService
+        +getUser(id) User
+        +createUser(data) User
+        +updateUser(id, data) User
+        +deleteUser(id) void
+    }
+
+    class UserService {
+        -repository: UserRepository
+        -cache: Cache
+        +findById(id) User
+        +save(user) User
+        +delete(id) void
+    }
+
+    class UserRepository {
+        <<interface>>
+        +find(id) User
+        +save(user) User
+        +delete(id) void
+    }
+
+    Application --> Config
+    Application --> Logger
+    Application --> Router
+    Router --> Route
+    Router --> Middleware
+    AuthMiddleware ..|> Middleware
+    RateLimitMiddleware ..|> Middleware
+    Route --> Handler
+    UserController ..|> Handler
+    UserController --> UserService
+    UserService --> UserRepository

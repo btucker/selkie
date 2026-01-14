@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="860" height="305" viewBox="0 0 860 305" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="5000" height="780" viewBox="0 0 5000 780" class="mermaid">
   <style>
 
 .mermaid {
@@ -203,58 +203,130 @@ marker path {
     <g class="nodes">
 
     </g>
-    <text x="430" y="70" class="gantt-title" text-anchor="middle" font-size="18" font-weight="bold">Project Plan</text>
+    <text x="2500" y="70" class="gantt-title" text-anchor="middle" font-size="18" font-weight="bold">Product Launch Timeline</text>
     <g class="timeline-axis">
-      <rect x="150" y="90" width="660" height="40" class="timeline-bg"/>
-      <line x1="150" y1="130" x2="810" y2="130" class="axis-line"/>
+      <rect x="150" y="90" width="4800" height="40" class="timeline-bg"/>
+      <line x1="150" y1="130" x2="4950" y2="130" class="axis-line"/>
       <line x1="150" y1="125" x2="150" y2="130" class="tick-mark"/>
       <text x="150" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-01</text>
-      <line x1="210" y1="125" x2="210" y2="130" class="tick-mark"/>
-      <text x="210" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-03</text>
-      <line x1="270" y1="125" x2="270" y2="130" class="tick-mark"/>
-      <text x="270" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-05</text>
-      <line x1="330" y1="125" x2="330" y2="130" class="tick-mark"/>
-      <text x="330" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-07</text>
-      <line x1="390" y1="125" x2="390" y2="130" class="tick-mark"/>
-      <text x="390" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-09</text>
-      <line x1="450" y1="125" x2="450" y2="130" class="tick-mark"/>
-      <text x="450" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-11</text>
-      <line x1="510" y1="125" x2="510" y2="130" class="tick-mark"/>
-      <text x="510" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-13</text>
+      <line x1="360" y1="125" x2="360" y2="130" class="tick-mark"/>
+      <text x="360" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-08</text>
       <line x1="570" y1="125" x2="570" y2="130" class="tick-mark"/>
       <text x="570" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-15</text>
-      <line x1="630" y1="125" x2="630" y2="130" class="tick-mark"/>
-      <text x="630" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-17</text>
-      <line x1="690" y1="125" x2="690" y2="130" class="tick-mark"/>
-      <text x="690" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-19</text>
-      <line x1="750" y1="125" x2="750" y2="130" class="tick-mark"/>
-      <text x="750" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-21</text>
-      <line x1="810" y1="125" x2="810" y2="130" class="tick-mark"/>
-      <text x="810" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-23</text>
+      <line x1="780" y1="125" x2="780" y2="130" class="tick-mark"/>
+      <text x="780" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-01-22</text>
+      <line x1="990" y1="125" x2="990" y2="130" class="tick-mark"/>
+      <text x="990" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-01-29</text>
+      <line x1="1200" y1="125" x2="1200" y2="130" class="tick-mark"/>
+      <text x="1200" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-02-05</text>
+      <line x1="1410" y1="125" x2="1410" y2="130" class="tick-mark"/>
+      <text x="1410" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-02-12</text>
+      <line x1="1620" y1="125" x2="1620" y2="130" class="tick-mark"/>
+      <text x="1620" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-02-19</text>
+      <line x1="1830" y1="125" x2="1830" y2="130" class="tick-mark"/>
+      <text x="1830" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-02-26</text>
+      <line x1="2040" y1="125" x2="2040" y2="130" class="tick-mark"/>
+      <text x="2040" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-03-04</text>
+      <line x1="2250" y1="125" x2="2250" y2="130" class="tick-mark"/>
+      <text x="2250" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-03-11</text>
+      <line x1="2460" y1="125" x2="2460" y2="130" class="tick-mark"/>
+      <text x="2460" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-03-18</text>
+      <line x1="2670" y1="125" x2="2670" y2="130" class="tick-mark"/>
+      <text x="2670" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-03-25</text>
+      <line x1="2880" y1="125" x2="2880" y2="130" class="tick-mark"/>
+      <text x="2880" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-04-01</text>
+      <line x1="3090" y1="125" x2="3090" y2="130" class="tick-mark"/>
+      <text x="3090" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-04-08</text>
+      <line x1="3300" y1="125" x2="3300" y2="130" class="tick-mark"/>
+      <text x="3300" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-04-15</text>
+      <line x1="3510" y1="125" x2="3510" y2="130" class="tick-mark"/>
+      <text x="3510" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-04-22</text>
+      <line x1="3720" y1="125" x2="3720" y2="130" class="tick-mark"/>
+      <text x="3720" y="120" class="axis-label" font-size="9" text-anchor="middle">2024-04-29</text>
+      <line x1="3930" y1="125" x2="3930" y2="130" class="tick-mark"/>
+      <text x="3930" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-05-06</text>
+      <line x1="4140" y1="125" x2="4140" y2="130" class="tick-mark"/>
+      <text x="4140" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-05-13</text>
+      <line x1="4350" y1="125" x2="4350" y2="130" class="tick-mark"/>
+      <text x="4350" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-05-20</text>
+      <line x1="4560" y1="125" x2="4560" y2="130" class="tick-mark"/>
+      <text x="4560" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-05-27</text>
+      <line x1="4770" y1="125" x2="4770" y2="130" class="tick-mark"/>
+      <text x="4770" y="120" class="axis-label" text-anchor="middle" font-size="9">2024-06-03</text>
       <g class="grid">
-        <line x1="150" y1="130" x2="150" y2="255" class="tick"/>
-        <line x1="210" y1="130" x2="210" y2="255" class="tick"/>
-        <line x1="270" y1="130" x2="270" y2="255" class="tick"/>
-        <line x1="330" y1="130" x2="330" y2="255" class="tick"/>
-        <line x1="390" y1="130" x2="390" y2="255" class="tick"/>
-        <line x1="450" y1="130" x2="450" y2="255" class="tick"/>
-        <line x1="510" y1="130" x2="510" y2="255" class="tick"/>
-        <line x1="570" y1="130" x2="570" y2="255" class="tick"/>
-        <line x1="630" y1="130" x2="630" y2="255" class="tick"/>
-        <line x1="690" y1="130" x2="690" y2="255" class="tick"/>
-        <line x1="750" y1="130" x2="750" y2="255" class="tick"/>
-        <line x1="810" y1="130" x2="810" y2="255" class="tick"/>
+        <line x1="150" y1="130" x2="150" y2="730" class="tick"/>
+        <line x1="360" y1="130" x2="360" y2="730" class="tick"/>
+        <line x1="570" y1="130" x2="570" y2="730" class="tick"/>
+        <line x1="780" y1="130" x2="780" y2="730" class="tick"/>
+        <line x1="990" y1="130" x2="990" y2="730" class="tick"/>
+        <line x1="1200" y1="130" x2="1200" y2="730" class="tick"/>
+        <line x1="1410" y1="130" x2="1410" y2="730" class="tick"/>
+        <line x1="1620" y1="130" x2="1620" y2="730" class="tick"/>
+        <line x1="1830" y1="130" x2="1830" y2="730" class="tick"/>
+        <line x1="2040" y1="130" x2="2040" y2="730" class="tick"/>
+        <line x1="2250" y1="130" x2="2250" y2="730" class="tick"/>
+        <line x1="2460" y1="130" x2="2460" y2="730" class="tick"/>
+        <line x1="2670" y1="130" x2="2670" y2="730" class="tick"/>
+        <line x1="2880" y1="130" x2="2880" y2="730" class="tick"/>
+        <line x1="3090" y1="130" x2="3090" y2="730" class="tick"/>
+        <line x1="3300" y1="130" x2="3300" y2="730" class="tick"/>
+        <line x1="3510" y1="130" x2="3510" y2="730" class="tick"/>
+        <line x1="3720" y1="130" x2="3720" y2="730" class="tick"/>
+        <line x1="3930" y1="130" x2="3930" y2="730" class="tick"/>
+        <line x1="4140" y1="130" x2="4140" y2="730" class="tick"/>
+        <line x1="4350" y1="130" x2="4350" y2="730" class="tick"/>
+        <line x1="4560" y1="130" x2="4560" y2="730" class="tick"/>
+        <line x1="4770" y1="130" x2="4770" y2="730" class="tick"/>
       </g>
     </g>
-    <text x="60" y="146.5" class="section-label" font-weight="bold" font-size="12" text-anchor="start">Phase 1</text>
-    <rect x="150" y="157.5" width="210" height="20" rx="3" ry="3" class="task task-bar task1"/>
-    <text x="255" y="171.5" class="taskText taskText1" text-anchor="middle" font-size="11">Task A</text>
-    <rect x="360" y="182.5" width="150" height="20" rx="3" ry="3" class="task task-bar task1"/>
-    <text x="435" y="196.5" class="taskText taskText1" font-size="11" text-anchor="middle">Task B</text>
-    <rect x="50" y="130" width="760" height="75" class="section section0"/>
-    <text x="60" y="221.5" class="section-label" font-weight="bold" font-size="12" text-anchor="start">Phase 2</text>
-    <rect x="510" y="232.5" width="300" height="20" rx="3" ry="3" class="task task-bar task2"/>
-    <text x="660" y="246.5" class="taskText taskText2" text-anchor="middle" font-size="11">Task C</text>
-    <rect x="50" y="205" width="760" height="50" class="section section1"/>
+    <text x="60" y="146.5" class="section-label" text-anchor="start" font-size="12" font-weight="bold">Research</text>
+    <rect x="150" y="157.5" width="420" height="20" rx="3" ry="3" class="task task-bar done done1"/>
+    <text x="360" y="171.5" class="taskText taskText1" font-size="11" text-anchor="middle">Market Analysis</text>
+    <rect x="360" y="182.5" width="630" height="20" rx="3" ry="3" class="task task-bar done done1"/>
+    <text x="675" y="196.5" class="taskText taskText1" text-anchor="middle" font-size="11">User Interviews</text>
+    <rect x="570" y="207.5" width="300" height="20" rx="3" ry="3" class="task task-bar done done1"/>
+    <text x="720" y="221.5" class="taskText taskText1" font-size="11" text-anchor="middle">Competitor Review</text>
+    <rect x="50" y="130" width="4900" height="100" class="section section0"/>
+    <text x="60" y="246.5" class="section-label" font-size="12" text-anchor="start" font-weight="bold">Design</text>
+    <rect x="990" y="257.5" width="420" height="20" rx="3" ry="3" class="task task-bar done done2"/>
+    <text x="1200" y="271.5" class="taskText taskText2" text-anchor="middle" font-size="11">Wireframes</text>
+    <rect x="1410" y="282.5" width="630" height="20" rx="3" ry="3" class="task task-bar done done2"/>
+    <text x="1725" y="296.5" class="taskText taskText2" text-anchor="middle" font-size="11">Visual Design</text>
+    <rect x="2040" y="307.5" width="420" height="20" rx="3" ry="3" class="task task-bar active active2"/>
+    <text x="2250" y="321.5" class="taskText taskText2" text-anchor="middle" font-size="11">Prototype</text>
+    <rect x="2460" y="332.5" width="300" height="20" rx="3" ry="3" class="task task-bar task2"/>
+    <text x="2610" y="346.5" class="taskText taskText2" text-anchor="middle" font-size="11">User Testing</text>
+    <rect x="50" y="230" width="4900" height="125" class="section section1"/>
+    <text x="60" y="371.5" class="section-label" text-anchor="start" font-size="12" font-weight="bold">Development</text>
+    <rect x="1410" y="382.5" width="1260" height="20" rx="3" ry="3" class="task task-bar task3"/>
+    <text x="2040" y="396.5" class="taskText taskText3" text-anchor="middle" font-size="11">Backend API</text>
+    <rect x="2040" y="407.5" width="1050" height="20" rx="3" ry="3" class="task task-bar task3"/>
+    <text x="2565" y="421.5" class="taskText taskText3" text-anchor="middle" font-size="11">Frontend MVP</text>
+    <rect x="2670" y="432.5" width="420" height="20" rx="3" ry="3" class="task task-bar task3"/>
+    <text x="2880" y="446.5" class="taskText taskText3" font-size="11" text-anchor="middle">Integration</text>
+    <rect x="3090" y="457.5" width="210" height="20" rx="3" ry="3" class="task task-bar task3"/>
+    <text x="3195" y="471.5" class="taskText taskText3" text-anchor="middle" font-size="11">Performance Tuning</text>
+    <rect x="50" y="355" width="4900" height="125" class="section section2"/>
+    <text x="60" y="496.5" class="section-label" text-anchor="start" font-weight="bold" font-size="12">Testing</text>
+    <rect x="3090" y="507.5" width="420" height="20" rx="3" ry="3" class="task task-bar task0"/>
+    <text x="3300" y="521.5" class="taskText taskText0" font-size="11" text-anchor="middle">Unit Tests</text>
+    <rect x="3090" y="532.5" width="300" height="20" rx="3" ry="3" class="task task-bar task0"/>
+    <text x="3240" y="546.5" class="taskText taskText0" font-size="11" text-anchor="middle">Integration Tests</text>
+    <rect x="3390" y="557.5" width="420" height="20" rx="3" ry="3" class="task task-bar task0"/>
+    <text x="3600" y="571.5" class="taskText taskText0" text-anchor="middle" font-size="11">UAT</text>
+    <rect x="3810" y="582.5" width="210" height="20" rx="3" ry="3" class="task task-bar task0"/>
+    <text x="3915" y="596.5" class="taskText taskText0" font-size="11" text-anchor="middle">Bug Fixes</text>
+    <rect x="50" y="480" width="4900" height="125" class="section section3"/>
+    <text x="60" y="621.5" class="section-label" font-size="12" text-anchor="start" font-weight="bold">Launch</text>
+    <rect x="3810" y="632.5" width="30" height="20" rx="3" ry="3" class="task task-bar task1"/>
+    <text x="3825" y="646.5" class="taskText taskText1" font-size="11" text-anchor="middle">Beta Release</text>
+    <polygon points="3810,642.5 3818,632.5 3826,642.5 3818,652.5" class="milestone"/>
+    <rect x="2760" y="657.5" width="630" height="20" rx="3" ry="3" class="task task-bar task1"/>
+    <text x="3075" y="671.5" class="taskText taskText1" font-size="11" text-anchor="middle">Marketing Prep</text>
+    <rect x="4020" y="682.5" width="30" height="20" rx="3" ry="3" class="task task-bar crit crit1"/>
+    <text x="4035" y="696.5" class="taskText taskText1" text-anchor="middle" font-size="11">Public Launch</text>
+    <rect x="4050" y="707.5" width="900" height="20" rx="3" ry="3" class="task task-bar task1"/>
+    <text x="4500" y="721.5" class="taskText taskText1" text-anchor="middle" font-size="11">Post-Launch Support</text>
+    <rect x="50" y="605" width="4900" height="125" class="section section0"/>
   </g>
 </svg>

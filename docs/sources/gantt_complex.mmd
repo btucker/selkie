@@ -1,0 +1,32 @@
+gantt
+    title Product Launch Timeline
+    dateFormat YYYY-MM-DD
+
+    section Research
+    Market Analysis      :done, research1, 2024-01-01, 14d
+    User Interviews      :done, research2, 2024-01-08, 21d
+    Competitor Review    :done, research3, after research1, 10d
+
+    section Design
+    Wireframes           :done, design1, after research2, 14d
+    Visual Design        :done, design2, after design1, 21d
+    Prototype            :active, design3, after design2, 14d
+    User Testing         :design4, after design3, 10d
+
+    section Development
+    Backend API          :dev1, after design1, 42d
+    Frontend MVP         :dev2, after design2, 35d
+    Integration          :dev3, after dev1, 14d
+    Performance Tuning   :dev4, after dev3, 7d
+
+    section Testing
+    Unit Tests           :test1, after dev2, 14d
+    Integration Tests    :test2, after dev3, 10d
+    UAT                  :test3, after test2, 14d
+    Bug Fixes            :test4, after test3, 7d
+
+    section Launch
+    Beta Release         :milestone, launch1, after test3, 1d
+    Marketing Prep       :launch2, after design4, 21d
+    Public Launch        :crit, launch3, after test4, 1d
+    Post-Launch Support  :launch4, after launch3, 30d

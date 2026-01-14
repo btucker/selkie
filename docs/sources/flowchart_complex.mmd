@@ -1,0 +1,45 @@
+flowchart TB
+    subgraph Frontend["Frontend Layer"]
+        UI[Web Interface]
+        Mobile[Mobile App]
+        CLI[CLI Tool]
+    end
+
+    subgraph API["API Gateway"]
+        Auth{Authentication}
+        Rate[Rate Limiter]
+        Cache[(Redis Cache)]
+    end
+
+    subgraph Services["Microservices"]
+        UserSvc[User Service]
+        OrderSvc[Order Service]
+        PaymentSvc[Payment Service]
+        NotifySvc[Notification Service]
+    end
+
+    subgraph Data["Data Layer"]
+        DB[(PostgreSQL)]
+        Search[(Elasticsearch)]
+        Queue[(Message Queue)]
+    end
+
+    UI --> Auth
+    Mobile --> Auth
+    CLI --> Auth
+    Auth -->|Valid| Rate
+    Auth -->|Invalid| Reject[Reject Request]
+    Rate --> Cache
+    Cache -->|Cache Hit| Response[Return Response]
+    Cache -->|Cache Miss| UserSvc
+
+    UserSvc --> DB
+    UserSvc --> Search
+    OrderSvc --> DB
+    OrderSvc --> Queue
+    PaymentSvc --> DB
+    PaymentSvc --> NotifySvc
+    NotifySvc --> Queue
+
+    Queue --> EmailWorker[Email Worker]
+    Queue --> SMSWorker[SMS Worker]

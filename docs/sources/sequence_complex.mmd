@@ -1,0 +1,41 @@
+sequenceDiagram
+    autonumber
+    participant User
+    participant Browser
+    participant CDN
+    participant API
+    participant Auth
+    participant DB
+    participant Cache
+    participant Queue
+
+    User->>Browser: Click Login
+    Browser->>CDN: Load Login Page
+    CDN-->>Browser: HTML/CSS/JS
+
+    User->>Browser: Enter Credentials
+    Browser->>API: POST /auth/login
+    API->>Auth: Validate Token
+
+    alt Invalid Credentials
+        Auth-->>API: 401 Unauthorized
+        API-->>Browser: Error Response
+        Browser-->>User: Show Error
+    else Valid Credentials
+        Auth->>DB: Query User
+        DB-->>Auth: User Record
+        Auth->>Cache: Store Session
+        Auth-->>API: JWT Token
+        API-->>Browser: Set Cookie
+        Browser-->>User: Redirect to Dashboard
+    end
+
+    User->>Browser: Request Dashboard
+    Browser->>API: GET /dashboard
+    API->>Cache: Check Session
+    Cache-->>API: Session Valid
+    API->>DB: Fetch User Data
+    DB-->>API: User Data
+    API->>Queue: Log Activity
+    API-->>Browser: Dashboard Data
+    Browser-->>User: Render Dashboard
