@@ -171,6 +171,9 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
         doc.add_style(&generate_er_css());
     }
 
+    // Add ER marker definitions
+    doc.add_defs(generate_er_markers());
+
     // Render title
     if !db.diagram_title.is_empty() {
         let title_elem = SvgElement::Text {
@@ -377,7 +380,7 @@ fn render_entity(
     }
 }
 
-/// Render a relationship line between two entities
+/// Render a relationship line between two entities using SVG markers
 #[allow(clippy::too_many_arguments)]
 fn render_relationship(
     x1: f64,
@@ -398,213 +401,68 @@ fn render_relationship(
     let (start_x, start_y, end_x, end_y) =
         calculate_connection_points(x1, y1, h1, x2, y2, h2, width);
 
-    // Main relationship line
-    let mut line_attrs = Attrs::new()
-        .with_stroke("#333333")
-        .with_stroke_width(1.0)
-        .with_fill("none")
-        .with_class("relationship-line");
+    // Calculate midpoint for Bezier curves (like mermaid.js)
+    let mid_y = (start_y + end_y) / 2.0;
+
+    // Create path data for the relationship line (using bezier curves like mermaid.js)
+    let path_d = format!(
+        "M{},{} C{},{} {},{} {},{}",
+        start_x, start_y, start_x, mid_y, end_x, mid_y, end_x, end_y
+    );
+
+    // Get marker IDs for cardinalities
+    // Note: Due to parser semantics, card_b is the left cardinality (for entity_a/start)
+    // and card_a is the right cardinality (for entity_b/end)
+    let marker_start = cardinality_to_marker_id(card_b, false);
+    let marker_end = cardinality_to_marker_id(card_a, true);
+
+    // Build path attributes with markers
+    let mut path_attrs = Attrs::new()
+        .with_class("relationshipLine")
+        .with_attr("marker-start", &format!("url(#{})", marker_start))
+        .with_attr("marker-end", &format!("url(#{})", marker_end));
 
     // Dotted line for non-identifying relationships
     if rel_type == Identification::NonIdentifying {
-        line_attrs = line_attrs.with_stroke_dasharray("5,5");
+        path_attrs = path_attrs.with_stroke_dasharray("3");
     }
 
-    children.push(SvgElement::Line {
-        x1: start_x,
-        y1: start_y,
-        x2: end_x,
-        y2: end_y,
-        attrs: line_attrs,
+    children.push(SvgElement::Path {
+        d: path_d,
+        attrs: path_attrs,
     });
-
-    // Calculate angle for cardinality symbols
-    let dx = end_x - start_x;
-    let dy = end_y - start_y;
-    let angle = dy.atan2(dx);
-
-    // Render cardinality symbols at start
-    let start_card = render_cardinality(start_x, start_y, angle, card_a, false);
-    children.push(start_card);
-
-    // Render cardinality symbols at end
-    let end_card = render_cardinality(end_x, end_y, angle, card_b, true);
-    children.push(end_card);
 
     // Relationship label
     if !label.is_empty() {
         let mid_x = (start_x + end_x) / 2.0;
-        let mid_y = (start_y + end_y) / 2.0;
+        let label_mid_y = mid_y;
 
         // Background for label
         let label_width = (label.len() as f64) * 7.0;
         children.push(SvgElement::Rect {
             x: mid_x - label_width / 2.0 - 4.0,
-            y: mid_y - 10.0,
+            y: label_mid_y - 12.0,
             width: label_width + 8.0,
-            height: 16.0,
-            rx: Some(2.0),
-            ry: Some(2.0),
-            attrs: Attrs::new()
-                .with_fill("#FFFFFF")
-                .with_stroke("#333333")
-                .with_stroke_width(0.5),
+            height: 23.0,
+            rx: Some(0.0),
+            ry: Some(0.0),
+            attrs: Attrs::new().with_class("background").with_fill("#FFFFFF"),
         });
 
         children.push(SvgElement::Text {
             x: mid_x,
-            y: mid_y + 3.0,
+            y: label_mid_y + 4.0,
             content: label.to_string(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
                 .with_class("relationship-label")
-                .with_attr("font-size", "10"),
+                .with_attr("font-size", "14"),
         });
     }
 
     SvgElement::Group {
         children,
         attrs: Attrs::new().with_class("relationship"),
-    }
-}
-
-/// Render cardinality symbol (crow's foot notation)
-fn render_cardinality(x: f64, y: f64, angle: f64, card: Cardinality, at_end: bool) -> SvgElement {
-    let mut children = Vec::new();
-    let offset = if at_end { 0.0 } else { std::f64::consts::PI };
-    let symbol_angle = angle + offset;
-
-    let cos_a = symbol_angle.cos();
-    let sin_a = symbol_angle.sin();
-
-    // Distance from connection point
-    let dist = 15.0;
-    let foot_spread = 8.0;
-
-    // Crow's foot end positions
-    let base_x = x + dist * cos_a;
-    let base_y = y + dist * sin_a;
-
-    // Perpendicular direction for spread
-    let perp_cos = (-sin_a) * foot_spread;
-    let perp_sin = cos_a * foot_spread;
-
-    match card {
-        Cardinality::OnlyOne => {
-            // Two vertical lines (||)
-            let line_dist = 5.0;
-            for i in [-1.0, 1.0] {
-                let lx = base_x + i * line_dist * cos_a;
-                let ly = base_y + i * line_dist * sin_a;
-                children.push(SvgElement::Line {
-                    x1: lx + perp_cos,
-                    y1: ly + perp_sin,
-                    x2: lx - perp_cos,
-                    y2: ly - perp_sin,
-                    attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
-                });
-            }
-        }
-        Cardinality::ZeroOrOne => {
-            // Circle and one line (o|)
-            let circle_x = base_x + 10.0 * cos_a;
-            let circle_y = base_y + 10.0 * sin_a;
-            children.push(SvgElement::Circle {
-                cx: circle_x,
-                cy: circle_y,
-                r: 5.0,
-                attrs: Attrs::new()
-                    .with_fill("none")
-                    .with_stroke("#333333")
-                    .with_stroke_width(1.0),
-            });
-            children.push(SvgElement::Line {
-                x1: base_x + perp_cos,
-                y1: base_y + perp_sin,
-                x2: base_x - perp_cos,
-                y2: base_y - perp_sin,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
-            });
-        }
-        Cardinality::ZeroOrMore => {
-            // Circle and crow's foot (o{)
-            let circle_x = base_x + 15.0 * cos_a;
-            let circle_y = base_y + 15.0 * sin_a;
-            children.push(SvgElement::Circle {
-                cx: circle_x,
-                cy: circle_y,
-                r: 5.0,
-                attrs: Attrs::new()
-                    .with_fill("none")
-                    .with_stroke("#333333")
-                    .with_stroke_width(1.0),
-            });
-            // Crow's foot
-            let foot_x = base_x + 5.0 * cos_a;
-            let foot_y = base_y + 5.0 * sin_a;
-            children.push(SvgElement::Path {
-                d: format!(
-                    "M {} {} L {} {} M {} {} L {} {}",
-                    x,
-                    y,
-                    foot_x + perp_cos,
-                    foot_y + perp_sin,
-                    x,
-                    y,
-                    foot_x - perp_cos,
-                    foot_y - perp_sin
-                ),
-                attrs: Attrs::new()
-                    .with_fill("none")
-                    .with_stroke("#333333")
-                    .with_stroke_width(1.0),
-            });
-        }
-        Cardinality::OneOrMore => {
-            // Line and crow's foot (|{)
-            children.push(SvgElement::Line {
-                x1: base_x + perp_cos,
-                y1: base_y + perp_sin,
-                x2: base_x - perp_cos,
-                y2: base_y - perp_sin,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
-            });
-            // Crow's foot
-            let foot_x = base_x + 5.0 * cos_a;
-            let foot_y = base_y + 5.0 * sin_a;
-            children.push(SvgElement::Path {
-                d: format!(
-                    "M {} {} L {} {} M {} {} L {} {}",
-                    x,
-                    y,
-                    foot_x + perp_cos,
-                    foot_y + perp_sin,
-                    x,
-                    y,
-                    foot_x - perp_cos,
-                    foot_y - perp_sin
-                ),
-                attrs: Attrs::new()
-                    .with_fill("none")
-                    .with_stroke("#333333")
-                    .with_stroke_width(1.0),
-            });
-        }
-        Cardinality::MdParent => {
-            // Parent indicator
-            children.push(SvgElement::Line {
-                x1: base_x + perp_cos,
-                y1: base_y + perp_sin,
-                x2: base_x - perp_cos,
-                y2: base_y - perp_sin,
-                attrs: Attrs::new().with_stroke("#333333").with_stroke_width(2.0),
-            });
-        }
-    }
-
-    SvgElement::Group {
-        children,
-        attrs: Attrs::new().with_class("cardinality"),
     }
 }
 
@@ -679,19 +537,199 @@ fn generate_er_css() -> String {
   fill: #333333;
 }
 
-.relationship-line {
+.relationshipLine {
   stroke: #333333;
+  stroke-width: 1;
+  fill: none;
 }
 
 .relationship-label {
   fill: #333333;
 }
 
-.cardinality {
+.marker {
+  fill: none;
   stroke: #333333;
+  stroke-width: 1;
+}
+
+.marker circle {
+  fill: white;
 }
 "#
     .to_string()
+}
+
+/// Generate SVG marker definitions for ER diagram cardinality symbols
+/// These match the mermaid.js marker definitions
+fn generate_er_markers() -> Vec<SvgElement> {
+    vec![
+        // onlyOneStart: Two vertical lines at the start (||)
+        SvgElement::Marker {
+            id: "er-onlyOneStart".to_string(),
+            view_box: "0 0 18 18".to_string(),
+            ref_x: 0.0,
+            ref_y: 9.0,
+            marker_width: 18.0,
+            marker_height: 18.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: vec![SvgElement::Path {
+                d: "M9,0 L9,18 M15,0 L15,18".to_string(),
+                attrs: Attrs::new().with_class("marker"),
+            }],
+        },
+        // onlyOneEnd: Two vertical lines at the end (||)
+        SvgElement::Marker {
+            id: "er-onlyOneEnd".to_string(),
+            view_box: "0 0 18 18".to_string(),
+            ref_x: 18.0,
+            ref_y: 9.0,
+            marker_width: 18.0,
+            marker_height: 18.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: vec![SvgElement::Path {
+                d: "M3,0 L3,18 M9,0 L9,18".to_string(),
+                attrs: Attrs::new().with_class("marker"),
+            }],
+        },
+        // zeroOrOneStart: Circle + one vertical line (o|)
+        SvgElement::Marker {
+            id: "er-zeroOrOneStart".to_string(),
+            view_box: "0 0 30 18".to_string(),
+            ref_x: 0.0,
+            ref_y: 9.0,
+            marker_width: 30.0,
+            marker_height: 18.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: vec![
+                SvgElement::Circle {
+                    cx: 21.0,
+                    cy: 9.0,
+                    r: 6.0,
+                    attrs: Attrs::new().with_fill("white").with_class("marker"),
+                },
+                SvgElement::Path {
+                    d: "M9,0 L9,18".to_string(),
+                    attrs: Attrs::new().with_class("marker"),
+                },
+            ],
+        },
+        // zeroOrOneEnd: Circle + one vertical line (o|)
+        SvgElement::Marker {
+            id: "er-zeroOrOneEnd".to_string(),
+            view_box: "0 0 30 18".to_string(),
+            ref_x: 30.0,
+            ref_y: 9.0,
+            marker_width: 30.0,
+            marker_height: 18.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: vec![
+                SvgElement::Circle {
+                    cx: 9.0,
+                    cy: 9.0,
+                    r: 6.0,
+                    attrs: Attrs::new().with_fill("white").with_class("marker"),
+                },
+                SvgElement::Path {
+                    d: "M21,0 L21,18".to_string(),
+                    attrs: Attrs::new().with_class("marker"),
+                },
+            ],
+        },
+        // oneOrMoreStart: Crow's foot + vertical line (|{)
+        SvgElement::Marker {
+            id: "er-oneOrMoreStart".to_string(),
+            view_box: "0 0 45 36".to_string(),
+            ref_x: 18.0,
+            ref_y: 18.0,
+            marker_width: 45.0,
+            marker_height: 36.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: vec![SvgElement::Path {
+                d: "M0,18 Q 18,0 36,18 Q 18,36 0,18 M42,9 L42,27".to_string(),
+                attrs: Attrs::new().with_class("marker"),
+            }],
+        },
+        // oneOrMoreEnd: Vertical line + crow's foot ({|)
+        SvgElement::Marker {
+            id: "er-oneOrMoreEnd".to_string(),
+            view_box: "0 0 45 36".to_string(),
+            ref_x: 27.0,
+            ref_y: 18.0,
+            marker_width: 45.0,
+            marker_height: 36.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: vec![SvgElement::Path {
+                d: "M3,9 L3,27 M9,18 Q27,0 45,18 Q27,36 9,18".to_string(),
+                attrs: Attrs::new().with_class("marker"),
+            }],
+        },
+        // zeroOrMoreStart: Crow's foot + circle (o{)
+        SvgElement::Marker {
+            id: "er-zeroOrMoreStart".to_string(),
+            view_box: "0 0 57 36".to_string(),
+            ref_x: 18.0,
+            ref_y: 18.0,
+            marker_width: 57.0,
+            marker_height: 36.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: vec![
+                SvgElement::Circle {
+                    cx: 48.0,
+                    cy: 18.0,
+                    r: 6.0,
+                    attrs: Attrs::new().with_fill("white").with_class("marker"),
+                },
+                SvgElement::Path {
+                    d: "M0,18 Q18,0 36,18 Q18,36 0,18".to_string(),
+                    attrs: Attrs::new().with_class("marker"),
+                },
+            ],
+        },
+        // zeroOrMoreEnd: Circle + crow's foot ({o)
+        SvgElement::Marker {
+            id: "er-zeroOrMoreEnd".to_string(),
+            view_box: "0 0 57 36".to_string(),
+            ref_x: 39.0,
+            ref_y: 18.0,
+            marker_width: 57.0,
+            marker_height: 36.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: vec![
+                SvgElement::Circle {
+                    cx: 9.0,
+                    cy: 18.0,
+                    r: 6.0,
+                    attrs: Attrs::new().with_fill("white").with_class("marker"),
+                },
+                SvgElement::Path {
+                    d: "M21,18 Q39,0 57,18 Q39,36 21,18".to_string(),
+                    attrs: Attrs::new().with_class("marker"),
+                },
+            ],
+        },
+    ]
+}
+
+/// Get the marker ID for a cardinality type
+fn cardinality_to_marker_id(card: Cardinality, is_end: bool) -> String {
+    let suffix = if is_end { "End" } else { "Start" };
+    let name = match card {
+        Cardinality::OnlyOne => "onlyOne",
+        Cardinality::ZeroOrOne => "zeroOrOne",
+        Cardinality::ZeroOrMore => "zeroOrMore",
+        Cardinality::OneOrMore => "oneOrMore",
+        Cardinality::MdParent => "onlyOne", // Use onlyOne for parent indicator
+    };
+    format!("er-{}{}", name, suffix)
 }
 
 #[cfg(test)]
@@ -699,6 +737,97 @@ mod tests {
     use super::*;
     use crate::diagrams::er::parse;
     use crate::render::svg::SvgStructure;
+
+    #[test]
+    fn test_er_markers_generated() {
+        // Test that ER diagrams with relationships include marker definitions
+        let input = r#"erDiagram
+    CUSTOMER ||--o{ ORDER : places
+"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // Should have marker definitions
+        assert!(
+            svg.contains("<marker id=\"er-onlyOneStart\""),
+            "Should have er-onlyOneStart marker. SVG: {}",
+            &svg[..500.min(svg.len())]
+        );
+        assert!(
+            svg.contains("<marker id=\"er-zeroOrMoreEnd\""),
+            "Should have er-zeroOrMoreEnd marker"
+        );
+
+        // Should have path with marker references
+        assert!(
+            svg.contains("marker-start=\"url(#er-onlyOneStart)\""),
+            "Should have marker-start on relationship path"
+        );
+        assert!(
+            svg.contains("marker-end=\"url(#er-zeroOrMoreEnd)\""),
+            "Should have marker-end on relationship path"
+        );
+    }
+
+    #[test]
+    fn test_all_cardinality_markers_present() {
+        // Test that all 8 marker types are generated
+        let input = r#"erDiagram
+    A ||--|| B : one-to-one
+"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // All 8 marker types should be defined
+        let expected_markers = [
+            "er-onlyOneStart",
+            "er-onlyOneEnd",
+            "er-zeroOrOneStart",
+            "er-zeroOrOneEnd",
+            "er-oneOrMoreStart",
+            "er-oneOrMoreEnd",
+            "er-zeroOrMoreStart",
+            "er-zeroOrMoreEnd",
+        ];
+
+        for marker_id in expected_markers {
+            assert!(
+                svg.contains(&format!("<marker id=\"{}\"", marker_id)),
+                "Should have {} marker defined",
+                marker_id
+            );
+        }
+    }
+
+    #[test]
+    fn test_relationship_uses_path_not_line() {
+        // Test that relationships use path elements (for markers) not line elements
+        let input = r#"erDiagram
+    CUSTOMER ||--o{ ORDER : places
+"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // Parse structure
+        let structure = SvgStructure::from_svg(&svg).unwrap();
+
+        // Should have path elements for relationships (including marker paths)
+        assert!(
+            structure.shapes.path > 0,
+            "Should have path elements for relationships. Got: {:?}",
+            structure.shapes
+        );
+
+        // Should have markers defined
+        assert!(
+            structure.marker_count > 0,
+            "Should have marker definitions. Got: {}",
+            structure.marker_count
+        );
+    }
 
     #[test]
     fn test_attribute_labels_rendered_separately() {

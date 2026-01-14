@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="260" height="518" viewBox="0 0 260 518" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="558" viewBox="0 0 480 558" class="mermaid">
   <style>
 
 .mermaid {
@@ -103,19 +103,57 @@ marker path {
   fill: #333333;
 }
 
-.relationship-line {
+.relationshipLine {
   stroke: #333333;
+  stroke-width: 1;
+  fill: none;
 }
 
 .relationship-label {
   fill: #333333;
 }
 
-.cardinality {
+.marker {
+  fill: none;
   stroke: #333333;
+  stroke-width: 1;
+}
+
+.marker circle {
+  fill: white;
 }
 
   </style>
+  <defs>
+    <marker id="er-onlyOneStart" viewBox="0 0 18 18" refX="0" refY="9" markerWidth="18" markerHeight="18" orient="auto">
+      <path d="M9,0 L9,18 M15,0 L15,18" class="marker"/>
+    </marker>
+    <marker id="er-onlyOneEnd" viewBox="0 0 18 18" refX="18" refY="9" markerWidth="18" markerHeight="18" orient="auto">
+      <path d="M3,0 L3,18 M9,0 L9,18" class="marker"/>
+    </marker>
+    <marker id="er-zeroOrOneStart" viewBox="0 0 30 18" refX="0" refY="9" markerWidth="30" markerHeight="18" orient="auto">
+      <circle cx="21" cy="9" r="6" class="marker" fill="white"/>
+      <path d="M9,0 L9,18" class="marker"/>
+    </marker>
+    <marker id="er-zeroOrOneEnd" viewBox="0 0 30 18" refX="30" refY="9" markerWidth="30" markerHeight="18" orient="auto">
+      <circle cx="9" cy="9" r="6" class="marker" fill="white"/>
+      <path d="M21,0 L21,18" class="marker"/>
+    </marker>
+    <marker id="er-oneOrMoreStart" viewBox="0 0 45 36" refX="18" refY="18" markerWidth="45" markerHeight="36" orient="auto">
+      <path d="M0,18 Q 18,0 36,18 Q 18,36 0,18 M42,9 L42,27" class="marker"/>
+    </marker>
+    <marker id="er-oneOrMoreEnd" viewBox="0 0 45 36" refX="27" refY="18" markerWidth="45" markerHeight="36" orient="auto">
+      <path d="M3,9 L3,27 M9,18 Q27,0 45,18 Q27,36 9,18" class="marker"/>
+    </marker>
+    <marker id="er-zeroOrMoreStart" viewBox="0 0 57 36" refX="18" refY="18" markerWidth="57" markerHeight="36" orient="auto">
+      <circle cx="48" cy="18" r="6" class="marker" fill="white"/>
+      <path d="M0,18 Q18,0 36,18 Q18,36 0,18" class="marker"/>
+    </marker>
+    <marker id="er-zeroOrMoreEnd" viewBox="0 0 57 36" refX="39" refY="18" markerWidth="57" markerHeight="36" orient="auto">
+      <circle cx="9" cy="18" r="6" class="marker" fill="white"/>
+      <path d="M21,18 Q39,0 57,18 Q39,36 21,18" class="marker"/>
+    </marker>
+  </defs>
   <g class="root">
     <g class="clusters">
 
@@ -130,53 +168,60 @@ marker path {
 
     </g>
     <g class="entity-node" id="entity-CUSTOMER-0">
-      <rect x="0" y="0" width="160" height="86" rx="0" ry="0" class="entity-box" stroke-width="1" fill="#ECECFF" stroke="#333333"/>
-      <rect x="0" y="0" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke-width="1" stroke="#333333"/>
-      <text x="80" y="20" class="entity-name" font-size="14" font-weight="bold" fill="#FFFFFF" text-anchor="middle">CUSTOMER</text>
-      <text x="8" y="54" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="58" y="54" class="entity-attr attribute-name" font-size="11" text-anchor="start">name</text>
-      <text x="8" y="74" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="58" y="74" class="entity-attr attribute-name" font-size="11" text-anchor="start">email</text>
+      <rect x="55" y="0" width="160" height="106" rx="0" ry="0" class="entity-box" stroke="#333333" fill="#ECECFF" stroke-width="1"/>
+      <rect x="55" y="0" width="160" height="30" rx="0" ry="0" class="entity-header" stroke-width="1" fill="#9370DB" stroke="#333333"/>
+      <text x="135" y="20" class="entity-name" font-size="14" text-anchor="middle" font-weight="bold" fill="#FFFFFF">CUSTOMER</text>
+      <text x="63" y="54" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
+      <text x="113" y="54" class="entity-attr attribute-name" text-anchor="start" font-size="11">name</text>
+      <text x="63" y="74" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
+      <text x="113" y="74" class="entity-attr attribute-name" text-anchor="start" font-size="11">email</text>
+      <text x="187" y="74" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
+      <text x="63" y="94" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
+      <text x="113" y="94" class="entity-attr attribute-name" font-size="11" text-anchor="start">address</text>
     </g>
-    <g class="entity-node" id="entity-ITEM-2">
-      <rect x="0" y="372" width="160" height="46" rx="0" ry="0" class="entity-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
-      <rect x="0" y="372" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke="#333333" stroke-width="1"/>
-      <text x="80" y="392" class="entity-name" text-anchor="middle" fill="#FFFFFF" font-weight="bold" font-size="14">ITEM</text>
+    <g class="entity-node" id="entity-LINE-ITEM-2">
+      <rect x="110" y="412" width="160" height="46" rx="0" ry="0" class="entity-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
+      <rect x="110" y="412" width="160" height="30" rx="0" ry="0" class="entity-header" stroke-width="1" fill="#9370DB" stroke="#333333"/>
+      <text x="190" y="432" class="entity-name" font-size="14" fill="#FFFFFF" font-weight="bold" text-anchor="middle">LINE-ITEM</text>
     </g>
     <g class="entity-node" id="entity-ORDER-1">
-      <rect x="0" y="186" width="160" height="86" rx="0" ry="0" class="entity-box" stroke-width="1" fill="#ECECFF" stroke="#333333"/>
-      <rect x="0" y="186" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke-width="1" stroke="#333333"/>
-      <text x="80" y="206" class="entity-name" font-weight="bold" fill="#FFFFFF" text-anchor="middle" font-size="14">ORDER</text>
-      <text x="8" y="240" class="entity-attr attribute-type" font-size="11" text-anchor="start">int</text>
-      <text x="58" y="240" class="entity-attr attribute-name" font-size="11" text-anchor="start">id</text>
-      <text x="8" y="260" class="entity-attr attribute-type" text-anchor="start" font-size="11">date</text>
-      <text x="58" y="260" class="entity-attr attribute-name" text-anchor="start" font-size="11">created</text>
+      <rect x="0" y="206" width="160" height="106" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
+      <rect x="0" y="206" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" stroke-width="1" fill="#9370DB"/>
+      <text x="80" y="226" class="entity-name" font-weight="bold" text-anchor="middle" font-size="14" fill="#FFFFFF">ORDER</text>
+      <text x="8" y="260" class="entity-attr attribute-type" font-size="11" text-anchor="start">int</text>
+      <text x="58" y="260" class="entity-attr attribute-name" text-anchor="start" font-size="11">orderNumber</text>
+      <text x="132" y="260" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
+      <text x="8" y="280" class="entity-attr attribute-type" text-anchor="start" font-size="11">date</text>
+      <text x="58" y="280" class="entity-attr attribute-name" text-anchor="start" font-size="11">orderDate</text>
+      <text x="8" y="300" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
+      <text x="58" y="300" class="entity-attr attribute-name" font-size="11" text-anchor="start">status</text>
+    </g>
+    <g class="entity-node" id="entity-PRODUCT-3">
+      <rect x="220" y="206" width="160" height="106" rx="0" ry="0" class="entity-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
+      <rect x="220" y="206" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" fill="#9370DB" stroke-width="1"/>
+      <text x="300" y="226" class="entity-name" font-weight="bold" text-anchor="middle" fill="#FFFFFF" font-size="14">PRODUCT</text>
+      <text x="228" y="260" class="entity-attr attribute-type" text-anchor="start" font-size="11">int</text>
+      <text x="278" y="260" class="entity-attr attribute-name" text-anchor="start" font-size="11">id</text>
+      <text x="352" y="260" class="entity-attr attribute-key" font-size="11" text-anchor="start">PK</text>
+      <text x="228" y="280" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
+      <text x="278" y="280" class="entity-attr attribute-name" text-anchor="start" font-size="11">name</text>
+      <text x="228" y="300" class="entity-attr attribute-type" font-size="11" text-anchor="start">float</text>
+      <text x="278" y="300" class="entity-attr attribute-name" font-size="11" text-anchor="start">price</text>
     </g>
     <g class="relationship">
-      <line x1="80" y1="86" x2="80" y2="186" class="relationship-line" fill="none" stroke-width="1" stroke="#333333"/>
-      <g class="cardinality">
-        <circle cx="80" cy="56" r="5" stroke-width="1" fill="none" stroke="#333333"/>
-        <path d="M 80 86 L 88 66 M 80 86 L 72 66" fill="none" stroke="#333333" stroke-width="1"/>
-      </g>
-      <g class="cardinality">
-        <line x1="72" y1="196" x2="88" y2="196" stroke-width="1" stroke="#333333"/>
-        <line x1="72" y1="206" x2="88" y2="206" stroke-width="1" stroke="#333333"/>
-      </g>
-      <rect x="55" y="126" width="50" height="16" rx="2" ry="2" stroke="#333333" stroke-width="0.5" fill="#FFFFFF"/>
-      <text x="80" y="139" class="relationship-label" font-size="10" text-anchor="middle">places</text>
+      <path d="M135,106 C135,156 80,156 80,206" class="relationshipLine" marker-end="url(#er-zeroOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
+      <rect x="82.5" y="144" width="50" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="107.5" y="160" class="relationship-label" text-anchor="middle" font-size="14">places</text>
     </g>
     <g class="relationship">
-      <line x1="80" y1="272" x2="80" y2="372" class="relationship-line" stroke-width="1" fill="none" stroke="#333333"/>
-      <g class="cardinality">
-        <line x1="88" y1="257" x2="72" y2="257" stroke="#333333" stroke-width="1"/>
-        <path d="M 80 272 L 88 252 M 80 272 L 72 252" fill="none" stroke="#333333" stroke-width="1"/>
-      </g>
-      <g class="cardinality">
-        <line x1="72" y1="382" x2="88" y2="382" stroke="#333333" stroke-width="1"/>
-        <line x1="72" y1="392" x2="88" y2="392" stroke-width="1" stroke="#333333"/>
-      </g>
-      <rect x="48" y="312" width="64" height="16" rx="2" ry="2" fill="#FFFFFF" stroke-width="0.5" stroke="#333333"/>
-      <text x="80" y="325" class="relationship-label" font-size="10" text-anchor="middle">contains</text>
+      <path d="M80,312 C80,362 190,362 190,412" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-oneOrMoreEnd)"/>
+      <rect x="103" y="350" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="135" y="366" class="relationship-label" font-size="14" text-anchor="middle">contains</text>
+    </g>
+    <g class="relationship">
+      <path d="M300,312 C300,362 190,362 190,412" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/>
+      <rect x="213" y="350" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="245" y="366" class="relationship-label" text-anchor="middle" font-size="14">includes</text>
     </g>
   </g>
 </svg>

@@ -117,8 +117,7 @@ fn to_dagre_config(options: &LayoutOptions) -> DagreConfig {
         },
         nodesep: options.node_spacing,
         ranksep: options.layer_spacing,
-        // Use LongestPath as workaround for network simplex bug (selkie-3yi)
-        ranker: Ranker::LongestPath,
+        ranker: Ranker::NetworkSimplex,
         ..Default::default()
     }
 }

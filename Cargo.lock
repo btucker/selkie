@@ -1842,6 +1842,7 @@ dependencies = [
  "dirs",
  "glob",
  "image",
+ "js-sys",
  "libc",
  "log",
  "pest",
@@ -1855,6 +1856,7 @@ dependencies = [
  "svg2pdf",
  "thiserror 1.0.69",
  "uuid",
+ "wasm-bindgen",
 ]
 
 [[package]]

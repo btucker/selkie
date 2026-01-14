@@ -66,6 +66,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         create_arrow_marker("arrow-filled", true),
         create_arrow_marker("arrow-open", false),
         create_cross_marker(),
+        create_sequence_number_marker(),
     ]);
 
     // Title offset
@@ -978,16 +979,23 @@ fn render_note(
             .with_class("note"),
     });
 
-    // Note text
-    children.push(SvgElement::Text {
-        x: x + note_width / 2.0,
-        y: top_y + text_padding + font_size,
-        content: message.to_string(),
-        attrs: Attrs::new()
-            .with_attr("text-anchor", "middle")
-            .with_class("note-text")
-            .with_attr("font-size", "11"),
-    });
+    // Note text - render each line as a separate text element (like mermaid.js)
+    let normalized = message
+        .replace("<br />", "\n")
+        .replace("<br/>", "\n")
+        .replace("<br>", "\n");
+    for (idx, line) in normalized.lines().enumerate() {
+        let text_y = top_y + text_padding + font_size + (idx as f64 * line_height);
+        children.push(SvgElement::Text {
+            x: x + note_width / 2.0,
+            y: text_y,
+            content: line.to_string(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("note-text")
+                .with_attr("font-size", "11"),
+        });
+    }
 
     SvgElement::Group {
         children,
@@ -1065,6 +1073,27 @@ fn create_cross_marker() -> SvgElement {
                     .with_stroke_width(2.0),
             },
         ],
+    }
+}
+
+/// Create a sequence number marker (circle background for message numbering)
+/// Matches mermaid.js marker: <marker id="sequencenumber">
+fn create_sequence_number_marker() -> SvgElement {
+    SvgElement::Marker {
+        id: "sequencenumber".to_string(),
+        view_box: "0 0 30 30".to_string(),
+        ref_x: 15.0,
+        ref_y: 15.0,
+        marker_width: 60.0,
+        marker_height: 40.0,
+        orient: "auto".to_string(),
+        marker_units: None,
+        children: vec![SvgElement::Circle {
+            cx: 15.0,
+            cy: 15.0,
+            r: 6.0,
+            attrs: Attrs::new().with_class("sequence-number"),
+        }],
     }
 }
 
@@ -1170,6 +1199,10 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
 
 .sequence-marker-cross {{
   stroke: {signal_color};
+}}
+
+.sequence-number {{
+  fill: {signal_color};
 }}
 "#,
         signal_text_color = theme.signal_text_color,

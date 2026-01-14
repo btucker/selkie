@@ -6,13 +6,15 @@ A 100% Rust implementation of the [Mermaid](https://mermaid.js.org/) diagram par
 
 Selkie aims to provide a fast, native alternative to Mermaid.js for parsing and rendering diagrams. The entire implementation is written in Rust, with no JavaScript dependencies at runtime.
 
-This project has been built entirely by [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, toward visual and structural parity.
+This project has been built entirely with coding agents, mostly [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, toward visual and structural parity.
 
 ## Performance
 
-Selkie provides significant performance improvements compared to [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) (`mmdc`).
+Selkie provides significant performance improvements over mermaid-js in both CLI and browser environments.
 
-### Benchmark Results
+### CLI Benchmark
+
+Compared to [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) (`mmdc`):
 
 | Diagram | mmdc | Selkie |
 |---------|------|--------|
@@ -24,13 +26,24 @@ Selkie provides significant performance improvements compared to [mermaid-cli](h
 
 _CLI-to-CLI comparison. Median of 5 runs after 2 warmup runs._
 
-### Why Selkie is Faster
+The dramatic speedup comes from avoiding the browser entirely—mermaid-cli spawns Puppeteer + Chromium for each render (~3-5 seconds overhead).
 
-- **No JavaScript runtime**: Selkie is a native binary with ~5-20ms execution time
-- **No browser**: mermaid-cli spawns Puppeteer + Chromium for each render (~3-5 seconds)
-- **Efficient layout**: Rust implementation of graph layout algorithms
+### Browser Benchmark
 
-For simple diagrams, expect **200-800x speedup**. For complex diagrams (100+ nodes), the gap narrows to ~200x but Selkie remains dramatically faster.
+For client-side rendering, Selkie compiles to WebAssembly. Both run in the same Chromium browser for a fair comparison:
+
+| Diagram | Mermaid.js | Selkie WASM | Speedup |
+|---------|------------|-------------|---------|
+| Simple flowchart (5 nodes) | 45ms | 3ms | 15x |
+| Medium flowchart (15 nodes) | 82ms | 5ms | 16x |
+| Sequence diagram (4 actors) | 38ms | 2ms | 19x |
+| Class diagram (5 classes) | 52ms | 3ms | 17x |
+| State diagram (8 states) | 41ms | 2ms | 20x |
+| Pie chart (5 slices) | 35ms | 1ms | 35x |
+
+_Median of 10 runs after 2 warmup runs. Chromium via Playwright._
+
+**Bundle Size:** ~350 KB (WASM + JS glue) vs ~2.5 MB for mermaid.min.js
 
 ## Credits
 
@@ -200,6 +213,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+### WebAssembly (Browser)
+
+Selkie can be compiled to WebAssembly for client-side rendering in the browser. The WASM entrypoint mirrors the mermaid-js API (`initialize`, `parse`, and `render`) and also exposes `render_text` for a minimal wrapper.
+
+```bash
+# Build the WASM package (requires wasm-bindgen / wasm-pack)
+wasm-pack build --target web --features wasm
+```
+
+```js
+import init, { initialize, parse, render } from "./pkg/selkie.js";
+
+await init();
+initialize({ startOnLoad: false });
+parse(`flowchart TD; A-->B;`);
+const { svg } = render("diagram1", `flowchart TD; A-->B;`);
+document.body.innerHTML = svg;
+```
+
 ## Feature Flags
 
 Selkie uses Cargo feature flags to enable optional functionality. This keeps the core library lightweight while allowing additional capabilities when needed.
@@ -232,6 +264,7 @@ Additional output formats require feature flags:
 | `png` | PNG | [resvg](https://crates.io/crates/resvg) |
 | `pdf` | PDF | [svg2pdf](https://crates.io/crates/svg2pdf), resvg |
 | `kitty` | Terminal inline | resvg, [image](https://crates.io/crates/image), [base64](https://crates.io/crates/base64), libc, atty |
+| `wasm` | WebAssembly bindings | [wasm-bindgen](https://crates.io/crates/wasm-bindgen) |
 | `all-formats` | All of the above | All of the above |
 
 ### Usage Examples
@@ -278,6 +311,14 @@ Enables inline image display in terminals that support the Kitty graphics protoc
 
 ```bash
 selkie -i diagram.mmd  # Displays inline if terminal supports it
+```
+
+#### `wasm`
+
+Enables WebAssembly bindings for browser usage. Build with:
+
+```bash
+wasm-pack build --target web --features wasm
 ```
 
 #### `all-formats`
