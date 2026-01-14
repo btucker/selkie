@@ -386,7 +386,7 @@ fn process_class_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                     }
                 }
             }
-            Rule::identifier => {
+            Rule::class_name => {
                 class_name = inner.as_str().to_string();
             }
             _ => {}
@@ -680,6 +680,31 @@ mod tests {
         assert!(
             db.get_classes().contains_key("myClass"),
             "myClass should be defined"
+        );
+    }
+
+    #[test]
+    fn test_parse_class_stmt() {
+        let input = r#"flowchart LR
+    A[Square] --> B((Circle))
+    classDef green fill:#9f6,stroke:#333
+    class A green"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        let db = result.unwrap();
+
+        // Check class is defined
+        assert!(
+            db.get_classes().contains_key("green"),
+            "green class should be defined"
+        );
+
+        // Check class is applied to vertex
+        let vertex_a = db.get_vertices().get("A").expect("A should exist");
+        assert!(
+            vertex_a.classes.contains(&"green".to_string()),
+            "A should have green class, but has: {:?}",
+            vertex_a.classes
         );
     }
 

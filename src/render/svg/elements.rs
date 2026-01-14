@@ -32,6 +32,11 @@ impl Attrs {
         self
     }
 
+    pub fn with_style(mut self, style: &str) -> Self {
+        self.attrs.insert("style".to_string(), style.to_string());
+        self
+    }
+
     pub fn with_transform(mut self, transform: &str) -> Self {
         self.attrs
             .insert("transform".to_string(), transform.to_string());
@@ -236,6 +241,89 @@ impl SvgElement {
         Self::Group {
             children,
             attrs: Attrs::new(),
+        }
+    }
+
+    /// Add inline style attribute
+    pub fn with_style(self, style: &str) -> Self {
+        match self {
+            Self::Rect {
+                x,
+                y,
+                width,
+                height,
+                rx,
+                ry,
+                attrs,
+            } => Self::Rect {
+                x,
+                y,
+                width,
+                height,
+                rx,
+                ry,
+                attrs: attrs.with_style(style),
+            },
+            Self::Circle { cx, cy, r, attrs } => Self::Circle {
+                cx,
+                cy,
+                r,
+                attrs: attrs.with_style(style),
+            },
+            Self::Ellipse {
+                cx,
+                cy,
+                rx,
+                ry,
+                attrs,
+            } => Self::Ellipse {
+                cx,
+                cy,
+                rx,
+                ry,
+                attrs: attrs.with_style(style),
+            },
+            Self::Polygon { points, attrs } => Self::Polygon {
+                points,
+                attrs: attrs.with_style(style),
+            },
+            Self::Path { d, attrs } => Self::Path {
+                d,
+                attrs: attrs.with_style(style),
+            },
+            Self::Line {
+                x1,
+                y1,
+                x2,
+                y2,
+                attrs,
+            } => Self::Line {
+                x1,
+                y1,
+                x2,
+                y2,
+                attrs: attrs.with_style(style),
+            },
+            Self::Polyline { points, attrs } => Self::Polyline {
+                points,
+                attrs: attrs.with_style(style),
+            },
+            Self::Text {
+                x,
+                y,
+                content,
+                attrs,
+            } => Self::Text {
+                x,
+                y,
+                content,
+                attrs: attrs.with_style(style),
+            },
+            Self::Group { children, attrs } => Self::Group {
+                children,
+                attrs: attrs.with_style(style),
+            },
+            other => other,
         }
     }
 

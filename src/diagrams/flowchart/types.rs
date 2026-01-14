@@ -666,6 +666,43 @@ impl FlowchartDb {
         &self.classes
     }
 
+    /// Get compiled styles for a vertex
+    ///
+    /// Compiles styles from the vertex's assigned classes and any inline styles
+    /// into a single CSS style string for use as an inline style attribute.
+    pub fn get_compiled_styles(&self, vertex: &FlowVertex) -> Option<String> {
+        let mut styles: Vec<String> = Vec::new();
+
+        // First, add styles from assigned classes
+        for class_name in &vertex.classes {
+            if let Some(class_def) = self.classes.get(class_name) {
+                styles.extend(class_def.styles.clone());
+            }
+        }
+
+        // Then add inline styles (these take precedence)
+        styles.extend(vertex.styles.clone());
+
+        if styles.is_empty() {
+            None
+        } else {
+            // Join styles with semicolons and add !important to override theme styles
+            let style_str = styles
+                .iter()
+                .map(|s| {
+                    let s = s.trim();
+                    if s.ends_with("!important") {
+                        s.to_string()
+                    } else {
+                        format!("{} !important", s)
+                    }
+                })
+                .collect::<Vec<_>>()
+                .join(";");
+            Some(style_str)
+        }
+    }
+
     /// Get all subgraphs
     pub fn subgraphs(&self) -> &[FlowSubGraph] {
         &self.subgraphs

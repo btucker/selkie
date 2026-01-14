@@ -136,7 +136,13 @@ impl SvgRenderer {
 
             // Get the original vertex info
             if let Some(vertex) = db.vertices().get(&node.id) {
-                let shape_element = shapes::render_shape(node, vertex, &self.config.theme);
+                let mut shape_element = shapes::render_shape(node, vertex, &self.config.theme);
+
+                // Apply compiled styles from classDef/class directives
+                if let Some(styles) = db.get_compiled_styles(vertex) {
+                    shape_element = shape_element.with_style(&styles);
+                }
+
                 doc.add_node(shape_element);
             }
         }
