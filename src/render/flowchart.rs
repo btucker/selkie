@@ -388,4 +388,82 @@ mod tests {
             svg
         );
     }
+
+    #[test]
+    fn test_subgraph_with_different_direction_end_to_end() {
+        use crate::diagrams::flowchart::parse;
+        use crate::layout;
+
+        // Parse a flowchart with TB direction but a subgraph with LR direction
+        // This tests the full flow from parsing to layout
+        let input = r#"flowchart TB
+    subgraph sub1[LR Subgraph]
+        direction LR
+        A[Node A] --> B[Node B]
+    end
+    C[External] --> A"#;
+
+        let db = parse(input).unwrap();
+
+        // Verify parsing captured the direction
+        let subgraphs = db.subgraphs();
+        assert_eq!(subgraphs.len(), 1);
+        assert_eq!(
+            subgraphs[0].dir,
+            Some("LR".to_string()),
+            "Subgraph should have LR direction"
+        );
+
+        // Convert to layout graph
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        // Verify the direction is in metadata
+        let sub_node = graph.get_node("sub1").unwrap();
+        assert_eq!(
+            sub_node.metadata.get("dir"),
+            Some(&"LR".to_string()),
+            "Subgraph node should have dir in metadata"
+        );
+
+        // Run layout
+        let graph = layout::layout(graph).unwrap();
+
+        // Get positions
+        let a = graph.get_node("A").unwrap();
+        let b = graph.get_node("B").unwrap();
+        let c = graph.get_node("C").unwrap();
+
+        eprintln!("A: x={:?}, y={:?}", a.x, a.y);
+        eprintln!("B: x={:?}, y={:?}", b.x, b.y);
+        eprintln!("C: x={:?}, y={:?}", c.x, c.y);
+
+        // A and B are in the LR subgraph, so they should be side-by-side
+        // (B to the right of A, similar y)
+        let a_center_y = a.y.unwrap() + a.height / 2.0;
+        let b_center_y = b.y.unwrap() + b.height / 2.0;
+
+        assert!(
+            (a_center_y - b_center_y).abs() < 15.0,
+            "A and B in LR subgraph should have similar y. A.y={:.1}, B.y={:.1}",
+            a_center_y,
+            b_center_y
+        );
+
+        assert!(
+            b.x.unwrap() > a.x.unwrap(),
+            "B should be to the right of A in LR subgraph. A.x={:.1}, B.x={:.1}",
+            a.x.unwrap(),
+            b.x.unwrap()
+        );
+
+        // C is in the TB main graph, so it should be above the subgraph (lower y)
+        let c_center_y = c.y.unwrap() + c.height / 2.0;
+        assert!(
+            c_center_y < a_center_y,
+            "C should be above the subgraph in TB layout. C.y={:.1}, A.y={:.1}",
+            c_center_y,
+            a_center_y
+        );
+    }
 }
