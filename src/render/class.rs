@@ -17,9 +17,9 @@ use crate::render::svg::{edges, Attrs, RenderConfig, SvgDocument, SvgElement};
 impl ToLayoutGraph for ClassDb {
     fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
         let config = NodeSizeConfig {
-            font_size: 12.0,
-            padding_horizontal: 10.0,
-            padding_vertical: 10.0,
+            font_size: 16.0,
+            padding_horizontal: 24.0,
+            padding_vertical: 24.0,
             min_width: 100.0,
             min_height: 60.0,
             max_width: Some(200.0),
@@ -53,8 +53,8 @@ impl ToLayoutGraph for ClassDb {
             };
 
             // Estimate size: header + members + methods
-            let header_height = 30.0;
-            let member_height = 18.0;
+            let header_height = 48.0;
+            let member_height = 24.0;
             let num_members = class.members.len() + class.methods.len();
             let annotations_height = if class.annotations.is_empty() {
                 0.0
@@ -72,12 +72,12 @@ impl ToLayoutGraph for ClassDb {
             };
             let class_text = format!("{}{}", label, type_suffix);
 
-            let mut max_text_width = size_estimator.estimate_text_size(&class_text, 14.0).0;
+            let mut max_text_width = size_estimator.estimate_text_size(&class_text, 16.0).0;
 
             for annotation in &class.annotations {
-                let text = format!("<<{}>>", annotation);
+                let text = format!("«{}»", annotation);
                 max_text_width =
-                    max_text_width.max(size_estimator.estimate_text_size(&text, 11.0).0);
+                    max_text_width.max(size_estimator.estimate_text_size(&text, 16.0).0);
             }
 
             for member in &class.members {
@@ -148,12 +148,12 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
     // Layout constants
-    let class_padding = 10.0;
-    let member_height = 18.0;
-    let header_height = 30.0;
-    let annotation_font_size = 11.0;
-    let class_name_font_size = 14.0;
-    let member_font_size = 12.0;
+    let class_padding = 24.0;
+    let member_height = 24.0;
+    let header_height = 48.0;
+    let annotation_font_size = 16.0;
+    let class_name_font_size = 16.0;
+    let member_font_size = 16.0;
 
     let classes: Vec<_> = db.classes.values().collect();
 
@@ -326,11 +326,11 @@ fn render_class_box(
 
     let mut current_y = y;
 
-    // Annotations (<<interface>>, <<abstract>>, etc.)
+    // Annotations (e.g. interface, abstract)
     if !class.annotations.is_empty() {
         for annotation in &class.annotations {
             current_y += member_height;
-            let annotation_text = format!("<<{}>>", annotation);
+            let annotation_text = format!("«{}»", annotation);
             let text_width = size_estimator
                 .estimate_text_size(&annotation_text, annotation_font_size)
                 .0;
@@ -509,7 +509,7 @@ fn render_relation(
     type2: i32,
     line_type: LineType,
     bend_points: Option<&Vec<Point>>,
-    size_estimator: &dyn SizeEstimator,
+    _size_estimator: &dyn SizeEstimator,
 ) -> SvgElement {
     let mut children = Vec::new();
 
@@ -649,23 +649,6 @@ fn render_relation(
     if !label.is_empty() {
         let mid_x = (start_x + end_x) / 2.0;
         let mid_y = (start_y + end_y) / 2.0;
-        let font_size = 11.0;
-        let text_width = size_estimator.estimate_text_size(label, font_size).0;
-        let text_height = font_size * 1.5;
-        let padding = 4.0;
-
-        children.push(SvgElement::Rect {
-            x: mid_x - text_width / 2.0 - padding,
-            y: mid_y - text_height / 2.0 - padding / 2.0,
-            width: text_width + padding * 2.0,
-            height: text_height + padding,
-            rx: None,
-            ry: None,
-            attrs: Attrs::new()
-                .with_class("edge-label-bg")
-                .with_attr("fill-opacity", "0.8"),
-        });
-
         children.push(SvgElement::Text {
             x: mid_x,
             y: mid_y,
