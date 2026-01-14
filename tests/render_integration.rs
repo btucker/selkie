@@ -2256,3 +2256,95 @@ flowchart TD
         "Should use default theme colors as fallback"
     );
 }
+
+// ============================================================================
+// State Diagram Improvements
+// ============================================================================
+
+#[test]
+fn test_state_diagram_all_states_rendered() {
+    // Issue: State diagrams should render ALL states mentioned in transitions.
+    // The sample state diagram has 5 states: [*] start, Idle, Running, Error, [*] end
+    // but the Error state was missing from the rendered output.
+    let input = r#"stateDiagram-v2
+    [*] --> Idle
+    Idle --> Running : start
+    Running --> Idle : stop
+    Running --> Error : error
+    Error --> Idle : reset
+    Error --> [*]"#;
+
+    let diagram = parse(input).expect("Failed to parse state diagram");
+    let svg = render(&diagram).expect("Failed to render state diagram");
+
+    // Count state-node groups (each state should have one)
+    let state_node_count = svg.matches(r#"class="state-node""#).count();
+
+    // Verify all states are present
+    assert!(
+        svg.contains("id=\"state-Idle\""),
+        "Should contain Idle state. SVG:\n{}",
+        svg
+    );
+    assert!(
+        svg.contains("id=\"state-Running\""),
+        "Should contain Running state. SVG:\n{}",
+        svg
+    );
+    assert!(
+        svg.contains("id=\"state-Error\""),
+        "Should contain Error state. SVG:\n{}",
+        svg
+    );
+
+    // Should have at least 5 state-node groups:
+    // [*] start, Idle, Running, Error, [*] end
+    assert!(
+        state_node_count >= 5,
+        "Should have at least 5 state-node groups (start, Idle, Running, Error, end), found {}. SVG:\n{}",
+        state_node_count,
+        svg
+    );
+}
+
+#[test]
+fn test_state_diagram_uses_curved_edges() {
+    // Issue: State diagram transitions should use curved paths like mermaid.js,
+    // not straight lines. Mermaid uses cubic Bezier curves for smooth edges.
+    let input = r#"stateDiagram-v2
+    [*] --> Idle
+    Idle --> Running : start
+    Running --> Idle : stop"#;
+
+    let diagram = parse(input).expect("Failed to parse state diagram");
+    let svg = render(&diagram).expect("Failed to render state diagram");
+
+    // Mermaid.js uses <path> elements with cubic Bezier curves (C command)
+    // for transitions, not straight <line> elements.
+    // Count path elements (should be used for edges)
+    let path_count = svg.matches("<path").count();
+    let line_count = svg.matches("<line").count();
+
+    // Transitions should use path elements, not line elements
+    // (excluding marker path which is in defs)
+    let marker_path_count = svg.matches(r#"<marker"#).count();
+    let edge_path_count = path_count.saturating_sub(marker_path_count);
+
+    // We have 3 transitions, they should all use paths
+    assert!(
+        edge_path_count >= 3,
+        "State diagram should use path elements for transitions (found {} paths excluding markers), not lines (found {}). SVG:\n{}",
+        edge_path_count,
+        line_count,
+        svg
+    );
+
+    // Line elements should not be used for transitions
+    // (there might be some lines for other purposes like dividers)
+    assert!(
+        line_count == 0,
+        "State diagram should not use <line> elements for transitions (found {}). SVG:\n{}",
+        line_count,
+        svg
+    );
+}

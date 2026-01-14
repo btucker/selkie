@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="139.2" height="393.6" viewBox="0 0 139.2 393.6" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="250" height="358.40000000000003" viewBox="0 0 250 358.40000000000003" class="mermaid">
   <style>
 
 .mermaid {
@@ -123,8 +123,9 @@ marker path {
   stroke-dasharray: 5, 5;
 }
 
-.transition-line {
+.transition-path {
   stroke: #333333;
+  fill: none;
 }
 
 .transition-label {
@@ -143,7 +144,7 @@ marker path {
   </style>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" stroke="#333333" stroke-width="1" fill="#333333"/>
+      <path d="M 0 0 L 10 5 L 0 10 z" stroke-width="1" stroke="#333333" fill="#333333"/>
     </marker>
   </defs>
   <g class="root">
@@ -159,34 +160,46 @@ marker path {
     <g class="nodes">
 
     </g>
+    <g class="state-node" id="state-Error">
+      <rect x="0" y="132.8" width="80" height="52.8" rx="10" ry="10" class="state-box" stroke-width="1" stroke="#333333" fill="#ECECFF"/>
+      <text x="40" y="164.20000000000002" class="state-label" text-anchor="middle" font-size="12">Error</text>
+    </g>
     <g class="state-node" id="state-Idle">
-      <rect x="14.399999999999999" y="84" width="70.4" height="52.8" rx="10" ry="10" class="state-box" fill="#ECECFF" stroke-width="1" stroke="#333333"/>
-      <text x="49.6" y="115.4" class="state-label" text-anchor="middle" font-size="12">Idle</text>
+      <rect x="102.00000000000001" y="265.6" width="70.4" height="52.8" rx="10" ry="10" class="state-box" stroke-width="1" stroke="#333333" fill="#ECECFF"/>
+      <text x="137.20000000000002" y="297" class="state-label" font-size="12" text-anchor="middle">Idle</text>
     </g>
     <g class="state-node" id="state-Running">
-      <rect x="0" y="216.8" width="99.2" height="52.8" rx="10" ry="10" class="state-box" stroke="#333333" fill="#ECECFF" stroke-width="1"/>
-      <text x="49.6" y="248.20000000000002" class="state-label" font-size="12" text-anchor="middle">Running</text>
+      <rect x="36.799999999999976" y="0" width="99.2" height="52.8" rx="10" ry="10" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#333333"/>
+      <text x="86.39999999999998" y="31.4" class="state-label" text-anchor="middle" font-size="12">Running</text>
     </g>
     <g class="state-node" id="state-[*]_end_0">
-      <circle cx="49.6" cy="341.6" r="12" class="state-end-outer" stroke-width="2" fill="none" stroke="#333333"/>
-      <circle cx="49.6" cy="341.6" r="7.199999999999999" class="state-end-inner" fill="#333333"/>
+      <circle cx="40" cy="292" r="12" class="state-end-outer" stroke="#333333" stroke-width="2" fill="none"/>
+      <circle cx="40" cy="292" r="7.199999999999999" class="state-end-inner" fill="#333333"/>
     </g>
     <g class="state-node" id="state-[*]_start_0">
-      <circle cx="49.6" cy="12" r="12" class="state-start" fill="#333333"/>
+      <circle cx="198" cy="26.4" r="12" class="state-start" fill="#333333"/>
     </g>
     <g class="transition">
-      <line x1="46.40532214028728" y1="23.566937078270175" x2="26.4" y2="84" class="transition-line" stroke="#333333" stroke-width="1" marker-end="url(#arrow)"/>
+      <path d="M 198.00 38.40 C 198.00 56.53, 198.00 74.67, 198.00 94.80 C 198.00 114.93, 198.00 137.07, 198.00 159.20 C 198.00 181.33, 198.00 203.47, 191.90 221.20 C 173.58 252.27, 161.37 265.60, 161.37 265.60" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)" stroke="#333333"/>
     </g>
     <g class="transition">
-      <line x1="49.6" y1="136.8" x2="35.2" y2="216.8" class="transition-line" stroke="#333333" stroke-width="1" marker-end="url(#arrow)"/>
-      <text x="42.400000000000006" y="171.8" class="transition-label" font-size="11" text-anchor="middle">start</text>
+      <path d="M 137.20 265.60 C 128.73 230.13, 120.27 194.67, 111.80 159.20 C 103.33 123.73, 94.87 88.27, 86.40 52.80" class="transition-path" stroke="#333333" marker-end="url(#arrow)" fill="none" stroke-width="1"/>
+      <text x="111.8" y="154.20000000000002" class="transition-label" font-size="11" text-anchor="middle">start</text>
     </g>
     <g class="transition">
-      <line x1="49.6" y1="216.8" x2="64" y2="136.8" class="transition-line" stroke-width="1" marker-end="url(#arrow)" stroke="#333333"/>
-      <text x="56.8" y="171.8" class="transition-label" font-size="11" text-anchor="middle">stop</text>
+      <path d="M 101.95 52.80 C 109.80 66.13, 117.65 79.47, 122.16 97.20 C 126.67 114.93, 127.83 137.07, 132.25 159.20 C 136.67 181.33, 144.33 203.47, 146.68 221.20 C 146.06 252.27, 143.08 265.60, 143.08 265.60" class="transition-path" stroke-width="1" stroke="#333333" fill="none" marker-end="url(#arrow)"/>
+      <text x="127.25" y="121" class="transition-label" font-size="11" text-anchor="middle">stop</text>
     </g>
     <g class="transition">
-      <line x1="49.6" y1="269.6" x2="83.40526680779794" y2="344.6158004233938" class="transition-line" marker-end="url(#arrow)" stroke-width="1" stroke="#333333"/>
+      <path d="M 67.95 52.80 C 58.63 66.13, 49.32 79.47, 44.66 92.80 C 40.00 106.13, 40.00 119.47, 40.00 132.80" class="transition-path" marker-end="url(#arrow)" stroke="#333333" fill="none" stroke-width="1"/>
+      <text x="53.97590361445782" y="67.8" class="transition-label" font-size="11" text-anchor="middle">error</text>
+    </g>
+    <g class="transition">
+      <path d="M 63.46 185.60 C 75.31 198.93, 87.15 212.27, 96.91 225.60 C 106.67 238.93, 114.34 252.27, 122.01 265.60" class="transition-path" marker-end="url(#arrow)" stroke-width="1" stroke="#333333" fill="none"/>
+      <text x="81.22891566265059" y="200.60000000000002" class="transition-label" text-anchor="middle" font-size="11">reset</text>
+    </g>
+    <g class="transition">
+      <path d="M 40.00 185.60 C 40.00 198.93, 40.00 212.27, 40.00 228.00 C 40.00 243.73, 40.00 261.87, 40.00 280.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke="#333333" stroke-width="1"/>
     </g>
   </g>
 </svg>

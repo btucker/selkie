@@ -4,10 +4,12 @@ use std::collections::HashMap;
 
 use crate::diagrams::state::{Direction, NotePosition, State, StateDb, StateType};
 use crate::error::Result;
+use crate::layout::Point;
 use crate::layout::{
     layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
     LayoutOptions, NodeShape, NodeSizeConfig, Padding, SizeEstimator, ToLayoutGraph,
 };
+use crate::render::svg::edges::build_curved_path;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
 /// Implement ToLayoutGraph for StateDb to enable proper DAG layout
@@ -156,6 +158,17 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         }
     }
 
+    // Extract edge bend points from layout
+    let mut edge_bend_points: HashMap<(String, String), Vec<Point>> = HashMap::new();
+    for edge in &layout_result.edges {
+        if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
+            edge_bend_points.insert(
+                (source.to_string(), target.to_string()),
+                edge.bend_points.clone(),
+            );
+        }
+    }
+
     // Title offset
     let title_offset = if !db.diagram_title.is_empty() {
         40.0
@@ -231,12 +244,16 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
 
     // Render transitions
     for relation in db.get_relations() {
-        if let (Some(&(x1, y1, w1, h1)), Some(&(x2, y2, _w2, _h2))) = (
+        if let (Some(&(x1, y1, w1, h1)), Some(&(x2, y2, w2, h2))) = (
             state_positions.get(&relation.state1),
             state_positions.get(&relation.state2),
         ) {
             let state1 = states.get(&relation.state1);
             let state2 = states.get(&relation.state2);
+
+            // Get bend points from layout
+            let edge_key = (relation.state1.clone(), relation.state2.clone());
+            let bend_points = edge_bend_points.get(&edge_key);
 
             let transition_elem = render_transition(
                 x1,
@@ -245,12 +262,15 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 y2,
                 w1,
                 h1,
+                w2,
+                h2,
                 start_end_radius,
                 8.0,  // fork_join_width
                 60.0, // fork_join_height
                 state1.map(|s| s.state_type),
                 state2.map(|s| s.state_type),
                 relation.description.as_deref(),
+                bend_points,
             );
             doc.add_element(transition_elem);
         }
@@ -424,62 +444,87 @@ fn render_transition(
     y1: f64,
     x2: f64,
     y2: f64,
-    state_width: f64,
-    state_height: f64,
+    w1: f64,
+    h1: f64,
+    w2: f64,
+    h2: f64,
     start_end_radius: f64,
     _fork_join_width: f64,
     _fork_join_height: f64,
     state1_type: Option<StateType>,
     state2_type: Option<StateType>,
     label: Option<&str>,
+    bend_points: Option<&Vec<Point>>,
 ) -> SvgElement {
     let mut children = Vec::new();
 
-    // Calculate connection points based on state types
-    let (start_x, start_y) = calculate_exit_point(
-        x1,
-        y1,
-        state_width,
-        state_height,
-        x2 + state_width / 2.0,
-        y2 + state_height / 2.0,
-        state1_type,
-        start_end_radius,
-    );
+    // Use bend points from layout if available, otherwise calculate connection points
+    let (path_d, label_x, label_y) = if let Some(points) = bend_points {
+        if !points.is_empty() {
+            // Use dagre's bend points to create a curved path
+            let curved_path = build_curved_path(points);
 
-    let (end_x, end_y) = calculate_entry_point(
-        x2,
-        y2,
-        state_width,
-        state_height,
-        x1 + state_width / 2.0,
-        y1 + state_height / 2.0,
-        state2_type,
-        start_end_radius,
-    );
+            // Calculate label position at midpoint of the path
+            let mid_idx = points.len() / 2;
+            let (lx, ly) = if points.len() > 1 && mid_idx > 0 {
+                let p1 = &points[mid_idx - 1];
+                let p2 = &points[mid_idx.min(points.len() - 1)];
+                ((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0)
+            } else {
+                (points[0].x, points[0].y)
+            };
 
-    // Transition line
-    children.push(SvgElement::Line {
-        x1: start_x,
-        y1: start_y,
-        x2: end_x,
-        y2: end_y,
+            (curved_path, lx, ly)
+        } else {
+            // Empty bend points - fallback to calculated path
+            calculate_fallback_path(
+                x1,
+                y1,
+                x2,
+                y2,
+                w1,
+                h1,
+                w2,
+                h2,
+                start_end_radius,
+                state1_type,
+                state2_type,
+            )
+        }
+    } else {
+        // No bend points - fallback to calculated path
+        calculate_fallback_path(
+            x1,
+            y1,
+            x2,
+            y2,
+            w1,
+            h1,
+            w2,
+            h2,
+            start_end_radius,
+            state1_type,
+            state2_type,
+        )
+    };
+
+    // Transition path (curved)
+    children.push(SvgElement::Path {
+        d: path_d,
         attrs: Attrs::new()
             .with_stroke("#333333")
             .with_stroke_width(1.0)
+            .with_fill("none")
             .with_attr("marker-end", "url(#arrow)")
-            .with_class("transition-line"),
+            .with_class("transition-path"),
     });
 
     // Transition label
     if let Some(text) = label {
         if !text.is_empty() {
-            let mid_x = (start_x + end_x) / 2.0;
-            let mid_y = (start_y + end_y) / 2.0;
-
             children.push(SvgElement::Text {
-                x: mid_x,
-                y: mid_y - 5.0,
+                x: label_x,
+                y: label_y - 5.0,
                 content: text.to_string(),
                 attrs: Attrs::new()
                     .with_attr("text-anchor", "middle")
@@ -493,6 +538,60 @@ fn render_transition(
         children,
         attrs: Attrs::new().with_class("transition"),
     }
+}
+
+/// Calculate fallback path when no bend points are available
+#[allow(clippy::too_many_arguments)]
+fn calculate_fallback_path(
+    x1: f64,
+    y1: f64,
+    x2: f64,
+    y2: f64,
+    w1: f64,
+    h1: f64,
+    w2: f64,
+    h2: f64,
+    start_end_radius: f64,
+    state1_type: Option<StateType>,
+    state2_type: Option<StateType>,
+) -> (String, f64, f64) {
+    // Calculate connection points based on state types
+    let (start_x, start_y) = calculate_exit_point(
+        x1,
+        y1,
+        w1,
+        h1,
+        x2 + w2 / 2.0,
+        y2 + h2 / 2.0,
+        state1_type,
+        start_end_radius,
+    );
+
+    let (end_x, end_y) = calculate_entry_point(
+        x2,
+        y2,
+        w2,
+        h2,
+        x1 + w1 / 2.0,
+        y1 + h1 / 2.0,
+        state2_type,
+        start_end_radius,
+    );
+
+    // Create a curved path between the two points
+    // Add a control point in the middle to create a slight curve
+    let mid_x = (start_x + end_x) / 2.0;
+    let mid_y = (start_y + end_y) / 2.0;
+
+    // For simple two-point path, create a slight curve
+    let points = vec![
+        Point::new(start_x, start_y),
+        Point::new(mid_x, mid_y),
+        Point::new(end_x, end_y),
+    ];
+
+    let path = build_curved_path(&points);
+    (path, mid_x, mid_y)
 }
 
 /// Calculate exit point from a state
@@ -796,8 +895,9 @@ fn generate_state_css() -> String {
   stroke-dasharray: 5, 5;
 }
 
-.transition-line {
+.transition-path {
   stroke: #333333;
+  fill: none;
 }
 
 .transition-label {
