@@ -1027,17 +1027,25 @@ fn test_class_inheritance_arrow_is_hollow_triangle() {
         "SVG should contain inheritance marker definition"
     );
 
-    // The marker path should have fill="none" for hollow triangle (not filled)
-    // Extract the marker section and check it has fill="none"
+    // The marker path should be hollow (fill="none" or light background fill, not filled with stroke color)
+    // Extract the marker section and verify it's not a solid filled triangle
     if let Some(marker_start) = svg
         .find(r#"id="inheritance-start""#)
         .or_else(|| svg.find(r#"id="inheritance-end""#))
     {
         let marker_end = svg[marker_start..].find("</marker>").unwrap_or(200);
         let marker_section = &svg[marker_start..marker_start + marker_end];
+        // Hollow can be fill="none" OR fill with a light color like #ECECFF or #FFFFFF
+        let is_hollow = marker_section.contains("fill=\"none\"")
+            || marker_section.contains("fill=\"#ECECFF\"")
+            || marker_section.contains("fill=\"#FFFFFF\"")
+            || marker_section.contains("fill=\"white\"");
+        // Should NOT be filled with the stroke/dark color
+        let is_solid = marker_section.contains("fill=\"#333333\"")
+            || marker_section.contains("fill=\"black\"");
         assert!(
-            marker_section.contains(r#"fill="none""#),
-            "Inheritance marker should have fill=\"none\" for hollow triangle. Got marker section:\n{}",
+            is_hollow && !is_solid,
+            "Inheritance marker should be hollow (not filled with stroke color). Got marker section:\n{}",
             marker_section
         );
     }
