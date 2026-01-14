@@ -208,6 +208,7 @@ impl Default for AutonumberConfig {
 #[derive(Debug, Clone)]
 pub struct Message {
     pub id: String,
+    pub order: usize,
     pub from: Option<String>,
     pub to: Option<String>,
     pub message: String,
@@ -220,6 +221,7 @@ pub struct Message {
 impl Message {
     pub fn new(
         id: String,
+        order: usize,
         from: Option<String>,
         to: Option<String>,
         message: String,
@@ -227,6 +229,7 @@ impl Message {
     ) -> Self {
         Self {
             id,
+            order,
             from,
             to,
             message,
@@ -242,18 +245,28 @@ impl Message {
 #[derive(Debug, Clone)]
 pub struct Note {
     pub actor: String,
+    pub actor_to: Option<String>,
     pub placement: Placement,
     pub message: String,
     pub wrap: bool,
+    pub order: usize,
 }
 
 impl Note {
-    pub fn new(actor: String, placement: Placement, message: String) -> Self {
+    pub fn new(
+        actor: String,
+        actor_to: Option<String>,
+        placement: Placement,
+        message: String,
+        order: usize,
+    ) -> Self {
         Self {
             actor,
+            actor_to,
             placement,
             message,
             wrap: false,
+            order,
         }
     }
 }
@@ -283,6 +296,8 @@ pub struct SequenceDb {
     autonumber: Option<AutonumberConfig>,
     /// Message ID counter
     message_counter: usize,
+    /// Event order counter for timeline placement
+    event_counter: usize,
     /// Accessibility title
     pub acc_title: String,
     /// Accessibility description
@@ -313,6 +328,7 @@ impl SequenceDb {
             wrap_enabled: false,
             autonumber: None,
             message_counter: 0,
+            event_counter: 0,
             acc_title: String::new(),
             acc_descr: String::new(),
             diagram_title: String::new(),
@@ -332,6 +348,7 @@ impl SequenceDb {
         self.wrap_enabled = false;
         self.autonumber = None;
         self.message_counter = 0;
+        self.event_counter = 0;
         self.acc_title.clear();
         self.acc_descr.clear();
         self.diagram_title.clear();
@@ -405,9 +422,12 @@ impl SequenceDb {
 
         let id = self.message_counter.to_string();
         self.message_counter += 1;
+        let order = self.event_counter;
+        self.event_counter += 1;
 
         let mut msg = Message::new(
             id,
+            order,
             Some(from.to_string()),
             Some(to.to_string()),
             message.to_string(),
@@ -425,8 +445,22 @@ impl SequenceDb {
     }
 
     /// Add a note to the diagram
-    pub fn add_note(&mut self, actor: &str, placement: Placement, message: &str) {
-        let mut note = Note::new(actor.to_string(), placement, message.to_string());
+    pub fn add_note(
+        &mut self,
+        actor: &str,
+        placement: Placement,
+        message: &str,
+        actor_to: Option<&str>,
+    ) {
+        let order = self.event_counter;
+        self.event_counter += 1;
+        let mut note = Note::new(
+            actor.to_string(),
+            actor_to.map(|value| value.to_string()),
+            placement,
+            message.to_string(),
+            order,
+        );
         note.wrap = self.wrap_enabled;
         self.notes.push(note);
     }
@@ -513,9 +547,12 @@ impl SequenceDb {
     pub fn add_signal(&mut self, message_type: LineType, message: Option<&str>) {
         let id = self.message_counter.to_string();
         self.message_counter += 1;
+        let order = self.event_counter;
+        self.event_counter += 1;
 
         let msg = Message::new(
             id,
+            order,
             None,
             None,
             message.unwrap_or("").to_string(),

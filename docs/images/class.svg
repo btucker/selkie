@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="580" height="414" viewBox="0 0 580 414" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="234" viewBox="0 0 260 234" class="mermaid">
   <style>
 
 .mermaid {
@@ -81,7 +81,14 @@ marker path {
 
 
 .class-box {
+  stroke: #333333;
+}
+
+.class-box-bg {
   fill: #ECECFF;
+}
+
+.class-divider {
   stroke: #333333;
 }
 
@@ -122,20 +129,35 @@ marker path {
 
   </style>
   <defs>
-    <marker id="inheritance" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 1 7 L 18 13 V 1 Z" stroke-width="1" fill="none" stroke="#333333"/>
+    <marker id="aggregation-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke="#333333" fill="none" stroke-width="1"/>
     </marker>
-    <marker id="aggregation" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" fill="none" stroke="#333333"/>
+    <marker id="aggregation-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke="#333333" fill="none" stroke-width="1"/>
     </marker>
-    <marker id="composition" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke-width="1" stroke="#333333"/>
+    <marker id="inheritance-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 1 7 L 18 13 V 1 Z" fill="none" stroke-width="1" stroke="#333333"/>
     </marker>
-    <marker id="dependency" viewBox="0 0 20 20" refX="20" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 0 0 L 20 10 L 0 20" fill="none" stroke="#333333" stroke-width="1"/>
+    <marker id="inheritance-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 1 7 L 18 13 V 1 Z" fill="none" stroke-width="1" stroke="#333333"/>
     </marker>
-    <marker id="lollipop" viewBox="0 0 20 20" refX="10" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <circle cx="10" cy="10" r="8" stroke="#333333" stroke-width="1" fill="#FFFFFF"/>
+    <marker id="composition-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke="#333333" stroke-width="1" fill="#333333"/>
+    </marker>
+    <marker id="composition-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke="#333333" stroke-width="1" fill="#333333"/>
+    </marker>
+    <marker id="dependency-start" viewBox="0 0 20 20" refX="18" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 20 10 L 0 20" stroke="#333333" fill="none" stroke-width="1"/>
+    </marker>
+    <marker id="dependency-end" viewBox="0 0 20 20" refX="1" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 20 10 L 0 20" stroke="#333333" fill="none" stroke-width="1"/>
+    </marker>
+    <marker id="lollipop-start" viewBox="0 0 20 20" refX="13" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+      <circle cx="10" cy="10" r="8" fill="#FFFFFF" stroke-width="1" stroke="#333333"/>
+    </marker>
+    <marker id="lollipop-end" viewBox="0 0 20 20" refX="1" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+      <circle cx="10" cy="10" r="8" fill="#FFFFFF" stroke-width="1" stroke="#333333"/>
     </marker>
   </defs>
   <g class="root">
@@ -151,31 +173,36 @@ marker path {
     <g class="nodes">
 
     </g>
-    <g class="class-node" id="class-Cat">
-      <rect x="290" y="216" width="180" height="68" rx="3" ry="3" class="class-box" stroke-width="1" stroke="#333333" fill="#ECECFF"/>
-      <text x="380" y="236" class="class-name" text-anchor="middle" font-weight="bold" font-size="14">Cat</text>
-      <line x1="290" y1="246" x2="470" y2="246" stroke="#333333" stroke-width="1"/>
-      <text x="300" y="270" class="class-method" font-size="12" text-anchor="start">+meow()</text>
-    </g>
     <g class="class-node" id="class-Animal">
-      <rect x="170" y="50" width="180" height="86" rx="3" ry="3" class="class-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
-      <text x="260" y="70" class="class-name" font-weight="bold" font-size="14" text-anchor="middle">Animal</text>
-      <line x1="170" y1="80" x2="350" y2="80" stroke="#333333" stroke-width="1"/>
-      <text x="180" y="104" class="class-member" font-size="12" text-anchor="start">+String name</text>
-      <line x1="170" y1="113" x2="350" y2="113" stroke-width="1" stroke="#333333"/>
-      <text x="180" y="127" class="class-method" text-anchor="start" font-size="12">+eat()</text>
+      <path d="M 79.80000000000001 0 H 180.2 A 3 3 0 0 1 183.2 3 V 83 A 3 3 0 0 1 180.2 86 H 79.80000000000001 A 3 3 0 0 1 76.80000000000001 83 V 3 A 3 3 0 0 1 79.80000000000001 0 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
+      <path d="M 79.80000000000001 0 H 180.2 A 3 3 0 0 1 183.2 3 V 83 A 3 3 0 0 1 180.2 86 H 79.80000000000001 A 3 3 0 0 1 76.80000000000001 83 V 3 A 3 3 0 0 1 79.80000000000001 0 Z" class="class-box" stroke-width="1" stroke="#333333" fill="none"/>
+      <foreignObject x="104.80000000000001" y="2.5" width="50.4" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 86.39999999999999px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Animal</p></span></div></foreignObject>
+      <path d="M 76.80000000000001 30 L 183.2 30" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <foreignObject x="86.80000000000001" y="39" width="86.39999999999999" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 86.39999999999999px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+String name</p></span></div></foreignObject>
+      <path d="M 76.80000000000001 58 L 183.2 58" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <foreignObject x="108.4" y="67" width="43.199999999999996" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 86.39999999999999px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+eat()</p></span></div></foreignObject>
     </g>
     <g class="class-node" id="class-Dog">
-      <rect x="50" y="216" width="180" height="68" rx="3" ry="3" class="class-box" fill="#ECECFF" stroke-width="1" stroke="#333333"/>
-      <text x="140" y="236" class="class-name" font-size="14" font-weight="bold" text-anchor="middle">Dog</text>
-      <line x1="50" y1="246" x2="230" y2="246" stroke="#333333" stroke-width="1"/>
-      <text x="60" y="270" class="class-method" font-size="12" text-anchor="start">+bark()</text>
+      <path d="M 163 166 H 257 A 3 3 0 0 1 260 169 V 231 A 3 3 0 0 1 257 234 H 163 A 3 3 0 0 1 160 231 V 169 A 3 3 0 0 1 163 166 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 163 166 H 257 A 3 3 0 0 1 260 169 V 231 A 3 3 0 0 1 257 234 H 163 A 3 3 0 0 1 160 231 V 169 A 3 3 0 0 1 163 166 Z" class="class-box" stroke="#333333" fill="none" stroke-width="1"/>
+      <foreignObject x="197.4" y="168.5" width="25.2" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 80px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Dog</p></span></div></foreignObject>
+      <path d="M 160 196 L 260 196" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <path d="M 160 224 L 260 224" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <foreignObject x="184.8" y="233" width="50.4" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 80px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+bark()</p></span></div></foreignObject>
+    </g>
+    <g class="class-node" id="class-Cat">
+      <path d="M 3 166 H 97 A 3 3 0 0 1 100 169 V 231 A 3 3 0 0 1 97 234 H 3 A 3 3 0 0 1 0 231 V 169 A 3 3 0 0 1 3 166 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 3 166 H 97 A 3 3 0 0 1 100 169 V 231 A 3 3 0 0 1 97 234 H 3 A 3 3 0 0 1 0 231 V 169 A 3 3 0 0 1 3 166 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
+      <foreignObject x="37.4" y="168.5" width="25.2" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 80px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Cat</p></span></div></foreignObject>
+      <path d="M 0 196 L 100 196" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <path d="M 0 224 L 100 224" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <foreignObject x="24.8" y="233" width="50.4" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 80px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+meow()</p></span></div></foreignObject>
     </g>
     <g class="relation">
-      <line x1="260" y1="136" x2="140" y2="216" class="relation-line" marker-start="url(#inheritance)" stroke-width="1" fill="none" stroke="#333333"/>
+      <path d="M 171.45 86.00 C 184.30 99.33, 197.15 112.67, 203.57 126.00 C 210.00 139.33, 210.00 152.67, 210.00 166.00" class="relation-line" stroke="#333333" marker-start="url(#inheritance-start)" stroke-width="1" fill="none"/>
     </g>
     <g class="relation">
-      <line x1="260" y1="136" x2="380" y2="216" class="relation-line" stroke="#333333" marker-start="url(#inheritance)" fill="none" stroke-width="1"/>
+      <path d="M 88.55 86.00 C 75.70 99.33, 62.85 112.67, 56.43 126.00 C 50.00 139.33, 50.00 152.67, 50.00 166.00" class="relation-line" fill="none" stroke-width="1" marker-start="url(#inheritance-start)" stroke="#333333"/>
     </g>
   </g>
 </svg>

@@ -980,14 +980,16 @@ fn test_class_inheritance_arrow_is_hollow_triangle() {
     let svg = render(&diagram).expect("Failed to render class diagram");
 
     // Inheritance relation should use a marker
-    let has_inheritance_marker = svg.contains("url(#inheritance)");
+    let has_inheritance_marker =
+        svg.contains("url(#inheritance-start)") || svg.contains("url(#inheritance-end)");
     assert!(
         has_inheritance_marker,
-        "Inheritance relation should use url(#inheritance) marker"
+        "Inheritance relation should use inheritance marker"
     );
 
     // The inheritance marker should exist and be hollow (fill="none")
-    let has_inheritance_def = svg.contains(r#"id="inheritance""#);
+    let has_inheritance_def =
+        svg.contains(r#"id="inheritance-start""#) || svg.contains(r#"id="inheritance-end""#);
     assert!(
         has_inheritance_def,
         "SVG should contain inheritance marker definition"
@@ -995,7 +997,10 @@ fn test_class_inheritance_arrow_is_hollow_triangle() {
 
     // The marker path should have fill="none" for hollow triangle (not filled)
     // Extract the marker section and check it has fill="none"
-    if let Some(marker_start) = svg.find(r#"id="inheritance""#) {
+    if let Some(marker_start) = svg
+        .find(r#"id="inheritance-start""#)
+        .or_else(|| svg.find(r#"id="inheritance-end""#))
+    {
         let marker_end = svg[marker_start..].find("</marker>").unwrap_or(200);
         let marker_section = &svg[marker_start..marker_start + marker_end];
         assert!(
@@ -1662,48 +1667,21 @@ fn test_class_diagram_parent_centered_over_children() {
     // The reference has: Animal at x=298, Duck at x=92, Fish at x=298, Zebra at x=488
     // Children span from ~92 to ~488, so parent should be near middle (~290)
 
-    // Parse Animal's x position
-    let animal_x = svg
-        .find(r#"id="class-Animal""#)
-        .and_then(|start| {
-            let remaining = &svg[start..];
-            remaining.find(r#"<rect x=""#).and_then(|rect_start| {
-                let after_x = &remaining[rect_start + 9..];
-                let end = after_x.find('"')?;
-                after_x[..end].parse::<f64>().ok()
-            })
-        })
-        .expect("Could not find Animal class x position");
+    // Parse Animal's x position and width from class box path
+    let (animal_x, animal_width) =
+        extract_class_box_position(&svg, "Animal").expect("Could not find Animal class x position");
 
     // Parse children's x positions
-    let duck_x = svg
-        .find(r#"id="class-Duck""#)
-        .and_then(|start| {
-            let remaining = &svg[start..];
-            remaining.find(r#"<rect x=""#).and_then(|rect_start| {
-                let after_x = &remaining[rect_start + 9..];
-                let end = after_x.find('"')?;
-                after_x[..end].parse::<f64>().ok()
-            })
-        })
-        .expect("Could not find Duck class x position");
+    let (duck_x, duck_width) =
+        extract_class_box_position(&svg, "Duck").expect("Could not find Duck class x position");
 
-    let zebra_x = svg
-        .find(r#"id="class-Zebra""#)
-        .and_then(|start| {
-            let remaining = &svg[start..];
-            remaining.find(r#"<rect x=""#).and_then(|rect_start| {
-                let after_x = &remaining[rect_start + 9..];
-                let end = after_x.find('"')?;
-                after_x[..end].parse::<f64>().ok()
-            })
-        })
-        .expect("Could not find Zebra class x position");
+    let (zebra_x, zebra_width) =
+        extract_class_box_position(&svg, "Zebra").expect("Could not find Zebra class x position");
 
-    // Class width is 180, so we need to account for that when calculating centers
-    let class_width = 180.0;
-    let animal_center = animal_x + class_width / 2.0;
-    let children_center = (duck_x + zebra_x + class_width) / 2.0;
+    let animal_center = animal_x + animal_width / 2.0;
+    let duck_center = duck_x + duck_width / 2.0;
+    let zebra_center = zebra_x + zebra_width / 2.0;
+    let children_center = (duck_center + zebra_center) / 2.0;
 
     // Animal should be centered over children (within reasonable tolerance)
     let tolerance = 50.0;
@@ -1719,6 +1697,47 @@ fn test_class_diagram_parent_centered_over_children() {
         duck_x,
         zebra_x
     );
+}
+
+fn extract_class_box_position(svg: &str, class_name: &str) -> Option<(f64, f64)> {
+    let id = format!(r#"id="class-{}""#, class_name);
+    let start = svg.find(&id)?;
+    let remaining = &svg[start..];
+
+    let mut scan = remaining;
+    while let Some(path_start) = scan.find("<path") {
+        let after_path = &scan[path_start..];
+        let tag_end = after_path.find("/>")?;
+        let element = &after_path[..tag_end];
+        if element.contains(r#"class="class-box-bg""#) {
+            return parse_box_path(element);
+        }
+        scan = &after_path[tag_end + 2..];
+    }
+
+    None
+}
+
+fn parse_box_path(element: &str) -> Option<(f64, f64)> {
+    let d_start = element.find(r#"d=""#)? + 3;
+    let d_end = element[d_start..].find('"')? + d_start;
+    let d = &element[d_start..d_end];
+    let mut parts = d.split_whitespace();
+    let cmd = parts.next()?;
+    if cmd != "M" {
+        return None;
+    }
+    let x1 = parts.next()?.parse::<f64>().ok()?;
+    parts.next()?; // y1
+    let h_cmd = parts.next()?;
+    if h_cmd != "H" {
+        return None;
+    }
+    let h = parts.next()?.parse::<f64>().ok()?;
+    let rx = 3.0;
+    let x = x1 - rx;
+    let width = h - x1 + 2.0 * rx;
+    Some((x, width))
 }
 
 #[test]
@@ -1953,6 +1972,198 @@ fn test_sequence_diagram_uses_theme_colors() {
     assert!(
         svg.contains("class=\"actor\"") || svg.contains(".actor"),
         "Actors should have CSS class styling"
+    );
+}
+
+#[test]
+fn test_sequence_open_arrow_has_no_marker() {
+    let input = r#"sequenceDiagram
+    participant A
+    participant B
+    A->B: Open
+    A->>B: Filled"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    assert_eq!(
+        svg.matches("marker-end=").count(),
+        1,
+        "Only filled arrows should get marker-end"
+    );
+}
+
+#[test]
+fn test_sequence_activation_renders_box() {
+    let input = r#"sequenceDiagram
+    participant A
+    participant C
+    A->>+C: Login request
+    C-->>-A: Token"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    assert!(
+        svg.contains("class=\"activation\""),
+        "Activation box should render for + activation"
+    );
+}
+
+#[test]
+fn test_sequence_loop_label_renders() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: start
+    loop Every minute
+    Alice->>Bob: ping
+    end"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    assert!(svg.contains(">loop<"), "Loop label should render in SVG");
+    assert!(
+        svg.contains("[Every minute]"),
+        "Loop condition label should render in SVG"
+    );
+    assert!(
+        svg.contains("labelBox") || svg.contains("loopLine"),
+        "Loop framing should render in SVG"
+    );
+}
+
+#[test]
+fn test_sequence_loop_condition_sits_near_top_line() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: start
+    loop Daily query
+    Alice->>Bob: ping
+    end"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    let label_y = svg
+        .split("<polygon")
+        .find_map(|chunk| {
+            if !chunk.contains("class=\"labelBox\"") {
+                return None;
+            }
+            let points = chunk.split("points=\"").nth(1)?.split('"').next()?;
+            let first_point = points.split_whitespace().next()?;
+            let y = first_point.split(',').nth(1)?;
+            y.parse::<f64>().ok()
+        })
+        .expect("Failed to parse label box y");
+
+    let loop_text_y = svg
+        .split("<text")
+        .find_map(|chunk| {
+            if !chunk.contains("class=\"loopText\"") {
+                return None;
+            }
+            let y = chunk.split("y=\"").nth(1)?.split('"').next()?;
+            y.parse::<f64>().ok()
+        })
+        .expect("Failed to parse loop text y");
+
+    assert!(
+        loop_text_y <= label_y + 20.0,
+        "Loop condition should sit just below the top line (label_y={}, loop_text_y={})",
+        label_y,
+        loop_text_y
+    );
+}
+
+#[test]
+fn test_sequence_fragment_uses_actor_theme_colors() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: start
+    loop Daily query
+    Alice->>Bob: ping
+    end"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let theme = Theme::forest();
+    let svg = render_with_config(
+        &diagram,
+        &RenderConfig {
+            theme: theme.clone(),
+            ..Default::default()
+        },
+    )
+    .expect("Failed to render sequence diagram");
+
+    assert!(
+        svg.contains(&format!("stroke: {};", theme.actor_border)),
+        "Fragment stroke should use actor border color"
+    );
+    assert!(
+        svg.contains(&format!("fill: {};", theme.actor_bkg)),
+        "Fragment fill should use actor background color"
+    );
+}
+
+#[test]
+fn test_sequence_fragment_frames_render_behind_text() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: start
+    loop Daily query
+    Alice->>Bob: ping
+    end"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    let frame_idx = svg
+        .find("class=\"loopLine\"")
+        .expect("Missing fragment frame");
+    let text_idx = svg
+        .find("class=\"loopText\"")
+        .expect("Missing fragment text");
+
+    assert!(
+        frame_idx < text_idx,
+        "Fragment frames should render before text"
+    );
+}
+
+#[test]
+fn test_sequence_loop_scopes_to_single_actor() {
+    let input = r#"sequenceDiagram
+    participant Alice
+    participant Bob
+    participant John
+    Alice->>John: Hello John, how are you?
+    loop HealthCheck
+        John->>John: Fight against hypochondria
+    end
+    John-->>Alice: Great!"#;
+
+    let diagram = parse(input).expect("Failed to parse sequence diagram");
+    let svg = render_with_config(&diagram, &RenderConfig::default())
+        .expect("Failed to render sequence diagram");
+
+    let loop_width = svg
+        .split("<rect")
+        .find_map(|chunk| {
+            if !chunk.contains("class=\"loopLine\"") {
+                return None;
+            }
+            let width = chunk.split("width=\"").nth(1)?.split('"').next()?;
+            width.parse::<f64>().ok()
+        })
+        .expect("Failed to parse loop frame width");
+
+    assert!(
+        loop_width < 300.0,
+        "Loop frame should scope to a single actor, got width {}",
+        loop_width
     );
 }
 

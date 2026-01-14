@@ -135,7 +135,7 @@ fn build_path(points: &[crate::layout::Point]) -> String {
 
 /// Build curved SVG path from bend points using basis spline interpolation
 /// This matches d3's curveBasis for smooth curves like mermaid.js
-fn build_curved_path(points: &[crate::layout::Point]) -> String {
+pub(crate) fn build_curved_path(points: &[crate::layout::Point]) -> String {
     if points.is_empty() {
         return String::new();
     }

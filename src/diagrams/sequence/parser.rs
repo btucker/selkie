@@ -412,7 +412,12 @@ fn process_note_stmt(db: &mut SequenceDb, pair: pest::iterators::Pair<Rule>) -> 
 
     // Add note for the first actor (most common case)
     if let Some(actor) = actors.first() {
-        db.add_note(actor, placement, &text);
+        let actor_to = if placement == Placement::Over {
+            actors.get(1).or_else(|| actors.last()).map(String::as_str)
+        } else {
+            None
+        };
+        db.add_note(actor, placement, &text, actor_to);
     }
 
     Ok(())
@@ -426,8 +431,8 @@ fn process_message_stmt(
     let mut to = String::new();
     let mut message = String::new();
     let mut arrow = String::new();
-    let mut activate = false;
-    let mut deactivate = false;
+    let mut activate_target = false;
+    let mut deactivate_target = false;
     let mut actor_count = 0;
 
     for inner in pair.into_inner() {
@@ -448,9 +453,9 @@ fn process_message_stmt(
                             if actor_count == 2 {
                                 // Target actor activation
                                 if marker == "+" {
-                                    activate = true;
+                                    activate_target = true;
                                 } else if marker == "-" {
-                                    deactivate = true;
+                                    deactivate_target = true;
                                 }
                             }
                         }
@@ -472,8 +477,9 @@ fn process_message_stmt(
     let (line_type, arrow_activate, arrow_deactivate) = parse_arrow_type(&arrow);
 
     // Combine activation from arrow and actor markers
-    let activate = activate || arrow_activate;
-    let deactivate = deactivate || arrow_deactivate;
+    let activate = activate_target || arrow_activate;
+    let deactivate = deactivate_target;
+    let deactivate_source = arrow_deactivate;
 
     // Add the message
     db.add_message(&from, &to, &message, line_type, activate);
@@ -484,6 +490,9 @@ fn process_message_stmt(
     }
     if deactivate {
         db.add_signal(LineType::ActiveEnd, Some(&to));
+    }
+    if deactivate_source {
+        db.add_signal(LineType::ActiveEnd, Some(&from));
     }
 
     Ok(())
@@ -1023,6 +1032,23 @@ deactivate Bob",
             let db = result.unwrap();
             let messages = db.get_messages();
             assert!(messages[0].activate);
+        }
+
+        #[test]
+        fn should_deactivate_sender_with_trailing_minus() {
+            let result = parse(
+                "sequenceDiagram
+Alice->>+C: Login request
+C-->>-Alice: Token",
+            );
+            assert!(result.is_ok());
+            let db = result.unwrap();
+            let messages = db.get_messages();
+            let active_end = messages
+                .iter()
+                .find(|msg| msg.message_type == LineType::ActiveEnd);
+            assert!(active_end.is_some());
+            assert_eq!(active_end.unwrap().message, "C");
         }
     }
 

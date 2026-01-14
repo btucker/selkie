@@ -2,7 +2,7 @@
 
 pub mod color;
 mod document;
-mod edges;
+pub(crate) mod edges;
 mod elements;
 mod markers;
 mod shapes;

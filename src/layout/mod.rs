@@ -138,13 +138,11 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
                     .map(|p| Point::new(p.x, p.y))
                     .collect();
 
-                // Set label position if present from dagre (for long edges with dummy nodes)
-                if let (Some(x), Some(y)) = (edge_label.x, edge_label.y) {
-                    edge.label_position = Some(Point::new(x, y));
-                }
-                // For edges without label position from dagre (short edges), compute from bend points
-                else if edge.label.is_some() && !edge.bend_points.is_empty() {
-                    // Use the midpoint of the edge path as label position
+                // Compute label position from the actual edge path (bend_points)
+                // This is more accurate than dagre's dummy node position, which doesn't
+                // account for shape boundary intersections (e.g., diamond corners)
+                if edge.label.is_some() && !edge.bend_points.is_empty() {
+                    // Use the midpoint of the actual edge path as label position
                     let mid_idx = edge.bend_points.len() / 2;
                     if mid_idx > 0 {
                         // Average the two middle points if even number of points
@@ -155,6 +153,12 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
                     } else {
                         // Use the middle point if odd number
                         edge.label_position = Some(edge.bend_points[mid_idx]);
+                    }
+                }
+                // Fallback to dagre's position if no bend points (shouldn't happen)
+                else if edge.label.is_some() {
+                    if let (Some(x), Some(y)) = (edge_label.x, edge_label.y) {
+                        edge.label_position = Some(Point::new(x, y));
                     }
                 }
             }
@@ -363,6 +367,84 @@ mod tests {
             label_pos.x,
             a_right,
             b_left
+        );
+    }
+
+    #[test]
+    fn test_edge_label_y_position_diagonal_edge() {
+        // Test that edge labels are positioned at the midpoint for diagonal edges
+        // This reproduces the bug where LR flowchart edge labels were positioned
+        // at the source y-coordinate instead of the edge midpoint
+        let mut graph = LayoutGraph::new("test_diagonal_label");
+        graph.options.direction = LayoutDirection::LeftToRight;
+
+        // Create a "decision" pattern: B has edges going to C (above) and D (below)
+        graph.add_node(LayoutNode::new("A", 50.0, 30.0));
+        graph.add_node(LayoutNode::new("B", 80.0, 80.0)); // Larger node like a diamond
+        graph.add_node(LayoutNode::new("C", 50.0, 30.0));
+        graph.add_node(LayoutNode::new("D", 50.0, 30.0));
+
+        // A -> B (no label)
+        graph.add_edge(LayoutEdge::new("e_ab", "A", "B"));
+        // B -> C with "Yes" label
+        graph.add_edge(LayoutEdge::new("e_bc", "B", "C").with_label("Yes"));
+        // B -> D with "No" label
+        graph.add_edge(LayoutEdge::new("e_bd", "B", "D").with_label("No"));
+
+        let result = layout(graph).unwrap();
+
+        // Get node positions
+        let b = result.get_node("B").unwrap();
+        let c = result.get_node("C").unwrap();
+        let d = result.get_node("D").unwrap();
+
+        let b_center_y = b.y.unwrap() + b.height / 2.0;
+        let c_center_y = c.y.unwrap() + c.height / 2.0;
+        let d_center_y = d.y.unwrap() + d.height / 2.0;
+
+        eprintln!("Node B center y: {}", b_center_y);
+        eprintln!("Node C center y: {}", c_center_y);
+        eprintln!("Node D center y: {}", d_center_y);
+
+        // Find the B->C edge
+        let edge_bc = result
+            .edges
+            .iter()
+            .find(|e| e.id == "e_bc")
+            .expect("Should have edge B->C");
+        let label_pos_bc = edge_bc
+            .label_position
+            .expect("Edge B->C should have label position");
+
+        eprintln!("Edge B->C label y: {}", label_pos_bc.y);
+        eprintln!("Edge B->C bend points: {:?}", edge_bc.bend_points);
+
+        // The label y should be between B and C's y-coordinates, not at B's y
+        // For a diagonal edge going from B to C, label should be near midpoint
+        let min_y = b_center_y.min(c_center_y);
+        let max_y = b_center_y.max(c_center_y);
+        let midpoint_y = (b_center_y + c_center_y) / 2.0;
+
+        // Allow some tolerance - label should be within the range, closer to midpoint
+        // The bug was that labels were at source y, not midpoint
+        assert!(
+            label_pos_bc.y >= min_y - 10.0 && label_pos_bc.y <= max_y + 10.0,
+            "Label y ({}) should be between B ({}) and C ({}) y-coordinates (with tolerance)",
+            label_pos_bc.y,
+            b_center_y,
+            c_center_y
+        );
+
+        // More strict check: label should be reasonably close to the midpoint
+        let distance_from_midpoint = (label_pos_bc.y - midpoint_y).abs();
+        let total_range = (max_y - min_y).abs();
+        assert!(
+            distance_from_midpoint < total_range * 0.6,
+            "Label y ({}) should be close to midpoint ({}), not at an extreme. Distance: {}, Range: {}",
+            label_pos_bc.y,
+            midpoint_y,
+            distance_from_midpoint,
+            total_range
         );
     }
 }
