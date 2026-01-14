@@ -23,8 +23,6 @@ pub struct EvalConfig {
     pub diagram_type_filter: Option<String>,
     /// Whether to skip visual comparison (SSIM)
     pub skip_visual: bool,
-    /// Whether to force refresh cached references
-    pub force_refresh: bool,
     /// Structural check configuration
     pub check_config: CheckConfig,
 }
@@ -99,18 +97,9 @@ impl EvalRunner {
             })
             .collect();
 
-        // Pre-render all reference SVGs in batch (unless force refresh)
+        // Pre-render all reference SVGs in batch (uses cache for already-rendered diagrams)
         let diagram_texts: Vec<&str> = filtered.iter().map(|i| i.text.as_str()).collect();
-        let reference_svgs = if self.config.force_refresh {
-            // Force refresh - render each individually (will be cached)
-            diagram_texts
-                .iter()
-                .map(|text| self.cache.render_with_mermaid(text))
-                .collect::<Vec<_>>()
-        } else {
-            // Use batch rendering with cache
-            self.cache.render_batch(&diagram_texts)
-        };
+        let reference_svgs = self.cache.render_batch(&diagram_texts);
 
         // Evaluate each diagram with pre-rendered reference
         for (i, input) in filtered.iter().enumerate() {
@@ -134,11 +123,7 @@ impl EvalRunner {
 
     /// Evaluate a single diagram (fetches reference SVG internally)
     pub fn evaluate_single(&self, input: &DiagramInput) -> DiagramResult {
-        let reference_svg = if self.config.force_refresh {
-            self.cache.render_with_mermaid(&input.text)
-        } else {
-            self.cache.get_or_render(&input.text)
-        };
+        let reference_svg = self.cache.get_or_render(&input.text);
         self.evaluate_single_with_reference(input, reference_svg)
     }
 

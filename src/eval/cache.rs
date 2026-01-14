@@ -95,7 +95,8 @@ impl ReferenceCache {
     }
 
     /// Render multiple diagrams at once, using cache where available.
-    /// Returns a vector of (diagram, Result<svg, error>) in the same order as input.
+    /// Uses mmdc batch mode (markdown input) for efficiency.
+    /// Returns a vector of Result<svg, error> in the same order as input.
     pub fn render_batch(&self, diagrams: &[&str]) -> Vec<Result<String, String>> {
         // Check which diagrams need rendering
         let uncached: Vec<(usize, &str)> = diagrams
@@ -113,36 +114,111 @@ impl ReferenceCache {
                 .collect();
         }
 
-        // Log progress for uncached diagrams
-        if !uncached.is_empty() {
-            eprint!("Rendering {} reference SVGs with mmdc...", uncached.len());
-        }
+        eprint!("Rendering {} reference SVGs with mmdc...", uncached.len());
 
-        // Render uncached diagrams
-        let mut results: Vec<Option<Result<String, String>>> = vec![None; diagrams.len()];
+        // Render uncached diagrams in batch using markdown mode
+        let batch_results = self.render_batch_with_mmdc(&uncached);
 
-        for (i, diagram) in &uncached {
-            let result = self.render_with_mermaid(diagram);
+        eprintln!(" done");
+
+        // Cache successful results
+        for ((_, diagram), result) in uncached.iter().zip(batch_results.iter()) {
             if let Ok(ref svg) = result {
                 let _ = self.put(diagram, svg);
             }
-            results[*i] = Some(result);
         }
 
-        if !uncached.is_empty() {
-            eprintln!(" done");
-        }
+        // Build final results: batch results for uncached, cache for cached
+        let mut batch_iter = batch_results.into_iter();
+        let mut uncached_idx = 0;
 
-        // Fill in cached results
         diagrams
             .iter()
             .enumerate()
             .map(|(i, d)| {
-                if let Some(result) = results[i].take() {
-                    result
+                if uncached_idx < uncached.len() && uncached[uncached_idx].0 == i {
+                    uncached_idx += 1;
+                    batch_iter.next().unwrap()
                 } else {
                     self.get(d).ok_or_else(|| "Cache miss".to_string())
                 }
+            })
+            .collect()
+    }
+
+    /// Render multiple diagrams in a single mmdc invocation using markdown batch mode
+    fn render_batch_with_mmdc(&self, diagrams: &[(usize, &str)]) -> Vec<Result<String, String>> {
+        // Create temp directory for mmdc output
+        let temp_dir = match tempfile::tempdir() {
+            Ok(dir) => dir,
+            Err(e) => {
+                return diagrams
+                    .iter()
+                    .map(|_| Err(format!("Failed to create temp dir: {}", e)))
+                    .collect();
+            }
+        };
+
+        // Create markdown file with all diagrams as fenced code blocks
+        let md_path = temp_dir.path().join("batch.md");
+        let mut md_content = String::new();
+        for (i, (_, diagram)) in diagrams.iter().enumerate() {
+            md_content.push_str(&format!(
+                "## Diagram {}\n\n```mermaid\n{}\n```\n\n",
+                i, diagram
+            ));
+        }
+
+        if let Err(e) = fs::write(&md_path, &md_content) {
+            return diagrams
+                .iter()
+                .map(|_| Err(format!("Failed to write markdown: {}", e)))
+                .collect();
+        }
+
+        // Run mmdc with markdown input
+        let output_md = temp_dir.path().join("output.md");
+        let artefacts_dir = temp_dir.path().join("svgs");
+
+        let output = Command::new("mmdc")
+            .args([
+                "-i",
+                md_path.to_str().unwrap(),
+                "-o",
+                output_md.to_str().unwrap(),
+                "-a",
+                artefacts_dir.to_str().unwrap(),
+                "-q",
+            ])
+            .stderr(Stdio::piped())
+            .output();
+
+        let output = match output {
+            Ok(o) => o,
+            Err(e) => {
+                return diagrams
+                    .iter()
+                    .map(|_| Err(format!("Failed to run mmdc: {}", e)))
+                    .collect();
+            }
+        };
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return diagrams
+                .iter()
+                .map(|_| Err(format!("mmdc failed: {}", stderr)))
+                .collect();
+        }
+
+        // Read generated SVGs (mmdc names them output-1.svg, output-2.svg, etc.)
+        diagrams
+            .iter()
+            .enumerate()
+            .map(|(i, _)| {
+                let svg_path = artefacts_dir.join(format!("output-{}.svg", i + 1));
+                fs::read_to_string(&svg_path)
+                    .map_err(|e| format!("Failed to read SVG {}: {}", svg_path.display(), e))
             })
             .collect()
     }
