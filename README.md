@@ -285,6 +285,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+### WebAssembly (Browser)
+
+Selkie can be compiled to WebAssembly for client-side rendering in the browser. The WASM entrypoint mirrors the mermaid-js API (`initialize`, `parse`, and `render`) and also exposes `render_text` for a minimal wrapper.
+
+```bash
+# Build the WASM package (requires wasm-bindgen / wasm-pack)
+wasm-pack build --target web --features wasm
+```
+
+```js
+import init, { initialize, parse, render, render_text } from "./pkg/selkie.js";
+
+await init();
+initialize({ startOnLoad: false });
+parse(`flowchart TD; A-->B;`);
+const { svg } = render("diagram1", `flowchart TD; A-->B;`);
+const svgTextOnly = render_text(`flowchart TD; A-->B;`);
+document.body.innerHTML = svg;
+```
+
 ## Feature Flags
 
 Selkie uses Cargo feature flags to enable optional functionality. This keeps the core library lightweight while allowing additional capabilities when needed.
@@ -317,6 +337,7 @@ Additional output formats require feature flags:
 | `png` | PNG | [resvg](https://crates.io/crates/resvg) |
 | `pdf` | PDF | [svg2pdf](https://crates.io/crates/svg2pdf), resvg |
 | `kitty` | Terminal inline | resvg, [image](https://crates.io/crates/image), [base64](https://crates.io/crates/base64), libc, atty |
+| `wasm` | WebAssembly bindings | [wasm-bindgen](https://crates.io/crates/wasm-bindgen) |
 | `all-formats` | All of the above | All of the above |
 
 ### Usage Examples
@@ -363,6 +384,14 @@ Enables inline image display in terminals that support the Kitty graphics protoc
 
 ```bash
 selkie -i diagram.mmd  # Displays inline if terminal supports it
+```
+
+#### `wasm`
+
+Enables WebAssembly bindings for browser usage. Build with:
+
+```bash
+wasm-pack build --target web --features wasm
 ```
 
 #### `all-formats`

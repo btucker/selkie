@@ -14,6 +14,8 @@ pub mod render;
 
 #[cfg(feature = "kitty")]
 pub mod kitty;
+#[cfg(feature = "wasm")]
+pub mod wasm;
 
 pub use config::Config;
 pub use error::{MermaidError, Result};

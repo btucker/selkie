@@ -11,6 +11,7 @@ categories = ["visualization", "parsing"]
 [lib]
 name = "mermaid"
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # Parsing
@@ -67,6 +68,7 @@ cli = ["clap"]
 png = ["resvg"]
 pdf = ["svg2pdf", "resvg"]
 kitty = ["resvg", "base64", "libc", "atty", "image"]
+wasm = ["js-sys", "wasm-bindgen"]
 all-formats = ["png", "pdf", "kitty"]
 
 [dependencies.clap]
@@ -96,4 +98,12 @@ optional = true
 
 [dependencies.image]
 version = "0.25"
+optional = true
+
+[dependencies.wasm-bindgen]
+version = "0.2"
+optional = true
+
+[dependencies.js-sys]
+version = "0.3"
 optional = true
