@@ -9,7 +9,7 @@
 //! 6. Compile results
 
 use super::cache::ReferenceCache;
-use super::checks::{check_structure, CheckConfig};
+use super::checks::{calculate_similarity, check_structure, CheckConfig};
 use super::samples::{OwnedSample, Sample};
 use super::{
     DiagramResult, Dimensions, EvalResult, Issue, Level, ParseResult, RenderResult, Status,
@@ -93,6 +93,11 @@ impl EvalRunner {
         self.svg_pairs.borrow_mut().drain(..).collect()
     }
 
+    /// Get a reference to the cache
+    pub fn cache(&self) -> &ReferenceCache {
+        &self.cache
+    }
+
     /// Evaluate a list of diagrams
     pub fn evaluate(&self, inputs: &[DiagramInput]) -> EvalResult {
         let mut result = EvalResult::new();
@@ -155,6 +160,7 @@ impl EvalRunner {
             diagram_text: Some(input.text.clone()),
             status: Status::Match,
             visual_similarity: None,
+            structural_similarity: None,
             structural_match: true,
             issues: Vec::new(),
             parse_result: ParseResult {
@@ -250,6 +256,9 @@ impl EvalRunner {
 
         // Step 5: Structural comparison
         if let (Some(selkie_struct), Some(ref_struct)) = (&selkie_structure, &reference_structure) {
+            // Calculate structural similarity score
+            result.structural_similarity = Some(calculate_similarity(selkie_struct, ref_struct));
+
             let check_issues =
                 check_structure(selkie_struct, ref_struct, &self.config.check_config);
             result.structural_match = !check_issues.iter().any(|i| i.level == Level::Error);

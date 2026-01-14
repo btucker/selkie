@@ -10,17 +10,22 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
-/// Cache for reference SVG outputs
+/// Cache for reference SVG and PNG outputs
 pub struct ReferenceCache {
-    /// Directory where cache files are stored
+    /// Directory where SVG cache files are stored
     cache_dir: PathBuf,
+    /// Directory where PNG cache files are stored
+    png_cache_dir: PathBuf,
 }
 
 impl ReferenceCache {
     /// Create a new cache with specified directory
     pub fn new(cache_dir: impl AsRef<Path>) -> Self {
+        let cache_path = cache_dir.as_ref().to_path_buf();
+        let png_path = cache_path.parent().unwrap_or(&cache_path).join("pngs");
         Self {
-            cache_dir: cache_dir.as_ref().to_path_buf(),
+            cache_dir: cache_path,
+            png_cache_dir: png_path,
         }
     }
 
@@ -31,14 +36,18 @@ impl ReferenceCache {
     /// - Linux: ~/.cache/selkie/references/
     /// - Windows: %LOCALAPPDATA%/selkie/references/
     ///
+    /// PNG cache: selkie/pngs/
+    ///
     /// Use `selkie eval --cache-info` to see the actual cache location.
     pub fn with_defaults() -> Self {
-        let cache_dir = dirs::cache_dir()
+        let base_dir = dirs::cache_dir()
             .unwrap_or_else(|| PathBuf::from(".cache"))
-            .join("selkie")
-            .join("references");
+            .join("selkie");
 
-        Self::new(cache_dir)
+        Self {
+            cache_dir: base_dir.join("references"),
+            png_cache_dir: base_dir.join("pngs"),
+        }
     }
 
     /// Get the cache directory path
@@ -272,10 +281,49 @@ impl ReferenceCache {
         Ok(svg)
     }
 
-    /// Clear all cached files
+    // ==================== PNG Cache Methods ====================
+
+    /// Get the PNG cache directory path
+    pub fn png_cache_dir(&self) -> &Path {
+        &self.png_cache_dir
+    }
+
+    /// Ensure the PNG cache directory exists
+    fn ensure_png_dir(&self) -> std::io::Result<()> {
+        fs::create_dir_all(&self.png_cache_dir)
+    }
+
+    /// Get the PNG cache path for a diagram
+    fn png_cache_path(&self, diagram: &str) -> PathBuf {
+        let hash = hash_diagram(diagram);
+        self.png_cache_dir.join(format!("{}.png", hash))
+    }
+
+    /// Check if a PNG is cached for this diagram
+    pub fn is_png_cached(&self, diagram: &str) -> bool {
+        self.png_cache_path(diagram).exists()
+    }
+
+    /// Get cached PNG data, or None if not cached
+    pub fn get_png(&self, diagram: &str) -> Option<Vec<u8>> {
+        let path = self.png_cache_path(diagram);
+        fs::read(path).ok()
+    }
+
+    /// Store PNG data in the cache
+    pub fn put_png(&self, diagram: &str, png_data: &[u8]) -> std::io::Result<()> {
+        self.ensure_png_dir()?;
+        let path = self.png_cache_path(diagram);
+        fs::write(path, png_data)
+    }
+
+    /// Clear all cached files (SVG and PNG)
     pub fn clear(&self) -> std::io::Result<()> {
         if self.cache_dir.exists() {
             fs::remove_dir_all(&self.cache_dir)?;
+        }
+        if self.png_cache_dir.exists() {
+            fs::remove_dir_all(&self.png_cache_dir)?;
         }
         Ok(())
     }

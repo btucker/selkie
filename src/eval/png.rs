@@ -132,7 +132,158 @@ pub fn source_to_rgba(source: &str) -> Result<(Vec<u8>, u32, u32), String> {
     results.into_iter().next().unwrap()
 }
 
-/// Render multiple mermaid sources to PNGs in a single mmdc invocation
+/// Render multiple mermaid sources to PNGs in a single mmdc invocation, using cache
+#[cfg(feature = "png")]
+pub fn sources_to_rgba_batch_cached(
+    sources: &[&str],
+    cache: &super::cache::ReferenceCache,
+) -> Vec<Result<RgbaImage, String>> {
+    use image::GenericImageView;
+    use std::process::{Command, Stdio};
+
+    // Check which sources need rendering (not in cache)
+    let uncached: Vec<(usize, &str)> = sources
+        .iter()
+        .enumerate()
+        .filter(|(_, s)| !cache.is_png_cached(s))
+        .map(|(i, s)| (i, *s))
+        .collect();
+
+    // If all cached, load from cache
+    if uncached.is_empty() {
+        return sources
+            .iter()
+            .map(|source| match cache.get_png(source) {
+                Some(png_data) => match image::load_from_memory(&png_data) {
+                    Ok(img) => {
+                        let (width, height) = img.dimensions();
+                        let rgba = img.into_rgba8().into_raw();
+                        Ok((rgba, width, height))
+                    }
+                    Err(e) => Err(format!("Failed to decode cached PNG: {}", e)),
+                },
+                None => Err("Cache miss".to_string()),
+            })
+            .collect();
+    }
+
+    // Create temp directory
+    let temp_dir = match tempfile::tempdir() {
+        Ok(dir) => dir,
+        Err(e) => {
+            return sources
+                .iter()
+                .map(|_| Err(format!("Failed to create temp dir: {}", e)))
+                .collect();
+        }
+    };
+
+    // Create markdown file with only uncached diagrams
+    let md_path = temp_dir.path().join("batch.md");
+    let mut md_content = String::new();
+    for (i, (_, source)) in uncached.iter().enumerate() {
+        md_content.push_str(&format!(
+            "## Diagram {}\n\n```mermaid\n{}\n```\n\n",
+            i, source
+        ));
+    }
+
+    if let Err(e) = fs::write(&md_path, &md_content) {
+        return sources
+            .iter()
+            .map(|_| Err(format!("Failed to write markdown: {}", e)))
+            .collect();
+    }
+
+    // Run mmdc with PNG output
+    let output_md = temp_dir.path().join("output.md");
+    let artefacts_dir = temp_dir.path().join("pngs");
+
+    let output = Command::new("mmdc")
+        .args([
+            "-i",
+            md_path.to_str().unwrap(),
+            "-o",
+            output_md.to_str().unwrap(),
+            "-a",
+            artefacts_dir.to_str().unwrap(),
+            "-e",
+            "png",
+            "-q",
+        ])
+        .stderr(Stdio::piped())
+        .output();
+
+    let output = match output {
+        Ok(o) => o,
+        Err(e) => {
+            return sources
+                .iter()
+                .map(|_| Err(format!("Failed to run mmdc: {}", e)))
+                .collect();
+        }
+    };
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return sources
+            .iter()
+            .map(|_| Err(format!("mmdc failed: {}", stderr)))
+            .collect();
+    }
+
+    // Read and cache rendered PNGs
+    let batch_results: Vec<Result<(Vec<u8>, RgbaImage), String>> = uncached
+        .iter()
+        .enumerate()
+        .map(|(i, (_, source))| {
+            let png_path = artefacts_dir.join(format!("output-{}.png", i + 1));
+            let png_data = fs::read(&png_path).map_err(|e| format!("Failed to read PNG: {}", e))?;
+
+            // Cache the raw PNG data
+            let _ = cache.put_png(source, &png_data);
+
+            // Decode PNG to RGBA
+            let img = image::load_from_memory(&png_data)
+                .map_err(|e| format!("Failed to decode PNG: {}", e))?;
+
+            let (width, height) = img.dimensions();
+            let rgba = img.into_rgba8().into_raw();
+
+            Ok((png_data, (rgba, width, height)))
+        })
+        .collect();
+
+    // Build final results: batch results for uncached, cache for cached
+    let mut batch_iter = batch_results.into_iter();
+    let mut uncached_idx = 0;
+
+    sources
+        .iter()
+        .enumerate()
+        .map(|(i, source)| {
+            if uncached_idx < uncached.len() && uncached[uncached_idx].0 == i {
+                uncached_idx += 1;
+                batch_iter.next().unwrap().map(|(_, rgba)| rgba)
+            } else {
+                // Load from cache
+                match cache.get_png(source) {
+                    Some(png_data) => match image::load_from_memory(&png_data) {
+                        Ok(img) => {
+                            let (width, height) = img.dimensions();
+                            let rgba = img.into_rgba8().into_raw();
+                            Ok((rgba, width, height))
+                        }
+                        Err(e) => Err(format!("Failed to decode cached PNG: {}", e)),
+                    },
+                    None => Err("Cache miss".to_string()),
+                }
+            }
+        })
+        .collect()
+}
+
+/// Render multiple mermaid sources to PNGs in a single mmdc invocation (no cache)
 #[cfg(feature = "png")]
 pub fn sources_to_rgba_batch(sources: &[&str]) -> Vec<Result<RgbaImage, String>> {
     use image::GenericImageView;
@@ -496,6 +647,7 @@ pub fn create_comparison_png(
 pub fn write_comparison_pngs(
     output_dir: &Path,
     comparisons: &[(String, String, String, String, String)], // (name, diagram_type, source_text, selkie_svg, reference_svg)
+    cache: &super::cache::ReferenceCache,
 ) -> Result<super::report::PngManifest, String> {
     use super::report::{PngManifest, PngManifestEntry};
 
@@ -503,13 +655,28 @@ pub fn write_comparison_pngs(
         diagrams: Vec::new(),
     };
 
-    // Batch render all reference PNGs with mmdc (single process invocation)
+    // Batch render all reference PNGs with mmdc (uses cache)
     let source_texts: Vec<&str> = comparisons
         .iter()
         .map(|(_, _, s, _, _)| s.as_str())
         .collect();
-    eprint!(" rendering references...");
-    let reference_rgbas = sources_to_rgba_batch(&source_texts);
+
+    // Count cached vs uncached for progress display
+    let cached_count = source_texts
+        .iter()
+        .filter(|s| cache.is_png_cached(s))
+        .count();
+    if cached_count == source_texts.len() {
+        eprint!(" ({} cached)...", cached_count);
+    } else {
+        eprint!(
+            " rendering {} references ({} cached)...",
+            source_texts.len() - cached_count,
+            cached_count
+        );
+    }
+
+    let reference_rgbas = sources_to_rgba_batch_cached(&source_texts, cache);
 
     // Render all selkie SVGs to RGBA (fast, uses resvg in-process)
     eprint!(" rendering selkie...");
@@ -615,6 +782,7 @@ pub fn create_comparison_png(
 pub fn write_comparison_pngs(
     _output_dir: &Path,
     _comparisons: &[(String, String, String, String, String)], // (name, diagram_type, source_text, selkie_svg, reference_svg)
+    _cache: &super::cache::ReferenceCache,
 ) -> Result<super::report::PngManifest, String> {
     Err("PNG feature not enabled. Build with --features png".to_string())
 }

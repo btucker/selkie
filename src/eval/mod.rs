@@ -42,7 +42,10 @@ pub struct TypeStats {
     pub total: usize,
     pub matching: usize,
     pub parity_percent: f64,
+    /// Average visual similarity (SSIM)
     pub avg_ssim: f64,
+    /// Average structural similarity (0-1 based on node/edge/label match)
+    pub avg_structural: f64,
 }
 
 /// Counts of issues by level
@@ -71,6 +74,8 @@ pub struct DiagramResult {
     pub status: Status,
     /// SSIM visual similarity score (0-1)
     pub visual_similarity: Option<f64>,
+    /// Structural similarity score (0-1)
+    pub structural_similarity: Option<f64>,
     /// Structural match (no errors)
     pub structural_match: bool,
     /// Issues found during evaluation
@@ -301,6 +306,7 @@ impl EvalResult {
                     matching: 0,
                     parity_percent: 0.0,
                     avg_ssim: 0.0,
+                    avg_structural: 0.0,
                 });
             entry.total += 1;
             if diagram.status == Status::Match {
@@ -327,6 +333,19 @@ impl EvalResult {
                 0.0
             } else {
                 type_ssim.iter().sum::<f64>() / type_ssim.len() as f64
+            };
+
+            // Compute per-type average structural similarity
+            let type_structural: Vec<f64> = self
+                .diagrams
+                .iter()
+                .filter(|d| &d.diagram_type == dtype)
+                .filter_map(|d| d.structural_similarity)
+                .collect();
+            stats.avg_structural = if type_structural.is_empty() {
+                0.0
+            } else {
+                type_structural.iter().sum::<f64>() / type_structural.len() as f64
             };
         }
     }

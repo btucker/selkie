@@ -36,20 +36,29 @@ pub fn text_summary(result: &EvalResult) -> String {
     // By diagram type
     if !result.by_type.is_empty() {
         output.push_str("By Diagram Type:\n");
+        output.push_str(&format!(
+            "  {:<12} {:>12} {:>12}\n",
+            "Type", "Structural", "Visual"
+        ));
+        output.push_str(&format!("  {}\n", "-".repeat(38)));
 
         let mut types: Vec<(&String, &TypeStats)> = result.by_type.iter().collect();
         types.sort_by_key(|(name, _)| name.as_str());
 
         for (dtype, stats) in types {
-            let bar = progress_bar(stats.parity_percent, 20);
-            let ssim_str = if stats.avg_ssim > 0.0 {
-                format!("  SSIM: {:.2}", stats.avg_ssim)
+            let structural_str = if stats.avg_structural > 0.0 {
+                format!("{:>11.0}%", stats.avg_structural * 100.0)
             } else {
-                String::new()
+                "         -".to_string()
+            };
+            let visual_str = if stats.avg_ssim > 0.0 {
+                format!("{:>11.0}%", stats.avg_ssim * 100.0)
+            } else {
+                "         -".to_string()
             };
             output.push_str(&format!(
-                "  {:<12} {}  {:.0}% ({}/{}){}\n",
-                dtype, bar, stats.parity_percent, stats.matching, stats.total, ssim_str
+                "  {:<12} {} {}\n",
+                dtype, structural_str, visual_str
             ));
         }
 
@@ -78,13 +87,6 @@ pub fn text_summary(result: &EvalResult) -> String {
     }
 
     output
-}
-
-/// Generate a progress bar string
-fn progress_bar(percent: f64, width: usize) -> String {
-    let filled = ((percent / 100.0) * width as f64).round() as usize;
-    let empty = width.saturating_sub(filled);
-    format!("{}{}", "█".repeat(filled), "░".repeat(empty))
 }
 
 /// Generate a detailed text report with issues
@@ -496,6 +498,7 @@ mod tests {
                         matching: 4,
                         parity_percent: 80.0,
                         avg_ssim: 0.93,
+                        avg_structural: 0.85,
                     },
                 ),
                 (
@@ -505,6 +508,7 @@ mod tests {
                         matching: 4,
                         parity_percent: 80.0,
                         avg_ssim: 0.91,
+                        avg_structural: 0.90,
                     },
                 ),
             ]),
@@ -525,13 +529,6 @@ mod tests {
         assert!(summary.contains("80.0%"));
         assert!(summary.contains("8/10"));
         assert!(summary.contains("flowchart"));
-    }
-
-    #[test]
-    fn test_progress_bar() {
-        assert_eq!(progress_bar(100.0, 10), "██████████");
-        assert_eq!(progress_bar(50.0, 10), "█████░░░░░");
-        assert_eq!(progress_bar(0.0, 10), "░░░░░░░░░░");
     }
 
     #[test]

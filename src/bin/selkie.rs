@@ -594,7 +594,7 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             "Generating comparison PNGs ({} diagrams)...",
             svg_pairs.len()
         );
-        match eval::png::write_comparison_pngs(&output_dir, &svg_pairs) {
+        match eval::png::write_comparison_pngs(&output_dir, &svg_pairs, runner.cache()) {
             Ok(_) => {
                 eprintln!(" done");
             }
