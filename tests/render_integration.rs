@@ -2469,3 +2469,91 @@ fn test_state_diagram_uses_curved_edges() {
         svg
     );
 }
+
+// ============================================================================
+// Layout Dimension Tests
+// ============================================================================
+
+#[test]
+#[ignore] // TODO: Fix horizontal coordinate assignment for parallel subgraphs (mermaid-rs-dod)
+fn test_flowchart_complex_layout_width() {
+    let input = std::fs::read_to_string("docs/sources/flowchart_complex.mmd")
+        .expect("Failed to read flowchart_complex.mmd");
+
+    let diagram = parse(&input).expect("Failed to parse");
+    let svg = render(&diagram).expect("Failed to render");
+
+    // Extract width from SVG viewBox or width attribute
+    let width_pattern = regex::Regex::new(r#"width="(\d+(?:\.\d+)?)""#).unwrap();
+    let width: f64 = width_pattern
+        .captures(&svg)
+        .and_then(|cap| cap.get(1))
+        .and_then(|m| m.as_str().parse().ok())
+        .expect("Could not extract width from SVG");
+
+    // Reference width is 1274px
+    // Accept within 15% tolerance (1083px minimum)
+    assert!(
+        width >= 1083.0,
+        "Flowchart width {} is too narrow (reference: 1274px, minimum: 1083px)",
+        width
+    );
+}
+
+#[test]
+fn test_flowchart_complex_emailworker_position() {
+    // Reproduces issue mermaid-rs-p2p: EmailWorker incorrectly placed inside Microservices
+    let input = std::fs::read_to_string("docs/sources/flowchart_complex.mmd")
+        .expect("Failed to read flowchart_complex.mmd");
+
+    let diagram = parse(&input).expect("Failed to parse");
+    let svg = render(&diagram).expect("Failed to render");
+
+    // Extract Queue node y position (should be in Data Layer, high y value)
+    let queue_pattern =
+        regex::Regex::new(r#"id="node-Queue"[^>]*>\s*<path[^>]*d="M [^ ]+ ([0-9.]+)"#).unwrap();
+    let queue_y: f64 = queue_pattern
+        .captures(&svg)
+        .and_then(|cap| cap.get(1))
+        .and_then(|m| m.as_str().parse().ok())
+        .expect("Could not extract Queue y position");
+
+    // Extract EmailWorker node y position
+    let email_pattern =
+        regex::Regex::new(r#"id="node-EmailWorker"[^>]*>\s*<rect[^>]*y="([0-9.]+)"#).unwrap();
+    let email_y: f64 = email_pattern
+        .captures(&svg)
+        .and_then(|cap| cap.get(1))
+        .and_then(|m| m.as_str().parse().ok())
+        .expect("Could not extract EmailWorker y position");
+
+    // Extract PaymentSvc node y position (inside Microservices)
+    let payment_pattern =
+        regex::Regex::new(r#"id="node-PaymentSvc"[^>]*>\s*<rect[^>]*y="([0-9.]+)"#).unwrap();
+    let payment_y: f64 = payment_pattern
+        .captures(&svg)
+        .and_then(|cap| cap.get(1))
+        .and_then(|m| m.as_str().parse().ok())
+        .expect("Could not extract PaymentSvc y position");
+
+    eprintln!("Node positions in flowchart_complex:");
+    eprintln!("  Queue: y={}", queue_y);
+    eprintln!("  EmailWorker: y={}", email_y);
+    eprintln!("  PaymentSvc: y={}", payment_y);
+
+    // Queue -> EmailWorker edge means EmailWorker should be BELOW Queue (higher y)
+    assert!(
+        queue_y < email_y,
+        "Queue should be above EmailWorker: Queue.y={}, EmailWorker.y={}",
+        queue_y,
+        email_y
+    );
+
+    // EmailWorker should be below PaymentSvc (it's target of Queue, which is target of NotifySvc)
+    assert!(
+        payment_y < email_y,
+        "PaymentSvc should be above EmailWorker: PaymentSvc.y={}, EmailWorker.y={}",
+        payment_y,
+        email_y
+    );
+}

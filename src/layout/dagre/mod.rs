@@ -127,6 +127,10 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     // Phase 5: Inject edge label proxies (create dummy nodes for labels)
     edge_labels::inject_edge_label_proxies(graph);
 
+    // Phase 5.5: Remove empty ranks created by nesting graph minlen multiplier
+    // This collapses sparse ranks except at border positions
+    util::remove_empty_ranks(graph);
+
     // Phase 6: Clean up nesting graph (remove nesting root and edges)
     // This keeps rank assignments but removes temporary nesting structure
     if is_compound {
@@ -989,6 +993,210 @@ mod tests {
             "D should be above F: D.y={:?}, F.y={:?}",
             d.y,
             f.y
+        );
+    }
+
+    #[test]
+    fn test_edge_from_subgraph_to_external_node() {
+        // Test case: Node inside subgraph (Queue) connects to external node (EmailWorker)
+        // EmailWorker should be BELOW Queue (higher y in TB layout)
+        let mut g = DagreGraph::new();
+        g.graph_mut().rankdir = "TB".to_string();
+
+        // Create a subgraph "Data" with a node "Queue" inside
+        g.set_node(
+            "Data",
+            graph::NodeLabel {
+                width: 200.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "Queue",
+            graph::NodeLabel {
+                width: 100.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
+        g.set_parent("Queue", "Data");
+
+        // Create external node EmailWorker (not in any subgraph)
+        g.set_node(
+            "EmailWorker",
+            graph::NodeLabel {
+                width: 100.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
+
+        // Edge from Queue to EmailWorker
+        g.set_edge("Queue", "EmailWorker", graph::EdgeLabel::default());
+
+        layout(
+            &mut g,
+            &DagreConfig {
+                ranksep: 50.0,
+                nodesep: 50.0,
+                ..Default::default()
+            },
+        );
+
+        let queue = g.node("Queue").unwrap();
+        let email_worker = g.node("EmailWorker").unwrap();
+
+        eprintln!("Compound graph with external node:");
+        eprintln!("  Queue: rank={:?}, y={:?}", queue.rank, queue.y);
+        eprintln!(
+            "  EmailWorker: rank={:?}, y={:?}",
+            email_worker.rank, email_worker.y
+        );
+
+        // Queue -> EmailWorker means EmailWorker should have higher rank (be below Queue)
+        assert!(
+            queue.rank.unwrap() < email_worker.rank.unwrap(),
+            "Queue should have lower rank than EmailWorker: Queue.rank={:?}, EmailWorker.rank={:?}",
+            queue.rank,
+            email_worker.rank
+        );
+
+        // In TB layout, higher rank = higher y value (lower on screen)
+        assert!(
+            queue.y.unwrap() < email_worker.y.unwrap(),
+            "Queue should be above EmailWorker (lower y): Queue.y={:?}, EmailWorker.y={:?}",
+            queue.y,
+            email_worker.y
+        );
+    }
+
+    #[test]
+    fn test_flowchart_complex_structure() {
+        // Test case mimicking flowchart_complex.mmd:
+        // - Services subgraph with PaymentSvc, NotifySvc, OrderSvc, UserSvc
+        // - Data subgraph with Queue, DB, Search
+        // - External nodes EmailWorker, SMSWorker connected from Queue
+        let mut g = DagreGraph::new();
+        g.graph_mut().rankdir = "TB".to_string();
+
+        // Services subgraph
+        g.set_node(
+            "Services",
+            graph::NodeLabel {
+                width: 300.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
+        for node in ["PaymentSvc", "NotifySvc", "OrderSvc", "UserSvc"] {
+            g.set_node(
+                node,
+                graph::NodeLabel {
+                    width: 100.0,
+                    height: 50.0,
+                    ..Default::default()
+                },
+            );
+            g.set_parent(node, "Services");
+        }
+
+        // Data subgraph
+        g.set_node(
+            "Data",
+            graph::NodeLabel {
+                width: 300.0,
+                height: 100.0,
+                ..Default::default()
+            },
+        );
+        for node in ["Queue", "DB", "Search"] {
+            g.set_node(
+                node,
+                graph::NodeLabel {
+                    width: 100.0,
+                    height: 50.0,
+                    ..Default::default()
+                },
+            );
+            g.set_parent(node, "Data");
+        }
+
+        // External nodes (not in any subgraph)
+        for node in ["EmailWorker", "SMSWorker"] {
+            g.set_node(
+                node,
+                graph::NodeLabel {
+                    width: 100.0,
+                    height: 50.0,
+                    ..Default::default()
+                },
+            );
+        }
+
+        // Edges from Services to Data
+        g.set_edge("UserSvc", "DB", graph::EdgeLabel::default());
+        g.set_edge("UserSvc", "Search", graph::EdgeLabel::default());
+        g.set_edge("OrderSvc", "DB", graph::EdgeLabel::default());
+        g.set_edge("OrderSvc", "Queue", graph::EdgeLabel::default());
+        g.set_edge("PaymentSvc", "DB", graph::EdgeLabel::default());
+        g.set_edge("PaymentSvc", "NotifySvc", graph::EdgeLabel::default());
+        g.set_edge("NotifySvc", "Queue", graph::EdgeLabel::default());
+
+        // Edges from Data to external nodes
+        g.set_edge("Queue", "EmailWorker", graph::EdgeLabel::default());
+        g.set_edge("Queue", "SMSWorker", graph::EdgeLabel::default());
+
+        layout(
+            &mut g,
+            &DagreConfig {
+                ranksep: 50.0,
+                nodesep: 50.0,
+                ..Default::default()
+            },
+        );
+
+        let queue = g.node("Queue").unwrap();
+        let email_worker = g.node("EmailWorker").unwrap();
+        let sms_worker = g.node("SMSWorker").unwrap();
+        let payment_svc = g.node("PaymentSvc").unwrap();
+
+        eprintln!("Complex flowchart structure:");
+        eprintln!(
+            "  PaymentSvc: rank={:?}, y={:?}",
+            payment_svc.rank, payment_svc.y
+        );
+        eprintln!("  Queue: rank={:?}, y={:?}", queue.rank, queue.y);
+        eprintln!(
+            "  EmailWorker: rank={:?}, y={:?}",
+            email_worker.rank, email_worker.y
+        );
+        eprintln!(
+            "  SMSWorker: rank={:?}, y={:?}",
+            sms_worker.rank, sms_worker.y
+        );
+
+        // Queue should be ABOVE EmailWorker and SMSWorker (Queue -> them)
+        assert!(
+            queue.y.unwrap() < email_worker.y.unwrap(),
+            "Queue should be above EmailWorker: Queue.y={:?}, EmailWorker.y={:?}",
+            queue.y,
+            email_worker.y
+        );
+        assert!(
+            queue.y.unwrap() < sms_worker.y.unwrap(),
+            "Queue should be above SMSWorker: Queue.y={:?}, SMSWorker.y={:?}",
+            queue.y,
+            sms_worker.y
+        );
+
+        // EmailWorker and SMSWorker should NOT be above PaymentSvc
+        // (they're targets of Queue, PaymentSvc feeds into NotifySvc which feeds into Queue)
+        assert!(
+            payment_svc.y.unwrap() < email_worker.y.unwrap(),
+            "PaymentSvc should be above EmailWorker: PaymentSvc.y={:?}, EmailWorker.y={:?}",
+            payment_svc.y,
+            email_worker.y
         );
     }
 }

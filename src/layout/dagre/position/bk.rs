@@ -6,7 +6,10 @@
 //! balances them by taking the median of the four x-coordinates for each node.
 
 use crate::layout::dagre::graph::DagreGraph;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+
+/// Type alias for block graph structure: (block roots, block edges with separations)
+type BlockGraph = (HashSet<String>, HashMap<String, Vec<(String, f64)>>);
 
 /// Assign x coordinates to all nodes using Brandes-Köpf algorithm
 pub fn position_x(g: &DagreGraph) -> HashMap<String, f64> {
@@ -179,6 +182,7 @@ fn vertical_alignment(
 }
 
 /// Horizontal compaction: assign x coordinates based on blocks
+/// This follows the dagre.js reference implementation with proper border node handling
 fn horizontal_compaction(
     g: &DagreGraph,
     layers: &[Vec<String>],
@@ -186,103 +190,232 @@ fn horizontal_compaction(
     _align: &HashMap<String, String>,
     nodesep: f64,
     edgesep: f64,
-    _reverse_sep: bool,
+    reverse_sep: bool,
 ) -> HashMap<String, f64> {
+    // Build block graph: nodes are block roots, edges are separation constraints
+    let (block_graph, block_edges) =
+        build_block_graph(g, layers, root, nodesep, edgesep, reverse_sep);
+
+    // Determine which border type to skip in pass2
+    let skip_border_type = if reverse_sep {
+        "borderLeft"
+    } else {
+        "borderRight"
+    };
+
     let mut xs: HashMap<String, f64> = HashMap::new();
 
-    // First pass: assign initial x coordinates based on position in layer
-    for layer in layers {
-        let mut x = 0.0;
-        for v in layer {
-            let width = g.node(v).map(|n| n.width).unwrap_or(0.0);
-            let sep = if g.node(v).map(|n| n.dummy.is_some()).unwrap_or(false) {
-                edgesep
-            } else {
-                nodesep
-            };
-
-            // Get the root of this node's block
-            let r = root.get(v).cloned().unwrap_or_else(|| v.clone());
-
-            // If root hasn't been positioned yet, position it
-            if !xs.contains_key(&r) {
-                xs.insert(r.clone(), x + width / 2.0);
+    // Pass 1: Assign smallest coordinates using iterative topological sort
+    // Process nodes in order such that all predecessors are processed first
+    let mut in_degree: HashMap<String, usize> = HashMap::new();
+    for v in &block_graph {
+        in_degree.insert(v.clone(), 0);
+    }
+    for preds in block_edges.values() {
+        for (pred, _) in preds {
+            if block_graph.contains(pred) {
+                *in_degree.entry(pred.clone()).or_insert(0) += 0; // ensure exists
             }
-
-            // Assign this node the same x as its root
-            xs.insert(v.clone(), *xs.get(&r).unwrap());
-
-            x = xs.get(v).copied().unwrap_or(0.0) + width / 2.0 + sep;
+        }
+    }
+    for (target, preds) in &block_edges {
+        if block_graph.contains(target) {
+            *in_degree.entry(target.clone()).or_insert(0) = preds.len();
         }
     }
 
-    // Second pass: propagate x coordinates from roots to aligned nodes
-    for (v, r) in root {
-        if let Some(&rx) = xs.get(r) {
-            xs.insert(v.clone(), rx);
-        }
-    }
-
-    // Third pass: resolve overlaps within each layer
-    for layer in layers {
-        resolve_overlaps_ordered(g, layer, &mut xs, nodesep, edgesep);
-    }
-
-    xs
-}
-
-/// Resolve overlaps in a layer while maintaining order
-fn resolve_overlaps_ordered(
-    g: &DagreGraph,
-    layer: &[String],
-    xs: &mut HashMap<String, f64>,
-    nodesep: f64,
-    edgesep: f64,
-) {
-    if layer.len() < 2 {
-        return;
-    }
-
-    // Get current positions and widths
-    let mut positions: Vec<(String, f64, f64)> = layer
+    // Start with nodes that have no predecessors
+    let mut queue: Vec<String> = in_degree
         .iter()
-        .filter_map(|v| {
-            let x = xs.get(v)?;
-            let width = g.node(v).map(|n| n.width).unwrap_or(0.0);
-            Some((v.clone(), *x, width))
-        })
+        .filter(|(_, &d)| d == 0)
+        .map(|(v, _)| v.clone())
         .collect();
 
-    // Sort by x position
-    positions.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
-
-    // Resolve overlaps left to right
-    for i in 1..positions.len() {
-        let prev_x = positions[i - 1].1;
-        let prev_width = positions[i - 1].2;
-        let curr_width = positions[i].2;
-
-        let prev_is_dummy = g
-            .node(&positions[i - 1].0)
-            .map(|n| n.dummy.is_some())
-            .unwrap_or(false);
-        let curr_is_dummy = g
-            .node(&positions[i].0)
-            .map(|n| n.dummy.is_some())
-            .unwrap_or(false);
-
-        let sep = if prev_is_dummy || curr_is_dummy {
-            edgesep
-        } else {
-            nodesep
-        };
-        let min_x = prev_x + prev_width / 2.0 + sep + curr_width / 2.0;
-
-        if positions[i].1 < min_x {
-            positions[i].1 = min_x;
-            xs.insert(positions[i].0.clone(), min_x);
+    // Build successor map
+    let mut successors: HashMap<String, Vec<(String, f64)>> = HashMap::new();
+    for (target, preds) in &block_edges {
+        for (source, sep) in preds {
+            successors
+                .entry(source.clone())
+                .or_default()
+                .push((target.clone(), *sep));
         }
     }
+
+    while let Some(v) = queue.pop() {
+        // Calculate x from predecessors
+        let x = if let Some(preds) = block_edges.get(&v) {
+            preds
+                .iter()
+                .filter_map(|(pred, sep)| xs.get(pred).map(|&px| px + sep))
+                .fold(0.0_f64, f64::max)
+        } else {
+            0.0
+        };
+        xs.insert(v.clone(), x);
+
+        // Decrement in-degree of successors
+        if let Some(succs) = successors.get(&v) {
+            for (succ, _) in succs {
+                if let Some(d) = in_degree.get_mut(succ) {
+                    *d = d.saturating_sub(1);
+                    if *d == 0 {
+                        queue.push(succ.clone());
+                    }
+                }
+            }
+        }
+    }
+
+    // Pass 2: Pull nodes toward maximum (iterative reverse topological order)
+    // Build reverse adjacency (out-degree based)
+    let mut out_degree: HashMap<String, usize> = HashMap::new();
+    for v in &block_graph {
+        out_degree.insert(v.clone(), successors.get(v).map(|s| s.len()).unwrap_or(0));
+    }
+
+    // Start with nodes that have no successors
+    let mut queue2: Vec<String> = out_degree
+        .iter()
+        .filter(|(_, &d)| d == 0)
+        .map(|(v, _)| v.clone())
+        .collect();
+
+    let mut processed2: HashSet<String> = HashSet::new();
+
+    while let Some(v) = queue2.pop() {
+        if processed2.contains(&v) {
+            continue;
+        }
+        processed2.insert(v.clone());
+
+        // Calculate min x from successors
+        let min_x = if let Some(succs) = successors.get(&v) {
+            succs
+                .iter()
+                .filter_map(|(succ, sep)| xs.get(succ).map(|&sx| sx - sep))
+                .fold(f64::INFINITY, f64::min)
+        } else {
+            f64::INFINITY
+        };
+
+        // Pull toward max, but NOT for border nodes of the skip type
+        let border_type = g.node(&v).and_then(|n| n.border_type.as_deref());
+        if min_x != f64::INFINITY && border_type != Some(skip_border_type) {
+            if let Some(curr_x) = xs.get_mut(&v) {
+                *curr_x = curr_x.max(min_x);
+            }
+        }
+
+        // Add predecessors to queue
+        if let Some(preds) = block_edges.get(&v) {
+            for (pred, _) in preds {
+                if !processed2.contains(pred) {
+                    queue2.push(pred.clone());
+                }
+            }
+        }
+    }
+
+    // Assign x coordinates to all nodes from their roots
+    // Use `root` map (not `align`) to get each node's block root
+    let mut result: HashMap<String, f64> = HashMap::new();
+    for (v, r) in root {
+        if let Some(&rx) = xs.get(r) {
+            result.insert(v.clone(), rx);
+        }
+    }
+
+    result
+}
+
+/// Build block graph for horizontal compaction
+/// Returns (set of block root nodes, map of node -> list of (predecessor, separation))
+fn build_block_graph(
+    g: &DagreGraph,
+    layers: &[Vec<String>],
+    root: &HashMap<String, String>,
+    nodesep: f64,
+    edgesep: f64,
+    reverse_sep: bool,
+) -> BlockGraph {
+    let mut block_nodes: HashSet<String> = HashSet::new();
+    let mut block_edges: HashMap<String, Vec<(String, f64)>> = HashMap::new();
+
+    for layer in layers {
+        let mut prev: Option<&String> = None;
+
+        for v in layer {
+            let v_root = root.get(v).unwrap_or(v);
+            block_nodes.insert(v_root.clone());
+
+            if let Some(u) = prev {
+                let u_root = root.get(u).unwrap_or(u);
+
+                // Calculate separation between u and v
+                let sep = calculate_sep(g, v, u, nodesep, edgesep, reverse_sep);
+
+                // Add edge from u_root to v_root with separation
+                let prev_sep = block_edges
+                    .get(v_root)
+                    .and_then(|edges| edges.iter().find(|(p, _)| p == u_root))
+                    .map(|(_, s)| *s)
+                    .unwrap_or(0.0);
+
+                // Keep maximum separation
+                if sep > prev_sep {
+                    block_edges
+                        .entry(v_root.clone())
+                        .or_default()
+                        .retain(|(p, _)| p != u_root);
+                    block_edges
+                        .entry(v_root.clone())
+                        .or_default()
+                        .push((u_root.clone(), sep));
+                }
+            }
+
+            prev = Some(v);
+        }
+    }
+
+    (block_nodes, block_edges)
+}
+
+/// Calculate separation between two adjacent nodes in a layer
+/// This matches the dagre.js sep() function
+fn calculate_sep(
+    g: &DagreGraph,
+    v: &str,
+    w: &str,
+    nodesep: f64,
+    edgesep: f64,
+    _reverse_sep: bool,
+) -> f64 {
+    let v_node = g.node(v);
+    let w_node = g.node(w);
+
+    let v_width = v_node.map(|n| n.width).unwrap_or(0.0);
+    let w_width = w_node.map(|n| n.width).unwrap_or(0.0);
+    let v_is_dummy = v_node.map(|n| n.dummy.is_some()).unwrap_or(false);
+    let w_is_dummy = w_node.map(|n| n.dummy.is_some()).unwrap_or(false);
+
+    let mut sum = 0.0;
+
+    // Add half of v's width
+    sum += v_width / 2.0;
+
+    // Handle labelpos adjustments (simplified - dagre has more complex logic)
+    // For now, skip labelpos handling as it's edge-label specific
+
+    // Add separation based on whether nodes are dummies
+    sum += if v_is_dummy { edgesep } else { nodesep } / 2.0;
+    sum += if w_is_dummy { edgesep } else { nodesep } / 2.0;
+
+    // Add half of w's width
+    sum += w_width / 2.0;
+
+    sum
 }
 
 /// Balance the four alignments by taking the median x for each node

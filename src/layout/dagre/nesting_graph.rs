@@ -34,8 +34,14 @@ pub fn run(g: &mut DagreGraph) {
     // Calculate tree depths
     let depths = tree_depths(g);
 
-    // Calculate height (maximum depth)
-    let height = depths.values().copied().max().unwrap_or(0);
+    // Calculate height (maximum depth minus 1, matching dagre.js)
+    // For flat subgraphs at depth 1, height = 0
+    let height = depths
+        .values()
+        .copied()
+        .max()
+        .unwrap_or(1)
+        .saturating_sub(1);
 
     // nodeSep = 2 * height + 1, ensures space for border nodes
     let node_sep = if height > 0 { 2 * height + 1 } else { 1 };

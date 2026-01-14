@@ -20,25 +20,178 @@ pub use types::{
 use crate::error::Result;
 use dagre::graph::{DagreGraph, EdgeLabel, NodeLabel};
 use dagre::{DagreConfig, RankDir, Ranker};
+use std::collections::HashMap;
+
+/// Stored layout result for a subgraph that was laid out with its own direction
+#[derive(Debug, Clone)]
+struct SubgraphLayoutResult {
+    /// Relative positions of child nodes (relative to subgraph origin)
+    child_positions: HashMap<String, (f64, f64)>, // (x, y) relative to subgraph top-left
+    /// Computed width of the subgraph content
+    width: f64,
+    /// Computed height of the subgraph content
+    height: f64,
+}
 
 /// Perform layout on a graph using dagre algorithm
 pub fn layout(mut graph: LayoutGraph) -> Result<LayoutGraph> {
-    // Convert LayoutGraph to DagreGraph
+    // Phase 1: Identify subgraphs with their own directions and lay them out first
+    let subgraph_layouts = layout_subgraphs_with_directions(&graph)?;
+
+    // Phase 2: Update subgraph node dimensions based on their internal layouts
+    for (subgraph_id, layout_result) in &subgraph_layouts {
+        if let Some(node) = graph.get_node_mut(subgraph_id) {
+            // Set subgraph dimensions from internal layout + padding for the cluster
+            let padding = 20.0; // Padding around subgraph content
+            node.width = layout_result.width + padding * 2.0;
+            node.height = layout_result.height + padding * 2.0;
+        }
+    }
+
+    // Phase 3: Run main layout on the parent graph
     let mut dagre_graph = to_dagre_graph(&graph);
-
-    // Configure dagre based on LayoutOptions
     let config = to_dagre_config(&graph.options);
-
-    // Run dagre layout
     dagre::layout(&mut dagre_graph, &config);
 
-    // Copy results back to LayoutGraph
+    // Phase 4: Copy results back to LayoutGraph
     apply_dagre_results(&mut graph, &dagre_graph);
+
+    // Phase 5: Apply pre-computed child positions for subgraphs with custom directions
+    apply_subgraph_child_positions(&mut graph, &subgraph_layouts);
 
     // Compute graph bounds
     graph.compute_bounds();
 
     Ok(graph)
+}
+
+/// Parse direction from string
+fn parse_direction(dir: &str) -> LayoutDirection {
+    match dir.to_uppercase().as_str() {
+        "LR" => LayoutDirection::LeftToRight,
+        "RL" => LayoutDirection::RightToLeft,
+        "BT" => LayoutDirection::BottomToTop,
+        _ => LayoutDirection::TopToBottom, // Default TB
+    }
+}
+
+/// Identify and layout subgraphs that have their own direction
+fn layout_subgraphs_with_directions(
+    graph: &LayoutGraph,
+) -> Result<HashMap<String, SubgraphLayoutResult>> {
+    let mut results = HashMap::new();
+
+    // Find subgraphs with custom directions
+    for node in &graph.nodes {
+        if node.metadata.get("is_group") == Some(&"true".to_string()) {
+            if let Some(dir_str) = node.metadata.get("dir") {
+                let subgraph_dir = parse_direction(dir_str);
+
+                // Only process if direction differs from parent
+                if subgraph_dir != graph.options.direction {
+                    // Find all child nodes belonging to this subgraph
+                    let child_ids: Vec<&str> = graph
+                        .nodes
+                        .iter()
+                        .filter(|n| n.parent_id.as_deref() == Some(&node.id))
+                        .map(|n| n.id.as_str())
+                        .collect();
+
+                    if child_ids.is_empty() {
+                        continue;
+                    }
+
+                    // Create a sub-graph with just these nodes
+                    let mut sub_graph = LayoutGraph::new(format!("{}_internal", node.id));
+                    sub_graph.options.direction = subgraph_dir;
+                    sub_graph.options.node_spacing = graph.options.node_spacing;
+                    sub_graph.options.layer_spacing = graph.options.layer_spacing;
+
+                    // Add child nodes (without parent relationship for internal layout)
+                    for child_id in &child_ids {
+                        if let Some(child_node) = graph.get_node(child_id) {
+                            let mut cloned = child_node.clone();
+                            cloned.parent_id = None; // Remove parent for internal layout
+                            sub_graph.add_node(cloned);
+                        }
+                    }
+
+                    // Add edges between children
+                    for edge in &graph.edges {
+                        if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
+                            if child_ids.contains(&source) && child_ids.contains(&target) {
+                                sub_graph.add_edge(edge.clone());
+                            }
+                        }
+                    }
+
+                    // Layout the sub-graph
+                    let mut dagre_graph = to_dagre_graph(&sub_graph);
+                    let config = to_dagre_config(&sub_graph.options);
+                    dagre::layout(&mut dagre_graph, &config);
+                    apply_dagre_results(&mut sub_graph, &dagre_graph);
+                    sub_graph.compute_bounds();
+
+                    // Store relative positions
+                    let mut child_positions = HashMap::new();
+                    let min_x = sub_graph
+                        .nodes
+                        .iter()
+                        .filter_map(|n| n.x)
+                        .fold(f64::MAX, f64::min);
+                    let min_y = sub_graph
+                        .nodes
+                        .iter()
+                        .filter_map(|n| n.y)
+                        .fold(f64::MAX, f64::min);
+
+                    for child in &sub_graph.nodes {
+                        if let (Some(x), Some(y)) = (child.x, child.y) {
+                            // Store position relative to subgraph origin
+                            child_positions.insert(child.id.clone(), (x - min_x, y - min_y));
+                        }
+                    }
+
+                    results.insert(
+                        node.id.clone(),
+                        SubgraphLayoutResult {
+                            child_positions,
+                            width: sub_graph.width.unwrap_or(0.0),
+                            height: sub_graph.height.unwrap_or(0.0),
+                        },
+                    );
+                }
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+/// Apply pre-computed child positions for subgraphs with custom directions
+fn apply_subgraph_child_positions(
+    graph: &mut LayoutGraph,
+    subgraph_layouts: &HashMap<String, SubgraphLayoutResult>,
+) {
+    for (subgraph_id, layout_result) in subgraph_layouts {
+        // Get the subgraph's final position
+        if let Some(subgraph_node) = graph.get_node(subgraph_id).cloned() {
+            if let (Some(sg_x), Some(sg_y)) = (subgraph_node.x, subgraph_node.y) {
+                // Calculate padding offset (center the content in the subgraph)
+                let padding = 20.0;
+                let content_offset_x = padding;
+                let content_offset_y = padding;
+
+                // Apply relative positions to children
+                for (child_id, (rel_x, rel_y)) in &layout_result.child_positions {
+                    if let Some(child) = graph.get_node_mut(child_id) {
+                        child.x = Some(sg_x + content_offset_x + rel_x);
+                        child.y = Some(sg_y + content_offset_y + rel_y);
+                    }
+                }
+            }
+        }
+    }
 }
 
 /// Convert LayoutGraph to DagreGraph for dagre processing
@@ -95,7 +248,10 @@ fn add_nodes_recursive(dg: &mut DagreGraph, nodes: &[LayoutNode], parent: Option
         dg.set_node(&node.id, label);
 
         // Set parent relationship for compound graphs
-        if let Some(parent_id) = parent {
+        // Priority: explicit parent_id field, then parent parameter (from nested children)
+        if let Some(ref parent_id) = node.parent_id {
+            dg.set_parent(&node.id, parent_id);
+        } else if let Some(parent_id) = parent {
             dg.set_parent(&node.id, parent_id);
         }
 
@@ -172,6 +328,15 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
 fn apply_results_recursive(nodes: &mut [LayoutNode], dg: &DagreGraph) {
     for node in nodes {
         if let Some(dagre_node) = dg.node(&node.id) {
+            // For compound nodes (subgraphs), dagre calculates width/height from border positions
+            // Copy these calculated dimensions back to the LayoutNode
+            if dagre_node.width > 0.0 && node.width == 0.0 {
+                node.width = dagre_node.width;
+            }
+            if dagre_node.height > 0.0 && node.height == 0.0 {
+                node.height = dagre_node.height;
+            }
+
             // Dagre returns center coordinates, convert to top-left
             if let (Some(cx), Some(cy)) = (dagre_node.x, dagre_node.y) {
                 node.x = Some(cx - node.width / 2.0);
@@ -197,6 +362,73 @@ fn apply_results_recursive(nodes: &mut [LayoutNode], dg: &DagreGraph) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_subgraph_with_different_direction() {
+        // Test that a subgraph with its own direction lays out nodes differently
+        // Main graph is TB (top-to-bottom), subgraph is LR (left-to-right)
+        //
+        // In TB layout: nodes stack vertically (y increases)
+        // In LR layout: nodes stack horizontally (x increases)
+        //
+        // So nodes inside the LR subgraph should be side-by-side (same y, different x)
+        // while the subgraph itself is positioned vertically relative to other top-level nodes
+
+        let mut graph = LayoutGraph::new("test_subgraph_dir");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        // Add a subgraph node with LR direction
+        let mut subgraph = LayoutNode::new("sub1", 0.0, 0.0);
+        subgraph
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        subgraph
+            .metadata
+            .insert("dir".to_string(), "LR".to_string());
+        graph.add_node(subgraph);
+
+        // Add child nodes belonging to the subgraph
+        graph.add_node(LayoutNode::new("A", 50.0, 30.0).with_parent("sub1"));
+        graph.add_node(LayoutNode::new("B", 50.0, 30.0).with_parent("sub1"));
+
+        // Add edge within subgraph
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+
+        // Add a node outside the subgraph
+        graph.add_node(LayoutNode::new("C", 50.0, 30.0));
+
+        // Add edge from subgraph to external node
+        graph.add_edge(LayoutEdge::new("e2", "B", "C"));
+
+        let result = layout(graph).unwrap();
+
+        let a = result.get_node("A").unwrap();
+        let b = result.get_node("B").unwrap();
+        let c = result.get_node("C").unwrap();
+
+        eprintln!("Node A: x={:?}, y={:?}", a.x, a.y);
+        eprintln!("Node B: x={:?}, y={:?}", b.x, b.y);
+        eprintln!("Node C: x={:?}, y={:?}", c.x, c.y);
+
+        // Within the LR subgraph, A and B should be side-by-side (B to the right of A)
+        // They should have similar y-coordinates
+        let a_center_y = a.y.unwrap() + a.height / 2.0;
+        let b_center_y = b.y.unwrap() + b.height / 2.0;
+
+        assert!(
+            (a_center_y - b_center_y).abs() < 10.0,
+            "A and B in LR subgraph should have similar y. A.y={:.1}, B.y={:.1}",
+            a_center_y,
+            b_center_y
+        );
+
+        assert!(
+            b.x.unwrap() > a.x.unwrap(),
+            "B should be to the right of A in LR subgraph. A.x={:.1}, B.x={:.1}",
+            a.x.unwrap(),
+            b.x.unwrap()
+        );
+    }
 
     #[test]
     fn test_layout_simple_graph() {
@@ -438,16 +670,27 @@ mod tests {
         );
 
         // More strict check: label should be reasonably close to the midpoint
+        // If B and C are at the same y (range=0), this is valid - label at their y is correct
         let distance_from_midpoint = (label_pos_bc.y - midpoint_y).abs();
         let total_range = (max_y - min_y).abs();
-        assert!(
-            distance_from_midpoint < total_range * 0.6,
-            "Label y ({}) should be close to midpoint ({}), not at an extreme. Distance: {}, Range: {}",
-            label_pos_bc.y,
-            midpoint_y,
-            distance_from_midpoint,
-            total_range
-        );
+        if total_range > 0.0 {
+            assert!(
+                distance_from_midpoint < total_range * 0.6,
+                "Label y ({}) should be close to midpoint ({}), not at an extreme. Distance: {}, Range: {}",
+                label_pos_bc.y,
+                midpoint_y,
+                distance_from_midpoint,
+                total_range
+            );
+        } else {
+            // When range is 0 (B and C at same y), label at that y is correct
+            assert!(
+                distance_from_midpoint < 5.0,
+                "Label y ({}) should be at midpoint ({}) when nodes are at same y",
+                label_pos_bc.y,
+                midpoint_y
+            );
+        }
     }
 
     #[test]

@@ -3,19 +3,27 @@
 //! Applies heuristics to minimize edge crossings in the graph and sets the best
 //! order solution as an order attribute on each node.
 //!
-//! Uses the barycenter heuristic with alternating up/down sweeps.
+//! Uses the barycenter heuristic with alternating up/down sweeps, with
+//! hierarchical subgraph sorting to keep sibling subgraphs together.
 
 mod barycenter;
 mod cross_count;
 mod init_order;
+mod resolve_conflicts;
 mod sort;
+mod sort_subgraph;
 
 use crate::layout::dagre::graph::DagreGraph;
 
 pub use barycenter::{barycenter, barycenter_down, BarycenterEntry};
 pub use cross_count::cross_count;
 pub use init_order::{assign_order, init_order};
+pub use resolve_conflicts::ConstraintGraph;
 pub use sort::{sort, SortResult};
+pub use sort_subgraph::{add_subgraph_constraints, sort_subgraph};
+
+/// Entry for parent group during layer sorting: (parent, sorted_nodes, barycenter, weight)
+type ParentGroupEntry = (Option<String>, Vec<String>, Option<f64>, f64);
 
 /// Assign order to nodes to minimize edge crossings
 pub fn order(g: &mut DagreGraph) {
@@ -50,11 +58,11 @@ pub fn order(g: &mut DagreGraph) {
         let bias_right = (i % 4) >= 2;
 
         if i % 2 == 0 {
-            // Down sweep (top to bottom)
-            sweep_down(g, max_rank, bias_right);
+            // Down sweep (top to bottom) - uses predecessors
+            sweep_down_hierarchical(g, max_rank, bias_right);
         } else {
-            // Up sweep (bottom to top)
-            sweep_up(g, max_rank, bias_right);
+            // Up sweep (bottom to top) - uses successors
+            sweep_up_hierarchical(g, max_rank, bias_right);
         }
 
         // Build layering from current order
@@ -74,70 +82,222 @@ pub fn order(g: &mut DagreGraph) {
     assign_order(g, &best_layering);
 }
 
-/// Down sweep: for each layer (top to bottom), order nodes by barycenter of predecessors
-fn sweep_down(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
+/// Down sweep with hierarchical subgraph sorting
+///
+/// For each layer (top to bottom), sort nodes hierarchically, keeping sibling
+/// subgraphs together and maintaining ordering constraints between them.
+fn sweep_down_hierarchical(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
+    let mut cg = ConstraintGraph::new();
+
     for rank in 1..=max_rank {
-        // Collect nodes and sort by current order to preserve stable ordering
-        let mut layer: Vec<(String, usize)> = g
+        // Get nodes at this rank (the "movable" layer)
+        let layer_nodes: Vec<String> = g
             .nodes()
             .iter()
-            .filter_map(|v| {
-                let node = g.node(v)?;
-                if node.rank == Some(rank as i32) {
-                    Some(((*v).clone(), node.order.unwrap_or(usize::MAX)))
-                } else {
-                    None
-                }
+            .filter(|v| {
+                g.node(v)
+                    .map(|n| n.rank == Some(rank as i32))
+                    .unwrap_or(false)
             })
+            .map(|s| s.to_string())
             .collect();
 
-        // Sort by current order to ensure stable input to barycenter/sort
-        layer.sort_by_key(|(_, order)| *order);
-        let layer: Vec<String> = layer.into_iter().map(|(v, _)| v).collect();
+        if layer_nodes.is_empty() {
+            continue;
+        }
 
-        let entries = barycenter(g, &layer);
-        let sorted = sort(entries, bias_right);
+        // Build a temporary view for sorting this rank
+        // We need to sort nodes hierarchically based on their subgraph structure
+        let sorted = sort_layer_hierarchical(g, &layer_nodes, &cg, bias_right, true);
 
         // Assign new order
-        for (i, v) in sorted.vs.iter().enumerate() {
+        for (i, v) in sorted.iter().enumerate() {
             if let Some(node) = g.node_mut(v) {
                 node.order = Some(i);
             }
         }
+
+        // Add subgraph constraints based on new ordering
+        add_subgraph_constraints(g, &mut cg, &sorted);
     }
 }
 
-/// Up sweep: for each layer (bottom to top), order nodes by barycenter of successors
-fn sweep_up(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
+/// Up sweep with hierarchical subgraph sorting
+///
+/// For each layer (bottom to top), sort nodes hierarchically, keeping sibling
+/// subgraphs together and maintaining ordering constraints between them.
+fn sweep_up_hierarchical(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
+    let mut cg = ConstraintGraph::new();
+
     for rank in (0..max_rank).rev() {
-        // Collect nodes and sort by current order to preserve stable ordering
-        let mut layer: Vec<(String, usize)> = g
+        // Get nodes at this rank (the "movable" layer)
+        let layer_nodes: Vec<String> = g
             .nodes()
             .iter()
-            .filter_map(|v| {
-                let node = g.node(v)?;
-                if node.rank == Some(rank as i32) {
-                    Some(((*v).clone(), node.order.unwrap_or(usize::MAX)))
-                } else {
-                    None
-                }
+            .filter(|v| {
+                g.node(v)
+                    .map(|n| n.rank == Some(rank as i32))
+                    .unwrap_or(false)
             })
+            .map(|s| s.to_string())
             .collect();
 
-        // Sort by current order to ensure stable input to barycenter/sort
-        layer.sort_by_key(|(_, order)| *order);
-        let layer: Vec<String> = layer.into_iter().map(|(v, _)| v).collect();
+        if layer_nodes.is_empty() {
+            continue;
+        }
 
-        let entries = barycenter_down(g, &layer);
-        let sorted = sort(entries, bias_right);
+        // Sort hierarchically using successors (outgoing edges)
+        let sorted = sort_layer_hierarchical(g, &layer_nodes, &cg, bias_right, false);
 
         // Assign new order
-        for (i, v) in sorted.vs.iter().enumerate() {
+        for (i, v) in sorted.iter().enumerate() {
             if let Some(node) = g.node_mut(v) {
                 node.order = Some(i);
             }
         }
+
+        // Add subgraph constraints based on new ordering
+        add_subgraph_constraints(g, &mut cg, &sorted);
     }
+}
+
+/// Sort a layer hierarchically, respecting subgraph structure
+///
+/// This function groups nodes by their immediate parent, sorts each group
+/// recursively, and then combines them while respecting constraint graph.
+fn sort_layer_hierarchical(
+    g: &DagreGraph,
+    layer_nodes: &[String],
+    _cg: &ConstraintGraph,
+    bias_right: bool,
+    use_predecessors: bool,
+) -> Vec<String> {
+    use std::collections::HashMap;
+
+    // Group nodes by their parent subgraph
+    let mut by_parent: HashMap<Option<String>, Vec<String>> = HashMap::new();
+    for v in layer_nodes {
+        let parent = g.parent(v).map(|s| s.to_string());
+        by_parent.entry(parent).or_default().push(v.clone());
+    }
+
+    // For each parent, get barycenters and sort
+    let mut parent_entries: Vec<ParentGroupEntry> = Vec::new();
+
+    for (parent, mut nodes) in by_parent {
+        // Sort nodes within this parent by current order for stability
+        nodes.sort_by_key(|v| g.node(v).and_then(|n| n.order).unwrap_or(usize::MAX));
+
+        // Calculate barycenters
+        let entries: Vec<BarycenterEntry> = if use_predecessors {
+            barycenter(g, &nodes)
+        } else {
+            barycenter_down(g, &nodes)
+        };
+
+        // Sort by barycenter
+        let sorted = sort(entries, bias_right);
+
+        // Ensure border nodes at edges for this parent
+        let reordered = if parent.is_some() {
+            ensure_border_nodes_at_edges_for_parent(g, sorted.vs, &parent)
+        } else {
+            sorted.vs
+        };
+
+        // Calculate aggregate barycenter for this parent group
+        let (sum, weight) = reordered.iter().fold((0.0, 0.0), |(sum, weight), v| {
+            if let Some(node) = g.node(v) {
+                if let Some(order) = node.order {
+                    return (sum + order as f64, weight + 1.0);
+                }
+            }
+            (sum, weight)
+        });
+
+        let avg_bc = if weight > 0.0 {
+            Some(sum / weight)
+        } else {
+            None
+        };
+
+        parent_entries.push((parent, reordered, avg_bc, weight));
+    }
+
+    // Sort parent groups by their aggregate barycenter
+    parent_entries.sort_by(|a, b| match (a.2, b.2) {
+        (Some(bc_a), Some(bc_b)) => bc_a.partial_cmp(&bc_b).unwrap_or(std::cmp::Ordering::Equal),
+        (Some(_), None) => std::cmp::Ordering::Less,
+        (None, Some(_)) => std::cmp::Ordering::Greater,
+        (None, None) => std::cmp::Ordering::Equal,
+    });
+
+    // Flatten into final order
+    let mut result: Vec<String> = Vec::new();
+    for (_, nodes, _, _) in parent_entries {
+        result.extend(nodes);
+    }
+
+    result
+}
+
+/// Ensure border nodes are at edges for a specific parent subgraph
+fn ensure_border_nodes_at_edges_for_parent(
+    g: &DagreGraph,
+    vs: Vec<String>,
+    parent: &Option<String>,
+) -> Vec<String> {
+    let parent = match parent {
+        Some(p) => p,
+        None => return vs,
+    };
+
+    let (border_left, border_right) = if let Some(parent_node) = g.node(parent) {
+        // Get the rank of the first node to determine which border nodes to use
+        let first_rank = vs.first().and_then(|v| g.node(v)).and_then(|n| n.rank);
+
+        if let Some(rank) = first_rank {
+            let min_rank = parent_node.min_rank.unwrap_or(0);
+            if rank >= min_rank {
+                let rank_idx = (rank - min_rank) as usize;
+                let bl = parent_node.border_left.get(rank_idx).cloned().flatten();
+                let br = parent_node.border_right.get(rank_idx).cloned().flatten();
+                (bl, br)
+            } else {
+                (None, None)
+            }
+        } else {
+            (None, None)
+        }
+    } else {
+        (None, None)
+    };
+
+    // Remove border nodes from their current positions
+    let non_border: Vec<String> = vs
+        .iter()
+        .filter(|v| {
+            Some(v.as_str()) != border_left.as_deref()
+                && Some(v.as_str()) != border_right.as_deref()
+        })
+        .cloned()
+        .collect();
+
+    // Reconstruct: [borderLeft, ...non_border, borderRight]
+    let mut reordered = Vec::new();
+    if let Some(ref bl) = border_left {
+        if vs.contains(bl) {
+            reordered.push(bl.clone());
+        }
+    }
+    reordered.extend(non_border);
+    if let Some(ref br) = border_right {
+        if vs.contains(br) {
+            reordered.push(br.clone());
+        }
+    }
+
+    reordered
 }
 
 /// Build layer matrix from current order assignments

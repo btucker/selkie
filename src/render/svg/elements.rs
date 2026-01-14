@@ -32,6 +32,11 @@ impl Attrs {
         self
     }
 
+    pub fn with_style(mut self, style: &str) -> Self {
+        self.attrs.insert("style".to_string(), style.to_string());
+        self
+    }
+
     pub fn with_transform(mut self, transform: &str) -> Self {
         self.attrs
             .insert("transform".to_string(), transform.to_string());
@@ -239,6 +244,89 @@ impl SvgElement {
         }
     }
 
+    /// Add inline style attribute
+    pub fn with_style(self, style: &str) -> Self {
+        match self {
+            Self::Rect {
+                x,
+                y,
+                width,
+                height,
+                rx,
+                ry,
+                attrs,
+            } => Self::Rect {
+                x,
+                y,
+                width,
+                height,
+                rx,
+                ry,
+                attrs: attrs.with_style(style),
+            },
+            Self::Circle { cx, cy, r, attrs } => Self::Circle {
+                cx,
+                cy,
+                r,
+                attrs: attrs.with_style(style),
+            },
+            Self::Ellipse {
+                cx,
+                cy,
+                rx,
+                ry,
+                attrs,
+            } => Self::Ellipse {
+                cx,
+                cy,
+                rx,
+                ry,
+                attrs: attrs.with_style(style),
+            },
+            Self::Polygon { points, attrs } => Self::Polygon {
+                points,
+                attrs: attrs.with_style(style),
+            },
+            Self::Path { d, attrs } => Self::Path {
+                d,
+                attrs: attrs.with_style(style),
+            },
+            Self::Line {
+                x1,
+                y1,
+                x2,
+                y2,
+                attrs,
+            } => Self::Line {
+                x1,
+                y1,
+                x2,
+                y2,
+                attrs: attrs.with_style(style),
+            },
+            Self::Polyline { points, attrs } => Self::Polyline {
+                points,
+                attrs: attrs.with_style(style),
+            },
+            Self::Text {
+                x,
+                y,
+                content,
+                attrs,
+            } => Self::Text {
+                x,
+                y,
+                content,
+                attrs: attrs.with_style(style),
+            },
+            Self::Group { children, attrs } => Self::Group {
+                children,
+                attrs: attrs.with_style(style),
+            },
+            other => other,
+        }
+    }
+
     /// Add attributes
     pub fn with_attrs(self, attrs: Attrs) -> Self {
         match self {
@@ -400,17 +488,37 @@ impl SvgElement {
                     .replace("<br/>", "\n")
                     .replace("<br>", "\n");
                 if normalized.contains('\n') {
-                    let tspans = normalized
-                        .split('\n')
+                    let lines: Vec<&str> = normalized.split('\n').collect();
+                    let num_lines = lines.len();
+                    // Calculate vertical offset to center the text block
+                    // For n lines with 1.2em spacing, offset first line by -(n-1)*0.6em
+                    let first_line_offset = if num_lines > 1 {
+                        -((num_lines - 1) as f64 * 0.6)
+                    } else {
+                        0.0
+                    };
+                    let tspans = lines
+                        .iter()
                         .enumerate()
                         .map(|(idx, line)| {
                             if idx == 0 {
-                                format!(
-                                    "<tspan x=\"{}\" y=\"{}\">{}</tspan>",
-                                    x,
-                                    y,
-                                    escape_xml(line)
-                                )
+                                if num_lines > 1 {
+                                    // Use dy to offset from the y position for centering
+                                    format!(
+                                        "<tspan x=\"{}\" y=\"{}\" dy=\"{}em\">{}</tspan>",
+                                        x,
+                                        y,
+                                        first_line_offset,
+                                        escape_xml(line)
+                                    )
+                                } else {
+                                    format!(
+                                        "<tspan x=\"{}\" y=\"{}\">{}</tspan>",
+                                        x,
+                                        y,
+                                        escape_xml(line)
+                                    )
+                                }
                             } else {
                                 format!(
                                     "<tspan x=\"{}\" dy=\"1.2em\">{}</tspan>",
@@ -514,8 +622,29 @@ mod tests {
         };
         let svg = element.to_svg(0);
 
-        assert!(svg.contains("<tspan x=\"10\" y=\"20\">Line 1</tspan>"));
+        // For 2 lines, first line should be offset by -0.6em to center the block
+        assert!(svg.contains("<tspan x=\"10\" y=\"20\" dy=\"-0.6em\">Line 1</tspan>"));
         assert!(svg.contains("<tspan x=\"10\" dy=\"1.2em\">Line 2</tspan>"));
         assert!(!svg.contains("<br/>"));
+    }
+
+    #[test]
+    fn text_three_lines_centers_vertically() {
+        let element = SvgElement::Text {
+            x: 50.0,
+            y: 100.0,
+            content: "Line 1<br/>Line 2<br/>Line 3".to_string(),
+            attrs: Attrs::new(),
+        };
+        let svg = element.to_svg(0);
+
+        // For 3 lines, first line should be offset by -1.2em (2 * 0.6) to center
+        assert!(
+            svg.contains("<tspan x=\"50\" y=\"100\" dy=\"-1.2em\">Line 1</tspan>"),
+            "First line should have dy=-1.2em for 3 lines. Got: {}",
+            svg
+        );
+        assert!(svg.contains("<tspan x=\"50\" dy=\"1.2em\">Line 2</tspan>"));
+        assert!(svg.contains("<tspan x=\"50\" dy=\"1.2em\">Line 3</tspan>"));
     }
 }

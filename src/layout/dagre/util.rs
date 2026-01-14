@@ -2,6 +2,63 @@
 
 use super::graph::DagreGraph;
 
+/// Remove empty ranks from the graph
+///
+/// After nesting graph processing, edge minlen values are multiplied by nodeRankFactor
+/// to ensure space for border nodes. This creates many empty intermediate ranks.
+/// This function collapses those empty ranks, except at positions divisible by
+/// nodeRankFactor (which are reserved for border nodes).
+///
+/// Reference: dagre.js util.removeEmptyRanks
+pub fn remove_empty_ranks(g: &mut DagreGraph) {
+    // Get all ranks and find the minimum
+    let node_ranks: Vec<i32> = g
+        .nodes()
+        .iter()
+        .filter_map(|v| g.node(v).and_then(|n| n.rank))
+        .collect();
+
+    if node_ranks.is_empty() {
+        return;
+    }
+
+    let offset = *node_ranks.iter().min().unwrap();
+
+    // Build layers (sparse - some indices may be empty)
+    let max_rank = node_ranks.iter().max().unwrap() - offset;
+    let mut layers: Vec<Vec<String>> = vec![Vec::new(); (max_rank + 1) as usize];
+
+    let all_nodes = g.nodes().to_vec();
+    for v in &all_nodes {
+        if let Some(node) = g.node(v) {
+            if let Some(rank) = node.rank {
+                let adjusted_rank = (rank - offset) as usize;
+                layers[adjusted_rank].push(v.to_string());
+            }
+        }
+    }
+
+    // Remove empty ranks, but keep those at positions divisible by nodeRankFactor
+    let node_rank_factor = g.graph().node_rank_factor.unwrap_or(1) as usize;
+    let mut delta: i32 = 0;
+
+    for (i, layer) in layers.iter().enumerate() {
+        if layer.is_empty() && (node_rank_factor == 0 || i % node_rank_factor != 0) {
+            // Empty rank not at a border position - remove it
+            delta -= 1;
+        } else if !layer.is_empty() && delta != 0 {
+            // Non-empty rank - adjust by delta
+            for v in layer {
+                if let Some(node) = g.node_mut(v) {
+                    if let Some(rank) = node.rank.as_mut() {
+                        *rank += delta;
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// Build a 2D matrix of nodes organized by layer (rank) and order.
 ///
 /// Returns a Vec where each element is a Vec of node IDs at that rank,

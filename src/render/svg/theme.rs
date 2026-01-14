@@ -20,6 +20,8 @@ pub struct Theme {
     pub line_color: String,
     /// Background color
     pub background: String,
+    /// Edge label background color
+    pub edge_label_background: String,
     /// Font family
     pub font_family: String,
     /// Base font size
@@ -110,6 +112,7 @@ impl Default for Theme {
             cluster_border_color: "#aaaa33".to_string(),
             line_color: "#333333".to_string(),
             background: "#ffffff".to_string(),
+            edge_label_background: "rgba(232, 232, 232, 0.8)".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
             // Pie chart - default theme (mermaid.js derived from primary/secondary)
@@ -175,6 +178,7 @@ impl Theme {
             cluster_border_color: "#666666".to_string(),
             line_color: "#81B1DB".to_string(),
             background: "#1f2020".to_string(),
+            edge_label_background: "#4a4a4a".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
             // Pie chart - dark theme (lighter colors for dark background)
@@ -238,6 +242,7 @@ impl Theme {
             cluster_border_color: "#999999".to_string(),
             line_color: "#666666".to_string(),
             background: "#ffffff".to_string(),
+            edge_label_background: "white".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
             // Pie chart - neutral theme (grayscale palette)
@@ -302,6 +307,7 @@ impl Theme {
             cluster_border_color: "#6eaa49".to_string(),
             line_color: "#008000".to_string(),
             background: "#ffffff".to_string(),
+            edge_label_background: "#e8e8e8".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
             // Pie chart - forest theme (green palette)
@@ -368,6 +374,7 @@ impl Theme {
             cluster_border_color: "#9370DB".to_string(),
             line_color: "#333333".to_string(),
             background: "#f4f4f4".to_string(),
+            edge_label_background: "rgba(232, 232, 232, 0.8)".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
             // Pie chart - base theme (warm pastels)
@@ -463,11 +470,10 @@ impl Theme {
 .edge-label {{
   fill: {primary_text_color};
   font-family: {font_family};
-  font-size: 12px;
 }}
 
 .edge-label-bg {{
-  fill: {background};
+  fill: {edge_label_background};
 }}
 
 .subgraph {{
@@ -509,7 +515,7 @@ marker path {{
             secondary_color = self.secondary_color,
             cluster_border_color = self.cluster_border_color,
             line_color = self.line_color,
-            background = self.background,
+            edge_label_background = self.edge_label_background,
         )
     }
 
@@ -582,6 +588,11 @@ marker path {{
             cluster_border_color: secondary_border.to_hex(),
             line_color: line_color.to_hex(),
             background: bg_color.to_hex(),
+            edge_label_background: if dark_mode {
+                "#4a4a4a".to_string()
+            } else {
+                "rgba(232, 232, 232, 0.8)".to_string()
+            },
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
 

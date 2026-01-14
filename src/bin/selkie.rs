@@ -170,6 +170,10 @@ struct EvalArgs {
     /// Show cache location and statistics, then exit
     #[arg(long)]
     cache_info: bool,
+
+    /// Open HTML report in default browser after evaluation
+    #[arg(long)]
+    open_report: bool,
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
@@ -608,7 +612,28 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     let _ = svg_pairs; // Suppress unused warning
 
     // Print the output directory path
-    eprintln!("Evaluation report written to: {}", output_dir.display());
+    let report_path = output_dir.join("index.html");
+    eprintln!("Evaluation report written to: {}", report_path.display());
+
+    // Open report in browser if requested
+    if args.open_report {
+        #[cfg(target_os = "macos")]
+        {
+            let _ = std::process::Command::new("open").arg(&report_path).spawn();
+        }
+        #[cfg(target_os = "linux")]
+        {
+            let _ = std::process::Command::new("xdg-open")
+                .arg(&report_path)
+                .spawn();
+        }
+        #[cfg(target_os = "windows")]
+        {
+            let _ = std::process::Command::new("cmd")
+                .args(["/C", "start", "", &report_path.to_string_lossy()])
+                .spawn();
+        }
+    }
 
     // Exit with error code if there are failures
     if result.issue_counts.errors > 0 {
@@ -715,7 +740,14 @@ fn svg_to_png(
 
     // Set up options with font database
     let mut opt = usvg::Options::default();
-    opt.fontdb_mut().load_system_fonts();
+    let fontdb = opt.fontdb_mut();
+    fontdb.load_system_fonts();
+
+    // Set default font families to use when specified fonts aren't found
+    // This ensures text renders even if "trebuchet ms" isn't available
+    fontdb.set_sans_serif_family("Arial");
+    fontdb.set_serif_family("Times New Roman");
+    fontdb.set_monospace_family("Courier New");
 
     // Parse SVG
     let tree =
@@ -763,7 +795,14 @@ fn svg_to_pdf(svg: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
 
     // Set up options with font database
     let mut opt = usvg::Options::default();
-    opt.fontdb_mut().load_system_fonts();
+    let fontdb = opt.fontdb_mut();
+    fontdb.load_system_fonts();
+
+    // Set default font families to use when specified fonts aren't found
+    // This ensures text renders even if "trebuchet ms" isn't available
+    fontdb.set_sans_serif_family("Arial");
+    fontdb.set_serif_family("Times New Roman");
+    fontdb.set_monospace_family("Courier New");
 
     // Parse SVG
     let tree =

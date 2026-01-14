@@ -69,6 +69,36 @@ pub fn render_edge_parts(
         if let Some(label_pos) = &layout_edge.label_position {
             let mut label_elements = Vec::new();
 
+            // Estimate text size for background
+            // Use font-size 12 (matching .edge-label style) and approximate char width
+            let font_size = 12.0;
+            let char_width_ratio = 0.6;
+
+            // Handle multiline text (split by <br> or newlines)
+            let text = flow_edge
+                .text
+                .replace("<br />", "\n")
+                .replace("<br/>", "\n")
+                .replace("<br>", "\n");
+            let lines: Vec<&str> = text.lines().collect();
+            let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
+            let num_lines = lines.len().max(1);
+
+            let text_width = (max_chars as f64) * font_size * char_width_ratio;
+            let text_height = (num_lines as f64) * font_size * 1.5;
+            let padding = 4.0;
+
+            // Background rectangle
+            label_elements.push(SvgElement::Rect {
+                x: label_pos.x - text_width / 2.0 - padding,
+                y: label_pos.y - text_height / 2.0 - padding / 2.0,
+                width: text_width + padding * 2.0,
+                height: text_height + padding,
+                rx: None,
+                ry: None,
+                attrs: Attrs::new().with_class("edge-label-bg"),
+            });
+
             // Text element
             let label_attrs = Attrs::new()
                 .with_class("edge-label")
