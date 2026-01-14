@@ -577,12 +577,11 @@ pub fn exchange_edges(
 }
 
 fn update_ranks(tree: &SpanningTree, g: &mut DagreGraph) {
+    // Use the spanning tree's root, NOT a node without compound parent.
+    // The spanning tree root is the node from which we built the tree.
     let root = tree
-        .nodes()
-        .into_iter()
-        .find(|v| g.parent(v.as_str()).is_none())
-        .cloned()
-        .or_else(|| tree.root.clone())
+        .root
+        .clone()
         .or_else(|| tree.nodes().first().cloned().cloned());
 
     let Some(root) = root else {
