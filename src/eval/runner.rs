@@ -99,7 +99,20 @@ impl EvalRunner {
             })
             .collect();
 
-        // Evaluate each diagram
+        // Pre-render all reference SVGs in batch (unless force refresh)
+        let diagram_texts: Vec<&str> = filtered.iter().map(|i| i.text.as_str()).collect();
+        let reference_svgs = if self.config.force_refresh {
+            // Force refresh - render each individually (will be cached)
+            diagram_texts
+                .iter()
+                .map(|text| self.cache.render_with_mermaid(text))
+                .collect::<Vec<_>>()
+        } else {
+            // Use batch rendering with cache
+            self.cache.render_batch(&diagram_texts)
+        };
+
+        // Evaluate each diagram with pre-rendered reference
         for (i, input) in filtered.iter().enumerate() {
             eprint!(
                 "\rEvaluating {}/{}: {}...",
@@ -107,7 +120,8 @@ impl EvalRunner {
                 filtered.len(),
                 input.name
             );
-            let diagram_result = self.evaluate_single(input);
+            let reference_svg = reference_svgs[i].clone();
+            let diagram_result = self.evaluate_single_with_reference(input, reference_svg);
             result.diagrams.push(diagram_result);
         }
         eprintln!();
@@ -118,8 +132,22 @@ impl EvalRunner {
         result
     }
 
-    /// Evaluate a single diagram
+    /// Evaluate a single diagram (fetches reference SVG internally)
     pub fn evaluate_single(&self, input: &DiagramInput) -> DiagramResult {
+        let reference_svg = if self.config.force_refresh {
+            self.cache.render_with_mermaid(&input.text)
+        } else {
+            self.cache.get_or_render(&input.text)
+        };
+        self.evaluate_single_with_reference(input, reference_svg)
+    }
+
+    /// Evaluate a single diagram with a pre-rendered reference SVG
+    fn evaluate_single_with_reference(
+        &self,
+        input: &DiagramInput,
+        reference_svg: Result<String, String>,
+    ) -> DiagramResult {
         let mut result = DiagramResult {
             name: input.name.clone(),
             source: input.source.clone(),
@@ -155,13 +183,7 @@ impl EvalRunner {
             }
         }
 
-        // Step 2: Get reference SVG
-        let reference_svg = if self.config.force_refresh {
-            self.cache.render_with_mermaid(&input.text)
-        } else {
-            self.cache.get_or_render(&input.text)
-        };
-
+        // Step 2: Process reference SVG result
         match &reference_svg {
             Ok(_) => result.parse_result.reference_success = true,
             Err(e) => {

@@ -14,16 +14,13 @@ use std::process::{Command, Stdio};
 pub struct ReferenceCache {
     /// Directory where cache files are stored
     cache_dir: PathBuf,
-    /// Path to the validation tools directory
-    validator_path: PathBuf,
 }
 
 impl ReferenceCache {
-    /// Create a new cache with specified directories
-    pub fn new(cache_dir: impl AsRef<Path>, validator_path: impl AsRef<Path>) -> Self {
+    /// Create a new cache with specified directory
+    pub fn new(cache_dir: impl AsRef<Path>) -> Self {
         Self {
             cache_dir: cache_dir.as_ref().to_path_buf(),
-            validator_path: validator_path.as_ref().to_path_buf(),
         }
     }
 
@@ -34,8 +31,6 @@ impl ReferenceCache {
     /// - Linux: ~/.cache/selkie/references/
     /// - Windows: %LOCALAPPDATA%/selkie/references/
     ///
-    /// Validator path: tools/validation/ (relative to cwd)
-    ///
     /// Use `selkie eval --cache-info` to see the actual cache location.
     pub fn with_defaults() -> Self {
         let cache_dir = dirs::cache_dir()
@@ -43,11 +38,7 @@ impl ReferenceCache {
             .join("selkie")
             .join("references");
 
-        let validator_path = std::env::current_dir()
-            .unwrap_or_default()
-            .join("tools/validation");
-
-        Self::new(cache_dir, validator_path)
+        Self::new(cache_dir)
     }
 
     /// Get the cache directory path
@@ -103,69 +94,106 @@ impl ReferenceCache {
         Ok(svg)
     }
 
-    /// Render a diagram using mermaid.js via Playwright
-    ///
-    /// Uses Playwright for accurate text measurements via real browser rendering.
-    pub fn render_with_mermaid(&self, diagram: &str) -> Result<String, String> {
-        // Prefer Playwright renderer for accurate getBBox measurements
-        let script = self.validator_path.join("render_mermaid_playwright.mjs");
+    /// Render multiple diagrams at once, using cache where available.
+    /// Returns a vector of (diagram, Result<svg, error>) in the same order as input.
+    pub fn render_batch(&self, diagrams: &[&str]) -> Vec<Result<String, String>> {
+        // Check which diagrams need rendering
+        let uncached: Vec<(usize, &str)> = diagrams
+            .iter()
+            .enumerate()
+            .filter(|(_, d)| !self.is_cached(d))
+            .map(|(i, d)| (i, *d))
+            .collect();
 
-        if !script.exists() {
-            return Err(format!(
-                "Mermaid renderer not found at {}. Run `npm install` in tools/validation/",
-                script.display()
-            ));
+        // If all cached, just return cached results
+        if uncached.is_empty() {
+            return diagrams
+                .iter()
+                .map(|d| self.get(d).ok_or_else(|| "Cache miss".to_string()))
+                .collect();
         }
 
-        let mut child = Command::new("node")
-            .arg(&script)
-            .arg("-")
-            .current_dir(&self.validator_path)
+        // Log progress for uncached diagrams
+        if !uncached.is_empty() {
+            eprint!("Rendering {} reference SVGs with mmdc...", uncached.len());
+        }
+
+        // Render uncached diagrams
+        let mut results: Vec<Option<Result<String, String>>> = vec![None; diagrams.len()];
+
+        for (i, diagram) in &uncached {
+            let result = self.render_with_mermaid(diagram);
+            if let Ok(ref svg) = result {
+                let _ = self.put(diagram, svg);
+            }
+            results[*i] = Some(result);
+        }
+
+        if !uncached.is_empty() {
+            eprintln!(" done");
+        }
+
+        // Fill in cached results
+        diagrams
+            .iter()
+            .enumerate()
+            .map(|(i, d)| {
+                if let Some(result) = results[i].take() {
+                    result
+                } else {
+                    self.get(d).ok_or_else(|| "Cache miss".to_string())
+                }
+            })
+            .collect()
+    }
+
+    /// Render a diagram using mmdc (mermaid CLI)
+    pub fn render_with_mermaid(&self, diagram: &str) -> Result<String, String> {
+        // Check if mmdc is available
+        let mmdc_check = Command::new("which")
+            .arg("mmdc")
+            .output()
+            .map_err(|e| format!("Failed to check for mmdc: {}", e))?;
+
+        if !mmdc_check.status.success() {
+            return Err(
+                "mmdc (mermaid CLI) is not installed. Install it with: npm install -g @mermaid-js/mermaid-cli"
+                    .to_string(),
+            );
+        }
+
+        // Run mmdc with stdin input and stdout output
+        let mut child = Command::new("mmdc")
+            .args(["-i", "-", "-o", "-", "-q"])
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()
-            .map_err(|e| format!("Failed to spawn node: {}", e))?;
+            .map_err(|e| format!("Failed to spawn mmdc: {}", e))?;
 
         // Write diagram to stdin
         if let Some(mut stdin) = child.stdin.take() {
             stdin
                 .write_all(diagram.as_bytes())
-                .map_err(|e| format!("Failed to write to stdin: {}", e))?;
+                .map_err(|e| format!("Failed to write to mmdc stdin: {}", e))?;
         }
 
         let output = child
             .wait_with_output()
-            .map_err(|e| format!("Failed to get output: {}", e))?;
+            .map_err(|e| format!("Failed to get mmdc output: {}", e))?;
 
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
-            return Err(format!("Mermaid render failed: {}", stderr));
+            return Err(format!("mmdc render failed: {}", stderr));
         }
 
-        let stdout = String::from_utf8_lossy(&output.stdout);
+        let svg = String::from_utf8_lossy(&output.stdout).to_string();
 
-        // The renderer returns raw SVG by default
-        if stdout.starts_with('<') {
-            Ok(stdout.to_string())
-        } else {
-            // Try parsing as JSON
-            #[derive(serde::Deserialize)]
-            struct RenderResult {
-                success: bool,
-                svg: Option<String>,
-                error: Option<String>,
-            }
-
-            let result: RenderResult = serde_json::from_str(&stdout)
-                .map_err(|e| format!("Invalid JSON response: {} - {}", e, stdout))?;
-
-            if result.success {
-                result.svg.ok_or_else(|| "No SVG in response".to_string())
-            } else {
-                Err(result.error.unwrap_or_else(|| "Unknown error".to_string()))
-            }
+        if svg.trim().is_empty() {
+            return Err("mmdc returned empty output".to_string());
         }
+
+        Ok(svg)
     }
 
     /// Clear all cached files
@@ -249,7 +277,7 @@ mod tests {
         let cache_dir = temp_dir().join("selkie_test_cache");
         let _ = fs::remove_dir_all(&cache_dir);
 
-        let cache = ReferenceCache::new(&cache_dir, ".");
+        let cache = ReferenceCache::new(&cache_dir);
 
         let diagram = "flowchart LR\n    A --> B";
         let svg = "<svg>test</svg>";
