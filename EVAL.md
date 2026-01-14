@@ -264,9 +264,6 @@ The eval system includes built-in sample diagrams covering:
 - Gantt charts with tasks
 
 ```bash
-# List available sample types
-selkie eval --list-types
-
 # Evaluate only flowchart samples
 selkie eval --type flowchart
 ```
@@ -299,9 +296,6 @@ pub struct EvalConfig {
     /// Skip visual comparison (faster)
     pub skip_visual: bool,
 
-    /// Force refresh cached references
-    pub force_refresh: bool,
-
     /// Structural check thresholds
     pub check_config: CheckConfig,
 }
@@ -317,25 +311,24 @@ pub struct CheckConfig {
 
 ## Requirements
 
-The eval system requires Node.js to render reference SVGs via Mermaid.js:
+The eval system requires [Mermaid CLI](https://github.com/mermaid-js/mermaid-cli) (`mmdc`) to render reference SVGs:
 
 ```bash
-# Install dependencies
-cd tools/validation
-npm install
+# Install mermaid-cli globally
+npm install -g @mermaid-js/mermaid-cli
 
 # Verify setup
-node render_mermaid.mjs --help
+mmdc --version
 ```
 
 ## Troubleshooting
 
-### "Mermaid renderer not found"
+### "mmdc is not installed" or "mmdc not found"
 
-Ensure the validation tools are installed:
+Install the Mermaid CLI:
 
 ```bash
-cd tools/validation && npm install
+npm install -g @mermaid-js/mermaid-cli
 ```
 
 ### High cache disk usage
