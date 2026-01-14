@@ -118,6 +118,9 @@ fn to_dagre_config(options: &LayoutOptions) -> DagreConfig {
         nodesep: options.node_spacing,
         ranksep: options.layer_spacing,
         ranker: Ranker::NetworkSimplex,
+        // Use DFS-based cycle detection instead of greedy
+        // Greedy can incorrectly reverse forward edges in graphs with back edges
+        acyclicer: dagre::Acyclicer::Dfs,
         ..Default::default()
     }
 }
@@ -444,6 +447,121 @@ mod tests {
             midpoint_y,
             distance_from_midpoint,
             total_range
+        );
+    }
+
+    #[test]
+    fn test_simple_chain_tb_alignment() {
+        // Simple chain without back edges should be perfectly vertically aligned
+        let mut graph = LayoutGraph::new("simple_chain");
+        graph.options.direction = LayoutDirection::TopToBottom;
+        graph.options.node_spacing = 50.0;
+        graph.options.layer_spacing = 60.0;
+
+        graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+        graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+        graph.add_node(LayoutNode::new("C", 80.0, 40.0));
+        graph.add_node(LayoutNode::new("D", 80.0, 40.0));
+
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+        graph.add_edge(LayoutEdge::new("e2", "B", "C"));
+        graph.add_edge(LayoutEdge::new("e3", "C", "D"));
+
+        let result = layout(graph).unwrap();
+
+        eprintln!("Simple chain layout:");
+        for node in &result.nodes {
+            eprintln!(
+                "  {}: x={:.1}, y={:.1}",
+                node.id,
+                node.x.unwrap_or(0.0),
+                node.y.unwrap_or(0.0)
+            );
+        }
+
+        // All nodes should have the same x (within 1 pixel)
+        let a_x = result.get_node("A").unwrap().x.unwrap();
+        let b_x = result.get_node("B").unwrap().x.unwrap();
+        let c_x = result.get_node("C").unwrap().x.unwrap();
+        let d_x = result.get_node("D").unwrap().x.unwrap();
+
+        assert!(
+            (a_x - b_x).abs() < 1.0,
+            "A ({:.1}) and B ({:.1}) should have same x",
+            a_x,
+            b_x
+        );
+        assert!(
+            (b_x - c_x).abs() < 1.0,
+            "B ({:.1}) and C ({:.1}) should have same x",
+            b_x,
+            c_x
+        );
+        assert!(
+            (c_x - d_x).abs() < 1.0,
+            "C ({:.1}) and D ({:.1}) should have same x",
+            c_x,
+            d_x
+        );
+    }
+
+    #[test]
+    fn test_state_diagram_pattern_tb_alignment() {
+        // This test mimics the state diagram pattern:
+        // Start -> Idle -> Running -> Error -> End
+        // With back edges: Running -> Idle, Error -> Idle
+        //
+        // In TB layout, all nodes should be roughly vertically aligned
+        // Back edges create dummy nodes but shouldn't significantly spread the layout
+        let mut graph = LayoutGraph::new("state_pattern");
+        graph.options.direction = LayoutDirection::TopToBottom;
+        graph.options.node_spacing = 50.0;
+        graph.options.layer_spacing = 60.0;
+
+        // Add nodes (small circles for start/end, rectangles for states)
+        graph.add_node(LayoutNode::new("Start", 24.0, 24.0).with_shape(NodeShape::Circle));
+        graph.add_node(LayoutNode::new("Idle", 80.0, 40.0).with_shape(NodeShape::RoundedRect));
+        graph.add_node(LayoutNode::new("Running", 80.0, 40.0).with_shape(NodeShape::RoundedRect));
+        graph.add_node(LayoutNode::new("Error", 80.0, 40.0).with_shape(NodeShape::RoundedRect));
+        graph.add_node(LayoutNode::new("End", 24.0, 24.0).with_shape(NodeShape::DoubleCircle));
+
+        // Forward edges (main flow)
+        graph.add_edge(LayoutEdge::new("e1", "Start", "Idle"));
+        graph.add_edge(LayoutEdge::new("e2", "Idle", "Running").with_label("start"));
+        graph.add_edge(LayoutEdge::new("e3", "Running", "Error").with_label("error"));
+        graph.add_edge(LayoutEdge::new("e4", "Error", "End"));
+
+        // Back edges (cycles)
+        graph.add_edge(LayoutEdge::new("e5", "Running", "Idle").with_label("stop"));
+        graph.add_edge(LayoutEdge::new("e6", "Error", "Idle").with_label("reset"));
+
+        let result = layout(graph).unwrap();
+
+        // Get x coordinates for main states (excluding start/end circles)
+        let idle_x = result.get_node("Idle").unwrap().x.unwrap();
+        let running_x = result.get_node("Running").unwrap().x.unwrap();
+        let error_x = result.get_node("Error").unwrap().x.unwrap();
+
+        // In TB layout with this structure, all states should be roughly aligned
+        // Back edges create dummy nodes which can cause some horizontal offset
+        // Allow up to 50 pixels tolerance (less than a full node width)
+        let mean_x = (idle_x + running_x + error_x) / 3.0;
+        let max_deviation = 50.0;
+
+        assert!(
+            (idle_x - mean_x).abs() < max_deviation,
+            "Idle x ({:.1}) should be near mean ({:.1}). States should be vertically aligned in TB layout.",
+            idle_x, mean_x
+        );
+        assert!(
+            (running_x - mean_x).abs() < max_deviation,
+            "Running x ({:.1}) should be near mean ({:.1}). States should be vertically aligned in TB layout.",
+            running_x, mean_x
+        );
+        assert!(
+            (error_x - mean_x).abs() < max_deviation,
+            "Error x ({:.1}) should be near mean ({:.1}). States should be vertically aligned in TB layout.",
+            error_x, mean_x
         );
     }
 }

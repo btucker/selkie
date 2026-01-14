@@ -1474,6 +1474,95 @@ fn test_flowchart_full_tb_layout() {
 }
 
 #[test]
+fn test_state_diagram_tb_centered_alignment() {
+    // In TB layout, all states should be horizontally centered (similar x coordinates)
+    // Mermaid.js places all states in a single vertical column
+    let input = r#"stateDiagram-v2
+    [*] --> Idle
+    Idle --> Running : start
+    Running --> Idle : stop
+    Running --> Error : error
+    Error --> Idle : reset
+    Error --> [*]"#;
+
+    let diagram = parse(input).expect("Failed to parse state diagram");
+    let svg = render(&diagram).expect("Failed to render state diagram");
+
+    // Extract x-coordinates for each state
+    let extract_state_x = |svg: &str, state_id: &str| -> Option<f64> {
+        let state_marker = format!(r#"id="state-{}""#, state_id);
+        let state_start = svg.find(&state_marker)?;
+        let state_section = &svg[state_start..];
+        let state_end = state_section.find("</g>")?;
+        let state_section = &state_section[..state_end];
+
+        // For rect: x="..."
+        if let Some(x_start) = state_section.find(r#" x=""#) {
+            let x_value_start = x_start + 4;
+            let remaining = &state_section[x_value_start..];
+            let x_end = remaining.find('"')?;
+            let x_str = &remaining[..x_end];
+            if let Ok(x) = x_str.parse::<f64>() {
+                // Get width to calculate center
+                if let Some(w_start) = state_section.find(r#" width=""#) {
+                    let w_value_start = w_start + 8;
+                    let remaining = &state_section[w_value_start..];
+                    let w_end = remaining.find('"')?;
+                    let w_str = &remaining[..w_end];
+                    if let Ok(w) = w_str.parse::<f64>() {
+                        return Some(x + w / 2.0);
+                    }
+                }
+                return Some(x);
+            }
+        }
+
+        // For circle (start/end states): cx="..."
+        if let Some(cx_start) = state_section.find(r#" cx=""#) {
+            let cx_value_start = cx_start + 5;
+            let remaining = &state_section[cx_value_start..];
+            let cx_end = remaining.find('"')?;
+            let cx_str = &remaining[..cx_end];
+            return cx_str.parse().ok();
+        }
+
+        None
+    };
+
+    // Get center x-coordinates
+    let x_idle = extract_state_x(&svg, "Idle").expect("Should find Idle state");
+    let x_running = extract_state_x(&svg, "Running").expect("Should find Running state");
+    let x_error = extract_state_x(&svg, "Error").expect("Should find Error state");
+
+    eprintln!("State center x-coordinates:");
+    eprintln!("  Idle: {}", x_idle);
+    eprintln!("  Running: {}", x_running);
+    eprintln!("  Error: {}", x_error);
+
+    // In TB layout, all states should be approximately centered
+    // Back edges create dummy nodes which can cause some horizontal offset
+    // Allow 50% variance from the mean to account for this
+    let mean_x = (x_idle + x_running + x_error) / 3.0;
+    let max_deviation = mean_x * 0.5;
+
+    assert!(
+        (x_idle - mean_x).abs() < max_deviation,
+        "Idle should be near center (mean={}). Got x={}. In TB layout, states should be in a single column.",
+        mean_x, x_idle
+    );
+    assert!(
+        (x_running - mean_x).abs() < max_deviation,
+        "Running should be near center (mean={}). Got x={}. In TB layout, states should be in a single column.",
+        mean_x, x_running
+    );
+    assert!(
+        (x_error - mean_x).abs() < max_deviation,
+        "Error should be near center (mean={}). Got x={}. In TB layout, states should be in a single column.",
+        mean_x, x_error
+    );
+}
+
+#[test]
 fn test_state_diagram_vertical_layout() {
     // State diagrams should default to vertical (top-to-bottom) layout
     // with states positioned based on the transition flow

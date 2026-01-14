@@ -85,6 +85,9 @@ pub fn undo(g: &mut DagreGraph) {
 }
 
 /// Find feedback arc set using DFS
+///
+/// Starts DFS from source nodes (nodes with no incoming edges) first to ensure
+/// forward edges are not incorrectly identified as back edges.
 fn dfs_fas(g: &DagreGraph) -> Vec<EdgeKey> {
     let mut fas = Vec::new();
     let mut visited = HashSet::new();
@@ -115,7 +118,26 @@ fn dfs_fas(g: &DagreGraph) -> Vec<EdgeKey> {
         stack.remove(v);
     }
 
-    for v in g.nodes() {
+    // Collect and sort nodes for deterministic ordering
+    let mut nodes: Vec<String> = g.nodes().into_iter().cloned().collect();
+    nodes.sort();
+
+    // First, identify source nodes (no incoming edges) and process them first
+    // This ensures DFS follows the "natural" flow direction
+    let mut sources: Vec<String> = nodes
+        .iter()
+        .filter(|v| g.in_edges(v).is_empty())
+        .cloned()
+        .collect();
+    sources.sort();
+
+    // Start DFS from source nodes first
+    for v in &sources {
+        dfs(g, v, &mut visited, &mut stack, &mut fas);
+    }
+
+    // Then process any remaining unvisited nodes (disconnected or cyclic components)
+    for v in &nodes {
         dfs(g, v, &mut visited, &mut stack, &mut fas);
     }
 
