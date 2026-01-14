@@ -2469,3 +2469,32 @@ fn test_state_diagram_uses_curved_edges() {
         svg
     );
 }
+
+// ============================================================================
+// Layout Dimension Tests
+// ============================================================================
+
+#[test]
+fn test_flowchart_complex_layout_width() {
+    let input = std::fs::read_to_string("docs/sources/flowchart_complex.mmd")
+        .expect("Failed to read flowchart_complex.mmd");
+
+    let diagram = parse(&input).expect("Failed to parse");
+    let svg = render(&diagram).expect("Failed to render");
+
+    // Extract width from SVG viewBox or width attribute
+    let width_pattern = regex::Regex::new(r#"width="(\d+(?:\.\d+)?)""#).unwrap();
+    let width: f64 = width_pattern
+        .captures(&svg)
+        .and_then(|cap| cap.get(1))
+        .and_then(|m| m.as_str().parse().ok())
+        .expect("Could not extract width from SVG");
+
+    // Reference width is 1274px
+    // Accept within 15% tolerance (1083px minimum)
+    assert!(
+        width >= 1083.0,
+        "Flowchart width {} is too narrow (reference: 1274px, minimum: 1083px)",
+        width
+    );
+}
