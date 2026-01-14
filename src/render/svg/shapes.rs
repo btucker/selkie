@@ -7,7 +7,15 @@ use super::elements::{Attrs, SvgElement};
 use super::theme::Theme;
 
 /// Render a node shape based on its type
-pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> SvgElement {
+///
+/// If `style` is provided, it will be applied as an inline style attribute
+/// on the shape element (not the wrapper group).
+pub fn render_shape(
+    node: &LayoutNode,
+    vertex: &FlowVertex,
+    _theme: &Theme,
+    style: Option<&str>,
+) -> SvgElement {
     let x = node.x.unwrap_or(0.0);
     let y = node.y.unwrap_or(0.0);
     let w = node.width;
@@ -246,6 +254,13 @@ pub fn render_shape(node: &LayoutNode, vertex: &FlowVertex, _theme: &Theme) -> S
         }
     };
 
+    // Apply inline style to shape if provided
+    let shape = if let Some(s) = style {
+        shape.with_style(s)
+    } else {
+        shape
+    };
+
     // Create label
     let label_text = vertex.text.as_deref().unwrap_or(&node.id);
     let label = SvgElement::text(cx, cy, label_text).with_attrs(
@@ -281,7 +296,7 @@ mod tests {
         vertex.vertex_type = Some(FlowVertexType::Subroutine);
 
         let theme = Theme::default();
-        let shape_element = render_shape(&node, &vertex, &theme);
+        let shape_element = render_shape(&node, &vertex, &theme, None);
         let svg = shape_element.to_svg(0);
 
         // The subroutine lines should NOT have hardcoded stroke color
