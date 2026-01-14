@@ -51,7 +51,7 @@ The eval system serves as the primary guidance mechanism for Claude Code during 
 ## Quick Start
 
 ```bash
-# Run evaluation with built-in samples
+# Run evaluation with built-in samples (outputs to /tmp/selkie-eval-XXXX/)
 selkie eval
 
 # Evaluate specific diagram types
@@ -60,10 +60,10 @@ selkie eval --type flowchart
 # Evaluate custom diagram files
 selkie eval ./diagrams/
 
-# Generate HTML report
-selkie eval --html report.html
+# Custom output directory (creates selkie-eval-XXXX/ subdirectory)
+selkie eval -o ./reports
 
-# Generate JSON report
+# Also generate JSON report
 selkie eval --json results.json
 ```
 
@@ -210,10 +210,37 @@ Visual comparison report with:
 - Summary statistics
 - Per-diagram status cards
 - Issue details with severity highlighting
+- Side-by-side SVG comparisons
+
+The HTML report is always generated as `index.html` in the output directory:
 
 ```bash
-selkie eval --html report.html
-open report.html
+selkie eval                    # Creates /tmp/selkie-eval-XXXX/index.html
+selkie eval -o ./reports       # Creates ./reports/selkie-eval-XXXX/index.html
+open /tmp/selkie-eval-*/index.html
+```
+
+## Output Directory Structure
+
+Each eval run creates a unique directory with all generated assets:
+
+```
+selkie-eval-a1b2c3d4/
+├── index.html                    # Main HTML report
+├── flowchart_basic_selkie.svg    # Selkie-rendered SVG
+├── flowchart_basic_reference.svg # Mermaid.js reference SVG
+├── flowchart_basic.png           # Side-by-side comparison (if png feature enabled)
+├── sequence_simple_selkie.svg
+├── sequence_simple_reference.svg
+├── sequence_simple.png
+└── ...
+```
+
+The path to the output directory is printed to stdout for easy scripting:
+
+```bash
+OUTPUT=$(selkie eval)
+open "$OUTPUT/index.html"
 ```
 
 ## Built-in Samples

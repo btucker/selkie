@@ -133,6 +133,15 @@ struct RenderArgs {
 
 /// Arguments for the eval command
 #[derive(Parser, Debug)]
+#[command(after_help = "\
+Examples:
+  selkie eval                     Run with gallery samples, output to /tmp
+  selkie eval -o ./reports        Output to custom directory
+  selkie eval --type flowchart    Evaluate only flowchart samples
+  selkie eval ./diagrams/         Evaluate .mmd files from directory
+  selkie eval --json report.json  Also generate JSON report
+  selkie eval --verbose           Show detailed per-diagram diffs
+")]
 struct EvalArgs {
     /// Input to evaluate: JSON file, directory, .mmd file, or omit for gallery samples
     #[arg(value_name = "TARGET")]
