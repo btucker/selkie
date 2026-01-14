@@ -157,6 +157,12 @@ impl LayoutNode {
         self
     }
 
+    /// Set children for compound nodes (subgraphs)
+    pub fn with_children(mut self, children: Vec<LayoutNode>) -> Self {
+        self.children = children;
+        self
+    }
+
     /// Create a dummy node for long edge routing
     pub fn dummy(id: impl Into<String>, edge_id: impl Into<String>) -> Self {
         Self {

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1102" height="1405.32" viewBox="-8 -53 1102 1405.32" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 12px;
+}
+
+.edge-label-bg {
+  fill: #ffffff;
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-Frontend">
+        <rect x="61.60000000000011" y="-45" width="793.5999999999999" height="117.8" class="cluster"/>
+        <text x="458.4000000000001" y="-29" class="cluster-label" text-anchor="middle">Frontend Layer</text>
+      </g>
+      <g class="subgraph" id="subgraph-API">
+        <rect x="174.79999999999998" y="107.80000000000001" width="375.60000000000014" height="593.6399999999999" class="cluster"/>
+        <text x="362.6" y="123.80000000000001" class="cluster-label" text-anchor="middle">API Gateway</text>
+      </g>
+      <g class="subgraph" id="subgraph-Services">
+        <rect x="182.00000000000003" y="756.4399999999999" width="904" height="278.5200000000001" class="cluster"/>
+        <text x="634" y="772.4399999999999" class="cluster-label" text-anchor="middle">Microservices</text>
+      </g>
+      <g class="subgraph" id="subgraph-Data">
+        <rect x="179.40000000000006" y="909.2399999999999" width="873" height="302.2800000000001" class="cluster"/>
+        <text x="615.9000000000001" y="925.2399999999999" class="cluster-label" text-anchor="middle">Data Layer</text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-UI-Auth-0">
+        <path d="M 754.31 52.80 C 752.74 69.47, 751.17 86.13, 708.94 113.49 C 666.72 140.85, 583.83 178.90, 500.95 216.95" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-Mobile-Auth-0">
+        <path d="M 435.23 52.80 C 435.75 69.47, 436.28 86.13, 436.54 102.80 C 436.80 119.47, 436.80 136.13, 436.80 152.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-CLI-Auth-0">
+        <path d="M 139.32 52.80 C 141.41 69.47, 143.51 86.13, 182.64 113.25 C 221.77 140.36, 297.94 177.92, 374.11 215.49" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Auth-Rate-0">
+        <path d="M 414.87 318.07 C 406.51 345.38, 398.16 372.69, 379.93 396.34 C 361.70 420.00, 333.60 440.00, 305.49 460.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Auth-Reject-0">
+        <path d="M 458.73 318.07 C 467.09 345.38, 475.44 372.69, 493.67 396.34 C 511.90 420.00, 540.00 440.00, 568.11 460.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Rate-Cache-0">
+        <path d="M 310.35 512.80 C 336.83 529.47, 363.32 546.13, 376.56 562.80 C 389.80 579.47, 389.80 596.13, 389.80 612.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Cache-Response-0">
+        <path d="M 367.60 681.44 C 354.67 701.44, 341.73 721.44, 307.40 741.44 C 273.06 761.44, 217.32 781.44, 161.58 801.44" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-Cache-UserSvc-0">
+        <path d="M 412.00 681.44 C 424.93 701.44, 437.87 721.44, 424.05 741.44 C 410.24 761.44, 369.69 781.44, 329.13 801.44" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-UserSvc-DB-0">
+        <path d="M 339.60 854.24 C 380.00 870.91, 420.40 887.57, 472.63 906.45 C 524.87 925.33, 588.93 946.41, 653.00 967.50" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-UserSvc-Search-0">
+        <path d="M 332.68 854.24 C 368.72 870.91, 404.76 887.57, 406.67 904.24 C 408.58 920.91, 376.36 937.57, 344.14 954.24" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-OrderSvc-DB-0">
+        <path d="M 623.73 854.24 C 624.82 870.91, 625.91 887.57, 635.35 904.24 C 644.79 920.91, 662.58 937.57, 680.37 954.24" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-OrderSvc-Queue-0">
+        <path d="M 673.42 854.24 C 705.88 870.91, 738.34 887.57, 745.24 909.96 C 752.13 932.35, 733.47 960.45, 733.47 988.56 C 733.47 1016.67, 752.13 1044.77, 779.57 1067.16 C 843.22 1106.21, 879.43 1122.88, 879.43 1122.88" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-PaymentSvc-DB-0">
+        <path d="M 882.15 854.24 C 827.70 870.91, 773.25 887.57, 745.85 904.24 C 718.44 920.91, 718.09 937.57, 717.73 954.24" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-PaymentSvc-NotifySvc-0">
+        <path d="M 963.42 854.24 C 960.28 870.91, 957.14 887.57, 955.57 905.56 C 954.00 923.55, 954.00 942.85, 954.00 962.16" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-NotifySvc-Queue-0">
+        <path d="M 954.00 1014.96 C 954.00 1034.27, 954.00 1053.57, 954.00 1071.56 C 954.00 1089.55, 954.00 1106.21, 954.00 1122.88" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Queue-EmailWorker-0">
+        <path d="M 885.29 1191.52 C 851.93 1208.19, 818.56 1224.85, 785.65 1241.52 C 752.74 1258.19, 720.28 1274.85, 687.82 1291.52" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Queue-SMSWorker-0">
+        <path d="M 954.00 1191.52 C 954.00 1208.19, 954.00 1224.85, 954.00 1241.52 C 954.00 1258.19, 954.00 1274.85, 954.00 1291.52" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-Auth-Rate-0">
+        <text x="402.3348953140579" y="359.03489531405785" class="edge-label" dominant-baseline="central" text-anchor="middle">Valid</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Auth-Reject-0">
+        <text x="471.2651046859422" y="359.03489531405785" class="edge-label" dominant-baseline="central" text-anchor="middle">Invalid</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Cache-Response-0">
+        <text x="348.20203562340976" y="711.44" class="edge-label" dominant-baseline="central" text-anchor="middle">Cache Hit</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Cache-UserSvc-0">
+        <text x="431.3979643765904" y="711.44" class="edge-label" text-anchor="middle" dominant-baseline="central">Cache Miss</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-Auth">
+        <polygon points="436.80000000000007,152.8 530.4000000000001,246.4 436.80000000000007,340 343.20000000000005,246.4"/>
+        <text x="436.80000000000007" y="246.4" class="label" dominant-baseline="central" text-anchor="middle">Authentication</text>
+      </g>
+      <g class="node" id="node-CLI">
+        <rect x="81.60000000000011" y="0" width="108.8" height="52.8"/>
+        <text x="136.0000000000001" y="26.4" class="label" dominant-baseline="central" text-anchor="middle">CLI Tool</text>
+      </g>
+      <g class="node" id="node-Cache">
+        <path d="M 321.00000000000006 623.096 a 68.8 10.296 0 0 0 137.6 0 a 68.8 10.296 0 0 0 -137.6 0 l 0 48.048 a 68.8 10.296 0 0 0 137.6 0 l 0 -48.048"/>
+        <text x="389.80000000000007" y="647.12" class="label" text-anchor="middle" dominant-baseline="central">Redis Cache</text>
+      </g>
+      <g class="node" id="node-DB">
+        <path d="M 653 964.536 a 64 10.296 0 0 0 128 0 a 64 10.296 0 0 0 -128 0 l 0 48.048 a 64 10.296 0 0 0 128 0 l 0 -48.048"/>
+        <text x="717" y="988.56" class="label" dominant-baseline="central" text-anchor="middle">PostgreSQL</text>
+      </g>
+      <g class="node" id="node-EmailWorker">
+        <rect x="562.8000000000001" y="1291.52" width="147.2" height="52.8"/>
+        <text x="636.4000000000001" y="1317.92" class="label" dominant-baseline="central" text-anchor="middle">Email Worker</text>
+      </g>
+      <g class="node" id="node-Mobile">
+        <rect x="370.4000000000001" y="0" width="128" height="52.8"/>
+        <text x="434.4000000000001" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">Mobile App</text>
+      </g>
+      <g class="node" id="node-NotifySvc">
+        <rect x="842.0000000000001" y="962.16" width="224" height="52.8"/>
+        <text x="954.0000000000001" y="988.56" class="label" text-anchor="middle" dominant-baseline="central">Notification Service</text>
+      </g>
+      <g class="node" id="node-OrderSvc">
+        <rect x="543.6000000000001" y="801.4399999999999" width="156.8" height="52.8"/>
+        <text x="622.0000000000001" y="827.8399999999999" class="label" dominant-baseline="central" text-anchor="middle">Order Service</text>
+      </g>
+      <g class="node" id="node-PaymentSvc">
+        <rect x="880.4000000000001" y="801.4399999999999" width="176" height="52.8"/>
+        <text x="968.4000000000001" y="827.8399999999999" class="label" text-anchor="middle" dominant-baseline="central">Payment Service</text>
+      </g>
+      <g class="node" id="node-Queue">
+        <path d="M 875.6000000000001 1133.176 a 78.4 10.296 0 0 0 156.8 0 a 78.4 10.296 0 0 0 -156.8 0 l 0 48.048 a 78.4 10.296 0 0 0 156.8 0 l 0 -48.048"/>
+        <text x="954.0000000000001" y="1157.1999999999998" class="label" text-anchor="middle" dominant-baseline="central">Message Queue</text>
+      </g>
+      <g class="node" id="node-Rate">
+        <rect x="194.79999999999998" y="460" width="147.2" height="52.8"/>
+        <text x="268.4" y="486.4" class="label" text-anchor="middle" dominant-baseline="central">Rate Limiter</text>
+      </g>
+      <g class="node" id="node-Reject">
+        <rect x="522" y="460" width="166.4" height="52.8"/>
+        <text x="605.2" y="486.4" class="label" text-anchor="middle" dominant-baseline="central">Reject Request</text>
+      </g>
+      <g class="node" id="node-Response">
+        <rect x="0" y="801.4399999999999" width="176" height="52.8"/>
+        <text x="88" y="827.8399999999999" class="label" dominant-baseline="central" text-anchor="middle">Return Response</text>
+      </g>
+      <g class="node" id="node-SMSWorker">
+        <rect x="890.0000000000001" y="1291.52" width="128" height="52.8"/>
+        <text x="954.0000000000001" y="1317.92" class="label" text-anchor="middle" dominant-baseline="central">SMS Worker</text>
+      </g>
+      <g class="node" id="node-Search">
+        <path d="M 199.40000000000006 964.536 a 78.4 10.296 0 0 0 156.8 0 a 78.4 10.296 0 0 0 -156.8 0 l 0 48.048 a 78.4 10.296 0 0 0 156.8 0 l 0 -48.048"/>
+        <text x="277.80000000000007" y="988.56" class="label" dominant-baseline="central" text-anchor="middle">Elasticsearch</text>
+      </g>
+      <g class="node" id="node-UI">
+        <rect x="678.4000000000001" y="0" width="156.8" height="52.8"/>
+        <text x="756.8000000000001" y="26.4" class="label" dominant-baseline="central" text-anchor="middle">Web Interface</text>
+      </g>
+      <g class="node" id="node-UserSvc">
+        <rect x="202.00000000000003" y="801.4399999999999" width="147.2" height="52.8"/>
+        <text x="275.6" y="827.8399999999999" class="label" dominant-baseline="central" text-anchor="middle">User Service</text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -13,10 +13,11 @@ impl ToLayoutGraph for FlowchartDb {
         let mut graph = LayoutGraph::new("flowchart");
 
         // Set layout options from diagram direction
+        // Note: node_spacing affects horizontal distance, layer_spacing affects vertical
         graph.options = LayoutOptions {
             direction: self.preferred_direction(),
-            node_spacing: 50.0,
-            layer_spacing: 50.0,
+            node_spacing: 180.0,
+            layer_spacing: 100.0,
             padding: Padding::uniform(20.0),
         };
 
