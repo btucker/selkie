@@ -223,13 +223,12 @@ wasm-pack build --target web --features wasm
 ```
 
 ```js
-import init, { initialize, parse, render, render_text } from "./pkg/selkie.js";
+import init, { initialize, parse, render } from "./pkg/selkie.js";
 
 await init();
 initialize({ startOnLoad: false });
 parse(`flowchart TD; A-->B;`);
 const { svg } = render("diagram1", `flowchart TD; A-->B;`);
-const svgTextOnly = render_text(`flowchart TD; A-->B;`);
 document.body.innerHTML = svg;
 ```
 
