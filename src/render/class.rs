@@ -206,33 +206,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     // Add marker definitions for relations
     doc.add_defs(create_class_markers());
 
-    // Render each class at dagre-computed position
-    for class in &classes {
-        if let Some(&(x, y)) = class_positions.get(&class.id) {
-            let (width, height) = class_dimensions
-                .get(&class.id)
-                .copied()
-                .unwrap_or((180.0, 60.0));
-
-            let class_elem = render_class_box(
-                class,
-                x,
-                y,
-                width,
-                height,
-                class_padding,
-                member_height,
-                header_height,
-                annotation_font_size,
-                class_name_font_size,
-                member_font_size,
-                &size_estimator,
-            );
-            doc.add_element(class_elem);
-        }
-    }
-
-    // Render relations using edge bend points from dagre
+    // Render relations FIRST so they appear behind class nodes
     for relation in &db.relations {
         let key = (relation.id1.clone(), relation.id2.clone());
 
@@ -273,6 +247,32 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
         }
     }
 
+    // Render class nodes AFTER relations so they appear on top
+    for class in &classes {
+        if let Some(&(x, y)) = class_positions.get(&class.id) {
+            let (width, height) = class_dimensions
+                .get(&class.id)
+                .copied()
+                .unwrap_or((180.0, 60.0));
+
+            let class_elem = render_class_box(
+                class,
+                x,
+                y,
+                width,
+                height,
+                class_padding,
+                member_height,
+                header_height,
+                annotation_font_size,
+                class_name_font_size,
+                member_font_size,
+                &size_estimator,
+            );
+            doc.add_element(class_elem);
+        }
+    }
+
     // Render notes
     for note in db.notes.values() {
         if let Some(&(x, y)) = class_positions.get(&note.class) {
@@ -302,7 +302,7 @@ fn render_class_box(
     annotation_font_size: f64,
     class_name_font_size: f64,
     member_font_size: f64,
-    size_estimator: &dyn SizeEstimator,
+    _size_estimator: &dyn SizeEstimator,
 ) -> SvgElement {
     let mut children = Vec::new();
 
@@ -325,31 +325,28 @@ fn render_class_box(
     });
 
     let mut current_y = y;
+    let center_x = x + width / 2.0;
+    let left_x = x + padding;
 
     // Annotations (e.g. interface, abstract)
     if !class.annotations.is_empty() {
         for annotation in &class.annotations {
             current_y += member_height;
             let annotation_text = format!("«{}»", annotation);
-            let text_width = size_estimator
-                .estimate_text_size(&annotation_text, annotation_font_size)
-                .0;
-            let text_x = x + (width - text_width) / 2.0;
-            let available_width = width - padding * 2.0;
-            children.push(foreign_object_label(
-                text_x,
-                current_y,
-                text_width,
-                annotation_font_size,
-                available_width,
-                &annotation_text,
-                "center",
-                "font-style: italic;",
-            ));
+            children.push(SvgElement::Text {
+                x: center_x,
+                y: current_y,
+                content: annotation_text,
+                attrs: Attrs::new()
+                    .with_attr("text-anchor", "middle")
+                    .with_attr("dominant-baseline", "middle")
+                    .with_attr("font-size", &annotation_font_size.to_string())
+                    .with_attr("font-style", "italic"),
+            });
         }
     }
 
-    // Class name
+    // Class name (centered)
     current_y += header_height / 2.0 + 5.0;
     let class_label = if !class.label.is_empty() {
         &class.label
@@ -363,21 +360,16 @@ fn render_class_box(
     };
 
     let class_text = format!("{}{}", class_label, type_suffix);
-    let text_width = size_estimator
-        .estimate_text_size(&class_text, class_name_font_size)
-        .0;
-    let text_x = x + (width - text_width) / 2.0;
-    let available_width = width - padding * 2.0;
-    children.push(foreign_object_label(
-        text_x,
-        current_y,
-        text_width,
-        class_name_font_size,
-        available_width,
-        &class_text,
-        "center",
-        "font-weight: bolder;",
-    ));
+    children.push(SvgElement::Text {
+        x: center_x,
+        y: current_y,
+        content: class_text,
+        attrs: Attrs::new()
+            .with_attr("text-anchor", "middle")
+            .with_attr("dominant-baseline", "middle")
+            .with_attr("font-size", &class_name_font_size.to_string())
+            .with_attr("font-weight", "bold"),
+    });
 
     let divider1_y = y + header_height;
     let members_section_height = (class.members.len().max(1) as f64) * member_height + padding;
@@ -392,27 +384,21 @@ fn render_class_box(
             .with_class("class-divider"),
     });
 
-    // Attributes section
+    // Attributes section (left-aligned)
     if !class.members.is_empty() {
         current_y = divider1_y + padding;
         for member in &class.members {
             current_y += member_height;
             let display = member.get_display_details();
-            let text_width = size_estimator
-                .estimate_text_size(&display.display_text, member_font_size)
-                .0;
-            let text_x = x + (width - text_width) / 2.0;
-            let available_width = width - padding * 2.0;
-            children.push(foreign_object_label(
-                text_x,
-                current_y - 4.0,
-                text_width,
-                member_font_size,
-                available_width,
-                &display.display_text,
-                "center",
-                &display.css_style,
-            ));
+            children.push(SvgElement::Text {
+                x: left_x,
+                y: current_y,
+                content: display.display_text,
+                attrs: Attrs::new()
+                    .with_attr("text-anchor", "start")
+                    .with_attr("dominant-baseline", "middle")
+                    .with_attr("font-size", &member_font_size.to_string()),
+            });
         }
     }
 
@@ -425,27 +411,21 @@ fn render_class_box(
             .with_class("class-divider"),
     });
 
-    // Methods section
+    // Methods section (left-aligned)
     if !class.methods.is_empty() {
         current_y = divider2_y + padding;
         for method in &class.methods {
             current_y += member_height;
             let display = method.get_display_details();
-            let text_width = size_estimator
-                .estimate_text_size(&display.display_text, member_font_size)
-                .0;
-            let text_x = x + (width - text_width) / 2.0;
-            let available_width = width - padding * 2.0;
-            children.push(foreign_object_label(
-                text_x,
-                current_y - 4.0,
-                text_width,
-                member_font_size,
-                available_width,
-                &display.display_text,
-                "center",
-                &display.css_style,
-            ));
+            children.push(SvgElement::Text {
+                x: left_x,
+                y: current_y,
+                content: display.display_text,
+                attrs: Attrs::new()
+                    .with_attr("text-anchor", "start")
+                    .with_attr("dominant-baseline", "middle")
+                    .with_attr("font-size", &member_font_size.to_string()),
+            });
         }
     }
 
@@ -513,15 +493,73 @@ fn render_relation(
 ) -> SvgElement {
     let mut children = Vec::new();
 
+    // Marker length in user units (markers are 10 units wide with viewBox 20, so roughly 10 units)
+    let marker_offset = 10.0;
+
     // Calculate path from bend points or fallback to direct line
+    // When using bend points, we need to adjust the first and last points
+    // to properly intersect with the node boundaries, offset by marker length
     let path_d = if let Some(points) = bend_points {
         if !points.is_empty() {
-            edges::build_curved_path(points)
+            // Create adjusted points with proper node boundary intersections
+            let mut adjusted_points = points.clone();
+
+            // Adjust first point: exit from source node toward target node
+            // Use target node center to determine exit direction (gives better visual results)
+            let target_center_x = x2 + w2 / 2.0;
+            let target_center_y = y2 + h2 / 2.0;
+            let (exit_x, exit_y) =
+                calculate_exit_point(x1, y1, w1, h1, target_center_x, target_center_y);
+
+            // Offset exit point inward by marker length if there's a start marker
+            let (adj_exit_x, adj_exit_y) = if type1 != -1 {
+                offset_point_toward(
+                    exit_x,
+                    exit_y,
+                    target_center_x,
+                    target_center_y,
+                    marker_offset,
+                )
+            } else {
+                (exit_x, exit_y)
+            };
+            adjusted_points[0] = Point {
+                x: adj_exit_x,
+                y: adj_exit_y,
+            };
+
+            // Adjust last point: entry into target node
+            // Use source node center to determine entry direction (gives better visual results
+            // than using local bend point direction)
+            let last_idx = adjusted_points.len() - 1;
+            let source_center_x = x1 + w1 / 2.0;
+            let source_center_y = y1 + h1 / 2.0;
+            let (entry_x, entry_y) =
+                calculate_entry_point(x2, y2, w2, h2, source_center_x, source_center_y);
+
+            // Offset entry point inward by marker length if there's an end marker
+            let (adj_entry_x, adj_entry_y) = if type2 != -1 {
+                offset_point_toward(
+                    entry_x,
+                    entry_y,
+                    source_center_x,
+                    source_center_y,
+                    marker_offset,
+                )
+            } else {
+                (entry_x, entry_y)
+            };
+            adjusted_points[last_idx] = Point {
+                x: adj_entry_x,
+                y: adj_entry_y,
+            };
+
+            edges::build_curved_path(&adjusted_points)
         } else {
-            build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2)
+            build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2, type1, type2, marker_offset)
         }
     } else {
-        build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2)
+        build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2, type1, type2, marker_offset)
     };
 
     // Determine marker based on relation type
@@ -667,6 +705,18 @@ fn render_relation(
     }
 }
 
+/// Offset a point toward a target by a given distance
+fn offset_point_toward(x: f64, y: f64, target_x: f64, target_y: f64, distance: f64) -> (f64, f64) {
+    let dx = target_x - x;
+    let dy = target_y - y;
+    let len = (dx * dx + dy * dy).sqrt();
+    if len > 0.0 {
+        (x + dx / len * distance, y + dy / len * distance)
+    } else {
+        (x, y)
+    }
+}
+
 /// Build direct path when no bend points available
 #[allow(clippy::too_many_arguments)]
 fn build_direct_path(
@@ -678,10 +728,31 @@ fn build_direct_path(
     y2: f64,
     h2: f64,
     w2: f64,
+    type1: i32,
+    type2: i32,
+    marker_offset: f64,
 ) -> String {
     let (start_x, start_y, end_x, end_y) =
         calculate_connection_points(x1, y1, h1, w1, x2, y2, h2, w2);
-    format!("M {} {} L {} {}", start_x, start_y, end_x, end_y)
+
+    // Offset start point if there's a start marker
+    let (adj_start_x, adj_start_y) = if type1 != -1 {
+        offset_point_toward(start_x, start_y, end_x, end_y, marker_offset)
+    } else {
+        (start_x, start_y)
+    };
+
+    // Offset end point if there's an end marker
+    let (adj_end_x, adj_end_y) = if type2 != -1 {
+        offset_point_toward(end_x, end_y, start_x, start_y, marker_offset)
+    } else {
+        (end_x, end_y)
+    };
+
+    format!(
+        "M {} {} L {} {}",
+        adj_start_x, adj_start_y, adj_end_x, adj_end_y
+    )
 }
 
 /// Calculate connection points on class box edges
@@ -734,6 +805,80 @@ fn calculate_connection_points(
     };
 
     (start_x, start_y, end_x, end_y)
+}
+
+/// Calculate the exit point from a rectangular node toward a target point
+/// This finds where a line from the node center to target_point intersects the node boundary
+fn calculate_exit_point(
+    x: f64,
+    y: f64,
+    w: f64,
+    h: f64,
+    target_x: f64,
+    target_y: f64,
+) -> (f64, f64) {
+    let cx = x + w / 2.0;
+    let cy = y + h / 2.0;
+    let dx = target_x - cx;
+    let dy = target_y - cy;
+
+    if dx.abs() < 0.001 && dy.abs() < 0.001 {
+        // Target is at center, default to bottom edge
+        return (cx, y + h);
+    }
+
+    if dx.abs() > dy.abs() {
+        // Exit through left or right edge
+        if dx > 0.0 {
+            (x + w, cy) // Right edge
+        } else {
+            (x, cy) // Left edge
+        }
+    } else {
+        // Exit through top or bottom edge
+        if dy > 0.0 {
+            (cx, y + h) // Bottom edge
+        } else {
+            (cx, y) // Top edge
+        }
+    }
+}
+
+/// Calculate the entry point into a rectangular node from a source point
+/// This finds where a line from source_point to node center intersects the node boundary
+fn calculate_entry_point(
+    x: f64,
+    y: f64,
+    w: f64,
+    h: f64,
+    source_x: f64,
+    source_y: f64,
+) -> (f64, f64) {
+    let cx = x + w / 2.0;
+    let cy = y + h / 2.0;
+    let dx = source_x - cx;
+    let dy = source_y - cy;
+
+    if dx.abs() < 0.001 && dy.abs() < 0.001 {
+        // Source is at center, default to top edge
+        return (cx, y);
+    }
+
+    if dx.abs() > dy.abs() {
+        // Enter through left or right edge
+        if dx > 0.0 {
+            (x + w, cy) // Right edge (source is to the right)
+        } else {
+            (x, cy) // Left edge (source is to the left)
+        }
+    } else {
+        // Enter through top or bottom edge
+        if dy > 0.0 {
+            (cx, y + h) // Bottom edge (source is below)
+        } else {
+            (cx, y) // Top edge (source is above)
+        }
+    }
 }
 
 /// Render a note attached to a class
@@ -965,38 +1110,6 @@ fn generate_class_css() -> String {
 }
 "#
     .to_string()
-}
-
-#[allow(clippy::too_many_arguments)]
-fn foreign_object_label(
-    x: f64,
-    y: f64,
-    width: f64,
-    font_size: f64,
-    max_width: f64,
-    text: &str,
-    align: &str,
-    style: &str,
-) -> SvgElement {
-    let line_height = font_size * 1.5;
-    let height = line_height;
-    let y_top = y - line_height + (line_height - font_size) / 2.0;
-    let text = escape_html(text);
-    let html = format!(
-        "<foreignObject x=\"{x}\" y=\"{y_top}\" width=\"{width}\" height=\"{height}\">\
-<div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: {max_width}px; text-align: {align}; font-size: {font_size}px;\">\
-<span class=\"nodeLabel markdown-node-label\" style=\"{style}\"><p style=\"margin:0;\">{text}</p></span>\
-</div></foreignObject>"
-    );
-    SvgElement::Raw { content: html }
-}
-
-fn escape_html(text: &str) -> String {
-    text.replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
-        .replace('\'', "&apos;")
 }
 
 #[cfg(test)]

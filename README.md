@@ -58,7 +58,7 @@ Selkie could not exist without all the human effort that has gone into these exc
 Selkie supports parsing and rendering for all major Mermaid diagram types. These examples showcase Selkie's rendering capabilities.
 
 ### Flowchart
-<img src="docs/images/flowchart.svg" alt="Flowchart" width="800">
+<img src="docs/images/flowchart_complex.svg" alt="Flowchart" width="800">
 
 ### Sequence Diagram
 <img src="docs/images/sequence.svg" alt="Sequence Diagram" width="800">
