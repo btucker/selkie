@@ -168,60 +168,60 @@ marker path {
 
     </g>
     <g class="entity-node" id="entity-CUSTOMER-0">
-      <rect x="55" y="0" width="160" height="106" rx="0" ry="0" class="entity-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
-      <rect x="55" y="0" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" stroke-width="1" fill="#9370DB"/>
-      <text x="135" y="20" class="entity-name" font-weight="bold" font-size="14" text-anchor="middle" fill="#FFFFFF">CUSTOMER</text>
+      <rect x="55" y="0" width="160" height="106" rx="0" ry="0" class="entity-box" stroke="#333333" fill="#ECECFF" stroke-width="1"/>
+      <rect x="55" y="0" width="160" height="30" rx="0" ry="0" class="entity-header" stroke-width="1" fill="#9370DB" stroke="#333333"/>
+      <text x="135" y="20" class="entity-name" font-size="14" text-anchor="middle" font-weight="bold" fill="#FFFFFF">CUSTOMER</text>
       <text x="63" y="54" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
       <text x="113" y="54" class="entity-attr attribute-name" text-anchor="start" font-size="11">name</text>
-      <text x="63" y="74" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
+      <text x="63" y="74" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
       <text x="113" y="74" class="entity-attr attribute-name" text-anchor="start" font-size="11">email</text>
       <text x="187" y="74" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
-      <text x="63" y="94" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="113" y="94" class="entity-attr attribute-name" text-anchor="start" font-size="11">address</text>
+      <text x="63" y="94" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
+      <text x="113" y="94" class="entity-attr attribute-name" font-size="11" text-anchor="start">address</text>
     </g>
     <g class="entity-node" id="entity-LINE-ITEM-2">
       <rect x="110" y="412" width="160" height="46" rx="0" ry="0" class="entity-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
-      <rect x="110" y="412" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke="#333333" stroke-width="1"/>
-      <text x="190" y="432" class="entity-name" font-size="14" font-weight="bold" fill="#FFFFFF" text-anchor="middle">LINE-ITEM</text>
+      <rect x="110" y="412" width="160" height="30" rx="0" ry="0" class="entity-header" stroke-width="1" fill="#9370DB" stroke="#333333"/>
+      <text x="190" y="432" class="entity-name" font-size="14" fill="#FFFFFF" font-weight="bold" text-anchor="middle">LINE-ITEM</text>
     </g>
     <g class="entity-node" id="entity-ORDER-1">
       <rect x="0" y="206" width="160" height="106" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
       <rect x="0" y="206" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" stroke-width="1" fill="#9370DB"/>
-      <text x="80" y="226" class="entity-name" fill="#FFFFFF" text-anchor="middle" font-size="14" font-weight="bold">ORDER</text>
+      <text x="80" y="226" class="entity-name" font-weight="bold" text-anchor="middle" font-size="14" fill="#FFFFFF">ORDER</text>
       <text x="8" y="260" class="entity-attr attribute-type" font-size="11" text-anchor="start">int</text>
-      <text x="58" y="260" class="entity-attr attribute-name" font-size="11" text-anchor="start">orderNumber</text>
+      <text x="58" y="260" class="entity-attr attribute-name" text-anchor="start" font-size="11">orderNumber</text>
       <text x="132" y="260" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
-      <text x="8" y="280" class="entity-attr attribute-type" font-size="11" text-anchor="start">date</text>
+      <text x="8" y="280" class="entity-attr attribute-type" text-anchor="start" font-size="11">date</text>
       <text x="58" y="280" class="entity-attr attribute-name" text-anchor="start" font-size="11">orderDate</text>
       <text x="8" y="300" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
       <text x="58" y="300" class="entity-attr attribute-name" font-size="11" text-anchor="start">status</text>
     </g>
     <g class="entity-node" id="entity-PRODUCT-3">
       <rect x="220" y="206" width="160" height="106" rx="0" ry="0" class="entity-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
-      <rect x="220" y="206" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke-width="1" stroke="#333333"/>
-      <text x="300" y="226" class="entity-name" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">PRODUCT</text>
-      <text x="228" y="260" class="entity-attr attribute-type" font-size="11" text-anchor="start">int</text>
+      <rect x="220" y="206" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" fill="#9370DB" stroke-width="1"/>
+      <text x="300" y="226" class="entity-name" font-weight="bold" text-anchor="middle" fill="#FFFFFF" font-size="14">PRODUCT</text>
+      <text x="228" y="260" class="entity-attr attribute-type" text-anchor="start" font-size="11">int</text>
       <text x="278" y="260" class="entity-attr attribute-name" text-anchor="start" font-size="11">id</text>
-      <text x="352" y="260" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
+      <text x="352" y="260" class="entity-attr attribute-key" font-size="11" text-anchor="start">PK</text>
       <text x="228" y="280" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="278" y="280" class="entity-attr attribute-name" font-size="11" text-anchor="start">name</text>
-      <text x="228" y="300" class="entity-attr attribute-type" text-anchor="start" font-size="11">float</text>
-      <text x="278" y="300" class="entity-attr attribute-name" text-anchor="start" font-size="11">price</text>
+      <text x="278" y="280" class="entity-attr attribute-name" text-anchor="start" font-size="11">name</text>
+      <text x="228" y="300" class="entity-attr attribute-type" font-size="11" text-anchor="start">float</text>
+      <text x="278" y="300" class="entity-attr attribute-name" font-size="11" text-anchor="start">price</text>
     </g>
     <g class="relationship">
-      <path d="M135,106 C135,156 80,156 80,206" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/>
+      <path d="M135,106 C135,156 80,156 80,206" class="relationshipLine" marker-end="url(#er-zeroOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
       <rect x="82.5" y="144" width="50" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="107.5" y="160" class="relationship-label" font-size="14" text-anchor="middle">places</text>
+      <text x="107.5" y="160" class="relationship-label" text-anchor="middle" font-size="14">places</text>
     </g>
     <g class="relationship">
-      <path d="M80,312 C80,362 190,362 190,412" class="relationshipLine" marker-end="url(#er-oneOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
+      <path d="M80,312 C80,362 190,362 190,412" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-oneOrMoreEnd)"/>
       <rect x="103" y="350" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="135" y="366" class="relationship-label" text-anchor="middle" font-size="14">contains</text>
+      <text x="135" y="366" class="relationship-label" font-size="14" text-anchor="middle">contains</text>
     </g>
     <g class="relationship">
       <path d="M300,312 C300,362 190,362 190,412" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/>
       <rect x="213" y="350" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="245" y="366" class="relationship-label" font-size="14" text-anchor="middle">includes</text>
+      <text x="245" y="366" class="relationship-label" text-anchor="middle" font-size="14">includes</text>
     </g>
   </g>
 </svg>
