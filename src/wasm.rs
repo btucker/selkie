@@ -8,13 +8,16 @@ pub fn initialize(_config: JsValue) {}
 /// Validate a Mermaid diagram and return an error on failure.
 #[wasm_bindgen]
 pub fn parse(input: &str) -> Result<(), JsValue> {
-    crate::parse(input).map(|_| ()).map_err(|err| JsValue::from_str(&err.to_string()))
+    crate::parse(input)
+        .map(|_| ())
+        .map_err(|err| JsValue::from_str(&err.to_string()))
 }
 
 /// Render Mermaid diagram text to SVG with a mermaid-js compatible return shape.
 #[wasm_bindgen]
 pub fn render(id: &str, input: &str) -> Result<JsValue, JsValue> {
-    let svg = crate::render::render_text(input).map_err(|err| JsValue::from_str(&err.to_string()))?;
+    let svg =
+        crate::render::render_text(input).map_err(|err| JsValue::from_str(&err.to_string()))?;
     let result = Object::new();
     Reflect::set(&result, &JsValue::from_str("id"), &JsValue::from_str(id))?;
     Reflect::set(&result, &JsValue::from_str("svg"), &JsValue::from_str(&svg))?;
