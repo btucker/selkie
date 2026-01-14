@@ -58,7 +58,8 @@ pub struct EvalRunner {
     config: EvalConfig,
     cache: ReferenceCache,
     /// SVG pairs collected during evaluation (for PNG generation)
-    svg_pairs: std::cell::RefCell<Vec<(String, String, String)>>, // (name, selkie_svg, reference_svg)
+    /// Format: (name, diagram_type, selkie_svg, reference_svg)
+    svg_pairs: std::cell::RefCell<Vec<(String, String, String, String)>>,
 }
 
 impl EvalRunner {
@@ -77,7 +78,8 @@ impl EvalRunner {
     }
 
     /// Get collected SVG pairs for PNG generation
-    pub fn take_svg_pairs(&self) -> Vec<(String, String, String)> {
+    /// Returns: Vec<(name, diagram_type, selkie_svg, reference_svg)>
+    pub fn take_svg_pairs(&self) -> Vec<(String, String, String, String)> {
         self.svg_pairs.borrow_mut().drain(..).collect()
     }
 
@@ -237,9 +239,10 @@ impl EvalRunner {
 
         // Step 6: Visual similarity (SSIM) and collect SVG pairs
         if let (Some(selkie), Ok(reference)) = (&selkie_svg, &reference_svg) {
-            // Store SVG pair for PNG generation
+            // Store SVG pair for PNG generation (name, diagram_type, selkie_svg, reference_svg)
             self.svg_pairs.borrow_mut().push((
                 input.name.clone(),
+                result.diagram_type.clone(),
                 selkie.clone(),
                 reference.clone(),
             ));

@@ -222,18 +222,27 @@ open /tmp/selkie-eval-*/index.html
 
 ## Output Directory Structure
 
-Each eval run creates a unique directory with all generated assets:
+Each eval run creates a unique directory with assets organized by diagram type:
 
 ```
 selkie-eval-a1b2c3d4/
-├── index.html                    # Main HTML report
-├── flowchart_basic_selkie.svg    # Selkie-rendered SVG
-├── flowchart_basic_reference.svg # Mermaid.js reference SVG
-├── flowchart_basic.png           # Side-by-side comparison (if png feature enabled)
-├── sequence_simple_selkie.svg
-├── sequence_simple_reference.svg
-├── sequence_simple.png
-└── ...
+├── index.html                      # Main HTML report
+├── manifest.json                   # PNG manifest (if png feature enabled)
+├── flowchart/
+│   ├── basic_selkie.svg            # Selkie-rendered SVG
+│   ├── basic_reference.svg         # Mermaid.js reference SVG
+│   ├── basic.png                   # Side-by-side comparison
+│   ├── styled_selkie.svg
+│   ├── styled_reference.svg
+│   └── styled.png
+├── sequence/
+│   ├── simple_selkie.svg
+│   ├── simple_reference.svg
+│   └── simple.png
+├── pie/
+│   └── ...
+└── state/
+    └── ...
 ```
 
 The path to the output directory is printed to stdout for easy scripting:

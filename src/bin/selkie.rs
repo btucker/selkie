@@ -567,17 +567,21 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     let html_path = output_dir.join("index.html");
     eval::report::write_html(&result, &html_path)?;
 
-    // Write SVGs to the output directory
+    // Write SVGs to subdirectories organized by diagram type
     let svg_pairs = runner.take_svg_pairs();
-    for (name, selkie_svg, reference_svg) in &svg_pairs {
+    for (name, diagram_type, selkie_svg, reference_svg) in &svg_pairs {
+        // Create subdirectory for this diagram type
+        let type_dir = output_dir.join(diagram_type);
+        fs::create_dir_all(&type_dir)?;
+
         let safe_name = name.replace(['/', ' '], "_");
 
         // Write selkie SVG
-        let selkie_path = output_dir.join(format!("{}_selkie.svg", safe_name));
+        let selkie_path = type_dir.join(format!("{}_selkie.svg", safe_name));
         fs::write(&selkie_path, selkie_svg)?;
 
         // Write reference SVG
-        let reference_path = output_dir.join(format!("{}_reference.svg", safe_name));
+        let reference_path = type_dir.join(format!("{}_reference.svg", safe_name));
         fs::write(&reference_path, reference_svg)?;
     }
 
@@ -592,7 +596,8 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    // Print the output directory path to stdout
+    // Print the output directory path
+    eprintln!("Evaluation report written to: {}", output_dir.display());
     println!("{}", output_dir.display());
 
     // Exit with error code if there are failures

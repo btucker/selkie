@@ -210,47 +210,49 @@ pub fn create_comparison_png(
     Ok(png_data)
 }
 
-/// Write comparison PNGs and manifest to directory
+/// Write comparison PNGs to subdirectories organized by diagram type
 #[cfg(feature = "png")]
 pub fn write_comparison_pngs(
     output_dir: &Path,
-    comparisons: &[(String, String, String)], // (name, selkie_svg, reference_svg)
+    comparisons: &[(String, String, String, String)], // (name, diagram_type, selkie_svg, reference_svg)
 ) -> Result<super::report::PngManifest, String> {
     use super::report::{PngManifest, PngManifestEntry};
-
-    // Create output directory
-    fs::create_dir_all(output_dir)
-        .map_err(|e| format!("Failed to create output directory: {}", e))?;
 
     let mut manifest = PngManifest {
         diagrams: Vec::new(),
     };
 
-    for (name, selkie_svg, reference_svg) in comparisons {
+    for (name, diagram_type, selkie_svg, reference_svg) in comparisons {
+        // Create subdirectory for this diagram type
+        let type_dir = output_dir.join(diagram_type);
+        fs::create_dir_all(&type_dir)
+            .map_err(|e| format!("Failed to create directory {}: {}", type_dir.display(), e))?;
+
         // Calculate visual similarity
         let comparison = compare_svgs(selkie_svg, reference_svg)?;
 
         // Create comparison PNG
         let png_data = create_comparison_png(selkie_svg, reference_svg, name)?;
 
-        // Write PNG file
-        let png_filename = format!("{}.png", name.replace(['/', ' '], "_"));
-        let png_path = output_dir.join(&png_filename);
+        // Write PNG file to type subdirectory
+        let safe_name = name.replace(['/', ' '], "_");
+        let png_filename = format!("{}.png", safe_name);
+        let png_path = type_dir.join(&png_filename);
         fs::write(&png_path, &png_data)
             .map_err(|e| format!("Failed to write PNG {}: {}", png_path.display(), e))?;
 
-        // Add to manifest
+        // Add to manifest with relative path including type directory
         manifest.diagrams.push(PngManifestEntry {
             name: name.clone(),
-            diagram_type: String::new(), // Will be filled in by caller
-            png: png_filename,
+            diagram_type: diagram_type.clone(),
+            png: format!("{}/{}", diagram_type, png_filename),
             structural_match: true, // Will be filled in by caller
             visual_similarity: Some(comparison.ssim),
             issues: Vec::new(), // Will be filled in by caller
         });
     }
 
-    // Write manifest
+    // Write manifest to root output directory
     let manifest_path = output_dir.join("manifest.json");
     let manifest_json = serde_json::to_string_pretty(&manifest)
         .map_err(|e| format!("Failed to serialize manifest: {}", e))?;
@@ -288,7 +290,7 @@ pub fn create_comparison_png(
 #[cfg(not(feature = "png"))]
 pub fn write_comparison_pngs(
     _output_dir: &Path,
-    _comparisons: &[(String, String, String)],
+    _comparisons: &[(String, String, String, String)], // (name, diagram_type, selkie_svg, reference_svg)
 ) -> Result<super::report::PngManifest, String> {
     Err("PNG feature not enabled. Build with --features png".to_string())
 }
