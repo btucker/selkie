@@ -245,11 +245,10 @@ selkie-eval-a1b2c3d4/
     └── ...
 ```
 
-The path to the output directory is printed to stdout for easy scripting:
+The output path is shown at the end of the evaluation:
 
-```bash
-OUTPUT=$(selkie eval)
-open "$OUTPUT/index.html"
+```
+Evaluation report written to: /tmp/selkie-eval-a1b2c3d4
 ```
 
 ## Built-in Samples

@@ -598,7 +598,6 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     // Print the output directory path
     eprintln!("Evaluation report written to: {}", output_dir.display());
-    println!("{}", output_dir.display());
 
     // Exit with error code if there are failures
     if result.issue_counts.errors > 0 {
