@@ -125,10 +125,17 @@ fn count_shapes(doc: &roxmltree::Document) -> ShapeCounts {
 
 /// Count only visible rects (those with width and height > 0)
 /// This excludes helper/placeholder rects used by mermaid.js for sizing
+/// and edge label background rects (class="edge-label-bg")
 fn count_visible_rects(doc: &roxmltree::Document) -> usize {
     doc.descendants()
         .filter(|n| n.tag_name().name() == "rect")
         .filter(|n| {
+            // Exclude edge label backgrounds (not structural elements)
+            let class = n.attribute("class").unwrap_or("");
+            if class.contains("edge-label-bg") {
+                return false;
+            }
+
             // Check if rect has non-zero dimensions
             let width = n
                 .attribute("width")
