@@ -608,7 +608,10 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     let _ = svg_pairs; // Suppress unused warning
 
     // Print the output directory path
-    eprintln!("Evaluation report written to: {}", output_dir.display());
+    eprintln!(
+        "Evaluation report written to: {}/index.html",
+        output_dir.display()
+    );
 
     // Exit with error code if there are failures
     if result.issue_counts.errors > 0 {

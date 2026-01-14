@@ -187,7 +187,7 @@ fn horizontal_compaction(
     g: &DagreGraph,
     layers: &[Vec<String>],
     root: &HashMap<String, String>,
-    align: &HashMap<String, String>,
+    _align: &HashMap<String, String>,
     nodesep: f64,
     edgesep: f64,
     reverse_sep: bool,
@@ -318,8 +318,9 @@ fn horizontal_compaction(
     }
 
     // Assign x coordinates to all nodes from their roots
+    // Use `root` map (not `align`) to get each node's block root
     let mut result: HashMap<String, f64> = HashMap::new();
-    for (v, r) in align {
+    for (v, r) in root {
         if let Some(&rx) = xs.get(r) {
             result.insert(v.clone(), rx);
         }
