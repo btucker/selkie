@@ -715,14 +715,7 @@ fn svg_to_png(
 
     // Set up options with font database
     let mut opt = usvg::Options::default();
-    let fontdb = opt.fontdb_mut();
-    fontdb.load_system_fonts();
-
-    // Set default font families to use when specified fonts aren't found
-    // This ensures text renders even if "trebuchet ms" isn't available
-    fontdb.set_sans_serif_family("Arial");
-    fontdb.set_serif_family("Times New Roman");
-    fontdb.set_monospace_family("Courier New");
+    opt.fontdb_mut().load_system_fonts();
 
     // Parse SVG
     let tree =
@@ -770,14 +763,7 @@ fn svg_to_pdf(svg: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
 
     // Set up options with font database
     let mut opt = usvg::Options::default();
-    let fontdb = opt.fontdb_mut();
-    fontdb.load_system_fonts();
-
-    // Set default font families to use when specified fonts aren't found
-    // This ensures text renders even if "trebuchet ms" isn't available
-    fontdb.set_sans_serif_family("Arial");
-    fontdb.set_serif_family("Times New Roman");
-    fontdb.set_monospace_family("Courier New");
+    opt.fontdb_mut().load_system_fonts();
 
     // Parse SVG
     let tree =
