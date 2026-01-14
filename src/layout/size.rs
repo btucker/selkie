@@ -50,7 +50,13 @@ impl SizeEstimator for CharacterSizeEstimator {
             return (0.0, font_size * self.line_height_ratio);
         }
 
-        let lines: Vec<&str> = text.lines().collect();
+        // Normalize <br> variants to newlines for proper line counting
+        let normalized = text
+            .replace("<br />", "\n")
+            .replace("<br/>", "\n")
+            .replace("<br>", "\n");
+
+        let lines: Vec<&str> = normalized.lines().collect();
         let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
         let num_lines = lines.len().max(1);
 
