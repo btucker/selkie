@@ -95,9 +95,14 @@ pub fn add_border_segments(g: &mut DagreGraph) {
 /// Add a single border node at a specific rank
 fn add_border_node(g: &mut DagreGraph, prop: &str, prefix: &str, sg: &str, rank: i32) {
     // Create the border node
+    // Border nodes have a small non-zero width to create separation between
+    // adjacent subgraphs during x-coordinate assignment. This matches how
+    // dagre.js creates visual separation between sibling subgraph boxes.
+    const BORDER_NODE_WIDTH: f64 = 10.0;
+
     let id = g.unique_id(prefix);
     let label = NodeLabel {
-        width: 0.0,
+        width: BORDER_NODE_WIDTH,
         height: 0.0,
         rank: Some(rank),
         border_type: Some(prop.to_string()),
