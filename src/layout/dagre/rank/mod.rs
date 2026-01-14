@@ -84,9 +84,7 @@ mod tests {
             },
         );
 
-        // Use LongestPath - NetworkSimplex has a bug in exchange_edges
-        // that can create negative slack. TODO: Fix network simplex.
-        assign_ranks(&mut g, Ranker::LongestPath);
+        assign_ranks(&mut g, Ranker::NetworkSimplex);
 
         let a_rank = g.node("a").unwrap().rank.unwrap();
         let c_rank = g.node("c").unwrap().rank.unwrap();
@@ -105,9 +103,7 @@ mod tests {
         g.set_path(&["a", "e", "g", "h"]);
         g.set_path(&["a", "f", "g"]);
 
-        // Use LongestPath for now - NetworkSimplex has a bug in exchange_edges
-        // that can create negative slack. TODO: Fix network simplex rank adjustment.
-        assign_ranks(&mut g, Ranker::LongestPath);
+        assign_ranks(&mut g, Ranker::NetworkSimplex);
 
         assert_eq!(g.node("a").unwrap().rank, Some(0));
         assert_eq!(g.node("b").unwrap().rank, Some(1));
@@ -129,12 +125,7 @@ mod tests {
         g.set_edge("C", "E", EdgeLabel::default());
         g.set_edge("E", "F", EdgeLabel::default());
 
-        assign_ranks(&mut g, Ranker::LongestPath);
-
-        eprintln!("Ranks:");
-        for v in ["A", "B", "C", "D", "E", "F"] {
-            eprintln!("  {}: {:?}", v, g.node(v).unwrap().rank);
-        }
+        assign_ranks(&mut g, Ranker::NetworkSimplex);
 
         assert_eq!(g.node("A").unwrap().rank, Some(0), "A should be rank 0");
         assert_eq!(g.node("B").unwrap().rank, Some(1), "B should be rank 1");

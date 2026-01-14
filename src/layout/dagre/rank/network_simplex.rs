@@ -191,7 +191,7 @@ pub fn run(g: &mut DagreGraph) {
 
 /// Build an initial feasible spanning tree using tight edges
 /// compound_nodes are excluded from the tree
-fn feasible_tree(g: &DagreGraph, compound_nodes: &HashSet<String>) -> SpanningTree {
+fn feasible_tree(g: &mut DagreGraph, compound_nodes: &HashSet<String>) -> SpanningTree {
     let mut tree = SpanningTree::new();
 
     // Add all non-compound nodes to tree
@@ -201,80 +201,111 @@ fn feasible_tree(g: &DagreGraph, compound_nodes: &HashSet<String>) -> SpanningTr
         }
     }
 
-    // Find tight edges (slack = 0) and build tree
+    let target_count = tree.nodes.len();
+    if target_count == 0 {
+        return tree;
+    }
+
     let mut in_tree: HashSet<String> = HashSet::new();
 
-    // Start with first non-compound node
     if let Some(first) = g.nodes().iter().find(|v| !compound_nodes.contains(**v)) {
         in_tree.insert((*first).clone());
         tree.root = Some((*first).clone());
     }
 
-    // Greedily add tight edges (skip edges involving compound nodes)
-    let mut changed = true;
-    while changed {
-        changed = false;
-        for edge_key in g.edges() {
-            let v = &edge_key.v;
-            let w = &edge_key.w;
+    while in_tree.len() < target_count {
+        expand_tight_tree(&mut tree, g, compound_nodes, &mut in_tree);
 
-            // Skip edges involving compound nodes
-            if compound_nodes.contains(v) || compound_nodes.contains(w) {
-                continue;
-            }
-
-            let v_in = in_tree.contains(v);
-            let w_in = in_tree.contains(w);
-
-            // Add edge if exactly one endpoint is in tree and edge is tight
-            if v_in != w_in {
-                let slack = super::util::slack(g, v, w).unwrap_or(i32::MAX);
-                if slack == 0 {
-                    tree.set_edge(v, w, TreeEdge::default());
-                    in_tree.insert(v.clone());
-                    in_tree.insert(w.clone());
-                    changed = true;
-                }
-            }
+        if in_tree.len() == target_count {
+            break;
         }
-    }
 
-    // If not all non-compound nodes are connected, add non-tight edges
-    for v in g.nodes() {
-        // Skip compound nodes
-        if compound_nodes.contains(v.as_str()) {
-            continue;
-        }
-        if !in_tree.contains(v.as_str()) {
-            // Find an edge connecting this node to the tree
-            for edge_key in g.in_edges(v).iter().chain(g.out_edges(v).iter()) {
-                let other = if edge_key.v == **v {
-                    &edge_key.w
-                } else {
-                    &edge_key.v
-                };
-                // Skip if other is a compound node
-                if compound_nodes.contains(other) {
-                    continue;
-                }
-                if in_tree.contains(other) {
-                    tree.set_edge(v, other, TreeEdge::default());
-                    in_tree.insert((*v).clone());
-                    // Adjust rank to make edge tight
-                    if edge_key.v == **v {
-                        // v -> other, so v.rank = other.rank - minlen
-                        let _other_rank = g.node(other).and_then(|n| n.rank).unwrap_or(0);
-                        let _minlen = g.edge_by_key(edge_key).map(|e| e.minlen).unwrap_or(1);
-                        // We need to update the graph's node rank
-                        // But we can't here since we don't have mutable access
+        let Some(edge_key) = find_min_slack_edge(g, compound_nodes, &in_tree) else {
+            break;
+        };
+
+        let slack = super::util::slack(g, &edge_key.v, &edge_key.w).unwrap_or(0);
+        let delta = if in_tree.contains(&edge_key.v) {
+            slack
+        } else {
+            -slack
+        };
+
+        if delta != 0 {
+            for v in &in_tree {
+                if let Some(node) = g.node_mut(v) {
+                    if let Some(rank) = node.rank {
+                        node.rank = Some(rank + delta);
                     }
-                    break;
                 }
             }
         }
     }
 
     tree
+}
+
+fn expand_tight_tree(
+    tree: &mut SpanningTree,
+    g: &DagreGraph,
+    compound_nodes: &HashSet<String>,
+    in_tree: &mut HashSet<String>,
+) {
+    let mut stack: Vec<String> = in_tree.iter().cloned().collect();
+    while let Some(v) = stack.pop() {
+        for edge_key in g.in_edges(&v).iter().chain(g.out_edges(&v).iter()) {
+            let w = if edge_key.v == v {
+                &edge_key.w
+            } else {
+                &edge_key.v
+            };
+
+            if compound_nodes.contains(w) {
+                continue;
+            }
+
+            if in_tree.contains(w) {
+                continue;
+            }
+
+            let slack = super::util::slack(g, &edge_key.v, &edge_key.w).unwrap_or(i32::MAX);
+            if slack == 0 {
+                tree.set_edge(&edge_key.v, &edge_key.w, TreeEdge::default());
+                in_tree.insert(w.clone());
+                stack.push(w.clone());
+            }
+        }
+    }
+}
+
+fn find_min_slack_edge(
+    g: &DagreGraph,
+    compound_nodes: &HashSet<String>,
+    in_tree: &HashSet<String>,
+) -> Option<EdgeKey> {
+    let mut best_edge: Option<EdgeKey> = None;
+    let mut best_slack = i32::MAX;
+
+    for edge_key in g.edges() {
+        if compound_nodes.contains(&edge_key.v) || compound_nodes.contains(&edge_key.w) {
+            continue;
+        }
+
+        let v_in = in_tree.contains(&edge_key.v);
+        let w_in = in_tree.contains(&edge_key.w);
+        if v_in == w_in {
+            continue;
+        }
+
+        if let Some(slack) = super::util::slack(g, &edge_key.v, &edge_key.w) {
+            if slack < best_slack {
+                best_slack = slack;
+                best_edge = Some(edge_key.clone());
+            }
+        }
+    }
+
+    best_edge
 }
 
 /// Initialize low and lim values for tree traversal
@@ -325,15 +356,27 @@ fn dfs_assign(tree: &mut SpanningTree, v: &str, parent: Option<&str>, counter: &
 
 /// Initialize cut values for all tree edges
 pub fn init_cut_values(tree: &mut SpanningTree, g: &DagreGraph) {
-    let edges: Vec<(String, String)> = tree
-        .edges_list()
-        .iter()
-        .map(|(v, w)| (v.to_string(), w.to_string()))
-        .collect();
+    let root = tree
+        .root
+        .clone()
+        .or_else(|| tree.nodes().first().cloned().cloned());
 
-    for (v, w) in edges {
-        let cutvalue = calc_cut_value(tree, g, &v, &w);
-        if let Some(edge) = tree.edge_mut(&v, &w) {
+    let Some(root) = root else {
+        return;
+    };
+
+    let mut order = Vec::new();
+    dfs_postorder(tree, &root, None, &mut order);
+
+    for v in order.into_iter().filter(|v| v != &root) {
+        let Some(parent) = tree.node(&v).and_then(|n| n.parent.as_ref()).cloned() else {
+            continue;
+        };
+        let cutvalue = calc_cut_value(tree, g, &v, &parent);
+        if let Some(edge) = tree.edge_mut(&v, &parent) {
+            edge.cutvalue = Some(cutvalue);
+        }
+        if let Some(edge) = tree.edge_mut(&parent, &v) {
             edge.cutvalue = Some(cutvalue);
         }
     }
@@ -341,37 +384,65 @@ pub fn init_cut_values(tree: &mut SpanningTree, g: &DagreGraph) {
 
 /// Calculate the cut value for a tree edge
 pub fn calc_cut_value(tree: &SpanningTree, g: &DagreGraph, v: &str, w: &str) -> i32 {
-    // The cut value is the sum of weights of edges crossing the cut
-    // minus the sum of weights of edges in the same direction
-
-    let mut cutvalue = 0;
-
-    // Determine which side is the tail (contains the child in the tree edge)
-    let v_node = tree.node(v);
-    let _w_node = tree.node(w);
-
-    let (tail, _head) = if v_node.and_then(|n| n.parent.as_ref()) == Some(&w.to_string()) {
-        (v, w)
+    let child = if tree
+        .node(v)
+        .and_then(|n| n.parent.as_ref())
+        .is_some_and(|p| p == w)
+    {
+        v
     } else {
-        (w, v)
+        w
     };
 
-    // For each edge in the graph, check if it crosses the cut
-    for edge_key in g.edges() {
-        let edge_v = &edge_key.v;
-        let edge_w = &edge_key.w;
+    let parent = if child == v { w } else { v };
 
-        let v_in_tail = is_descendant(tree, edge_v, tail);
-        let w_in_tail = is_descendant(tree, edge_w, tail);
+    let mut child_is_tail = true;
+    let mut graph_edge = g.edge(child, parent);
+    if graph_edge.is_none() {
+        child_is_tail = false;
+        graph_edge = g.edge(parent, child);
+    }
 
-        let weight = g.edge_by_key(edge_key).map(|e| e.weight).unwrap_or(1);
+    let mut cutvalue = graph_edge.map(|e| e.weight).unwrap_or(0);
 
-        if v_in_tail && !w_in_tail {
-            // Edge goes from tail to head component (same direction as tree edge)
-            cutvalue += weight;
-        } else if !v_in_tail && w_in_tail {
-            // Edge goes from head to tail component (opposite direction)
-            cutvalue -= weight;
+    let mut incident_edges: Vec<&EdgeKey> = g
+        .in_edges(child)
+        .iter()
+        .chain(g.out_edges(child).iter())
+        .copied()
+        .collect();
+    incident_edges.sort();
+    incident_edges.dedup();
+
+    for edge_key in incident_edges {
+        let is_out_edge = edge_key.v == child;
+        let other = if is_out_edge {
+            &edge_key.w
+        } else {
+            &edge_key.v
+        };
+        if other == parent {
+            continue;
+        }
+
+        let points_to_head = is_out_edge == child_is_tail;
+        let other_weight = g.edge_by_key(edge_key).map(|e| e.weight).unwrap_or(1);
+        cutvalue += if points_to_head {
+            other_weight
+        } else {
+            -other_weight
+        };
+
+        if tree.has_edge(child, other) {
+            let other_cut = tree
+                .edge(child, other)
+                .and_then(|e| e.cutvalue)
+                .unwrap_or(0);
+            cutvalue += if points_to_head {
+                -other_cut
+            } else {
+                other_cut
+            };
         }
     }
 
@@ -429,16 +500,22 @@ pub fn enter_edge_with_exclusion(
     leave: &(String, String),
     exclude: Option<&(String, String)>,
 ) -> Option<EdgeKey> {
-    // Determine which side is the tail (child in tree edge)
-    // The tail is the node whose parent is the other node
-    let tail = {
-        let v_parent = tree.node(&leave.0).and_then(|n| n.parent.as_ref());
-        if v_parent.map(|p| p == &leave.1).unwrap_or(false) {
-            &leave.0 // leave.0's parent is leave.1, so leave.0 is the child (tail)
-        } else {
-            &leave.1 // Otherwise, leave.1 is the child (tail)
-        }
-    };
+    let mut v = leave.0.clone();
+    let mut w = leave.1.clone();
+
+    if g.edge(&v, &w).is_none() {
+        std::mem::swap(&mut v, &mut w);
+    }
+
+    let v_label = tree.node(&v)?;
+    let w_label = tree.node(&w)?;
+    let mut tail = &v;
+    let mut flip = false;
+
+    if v_label.lim.unwrap_or(0) > w_label.lim.unwrap_or(0) {
+        tail = &w;
+        flip = true;
+    }
 
     // Find the non-tree edge with minimum slack that crosses the cut
     let mut best_edge: Option<EdgeKey> = None;
@@ -463,7 +540,7 @@ pub fn enter_edge_with_exclusion(
         let w_in_tail = is_descendant(tree, &edge_key.w, tail);
 
         // Edge must cross the cut
-        if v_in_tail != w_in_tail {
+        if flip == v_in_tail && flip != w_in_tail {
             if let Some(slack) = super::util::slack(g, &edge_key.v, &edge_key.w) {
                 if slack < best_slack {
                     best_slack = slack;
@@ -483,55 +560,84 @@ pub fn exchange_edges(
     leave: &(String, String),
     enter: &EdgeKey,
 ) {
-    // Determine which side is the tail (child in tree edge) BEFORE modifying tree
-    // The tail is the node whose parent is the other node
-    let tail = {
-        let v_parent = tree.node(&leave.0).and_then(|n| n.parent.as_ref());
-        if v_parent.map(|p| p == &leave.1).unwrap_or(false) {
-            leave.0.clone() // leave.0's parent is leave.1, so leave.0 is the child (tail)
-        } else {
-            leave.1.clone() // Otherwise, leave.1 is the child (tail)
-        }
-    };
-
-    // Collect nodes in the tail component BEFORE modifying tree
-    let tail_nodes: Vec<String> = g
-        .nodes()
-        .iter()
-        .filter(|v| is_descendant(tree, v, &tail))
-        .map(|v| (*v).clone())
-        .collect();
-
     // Remove leaving edge from tree
     tree.remove_edge(&leave.0, &leave.1);
 
     // Add entering edge to tree
     tree.set_edge(&enter.v, &enter.w, TreeEdge::default());
 
-    // Update ranks based on slack of entering edge
-    if let Some(slack) = super::util::slack(g, &enter.v, &enter.w) {
-        if slack != 0 {
-            // Determine which direction to adjust based on whether enter.v is in tail
-            let v_in_tail = tail_nodes.contains(&enter.v);
-
-            // Adjust ranks in the tail component
-            let delta = if v_in_tail { slack } else { -slack };
-
-            for v in &tail_nodes {
-                if let Some(node) = g.node_mut(v) {
-                    if let Some(rank) = node.rank {
-                        node.rank = Some(rank + delta);
-                    }
-                }
-            }
-        }
-    }
-
     // Recompute low/lim values
     init_low_lim_values(tree, tree.root.clone());
 
     // Recompute cut values
     init_cut_values(tree, g);
+
+    // Update ranks based on the new tree structure
+    update_ranks(tree, g);
+}
+
+fn update_ranks(tree: &SpanningTree, g: &mut DagreGraph) {
+    let root = tree
+        .nodes()
+        .into_iter()
+        .find(|v| g.parent(v.as_str()).is_none())
+        .cloned()
+        .or_else(|| tree.root.clone())
+        .or_else(|| tree.nodes().first().cloned().cloned());
+
+    let Some(root) = root else {
+        return;
+    };
+
+    if let Some(node) = g.node_mut(&root) {
+        if node.rank.is_none() {
+            node.rank = Some(0);
+        }
+    }
+
+    let mut ordered = Vec::new();
+    dfs_preorder(tree, &root, None, &mut ordered);
+
+    for v in ordered.into_iter().skip(1) {
+        let Some(parent) = tree.node(&v).and_then(|n| n.parent.as_ref()).cloned() else {
+            continue;
+        };
+
+        let (edge, flipped) = if let Some(edge) = g.edge(&v, &parent) {
+            (edge, false)
+        } else if let Some(edge) = g.edge(&parent, &v) {
+            (edge, true)
+        } else {
+            continue;
+        };
+
+        let parent_rank = g.node(&parent).and_then(|n| n.rank).unwrap_or(0);
+        let delta = if flipped { edge.minlen } else { -edge.minlen };
+
+        if let Some(node) = g.node_mut(&v) {
+            node.rank = Some(parent_rank + delta);
+        }
+    }
+}
+
+fn dfs_preorder(tree: &SpanningTree, v: &str, parent: Option<&str>, out: &mut Vec<String>) {
+    out.push(v.to_string());
+    for w in tree.neighbors(v) {
+        if parent.is_some_and(|p| p == w.as_str()) {
+            continue;
+        }
+        dfs_preorder(tree, &w, Some(v), out);
+    }
+}
+
+fn dfs_postorder(tree: &SpanningTree, v: &str, parent: Option<&str>, out: &mut Vec<String>) {
+    for w in tree.neighbors(v) {
+        if parent.is_some_and(|p| p == w.as_str()) {
+            continue;
+        }
+        dfs_postorder(tree, &w, Some(v), out);
+    }
+    out.push(v.to_string());
 }
 
 #[cfg(test)]
