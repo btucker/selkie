@@ -204,17 +204,45 @@ fn extract_labels(doc: &roxmltree::Document) -> Vec<String> {
     for node in doc.descendants() {
         let tag = node.tag_name().name();
 
-        // For text elements, get the combined text content of all children
-        // This handles mermaid.js splitting words into separate tspan elements
+        // For text elements, check if they have tspan children
         if tag == "text" {
-            let combined = collect_text_content(&node);
-            // Normalize whitespace: collapse multiple spaces/newlines into single space
-            let combined: String = combined.split_whitespace().collect::<Vec<_>>().join(" ");
-            if !combined.is_empty() && !seen.contains(&combined) {
-                seen.insert(combined.clone());
-                labels.push(combined);
+            let tspans: Vec<_> = node
+                .children()
+                .filter(|c| c.tag_name().name() == "tspan")
+                .collect();
+
+            // Check if this is multi-line text (tspans with dy attribute)
+            // vs multi-word single-line text (tspans without dy)
+            let is_multiline =
+                tspans.len() > 1 && tspans.iter().skip(1).any(|t| t.attribute("dy").is_some());
+
+            if is_multiline {
+                // Multi-line text: extract each tspan as a separate label
+                // This matches how mermaid.js uses <p> elements in foreignObject
+                for tspan in tspans {
+                    let text: String = tspan
+                        .text()
+                        .unwrap_or("")
+                        .split_whitespace()
+                        .collect::<Vec<_>>()
+                        .join(" ");
+                    if !text.is_empty() && !seen.contains(&text) {
+                        seen.insert(text.clone());
+                        labels.push(text);
+                    }
+                }
+            } else {
+                // Single-line or multi-word: get combined content
+                let combined = collect_text_content(&node);
+                // Normalize whitespace: collapse multiple spaces/newlines into single space
+                let combined: String = combined.split_whitespace().collect::<Vec<_>>().join(" ");
+                if !combined.is_empty() && !seen.contains(&combined) {
+                    seen.insert(combined.clone());
+                    labels.push(combined);
+                }
             }
         }
+        // For tspan directly under text, handled above
         // For p/span (mermaid.js foreignObject HTML), get direct text content
         else if tag == "p" || tag == "span" {
             // Only get direct text, not combined content, to avoid duplicates
@@ -274,6 +302,46 @@ mod tests {
         assert!(
             !structure.labels.iter().any(|l| l == "Main" || l == " Flow"),
             "Should not have separate tspan fragments. Got: {:?}",
+            structure.labels
+        );
+    }
+
+    #[test]
+    fn test_extract_multiline_tspans_separately() {
+        // Multi-line text uses dy attribute to position lines
+        let multiline_svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <text x="10" y="20">
+                <tspan x="10" y="20">Line one</tspan>
+                <tspan x="10" dy="1.2em">Line two</tspan>
+                <tspan x="10" dy="1.2em">Line three</tspan>
+            </text>
+        </svg>"#;
+
+        let structure = SvgStructure::from_svg(multiline_svg).unwrap();
+
+        // Should extract each line as a separate label
+        assert!(
+            structure.labels.contains(&"Line one".to_string()),
+            "Should extract 'Line one'. Got: {:?}",
+            structure.labels
+        );
+        assert!(
+            structure.labels.contains(&"Line two".to_string()),
+            "Should extract 'Line two'. Got: {:?}",
+            structure.labels
+        );
+        assert!(
+            structure.labels.contains(&"Line three".to_string()),
+            "Should extract 'Line three'. Got: {:?}",
+            structure.labels
+        );
+        // Should NOT have combined form
+        assert!(
+            !structure
+                .labels
+                .iter()
+                .any(|l| l.contains("Line one") && l.contains("Line two")),
+            "Should not combine multiline tspans. Got: {:?}",
             structure.labels
         );
     }
