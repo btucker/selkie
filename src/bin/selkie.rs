@@ -568,24 +568,30 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     eval::report::write_html(&result, &html_path)?;
 
     // Write SVGs to subdirectories organized by diagram type
-    let svg_pairs = runner.take_svg_pairs();
-    for (name, diagram_type, selkie_svg, reference_svg) in &svg_pairs {
-        // Create subdirectory for this diagram type
-        let type_dir = output_dir.join(diagram_type);
-        fs::create_dir_all(&type_dir)?;
+    for diagram in &result.diagrams {
+        let type_dir = output_dir.join(&diagram.diagram_type);
+        let safe_name = diagram.name.replace(['/', ' '], "_");
 
-        let safe_name = name.replace(['/', ' '], "_");
+        // Only create directory if we have at least one SVG to write
+        if diagram.selkie_svg.is_some() || diagram.reference_svg.is_some() {
+            fs::create_dir_all(&type_dir)?;
+        }
 
-        // Write selkie SVG
-        let selkie_path = type_dir.join(format!("{}_selkie.svg", safe_name));
-        fs::write(&selkie_path, selkie_svg)?;
+        // Write selkie SVG if available
+        if let Some(ref svg) = diagram.selkie_svg {
+            let path = type_dir.join(format!("{}_selkie.svg", safe_name));
+            fs::write(&path, svg)?;
+        }
 
-        // Write reference SVG
-        let reference_path = type_dir.join(format!("{}_reference.svg", safe_name));
-        fs::write(&reference_path, reference_svg)?;
+        // Write reference SVG if available
+        if let Some(ref svg) = diagram.reference_svg {
+            let path = type_dir.join(format!("{}_reference.svg", safe_name));
+            fs::write(&path, svg)?;
+        }
     }
 
-    // Write comparison PNGs if png feature is enabled
+    // Write comparison PNGs if png feature is enabled (requires both SVGs)
+    let svg_pairs = runner.take_svg_pairs();
     #[cfg(feature = "png")]
     if !svg_pairs.is_empty() {
         match eval::png::write_comparison_pngs(&output_dir, &svg_pairs) {
@@ -595,6 +601,8 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
+    #[cfg(not(feature = "png"))]
+    let _ = svg_pairs; // Suppress unused warning
 
     // Print the output directory path
     eprintln!("Evaluation report written to: {}", output_dir.display());
