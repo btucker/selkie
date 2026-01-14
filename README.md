@@ -146,29 +146,19 @@ selkie eval
 # Evaluate specific diagram types
 selkie eval --type flowchart
 
-# Generate HTML comparison report
-selkie eval --html report.html
+# Output to custom directory
+selkie eval -o ./reports
 
-# Generate side-by-side comparison PNGs
-selkie eval --pngs comparison_output/
+# Show detailed per-diagram diffs
+selkie eval --verbose
 ```
 
-The eval system performs:
-
+The eval system generates an HTML report with:
 - **Structural comparison** - Node/edge counts, labels, connections
-- **Visual similarity** - SSIM-based image comparison using [SSIM](https://en.wikipedia.org/wiki/Structural_similarity_index_measure)
-- **Report generation** - Text, JSON, HTML, and side-by-side PNG outputs
+- **Visual similarity** - SSIM-based image comparison
+- **Side-by-side PNGs** - Selkie output next to Mermaid.js reference
 
-#### Visual Comparison
-
-The `--pngs` flag generates side-by-side comparison images showing Selkie output next to the Mermaid.js reference. This requires:
-
-1. Building with `--features png` for PNG generation
-2. [Mermaid CLI](https://github.com/mermaid-js/mermaid-cli) (`npm install -g @mermaid-js/mermaid-cli`)
-
-Each comparison PNG places Selkie's output on the left and Mermaid.js on the right, making differences easy to spot.
-
-Current status: **100% parity** on built-in test samples (16/16 diagrams match reference).
+Requires [Mermaid CLI](https://github.com/mermaid-js/mermaid-cli) for reference rendering (`npm install -g @mermaid-js/mermaid-cli`).
 
 ### As a Library
 
