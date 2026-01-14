@@ -48,8 +48,8 @@ bd sync               # Sync with git
 3. Confirm our changes in this branch are increasing scores.
 4. When you resolve a rendering issue, update the svg in docs/images
 5. Follow TDD, Commit when tests are passing
-6. Explore Reference implementations to understand how they work:
-    - ~/projects/mermaid/
-    - ~/projects/dagre/
-    - ~/projects/elkjs/
+6. Explore Reference implementations available as git submodules in reference-implementations:
+    - mermaid
+    - dagre
+    - elkjs
 7. Return to step 1
