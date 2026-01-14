@@ -11,6 +11,8 @@ pub struct BarycenterEntry {
     pub v: String,
     pub barycenter: Option<f64>,
     pub weight: f64,
+    /// Original index for stable sorting tie-breaking
+    pub i: usize,
 }
 
 /// Calculate barycenters for movable nodes based on in-edges
@@ -20,13 +22,15 @@ pub struct BarycenterEntry {
 pub fn barycenter(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
     movable
         .iter()
-        .map(|v| {
+        .enumerate()
+        .map(|(i, v)| {
             let in_edges = g.in_edges(v);
             if in_edges.is_empty() {
                 return BarycenterEntry {
                     v: v.clone(),
                     barycenter: None,
                     weight: 0.0,
+                    i,
                 };
             }
 
@@ -52,12 +56,14 @@ pub fn barycenter(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
                     v: v.clone(),
                     barycenter: Some(sum / weight),
                     weight,
+                    i,
                 }
             } else {
                 BarycenterEntry {
                     v: v.clone(),
                     barycenter: None,
                     weight: 0.0,
+                    i,
                 }
             }
         })
@@ -71,13 +77,15 @@ pub fn barycenter(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
 pub fn barycenter_down(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
     movable
         .iter()
-        .map(|v| {
+        .enumerate()
+        .map(|(i, v)| {
             let out_edges = g.out_edges(v);
             if out_edges.is_empty() {
                 return BarycenterEntry {
                     v: v.clone(),
                     barycenter: None,
                     weight: 0.0,
+                    i,
                 };
             }
 
@@ -103,12 +111,14 @@ pub fn barycenter_down(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntr
                     v: v.clone(),
                     barycenter: Some(sum / weight),
                     weight,
+                    i,
                 }
             } else {
                 BarycenterEntry {
                     v: v.clone(),
                     barycenter: None,
                     weight: 0.0,
+                    i,
                 }
             }
         })

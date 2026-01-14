@@ -192,13 +192,14 @@ fn expand_subgraphs(
                 .collect();
 
             // Convert back to BarycenterEntry for sorting
-            // All nodes in an entry share the same barycenter
+            // All nodes in an entry share the same barycenter and original index
             expanded_vs
                 .into_iter()
                 .map(|v| BarycenterEntry {
                     v,
                     barycenter: entry.barycenter,
                     weight: entry.weight,
+                    i: entry.i,
                 })
                 .collect::<Vec<_>>()
         })

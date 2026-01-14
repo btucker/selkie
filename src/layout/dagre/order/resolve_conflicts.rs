@@ -49,7 +49,7 @@ struct MappedEntry {
 #[derive(Debug, Clone)]
 pub struct ResolvedEntry {
     pub vs: Vec<String>,
-    #[allow(dead_code)] // Used for stable sorting in dagre.js, preserved for compatibility
+    /// Original index for stable sorting tie-breaking
     pub i: usize,
     pub barycenter: Option<f64>,
     pub weight: f64,
@@ -233,11 +233,13 @@ mod tests {
                 v: "a".to_string(),
                 barycenter: Some(1.0),
                 weight: 1.0,
+                i: 0,
             },
             BarycenterEntry {
                 v: "b".to_string(),
                 barycenter: Some(2.0),
                 weight: 1.0,
+                i: 1,
             },
         ];
 
@@ -255,11 +257,13 @@ mod tests {
                 v: "a".to_string(),
                 barycenter: Some(2.0), // Would sort after b
                 weight: 1.0,
+                i: 0,
             },
             BarycenterEntry {
                 v: "b".to_string(),
                 barycenter: Some(1.0), // Would sort before a
                 weight: 1.0,
+                i: 1,
             },
         ];
 

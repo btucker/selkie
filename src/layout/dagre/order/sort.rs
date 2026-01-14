@@ -19,28 +19,28 @@ pub struct SortResult {
 /// Entries without a barycenter maintain their relative order.
 pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
     // Partition into sortable (has barycenter) and unsortable (no barycenter)
-    let mut sortable: Vec<(usize, BarycenterEntry)> = Vec::new();
-    let mut unsortable: Vec<(usize, BarycenterEntry)> = Vec::new();
+    let mut sortable: Vec<BarycenterEntry> = Vec::new();
+    let mut unsortable: Vec<BarycenterEntry> = Vec::new();
 
-    for (i, entry) in entries.into_iter().enumerate() {
+    for entry in entries {
         if entry.barycenter.is_some() {
-            sortable.push((i, entry));
+            sortable.push(entry);
         } else {
-            unsortable.push((i, entry));
+            unsortable.push(entry);
         }
     }
 
-    // Sort sortable entries by barycenter
-    sortable.sort_by(|(i_a, a), (i_b, b)| {
+    // Sort sortable entries by barycenter, using original index (entry.i) for tie-breaking
+    sortable.sort_by(|a, b| {
         let bc_a = a.barycenter.unwrap();
         let bc_b = b.barycenter.unwrap();
 
         match bc_a.partial_cmp(&bc_b) {
             Some(std::cmp::Ordering::Equal) | None => {
                 if bias_right {
-                    i_b.cmp(i_a)
+                    b.i.cmp(&a.i)
                 } else {
-                    i_a.cmp(i_b)
+                    a.i.cmp(&b.i)
                 }
             }
             Some(ord) => ord,
@@ -48,7 +48,7 @@ pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
     });
 
     // Sort unsortable by original index (descending for consumption)
-    unsortable.sort_by(|(i_a, _), (i_b, _)| i_b.cmp(i_a));
+    unsortable.sort_by(|a, b| b.i.cmp(&a.i));
 
     // Merge the two lists
     let mut vs = Vec::new();
@@ -59,7 +59,7 @@ pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
     // Consume unsortable entries that come before any sortable
     consume_unsortable(&mut vs, &mut unsortable, &mut vs_index);
 
-    for (_, entry) in sortable {
+    for entry in sortable {
         vs_index += 1;
         vs.push(entry.v.clone());
         if let Some(bc) = entry.barycenter {
@@ -82,12 +82,12 @@ pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
 
 fn consume_unsortable(
     vs: &mut Vec<String>,
-    unsortable: &mut Vec<(usize, BarycenterEntry)>,
+    unsortable: &mut Vec<BarycenterEntry>,
     index: &mut usize,
 ) {
-    while let Some((i, _)) = unsortable.last() {
-        if *i <= *index {
-            let (_, entry) = unsortable.pop().unwrap();
+    while let Some(entry) = unsortable.last() {
+        if entry.i <= *index {
+            let entry = unsortable.pop().unwrap();
             vs.push(entry.v);
             *index += 1;
         } else {
@@ -107,16 +107,19 @@ mod tests {
                 v: "a".to_string(),
                 barycenter: Some(2.0),
                 weight: 1.0,
+                i: 0,
             },
             BarycenterEntry {
                 v: "b".to_string(),
                 barycenter: Some(1.0),
                 weight: 1.0,
+                i: 1,
             },
             BarycenterEntry {
                 v: "c".to_string(),
                 barycenter: Some(3.0),
                 weight: 1.0,
+                i: 2,
             },
         ];
 
@@ -132,16 +135,19 @@ mod tests {
                 v: "a".to_string(),
                 barycenter: Some(1.0),
                 weight: 1.0,
+                i: 0,
             },
             BarycenterEntry {
                 v: "b".to_string(),
                 barycenter: Some(1.0),
                 weight: 1.0,
+                i: 1,
             },
             BarycenterEntry {
                 v: "c".to_string(),
                 barycenter: Some(1.0),
                 weight: 1.0,
+                i: 2,
             },
         ];
 
@@ -157,11 +163,13 @@ mod tests {
                 v: "a".to_string(),
                 barycenter: Some(1.0),
                 weight: 1.0,
+                i: 0,
             },
             BarycenterEntry {
                 v: "b".to_string(),
                 barycenter: Some(1.0),
                 weight: 1.0,
+                i: 1,
             },
         ];
 
@@ -177,16 +185,19 @@ mod tests {
                 v: "a".to_string(),
                 barycenter: Some(2.0),
                 weight: 1.0,
+                i: 0,
             },
             BarycenterEntry {
                 v: "b".to_string(),
                 barycenter: None,
                 weight: 0.0,
+                i: 1,
             },
             BarycenterEntry {
                 v: "c".to_string(),
                 barycenter: Some(1.0),
                 weight: 1.0,
+                i: 2,
             },
         ];
 
