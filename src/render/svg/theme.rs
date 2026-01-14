@@ -470,7 +470,6 @@ impl Theme {
 .edge-label {{
   fill: {primary_text_color};
   font-family: {font_family};
-  font-size: 12px;
 }}
 
 .edge-label-bg {{
