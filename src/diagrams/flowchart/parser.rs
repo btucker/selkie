@@ -562,6 +562,7 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
 fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> Result<()> {
     let mut id = String::new();
     let mut title = None;
+    let mut subgraph_dir: Option<String> = None;
 
     // Track existing vertices before processing subgraph content
     let existing_vertices: std::collections::HashSet<String> =
@@ -584,9 +585,24 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
                 }
             }
             Rule::document => {
-                // Recursively process subgraph content
+                // Process subgraph content, capturing direction statements
                 for doc_inner in inner.into_inner() {
-                    process_rule(doc_inner, db)?;
+                    // document contains statements, which wrap the actual rules
+                    if doc_inner.as_rule() == Rule::statement {
+                        // Get the actual statement type from inside
+                        for stmt_inner in doc_inner.into_inner() {
+                            if stmt_inner.as_rule() == Rule::direction_stmt {
+                                // Capture direction for this subgraph specifically
+                                for dir_inner in stmt_inner.into_inner() {
+                                    if dir_inner.as_rule() == Rule::direction {
+                                        subgraph_dir = Some(dir_inner.as_str().to_string());
+                                    }
+                                }
+                            } else {
+                                process_rule(stmt_inner, db)?;
+                            }
+                        }
+                    }
                 }
             }
             _ => {}
@@ -601,7 +617,12 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
         .cloned()
         .collect();
 
-    db.add_subgraph_with_nodes(&id, title.as_deref().unwrap_or(&id), new_vertices);
+    db.add_subgraph_with_dir(
+        &id,
+        title.as_deref().unwrap_or(&id),
+        new_vertices,
+        subgraph_dir,
+    );
     Ok(())
 }
 
@@ -718,6 +739,56 @@ end"#;
         assert!(result.is_ok(), "Failed to parse: {:?}", result);
         let db = result.unwrap();
         assert!(!db.subgraphs().is_empty(), "Should have subgraphs");
+    }
+
+    #[test]
+    fn test_parse_subgraph_with_direction() {
+        let input = r#"flowchart LR
+subgraph sub1[Title]
+    direction TB
+    A --> B
+end"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        let db = result.unwrap();
+
+        let subgraphs = db.subgraphs();
+        assert_eq!(subgraphs.len(), 1, "Should have one subgraph");
+
+        let subgraph = &subgraphs[0];
+        assert_eq!(subgraph.id, "sub1");
+        assert_eq!(
+            subgraph.dir,
+            Some("TB".to_string()),
+            "Subgraph should have TB direction"
+        );
+
+        // The main graph direction should still be LR (not affected by subgraph direction)
+        assert_eq!(
+            db.get_direction(),
+            "LR",
+            "Main graph direction should remain LR"
+        );
+    }
+
+    #[test]
+    fn test_parse_subgraph_without_direction() {
+        let input = r#"flowchart TB
+subgraph sub1[Title]
+    A --> B
+end"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        let db = result.unwrap();
+
+        let subgraphs = db.subgraphs();
+        assert_eq!(subgraphs.len(), 1);
+
+        let subgraph = &subgraphs[0];
+        assert_eq!(
+            subgraph.dir, None,
+            "Subgraph without direction statement should have dir=None"
+        );
     }
 
     #[test]

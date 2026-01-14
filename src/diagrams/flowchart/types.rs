@@ -768,6 +768,17 @@ impl FlowchartDb {
         self.add_sub_graph(nodes, id, title, "");
     }
 
+    /// Add a subgraph with member nodes and optional direction
+    pub fn add_subgraph_with_dir(
+        &mut self,
+        id: &str,
+        title: &str,
+        nodes: Vec<String>,
+        dir: Option<String>,
+    ) {
+        self.add_sub_graph(nodes, id, title, dir.as_deref().unwrap_or(""));
+    }
+
     /// Set link on a vertex (for click handler)
     pub fn set_link(&mut self, id: &str, link: &str, target: Option<&str>) {
         if let Some(vertex) = self.vertices.get_mut(id) {

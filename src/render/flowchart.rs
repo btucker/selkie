@@ -47,6 +47,12 @@ impl ToLayoutGraph for FlowchartDb {
                 .metadata
                 .insert("is_group".to_string(), "true".to_string());
 
+            // Store subgraph direction if specified
+            // Note: Full subgraph direction support requires recursive layout (like mermaid.js)
+            if let Some(ref dir) = subgraph.dir {
+                sg_node.metadata.insert("dir".to_string(), dir.clone());
+            }
+
             graph.add_node(sg_node);
         }
 
