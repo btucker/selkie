@@ -148,34 +148,42 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
     let spatial_maps = build_spatial_maps(&adj, &node_ids);
 
     let mut positions: HashMap<String, (f64, f64)> = HashMap::new();
-    let mut offset_x = 0.0;
+    let mut max_x = 0.0;
 
+    // Initialize positions from grid layout (warm start)
     for spatial_map in spatial_maps {
         let mut component_positions: Vec<(String, f64, f64)> = Vec::new();
-        let mut min_x = f64::MAX;
-        let mut max_x = f64::MIN;
+        let mut local_min_x = f64::MAX;
+        let mut local_max_x = f64::MIN;
 
         for (id, (grid_x, grid_y)) in spatial_map {
             let cx = (grid_x as f64) * ARCH_NODE_SPACING;
             let cy = (-grid_y as f64) * ARCH_NODE_SPACING;
-            min_x = min_x.min(cx);
-            max_x = max_x.max(cx);
+            local_min_x = local_min_x.min(cx);
+            local_max_x = local_max_x.max(cx);
             component_positions.push((id, cx, cy));
         }
 
-        let shift_x = if min_x == f64::MAX {
+        let shift_x = if local_min_x == f64::MAX {
             0.0
         } else {
-            offset_x - min_x
+            max_x - local_min_x
         };
+
         for (id, cx, cy) in component_positions {
             positions.insert(id, (cx + shift_x, cy));
         }
 
-        if min_x != f64::MAX {
-            offset_x = max_x + shift_x + ARCH_NODE_SPACING;
+        if local_min_x != f64::MAX {
+            max_x = max_x + (local_max_x - local_min_x) + ARCH_NODE_SPACING * 2.0;
         }
     }
+
+    // Refine positions with force-directed simulation to better match reference strategy (fCoSE)
+    // and handle overlaps/grouping dynamically.
+    let mut sim = Simulation::new(db, positions.clone(), &adj);
+    sim.run(300);
+    positions = sim.get_positions();
 
     let half_icon = ARCH_ICON_SIZE / 2.0;
     for (id, (cx, cy)) in positions {
@@ -196,6 +204,263 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
     }
 
     graph.compute_bounds();
+}
+
+// --- Simulation Logic ---
+
+const REPULSION_FORCE: f64 = 1_000_000.0;
+const SPRING_STIFFNESS: f64 = 0.8;
+const GROUP_GRAVITY: f64 = 0.02;
+const DAMPING: f64 = 0.8;
+const DT: f64 = 0.5;
+
+struct NodeState {
+    x: f64,
+    y: f64,
+    vx: f64,
+    vy: f64,
+}
+
+struct Constraint {
+    target: String, // from source to target
+    dx: f64,
+    dy: f64,
+}
+
+struct Simulation {
+    nodes: HashMap<String, NodeState>,
+    edges: HashMap<String, Vec<Constraint>>, // source -> [constraints]
+    groups: HashMap<String, Vec<String>>,    // group_id -> [node_ids]
+}
+
+impl Simulation {
+    fn new(
+        db: &ArchitectureDb,
+        initial_positions: HashMap<String, (f64, f64)>,
+        adj: &HashMap<String, Vec<(ArchitectureDirectionPair, String, i32)>>,
+    ) -> Self {
+        let mut nodes = HashMap::new();
+        for (id, (x, y)) in initial_positions {
+            nodes.insert(
+                id,
+                NodeState {
+                    x,
+                    y,
+                    vx: 0.0,
+                    vy: 0.0,
+                },
+            );
+        }
+
+        let mut edges = HashMap::new();
+        for (src, neighbors) in adj {
+            for (pair, dst, distance) in neighbors {
+                // Constraints are directional. We add source -> target.
+                // adj contains both directions (A->B and B->A via build_adjacency).
+                // We only want to process each physical edge once or consistent constraints.
+                // ArchitectureDirectionPair stores 'source' direction.
+                // We can use it to determine target position relative to source.
+                // dx/dy from shift_position logic.
+
+                let mut dx = 0.0;
+                let mut dy = 0.0;
+                let dist = (*distance as f64) * ARCH_NODE_SPACING;
+
+                if pair.source.is_x() {
+                    dx = if pair.source == ArchitectureDirection::Left {
+                        -dist
+                    } else {
+                        dist
+                    };
+                } else {
+                    dy = if pair.source == ArchitectureDirection::Top {
+                        dist // Top is Up (-y in screen?), wait.
+                             // In shift_position: Top -> distance. Bottom -> -distance.
+                             // Grid Y increases Up (in shift_position logic interpretation for layout).
+                             // cy = -grid_y * SPACING.
+                             // So if grid_y + 1 (Up), cy decreases.
+                             // Here we are working in world coords (cx, cy).
+                             // We should stick to world coord constraints.
+                             // Top means target is ABOVE source.
+                             // y_target < y_source.
+                             // So dy should be negative.
+                    } else {
+                        -dist // Bottom means target is BELOW. y_target > y_source. dy positive?
+                    };
+                }
+
+                // Wait, need to check coord system consistency.
+                // build_spatial_maps uses: cy = -grid_y * SPACING.
+                // shift_position: Top -> +distance (grid_y).
+                // So Top -> +grid_y -> -cy. (Up).
+                // Bottom -> -distance (grid_y) -> +cy. (Down).
+                // So:
+                // Top: dy = -dist.
+                // Bottom: dy = dist.
+                // Left: dx = -dist.
+                // Right: dx = dist.
+
+                // Corrections based on shift_position:
+                // source.is_x(): Left -> -distance. Right -> +distance.
+                // source.is_y(): Top -> +distance. Bottom -> -distance.
+                // This was GRID units.
+                // World coords:
+                // X = grid_x * S.
+                // Y = -grid_y * S.
+                // Top -> +grid_y -> Y changes by -grid_y_change * S = -distance * S.
+                // So Top -> dy = -dist.
+                // Bottom -> -grid_y -> Y changes by -(-distance) * S = +distance * S.
+                // So Bottom -> dy = dist.
+
+                if pair.source == ArchitectureDirection::Top {
+                    dy = -dist;
+                } else if pair.source == ArchitectureDirection::Bottom {
+                    dy = dist;
+                } else if pair.source == ArchitectureDirection::Left {
+                    dx = -dist;
+                } else if pair.source == ArchitectureDirection::Right {
+                    dx = dist;
+                }
+
+                edges
+                    .entry(src.clone())
+                    .or_insert(Vec::new())
+                    .push(Constraint {
+                        target: dst.clone(),
+                        dx,
+                        dy,
+                    });
+            }
+        }
+
+        // Build group map
+        let mut groups: HashMap<String, Vec<String>> = HashMap::new();
+        let node_groups = build_node_group_map(db);
+        for (node, group_opt) in node_groups {
+            if let Some(group) = group_opt {
+                groups.entry(group).or_default().push(node);
+            }
+        }
+
+        Self {
+            nodes,
+            edges,
+            groups,
+        }
+    }
+
+    fn run(&mut self, iterations: usize) {
+        let keys: Vec<String> = self.nodes.keys().cloned().collect();
+
+        for _ in 0..iterations {
+            let mut forces: HashMap<String, (f64, f64)> = HashMap::new();
+
+            // 1. Repulsion (All pairs)
+            for i in 0..keys.len() {
+                for j in (i + 1)..keys.len() {
+                    let k1 = &keys[i];
+                    let k2 = &keys[j];
+                    let n1 = &self.nodes[k1];
+                    let n2 = &self.nodes[k2];
+
+                    let dx = n1.x - n2.x;
+                    let dy = n1.y - n2.y;
+                    let dist_sq = dx * dx + dy * dy;
+                    let dist = dist_sq.sqrt().max(1.0);
+
+                    // Repulsion
+                    let f = REPULSION_FORCE / dist_sq;
+                    let fx = (dx / dist) * f;
+                    let fy = (dy / dist) * f;
+
+                    let f1 = forces.entry(k1.clone()).or_insert((0.0, 0.0));
+                    f1.0 += fx;
+                    f1.1 += fy;
+
+                    let f2 = forces.entry(k2.clone()).or_insert((0.0, 0.0));
+                    f2.0 -= fx;
+                    f2.1 -= fy;
+                }
+            }
+
+            // 2. Edge Constraints (Springs)
+            for (src, constraints) in &self.edges {
+                let n_src = &self.nodes[src];
+                for c in constraints {
+                    if let Some(n_tgt) = self.nodes.get(&c.target) {
+                        // Hooke's Law: F = k * (extension)
+                        // Target pos for tgt is src + d
+                        // extension = (tgt_pos - src_pos) - d
+                        // No, simpler: Attract tgt to (src + d). Attract src to (tgt - d).
+
+                        let target_x = n_src.x + c.dx;
+                        let target_y = n_src.y + c.dy;
+
+                        let dx = n_tgt.x - target_x;
+                        let dy = n_tgt.y - target_y;
+
+                        let fx = -SPRING_STIFFNESS * dx;
+                        let fy = -SPRING_STIFFNESS * dy;
+
+                        // Apply to target
+                        let f_tgt = forces.entry(c.target.clone()).or_insert((0.0, 0.0));
+                        f_tgt.0 += fx;
+                        f_tgt.1 += fy;
+
+                        // Apply opposite to source
+                        let f_src = forces.entry(src.clone()).or_insert((0.0, 0.0));
+                        f_src.0 -= fx;
+                        f_src.1 -= fy;
+                    }
+                }
+            }
+
+            // 3. Group Gravity (Keep groups compact)
+            for members in self.groups.values() {
+                if members.is_empty() {
+                    continue;
+                }
+                // Calculate centroid
+                let mut sum_x = 0.0;
+                let mut sum_y = 0.0;
+                for m in members {
+                    if let Some(n) = self.nodes.get(m) {
+                        sum_x += n.x;
+                        sum_y += n.y;
+                    }
+                }
+                let cx = sum_x / members.len() as f64;
+                let cy = sum_y / members.len() as f64;
+
+                for m in members {
+                    if let Some(n) = self.nodes.get(m) {
+                        let dx = cx - n.x;
+                        let dy = cy - n.y;
+                        let f = forces.entry(m.clone()).or_insert((0.0, 0.0));
+                        f.0 += dx * GROUP_GRAVITY;
+                        f.1 += dy * GROUP_GRAVITY;
+                    }
+                }
+            }
+
+            // Update positions
+            for (id, node) in self.nodes.iter_mut() {
+                if let Some((fx, fy)) = forces.get(id) {
+                    node.vx = (node.vx + fx * DT) * DAMPING;
+                    node.vy = (node.vy + fy * DT) * DAMPING;
+                    node.x += node.vx * DT;
+                    node.y += node.vy * DT;
+                }
+            }
+        }
+    }
+
+    fn get_positions(&self) -> HashMap<String, (f64, f64)> {
+        self.nodes
+            .iter()
+            .map(|(k, v)| (k.clone(), (v.x, v.y)))
+            .collect()
+    }
 }
 
 fn build_adjacency(
