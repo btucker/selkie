@@ -17,7 +17,15 @@ impl ToLayoutGraph for StateDb {
     fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
         use std::collections::HashSet;
 
-        let config = NodeSizeConfig::default();
+        // State-specific config: smaller padding since state diagrams use SVG text (not foreignObject)
+        let config = NodeSizeConfig {
+            font_size: 10.0, // Matches mermaid state font-size
+            padding_horizontal: 10.0,
+            padding_vertical: 8.0,
+            min_width: 40.0,
+            min_height: 26.0,
+            max_width: Some(200.0),
+        };
         let mut graph = LayoutGraph::new("state");
 
         // Set layout options from diagram direction
@@ -105,8 +113,8 @@ impl ToLayoutGraph for StateDb {
             let (width, height) = if id.starts_with("[*]")
                 || matches!(state.state_type, StateType::Start | StateType::End)
             {
-                // Small fixed size for start/end circles
-                (24.0, 24.0)
+                // Small fixed size for start/end circles (r=7, diameter=14)
+                (14.0, 14.0)
             } else if matches!(state.state_type, StateType::Fork | StateType::Join) {
                 // Horizontal bar matching mermaid reference (70×10)
                 (70.0, 10.0)
@@ -161,8 +169,8 @@ impl ToLayoutGraph for StateDb {
 pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
-    // Layout constants
-    let start_end_radius = 12.0;
+    // Layout constants (matching mermaid reference: r=7 for start/end circles)
+    let start_end_radius = 7.0;
     let margin = 20.0;
 
     // Determine which [*] states are starts vs ends based on transitions
@@ -189,8 +197,12 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         return Ok(doc.to_string());
     }
 
-    // Use proper DAG layout
-    let size_estimator = CharacterSizeEstimator::default();
+    // Use proper DAG layout with state-specific estimator
+    // State diagrams use SVG text (not foreignObject) so line height is tighter
+    let size_estimator = CharacterSizeEstimator {
+        char_width_ratio: 0.6,
+        line_height_ratio: 1.4, // SVG text vs 2.3 for HTML foreignObject
+    };
     let layout_input = db.to_layout_graph(&size_estimator)?;
     let layout_result = layout(layout_input)?;
 
@@ -599,7 +611,7 @@ fn render_state_node(
                     attrs: Attrs::new()
                         .with_attr("text-anchor", "middle")
                         .with_class("state-label")
-                        .with_attr("font-size", "12"),
+                        .with_attr("font-size", "10"),
                 });
 
                 // State descriptions
@@ -978,19 +990,20 @@ fn render_note(x: f64, y: f64, text: &str) -> SvgElement {
     }
 }
 
-/// Create arrow marker
+/// Create arrow marker (matches mermaid barbEnd marker)
 fn create_arrow_marker() -> SvgElement {
     SvgElement::Marker {
         id: "arrow".to_string(),
-        view_box: "0 0 10 10".to_string(),
-        ref_x: 10.0,
-        ref_y: 5.0,
-        marker_width: 6.0,
-        marker_height: 6.0,
+        view_box: "0 0 20 14".to_string(),
+        ref_x: 19.0,
+        ref_y: 7.0,
+        marker_width: 20.0,
+        marker_height: 14.0,
         orient: "auto".to_string(),
-        marker_units: None,
+        marker_units: Some("userSpaceOnUse".to_string()),
         children: vec![SvgElement::Path {
-            d: "M 0 0 L 10 5 L 0 10 z".to_string(),
+            // Barbed arrow shape matching mermaid reference: M 19,7 L9,13 L14,7 L9,1 Z
+            d: "M 19,7 L9,13 L14,7 L9,1 Z".to_string(),
             attrs: Attrs::new()
                 .with_fill("#333333")
                 .with_stroke("#333333")
@@ -1044,24 +1057,24 @@ fn render_end_state_bullseye(
     height: f64,
     start_end_radius: f64,
 ) {
-    // Outer circle
+    // Outer circle: purple fill with white stroke (matching mermaid reference)
     children.push(SvgElement::Circle {
         cx: x + width / 2.0,
         cy: y + height / 2.0,
         r: start_end_radius,
         attrs: Attrs::new()
-            .with_fill("none")
-            .with_stroke("#333333")
-            .with_stroke_width(2.0)
+            .with_fill("#9370DB")
+            .with_stroke("white")
+            .with_stroke_width(1.5)
             .with_class("state-end-outer"),
     });
-    // Inner circle
+    // Inner circle: white fill (matching mermaid reference)
     children.push(SvgElement::Circle {
         cx: x + width / 2.0,
         cy: y + height / 2.0,
-        r: start_end_radius * 0.6,
+        r: start_end_radius * 0.5,
         attrs: Attrs::new()
-            .with_fill("#333333")
+            .with_fill("white")
             .with_class("state-end-inner"),
     });
 }
@@ -1079,6 +1092,7 @@ fn generate_state_css() -> String {
 
 .state-label {
   fill: #333333;
+  font-weight: bold;
 }
 
 .state-description {
@@ -1090,11 +1104,13 @@ fn generate_state_css() -> String {
 }
 
 .state-end-outer {
-  stroke: #333333;
+  fill: #9370DB;
+  stroke: white;
+  stroke-width: 1.5;
 }
 
 .state-end-inner {
-  fill: #333333;
+  fill: white;
 }
 
 .state-fork-join {
