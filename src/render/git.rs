@@ -1982,9 +1982,9 @@ fn compute_git_palette(theme: &Theme) -> GitPalette {
 
     for color in &mut git_colors {
         if dark_mode {
-            *color = lighten(color, 25.0);
+            *color = lighten(color, 50.0);
         } else {
-            *color = darken(color, 25.0);
+            *color = darken(color, 50.0);
         }
     }
 
@@ -1993,7 +1993,7 @@ fn compute_git_palette(theme: &Theme) -> GitPalette {
         .enumerate()
         .map(|(idx, c)| {
             if idx == 0 {
-                darken(&invert(c), 25.0).to_hex()
+                darken(&invert(c), 50.0).to_hex()
             } else {
                 invert(c).to_hex()
             }
