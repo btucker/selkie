@@ -1061,8 +1061,8 @@ fn determine_start_end_states(db: &StateDb) -> HashMap<&str, StartEndInfo> {
     result
 }
 
-/// Render end state bullseye (double circle - ring with hollow center)
-/// Mermaid uses a "donut" approach: solid border-color outer circle + background inner circle
+/// Render end state bullseye (outer ring + filled inner circle)
+/// Mermaid stateEnd.ts: outer=stroke only (lineColor), inner=filled (stateBorder)
 fn render_end_state_bullseye(
     children: &mut Vec<SvgElement>,
     x: f64,
@@ -1072,25 +1072,27 @@ fn render_end_state_bullseye(
     start_end_radius: f64,
     theme: &crate::render::svg::Theme,
 ) {
-    // Outer circle: filled with primary_border_color, stroke with background (matches mermaid)
+    // Outer circle: stroke only with line_color, no fill (creates the outer ring)
     children.push(SvgElement::Circle {
         cx: x + width / 2.0,
         cy: y + height / 2.0,
         r: start_end_radius,
         attrs: Attrs::new()
-            .with_fill(&theme.primary_border_color)
-            .with_stroke(&theme.background)
-            .with_stroke_width(1.5)
+            .with_fill("none")
+            .with_stroke(&theme.line_color)
+            .with_stroke_width(2.0)
             .with_class("state-end-outer"),
     });
-    // Inner circle: background fill to create hollow center (bullseye effect)
-    // Mermaid uses ratio of inner radius ~3.5 to outer radius ~7, so 0.5
+    // Inner circle: filled with primary_border_color (creates the center dot)
+    // Mermaid uses diameter ratio 5:14, so radius ratio ~0.36
     children.push(SvgElement::Circle {
         cx: x + width / 2.0,
         cy: y + height / 2.0,
-        r: start_end_radius * 0.5,
+        r: start_end_radius * 0.36,
         attrs: Attrs::new()
-            .with_fill(&theme.background)
+            .with_fill(&theme.primary_border_color)
+            .with_stroke(&theme.primary_border_color)
+            .with_stroke_width(2.0)
             .with_class("state-end-inner"),
     });
 }
@@ -1120,13 +1122,15 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .state-end-outer {{
-  fill: {primary_border_color};
-  stroke: {background};
-  stroke-width: 1.5;
+  fill: none;
+  stroke: {line_color};
+  stroke-width: 2;
 }}
 
 .state-end-inner {{
-  fill: {background};
+  fill: {primary_border_color};
+  stroke: {primary_border_color};
+  stroke-width: 2;
 }}
 
 .state-fork-join {{
