@@ -282,8 +282,9 @@ fn render_task_bars(
         };
         doc.add_element(bar_elem);
 
-        // Estimate text width (approx 0.6 * fontSize per character for typical fonts)
-        let estimated_text_width = task.task.len() as f64 * FONT_SIZE * 0.6;
+        // Estimate text width (approx 0.5 * fontSize per character for typical fonts)
+        // Based on measured mermaid.js output: avg char width ≈ 0.48 * fontSize
+        let estimated_text_width = task.task.len() as f64 * FONT_SIZE * 0.5;
         let text_y = bar_y + BAR_HEIGHT / 2.0 + (FONT_SIZE / 2.0 - 2.0);
 
         // Determine if text fits inside bar, or needs to go outside
