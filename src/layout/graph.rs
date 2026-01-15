@@ -19,6 +19,10 @@ pub struct LayoutGraph {
     pub width: Option<f64>,
     /// Computed graph height (set after layout)
     pub height: Option<f64>,
+    /// Bounds origin X (min_x from compute_bounds, for viewBox)
+    pub bounds_x: Option<f64>,
+    /// Bounds origin Y (min_y from compute_bounds, for viewBox)
+    pub bounds_y: Option<f64>,
 }
 
 impl LayoutGraph {
@@ -30,6 +34,8 @@ impl LayoutGraph {
             options: LayoutOptions::default(),
             width: None,
             height: None,
+            bounds_x: None,
+            bounds_y: None,
         }
     }
 
@@ -198,6 +204,8 @@ impl LayoutGraph {
             // Content bounds only - padding is applied in the renderer
             self.width = Some(max_x - min_x);
             self.height = Some(max_y - min_y);
+            self.bounds_x = Some(min_x);
+            self.bounds_y = Some(min_y);
         }
     }
 

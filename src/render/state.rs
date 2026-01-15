@@ -237,10 +237,16 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     };
 
     // Calculate diagram bounds (layout now includes edge labels)
+    // Use bounds origin to handle content with negative coordinates (e.g., edge labels)
+    let bounds_x = layout_result.bounds_x.unwrap_or(0.0);
+    let bounds_y = layout_result.bounds_y.unwrap_or(0.0);
     let max_width = layout_result.width.unwrap_or(400.0) + margin * 2.0;
     let max_height = layout_result.height.unwrap_or(200.0) + margin * 2.0 + title_offset;
 
-    doc.set_size(max_width, max_height);
+    // ViewBox origin accounts for margin offset from content bounds
+    let view_x = bounds_x - margin;
+    let view_y = bounds_y - margin - title_offset;
+    doc.set_size_with_origin(view_x, view_y, max_width, max_height);
 
     // Add theme styles
     if config.embed_css {
@@ -1603,12 +1609,21 @@ mod tests {
             // Edge labels should be within the viewBox
             // Account for label width (approximate)
             let approx_width = label.len() as f64 * 9.6; // 16px * 0.6 char ratio
+            let label_left = x - approx_width / 2.0;
             let label_right = x + approx_width / 2.0;
 
+            // Check left edge
+            assert!(
+                label_left >= vb_x - 5.0, // 5px tolerance
+                "Label '{}' at x={} (left edge ~{}) extends beyond viewBox left {} (viewBox: {} {} {} {})",
+                label, x, label_left, vb_x, vb_x, vb_y, vb_width, vb_height
+            );
+
+            // Check right edge
             assert!(
                 label_right <= vb_x + vb_width + 5.0, // 5px tolerance
-                "Label '{}' at x={} (right edge ~{}) extends beyond viewBox width {} (viewBox: {} {} {} {})",
-                label, x, label_right, vb_width, vb_x, vb_y, vb_width, vb_height
+                "Label '{}' at x={} (right edge ~{}) extends beyond viewBox right {} (viewBox: {} {} {} {})",
+                label, x, label_right, vb_x + vb_width, vb_x, vb_y, vb_width, vb_height
             );
         }
     }
