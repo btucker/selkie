@@ -1968,7 +1968,11 @@ fn generate_git_css(theme: &Theme) -> String {
 fn compute_git_palette(theme: &Theme) -> GitPalette {
     let primary = Color::parse(&theme.primary_color).unwrap_or(Color::rgb(236, 236, 255));
     let secondary = Color::parse(&theme.secondary_color).unwrap_or(Color::rgb(255, 255, 222));
-    let tertiary = Color::parse(&theme.tertiary_color).unwrap_or(Color::rgb(250, 250, 250));
+    let tertiary = if theme.tertiary_color.trim().eq_ignore_ascii_case("#fafafa") {
+        adjust(&primary, -160.0, 0.0, 0.0)
+    } else {
+        Color::parse(&theme.tertiary_color).unwrap_or_else(|| adjust(&primary, -160.0, 0.0, 0.0))
+    };
     let dark_mode = Color::parse(&theme.background)
         .map(|c| c.is_dark())
         .unwrap_or(false);
