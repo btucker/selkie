@@ -213,8 +213,9 @@ fn build_adjacency(
         let lhs_group = node_groups.get(&edge.lhs_id).and_then(|g| g.as_deref());
         let rhs_group = node_groups.get(&edge.rhs_id).and_then(|g| g.as_deref());
 
-        // Increase distance if crossing group boundaries to separate subgraphs
-        let distance = if lhs_group != rhs_group { 2 } else { 1 };
+        // Use larger distance for disjoint groups to prevent bounding box overlaps
+        let related = are_groups_related(lhs_group, rhs_group, db);
+        let distance = if related { 1 } else { 3 };
 
         if let Some(pair) = ArchitectureDirectionPair::new(edge.lhs_dir, edge.rhs_dir) {
             adj.entry(edge.lhs_id.clone())
@@ -229,6 +230,43 @@ fn build_adjacency(
     }
 
     adj
+}
+
+fn are_groups_related(g1: Option<&str>, g2: Option<&str>, db: &ArchitectureDb) -> bool {
+    match (g1, g2) {
+        (None, None) => true,
+        (Some(a), Some(b)) => {
+            if a == b {
+                return true;
+            }
+            // Is a ancestor of b?
+            let mut curr = Some(b.to_string());
+            while let Some(c) = curr {
+                if c == a {
+                    return true;
+                }
+                curr = db
+                    .get_groups()
+                    .iter()
+                    .find(|g| g.id == c)
+                    .and_then(|g| g.parent.clone());
+            }
+            // Is b ancestor of a?
+            let mut curr = Some(a.to_string());
+            while let Some(c) = curr {
+                if c == b {
+                    return true;
+                }
+                curr = db
+                    .get_groups()
+                    .iter()
+                    .find(|g| g.id == c)
+                    .and_then(|g| g.parent.clone());
+            }
+            false
+        }
+        _ => false,
+    }
 }
 
 fn build_spatial_maps(
