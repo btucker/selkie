@@ -15,10 +15,14 @@ pub use elements::{Attrs, SvgElement};
 pub use structure::SvgStructure;
 pub use theme::{Theme, ThemeBuilder};
 
-use crate::diagrams::architecture::{ArchitectureDb, ArchitectureDirection, ArchitectureGroup};
+use crate::diagrams::architecture::{ArchitectureDb, ArchitectureDirection, ArchitectureService};
 use crate::diagrams::flowchart::{FlowSubGraph, FlowchartDb};
 use crate::error::Result;
 use crate::layout::{LayoutGraph, LayoutNode, Point};
+use crate::render::architecture::{
+    ARCH_EDGE_GROUP_LABEL_SHIFT, ARCH_FONT_SIZE, ARCH_GROUP_ICON_SCALE, ARCH_ICON_SIZE,
+    ARCH_LABEL_HEIGHT, ARCH_PADDING,
+};
 
 /// Configuration for SVG rendering
 #[derive(Debug, Clone)]
@@ -157,7 +161,7 @@ impl SvgRenderer {
         doc.set_size_with_origin(view_min_x, view_min_y, view_width, view_height);
 
         if self.config.embed_css {
-            let mut css = self.config.theme.generate_css();
+            let mut css = architecture_css();
             if let Some(ref custom_css) = self.config.theme_css {
                 let sanitized = sanitize_css(custom_css);
                 if !sanitized.is_empty() {
@@ -168,37 +172,14 @@ impl SvgRenderer {
             doc.add_style(&css);
         }
 
-        doc.add_defs(markers::create_arrow_markers(&self.config.theme));
+        let edges = render_architecture_edges(db, graph);
+        doc.add_edge_path(edges);
 
-        for group in db.get_groups() {
-            if let Some(element) = self.render_architecture_group(group, graph) {
-                doc.add_cluster(element);
-            }
-        }
+        let services = render_architecture_services(db, graph);
+        doc.add_node(services);
 
-        for edge in &graph.edges {
-            if edge.id.contains("_dummy_") {
-                continue;
-            }
-            let (path, label) = render_architecture_edge(edge, graph);
-            if let Some(path) = path {
-                doc.add_edge_path(path);
-            }
-            if let Some(label) = label {
-                doc.add_edge_label(label);
-            }
-        }
-
-        for node in &graph.nodes {
-            if node.is_dummy
-                || matches!(node.metadata.get("is_group"), Some(value) if value == "true")
-            {
-                continue;
-            }
-            if let Some(element) = render_architecture_node(node) {
-                doc.add_node(element);
-            }
-        }
+        let groups = render_architecture_groups(db, graph);
+        doc.add_node(groups);
 
         Ok(doc.to_string())
     }
@@ -272,24 +253,34 @@ impl SvgRenderer {
         db: &ArchitectureDb,
         graph: &LayoutGraph,
     ) -> (f64, f64, f64, f64) {
-        let padding = self.config.padding;
-        let group_padding = 20.0;
-        let title_height = 22.0;
-
         let mut min_x = f64::MAX;
         let mut min_y = f64::MAX;
         let mut max_x = f64::MIN;
         let mut max_y = f64::MIN;
 
-        for node in &graph.nodes {
-            if node.is_dummy {
-                continue;
+        for service in db.get_services() {
+            if let Some(node) = graph.get_node(&service.id) {
+                if let (Some(x), Some(y)) = (node.x, node.y) {
+                    let mut height = node.height;
+                    if service.title.is_some() {
+                        height += ARCH_LABEL_HEIGHT;
+                    }
+                    min_x = min_x.min(x);
+                    min_y = min_y.min(y);
+                    max_x = max_x.max(x + node.width);
+                    max_y = max_y.max(y + height);
+                }
             }
-            if let (Some(x), Some(y)) = (node.x, node.y) {
-                min_x = min_x.min(x);
-                min_y = min_y.min(y);
-                max_x = max_x.max(x + node.width);
-                max_y = max_y.max(y + node.height);
+        }
+
+        for junction in db.get_junctions() {
+            if let Some(node) = graph.get_node(&junction.id) {
+                if let (Some(x), Some(y)) = (node.x, node.y) {
+                    min_x = min_x.min(x);
+                    min_y = min_y.min(y);
+                    max_x = max_x.max(x + node.width);
+                    max_y = max_y.max(y + node.height);
+                }
             }
         }
 
@@ -297,15 +288,10 @@ impl SvgRenderer {
             if let Some(node) = graph.get_node(&group.id) {
                 if let (Some(x), Some(y)) = (node.x, node.y) {
                     if node.width > 0.0 && node.height > 0.0 {
-                        let box_min_x = x - group_padding;
-                        let box_min_y = y - group_padding - title_height;
-                        let box_max_x = x + node.width + group_padding;
-                        let box_max_y = y + node.height + group_padding;
-
-                        min_x = min_x.min(box_min_x);
-                        min_y = min_y.min(box_min_y);
-                        max_x = max_x.max(box_max_x);
-                        max_y = max_y.max(box_max_y);
+                        min_x = min_x.min(x);
+                        min_y = min_y.min(y);
+                        max_x = max_x.max(x + node.width);
+                        max_y = max_y.max(y + node.height);
                     }
                 }
             }
@@ -318,10 +304,10 @@ impl SvgRenderer {
             max_y = graph.height.unwrap_or(600.0);
         }
 
-        min_x -= padding;
-        min_y -= padding;
-        max_x += padding;
-        max_y += padding;
+        min_x -= ARCH_PADDING;
+        min_y -= ARCH_PADDING;
+        max_x += ARCH_PADDING;
+        max_y += ARCH_PADDING;
 
         let width = max_x - min_x;
         let height = max_y - min_y;
@@ -393,205 +379,372 @@ impl SvgRenderer {
 
         Some(SvgElement::group(vec![rect, label]).with_attrs(group_attrs))
     }
-
-    fn render_architecture_group(
-        &self,
-        group: &ArchitectureGroup,
-        graph: &LayoutGraph,
-    ) -> Option<SvgElement> {
-        let node = graph.get_node(&group.id)?;
-        let (x, y) = (node.x?, node.y?);
-        if node.width == 0.0 || node.height == 0.0 {
-            return None;
-        }
-
-        let padding = 20.0;
-        let title_height = 22.0;
-
-        let rect_x = x - padding;
-        let rect_y = y - padding - title_height;
-        let rect_w = node.width + padding * 2.0;
-        let rect_h = node.height + padding * 2.0 + title_height;
-
-        let rect = SvgElement::rect(rect_x, rect_y, rect_w, rect_h)
-            .with_attrs(Attrs::new().with_class("cluster"));
-
-        let label_text = group.title.as_deref().unwrap_or(group.id.as_str());
-        let label = SvgElement::Text {
-            x: rect_x + rect_w / 2.0,
-            y: rect_y + 15.0,
-            content: label_text.to_string(),
-            attrs: Attrs::new()
-                .with_class("cluster-label")
-                .with_attr("text-anchor", "middle"),
-        };
-
-        let group_attrs = Attrs::new()
-            .with_class("subgraph")
-            .with_id(&format!("group-{}", group.id));
-
-        Some(SvgElement::group(vec![rect, label]).with_attrs(group_attrs))
-    }
 }
 
-fn render_architecture_node(node: &LayoutNode) -> Option<SvgElement> {
-    let (x, y) = (node.x?, node.y?);
-    let w = node.width;
-    let h = node.height;
-    let cx = x + w / 2.0;
-    let cy = y + h / 2.0;
+fn architecture_css() -> String {
+    [
+        ".mermaid{font-family:\"trebuchet ms\",verdana,arial,sans-serif;font-size:16px;fill:#333;}",
+        ".mermaid svg{font-family:\"trebuchet ms\",verdana,arial,sans-serif;font-size:16px;}",
+        ".mermaid p{margin:0;}",
+        ".mermaid .edge{stroke-width:3;stroke:#333333;fill:none;}",
+        ".mermaid .arrow{fill:#333333;}",
+        ".mermaid .node-bkg{fill:none;stroke:hsl(240, 60%, 86.2745098039%);stroke-width:2px;stroke-dasharray:8;}",
+        ".mermaid .node-icon-text{display:flex;align-items:center;}",
+        ".mermaid .node-icon-text>div{color:#fff;margin:1px;height:fit-content;text-align:center;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;}",
+    ]
+    .join("\n")
+}
 
-    let node_type = node
-        .metadata
-        .get("node_type")
-        .map(|s| s.as_str())
-        .unwrap_or("service");
-
-    let shape = if node_type == "junction" {
-        SvgElement::circle(cx, cy, (w.min(h)) / 2.0)
-    } else {
-        SvgElement::rounded_rect(x, y, w, h, 6.0)
-    };
-
-    let mut elements = vec![shape];
-
-    if node_type != "junction" {
-        if let Some(label) = node.label.as_deref() {
-            let label_element = SvgElement::text(cx, cy, label).with_attrs(
-                Attrs::new()
-                    .with_class("label")
-                    .with_attr("text-anchor", "middle")
-                    .with_attr("dominant-baseline", "central"),
-            );
-            elements.push(label_element);
+fn render_architecture_edges(db: &ArchitectureDb, graph: &LayoutGraph) -> SvgElement {
+    let mut elements = Vec::new();
+    for edge in db.get_edges().iter() {
+        if let Some(element) = render_architecture_edge(edge, db, graph) {
+            elements.push(element);
         }
     }
 
-    let group_attrs = Attrs::new()
-        .with_class("node")
-        .with_id(&format!("node-{}", node.id));
+    SvgElement::group(elements).with_attrs(Attrs::new().with_class("architecture-edges"))
+}
 
-    Some(SvgElement::group(elements).with_attrs(group_attrs))
+fn render_architecture_services(db: &ArchitectureDb, graph: &LayoutGraph) -> SvgElement {
+    let mut elements = Vec::new();
+    for service in db.get_services().iter() {
+        if let Some(node) = graph.get_node(&service.id) {
+            if let Some(element) = render_architecture_service(service, node) {
+                elements.push(element);
+            }
+        }
+    }
+    for junction in db.get_junctions() {
+        if let Some(node) = graph.get_node(&junction.id) {
+            if let Some(element) = render_architecture_junction(&junction.id, node) {
+                elements.push(element);
+            }
+        }
+    }
+
+    SvgElement::group(elements).with_attrs(Attrs::new().with_class("architecture-services"))
+}
+
+fn render_architecture_groups(db: &ArchitectureDb, graph: &LayoutGraph) -> SvgElement {
+    let mut elements = Vec::new();
+    for group in db.get_groups() {
+        let Some(node) = graph.get_node(&group.id) else {
+            continue;
+        };
+        let (Some(x), Some(y)) = (node.x, node.y) else {
+            continue;
+        };
+        if node.width == 0.0 || node.height == 0.0 {
+            continue;
+        }
+
+        let rect = SvgElement::rect(x, y, node.width, node.height).with_attrs(
+            Attrs::new()
+                .with_class("node-bkg")
+                .with_id(&format!("group-{}", group.id)),
+        );
+
+        let mut label_elements = Vec::new();
+        let half_icon = ARCH_ICON_SIZE / 2.0;
+        let mut shifted_x = x - half_icon;
+        let mut shifted_y = y - half_icon;
+
+        if let Some(icon) = group.icon.as_deref() {
+            let icon_svg = architecture_icon_svg(icon, ARCH_PADDING * ARCH_GROUP_ICON_SCALE);
+            let icon_group = SvgElement::group(vec![SvgElement::Raw {
+                content: format!("<g>{}</g>", icon_svg),
+            }])
+            .with_attrs(Attrs::new().with_transform(&format!(
+                "translate({}, {})",
+                shifted_x + half_icon + 1.0,
+                shifted_y + half_icon + 1.0
+            )));
+            label_elements.push(icon_group);
+            shifted_x += ARCH_PADDING * ARCH_GROUP_ICON_SCALE;
+            shifted_y += ARCH_FONT_SIZE / 2.0 - 1.0 - 2.0;
+        }
+
+        if let Some(title) = group.title.as_deref().or(Some(group.id.as_str())) {
+            let label_markup = architecture_text_markup(title);
+            let label_group = SvgElement::group(vec![SvgElement::Raw {
+                content: label_markup,
+            }])
+            .with_attrs(
+                Attrs::new()
+                    .with_attr("dy", "1em")
+                    .with_attr("alignment-baseline", "middle")
+                    .with_attr("dominant-baseline", "start")
+                    .with_attr("text-anchor", "start")
+                    .with_transform(&format!(
+                        "translate({}, {})",
+                        shifted_x + half_icon + 4.0,
+                        shifted_y + half_icon + 2.0
+                    )),
+            );
+            label_elements.push(label_group);
+        }
+
+        elements.push(rect);
+        if !label_elements.is_empty() {
+            elements.push(SvgElement::group(label_elements));
+        }
+    }
+
+    SvgElement::group(elements).with_attrs(Attrs::new().with_class("architecture-groups"))
+}
+
+fn render_architecture_service(
+    service: &ArchitectureService,
+    node: &LayoutNode,
+) -> Option<SvgElement> {
+    let (x, y) = (node.x?, node.y?);
+    let mut children = Vec::new();
+
+    if let Some(title) = service.title.as_deref() {
+        let label_markup = architecture_text_markup(title);
+        let label_group = SvgElement::group(vec![SvgElement::Raw {
+            content: label_markup,
+        }])
+        .with_attrs(
+            Attrs::new()
+                .with_attr("dy", "1em")
+                .with_attr("alignment-baseline", "middle")
+                .with_attr("dominant-baseline", "middle")
+                .with_attr("text-anchor", "middle")
+                .with_transform(&format!(
+                    "translate({}, {})",
+                    ARCH_ICON_SIZE / 2.0,
+                    ARCH_ICON_SIZE
+                )),
+        );
+        children.push(label_group);
+    }
+
+    let icon_group = if let Some(icon) = service.icon.as_deref() {
+        let icon_svg = architecture_icon_svg(icon, ARCH_ICON_SIZE);
+        SvgElement::group(vec![SvgElement::Raw {
+            content: format!("<g>{}</g>", icon_svg),
+        }])
+    } else if let Some(icon_text) = service.icon_text.as_deref() {
+        let icon_svg = architecture_icon_svg("blank", ARCH_ICON_SIZE);
+        let text_markup = format!(
+            "<g><g>{}</g><g><foreignObject width=\"{size}\" height=\"{size}\"><div class=\"node-icon-text\" style=\"height: {size}px;\"><div>{text}</div></div></foreignObject></g></g>",
+            icon_svg,
+            size = ARCH_ICON_SIZE,
+            text = escape_xml(icon_text)
+        );
+        SvgElement::Raw {
+            content: text_markup,
+        }
+    } else {
+        let d = format!(
+            "M0 {size} v{neg} q0,-5 5,-5 h{size} q5,0 5,5 v{size} H0 Z",
+            size = ARCH_ICON_SIZE,
+            neg = -ARCH_ICON_SIZE
+        );
+        SvgElement::group(vec![SvgElement::path(d).with_attrs(
+            Attrs::new()
+                .with_class("node-bkg")
+                .with_id(&format!("node-{}", service.id)),
+        )])
+    };
+
+    children.push(icon_group);
+
+    let group_attrs = Attrs::new()
+        .with_class("architecture-service")
+        .with_id(&format!("service-{}", service.id))
+        .with_transform(&format!("translate({}, {})", x, y));
+
+    Some(SvgElement::group(children).with_attrs(group_attrs))
+}
+
+fn render_architecture_junction(id: &str, node: &LayoutNode) -> Option<SvgElement> {
+    let (x, y) = (node.x?, node.y?);
+    let rect = SvgElement::rect(0.0, 0.0, ARCH_ICON_SIZE, ARCH_ICON_SIZE).with_attrs(
+        Attrs::new()
+            .with_id(&format!("node-{}", id))
+            .with_attr("fill-opacity", "0"),
+    );
+    let group = SvgElement::group(vec![SvgElement::group(vec![rect])]).with_attrs(
+        Attrs::new()
+            .with_class("architecture-junction")
+            .with_transform(&format!("translate({}, {})", x, y)),
+    );
+    Some(group)
 }
 
 fn render_architecture_edge(
-    edge: &crate::layout::LayoutEdge,
+    edge: &crate::diagrams::architecture::ArchitectureEdge,
+    db: &ArchitectureDb,
     graph: &LayoutGraph,
-) -> (Option<SvgElement>, Option<SvgElement>) {
-    let source_id = edge.source();
-    let target_id = edge.target();
-    let source_node = source_id.and_then(|id| graph.get_node(id));
-    let target_node = target_id.and_then(|id| graph.get_node(id));
+) -> Option<SvgElement> {
+    let source_node = graph.get_node(&edge.lhs_id)?;
+    let target_node = graph.get_node(&edge.rhs_id)?;
 
-    let source_dir = edge
-        .metadata
-        .get("lhs_dir")
-        .and_then(|s| parse_arch_direction(s));
-    let target_dir = edge
-        .metadata
-        .get("rhs_dir")
-        .and_then(|s| parse_arch_direction(s));
+    let mut start = architecture_node_port(source_node, edge.lhs_dir)?;
+    let mut end = architecture_node_port(target_node, edge.rhs_dir)?;
 
-    let start = source_node
-        .and_then(|node| source_dir.and_then(|dir| node_port(node, dir)))
-        .or_else(|| source_node.and_then(LayoutNode::center));
-    let end = target_node
-        .and_then(|node| target_dir.and_then(|dir| node_port(node, dir)))
-        .or_else(|| target_node.and_then(LayoutNode::center));
-
-    let mut points = if edge.bend_points.is_empty() {
-        Vec::new()
-    } else {
-        edge.bend_points.clone()
-    };
-
-    if let (Some(start), Some(end)) = (start, end) {
-        if points.len() >= 2 {
-            points[0] = start;
-            if let Some(last) = points.last_mut() {
-                *last = end;
-            }
+    let group_edge_shift = ARCH_PADDING + 4.0;
+    if edge.lhs_group {
+        if edge.lhs_dir.is_x() {
+            start.x += if edge.lhs_dir == ArchitectureDirection::Left {
+                -group_edge_shift
+            } else {
+                group_edge_shift
+            };
         } else {
-            points = vec![start, end];
+            start.y += if edge.lhs_dir == ArchitectureDirection::Top {
+                -group_edge_shift
+            } else {
+                group_edge_shift + ARCH_EDGE_GROUP_LABEL_SHIFT
+            };
+        }
+    }
+    if edge.rhs_group {
+        if edge.rhs_dir.is_x() {
+            end.x += if edge.rhs_dir == ArchitectureDirection::Left {
+                -group_edge_shift
+            } else {
+                group_edge_shift
+            };
+        } else {
+            end.y += if edge.rhs_dir == ArchitectureDirection::Top {
+                -group_edge_shift
+            } else {
+                group_edge_shift + ARCH_EDGE_GROUP_LABEL_SHIFT
+            };
         }
     }
 
-    let path = if points.len() >= 2 {
-        let path_d = edges::build_curved_path(&points);
-        let mut attrs = Attrs::new().with_class("edge-path").with_fill("none");
-
-        if parse_bool(edge.metadata.get("rhs_into")) {
-            attrs = attrs.with_attr("marker-end", "url(#arrow_point)");
+    let half_icon = ARCH_ICON_SIZE / 2.0;
+    if !edge.lhs_group && is_junction_node(db, source_node, &edge.lhs_id) {
+        if edge.lhs_dir.is_x() {
+            start.x += if edge.lhs_dir == ArchitectureDirection::Left {
+                half_icon
+            } else {
+                -half_icon
+            };
+        } else {
+            start.y += if edge.lhs_dir == ArchitectureDirection::Top {
+                half_icon
+            } else {
+                -half_icon
+            };
         }
-        if parse_bool(edge.metadata.get("lhs_into")) {
-            attrs = attrs.with_attr("marker-start", "url(#arrow_point_start)");
+    }
+    if !edge.rhs_group && is_junction_node(db, target_node, &edge.rhs_id) {
+        if edge.rhs_dir.is_x() {
+            end.x += if edge.rhs_dir == ArchitectureDirection::Left {
+                half_icon
+            } else {
+                -half_icon
+            };
+        } else {
+            end.y += if edge.rhs_dir == ArchitectureDirection::Top {
+                half_icon
+            } else {
+                -half_icon
+            };
         }
+    }
 
-        let path_element = SvgElement::path(path_d).with_attrs(attrs);
-        let group_attrs = Attrs::new()
-            .with_class("edge")
-            .with_id(&format!("edge-{}", edge.id));
-        Some(SvgElement::group(vec![path_element]).with_attrs(group_attrs))
-    } else {
-        None
-    };
+    let points = architecture_edge_points(start, end, edge.lhs_dir, edge.rhs_dir);
+    let path_d = build_architecture_path(&points);
 
-    let label = edge.label.as_deref().and_then(|text| {
-        let label_pos = edge
-            .label_position
-            .or_else(|| midpoint_from_points(&points));
-        let label_pos = label_pos?;
+    let mut edge_children = Vec::new();
+    edge_children.push(
+        SvgElement::path(path_d).with_attrs(
+            Attrs::new()
+                .with_class("edge")
+                .with_id(&format!("L_{}_{}_0", edge.lhs_id, edge.rhs_id)),
+        ),
+    );
 
-        let font_size = 12.0;
-        let char_width_ratio = 0.6;
-        let lines: Vec<&str> = text.lines().collect();
-        let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
-        let num_lines = lines.len().max(1);
+    let arrow_size = ARCH_ICON_SIZE / 6.0;
+    let half_arrow = arrow_size / 2.0;
 
-        let text_width = (max_chars as f64) * font_size * char_width_ratio;
-        let text_height = (num_lines as f64) * font_size * 1.5;
-        let padding = 4.0;
+    if edge.lhs_into {
+        let x_shift = if edge.lhs_dir.is_x() {
+            architecture_arrow_shift(edge.lhs_dir, start.x, arrow_size)
+        } else {
+            start.x - half_arrow
+        };
+        let y_shift = if edge.lhs_dir.is_y() {
+            architecture_arrow_shift(edge.lhs_dir, start.y, arrow_size)
+        } else {
+            start.y - half_arrow
+        };
+        edge_children.push(SvgElement::Polygon {
+            points: architecture_arrow_points(edge.lhs_dir, arrow_size),
+            attrs: Attrs::new()
+                .with_class("arrow")
+                .with_transform(&format!("translate({}, {})", x_shift, y_shift)),
+        });
+    }
+    if edge.rhs_into {
+        let x_shift = if edge.rhs_dir.is_x() {
+            architecture_arrow_shift(edge.rhs_dir, end.x, arrow_size)
+        } else {
+            end.x - half_arrow
+        };
+        let y_shift = if edge.rhs_dir.is_y() {
+            architecture_arrow_shift(edge.rhs_dir, end.y, arrow_size)
+        } else {
+            end.y - half_arrow
+        };
+        edge_children.push(SvgElement::Polygon {
+            points: architecture_arrow_points(edge.rhs_dir, arrow_size),
+            attrs: Attrs::new()
+                .with_class("arrow")
+                .with_transform(&format!("translate({}, {})", x_shift, y_shift)),
+        });
+    }
 
-        let bg = SvgElement::Rect {
-            x: label_pos.x - text_width / 2.0 - padding,
-            y: label_pos.y - text_height / 2.0 - padding / 2.0,
-            width: text_width + padding * 2.0,
-            height: text_height + padding,
-            rx: None,
-            ry: None,
-            attrs: Attrs::new().with_class("edge-label-bg"),
+    if let Some(label) = edge.title.as_deref() {
+        let (label_x, label_y) = edge_label_position(&points);
+        let label_transform = if edge.lhs_dir.is_x() && edge.rhs_dir.is_x() {
+            format!("translate({}, {})", label_x, label_y)
+        } else if edge.lhs_dir.is_y() && edge.rhs_dir.is_y() {
+            format!("translate({}, {}) rotate(-90)", label_x, label_y)
+        } else {
+            let angle = architecture_xy_label_angle(edge.lhs_dir, edge.rhs_dir);
+            format!("translate({}, {}) rotate({})", label_x, label_y, angle)
         };
 
-        let label_attrs = Attrs::new()
-            .with_class("edge-label")
-            .with_attr("text-anchor", "middle")
-            .with_attr("dominant-baseline", "central");
-        let label_text = SvgElement::text(label_pos.x, label_pos.y, text).with_attrs(label_attrs);
-
-        let group_attrs = Attrs::new()
-            .with_class("edgeLabel")
-            .with_id(&format!("edge-label-{}", edge.id));
-        Some(SvgElement::group(vec![bg, label_text]).with_attrs(group_attrs))
-    });
-
-    (path, label)
-}
-
-fn parse_arch_direction(value: &str) -> Option<ArchitectureDirection> {
-    match value {
-        "L" => Some(ArchitectureDirection::Left),
-        "R" => Some(ArchitectureDirection::Right),
-        "T" => Some(ArchitectureDirection::Top),
-        "B" => Some(ArchitectureDirection::Bottom),
-        _ => None,
+        let label_markup = architecture_text_markup(label);
+        let label_group = SvgElement::group(vec![SvgElement::Raw {
+            content: label_markup,
+        }])
+        .with_attrs(
+            Attrs::new()
+                .with_attr("dy", "1em")
+                .with_attr("alignment-baseline", "middle")
+                .with_attr("dominant-baseline", "middle")
+                .with_attr("text-anchor", "middle")
+                .with_transform(&label_transform),
+        );
+        edge_children.push(label_group);
     }
+
+    Some(SvgElement::group(edge_children))
 }
 
-fn parse_bool(value: Option<&String>) -> bool {
-    matches!(value, Some(v) if v == "true")
+fn is_junction_node(db: &ArchitectureDb, node: &LayoutNode, id: &str) -> bool {
+    if node
+        .metadata
+        .get("node_type")
+        .map(|value| value == "junction")
+        .unwrap_or(false)
+    {
+        return true;
+    }
+
+    db.get_junctions().iter().any(|junction| junction.id == id)
 }
 
-fn node_port(node: &LayoutNode, dir: ArchitectureDirection) -> Option<Point> {
+fn architecture_node_port(node: &LayoutNode, dir: ArchitectureDirection) -> Option<Point> {
     let (x, y) = (node.x?, node.y?);
     let w = node.width;
     let h = node.height;
@@ -604,18 +757,161 @@ fn node_port(node: &LayoutNode, dir: ArchitectureDirection) -> Option<Point> {
     Some(point)
 }
 
-fn midpoint_from_points(points: &[Point]) -> Option<Point> {
-    if points.is_empty() {
-        return None;
+fn architecture_edge_points(
+    start: Point,
+    end: Point,
+    source_dir: ArchitectureDirection,
+    target_dir: ArchitectureDirection,
+) -> Vec<Point> {
+    if is_architecture_direction_xy(source_dir, target_dir) {
+        let bend = if source_dir.is_y() {
+            Point::new(start.x, end.y)
+        } else {
+            Point::new(end.x, start.y)
+        };
+        vec![start, bend, end]
+    } else {
+        vec![start, end]
+    }
+}
+
+fn build_architecture_path(points: &[Point]) -> String {
+    let mut d = String::new();
+    if let Some(first) = points.first() {
+        d.push_str(&format!("M {},{}", first.x, first.y));
+    }
+    for point in points.iter().skip(1) {
+        d.push_str(&format!(" L {},{}", point.x, point.y));
+    }
+    d
+}
+
+fn edge_label_position(points: &[Point]) -> (f64, f64) {
+    if points.len() < 2 {
+        return (0.0, 0.0);
     }
     let mid = points.len() / 2;
     if points.len().is_multiple_of(2) && mid > 0 {
         let p1 = points[mid - 1];
         let p2 = points[mid];
-        Some(Point::new((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0))
+        ((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0)
     } else {
-        Some(points[mid])
+        let p = points[mid];
+        (p.x, p.y)
     }
+}
+
+fn architecture_arrow_points(dir: ArchitectureDirection, size: f64) -> Vec<Point> {
+    match dir {
+        ArchitectureDirection::Left => vec![
+            Point::new(size, size / 2.0),
+            Point::new(0.0, size),
+            Point::new(0.0, 0.0),
+        ],
+        ArchitectureDirection::Right => vec![
+            Point::new(0.0, size / 2.0),
+            Point::new(size, 0.0),
+            Point::new(size, size),
+        ],
+        ArchitectureDirection::Top => vec![
+            Point::new(0.0, 0.0),
+            Point::new(size, 0.0),
+            Point::new(size / 2.0, size),
+        ],
+        ArchitectureDirection::Bottom => vec![
+            Point::new(size / 2.0, 0.0),
+            Point::new(size, size),
+            Point::new(0.0, size),
+        ],
+    }
+}
+
+fn architecture_arrow_shift(dir: ArchitectureDirection, orig: f64, size: f64) -> f64 {
+    match dir {
+        ArchitectureDirection::Left | ArchitectureDirection::Top => orig - size + 2.0,
+        ArchitectureDirection::Right | ArchitectureDirection::Bottom => orig - 2.0,
+    }
+}
+
+fn architecture_xy_label_angle(
+    source_dir: ArchitectureDirection,
+    target_dir: ArchitectureDirection,
+) -> f64 {
+    if (source_dir == ArchitectureDirection::Left && target_dir == ArchitectureDirection::Top)
+        || (source_dir == ArchitectureDirection::Top && target_dir == ArchitectureDirection::Left)
+    {
+        -45.0
+    } else if (source_dir == ArchitectureDirection::Bottom
+        && target_dir == ArchitectureDirection::Left)
+        || (source_dir == ArchitectureDirection::Left
+            && target_dir == ArchitectureDirection::Bottom)
+    {
+        45.0
+    } else if (source_dir == ArchitectureDirection::Bottom
+        && target_dir == ArchitectureDirection::Right)
+        || (source_dir == ArchitectureDirection::Right
+            && target_dir == ArchitectureDirection::Bottom)
+    {
+        -45.0
+    } else {
+        45.0
+    }
+}
+
+fn is_architecture_direction_xy(a: ArchitectureDirection, b: ArchitectureDirection) -> bool {
+    (a.is_x() && b.is_y()) || (a.is_y() && b.is_x())
+}
+
+fn architecture_text_markup(text: &str) -> String {
+    let escaped = escape_xml(text);
+    format!(
+        "<g><rect class=\"background\" style=\"stroke: none\"/><text y=\"-10.1\" style=\"\"><tspan class=\"text-outer-tspan\" x=\"0\" y=\"-0.1em\" dy=\"1.1em\"><tspan font-style=\"normal\" class=\"text-inner-tspan\" font-weight=\"normal\">{}</tspan></tspan></text></g>",
+        escaped
+    )
+}
+
+fn architecture_icon_svg(name: &str, size: f64) -> String {
+    let body = architecture_icon_body(name);
+    format!(
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{size}\" height=\"{size}\" viewBox=\"0 0 80 80\">{body}</svg>",
+        size = size,
+        body = body
+    )
+}
+
+fn architecture_icon_body(name: &str) -> &'static str {
+    match name.to_ascii_lowercase().as_str() {
+        "database" => ARCH_ICON_DATABASE,
+        "server" => ARCH_ICON_SERVER,
+        "disk" => ARCH_ICON_DISK,
+        "internet" => ARCH_ICON_INTERNET,
+        "cloud" => ARCH_ICON_CLOUD,
+        "blank" => ARCH_ICON_BLANK,
+        _ => ARCH_ICON_UNKNOWN,
+    }
+}
+
+const ARCH_ICON_DATABASE: &str = r#"<g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><path data-name="4" d="m20,57.86c0,3.94,8.95,7.14,20,7.14s20-3.2,20-7.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path data-name="3" d="m20,45.95c0,3.94,8.95,7.14,20,7.14s20-3.2,20-7.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path data-name="2" d="m20,34.05c0,3.94,8.95,7.14,20,7.14s20-3.2,20-7.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse data-name="1" cx="40" cy="22.14" rx="20" ry="7.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="20" y1="57.86" x2="20" y2="22.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="60" y1="57.86" x2="60" y2="22.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/></g>"#;
+
+const ARCH_ICON_SERVER: &str = r#"<g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><rect x="17.5" y="17.5" width="45" height="45" rx="2" ry="2" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="17.5" y1="32.5" x2="62.5" y2="32.5" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="17.5" y1="47.5" x2="62.5" y2="47.5" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><g><path d="m56.25,25c0,.27-.45.5-1,.5h-10.5c-.55,0-1-.23-1-.5s.45-.5,1-.5h10.5c.55,0,1,.23,1,.5Z" style="fill: #fff; stroke-width: 0px;"/><path d="m56.25,25c0,.27-.45.5-1,.5h-10.5c-.55,0-1-.23-1-.5s.45-.5,1-.5h10.5c.55,0,1,.23,1,.5Z" style="fill: none; stroke: #fff; stroke-miterlimit: 10;"/></g><g><path d="m56.25,40c0,.27-.45.5-1,.5h-10.5c-.55,0-1-.23-1-.5s.45-.5,1-.5h10.5c.55,0,1,.23,1,.5Z" style="fill: #fff; stroke-width: 0px;"/><path d="m56.25,40c0,.27-.45.5-1,.5h-10.5c-.55,0-1-.23-1-.5s.45-.5,1-.5h10.5c.55,0,1,.23,1,.5Z" style="fill: none; stroke: #fff; stroke-miterlimit: 10;"/></g><g><path d="m56.25,55c0,.27-.45.5-1,.5h-10.5c-.55,0-1-.23-1-.5s.45-.5,1-.5h10.5c.55,0,1,.23,1,.5Z" style="fill: #fff; stroke-width: 0px;"/><path d="m56.25,55c0,.27-.45.5-1,.5h-10.5c-.55,0-1-.23-1-.5s.45-.5,1-.5h10.5c.55,0,1,.23,1,.5Z" style="fill: none; stroke: #fff; stroke-miterlimit: 10;"/></g><g><circle cx="32.5" cy="25" r=".75" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10;"/><circle cx="27.5" cy="25" r=".75" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10;"/><circle cx="22.5" cy="25" r=".75" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10;"/></g><g><circle cx="32.5" cy="40" r=".75" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10;"/><circle cx="27.5" cy="40" r=".75" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10;"/><circle cx="22.5" cy="40" r=".75" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10;"/></g><g><circle cx="32.5" cy="55" r=".75" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10;"/><circle cx="27.5" cy="55" r=".75" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10;"/><circle cx="22.5" cy="55" r=".75" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10;"/></g></g>"#;
+
+const ARCH_ICON_DISK: &str = r#"<g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><rect x="20" y="15" width="40" height="50" rx="1" ry="1" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="24" cy="19.17" rx=".8" ry=".83" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="56" cy="19.17" rx=".8" ry=".83" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="24" cy="60.83" rx=".8" ry=".83" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="56" cy="60.83" rx=".8" ry=".83" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="40" cy="33.75" rx="14" ry="14.58" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="40" cy="33.75" rx="4" ry="4.17" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path d="m37.51,42.52l-4.83,13.22c-.26.71-1.1,1.02-1.76.64l-4.18-2.42c-.66-.38-.81-1.26-.33-1.84l9.01-10.8c.88-1.05,2.56-.08,2.09,1.2Z" style="fill: #fff; stroke-width: 0px;"/></g>"#;
+
+const ARCH_ICON_INTERNET: &str = r#"<g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><circle cx="40" cy="40" r="22.5" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="40" y1="17.5" x2="40" y2="62.5" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="17.5" y1="40" x2="62.5" y2="40" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path d="m39.99,17.51c-15.28,11.1-15.28,33.88,0,44.98" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path d="m40.01,17.51c15.28,11.1,15.28,33.88,0,44.98" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="19.75" y1="30.1" x2="60.25" y2="30.1" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="19.75" y1="49.9" x2="60.25" y2="49.9" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/></g>"#;
+
+const ARCH_ICON_CLOUD: &str = r#"<g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><path d="m65,47.5c0,2.76-2.24,5-5,5H20c-2.76,0-5-2.24-5-5,0-1.87,1.03-3.51,2.56-4.36-.04-.21-.06-.42-.06-.64,0-2.6,2.48-4.74,5.65-4.97,1.65-4.51,6.34-7.76,11.85-7.76.86,0,1.69.08,2.5.23,2.09-1.57,4.69-2.5,7.5-2.5,6.1,0,11.19,4.38,12.28,10.17,2.14.56,3.72,2.51,3.72,4.83,0,.03,0,.07-.01.1,2.29.46,4.01,2.48,4.01,4.9Z" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/></g>"#;
+
+const ARCH_ICON_UNKNOWN: &str = r#"<g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><text transform="translate(21.16 64.67)" style="fill: #fff; font-family: ArialMT, Arial; font-size: 67.75px;"><tspan x="0" y="0">?</tspan></text></g>"#;
+
+const ARCH_ICON_BLANK: &str =
+    r#"<g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/></g>"#;
+
+fn escape_xml(text: &str) -> String {
+    text.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&apos;")
 }
 
 /// Sanitize CSS to prevent script injection and other attacks

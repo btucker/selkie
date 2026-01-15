@@ -144,8 +144,7 @@ fn render_architecture(
 ) -> Result<String> {
     let size_estimator = CharacterSizeEstimator::default();
 
-    let graph = db.to_layout_graph(&size_estimator)?;
-    let graph = layout::layout(graph)?;
+    let graph = architecture::layout_architecture(db, &size_estimator)?;
 
     let renderer = SvgRenderer::new(config.clone());
     renderer.render_architecture(db, &graph)
