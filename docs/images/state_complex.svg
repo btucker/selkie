@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="374.8" height="1692.7999999999997" viewBox="0 0 374.8 1692.7999999999997" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.state-title {
+  fill: #333333;
+}
+
+.state-box {
+  fill: #ECECFF;
+  stroke: #333333;
+}
+
+.state-label {
+  fill: #333333;
+}
+
+.state-description {
+  fill: #666666;
+}
+
+.state-start {
+  fill: #333333;
+}
+
+.state-end-outer {
+  stroke: #333333;
+}
+
+.state-end-inner {
+  fill: #333333;
+}
+
+.state-fork-join {
+  fill: #333333;
+}
+
+.state-choice {
+  fill: #ECECFF;
+  stroke: #333333;
+}
+
+.state-divider {
+  stroke: #333333;
+  stroke-dasharray: 5, 5;
+}
+
+.transition-path {
+  stroke: #333333;
+  fill: none;
+}
+
+.transition-label {
+  fill: #333333;
+}
+
+.transition-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+  stroke: none;
+}
+
+.note-box {
+  fill: #FFFFCC;
+  stroke: #333333;
+}
+
+.note-text {
+  fill: #333333;
+}
+
+.state-composite-outer {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.state-composite-inner {
+  fill: white;
+  stroke: none;
+}
+
+.state-composite-label {
+  fill: #333333;
+  font-weight: bold;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="composite-state" id="composite-Idle">
+      <rect x="84.40000000000002" y="74" width="119.59999999999998" height="414.6" rx="5" ry="5" class="state-composite-outer"/>
+      <rect x="84.40000000000002" y="95" width="119.59999999999998" height="393.6" rx="0" ry="0" class="state-composite-inner"/>
+      <text x="99.40000000000002" y="90" class="state-composite-label" font-size="14">Idle</text>
+    </g>
+    <g class="composite-state" id="composite-Executing">
+      <rect x="164.40000000000003" y="1243.2" width="100.40000000000003" height="364.5999999999999" rx="5" ry="5" class="state-composite-outer"/>
+      <rect x="164.40000000000003" y="1264.2" width="100.40000000000003" height="343.5999999999999" rx="0" ry="0" class="state-composite-inner"/>
+      <text x="179.40000000000003" y="1259.2" class="state-composite-label" font-size="14">Executing</text>
+    </g>
+    <g class="composite-state" id="composite-Processing">
+      <rect x="84.9" y="956.4000000000001" width="219.9" height="681.3999999999999" rx="5" ry="5" class="state-composite-outer"/>
+      <rect x="84.9" y="977.4000000000001" width="219.9" height="660.3999999999999" rx="0" ry="0" class="state-composite-inner"/>
+      <text x="99.9" y="972.4000000000001" class="state-composite-label" font-size="14">Processing</text>
+    </g>
+    <g class="state-node" id="state-Active">
+      <rect x="99.40000000000002" y="420.8" width="89.6" height="52.8" rx="10" ry="10" class="state-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
+      <text x="144.20000000000002" y="452.2" class="state-label" font-size="12" text-anchor="middle">Active</text>
+    </g>
+    <g class="state-node" id="state-Done">
+      <rect x="179.40000000000003" y="1540" width="70.4" height="52.8" rx="10" ry="10" class="state-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
+      <text x="214.60000000000002" y="1571.4" class="state-label" text-anchor="middle" font-size="12">Done</text>
+    </g>
+    <g class="state-node" id="state-Init">
+      <rect x="179.40000000000003" y="1397.2" width="70.4" height="52.8" rx="10" ry="10" class="state-box" stroke-width="1" stroke="#333333" fill="#ECECFF"/>
+      <text x="214.60000000000002" y="1428.6000000000001" class="state-label" text-anchor="middle" font-size="12">Init</text>
+    </g>
+    <g class="state-node" id="state-Ready">
+      <rect x="104.20000000000002" y="227.99999999999997" width="80" height="52.8" rx="10" ry="10" class="state-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
+      <text x="144.20000000000002" y="259.4" class="state-label" font-size="12" text-anchor="middle">Ready</text>
+    </g>
+    <g class="state-node" id="state-ResourceAlloc">
+      <rect x="0" y="693.6" width="156.8" height="52.8" rx="10" ry="10" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#333333"/>
+      <text x="78.4" y="725" class="state-label" text-anchor="middle" font-size="12">ResourceAlloc</text>
+    </g>
+    <g class="state-node" id="state-Validating">
+      <rect x="99.9" y="1110.4" width="128" height="52.8" rx="10" ry="10" class="state-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
+      <text x="163.9" y="1141.8000000000002" class="state-label" text-anchor="middle" font-size="12">Validating</text>
+    </g>
+    <g class="state-node" id="state-Validation">
+      <rect x="206.8" y="693.6" width="128" height="52.8" rx="10" ry="10" class="state-box" stroke="#333333" fill="#ECECFF" stroke-width="1"/>
+      <text x="270.8" y="725" class="state-label" text-anchor="middle" font-size="12">Validation</text>
+    </g>
+    <g class="state-node" id="state-[*]_start_0">
+      <circle cx="174.60000000000002" cy="12" r="12" class="state-start" fill="#333333"/>
+    </g>
+    <g class="state-node" id="state-[*]_start_1">
+      <circle cx="144.20000000000002" cy="126" r="12" class="state-start" fill="#333333"/>
+    </g>
+    <g class="state-node" id="state-[*]_start_2">
+      <circle cx="163.9" cy="1008.4000000000001" r="12" class="state-start" fill="#333333"/>
+    </g>
+    <g class="state-node" id="state-[*]_start_3">
+      <circle cx="214.60000000000002" cy="1295.2" r="12" class="state-start" fill="#333333"/>
+    </g>
+    <g class="state-node" id="state-fork_state">
+      <rect x="49.40000000000002" y="593.6" width="70" height="10" rx="2" ry="2" class="state-fork-join" fill="#333333"/>
+    </g>
+    <g class="state-node" id="state-join_state">
+      <rect x="49.40000000000002" y="836.4" width="70" height="10" rx="2" ry="2" class="state-fork-join" fill="#333333"/>
+    </g>
+    <g class="transition">
+      <path d="M 174.60 24.00 C 174.60 34.00, 174.60 44.00, 173.97 54.00 C 173.33 64.00, 172.06 74.00, 170.80 84.00" class="transition-path" fill="none" stroke-width="1" stroke="#333333" marker-end="url(#arrow)"/>
+    </g>
+    <g class="transition">
+      <path d="M 144.20 138.00 C 144.20 148.00, 144.20 158.00, 144.20 168.00 C 144.20 178.00, 144.20 188.00, 144.20 198.00 C 144.20 218.00, 144.20 228.00, 144.20 228.00" class="transition-path" stroke="#333333" marker-end="url(#arrow)" fill="none" stroke-width="1"/>
+    </g>
+    <g class="transition">
+      <path d="M 144.20 280.80 C 144.20 290.80, 144.20 300.80, 144.20 312.47 C 144.20 324.13, 144.20 337.47, 144.20 350.80 C 144.20 364.13, 144.20 377.47, 144.20 389.13 C 144.20 410.80, 144.20 420.80, 144.20 420.80" class="transition-path" fill="none" stroke="#333333" marker-end="url(#arrow)" stroke-width="1"/>
+      <rect x="110.95000000000002" y="314.8" width="66.5" height="18" rx="2" ry="2" class="transition-label-bg"/>
+      <text x="144.20000000000002" y="325.8" class="transition-label" font-size="11" text-anchor="middle">Start Job</text>
+    </g>
+    <g class="transition">
+      <path d="M 91.88 503.60 C 89.39 513.60, 86.89 523.60, 85.65 533.60 C 84.40 543.60, 84.40 553.60, 84.40 563.60 C 84.40 583.60, 84.40 593.60, 84.40 593.60" class="transition-path" marker-end="url(#arrow)" fill="none" stroke="#333333" stroke-width="1"/>
+    </g>
+    <g class="transition">
+      <path d="M 111.03 603.60 C 164.29 613.60, 217.54 623.60, 244.17 633.60 C 270.80 643.60, 270.80 653.60, 270.80 663.60 C 270.80 683.60, 270.80 693.60, 270.80 693.60" class="transition-path" stroke-width="1" fill="none" stroke="#333333" marker-end="url(#arrow)"/>
+    </g>
+    <g class="transition">
+      <path d="M 83.54 603.60 C 81.83 613.60, 80.11 623.60, 79.26 633.60 C 78.40 643.60, 78.40 653.60, 78.40 663.60 C 78.40 683.60, 78.40 693.60, 78.40 693.60" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)" stroke="#333333"/>
+    </g>
+    <g class="transition">
+      <path d="M 270.80 746.40 C 270.80 756.40, 270.80 766.40, 270.80 776.40 C 270.80 786.40, 270.80 796.40, 244.17 806.40 C 164.29 826.40, 111.03 836.40, 111.03 836.40" class="transition-path" stroke-width="1" stroke="#333333" fill="none" marker-end="url(#arrow)"/>
+    </g>
+    <g class="transition">
+      <path d="M 78.40 746.40 C 78.40 756.40, 78.40 766.40, 78.40 776.40 C 78.40 786.40, 78.40 796.40, 79.26 806.40 C 81.83 826.40, 83.54 836.40, 83.54 836.40" class="transition-path" stroke-width="1" marker-end="url(#arrow)" stroke="#333333" fill="none"/>
+    </g>
+    <g class="transition">
+      <path d="M 84.40 846.40 C 84.40 856.40, 84.40 866.40, 84.40 876.40 C 84.40 886.40, 84.40 896.40, 84.40 906.40 C 84.40 926.40, 84.40 936.40, 84.40 936.40" class="transition-path" fill="none" stroke-width="1" marker-end="url(#arrow)" stroke="#333333"/>
+    </g>
+    <g class="transition">
+      <path d="M 163.90 1020.40 C 163.90 1030.40, 163.90 1040.40, 163.90 1050.40 C 163.90 1060.40, 163.90 1070.40, 163.90 1080.40 C 163.90 1100.40, 163.90 1110.40, 163.90 1110.40" class="transition-path" stroke="#333333" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
+    </g>
+    <g class="transition">
+      <path d="M 163.90 1163.20 C 163.90 1173.20, 163.90 1183.20, 163.90 1193.20 C 163.90 1203.20, 163.90 1213.20, 165.08 1223.20 C 168.62 1243.20, 170.98 1253.20, 170.98 1253.20" class="transition-path" marker-end="url(#arrow)" stroke-width="1" stroke="#333333" fill="none"/>
+    </g>
+    <g class="transition">
+      <path d="M 214.60 1307.20 C 214.60 1317.20, 214.60 1327.20, 214.60 1337.20 C 214.60 1347.20, 214.60 1357.20, 214.60 1367.20 C 214.60 1387.20, 214.60 1397.20, 214.60 1397.20" class="transition-path" stroke="#333333" stroke-width="1" marker-end="url(#arrow)" fill="none"/>
+    </g>
+    <g class="transition">
+      <path d="M 214.60 1450.00 C 214.60 1460.00, 214.60 1470.00, 214.60 1480.00 C 214.60 1490.00, 214.60 1500.00, 214.60 1510.00 C 214.60 1530.00, 214.60 1540.00, 214.60 1540.00" class="transition-path" marker-end="url(#arrow)" fill="none" stroke="#333333" stroke-width="1"/>
+    </g>
+  </g>
+</svg>
