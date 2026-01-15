@@ -413,6 +413,43 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 }
             }
 
+            // If the target is a fork/join state, adjust the last bend point
+            // to connect to the top-center of the fork/join bar
+            if fork_join_ids.contains(&target) && !bend_points.is_empty() {
+                if let Some(&(fj_x, fj_y, fj_w, _fj_h)) = state_positions.get(target) {
+                    let fj_center_x = fj_x + fj_w / 2.0;
+                    let fj_top_y = fj_y;
+                    let last_idx = bend_points.len() - 1;
+                    bend_points[last_idx].x = fj_center_x;
+                    bend_points[last_idx].y = fj_top_y;
+                }
+            }
+
+            // If the target is a composite state, adjust the last bend point
+            // to hit the top-center of the rendered composite box (not the border node)
+            if composite_ids.contains(target) && !bend_points.is_empty() {
+                if let Some((comp_x, comp_y, comp_w, _comp_h)) =
+                    calculate_composite_bounds(target, db, &state_positions, &layout_result)
+                {
+                    let comp_center_x = comp_x + comp_w / 2.0;
+                    let comp_top_y = comp_y;
+                    let last_idx = bend_points.len() - 1;
+                    bend_points[last_idx].x = comp_center_x;
+                    bend_points[last_idx].y = comp_top_y;
+                }
+            }
+
+            // If the source is a fork/join state, adjust the first bend point
+            // to come from the bottom-center of the fork/join bar
+            if fork_join_ids.contains(&source) && !bend_points.is_empty() {
+                if let Some(&(fj_x, fj_y, fj_w, fj_h)) = state_positions.get(source) {
+                    let fj_center_x = fj_x + fj_w / 2.0;
+                    let fj_bottom_y = fj_y + fj_h;
+                    bend_points[0].x = fj_center_x;
+                    bend_points[0].y = fj_bottom_y;
+                }
+            }
+
             edge_bend_points.insert((source.to_string(), target.to_string()), bend_points);
             if let Some(label_pos) = &edge.label_position {
                 edge_label_positions.insert((source.to_string(), target.to_string()), *label_pos);
@@ -473,8 +510,40 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     let mut sorted_states: Vec<_> = states.iter().collect();
     sorted_states.sort_by(|a, b| a.0.cmp(b.0));
 
+    // Sort composite states by nesting depth (parents before children)
+    // This ensures correct z-order: parent composites render first, children on top
+    let mut sorted_composites: Vec<&str> = composite_states.iter().copied().collect();
+    sorted_composites.sort_by(|a, b| {
+        // Calculate depth for each composite
+        let depth_a = {
+            let mut depth = 0;
+            let mut current = *a;
+            while let Some(parent) = states.get(current).and_then(|s| s.parent.as_deref()) {
+                if composite_states.contains(parent) {
+                    depth += 1;
+                }
+                current = parent;
+            }
+            depth
+        };
+        let depth_b = {
+            let mut depth = 0;
+            let mut current = *b;
+            while let Some(parent) = states.get(current).and_then(|s| s.parent.as_deref()) {
+                if composite_states.contains(parent) {
+                    depth += 1;
+                }
+                current = parent;
+            }
+            depth
+        };
+        // Sort by depth first (parents before children), then by name for consistency
+        depth_a.cmp(&depth_b).then_with(|| a.cmp(b))
+    });
+
     // First, render composite state containers (behind everything else)
-    for composite_id in &composite_states {
+    // Sorted by depth ensures parents render before children for correct z-order
+    for composite_id in &sorted_composites {
         if let Some(composite_elem) = render_composite_state(
             composite_id,
             db,
@@ -1963,6 +2032,42 @@ mod tests {
         assert!(
             svg.contains("#f0f0f0"),
             "CSS should include alternate background color #f0f0f0"
+        );
+    }
+
+    #[test]
+    fn test_nested_composite_renders_after_parent() {
+        // Nested composite states must be rendered AFTER their parent in SVG
+        // to appear on top (correct z-order)
+        let input = r#"stateDiagram-v2
+    state Processing {
+        [*] --> Validating
+        Validating --> Executing
+        state Executing {
+            [*] --> Init
+            Init --> Done
+        }
+    }
+"#;
+        let db = parse(input).expect("Should parse");
+        let config = crate::render::RenderConfig::default();
+        let svg = render_state(&db, &config).expect("Should render");
+
+        // Find positions of composite states in SVG
+        let processing_pos = svg
+            .find("id=\"composite-Processing\"")
+            .expect("Processing composite should exist");
+        let executing_pos = svg
+            .find("id=\"composite-Executing\"")
+            .expect("Executing composite should exist");
+
+        // Executing must come AFTER Processing for correct z-order
+        assert!(
+            executing_pos > processing_pos,
+            "Nested composite (Executing) must be rendered after parent (Processing) for correct z-order. \
+             Processing at {}, Executing at {}",
+            processing_pos,
+            executing_pos
         );
     }
 }
