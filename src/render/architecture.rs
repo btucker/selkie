@@ -329,18 +329,29 @@ fn apply_cross_group_offsets(db: &ArchitectureDb, positions: &mut HashMap<String
             continue;
         }
 
-        let (target_id, dir) = if lhs_group.is_none() && rhs_group.is_some() {
-            (edge.lhs_id.as_str(), edge.lhs_dir)
+        let (target_id, dir, magnitude, sign) = if lhs_group.is_none() && rhs_group.is_some() {
+            (
+                edge.lhs_id.as_str(),
+                edge.lhs_dir,
+                ARCH_CROSS_GROUP_OFFSET,
+                -1.0,
+            )
         } else if rhs_group.is_none() && lhs_group.is_some() {
-            (edge.rhs_id.as_str(), edge.rhs_dir)
+            (
+                edge.rhs_id.as_str(),
+                edge.rhs_dir,
+                ARCH_CROSS_GROUP_OFFSET,
+                -1.0,
+            )
         } else {
-            continue;
+            // Both in different groups: push rhs away (forward) by a full node spacing
+            (edge.rhs_id.as_str(), edge.lhs_dir, ARCH_NODE_SPACING, 1.0)
         };
 
         let (dx, dy) = architecture_direction_vector(dir);
         let entry = offsets.entry(target_id.to_string()).or_insert((0.0, 0.0));
-        entry.0 += -dx * ARCH_CROSS_GROUP_OFFSET;
-        entry.1 += -dy * ARCH_CROSS_GROUP_OFFSET;
+        entry.0 += sign * dx * magnitude;
+        entry.1 += sign * dy * magnitude;
     }
 
     for (id, (dx, dy)) in offsets {
@@ -662,5 +673,62 @@ mod tests {
         let c_pos = (node_c.x.unwrap(), node_c.y.unwrap());
 
         assert_ne!(b_pos, c_pos, "Nodes B and C should not overlap");
+    }
+
+    #[test]
+
+    fn test_cross_group_separation() {
+        let mut db = ArchitectureDb::new();
+
+        // G1: A -> G2: B (Right)
+
+        db.add_group(ArchitectureGroup::new("G1".to_string()))
+            .unwrap();
+
+        db.add_group(ArchitectureGroup::new("G2".to_string()))
+            .unwrap();
+
+        db.add_service(ArchitectureService::new("A".to_string()).with_parent("G1"))
+            .unwrap();
+
+        db.add_service(ArchitectureService::new("B".to_string()).with_parent("G2"))
+            .unwrap();
+
+        db.add_edge(ArchitectureEdge::new(
+            "A".to_string(),
+            ArchitectureDirection::Right,
+            "B".to_string(),
+            ArchitectureDirection::Left,
+        ))
+        .unwrap();
+
+        let estimator = CharacterSizeEstimator::default();
+
+        let graph = layout_architecture(&db, &estimator).unwrap();
+
+        let node_a = graph.get_node("A").unwrap();
+
+        let node_b = graph.get_node("B").unwrap();
+
+        let ax = node_a.x.unwrap();
+
+        let bx = node_b.x.unwrap();
+
+        // A is at grid (0,0) -> cx=0.
+
+        // B is at grid (1,0) -> cx=200.
+
+        // Offset adds 200 to B.
+
+        // B should be at 400.
+
+        // Distance 400.
+
+        assert!(
+            bx - ax >= 300.0,
+            "Nodes in different groups should be separated significantly. ax={}, bx={}",
+            ax,
+            bx
+        );
     }
 }
