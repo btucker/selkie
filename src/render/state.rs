@@ -38,13 +38,40 @@ impl ToLayoutGraph for StateDb {
             .filter_map(|s| s.parent.as_deref())
             .collect();
 
-        // Convert states to layout nodes (sorted for deterministic order)
+        // Add composite state nodes FIRST (like flowchart subgraphs)
+        // These have zero dimensions initially - dagre expands them based on children
+        for composite_id in &composite_states {
+            if let Some(state) = states.get(*composite_id) {
+                let mut node = LayoutNode::new(*composite_id, 0.0, 0.0)
+                    .with_shape(NodeShape::Rectangle)
+                    .with_label(&state.id);
+
+                // Set parent if this composite is nested inside another
+                if let Some(parent_id) = &state.parent {
+                    node = node.with_parent(parent_id);
+                }
+
+                // Mark as a group (consistent with flowchart subgraphs)
+                node.metadata
+                    .insert("is_group".to_string(), "true".to_string());
+                node.metadata
+                    .insert("state_type".to_string(), format!("{:?}", state.state_type));
+
+                graph.add_node(node);
+            }
+        }
+
+        // Convert non-composite states to layout nodes (sorted for deterministic order)
         let mut state_ids: Vec<&String> = states.keys().collect();
         state_ids.sort();
 
         for id in state_ids {
+            // Skip composite states - already added above
+            if composite_states.contains(id.as_str()) {
+                continue;
+            }
+
             let state = states.get(id).unwrap();
-            let is_composite = composite_states.contains(id.as_str());
 
             // Determine shape based on state type
             let (shape, label) = match state.state_type {
@@ -74,12 +101,8 @@ impl ToLayoutGraph for StateDb {
 
             let label_text = label.unwrap_or(if id.starts_with("[*]") { "" } else { &state.id });
 
-            // Composite states get a placeholder size - dagre will resize based on children
-            // Non-composite states get estimated sizes based on content
-            let (width, height) = if is_composite {
-                // Placeholder size that will be expanded by compound layout
-                (100.0, 60.0)
-            } else if id.starts_with("[*]")
+            // Size based on state type
+            let (width, height) = if id.starts_with("[*]")
                 || matches!(state.state_type, StateType::Start | StateType::End)
             {
                 // Small fixed size for start/end circles
@@ -101,13 +124,9 @@ impl ToLayoutGraph for StateDb {
                 node = node.with_parent(parent_id);
             }
 
-            // Store state type and composite flag in metadata
+            // Store state type in metadata
             node.metadata
                 .insert("state_type".to_string(), format!("{:?}", state.state_type));
-            if is_composite {
-                node.metadata
-                    .insert("is_composite".to_string(), "true".to_string());
-            }
 
             graph.add_node(node);
         }
@@ -1133,15 +1152,16 @@ mod tests {
             .find(|n| n.id == "Idle")
             .expect("Should have Idle node");
         assert_eq!(
-            idle_node.metadata.get("is_composite").map(String::as_str),
+            idle_node.metadata.get("is_group").map(String::as_str),
             Some("true"),
             "Idle should be marked as composite"
         );
     }
 
     #[test]
-    fn test_composite_state_has_placeholder_size() {
-        // Composite states get a placeholder size that will be expanded by compound layout
+    fn test_composite_state_has_zero_initial_size() {
+        // Composite states get zero initial dimensions - dagre expands them based on children
+        // This matches flowchart subgraph behavior for proper compound graph layout
         let input = r#"stateDiagram-v2
     state Parent {
         [*] --> Child
@@ -1158,14 +1178,20 @@ mod tests {
             .iter()
             .find(|n| n.id == "Parent")
             .expect("Should have Parent node");
-        // Placeholder size is set for composite states
-        assert!(
-            parent_node.width > 0.0,
-            "Composite state should have non-zero width"
+        // Zero initial size allows compound layout to compute correct bounds
+        assert_eq!(
+            parent_node.width, 0.0,
+            "Composite state should have zero initial width"
         );
-        assert!(
-            parent_node.height > 0.0,
-            "Composite state should have non-zero height"
+        assert_eq!(
+            parent_node.height, 0.0,
+            "Composite state should have zero initial height"
+        );
+        // Should be marked as a group
+        assert_eq!(
+            parent_node.metadata.get("is_group").map(String::as_str),
+            Some("true"),
+            "Composite state should be marked as a group"
         );
     }
 
@@ -1241,7 +1267,7 @@ mod tests {
         // Verify composite states are marked correctly
         let executing = graph.nodes.iter().find(|n| n.id == "Executing").unwrap();
         assert_eq!(
-            executing.metadata.get("is_composite").map(String::as_str),
+            executing.metadata.get("is_group").map(String::as_str),
             Some("true")
         );
 
@@ -1277,6 +1303,163 @@ mod tests {
         assert!(
             invalid_coords.is_empty(),
             "All nodes should have valid coordinates"
+        );
+    }
+
+    #[test]
+    fn test_debug_compound_graph_structure() {
+        // Debug test to understand compound graph structure
+        let input = r#"stateDiagram-v2
+    [*] --> Idle
+    state Idle {
+        [*] --> Ready
+        Ready --> Active: Start Job
+    }
+    state fork_state <<fork>>
+    state join_state <<join>>
+    Idle --> fork_state
+    fork_state --> Validation
+    fork_state --> ResourceAlloc
+    Validation --> join_state
+    ResourceAlloc --> join_state
+    join_state --> Processing
+    state Processing {
+        [*] --> Validating
+        Validating --> Executing
+        state Executing {
+            [*] --> Init
+            Init --> Done
+        }
+    }
+"#;
+        let db = parse(input).expect("Should parse");
+        let size_estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
+
+        // Print structure
+        eprintln!("\n=== Input Structure ===");
+        for node in &graph.nodes {
+            eprintln!(
+                "  {} (w={}, h={}, parent={:?}, is_group={:?})",
+                node.id,
+                node.width,
+                node.height,
+                node.parent_id,
+                node.metadata.get("is_group")
+            );
+        }
+
+        // Print edges
+        eprintln!("\n=== Edges ===");
+        for edge in &graph.edges {
+            eprintln!(
+                "  {} -> {}",
+                edge.source().unwrap_or("?"),
+                edge.target().unwrap_or("?")
+            );
+        }
+
+        // Run layout
+        let result = layout(graph).expect("Layout should succeed");
+
+        // Print final positions
+        eprintln!("\n=== Final Positions ===");
+        let mut sorted_nodes: Vec<_> = result.nodes.iter().collect();
+        sorted_nodes.sort_by(|a, b| a.id.cmp(&b.id));
+        for node in sorted_nodes {
+            eprintln!(
+                "  {} -> x={:?}, y={:?}, w={}, h={}",
+                node.id, node.x, node.y, node.width, node.height
+            );
+        }
+    }
+
+    #[test]
+    fn test_dagre_graph_compound_structure() {
+        // Test that DagreGraph is correctly set up with compound structure
+        use crate::layout::dagre::graph::DagreGraph;
+        use crate::layout::dagre::graph::NodeLabel;
+
+        let mut dg = DagreGraph::new();
+
+        // Set up simple compound: Parent contains Child
+        dg.set_node(
+            "Parent",
+            NodeLabel {
+                width: 0.0,
+                height: 0.0,
+                ..Default::default()
+            },
+        );
+        dg.set_node(
+            "Child",
+            NodeLabel {
+                width: 50.0,
+                height: 30.0,
+                ..Default::default()
+            },
+        );
+        dg.set_parent("Child", "Parent");
+
+        eprintln!("is_compound: {}", dg.is_compound());
+        eprintln!("Parent children: {:?}", dg.children("Parent"));
+        eprintln!("Child parent: {:?}", dg.parent("Child"));
+
+        assert!(dg.is_compound(), "Graph should be compound");
+        assert!(dg.children("Parent").contains(&&"Child".to_string()));
+        assert_eq!(dg.parent("Child"), Some(&"Parent".to_string()));
+    }
+
+    #[test]
+    fn test_simple_compound_layout() {
+        // Minimal test to debug compound graph layout
+        let input = r#"stateDiagram-v2
+    state Parent {
+        [*] --> Child
+        Child --> Done
+    }
+"#;
+        let db = parse(input).expect("Should parse");
+        let size_estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
+
+        // Print structure
+        eprintln!("\n=== Input Structure ===");
+        for node in &graph.nodes {
+            eprintln!(
+                "  {} (w={}, h={}, parent={:?}, is_group={:?})",
+                node.id,
+                node.width,
+                node.height,
+                node.parent_id,
+                node.metadata.get("is_group")
+            );
+        }
+
+        // Run layout
+        let result = layout(graph).expect("Layout should succeed");
+
+        // Print final positions
+        eprintln!("\n=== Final Positions ===");
+        let mut sorted_nodes: Vec<_> = result.nodes.iter().collect();
+        sorted_nodes.sort_by(|a, b| a.id.cmp(&b.id));
+        for node in sorted_nodes {
+            eprintln!(
+                "  {} -> x={:?}, y={:?}, w={}, h={}",
+                node.id, node.x, node.y, node.width, node.height
+            );
+        }
+
+        // Verify Parent has non-zero dimensions after layout
+        let parent = result.nodes.iter().find(|n| n.id == "Parent").unwrap();
+        assert!(
+            parent.width > 0.0,
+            "Parent compound should have width > 0 after layout, got {}",
+            parent.width
         );
     }
 }

@@ -438,7 +438,8 @@ fn process_transition(
     }
 
     // Add the relation - this handles [*] states by creating unique start/end IDs
-    db.add_relation(&from, &to, label.as_deref());
+    // Pass parent so [*] states inside composites get the correct parent
+    db.add_relation(&from, &to, label.as_deref(), parent);
     Ok(())
 }
 

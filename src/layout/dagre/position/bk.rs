@@ -182,7 +182,8 @@ fn vertical_alignment(
 }
 
 /// Horizontal compaction: assign x coordinates based on blocks
-/// This follows the dagre.js reference implementation with proper border node handling
+/// This follows the dagre.js reference implementation using DFS iteration
+/// which handles cycles gracefully (unlike topological sort)
 fn horizontal_compaction(
     g: &DagreGraph,
     layers: &[Vec<String>],
@@ -205,33 +206,7 @@ fn horizontal_compaction(
 
     let mut xs: HashMap<String, f64> = HashMap::new();
 
-    // Pass 1: Assign smallest coordinates using iterative topological sort
-    // Process nodes in order such that all predecessors are processed first
-    let mut in_degree: HashMap<String, usize> = HashMap::new();
-    for v in &block_graph {
-        in_degree.insert(v.clone(), 0);
-    }
-    for preds in block_edges.values() {
-        for (pred, _) in preds {
-            if block_graph.contains(pred) {
-                *in_degree.entry(pred.clone()).or_insert(0) += 0; // ensure exists
-            }
-        }
-    }
-    for (target, preds) in &block_edges {
-        if block_graph.contains(target) {
-            *in_degree.entry(target.clone()).or_insert(0) = preds.len();
-        }
-    }
-
-    // Start with nodes that have no predecessors
-    let mut queue: Vec<String> = in_degree
-        .iter()
-        .filter(|(_, &d)| d == 0)
-        .map(|(v, _)| v.clone())
-        .collect();
-
-    // Build successor map
+    // Build successor map (for pass2)
     let mut successors: HashMap<String, Vec<(String, f64)>> = HashMap::new();
     for (target, preds) in &block_edges {
         for (source, sep) in preds {
@@ -242,84 +217,93 @@ fn horizontal_compaction(
         }
     }
 
-    while let Some(v) = queue.pop() {
-        // Calculate x from predecessors
-        let x = if let Some(preds) = block_edges.get(&v) {
-            preds
-                .iter()
-                .filter_map(|(pred, sep)| xs.get(pred).map(|&px| px + sep))
-                .fold(0.0_f64, f64::max)
-        } else {
-            0.0
-        };
-        xs.insert(v.clone(), x);
+    // DFS-based iteration that handles cycles (like dagre.js)
+    // For each node, we first push all predecessors to process them,
+    // then when we return to the node, we compute its x coordinate.
+    fn dfs_iterate<F>(
+        nodes: &HashSet<String>,
+        get_neighbors: impl Fn(&str) -> Vec<String>,
+        mut process: F,
+    ) where
+        F: FnMut(&str),
+    {
+        let mut stack: Vec<String> = nodes.iter().cloned().collect();
+        let mut visited: HashSet<String> = HashSet::new();
 
-        // Decrement in-degree of successors
-        if let Some(succs) = successors.get(&v) {
-            for (succ, _) in succs {
-                if let Some(d) = in_degree.get_mut(succ) {
-                    *d = d.saturating_sub(1);
-                    if *d == 0 {
-                        queue.push(succ.clone());
+        while let Some(elem) = stack.pop() {
+            if visited.contains(&elem) {
+                // Second visit: process the node
+                process(&elem);
+            } else {
+                // First visit: mark visited and push neighbors
+                visited.insert(elem.clone());
+                stack.push(elem.clone()); // Push back for second visit
+                for neighbor in get_neighbors(&elem) {
+                    if !visited.contains(&neighbor) {
+                        stack.push(neighbor);
                     }
                 }
             }
         }
     }
 
-    // Pass 2: Pull nodes toward maximum (iterative reverse topological order)
-    // Build reverse adjacency (out-degree based)
-    let mut out_degree: HashMap<String, usize> = HashMap::new();
-    for v in &block_graph {
-        out_degree.insert(v.clone(), successors.get(v).map(|s| s.len()).unwrap_or(0));
-    }
+    // Pass 1: Assign smallest coordinates (process predecessors first)
+    dfs_iterate(
+        &block_graph,
+        |v| {
+            block_edges
+                .get(v)
+                .map(|preds| preds.iter().map(|(p, _)| p.clone()).collect())
+                .unwrap_or_default()
+        },
+        |elem| {
+            let x = block_edges
+                .get(elem)
+                .map(|preds| {
+                    preds
+                        .iter()
+                        .filter_map(|(pred, sep)| xs.get(pred).map(|&px| px + sep))
+                        .fold(0.0_f64, f64::max)
+                })
+                .unwrap_or(0.0);
+            xs.insert(elem.to_string(), x);
+        },
+    );
 
-    // Start with nodes that have no successors
-    let mut queue2: Vec<String> = out_degree
-        .iter()
-        .filter(|(_, &d)| d == 0)
-        .map(|(v, _)| v.clone())
-        .collect();
+    // Pass 2: Pull nodes toward maximum (process successors first)
+    dfs_iterate(
+        &block_graph,
+        |v| {
+            successors
+                .get(v)
+                .map(|succs| succs.iter().map(|(s, _)| s.clone()).collect())
+                .unwrap_or_default()
+        },
+        |elem| {
+            let min_x = successors
+                .get(elem)
+                .map(|succs| {
+                    succs
+                        .iter()
+                        .filter_map(|(succ, sep)| xs.get(succ).map(|&sx| sx - sep))
+                        .fold(f64::INFINITY, f64::min)
+                })
+                .unwrap_or(f64::INFINITY);
 
-    let mut processed2: HashSet<String> = HashSet::new();
-
-    while let Some(v) = queue2.pop() {
-        if processed2.contains(&v) {
-            continue;
-        }
-        processed2.insert(v.clone());
-
-        // Calculate min x from successors
-        let min_x = if let Some(succs) = successors.get(&v) {
-            succs
-                .iter()
-                .filter_map(|(succ, sep)| xs.get(succ).map(|&sx| sx - sep))
-                .fold(f64::INFINITY, f64::min)
-        } else {
-            f64::INFINITY
-        };
-
-        // Pull toward max, but NOT for border nodes of the skip type
-        let border_type = g.node(&v).and_then(|n| n.border_type.as_deref());
-        if min_x != f64::INFINITY && border_type != Some(skip_border_type) {
-            if let Some(curr_x) = xs.get_mut(&v) {
-                *curr_x = curr_x.max(min_x);
-            }
-        }
-
-        // Add predecessors to queue
-        if let Some(preds) = block_edges.get(&v) {
-            for (pred, _) in preds {
-                if !processed2.contains(pred) {
-                    queue2.push(pred.clone());
+            // Pull toward max, but NOT for border nodes of the skip type
+            let border_type = g.node(elem).and_then(|n| n.border_type.as_deref());
+            if min_x != f64::INFINITY && border_type != Some(skip_border_type) {
+                if let Some(curr_x) = xs.get_mut(elem) {
+                    *curr_x = curr_x.max(min_x);
                 }
             }
-        }
-    }
+        },
+    );
 
     // Assign x coordinates to all nodes from their roots
     // Use `root` map (not `align`) to get each node's block root
     let mut result: HashMap<String, f64> = HashMap::new();
+
     for (v, r) in root {
         if let Some(&rx) = xs.get(r) {
             result.insert(v.clone(), rx);
