@@ -345,7 +345,12 @@ fn process_arrow(
                     if line_inner.as_rule() == Rule::arrow_line_with_label {
                         for label_inner in line_inner.into_inner() {
                             if label_inner.as_rule() == Rule::arrow_label {
-                                title = Some(label_inner.as_str().trim().to_string());
+                                let s = label_inner.as_str().trim();
+                                if s.starts_with('[') && s.ends_with(']') {
+                                    title = Some(s[1..s.len() - 1].to_string());
+                                } else {
+                                    title = Some(s.to_string());
+                                }
                             }
                         }
                     }
@@ -714,5 +719,17 @@ mod tests {
         assert_eq!(result.get_groups().len(), 1);
         assert_eq!(result.get_services().len(), 3);
         assert_eq!(result.get_edges().len(), 2);
+    }
+
+    #[test]
+    fn test_edge_label_strip_brackets() {
+        let input = "architecture-beta
+            service A
+            service B
+            A:R -[label]- L:B
+            ";
+        let result = parse(input).unwrap();
+        let edges = result.get_edges();
+        assert_eq!(edges[0].title, Some("label".to_string()));
     }
 }
