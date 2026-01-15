@@ -705,9 +705,27 @@ fn render_transition(
             .with_class("transition-path"),
     });
 
-    // Transition label
+    // Transition label with background (matching flowchart style)
     if let Some(text) = label {
         if !text.is_empty() {
+            // Estimate text dimensions for background
+            let char_width = 6.5; // Approximate for font-size 11
+            let text_width = text.len() as f64 * char_width;
+            let text_height = 14.0;
+            let padding = 4.0;
+
+            // Background rect
+            children.push(SvgElement::Rect {
+                x: label_x - text_width / 2.0 - padding,
+                y: label_y - text_height - padding / 2.0,
+                width: text_width + padding * 2.0,
+                height: text_height + padding,
+                rx: Some(2.0),
+                ry: Some(2.0),
+                attrs: Attrs::new().with_class("transition-label-bg"),
+            });
+
+            // Label text
             children.push(SvgElement::Text {
                 x: label_x,
                 y: label_y - 5.0,
@@ -1088,6 +1106,11 @@ fn generate_state_css() -> String {
 
 .transition-label {
   fill: #333333;
+}
+
+.transition-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+  stroke: none;
 }
 
 .note-box {
