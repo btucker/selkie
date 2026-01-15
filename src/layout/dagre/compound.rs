@@ -248,6 +248,119 @@ pub fn remove_border_nodes(g: &mut DagreGraph) {
     }
 }
 
+/// Redirect edges to/from compound nodes to their border nodes
+///
+/// In state diagrams, edges can go directly TO or FROM composite states.
+/// For ranking to work correctly, these edges must be redirected:
+/// - Edge TO compound → redirect to compound's border_top
+/// - Edge FROM compound → redirect from compound's border_bottom
+///
+/// This should be called AFTER nesting_graph::run (which creates border nodes)
+/// but BEFORE rank assignment.
+pub fn redirect_edges_to_border_nodes(g: &mut DagreGraph) {
+    // Collect compound nodes (nodes with children and border nodes)
+    let compound_nodes: Vec<(String, Option<String>, Option<String>)> = g
+        .nodes()
+        .iter()
+        .filter(|v| !g.children(v).is_empty())
+        .map(|v| {
+            let node = g.node(v).cloned().unwrap_or_default();
+            ((*v).clone(), node.border_top, node.border_bottom)
+        })
+        .collect();
+
+    if compound_nodes.is_empty() {
+        return;
+    }
+
+    // Build a map for quick lookup
+    let border_top_map: std::collections::HashMap<String, String> = compound_nodes
+        .iter()
+        .filter_map(|(v, bt, _)| bt.as_ref().map(|b| (v.clone(), b.clone())))
+        .collect();
+
+    let border_bottom_map: std::collections::HashMap<String, String> = compound_nodes
+        .iter()
+        .filter_map(|(v, _, bb)| bb.as_ref().map(|b| (v.clone(), b.clone())))
+        .collect();
+
+    // Collect edges that need redirection
+    let edges_to_redirect: Vec<(
+        super::graph::EdgeKey,
+        super::graph::EdgeLabel,
+        String,
+        String,
+    )> = g
+        .edges()
+        .iter()
+        .filter_map(|key| {
+            let edge = g.edge_by_key(key)?.clone();
+
+            // Skip nesting edges - they're already correctly configured
+            if edge.nesting_edge {
+                return None;
+            }
+
+            let new_source = border_bottom_map.get(&key.v).cloned();
+            let new_target = border_top_map.get(&key.w).cloned();
+
+            // Only redirect if source or target is a compound node
+            if new_source.is_some() || new_target.is_some() {
+                let final_source = new_source.unwrap_or_else(|| key.v.clone());
+                let final_target = new_target.unwrap_or_else(|| key.w.clone());
+                Some(((*key).clone(), edge, final_source, final_target))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    // Remove old edges and add redirected ones
+    for (old_key, mut label, new_source, new_target) in edges_to_redirect {
+        g.remove_edge_by_key(&old_key);
+
+        // Store original source/target for edge routing later
+        if label.original_source.is_none() {
+            label.original_source = Some(old_key.v.clone());
+        }
+        if label.original_target.is_none() {
+            label.original_target = Some(old_key.w.clone());
+        }
+
+        g.set_edge(&new_source, &new_target, label);
+    }
+}
+
+/// Restore edges to their original source/target after layout
+///
+/// This undoes the redirect_edges_to_border_nodes transformation.
+/// Should be called after layout is complete.
+pub fn restore_redirected_edges(g: &mut DagreGraph) {
+    // Collect edges with original_source or original_target set
+    let edges_to_restore: Vec<(super::graph::EdgeKey, super::graph::EdgeLabel)> = g
+        .edges()
+        .iter()
+        .filter_map(|key| {
+            let edge = g.edge_by_key(key)?;
+            if edge.original_source.is_some() || edge.original_target.is_some() {
+                Some(((*key).clone(), edge.clone()))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    // Remove redirected edges and add restored ones
+    for (old_key, mut label) in edges_to_restore {
+        g.remove_edge_by_key(&old_key);
+
+        let orig_source = label.original_source.take().unwrap_or(old_key.v);
+        let orig_target = label.original_target.take().unwrap_or(old_key.w);
+
+        g.set_edge(&orig_source, &orig_target, label);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

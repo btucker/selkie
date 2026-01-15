@@ -168,6 +168,10 @@ pub struct EdgeLabel {
     pub label_rank: Option<i32>,
     /// Whether this is a nesting edge (compound graph support)
     pub nesting_edge: bool,
+    /// Original source node before edge redirection (for compound graphs)
+    pub original_source: Option<String>,
+    /// Original target node before edge redirection (for compound graphs)
+    pub original_target: Option<String>,
 }
 
 impl Default for EdgeLabel {
@@ -187,6 +191,8 @@ impl Default for EdgeLabel {
             cutvalue: None,
             label_rank: None,
             nesting_edge: false,
+            original_source: None,
+            original_target: None,
         }
     }
 }
