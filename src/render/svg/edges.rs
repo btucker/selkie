@@ -162,15 +162,88 @@ pub(crate) fn build_curved_path(points: &[crate::layout::Point]) -> String {
         );
     }
 
+    // Simplify bend points by removing nearly-collinear intermediate points
+    // This produces straighter edges when dagre routes unnecessarily
+    let simplified = simplify_collinear_points(points);
+
     // Add subtle curvature to straight edges (matching mermaid's visual style)
     // When points are perfectly aligned vertically/horizontally, basis spline
     // produces a straight line. Mermaid's dagre has slight floating-point
     // variations that create subtle curves. We replicate this effect.
-    let adjusted = add_subtle_curvature(points);
+    let adjusted = add_subtle_curvature(&simplified);
 
     // Use basis spline interpolation (like d3's curveBasis)
     // This creates smooth curves through the control points
     build_basis_path(&adjusted)
+}
+
+/// Simplify bend points by removing intermediate points that are nearly collinear
+/// with their neighbors. This produces straighter edges.
+/// Only applies to edges with significant existing curvature - straight edges
+/// are passed through unchanged so add_subtle_curvature can work on them.
+fn simplify_collinear_points(points: &[crate::layout::Point]) -> Vec<crate::layout::Point> {
+    if points.len() <= 2 {
+        return points.to_vec();
+    }
+
+    // First check if the edge is already nearly straight overall
+    // If so, don't simplify - let add_subtle_curvature handle it
+    let first = &points[0];
+    let last = &points[points.len() - 1];
+    let max_overall_deviation = points[1..points.len() - 1]
+        .iter()
+        .map(|p| perpendicular_distance(p, first, last))
+        .fold(0.0_f64, f64::max);
+
+    // If the edge is already nearly straight (all points close to the line),
+    // keep all points for subtle curvature processing
+    if max_overall_deviation < 5.0 {
+        return points.to_vec();
+    }
+
+    let mut result = Vec::with_capacity(points.len());
+    result.push(points[0]);
+
+    // Check each intermediate point - keep it only if it significantly deviates
+    // from the line between its neighbors
+    for i in 1..points.len() - 1 {
+        let prev = &points[i - 1];
+        let curr = &points[i];
+        let next = &points[i + 1];
+
+        // Calculate perpendicular distance from curr to line prev->next
+        let deviation = perpendicular_distance(curr, prev, next);
+
+        // Keep point only if it deviates significantly (threshold in pixels)
+        // Using a larger threshold to straighten edges that curve unnecessarily
+        if deviation > 20.0 {
+            result.push(*curr);
+        }
+    }
+
+    result.push(points[points.len() - 1]);
+    result
+}
+
+/// Calculate perpendicular distance from point p to line defined by a and b
+fn perpendicular_distance(
+    p: &crate::layout::Point,
+    a: &crate::layout::Point,
+    b: &crate::layout::Point,
+) -> f64 {
+    let dx = b.x - a.x;
+    let dy = b.y - a.y;
+    let len_sq = dx * dx + dy * dy;
+
+    if len_sq < 0.0001 {
+        // a and b are the same point
+        let px = p.x - a.x;
+        let py = p.y - a.y;
+        return (px * px + py * py).sqrt();
+    }
+
+    // Calculate perpendicular distance using cross product formula
+    ((b.x - a.x) * (a.y - p.y) - (a.x - p.x) * (b.y - a.y)).abs() / len_sq.sqrt()
 }
 
 /// Add subtle curvature to edge points when they're too straight
