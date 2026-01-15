@@ -63,6 +63,7 @@ pub struct TaskFlags {
     pub done: bool,
     pub critical: bool,
     pub milestone: bool,
+    pub vert: bool,
 }
 
 /// A task in the Gantt chart
@@ -638,6 +639,7 @@ impl GanttDb {
                 "active" => result.flags.active = true,
                 "crit" => result.flags.critical = true,
                 "milestone" => result.flags.milestone = true,
+                "vert" => result.flags.vert = true,
                 _ => {
                     // Check if it's an "after" reference
                     if let Some(stripped) = part.strip_prefix("after ") {
@@ -1202,6 +1204,31 @@ mod tests {
 
         assert!(tasks[0].flags.critical);
         assert!(tasks[0].flags.done);
+    }
+
+    #[test]
+    fn test_task_flags_vert() {
+        let mut db = GanttDb::new();
+        db.set_date_format("YYYY-MM-DD");
+        db.add_section("section");
+        db.add_task("Sprint Start", "vert, sprint1, 2024-01-15, 1d");
+        let tasks = db.get_tasks();
+
+        assert!(tasks[0].flags.vert);
+        assert_eq!(tasks[0].id, "sprint1");
+        assert_eq!(tasks[0].task, "Sprint Start");
+    }
+
+    #[test]
+    fn test_task_flags_milestone() {
+        let mut db = GanttDb::new();
+        db.set_date_format("YYYY-MM-DD");
+        db.add_section("section");
+        db.add_task("Release", "milestone, rel1, 2024-02-01, 1d");
+        let tasks = db.get_tasks();
+
+        assert!(tasks[0].flags.milestone);
+        assert_eq!(tasks[0].id, "rel1");
     }
 
     // ==================

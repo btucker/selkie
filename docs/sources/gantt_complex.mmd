@@ -1,6 +1,7 @@
 gantt
     title Product Launch Timeline
     dateFormat YYYY-MM-DD
+    todayMarker off
 
     section Research
     Market Analysis      :done, research1, 2024-01-01, 14d
@@ -23,10 +24,13 @@ gantt
     Unit Tests           :test1, after dev2, 14d
     Integration Tests    :test2, after dev3, 10d
     UAT                  :test3, after test2, 14d
-    Bug Fixes            :test4, after test3, 7d
+    Bug Fixes            :done, crit, test4, after test3, 7d
 
     section Launch
     Beta Release         :milestone, launch1, after test3, 1d
     Marketing Prep       :launch2, after design4, 21d
     Public Launch        :crit, launch3, after test4, 1d
     Post-Launch Support  :launch4, after launch3, 30d
+
+    section Markers
+    Q2 Start             :vert, q2start, 2024-04-01, 1d

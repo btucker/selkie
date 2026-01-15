@@ -260,25 +260,36 @@ fn render_task_bars(
             format!("task task{}", sec_num)
         };
 
-        // Handle milestone differently
-        let (final_x, final_width, extra_class) = if task.flags.milestone {
+        // Handle special task types: vert markers and milestones
+        let (final_x, final_y, final_width, final_height, extra_class) = if task.flags.vert {
+            // Vert marker: thin vertical line spanning entire chart
+            let vert_width = BAR_HEIGHT * 0.08; // Very narrow
+            let vert_height = tasks.len() as f64 * row_height + BAR_HEIGHT * 2.0;
+            (
+                bar_x,
+                GRID_LINE_START_PADDING,
+                vert_width,
+                vert_height,
+                " vert ",
+            )
+        } else if task.flags.milestone {
             // Milestone: small square centered at midpoint
             let mid_x = bar_x + bar_width / 2.0 - BAR_HEIGHT / 2.0;
-            (mid_x, BAR_HEIGHT, " milestone ")
+            (mid_x, bar_y, BAR_HEIGHT, BAR_HEIGHT, " milestone ")
         } else {
-            (bar_x, bar_width, "")
+            (bar_x, bar_y, bar_width, BAR_HEIGHT, "")
         };
 
         // Calculate transform-origin for proper rotation (needed for milestones)
         let center_x = final_x + final_width / 2.0;
-        let center_y = bar_y + BAR_HEIGHT / 2.0;
+        let center_y = final_y + final_height / 2.0;
         let transform_origin = format!("{}px {}px", center_x, center_y);
 
         let bar_elem = SvgElement::Rect {
             x: final_x,
-            y: bar_y,
+            y: final_y,
             width: final_width,
-            height: BAR_HEIGHT,
+            height: final_height,
             rx: Some(3.0),
             ry: Some(3.0),
             attrs: Attrs::new()
@@ -288,48 +299,60 @@ fn render_task_bars(
         };
         doc.add_element(bar_elem);
 
-        // Estimate text width (approx 0.5 * fontSize per character for typical fonts)
-        // Based on measured mermaid.js output: avg char width ≈ 0.48 * fontSize
-        let estimated_text_width = task.task.len() as f64 * FONT_SIZE * 0.5;
-        let text_y = bar_y + BAR_HEIGHT / 2.0 + (FONT_SIZE / 2.0 - 2.0);
-
-        // Determine if text fits inside bar, or needs to go outside
-        let text_fits_inside = estimated_text_width <= final_width;
-        let end_x = final_x + final_width;
-        let room_on_right = end_x + estimated_text_width + 1.5 * left_padding <= TARGET_WIDTH;
-
-        // Calculate text position and class based on fit
-        // Note: final_x/end_x already include left_padding, so just offset by 5px
-        let (text_x, text_position) = if text_fits_inside {
-            // Center inside bar
-            (final_x + final_width / 2.0, TextPosition::Inside)
-        } else if room_on_right {
-            // Place 5px to the right of bar
-            (end_x + 5.0, TextPosition::OutsideRight)
+        // Handle text positioning differently for vert markers
+        if task.flags.vert {
+            // Vert text: positioned below the chart, centered on the marker
+            let vert_text_y = GRID_LINE_START_PADDING + tasks.len() as f64 * row_height + 60.0;
+            let task_label = SvgElement::Text {
+                x: final_x + final_width / 2.0,
+                y: vert_text_y,
+                content: task.task.clone(),
+                attrs: Attrs::new()
+                    .with_class(&format!("taskText taskText{} vertText", sec_num))
+                    .with_attr("font-size", &format!("{}", FONT_SIZE as i32))
+                    .with_attr("id", &format!("{}-text", task.id)),
+            };
+            doc.add_element(task_label);
         } else {
-            // Place 5px to the left of bar
-            (final_x - 5.0, TextPosition::OutsideLeft)
-        };
+            // Standard task text positioning
+            // Estimate text width (approx 0.5 * fontSize per character for typical fonts)
+            let estimated_text_width = task.task.len() as f64 * FONT_SIZE * 0.5;
+            let text_y = bar_y + BAR_HEIGHT / 2.0 + (FONT_SIZE / 2.0 - 2.0);
 
-        // Determine text class based on position and task flags
-        let text_class = build_text_class(sec_num, &task.flags, text_position);
+            // Determine if text fits inside bar, or needs to go outside
+            let text_fits_inside = estimated_text_width <= final_width;
+            let end_x = final_x + final_width;
+            let room_on_right = end_x + estimated_text_width + 1.5 * left_padding <= TARGET_WIDTH;
 
-        let milestone_text_class = if task.flags.milestone {
-            " milestoneText"
-        } else {
-            ""
-        };
+            // Calculate text position and class based on fit
+            let (text_x, text_position) = if text_fits_inside {
+                (final_x + final_width / 2.0, TextPosition::Inside)
+            } else if room_on_right {
+                (end_x + 5.0, TextPosition::OutsideRight)
+            } else {
+                (final_x - 5.0, TextPosition::OutsideLeft)
+            };
 
-        let task_label = SvgElement::Text {
-            x: text_x,
-            y: text_y,
-            content: task.task.clone(),
-            attrs: Attrs::new()
-                .with_class(&format!("{}{}", text_class, milestone_text_class))
-                .with_attr("font-size", &format!("{}", FONT_SIZE as i32))
-                .with_attr("id", &format!("{}-text", task.id)),
-        };
-        doc.add_element(task_label);
+            // Determine text class based on position and task flags
+            let text_class = build_text_class(sec_num, &task.flags, text_position);
+
+            let milestone_text_class = if task.flags.milestone {
+                " milestoneText"
+            } else {
+                ""
+            };
+
+            let task_label = SvgElement::Text {
+                x: text_x,
+                y: text_y,
+                content: task.task.clone(),
+                attrs: Attrs::new()
+                    .with_class(&format!("{}{}", text_class, milestone_text_class))
+                    .with_attr("font-size", &format!("{}", FONT_SIZE as i32))
+                    .with_attr("id", &format!("{}-text", task.id)),
+            };
+            doc.add_element(task_label);
+        }
     }
 }
 
@@ -757,6 +780,16 @@ fn generate_gantt_css(theme: &crate::render::svg::Theme) -> String {
 
 .activeCritText0, .activeCritText1, .activeCritText2, .activeCritText3 {{
   fill: {task_text_dark_color} !important;
+}}
+
+.vert {{
+  stroke: navy;
+}}
+
+.vertText {{
+  font-size: 15px;
+  text-anchor: middle;
+  fill: navy !important;
 }}
 
 /* critText does not need a separate fill rule - it inherits white from taskText,
