@@ -71,7 +71,7 @@ cli = ["clap"]
 png = ["resvg", "image"]
 pdf = ["svg2pdf", "resvg"]
 kitty = ["resvg", "base64", "libc", "atty", "image"]
-wasm = ["js-sys", "wasm-bindgen"]
+wasm = ["js-sys", "wasm-bindgen", "uuid/js"]
 all-formats = ["png", "pdf", "kitty"]
 eval = ["cli", "png"]  # Everything needed for `selkie eval`
 
