@@ -1059,24 +1059,27 @@ fn render_end_state_bullseye(
     height: f64,
     start_end_radius: f64,
 ) {
-    // Outer circle: purple fill with white stroke (matching mermaid reference)
+    // Outer ring: light fill with dark stroke (matching mermaid reference)
     children.push(SvgElement::Circle {
         cx: x + width / 2.0,
         cy: y + height / 2.0,
         r: start_end_radius,
         attrs: Attrs::new()
-            .with_fill("#9370DB")
-            .with_stroke("white")
-            .with_stroke_width(1.5)
+            .with_fill("#ECECFF")
+            .with_stroke("#9370DB")
+            .with_stroke_width(1.0)
             .with_class("state-end-outer"),
     });
-    // Inner circle: white fill (matching mermaid reference)
+    // Inner filled circle: purple fill with purple stroke (matching mermaid reference)
+    // Mermaid uses ratio of inner radius ~2.5 to outer radius ~7, so about 0.36
     children.push(SvgElement::Circle {
         cx: x + width / 2.0,
         cy: y + height / 2.0,
-        r: start_end_radius * 0.5,
+        r: start_end_radius * 0.36,
         attrs: Attrs::new()
-            .with_fill("white")
+            .with_fill("#9370DB")
+            .with_stroke("#9370DB")
+            .with_stroke_width(1.0)
             .with_class("state-end-inner"),
     });
 }
@@ -1105,13 +1108,15 @@ fn generate_state_css() -> String {
 }
 
 .state-end-outer {
-  fill: #9370DB;
-  stroke: white;
-  stroke-width: 1.5;
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1;
 }
 
 .state-end-inner {
-  fill: white;
+  fill: #9370DB;
+  stroke: #9370DB;
+  stroke-width: 1;
 }
 
 .state-fork-join {
