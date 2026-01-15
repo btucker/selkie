@@ -312,12 +312,18 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
             let mut bend_points = edge.bend_points.clone();
 
-            // If the source was repositioned, adjust the first bend point(s)
+            // If the source is a repositioned start node going to a composite,
+            // make the edge a straight vertical line by aligning all points
             if let Some(&offset_x) = start_node_offsets.get(source) {
-                // Adjust all bend points to create a straight line from new position
-                // The first point should match the new start node center
-                if !bend_points.is_empty() {
-                    // Shift only the first point to match new start position
+                if composite_ids.contains(target) && !bend_points.is_empty() {
+                    // Get the new start position x coordinate (center)
+                    let new_x = bend_points[0].x + offset_x;
+                    // Make all points vertically aligned for a straight edge
+                    for point in &mut bend_points {
+                        point.x = new_x;
+                    }
+                } else if !bend_points.is_empty() {
+                    // For non-composite targets, just shift the first point
                     bend_points[0].x += offset_x;
                 }
             }
