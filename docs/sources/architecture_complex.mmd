@@ -25,12 +25,12 @@ architecture-beta
     gateway:R --> L:web
     web:R --> L:api
     api:R -- L:auth
-    api{group}:B -jwt- T:core{group}
+    api{group}:B -[jwt]- T:core{group}
     core:L -- R:queue
     core:R -- L:cache
     core:B -- T:hub
     hub:R -- L:metrics
     metrics:R -- L:logs
-    core{group}:R -sql- L:db{group}
+    core{group}:R -[sql]- L:db{group}
     db:B -- T:search
-    cache{group}:B -replicate- R:db{group}
+    cache{group}:B -[replicate]- R:db{group}
