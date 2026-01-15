@@ -282,28 +282,29 @@ fn render_task_bars(
         };
         doc.add_element(bar_elem);
 
-        // Task label - center in bar if fits, otherwise outside
-        let text_x = final_x + final_width / 2.0;
+        // Estimate text width (approx 0.6 * fontSize per character for typical fonts)
+        let estimated_text_width = task.task.len() as f64 * FONT_SIZE * 0.6;
         let text_y = bar_y + BAR_HEIGHT / 2.0 + (FONT_SIZE / 2.0 - 2.0);
 
-        // Determine text class
-        let text_class = if task.flags.active {
-            if task.flags.critical {
-                format!("taskText taskText{} activeCritText{}", sec_num, sec_num)
-            } else {
-                format!("taskText taskText{} activeText{}", sec_num, sec_num)
-            }
-        } else if task.flags.done {
-            if task.flags.critical {
-                format!("taskText taskText{} doneCritText{}", sec_num, sec_num)
-            } else {
-                format!("taskText taskText{} doneText{}", sec_num, sec_num)
-            }
-        } else if task.flags.critical {
-            format!("taskText taskText{} critText{}", sec_num, sec_num)
+        // Determine if text fits inside bar, or needs to go outside
+        let text_fits_inside = estimated_text_width <= final_width;
+        let end_x = final_x + final_width;
+        let room_on_right = end_x + estimated_text_width + 1.5 * left_padding <= TARGET_WIDTH;
+
+        // Calculate text position and class based on fit
+        let (text_x, text_position) = if text_fits_inside {
+            // Center inside bar
+            (final_x + final_width / 2.0, TextPosition::Inside)
+        } else if room_on_right {
+            // Place to the right of bar
+            (end_x + left_padding + 5.0, TextPosition::OutsideRight)
         } else {
-            format!("taskText taskText{}", sec_num)
+            // Place to the left of bar
+            (final_x + left_padding - 5.0, TextPosition::OutsideLeft)
         };
+
+        // Determine text class based on position and task flags
+        let text_class = build_text_class(sec_num, &task.flags, text_position);
 
         let milestone_text_class = if task.flags.milestone {
             " milestoneText"
@@ -322,6 +323,51 @@ fn render_task_bars(
         };
         doc.add_element(task_label);
     }
+}
+
+/// Text position relative to task bar
+#[derive(Clone, Copy)]
+enum TextPosition {
+    Inside,
+    OutsideRight,
+    OutsideLeft,
+}
+
+/// Build CSS class string for task text based on position and flags
+fn build_text_class(
+    sec_num: usize,
+    flags: &crate::diagrams::gantt::TaskFlags,
+    position: TextPosition,
+) -> String {
+    // Base class depends on position
+    let base_class = match position {
+        TextPosition::Inside => format!("taskText taskText{}", sec_num),
+        TextPosition::OutsideRight => {
+            format!("taskTextOutsideRight taskTextOutside{}", sec_num)
+        }
+        TextPosition::OutsideLeft => format!("taskTextOutsideLeft taskTextOutside{}", sec_num),
+    };
+
+    // Add status-specific class
+    let status_class = if flags.active {
+        if flags.critical {
+            format!(" activeCritText{}", sec_num)
+        } else {
+            format!(" activeText{}", sec_num)
+        }
+    } else if flags.done {
+        if flags.critical {
+            format!(" doneCritText{}", sec_num)
+        } else {
+            format!(" doneText{}", sec_num)
+        }
+    } else if flags.critical {
+        format!(" critText{}", sec_num)
+    } else {
+        String::new()
+    };
+
+    format!("{}{}", base_class, status_class)
 }
 
 /// Render section labels on the left side
