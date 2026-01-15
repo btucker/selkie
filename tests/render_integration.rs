@@ -1654,6 +1654,84 @@ fn test_state_diagram_vertical_layout() {
 }
 
 #[test]
+fn test_state_diagram_fork_join_centered() {
+    // Fork and join bars should be centered between their parallel branches
+    let input = r#"stateDiagram-v2
+    [*] --> Active
+    state fork_state <<fork>>
+    Active --> fork_state
+    fork_state --> BranchA
+    fork_state --> BranchB
+    state join_state <<join>>
+    BranchA --> join_state
+    BranchB --> join_state
+    join_state --> Done
+    Done --> [*]"#;
+
+    let diagram = parse(input).expect("Failed to parse state diagram");
+    let svg = render(&diagram).expect("Failed to render state diagram");
+
+    // Extract center x-coordinate from a state's rect element
+    let extract_center_x = |svg: &str, state_id: &str| -> Option<f64> {
+        let state_marker = format!(r#"id="state-{}""#, state_id);
+        let state_start = svg.find(&state_marker)?;
+        let state_section = &svg[state_start..];
+        let state_end = state_section.find("</g>")?;
+        let state_section = &state_section[..state_end];
+
+        // For rect: x="..." width="..."
+        if let Some(x_start) = state_section.find(r#" x=""#) {
+            let x_value_start = x_start + 4;
+            let remaining = &state_section[x_value_start..];
+            let x_end = remaining.find('"')?;
+            let x_str = &remaining[..x_end];
+            if let Ok(x) = x_str.parse::<f64>() {
+                if let Some(w_start) = state_section.find(r#" width=""#) {
+                    let w_value_start = w_start + 8;
+                    let remaining = &state_section[w_value_start..];
+                    let w_end = remaining.find('"')?;
+                    let w_str = &remaining[..w_end];
+                    if let Ok(w) = w_str.parse::<f64>() {
+                        return Some(x + w / 2.0);
+                    }
+                }
+            }
+        }
+        None
+    };
+
+    // Get centers
+    let branch_a_center = extract_center_x(&svg, "BranchA").expect("Should find BranchA");
+    let branch_b_center = extract_center_x(&svg, "BranchB").expect("Should find BranchB");
+    let fork_center = extract_center_x(&svg, "fork_state").expect("Should find fork_state");
+    let join_center = extract_center_x(&svg, "join_state").expect("Should find join_state");
+
+    eprintln!(
+        "Branch centers: A={}, B={}",
+        branch_a_center, branch_b_center
+    );
+    eprintln!("Fork center: {}", fork_center);
+    eprintln!("Join center: {}", join_center);
+
+    // Fork/join should be centered between the branches
+    let expected_center = (branch_a_center + branch_b_center) / 2.0;
+    let tolerance = 20.0; // Allow some positioning variance
+
+    assert!(
+        (fork_center - expected_center).abs() < tolerance,
+        "Fork should be centered between branches. Expected ~{}, got {}",
+        expected_center,
+        fork_center
+    );
+    assert!(
+        (join_center - expected_center).abs() < tolerance,
+        "Join should be centered between branches. Expected ~{}, got {}",
+        expected_center,
+        join_center
+    );
+}
+
+#[test]
 fn test_class_diagram_cardinality_labels() {
     // Class diagram relations with cardinality should render the cardinality labels
     // Duck "1" *-- "many" Egg : has

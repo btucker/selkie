@@ -251,6 +251,59 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         }
     }
 
+    // Post-process: Center fork/join bars between their parallel branches
+    // Fork bars should be centered between their target states
+    // Join bars should be centered between their source states
+    let mut fork_join_offsets: HashMap<String, f64> = HashMap::new();
+
+    // Collect fork and join states
+    let fork_join_ids: Vec<&str> = states
+        .iter()
+        .filter(|(_, s)| matches!(s.state_type, StateType::Fork | StateType::Join))
+        .map(|(id, _)| id.as_str())
+        .collect();
+
+    for fj_id in &fork_join_ids {
+        let is_fork = states
+            .get(*fj_id)
+            .map(|s| matches!(s.state_type, StateType::Fork))
+            .unwrap_or(false);
+
+        // Collect connected state centers (targets for fork, sources for join)
+        let mut connected_centers: Vec<f64> = Vec::new();
+
+        for edge in &layout_result.edges {
+            if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
+                if is_fork && source == *fj_id {
+                    // Fork: collect target centers
+                    if let Some(&(x, _, w, _)) = state_positions.get(target) {
+                        connected_centers.push(x + w / 2.0);
+                    }
+                } else if !is_fork && target == *fj_id {
+                    // Join: collect source centers
+                    if let Some(&(x, _, w, _)) = state_positions.get(source) {
+                        connected_centers.push(x + w / 2.0);
+                    }
+                }
+            }
+        }
+
+        // Center fork/join between connected states
+        if connected_centers.len() >= 2 {
+            let min_x = connected_centers.iter().copied().fold(f64::MAX, f64::min);
+            let max_x = connected_centers.iter().copied().fold(f64::MIN, f64::max);
+            let ideal_center = (min_x + max_x) / 2.0;
+
+            if let Some(&(fj_x, fj_y, fj_w, fj_h)) = state_positions.get(*fj_id) {
+                let current_center = fj_x + fj_w / 2.0;
+                let offset_x = ideal_center - current_center;
+                let new_x = fj_x + offset_x;
+                state_positions.insert(fj_id.to_string(), (new_x, fj_y, fj_w, fj_h));
+                fork_join_offsets.insert(fj_id.to_string(), offset_x);
+            }
+        }
+    }
+
     // Extract edge bend points and label positions from layout
     // Adjust bend points for edges from repositioned start nodes
     let mut edge_bend_points: HashMap<(String, String), Vec<Point>> = HashMap::new();
