@@ -292,15 +292,16 @@ fn render_task_bars(
         let room_on_right = end_x + estimated_text_width + 1.5 * left_padding <= TARGET_WIDTH;
 
         // Calculate text position and class based on fit
+        // Note: final_x/end_x already include left_padding, so just offset by 5px
         let (text_x, text_position) = if text_fits_inside {
             // Center inside bar
             (final_x + final_width / 2.0, TextPosition::Inside)
         } else if room_on_right {
-            // Place to the right of bar
-            (end_x + left_padding + 5.0, TextPosition::OutsideRight)
+            // Place 5px to the right of bar
+            (end_x + 5.0, TextPosition::OutsideRight)
         } else {
-            // Place to the left of bar
-            (final_x + left_padding - 5.0, TextPosition::OutsideLeft)
+            // Place 5px to the left of bar
+            (final_x - 5.0, TextPosition::OutsideLeft)
         };
 
         // Determine text class based on position and task flags
