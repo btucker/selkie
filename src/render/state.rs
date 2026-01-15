@@ -108,7 +108,8 @@ impl ToLayoutGraph for StateDb {
                 // Small fixed size for start/end circles
                 (24.0, 24.0)
             } else if matches!(state.state_type, StateType::Fork | StateType::Join) {
-                (8.0, 60.0)
+                // Horizontal bar matching mermaid reference (70×10)
+                (70.0, 10.0)
             } else {
                 size_estimator.estimate_node_size(Some(label_text), shape, &config)
             };
@@ -287,8 +288,8 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 width,
                 height,
                 start_end_radius,
-                8.0,  // fork_join_width
-                60.0, // fork_join_height
+                70.0, // fork_join_width (horizontal bar)
+                10.0, // fork_join_height
                 is_end_state,
             );
             doc.add_element(state_elem);
@@ -328,8 +329,8 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 w2,
                 h2,
                 start_end_radius,
-                8.0,  // fork_join_width
-                60.0, // fork_join_height
+                70.0, // fork_join_width (horizontal bar)
+                10.0, // fork_join_height
                 state1.map(|s| s.state_type),
                 state2.map(|s| s.state_type),
                 relation.description.as_deref(),
