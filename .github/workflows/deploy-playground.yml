@@ -27,7 +27,7 @@ jobs:
           target: wasm32-unknown-unknown
 
       - name: Install wasm-pack
-        run: cargo install wasm-pack
+        run: cargo install wasm-pack@0.12.1
 
       - name: Build WASM package
         run: wasm-pack build --target web --features wasm --out-dir playground/pkg
