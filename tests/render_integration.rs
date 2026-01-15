@@ -865,9 +865,9 @@ fn test_gantt_task_labels_inside_bars() {
     let diagram = parse(input).expect("Failed to parse Gantt chart");
     let svg = render(&diagram).expect("Failed to render Gantt chart");
 
-    // Task bar should be rendered
+    // Task bar should be rendered (mermaid uses "task task0" etc.)
     assert!(
-        svg.contains("task-bar"),
+        svg.contains("task task") || svg.contains("task-bar"),
         "Gantt chart should have task bars"
     );
 
