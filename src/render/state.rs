@@ -17,10 +17,10 @@ impl ToLayoutGraph for StateDb {
     fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
         use std::collections::HashSet;
 
-        // State-specific config: smaller padding since state diagrams use SVG text (not foreignObject)
+        // State-specific config: mermaid uses 16px font-size for node labels
         let config = NodeSizeConfig {
-            font_size: 10.0, // Matches mermaid state font-size
-            padding_horizontal: 10.0,
+            font_size: 16.0, // Matches mermaid base font-size
+            padding_horizontal: 8.0,
             padding_vertical: 8.0,
             min_width: 40.0,
             min_height: 26.0,
@@ -611,7 +611,7 @@ fn render_state_node(
                     attrs: Attrs::new()
                         .with_attr("text-anchor", "middle")
                         .with_class("state-label")
-                        .with_attr("font-size", "10"),
+                        .with_attr("font-size", "16"),
                 });
 
                 // State descriptions
@@ -1092,7 +1092,6 @@ fn generate_state_css() -> String {
 
 .state-label {
   fill: #333333;
-  font-weight: bold;
 }
 
 .state-description {
