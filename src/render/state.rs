@@ -202,14 +202,18 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         }
     }
 
-    // Extract edge bend points from layout
+    // Extract edge bend points and label positions from layout
     let mut edge_bend_points: HashMap<(String, String), Vec<Point>> = HashMap::new();
+    let mut edge_label_positions: HashMap<(String, String), Point> = HashMap::new();
     for edge in &layout_result.edges {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
             edge_bend_points.insert(
                 (source.to_string(), target.to_string()),
                 edge.bend_points.clone(),
             );
+            if let Some(label_pos) = &edge.label_position {
+                edge_label_positions.insert((source.to_string(), target.to_string()), *label_pos);
+            }
         }
     }
 
@@ -315,9 +319,10 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
             let state1 = states.get(&relation.state1);
             let state2 = states.get(&relation.state2);
 
-            // Get bend points from layout
+            // Get bend points and label position from layout
             let edge_key = (relation.state1.clone(), relation.state2.clone());
             let bend_points = edge_bend_points.get(&edge_key);
+            let label_position = edge_label_positions.get(&edge_key);
 
             let transition_elem = render_transition(
                 x1,
@@ -335,6 +340,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 state2.map(|s| s.state_type),
                 relation.description.as_deref(),
                 bend_points,
+                label_position,
             );
             doc.add_element(transition_elem);
         }
@@ -641,6 +647,7 @@ fn render_transition(
     state2_type: Option<StateType>,
     label: Option<&str>,
     bend_points: Option<&Vec<Point>>,
+    label_position: Option<&Point>,
 ) -> SvgElement {
     let mut children = Vec::new();
 
@@ -650,14 +657,19 @@ fn render_transition(
             // Use dagre's bend points to create a curved path
             let curved_path = build_curved_path(points);
 
-            // Calculate label position at midpoint of the path
-            let mid_idx = points.len() / 2;
-            let (lx, ly) = if points.len() > 1 && mid_idx > 0 {
-                let p1 = &points[mid_idx - 1];
-                let p2 = &points[mid_idx.min(points.len() - 1)];
-                ((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0)
+            // Use layout-provided label position if available, otherwise calculate midpoint
+            let (lx, ly) = if let Some(pos) = label_position {
+                (pos.x, pos.y)
             } else {
-                (points[0].x, points[0].y)
+                // Calculate label position at midpoint of the path
+                let mid_idx = points.len() / 2;
+                if points.len() > 1 && mid_idx > 0 {
+                    let p1 = &points[mid_idx - 1];
+                    let p2 = &points[mid_idx.min(points.len() - 1)];
+                    ((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0)
+                } else {
+                    (points[0].x, points[0].y)
+                }
             };
 
             (curved_path, lx, ly)
