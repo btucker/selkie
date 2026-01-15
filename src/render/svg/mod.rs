@@ -15,9 +15,10 @@ pub use elements::{Attrs, SvgElement};
 pub use structure::SvgStructure;
 pub use theme::{Theme, ThemeBuilder};
 
+use crate::diagrams::architecture::{ArchitectureDb, ArchitectureDirection, ArchitectureGroup};
 use crate::diagrams::flowchart::{FlowSubGraph, FlowchartDb};
 use crate::error::Result;
-use crate::layout::LayoutGraph;
+use crate::layout::{LayoutGraph, LayoutNode, Point};
 
 /// Configuration for SVG rendering
 #[derive(Debug, Clone)]
@@ -148,6 +149,60 @@ impl SvgRenderer {
         Ok(doc.to_string())
     }
 
+    /// Render an architecture diagram to SVG
+    pub fn render_architecture(&self, db: &ArchitectureDb, graph: &LayoutGraph) -> Result<String> {
+        let mut doc = SvgDocument::new();
+        let (view_min_x, view_min_y, view_width, view_height) =
+            self.calculate_architecture_bounds(db, graph);
+        doc.set_size_with_origin(view_min_x, view_min_y, view_width, view_height);
+
+        if self.config.embed_css {
+            let mut css = self.config.theme.generate_css();
+            if let Some(ref custom_css) = self.config.theme_css {
+                let sanitized = sanitize_css(custom_css);
+                if !sanitized.is_empty() {
+                    css.push_str("\n/* Custom CSS */\n");
+                    css.push_str(&sanitized);
+                }
+            }
+            doc.add_style(&css);
+        }
+
+        doc.add_defs(markers::create_arrow_markers(&self.config.theme));
+
+        for group in db.get_groups() {
+            if let Some(element) = self.render_architecture_group(group, graph) {
+                doc.add_cluster(element);
+            }
+        }
+
+        for edge in &graph.edges {
+            if edge.id.contains("_dummy_") {
+                continue;
+            }
+            let (path, label) = render_architecture_edge(edge, graph);
+            if let Some(path) = path {
+                doc.add_edge_path(path);
+            }
+            if let Some(label) = label {
+                doc.add_edge_label(label);
+            }
+        }
+
+        for node in &graph.nodes {
+            if node.is_dummy
+                || matches!(node.metadata.get("is_group"), Some(value) if value == "true")
+            {
+                continue;
+            }
+            if let Some(element) = render_architecture_node(node) {
+                doc.add_node(element);
+            }
+        }
+
+        Ok(doc.to_string())
+    }
+
     /// Calculate bounds for the flowchart including subgraph boxes
     /// Returns (min_x, min_y, width, height) for the viewBox
     fn calculate_flowchart_bounds(
@@ -201,6 +256,68 @@ impl SvgRenderer {
         }
 
         // Apply global padding
+        min_x -= padding;
+        min_y -= padding;
+        max_x += padding;
+        max_y += padding;
+
+        let width = max_x - min_x;
+        let height = max_y - min_y;
+
+        (min_x, min_y, width, height)
+    }
+
+    fn calculate_architecture_bounds(
+        &self,
+        db: &ArchitectureDb,
+        graph: &LayoutGraph,
+    ) -> (f64, f64, f64, f64) {
+        let padding = self.config.padding;
+        let group_padding = 20.0;
+        let title_height = 22.0;
+
+        let mut min_x = f64::MAX;
+        let mut min_y = f64::MAX;
+        let mut max_x = f64::MIN;
+        let mut max_y = f64::MIN;
+
+        for node in &graph.nodes {
+            if node.is_dummy {
+                continue;
+            }
+            if let (Some(x), Some(y)) = (node.x, node.y) {
+                min_x = min_x.min(x);
+                min_y = min_y.min(y);
+                max_x = max_x.max(x + node.width);
+                max_y = max_y.max(y + node.height);
+            }
+        }
+
+        for group in db.get_groups() {
+            if let Some(node) = graph.get_node(&group.id) {
+                if let (Some(x), Some(y)) = (node.x, node.y) {
+                    if node.width > 0.0 && node.height > 0.0 {
+                        let box_min_x = x - group_padding;
+                        let box_min_y = y - group_padding - title_height;
+                        let box_max_x = x + node.width + group_padding;
+                        let box_max_y = y + node.height + group_padding;
+
+                        min_x = min_x.min(box_min_x);
+                        min_y = min_y.min(box_min_y);
+                        max_x = max_x.max(box_max_x);
+                        max_y = max_y.max(box_max_y);
+                    }
+                }
+            }
+        }
+
+        if min_x == f64::MAX {
+            min_x = 0.0;
+            min_y = 0.0;
+            max_x = graph.width.unwrap_or(800.0);
+            max_y = graph.height.unwrap_or(600.0);
+        }
+
         min_x -= padding;
         min_y -= padding;
         max_x += padding;
@@ -275,6 +392,229 @@ impl SvgRenderer {
             .with_id(&format!("subgraph-{}", subgraph.id));
 
         Some(SvgElement::group(vec![rect, label]).with_attrs(group_attrs))
+    }
+
+    fn render_architecture_group(
+        &self,
+        group: &ArchitectureGroup,
+        graph: &LayoutGraph,
+    ) -> Option<SvgElement> {
+        let node = graph.get_node(&group.id)?;
+        let (x, y) = (node.x?, node.y?);
+        if node.width == 0.0 || node.height == 0.0 {
+            return None;
+        }
+
+        let padding = 20.0;
+        let title_height = 22.0;
+
+        let rect_x = x - padding;
+        let rect_y = y - padding - title_height;
+        let rect_w = node.width + padding * 2.0;
+        let rect_h = node.height + padding * 2.0 + title_height;
+
+        let rect = SvgElement::rect(rect_x, rect_y, rect_w, rect_h)
+            .with_attrs(Attrs::new().with_class("cluster"));
+
+        let label_text = group.title.as_deref().unwrap_or(group.id.as_str());
+        let label = SvgElement::Text {
+            x: rect_x + rect_w / 2.0,
+            y: rect_y + 15.0,
+            content: label_text.to_string(),
+            attrs: Attrs::new()
+                .with_class("cluster-label")
+                .with_attr("text-anchor", "middle"),
+        };
+
+        let group_attrs = Attrs::new()
+            .with_class("subgraph")
+            .with_id(&format!("group-{}", group.id));
+
+        Some(SvgElement::group(vec![rect, label]).with_attrs(group_attrs))
+    }
+}
+
+fn render_architecture_node(node: &LayoutNode) -> Option<SvgElement> {
+    let (x, y) = (node.x?, node.y?);
+    let w = node.width;
+    let h = node.height;
+    let cx = x + w / 2.0;
+    let cy = y + h / 2.0;
+
+    let node_type = node
+        .metadata
+        .get("node_type")
+        .map(|s| s.as_str())
+        .unwrap_or("service");
+
+    let shape = if node_type == "junction" {
+        SvgElement::circle(cx, cy, (w.min(h)) / 2.0)
+    } else {
+        SvgElement::rounded_rect(x, y, w, h, 6.0)
+    };
+
+    let mut elements = vec![shape];
+
+    if node_type != "junction" {
+        if let Some(label) = node.label.as_deref() {
+            let label_element = SvgElement::text(cx, cy, label).with_attrs(
+                Attrs::new()
+                    .with_class("label")
+                    .with_attr("text-anchor", "middle")
+                    .with_attr("dominant-baseline", "central"),
+            );
+            elements.push(label_element);
+        }
+    }
+
+    let group_attrs = Attrs::new()
+        .with_class("node")
+        .with_id(&format!("node-{}", node.id));
+
+    Some(SvgElement::group(elements).with_attrs(group_attrs))
+}
+
+fn render_architecture_edge(
+    edge: &crate::layout::LayoutEdge,
+    graph: &LayoutGraph,
+) -> (Option<SvgElement>, Option<SvgElement>) {
+    let source_id = edge.source();
+    let target_id = edge.target();
+    let source_node = source_id.and_then(|id| graph.get_node(id));
+    let target_node = target_id.and_then(|id| graph.get_node(id));
+
+    let source_dir = edge
+        .metadata
+        .get("lhs_dir")
+        .and_then(|s| parse_arch_direction(s));
+    let target_dir = edge
+        .metadata
+        .get("rhs_dir")
+        .and_then(|s| parse_arch_direction(s));
+
+    let start = source_node
+        .and_then(|node| source_dir.and_then(|dir| node_port(node, dir)))
+        .or_else(|| source_node.and_then(LayoutNode::center));
+    let end = target_node
+        .and_then(|node| target_dir.and_then(|dir| node_port(node, dir)))
+        .or_else(|| target_node.and_then(LayoutNode::center));
+
+    let mut points = if edge.bend_points.is_empty() {
+        Vec::new()
+    } else {
+        edge.bend_points.clone()
+    };
+
+    if let (Some(start), Some(end)) = (start, end) {
+        if points.len() >= 2 {
+            points[0] = start;
+            if let Some(last) = points.last_mut() {
+                *last = end;
+            }
+        } else {
+            points = vec![start, end];
+        }
+    }
+
+    let path = if points.len() >= 2 {
+        let path_d = edges::build_curved_path(&points);
+        let mut attrs = Attrs::new().with_class("edge-path").with_fill("none");
+
+        if parse_bool(edge.metadata.get("rhs_into")) {
+            attrs = attrs.with_attr("marker-end", "url(#arrow_point)");
+        }
+        if parse_bool(edge.metadata.get("lhs_into")) {
+            attrs = attrs.with_attr("marker-start", "url(#arrow_point_start)");
+        }
+
+        let path_element = SvgElement::path(path_d).with_attrs(attrs);
+        let group_attrs = Attrs::new()
+            .with_class("edge")
+            .with_id(&format!("edge-{}", edge.id));
+        Some(SvgElement::group(vec![path_element]).with_attrs(group_attrs))
+    } else {
+        None
+    };
+
+    let label = edge.label.as_deref().and_then(|text| {
+        let label_pos = edge
+            .label_position
+            .or_else(|| midpoint_from_points(&points));
+        let label_pos = label_pos?;
+
+        let font_size = 12.0;
+        let char_width_ratio = 0.6;
+        let lines: Vec<&str> = text.lines().collect();
+        let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
+        let num_lines = lines.len().max(1);
+
+        let text_width = (max_chars as f64) * font_size * char_width_ratio;
+        let text_height = (num_lines as f64) * font_size * 1.5;
+        let padding = 4.0;
+
+        let bg = SvgElement::Rect {
+            x: label_pos.x - text_width / 2.0 - padding,
+            y: label_pos.y - text_height / 2.0 - padding / 2.0,
+            width: text_width + padding * 2.0,
+            height: text_height + padding,
+            rx: None,
+            ry: None,
+            attrs: Attrs::new().with_class("edge-label-bg"),
+        };
+
+        let label_attrs = Attrs::new()
+            .with_class("edge-label")
+            .with_attr("text-anchor", "middle")
+            .with_attr("dominant-baseline", "central");
+        let label_text = SvgElement::text(label_pos.x, label_pos.y, text).with_attrs(label_attrs);
+
+        let group_attrs = Attrs::new()
+            .with_class("edgeLabel")
+            .with_id(&format!("edge-label-{}", edge.id));
+        Some(SvgElement::group(vec![bg, label_text]).with_attrs(group_attrs))
+    });
+
+    (path, label)
+}
+
+fn parse_arch_direction(value: &str) -> Option<ArchitectureDirection> {
+    match value {
+        "L" => Some(ArchitectureDirection::Left),
+        "R" => Some(ArchitectureDirection::Right),
+        "T" => Some(ArchitectureDirection::Top),
+        "B" => Some(ArchitectureDirection::Bottom),
+        _ => None,
+    }
+}
+
+fn parse_bool(value: Option<&String>) -> bool {
+    matches!(value, Some(v) if v == "true")
+}
+
+fn node_port(node: &LayoutNode, dir: ArchitectureDirection) -> Option<Point> {
+    let (x, y) = (node.x?, node.y?);
+    let w = node.width;
+    let h = node.height;
+    let point = match dir {
+        ArchitectureDirection::Left => Point::new(x, y + h / 2.0),
+        ArchitectureDirection::Right => Point::new(x + w, y + h / 2.0),
+        ArchitectureDirection::Top => Point::new(x + w / 2.0, y),
+        ArchitectureDirection::Bottom => Point::new(x + w / 2.0, y + h),
+    };
+    Some(point)
+}
+
+fn midpoint_from_points(points: &[Point]) -> Option<Point> {
+    if points.is_empty() {
+        return None;
+    }
+    let mid = points.len() / 2;
+    if points.len().is_multiple_of(2) && mid > 0 {
+        let p1 = points[mid - 1];
+        let p2 = points[mid];
+        Some(Point::new((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0))
+    } else {
+        Some(points[mid])
     }
 }
 

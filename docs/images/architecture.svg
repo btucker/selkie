@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="405.6" height="518.72" viewBox="-28 -50 405.6 518.72" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="group-api">
+        <rect x="-20" y="-42" width="389.6" height="435.22" class="cluster"/>
+        <text x="174.8" y="-27" class="cluster-label" text-anchor="middle">API</text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-edge-0-db-server">
+        <path d="M 40.00 88.93 C 87.73 88.93, 135.47 88.93, 180.40 113.57 C 225.33 138.22, 267.47 187.50, 309.60 236.79" class="edge-path" fill="none"/>
+      </g>
+      <g class="edge" id="edge-edge-1-disk1-server">
+        <path d="M 91.60 202.86 C 122.13 214.17, 152.67 225.48, 181.80 235.49 C 210.93 245.49, 238.67 254.19, 266.40 262.89" class="edge-path" fill="none"/>
+      </g>
+      <g class="edge" id="edge-edge-2-gateway-server">
+        <path d="M 131.60 420.72 C 148.80 387.20, 166.00 353.69, 181.27 323.03 C 196.53 292.38, 209.87 264.58, 223.20 236.79" class="edge-path" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-db">
+        <rect x="39.99999999999999" y="55.00000000000001" width="103.2" height="67.86" rx="6" ry="6"/>
+        <text x="91.6" y="88.93" class="label" text-anchor="middle" dominant-baseline="central">Database</text>
+      </g>
+      <g class="node" id="node-disk1">
+        <rect x="44.199999999999996" y="202.86" width="94.8" height="67.86" rx="6" ry="6"/>
+        <text x="91.6" y="236.79000000000002" class="label" text-anchor="middle" dominant-baseline="central">Storage</text>
+      </g>
+      <g class="node" id="node-gateway">
+        <rect x="51.599999999999994" y="380.72" width="80" height="80" rx="6" ry="6"/>
+        <text x="91.6" y="420.72" class="label" text-anchor="middle" dominant-baseline="central">Gateway</text>
+      </g>
+      <g class="node" id="node-server">
+        <rect x="223.2" y="210.69000000000003" width="86.4" height="52.199999999999996" rx="6" ry="6"/>
+        <text x="266.4" y="236.79000000000002" class="label" text-anchor="middle" dominant-baseline="central">Server</text>
+      </g>
+    </g>
+  </g>
+</svg>
