@@ -25,6 +25,16 @@ struct GitGraphConfig {
     title_top_margin: f64,
 }
 
+#[derive(Debug, Clone)]
+struct GitTextContext<'a> {
+    dir: DiagramOrientation,
+    show_commit_label: bool,
+    rotate_commit_label: bool,
+    commit_label_font_size: f64,
+    tag_label_font_size: f64,
+    estimator: &'a CharacterSizeEstimator,
+}
+
 impl Default for GitGraphConfig {
     fn default() -> Self {
         Self {
@@ -73,6 +83,255 @@ struct GitPalette {
     text_color: String,
 }
 
+#[derive(Debug, Clone)]
+struct Bounds {
+    min_x: f64,
+    min_y: f64,
+    max_x: f64,
+    max_y: f64,
+}
+
+impl Default for Bounds {
+    fn default() -> Self {
+        Self {
+            min_x: f64::MAX,
+            min_y: f64::MAX,
+            max_x: f64::MIN,
+            max_y: f64::MIN,
+        }
+    }
+}
+
+impl Bounds {
+    fn is_valid(&self) -> bool {
+        self.min_x.is_finite() && self.min_y.is_finite() && self.max_x.is_finite()
+    }
+
+    fn finish(&self) -> (f64, f64, f64, f64) {
+        (self.min_x, self.min_y, self.max_x, self.max_y)
+    }
+
+    fn include_point(&mut self, x: f64, y: f64) {
+        self.min_x = self.min_x.min(x);
+        self.min_y = self.min_y.min(y);
+        self.max_x = self.max_x.max(x);
+        self.max_y = self.max_y.max(y);
+    }
+
+    fn include_rect(&mut self, x: f64, y: f64, width: f64, height: f64) {
+        self.include_point(x, y);
+        self.include_point(x + width, y + height);
+    }
+
+    fn include_commit_label(
+        &mut self,
+        commit: &Commit,
+        pos: &CommitPosition,
+        ctx: &GitTextContext<'_>,
+    ) {
+        let (bbox_w, bbox_h) = ctx
+            .estimator
+            .estimate_text_size(&commit.id, ctx.commit_label_font_size);
+        let commit_pos_offset = commit_pos_with_offset(pos, ctx.dir);
+
+        let mut rect_x = commit_pos_offset - bbox_w / 2.0 - PY;
+        let mut rect_y = pos.y + 13.5;
+        let rect_w = bbox_w + 2.0 * PY;
+        let rect_h = bbox_h + 2.0 * PY;
+
+        if matches!(
+            ctx.dir,
+            DiagramOrientation::TopToBottom | DiagramOrientation::BottomToTop
+        ) {
+            rect_x = pos.x - (bbox_w + 4.0 * PX + 5.0);
+            rect_y = pos.y - 12.0;
+        }
+
+        if ctx.rotate_commit_label {
+            if matches!(
+                ctx.dir,
+                DiagramOrientation::TopToBottom | DiagramOrientation::BottomToTop
+            ) {
+                self.include_rotated_rect(
+                    rect_x, rect_y, rect_w, rect_h, -45.0, pos.x, pos.y, 0.0, 0.0,
+                );
+            } else {
+                let r_x = -7.5 - ((bbox_w + 10.0) / 25.0) * 9.5;
+                let r_y = 10.0 + (bbox_w / 25.0) * 8.5;
+                self.include_rotated_rect(
+                    rect_x,
+                    rect_y,
+                    rect_w,
+                    rect_h,
+                    -45.0,
+                    commit_pos_offset,
+                    pos.y,
+                    r_x,
+                    r_y,
+                );
+            }
+        } else {
+            self.include_rect(rect_x, rect_y, rect_w, rect_h);
+        }
+    }
+
+    fn include_commit_tags(
+        &mut self,
+        commit: &Commit,
+        pos: &CommitPosition,
+        ctx: &GitTextContext<'_>,
+    ) {
+        let mut max_tag_bbox_width: f64 = 0.0;
+        let mut max_tag_bbox_height: f64 = 0.0;
+        for tag_value in commit.tags.iter().rev() {
+            let (tag_w, tag_h) = ctx
+                .estimator
+                .estimate_text_size(tag_value, ctx.tag_label_font_size);
+            max_tag_bbox_width = max_tag_bbox_width.max(tag_w);
+            max_tag_bbox_height = max_tag_bbox_height.max(tag_h);
+        }
+
+        let mut y_cursor = 0.0;
+        for tag_value in commit.tags.iter().rev() {
+            let (tag_w, _tag_h) = ctx
+                .estimator
+                .estimate_text_size(tag_value, ctx.tag_label_font_size);
+            let h2 = max_tag_bbox_height / 2.0;
+            let pos_with_offset = commit_pos_with_offset(pos, ctx.dir);
+            let ly = pos.y - 19.2 - y_cursor;
+
+            let points = if matches!(
+                ctx.dir,
+                DiagramOrientation::TopToBottom | DiagramOrientation::BottomToTop
+            ) {
+                let y_origin = pos_with_offset + y_cursor;
+                let base = vec![
+                    crate::layout::Point::new(pos.x, y_origin + 2.0),
+                    crate::layout::Point::new(pos.x, y_origin - 2.0),
+                    crate::layout::Point::new(pos.x + LAYOUT_OFFSET, y_origin - h2 - 2.0),
+                    crate::layout::Point::new(
+                        pos.x + LAYOUT_OFFSET + max_tag_bbox_width + 4.0,
+                        y_origin - h2 - 2.0,
+                    ),
+                    crate::layout::Point::new(
+                        pos.x + LAYOUT_OFFSET + max_tag_bbox_width + 4.0,
+                        y_origin + h2 + 2.0,
+                    ),
+                    crate::layout::Point::new(pos.x + LAYOUT_OFFSET, y_origin + h2 + 2.0),
+                ];
+                let transform =
+                    Transform::rotate_translate(45.0, pos.x, pos_with_offset, 12.0, 12.0);
+                base.into_iter()
+                    .map(|p| transform.apply(p))
+                    .collect::<Vec<_>>()
+            } else {
+                vec![
+                    crate::layout::Point::new(
+                        pos_with_offset - max_tag_bbox_width / 2.0 - PX / 2.0,
+                        ly + PY,
+                    ),
+                    crate::layout::Point::new(
+                        pos_with_offset - max_tag_bbox_width / 2.0 - PX / 2.0,
+                        ly - PY,
+                    ),
+                    crate::layout::Point::new(
+                        pos_with_offset - max_tag_bbox_width / 2.0 - PX,
+                        ly - h2 - PY,
+                    ),
+                    crate::layout::Point::new(
+                        pos_with_offset + max_tag_bbox_width / 2.0 + PX,
+                        ly - h2 - PY,
+                    ),
+                    crate::layout::Point::new(
+                        pos_with_offset + max_tag_bbox_width / 2.0 + PX,
+                        ly + h2 + PY,
+                    ),
+                    crate::layout::Point::new(
+                        pos_with_offset - max_tag_bbox_width / 2.0 - PX,
+                        ly + h2 + PY,
+                    ),
+                ]
+            };
+
+            for point in points {
+                self.include_point(point.x, point.y);
+            }
+            self.include_rect(
+                pos_with_offset - tag_w / 2.0,
+                pos.y - 16.0 - y_cursor,
+                tag_w,
+                max_tag_bbox_height,
+            );
+            y_cursor += 20.0;
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn include_rotated_rect(
+        &mut self,
+        x: f64,
+        y: f64,
+        width: f64,
+        height: f64,
+        angle_deg: f64,
+        cx: f64,
+        cy: f64,
+        translate_x: f64,
+        translate_y: f64,
+    ) {
+        let transform = Transform::rotate_translate(angle_deg, cx, cy, translate_x, translate_y);
+        let corners = [
+            crate::layout::Point::new(x, y),
+            crate::layout::Point::new(x + width, y),
+            crate::layout::Point::new(x + width, y + height),
+            crate::layout::Point::new(x, y + height),
+        ];
+        for corner in corners {
+            let rotated = transform.apply(corner);
+            self.include_point(rotated.x, rotated.y);
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Transform {
+    angle_rad: f64,
+    cx: f64,
+    cy: f64,
+    translate_x: f64,
+    translate_y: f64,
+}
+
+impl Transform {
+    fn rotate_translate(
+        angle_deg: f64,
+        cx: f64,
+        cy: f64,
+        translate_x: f64,
+        translate_y: f64,
+    ) -> Self {
+        Self {
+            angle_rad: angle_deg.to_radians(),
+            cx,
+            cy,
+            translate_x,
+            translate_y,
+        }
+    }
+
+    fn apply(&self, point: crate::layout::Point) -> crate::layout::Point {
+        let mut x = point.x + self.translate_x;
+        let mut y = point.y + self.translate_y;
+        let cos = self.angle_rad.cos();
+        let sin = self.angle_rad.sin();
+        let dx = x - self.cx;
+        let dy = y - self.cy;
+        x = self.cx + dx * cos - dy * sin;
+        y = self.cy + dx * sin + dy * cos;
+        crate::layout::Point::new(x, y)
+    }
+}
+
 pub fn render_git(db: &GitGraphDb, config: &RenderConfig) -> Result<String> {
     let git_config = GitGraphConfig::default();
     let mut doc = SvgDocument::new();
@@ -99,10 +358,21 @@ pub fn render_git(db: &GitGraphDb, config: &RenderConfig) -> Result<String> {
     }
 
     let dir = db.get_direction();
-    let estimator = CharacterSizeEstimator::default();
+    let estimator = CharacterSizeEstimator {
+        char_width_ratio: 0.6,
+        line_height_ratio: 1.0,
+    };
     let branch_font_size = parse_font_size(&theme.font_size);
     let commit_label_font_size = 10.0;
     let tag_label_font_size = 10.0;
+    let text_ctx = GitTextContext {
+        dir,
+        show_commit_label: git_config.show_commit_label,
+        rotate_commit_label: git_config.rotate_commit_label,
+        commit_label_font_size,
+        tag_label_font_size,
+        estimator: &estimator,
+    };
 
     let mut branch_pos: HashMap<String, BranchPosition> = HashMap::new();
     let mut pos = 0.0;
@@ -170,10 +440,10 @@ pub fn render_git(db: &GitGraphDb, config: &RenderConfig) -> Result<String> {
         &branches,
         &branch_pos,
         &commit_pos,
-        dir,
+        commits,
         max_pos,
         branch_font_size,
-        &estimator,
+        &text_ctx,
         git_config.diagram_padding,
     );
     doc.set_size_with_origin(min_x, min_y, width, height);
@@ -186,54 +456,82 @@ fn calculate_bounds(
     branches: &[crate::diagrams::git::BranchConfig],
     branch_pos: &HashMap<String, BranchPosition>,
     commit_pos: &HashMap<String, CommitPosition>,
-    dir: DiagramOrientation,
+    commits: &HashMap<String, Commit>,
     max_pos: f64,
     branch_font_size: f64,
-    estimator: &CharacterSizeEstimator,
+    text_ctx: &GitTextContext<'_>,
     padding: f64,
 ) -> (f64, f64, f64, f64) {
-    let mut min_x = f64::MAX;
-    let mut min_y = f64::MAX;
-    let mut max_x = f64::MIN;
-    let mut max_y = f64::MIN;
+    let mut bounds = Bounds::default();
 
-    for pos in commit_pos.values() {
-        min_x = min_x.min(pos.x - 30.0);
-        max_x = max_x.max(pos.x + 30.0);
-        min_y = min_y.min(pos.y - 40.0);
-        max_y = max_y.max(pos.y + 40.0);
+    for commit in commits.values() {
+        if let Some(pos) = commit_pos.get(&commit.id) {
+            let radius = if commit.commit_type == CommitType::Merge {
+                9.0
+            } else {
+                10.0
+            };
+            bounds.include_rect(pos.x - radius, pos.y - radius, radius * 2.0, radius * 2.0);
+
+            if should_draw_commit_label(commit, text_ctx.show_commit_label) {
+                bounds.include_commit_label(commit, pos, text_ctx);
+            }
+
+            if !commit.tags.is_empty() {
+                bounds.include_commit_tags(commit, pos, text_ctx);
+            }
+        }
     }
 
     for branch in branches {
         if let Some(pos) = branch_pos.get(&branch.name) {
-            let (bbox_w, bbox_h) = estimator.estimate_text_size(&branch.name, branch_font_size);
-            match dir {
+            let (bbox_w, bbox_h) = text_ctx
+                .estimator
+                .estimate_text_size(&branch.name, branch_font_size);
+            let rotate_offset = if text_ctx.rotate_commit_label {
+                30.0
+            } else {
+                0.0
+            };
+            let (bkg_x, bkg_y) = match text_ctx.dir {
                 DiagramOrientation::LeftToRight => {
-                    min_x = min_x.min(-bbox_w - 60.0);
-                    max_x = max_x.max(max_pos + 20.0);
-                    min_y = min_y.min(pos.pos - bbox_h);
-                    max_y = max_y.max(pos.pos + bbox_h);
+                    let label_x = -bbox_w - 14.0 - rotate_offset;
+                    let bkg_x = label_x - 5.0;
+                    let bkg_y = pos.pos - bbox_h / 2.0 - 2.0;
+                    (bkg_x, bkg_y)
                 }
                 DiagramOrientation::TopToBottom => {
-                    min_x = min_x.min(pos.pos - bbox_w / 2.0 - 20.0);
-                    max_x = max_x.max(pos.pos + bbox_w / 2.0 + 20.0);
-                    min_y = min_y.min(-bbox_h - 20.0);
-                    max_y = max_y.max(max_pos + 20.0);
+                    let bkg_x = pos.pos - bbox_w / 2.0 - 10.0;
+                    let bkg_y = 0.0;
+                    (bkg_x, bkg_y)
                 }
                 DiagramOrientation::BottomToTop => {
-                    min_x = min_x.min(pos.pos - bbox_w / 2.0 - 20.0);
-                    max_x = max_x.max(pos.pos + bbox_w / 2.0 + 20.0);
-                    min_y = min_y.min(-20.0);
-                    max_y = max_y.max(max_pos + bbox_h + 20.0);
+                    let bkg_x = pos.pos - bbox_w / 2.0 - 10.0;
+                    let bkg_y = max_pos;
+                    (bkg_x, bkg_y)
+                }
+            };
+            bounds.include_rect(bkg_x, bkg_y, bbox_w + 18.0, bbox_h + 4.0);
+
+            match text_ctx.dir {
+                DiagramOrientation::LeftToRight => {
+                    bounds.include_point(max_pos, pos.pos);
+                }
+                DiagramOrientation::TopToBottom => {
+                    bounds.include_point(pos.pos, max_pos);
+                }
+                DiagramOrientation::BottomToTop => {
+                    bounds.include_point(pos.pos, max_pos);
                 }
             }
         }
     }
 
-    if !min_x.is_finite() || !min_y.is_finite() {
+    if !bounds.is_valid() {
         return (0.0, 0.0, 400.0, 200.0);
     }
 
+    let (min_x, min_y, max_x, max_y) = bounds.finish();
     let width = (max_x - min_x) + padding * 2.0;
     let height = (max_y - min_y) + padding * 2.0;
     (min_x - padding, min_y - padding, width, height)
@@ -500,6 +798,17 @@ fn get_commit_position(
         x,
         y,
         pos_with_offset,
+    }
+}
+
+fn commit_pos_with_offset(pos: &CommitPosition, dir: DiagramOrientation) -> f64 {
+    if matches!(
+        dir,
+        DiagramOrientation::TopToBottom | DiagramOrientation::BottomToTop
+    ) {
+        pos.y
+    } else {
+        pos.x
     }
 }
 
