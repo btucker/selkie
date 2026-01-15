@@ -1,0 +1,69 @@
+name: Test Playground
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'playground/**'
+      - 'playground-tests/**'
+      - 'src/**'
+      - 'Cargo.toml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'playground/**'
+      - 'playground-tests/**'
+      - 'src/**'
+      - 'Cargo.toml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack@0.12.1
+
+      - name: Build WASM package
+        run: |
+          wasm-pack build --target web --features wasm
+          mv pkg playground/pkg
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: playground-tests/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd playground-tests
+          npm ci
+
+      - name: Install Playwright browsers
+        run: |
+          cd playground-tests
+          npx playwright install chromium --with-deps
+
+      - name: Run Playwright tests
+        run: |
+          cd playground-tests
+          npm test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playground-tests/playwright-report/
+          retention-days: 7

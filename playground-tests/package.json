@@ -1,0 +1,17 @@
+{
+  "name": "playground-tests",
+  "version": "1.0.0",
+  "description": "Playwright tests for Selkie playground",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0"
+  }
+}
