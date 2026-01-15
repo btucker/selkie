@@ -733,7 +733,7 @@ fn render_transition(
     if let Some(text) = label {
         if !text.is_empty() {
             // Estimate text dimensions for background
-            let char_width = 6.5; // Approximate for font-size 11
+            let char_width = 9.6; // Approximate for font-size 16 (0.6 ratio)
             let text_width = text.len() as f64 * char_width;
             let text_height = 14.0;
             let padding = 4.0;
@@ -757,7 +757,7 @@ fn render_transition(
                 attrs: Attrs::new()
                     .with_attr("text-anchor", "middle")
                     .with_class("transition-label")
-                    .with_attr("font-size", "11"),
+                    .with_attr("font-size", "16"),
             });
         }
     }
@@ -981,7 +981,7 @@ fn render_note(x: f64, y: f64, text: &str) -> SvgElement {
         attrs: Attrs::new()
             .with_attr("text-anchor", "middle")
             .with_class("note-text")
-            .with_attr("font-size", "11"),
+            .with_attr("font-size", "16"),
     });
 
     SvgElement::Group {
