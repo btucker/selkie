@@ -6,6 +6,7 @@ mod class;
 mod er;
 mod flowchart;
 mod gantt;
+mod git;
 mod pie;
 mod sequence;
 mod state;
@@ -72,6 +73,7 @@ pub fn render_text(text: &str) -> Result<String> {
 pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<String> {
     match diagram {
         Diagram::Flowchart(db) => render_flowchart(db, config),
+        Diagram::Git(db) => git::render_git(db, config),
         Diagram::Pie(db) => pie::render_pie(db, config),
         Diagram::Sequence(db) => sequence::render_sequence(db, config),
         Diagram::Class(db) => class::render_class(db, config),
