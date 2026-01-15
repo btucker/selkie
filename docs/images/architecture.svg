@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1023.5173925219483" height="482.48907607636534" viewBox="-86.70722828786364 -129.43808352367674 1023.5173925219483 482.48907607636534" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="732.6869006144765" height="484.24010770861935" viewBox="-18.58095979348998 -129.3790479124342 732.6869006144765 484.24010770861935" class="mermaid">
   <style>
 .mermaid{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}
 .mermaid svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}
@@ -17,14 +17,14 @@
     <g class="edgePaths">
       <g class="architecture-edges">
         <g>
-          <path d="M 774.3101642340846,-6.938083523676731 L 637.3693337607422,-3.0484494062125407" class="edge" id="L_db_server_0"/>
+          <path d="M 551.6059408209865,-6.879047912434189 L 413.54799142335656,-2.982466893700817" class="edge" id="L_db_server_0"/>
         </g>
         <g>
-          <path d="M 595.0277302930369,173.5509925526886 L 597.3693337607422,36.95155059378746" class="edge" id="L_disk1_server_0"/>
+          <path d="M 373.4270275491469,175.36105979618512 L 373.54799142335656,37.01753310629918" class="edge" id="L_disk1_server_0"/>
         </g>
         <g>
-          <path d="M 33.292771712136364,-3.5644596227988785 L 557.3693337607422,-3.0484494062125407" class="edge" id="L_gateway_server_0"/>
-          <polygon points="13.333333333333334,6.666666666666667 0,13.333333333333334 0,0" class="arrow" transform="translate(546.0360004274088, -9.715116072879209)"/>
+          <path d="M 101.41904020651002,-5.499544990049941 L 333.54799142335656,-2.982466893700817" class="edge" id="L_gateway_server_0"/>
+          <polygon points="13.333333333333334,6.666666666666667 0,13.333333333333334 0,0" class="arrow" transform="translate(322.21465809002325, -9.649133560367485)"/>
         </g>
       </g>
     </g>
@@ -33,32 +33,32 @@
     </g>
     <g class="nodes">
       <g class="architecture-services">
-        <g class="architecture-service" id="service-db" transform="translate(774.3101642340846, -46.93808352367673)">
-          <g alignment-baseline="middle" dominant-baseline="middle" dy="1em" text-anchor="middle" transform="translate(40, 80)">
+        <g class="architecture-service" id="service-db" transform="translate(551.6059408209865, -46.87904791243419)">
+          <g text-anchor="middle" alignment-baseline="middle" dy="1em" dominant-baseline="middle" transform="translate(40, 80)">
             <g><rect class="background" style="stroke: none"/><text y="-10.1" style=""><tspan class="text-outer-tspan" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Database</tspan></tspan></text></g>
           </g>
           <g>
             <g><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><path data-name="4" d="m20,57.86c0,3.94,8.95,7.14,20,7.14s20-3.2,20-7.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path data-name="3" d="m20,45.95c0,3.94,8.95,7.14,20,7.14s20-3.2,20-7.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path data-name="2" d="m20,34.05c0,3.94,8.95,7.14,20,7.14s20-3.2,20-7.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse data-name="1" cx="40" cy="22.14" rx="20" ry="7.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="20" y1="57.86" x2="20" y2="22.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="60" y1="57.86" x2="60" y2="22.14" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/></g></svg></g>
           </g>
         </g>
-        <g class="architecture-service" id="service-gateway" transform="translate(-46.707228287863636, -43.56445962279888)">
-          <g transform="translate(40, 80)" text-anchor="middle" dy="1em" alignment-baseline="middle" dominant-baseline="middle">
-            <g><rect class="background" style="stroke: none"/><text y="-10.1" style=""><tspan class="text-outer-tspan" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Gateway</tspan></tspan></text></g>
-          </g>
-          <g>
-            <g><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><circle cx="40" cy="40" r="22.5" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="40" y1="17.5" x2="40" y2="62.5" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="17.5" y1="40" x2="62.5" y2="40" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path d="m39.99,17.51c-15.28,11.1-15.28,33.88,0,44.98" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path d="m40.01,17.51c15.28,11.1,15.28,33.88,0,44.98" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="19.75" y1="30.1" x2="60.25" y2="30.1" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="19.75" y1="49.9" x2="60.25" y2="49.9" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/></g></svg></g>
-          </g>
-        </g>
-        <g class="architecture-service" transform="translate(555.0277302930369, 173.5509925526886)" id="service-disk1">
-          <g dy="1em" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" transform="translate(40, 80)">
+        <g class="architecture-service" id="service-disk1" transform="translate(333.4270275491469, 175.36105979618512)">
+          <g alignment-baseline="middle" dy="1em" transform="translate(40, 80)" dominant-baseline="middle" text-anchor="middle">
             <g><rect class="background" style="stroke: none"/><text y="-10.1" style=""><tspan class="text-outer-tspan" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Storage</tspan></tspan></text></g>
           </g>
           <g>
             <g><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><rect x="20" y="15" width="40" height="50" rx="1" ry="1" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="24" cy="19.17" rx=".8" ry=".83" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="56" cy="19.17" rx=".8" ry=".83" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="24" cy="60.83" rx=".8" ry=".83" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="56" cy="60.83" rx=".8" ry=".83" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="40" cy="33.75" rx="14" ry="14.58" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><ellipse cx="40" cy="33.75" rx="4" ry="4.17" style="fill: #fff; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path d="m37.51,42.52l-4.83,13.22c-.26.71-1.1,1.02-1.76.64l-4.18-2.42c-.66-.38-.81-1.26-.33-1.84l9.01-10.8c.88-1.05,2.56-.08,2.09,1.2Z" style="fill: #fff; stroke-width: 0px;"/></g></svg></g>
           </g>
         </g>
-        <g class="architecture-service" id="service-server" transform="translate(557.3693337607422, -43.04844940621254)">
-          <g dy="1em" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle" transform="translate(40, 80)">
+        <g class="architecture-service" transform="translate(21.41904020651002, -45.49954499004994)" id="service-gateway">
+          <g dy="1em" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" transform="translate(40, 80)">
+            <g><rect class="background" style="stroke: none"/><text y="-10.1" style=""><tspan class="text-outer-tspan" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Gateway</tspan></tspan></text></g>
+          </g>
+          <g>
+            <g><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><circle cx="40" cy="40" r="22.5" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="40" y1="17.5" x2="40" y2="62.5" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="17.5" y1="40" x2="62.5" y2="40" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path d="m39.99,17.51c-15.28,11.1-15.28,33.88,0,44.98" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><path d="m40.01,17.51c15.28,11.1,15.28,33.88,0,44.98" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="19.75" y1="30.1" x2="60.25" y2="30.1" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/><line x1="19.75" y1="49.9" x2="60.25" y2="49.9" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/></g></svg></g>
+          </g>
+        </g>
+        <g class="architecture-service" transform="translate(333.54799142335656, -42.98246689370082)" id="service-server">
+          <g text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em" transform="translate(40, 80)">
             <g><rect class="background" style="stroke: none"/><text y="-10.1" style=""><tspan class="text-outer-tspan" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Server</tspan></tspan></text></g>
           </g>
           <g>
@@ -67,12 +67,12 @@
         </g>
       </g>
       <g class="architecture-groups">
-        <rect x="512.5277302930369" y="-89.43808352367674" width="384.28243394104766" height="402.48907607636534" class="node-bkg" id="group-api"/>
+        <rect x="290.9270275491469" y="-89.37904791243419" width="383.1789132718396" height="404.24010770861935" class="node-bkg" id="group-api"/>
         <g>
-          <g transform="translate(513.5277302930369, -88.43808352367674)">
+          <g transform="translate(291.9270275491469, -88.3790479124342)">
             <g><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 80 80"><g><rect width="80" height="80" style="fill: #087ebf; stroke-width: 0px;"/><path d="m65,47.5c0,2.76-2.24,5-5,5H20c-2.76,0-5-2.24-5-5,0-1.87,1.03-3.51,2.56-4.36-.04-.21-.06-.42-.06-.64,0-2.6,2.48-4.74,5.65-4.97,1.65-4.51,6.34-7.76,11.85-7.76.86,0,1.69.08,2.5.23,2.09-1.57,4.69-2.5,7.5-2.5,6.1,0,11.19,4.38,12.28,10.17,2.14.56,3.72,2.51,3.72,4.83,0,.03,0,.07-.01.1,2.29.46,4.01,2.48,4.01,4.9Z" style="fill: none; stroke: #fff; stroke-miterlimit: 10; stroke-width: 2px;"/></g></svg></g>
           </g>
-          <g text-anchor="start" transform="translate(546.5277302930369, -82.43808352367674)" alignment-baseline="middle" dy="1em" dominant-baseline="start">
+          <g dominant-baseline="start" dy="1em" text-anchor="start" transform="translate(324.9270275491469, -82.3790479124342)" alignment-baseline="middle">
             <g><rect class="background" style="stroke: none"/><text y="-10.1" style=""><tspan class="text-outer-tspan" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">API</tspan></tspan></text></g>
           </g>
         </g>

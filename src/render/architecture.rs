@@ -237,7 +237,7 @@ impl Simulation {
     fn new(
         db: &ArchitectureDb,
         initial_positions: HashMap<String, (f64, f64)>,
-        adj: &HashMap<String, Vec<(ArchitectureDirectionPair, String, i32)>>,
+        adj: &HashMap<String, Vec<(ArchitectureDirectionPair, String, f64)>>,
     ) -> Self {
         let mut nodes = HashMap::new();
         for (id, (x, y)) in initial_positions {
@@ -255,62 +255,9 @@ impl Simulation {
         let mut edges = HashMap::new();
         for (src, neighbors) in adj {
             for (pair, dst, distance) in neighbors {
-                // Constraints are directional. We add source -> target.
-                // adj contains both directions (A->B and B->A via build_adjacency).
-                // We only want to process each physical edge once or consistent constraints.
-                // ArchitectureDirectionPair stores 'source' direction.
-                // We can use it to determine target position relative to source.
-                // dx/dy from shift_position logic.
-
                 let mut dx = 0.0;
                 let mut dy = 0.0;
-                let dist = (*distance as f64) * ARCH_NODE_SPACING;
-
-                if pair.source.is_x() {
-                    dx = if pair.source == ArchitectureDirection::Left {
-                        -dist
-                    } else {
-                        dist
-                    };
-                } else {
-                    dy = if pair.source == ArchitectureDirection::Top {
-                        dist // Top is Up (-y in screen?), wait.
-                             // In shift_position: Top -> distance. Bottom -> -distance.
-                             // Grid Y increases Up (in shift_position logic interpretation for layout).
-                             // cy = -grid_y * SPACING.
-                             // So if grid_y + 1 (Up), cy decreases.
-                             // Here we are working in world coords (cx, cy).
-                             // We should stick to world coord constraints.
-                             // Top means target is ABOVE source.
-                             // y_target < y_source.
-                             // So dy should be negative.
-                    } else {
-                        -dist // Bottom means target is BELOW. y_target > y_source. dy positive?
-                    };
-                }
-
-                // Wait, need to check coord system consistency.
-                // build_spatial_maps uses: cy = -grid_y * SPACING.
-                // shift_position: Top -> +distance (grid_y).
-                // So Top -> +grid_y -> -cy. (Up).
-                // Bottom -> -distance (grid_y) -> +cy. (Down).
-                // So:
-                // Top: dy = -dist.
-                // Bottom: dy = dist.
-                // Left: dx = -dist.
-                // Right: dx = dist.
-
-                // Corrections based on shift_position:
-                // source.is_x(): Left -> -distance. Right -> +distance.
-                // source.is_y(): Top -> +distance. Bottom -> -distance.
-                // This was GRID units.
-                // World coords:
-                // X = grid_x * S.
-                // Y = -grid_y * S.
-                // Top -> +grid_y -> Y changes by -grid_y_change * S = -distance * S.
-                // So Top -> dy = -dist.
-                // Bottom -> -grid_y -> Y changes by -(-distance) * S = +distance * S.
-                // So Bottom -> dy = dist.
+                let dist = (*distance) * ARCH_NODE_SPACING;
 
                 if pair.source == ArchitectureDirection::Top {
                     dy = -dist;
@@ -466,8 +413,8 @@ impl Simulation {
 fn build_adjacency(
     db: &ArchitectureDb,
     node_ids: &[String],
-) -> HashMap<String, Vec<(ArchitectureDirectionPair, String, i32)>> {
-    let mut adj: HashMap<String, Vec<(ArchitectureDirectionPair, String, i32)>> = HashMap::new();
+) -> HashMap<String, Vec<(ArchitectureDirectionPair, String, f64)>> {
+    let mut adj: HashMap<String, Vec<(ArchitectureDirectionPair, String, f64)>> = HashMap::new();
     for id in node_ids {
         adj.insert(id.clone(), Vec::new());
     }
@@ -480,7 +427,7 @@ fn build_adjacency(
 
         // Use larger distance for disjoint groups to prevent bounding box overlaps
         let related = are_groups_related(lhs_group, rhs_group, db);
-        let distance = if related { 1 } else { 3 };
+        let distance = if related { 1.0 } else { 1.5 };
 
         if let Some(pair) = ArchitectureDirectionPair::new(edge.lhs_dir, edge.rhs_dir) {
             adj.entry(edge.lhs_id.clone())
@@ -535,7 +482,7 @@ fn are_groups_related(g1: Option<&str>, g2: Option<&str>, db: &ArchitectureDb) -
 }
 
 fn build_spatial_maps(
-    adj: &HashMap<String, Vec<(ArchitectureDirectionPair, String, i32)>>,
+    adj: &HashMap<String, Vec<(ArchitectureDirectionPair, String, f64)>>,
     node_ids: &[String],
 ) -> Vec<HashMap<String, (i32, i32)>> {
     let mut visited: HashSet<String> = HashSet::new();
@@ -567,7 +514,8 @@ fn build_spatial_maps(
                         continue;
                     }
 
-                    let (tx, ty) = pair.shift_position(x, y, *distance);
+                    // Warm start with grid approximation
+                    let (tx, ty) = pair.shift_position(x, y, distance.round() as i32);
                     let (nx, ny) = if occupied.contains(&(tx, ty)) {
                         find_alternative_position((tx, ty), pair.source, &occupied)
                     } else {
