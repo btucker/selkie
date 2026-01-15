@@ -105,7 +105,19 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
     // Collect tasks grouped by section for rendering
     let sections = collect_sections(&tasks);
 
-    // Render section backgrounds (full width rows behind tasks)
+    // Render grid and axis FIRST (behind everything else)
+    let grid_height = total_height - TOP_PADDING - GRID_LINE_START_PADDING;
+    render_grid_and_axis(
+        &mut doc,
+        min_date,
+        days_range,
+        LEFT_PADDING,
+        chart_width,
+        total_height,
+        grid_height,
+    );
+
+    // Render section backgrounds (behind tasks but over grid)
     render_section_backgrounds(
         &mut doc,
         &tasks,
@@ -115,7 +127,7 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
         row_height,
     );
 
-    // Render task bars
+    // Render task bars (on top of backgrounds and grid)
     render_task_bars(
         &mut doc,
         &tasks,
@@ -130,18 +142,6 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
 
     // Render section labels on left side
     render_section_labels(&mut doc, &tasks, &sections, TOP_PADDING, row_height);
-
-    // Render grid and axis
-    let grid_height = total_height - TOP_PADDING - GRID_LINE_START_PADDING;
-    render_grid_and_axis(
-        &mut doc,
-        min_date,
-        days_range,
-        LEFT_PADDING,
-        chart_width,
-        total_height,
-        grid_height,
-    );
 
     // Render today line
     render_today_line(
