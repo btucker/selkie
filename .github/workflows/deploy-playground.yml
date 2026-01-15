@@ -6,9 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: "pages"
@@ -30,25 +28,17 @@ jobs:
         run: cargo install wasm-pack
 
       - name: Build WASM package
+        run: wasm-pack build --target web --features wasm
+
+      - name: Deploy to docs
         run: |
-          wasm-pack build --target web --features wasm
-          mv pkg playground/pkg
+          cp playground/index.html playground/app.js playground/style.css docs/
+          mv pkg docs/pkg
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./playground
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git diff --staged --quiet || git commit -m "Update playground WASM build"
+          git push
