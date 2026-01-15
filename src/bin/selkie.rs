@@ -539,25 +539,18 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     // Run evaluation
     let result = runner.evaluate(&inputs);
 
-    // Output results to stderr (verbose or summary)
-    if args.verbose {
-        eprintln!("{}", eval::report::text_detailed(&result));
-    } else {
-        eprintln!("{}", eval::report::text_summary(&result));
-    }
-
-    // Write JSON if requested
-    if let Some(ref path) = args.json {
-        eval::report::write_json(&result, path)?;
-        eprintln!("Wrote JSON report to {}", path.display());
-    }
-
     // Create output directory with random ID
     let base_dir = args.output.unwrap_or_else(|| PathBuf::from("/tmp"));
     let random_id = &Uuid::new_v4().to_string()[..8];
     let output_dir = base_dir.join(format!("selkie-eval-{}", random_id));
 
     fs::create_dir_all(&output_dir)?;
+
+    // Write JSON if requested
+    if let Some(ref path) = args.json {
+        eval::report::write_json(&result, path)?;
+        eprintln!("Wrote JSON report to {}", path.display());
+    }
 
     // Write HTML report as index.html
     eprint!("Writing HTML report...");
@@ -580,14 +573,12 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         if let Some(ref svg) = diagram.selkie_svg {
             let path = type_dir.join(format!("{}_selkie.svg", safe_name));
             fs::write(&path, svg)?;
-            eprintln!("SVG: {}", path.display());
         }
 
         // Write reference SVG if available
         if let Some(ref svg) = diagram.reference_svg {
             let path = type_dir.join(format!("{}_reference.svg", safe_name));
             fs::write(&path, svg)?;
-            eprintln!("Ref SVG: {}", path.display());
         }
     }
     eprintln!(" done");
@@ -601,12 +592,8 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             svg_pairs.len()
         );
         match eval::png::write_comparison_pngs(&output_dir, &svg_pairs, runner.cache()) {
-            Ok(manifest) => {
+            Ok(_) => {
                 eprintln!(" done");
-                for entry in manifest.diagrams {
-                    let path = output_dir.join(entry.png);
-                    eprintln!("Comparison PNG: {}", path.display());
-                }
             }
             Err(e) => {
                 eprintln!(" failed");
@@ -616,6 +603,16 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     }
     #[cfg(not(feature = "png"))]
     let _ = svg_pairs; // Suppress unused warning
+
+    // Output results to stderr (verbose or summary)
+    if args.verbose {
+        eprintln!(
+            "{}",
+            eval::report::text_detailed(&result, Some(&output_dir))
+        );
+    } else {
+        eprintln!("{}", eval::report::text_summary(&result, Some(&output_dir)));
+    }
 
     // Print the output directory path
     let report_path = output_dir.join("index.html");
