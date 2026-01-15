@@ -63,7 +63,7 @@ pub fn text_summary(result: &EvalResult, output_dir: Option<&Path>) -> String {
 
             if let Some(base_dir) = output_dir {
                 let type_dir = base_dir.join(dtype);
-                output.push_str(&format!("    Location: {}\n", type_dir.display()));
+                output.push_str(&format!("    SVG Location: {}\n", type_dir.display()));
 
                 // List comparison PNGs for this type
                 let mut pngs: Vec<String> = result
