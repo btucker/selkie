@@ -245,11 +245,11 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     // Add theme styles
     if config.embed_css {
         doc.add_style(&config.theme.generate_css());
-        doc.add_style(&generate_state_css());
+        doc.add_style(&generate_state_css(&config.theme));
     }
 
-    // Add arrow marker
-    doc.add_defs(vec![create_arrow_marker()]);
+    // Add arrow marker (uses theme colors)
+    doc.add_defs(vec![create_arrow_marker(&config.theme)]);
 
     // Render title
     if !db.diagram_title.is_empty() {
@@ -307,6 +307,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 70.0, // fork_join_width (horizontal bar)
                 10.0, // fork_join_height
                 is_end_state,
+                &config.theme,
             );
             doc.add_element(state_elem);
 
@@ -495,24 +496,27 @@ fn render_state_node(
     fork_join_width: f64,
     fork_join_height: f64,
     is_end_state: bool,
+    theme: &crate::render::svg::Theme,
 ) -> SvgElement {
     let mut children = Vec::new();
 
     match state.state_type {
         StateType::Start => {
-            // Filled circle for start state
+            // Filled circle for start state (specialStateColor = lineColor)
             children.push(SvgElement::Circle {
                 cx: x + width / 2.0,
                 cy: y + height / 2.0,
                 r: start_end_radius,
-                attrs: Attrs::new().with_fill("#333333").with_class("state-start"),
+                attrs: Attrs::new()
+                    .with_fill(&theme.line_color)
+                    .with_class("state-start"),
             });
         }
         StateType::End => {
-            render_end_state_bullseye(&mut children, x, y, width, height, start_end_radius);
+            render_end_state_bullseye(&mut children, x, y, width, height, start_end_radius, theme);
         }
         StateType::Fork | StateType::Join => {
-            // Black bar for fork/join
+            // Black bar for fork/join (specialStateColor = lineColor)
             children.push(SvgElement::Rect {
                 x: x + (width - fork_join_width) / 2.0,
                 y: y + (height - fork_join_height) / 2.0,
@@ -521,7 +525,7 @@ fn render_state_node(
                 rx: Some(2.0),
                 ry: Some(2.0),
                 attrs: Attrs::new()
-                    .with_fill("#333333")
+                    .with_fill(&theme.line_color)
                     .with_class("state-fork-join"),
             });
         }
@@ -551,8 +555,8 @@ fn render_state_node(
                     },
                 ],
                 attrs: Attrs::new()
-                    .with_fill("#ECECFF")
-                    .with_stroke("#333333")
+                    .with_fill(&theme.primary_color)
+                    .with_stroke(&theme.line_color)
                     .with_stroke_width(1.0)
                     .with_class("state-choice"),
             });
@@ -565,7 +569,7 @@ fn render_state_node(
                 x2: x + width,
                 y2: y + height / 2.0,
                 attrs: Attrs::new()
-                    .with_stroke("#333333")
+                    .with_stroke(&theme.line_color)
                     .with_stroke_width(2.0)
                     .with_stroke_dasharray("5,5")
                     .with_class("state-divider"),
@@ -576,18 +580,28 @@ fn render_state_node(
             if state.id == "[*]" {
                 if is_end_state {
                     // End state: double circle (bullseye)
-                    render_end_state_bullseye(&mut children, x, y, width, height, start_end_radius);
+                    render_end_state_bullseye(
+                        &mut children,
+                        x,
+                        y,
+                        width,
+                        height,
+                        start_end_radius,
+                        theme,
+                    );
                 } else {
-                    // Start state: filled circle
+                    // Start state: filled circle (specialStateColor = lineColor)
                     children.push(SvgElement::Circle {
                         cx: x + width / 2.0,
                         cy: y + height / 2.0,
                         r: start_end_radius,
-                        attrs: Attrs::new().with_fill("#333333").with_class("state-start"),
+                        attrs: Attrs::new()
+                            .with_fill(&theme.line_color)
+                            .with_class("state-start"),
                     });
                 }
             } else {
-                // Rounded rectangle for regular state (rx=5 and purple stroke matching reference)
+                // Rounded rectangle for regular state (stateBkg + stateBorder)
                 children.push(SvgElement::Rect {
                     x,
                     y,
@@ -596,8 +610,8 @@ fn render_state_node(
                     rx: Some(5.0),
                     ry: Some(5.0),
                     attrs: Attrs::new()
-                        .with_fill("#ECECFF")
-                        .with_stroke("#9370DB")
+                        .with_fill(&theme.primary_color)
+                        .with_stroke(&theme.primary_border_color)
                         .with_stroke_width(1.0)
                         .with_class("state-box"),
                 });
@@ -718,11 +732,10 @@ fn render_transition(
         )
     };
 
-    // Transition path (curved)
+    // Transition path (curved) - colors from CSS via theme
     children.push(SvgElement::Path {
         d: path_d,
         attrs: Attrs::new()
-            .with_stroke("#333333")
             .with_stroke_width(1.0)
             .with_fill("none")
             .with_attr("marker-end", "url(#arrow)")
@@ -947,16 +960,13 @@ fn render_note(x: f64, y: f64, text: &str) -> SvgElement {
         y + note_height
     );
 
+    // Note box - colors from CSS via theme
     children.push(SvgElement::Path {
         d: path,
-        attrs: Attrs::new()
-            .with_fill("#FFFFCC")
-            .with_stroke("#333333")
-            .with_stroke_width(1.0)
-            .with_class("note-box"),
+        attrs: Attrs::new().with_stroke_width(1.0).with_class("note-box"),
     });
 
-    // Fold line
+    // Fold line - uses same stroke color as note-box
     let fold_path = format!(
         "M {} {} L {} {} L {} {}",
         x + note_width - fold_size,
@@ -971,8 +981,8 @@ fn render_note(x: f64, y: f64, text: &str) -> SvgElement {
         d: fold_path,
         attrs: Attrs::new()
             .with_fill("none")
-            .with_stroke("#333333")
-            .with_stroke_width(1.0),
+            .with_stroke_width(1.0)
+            .with_class("note-box"),
     });
 
     // Note text
@@ -993,7 +1003,8 @@ fn render_note(x: f64, y: f64, text: &str) -> SvgElement {
 }
 
 /// Create arrow marker (matches mermaid barbEnd marker)
-fn create_arrow_marker() -> SvgElement {
+/// Uses theme line_color for fill/stroke (SVG markers don't inherit CSS)
+fn create_arrow_marker(theme: &crate::render::svg::Theme) -> SvgElement {
     SvgElement::Marker {
         id: "arrow".to_string(),
         view_box: "0 0 20 14".to_string(),
@@ -1007,8 +1018,8 @@ fn create_arrow_marker() -> SvgElement {
             // Barbed arrow shape matching mermaid reference: M 19,7 L9,13 L14,7 L9,1 Z
             d: "M 19,7 L9,13 L14,7 L9,1 Z".to_string(),
             attrs: Attrs::new()
-                .with_fill("#333333")
-                .with_stroke("#333333")
+                .with_fill(&theme.line_color)
+                .with_stroke(&theme.line_color)
                 .with_stroke_width(1.0),
         }],
     }
@@ -1050,7 +1061,8 @@ fn determine_start_end_states(db: &StateDb) -> HashMap<&str, StartEndInfo> {
     result
 }
 
-/// Render end state bullseye (double circle)
+/// Render end state bullseye (double circle - ring with hollow center)
+/// Mermaid uses a "donut" approach: solid border-color outer circle + background inner circle
 fn render_end_state_bullseye(
     children: &mut Vec<SvgElement>,
     x: f64,
@@ -1058,121 +1070,126 @@ fn render_end_state_bullseye(
     width: f64,
     height: f64,
     start_end_radius: f64,
+    theme: &crate::render::svg::Theme,
 ) {
-    // Outer ring: light fill with dark stroke (matching mermaid reference)
+    // Outer circle: filled with primary_border_color, stroke with background (matches mermaid)
     children.push(SvgElement::Circle {
         cx: x + width / 2.0,
         cy: y + height / 2.0,
         r: start_end_radius,
         attrs: Attrs::new()
-            .with_fill("#ECECFF")
-            .with_stroke("#9370DB")
-            .with_stroke_width(1.0)
+            .with_fill(&theme.primary_border_color)
+            .with_stroke(&theme.background)
+            .with_stroke_width(1.5)
             .with_class("state-end-outer"),
     });
-    // Inner filled circle: purple fill with purple stroke (matching mermaid reference)
-    // Mermaid uses ratio of inner radius ~2.5 to outer radius ~7, so about 0.36
+    // Inner circle: background fill to create hollow center (bullseye effect)
+    // Mermaid uses ratio of inner radius ~3.5 to outer radius ~7, so 0.5
     children.push(SvgElement::Circle {
         cx: x + width / 2.0,
         cy: y + height / 2.0,
-        r: start_end_radius * 0.36,
+        r: start_end_radius * 0.5,
         attrs: Attrs::new()
-            .with_fill("#9370DB")
-            .with_stroke("#9370DB")
-            .with_stroke_width(1.0)
+            .with_fill(&theme.background)
             .with_class("state-end-inner"),
     });
 }
 
-fn generate_state_css() -> String {
-    r#"
-.state-title {
-  fill: #333333;
-}
+fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
+    format!(
+        r#"
+.state-title {{
+  fill: {text_color};
+}}
 
-.state-box {
-  fill: #ECECFF;
-  stroke: #9370DB;
-}
+.state-box {{
+  fill: {primary_color};
+  stroke: {primary_border_color};
+}}
 
-.state-label {
-  fill: #333333;
-}
+.state-label {{
+  fill: {text_color};
+}}
 
-.state-description {
+.state-description {{
   fill: #666666;
-}
+}}
 
-.state-start {
-  fill: #333333;
-}
+.state-start {{
+  fill: {line_color};
+}}
 
-.state-end-outer {
-  fill: #ECECFF;
-  stroke: #9370DB;
-  stroke-width: 1;
-}
+.state-end-outer {{
+  fill: {primary_border_color};
+  stroke: {background};
+  stroke-width: 1.5;
+}}
 
-.state-end-inner {
-  fill: #9370DB;
-  stroke: #9370DB;
-  stroke-width: 1;
-}
+.state-end-inner {{
+  fill: {background};
+}}
 
-.state-fork-join {
-  fill: #333333;
-}
+.state-fork-join {{
+  fill: {line_color};
+}}
 
-.state-choice {
-  fill: #ECECFF;
-  stroke: #333333;
-}
+.state-choice {{
+  fill: {primary_color};
+  stroke: {line_color};
+}}
 
-.state-divider {
-  stroke: #333333;
+.state-divider {{
+  stroke: {line_color};
   stroke-dasharray: 5, 5;
-}
+}}
 
-.transition-path {
-  stroke: #333333;
+.transition-path {{
+  stroke: {line_color};
   fill: none;
-}
+}}
 
-.transition-label {
-  fill: #333333;
-}
+.transition-label {{
+  fill: {text_color};
+}}
 
-.transition-label-bg {
-  fill: rgba(232, 232, 232, 0.8);
+.transition-label-bg {{
+  fill: {edge_label_background};
   stroke: none;
-}
+}}
 
-.note-box {
-  fill: #FFFFCC;
-  stroke: #333333;
-}
+.note-box {{
+  fill: {note_bkg_color};
+  stroke: {line_color};
+}}
 
-.note-text {
-  fill: #333333;
-}
+.note-text {{
+  fill: {text_color};
+}}
 
-.state-composite-outer {
-  fill: #ECECFF;
-  stroke: #9370DB;
+.state-composite-outer {{
+  fill: {primary_color};
+  stroke: {primary_border_color};
   stroke-width: 1px;
-}
+}}
 
-.state-composite-inner {
-  fill: white;
+.state-composite-inner {{
+  fill: {background};
   stroke: none;
-}
+}}
 
-.state-composite-label {
-  fill: #333333;
+.state-composite-label {{
+  fill: {text_color};
   font-weight: bold;
-}
-"#
-    .to_string()
+}}
+"#,
+        text_color = theme.primary_text_color,
+        primary_color = theme.primary_color,
+        primary_border_color = theme.primary_border_color,
+        line_color = theme.line_color,
+        background = theme.background,
+        edge_label_background = theme.edge_label_background,
+        note_bkg_color = theme.note_bkg_color,
+    )
 }
 
 #[cfg(test)]
