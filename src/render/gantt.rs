@@ -759,9 +759,9 @@ fn generate_gantt_css(theme: &crate::render::svg::Theme) -> String {
   fill: {task_text_dark_color} !important;
 }}
 
-.critText0, .critText1, .critText2, .critText3 {{
-  fill: {task_text_dark_color};
-}}
+/* critText does not need a separate fill rule - it inherits white from taskText,
+   which provides good contrast on red crit task backgrounds. The critText class
+   exists only for programmatic identification, not styling. */
 "#,
         font_family = theme.font_family,
         text_color = theme.primary_text_color,
