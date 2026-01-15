@@ -3,7 +3,7 @@
 use js_sys::{Function, Reflect};
 use wasm_bindgen::JsValue;
 
-use mermaid::wasm::{initialize, parse, render, render_text};
+use selkie::wasm::{initialize, parse, render, render_text};
 
 #[test]
 fn render_text_returns_svg() {

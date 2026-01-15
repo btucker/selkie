@@ -411,14 +411,25 @@ const examples = {
 // State
 let selkie = null;
 let currentZoom = 1;
+let currentTheme = 'default';
 let renderTimeout = null;
 let lastSvg = '';
+
+// Theme backgrounds (must match Rust theme definitions)
+const themeBackgrounds = {
+    'default': '#ffffff',
+    'dark': '#1f2020',
+    'forest': '#ffffff',
+    'neutral': '#ffffff',
+    'base': '#f4f4f4',
+};
 
 // DOM Elements
 const editor = document.getElementById('editor');
 const preview = document.getElementById('preview');
 const errorDisplay = document.getElementById('error-display');
 const renderTimeDisplay = document.getElementById('render-time');
+const themeSelect = document.getElementById('theme-select');
 const exampleSelect = document.getElementById('example-select');
 const loadingOverlay = document.getElementById('loading-overlay');
 const divider = document.getElementById('divider');
@@ -479,6 +490,14 @@ function setupEventListeners() {
         }
     });
 
+    // Theme selector
+    themeSelect.addEventListener('change', (e) => {
+        currentTheme = e.target.value;
+        updatePreviewBackground();
+        renderDiagram();
+        updateUrl();
+    });
+
     // Zoom controls
     document.getElementById('zoom-in').addEventListener('click', () => {
         currentZoom = Math.min(currentZoom + 0.25, 3);
@@ -513,9 +532,19 @@ function renderDiagram() {
         return;
     }
 
+    // Prepend theme directive if not using default theme
+    let diagramInput = input;
+    if (currentTheme !== 'default') {
+        // Check if the diagram already has a theme directive
+        const hasThemeDirective = /%%\{.*"theme"\s*:/i.test(input);
+        if (!hasThemeDirective) {
+            diagramInput = `%%{init: {"theme": "${currentTheme}"}}%%\n${input}`;
+        }
+    }
+
     try {
         const startTime = performance.now();
-        const result = selkie.render('diagram', input);
+        const result = selkie.render('diagram', diagramInput);
         const endTime = performance.now();
 
         lastSvg = result.svg;
@@ -537,6 +566,12 @@ function renderDiagram() {
 function applyZoom() {
     preview.style.transform = `scale(${currentZoom})`;
     document.getElementById('zoom-reset').textContent = `${Math.round(currentZoom * 100)}%`;
+}
+
+// Update preview background to match theme
+function updatePreviewBackground() {
+    const bgColor = themeBackgrounds[currentTheme] || themeBackgrounds['default'];
+    previewContainer.style.backgroundColor = bgColor;
 }
 
 // Download SVG file
@@ -594,7 +629,9 @@ function updateUrl() {
     const code = editor.value;
     if (code) {
         const encoded = btoa(encodeURIComponent(code));
-        history.replaceState(null, '', `#${encoded}`);
+        // Include theme in URL if not default
+        const themePrefix = currentTheme !== 'default' ? `${currentTheme}:` : '';
+        history.replaceState(null, '', `#${themePrefix}${encoded}`);
     } else {
         history.replaceState(null, '', window.location.pathname);
     }
@@ -604,8 +641,25 @@ function loadFromUrl() {
     const hash = window.location.hash.slice(1);
     if (hash) {
         try {
-            const decoded = decodeURIComponent(atob(hash));
+            // Check for theme prefix (format: "theme:base64code" or just "base64code")
+            let theme = 'default';
+            let codeHash = hash;
+
+            const colonIndex = hash.indexOf(':');
+            if (colonIndex > 0 && colonIndex < 10) {
+                // Potential theme prefix (themes are short names)
+                const potentialTheme = hash.substring(0, colonIndex);
+                if (themeBackgrounds[potentialTheme]) {
+                    theme = potentialTheme;
+                    codeHash = hash.substring(colonIndex + 1);
+                }
+            }
+
+            const decoded = decodeURIComponent(atob(codeHash));
             editor.value = decoded;
+            currentTheme = theme;
+            themeSelect.value = theme;
+            updatePreviewBackground();
             renderDiagram();
             return;
         } catch (e) {
@@ -615,6 +669,7 @@ function loadFromUrl() {
 
     // Load default example
     editor.value = examples['flowchart-simple'];
+    updatePreviewBackground();
     renderDiagram();
 }
 

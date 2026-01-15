@@ -35,7 +35,7 @@ pub fn render(diagram: &Diagram) -> Result<String> {
 /// # Example
 ///
 /// ```
-/// use mermaid::render::render_text;
+/// use selkie::render::render_text;
 ///
 /// let svg = render_text(r#"%%{init: {"theme": "dark"}}%%
 /// flowchart TD
