@@ -587,17 +587,17 @@ fn render_state_node(
                     });
                 }
             } else {
-                // Rounded rectangle for regular state
+                // Rounded rectangle for regular state (rx=5 and purple stroke matching reference)
                 children.push(SvgElement::Rect {
                     x,
                     y,
                     width,
                     height,
-                    rx: Some(10.0),
-                    ry: Some(10.0),
+                    rx: Some(5.0),
+                    ry: Some(5.0),
                     attrs: Attrs::new()
                         .with_fill("#ECECFF")
-                        .with_stroke("#333333")
+                        .with_stroke("#9370DB")
                         .with_stroke_width(1.0)
                         .with_class("state-box"),
                 });
@@ -732,19 +732,19 @@ fn render_transition(
     // Transition label with background (matching flowchart edge label style)
     if let Some(text) = label {
         if !text.is_empty() {
-            // Estimate text dimensions for background (matching flowchart render_edge_parts)
+            // Estimate text dimensions for background
             let font_size = 16.0;
             let char_width_ratio = 0.6;
             let text_width = text.len() as f64 * font_size * char_width_ratio;
-            let text_height = font_size * 1.5;
-            let padding = 4.0;
+            let text_height = font_size * 1.1; // Tighter for SVG text
+            let padding = 2.0;
 
             // Background rect (centered on label position)
             children.push(SvgElement::Rect {
                 x: label_x - text_width / 2.0 - padding,
-                y: label_y - text_height / 2.0 - padding / 2.0,
+                y: label_y - text_height / 2.0 - padding,
                 width: text_width + padding * 2.0,
-                height: text_height + padding,
+                height: text_height + padding * 2.0,
                 rx: Some(2.0),
                 ry: Some(2.0),
                 attrs: Attrs::new().with_class("transition-label-bg"),
@@ -1089,7 +1089,7 @@ fn generate_state_css() -> String {
 
 .state-box {
   fill: #ECECFF;
-  stroke: #333333;
+  stroke: #9370DB;
 }
 
 .state-label {
