@@ -1072,14 +1072,14 @@ fn render_end_state_bullseye(
     start_end_radius: f64,
     theme: &crate::render::svg::Theme,
 ) {
-    // Outer circle: stroke only with line_color, no fill (creates the outer ring)
+    // Outer circle: stroke only with primary_border_color (purple), no fill
     children.push(SvgElement::Circle {
         cx: x + width / 2.0,
         cy: y + height / 2.0,
         r: start_end_radius,
         attrs: Attrs::new()
             .with_fill("none")
-            .with_stroke(&theme.line_color)
+            .with_stroke(&theme.primary_border_color)
             .with_stroke_width(2.0)
             .with_class("state-end-outer"),
     });
@@ -1123,7 +1123,7 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
 
 .state-end-outer {{
   fill: none;
-  stroke: {line_color};
+  stroke: {primary_border_color};
   stroke-width: 2;
 }}
 
