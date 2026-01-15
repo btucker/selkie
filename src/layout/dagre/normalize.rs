@@ -35,13 +35,20 @@ pub fn run(graph: &mut DagreGraph) {
     let mut dummy_chains: Vec<String> = Vec::new();
 
     for (v, w, name, v_rank, w_rank) in edges_to_normalize {
-        // Get edge label before removing
-        let edge_label = graph.edge(&v, &w).cloned().unwrap_or_default();
+        // Build the full edge key (including name for multigraph support)
+        let edge_key = if let Some(ref n) = name {
+            super::graph::EdgeKey::with_name(&v, &w, n)
+        } else {
+            super::graph::EdgeKey::new(&v, &w)
+        };
+
+        // Get edge label before removing (use edge_by_key for multigraph support)
+        let edge_label = graph.edge_by_key(&edge_key).cloned().unwrap_or_default();
         let weight = edge_label.weight;
         let label_rank = edge_label.label_rank;
 
-        // Remove the original long edge
-        graph.remove_edge(&v, &w);
+        // Remove the original long edge (use remove_edge_by_key for multigraph support)
+        graph.remove_edge_by_key(&edge_key);
 
         let mut prev_node = v.clone();
         let mut first_dummy: Option<String> = None;
@@ -355,24 +362,25 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
     let rankdir = graph.graph().rankdir.as_str();
     let _is_horizontal = rankdir == "LR" || rankdir == "RL";
 
-    // Collect edge data (v, w, points) upfront to avoid borrow issues
-    let edge_data: Vec<_> = graph
-        .edges()
+    // Collect edge keys first to break the borrow on graph
+    let edge_keys: Vec<_> = graph.edges().into_iter().cloned().collect();
+
+    // Collect edge data (key, nodes, points) upfront to avoid borrow issues
+    // Use EdgeKey to properly handle multigraph edges (multiple edges between same nodes)
+    let edge_data: Vec<_> = edge_keys
         .iter()
         .filter_map(|key| {
-            let v = key.v.clone();
-            let w = key.w.clone();
-            let node_v = graph.node(&v)?.clone();
-            let node_w = graph.node(&w)?.clone();
+            let node_v = graph.node(&key.v)?.clone();
+            let node_w = graph.node(&key.w)?.clone();
             let points = graph
-                .edge(&v, &w)
+                .edge_by_key(key)
                 .map(|e| e.points.clone())
                 .unwrap_or_default();
-            Some((v, w, node_v, node_w, points))
+            Some((key.clone(), node_v, node_w, points))
         })
         .collect();
 
-    for (v, w, node_v, node_w, mut points) in edge_data {
+    for (edge_key, node_v, node_w, mut points) in edge_data {
         // Determine start and end reference points
         let (p1, p2) = if points.is_empty() {
             // No intermediate points - use node centers
@@ -410,8 +418,8 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
         // is just a straight line. Adding artificial midpoints caused edges to curve
         // excessively and enter nodes from the wrong side (sides instead of top in TB).
 
-        // Update edge with new points
-        if let Some(edge) = graph.edge_mut(&v, &w) {
+        // Update edge with new points using the full key (handles multigraph)
+        if let Some(edge) = graph.edge_by_key_mut(&edge_key) {
             edge.points = points;
         }
     }

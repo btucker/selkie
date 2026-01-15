@@ -807,4 +807,57 @@ mod tests {
             error_x, mean_x
         );
     }
+
+    #[test]
+    fn test_bidirectional_edges_both_have_points() {
+        // Test that edges A→B and B→A both get bend points after layout
+        // This is important for state diagrams with transitions in both directions
+        let mut graph = LayoutGraph::new("bidirectional");
+        graph.options.direction = LayoutDirection::TopToBottom;
+        graph.options.node_spacing = 50.0;
+        graph.options.layer_spacing = 60.0;
+
+        // Create nodes
+        graph.add_node(LayoutNode::new("Idle", 60.0, 40.0));
+        graph.add_node(LayoutNode::new("Running", 80.0, 40.0));
+
+        // Create bidirectional edges
+        graph.add_edge(LayoutEdge::new("forward", "Idle", "Running").with_label("start"));
+        graph.add_edge(LayoutEdge::new("backward", "Running", "Idle").with_label("stop"));
+
+        let result = layout(graph).unwrap();
+
+        // Find both edges
+        let forward_edge = result
+            .edges
+            .iter()
+            .find(|e| e.id == "forward")
+            .expect("Should have forward edge");
+        let backward_edge = result
+            .edges
+            .iter()
+            .find(|e| e.id == "backward")
+            .expect("Should have backward edge");
+
+        eprintln!(
+            "Forward edge (Idle→Running) has {} bend points",
+            forward_edge.bend_points.len()
+        );
+        eprintln!(
+            "Backward edge (Running→Idle) has {} bend points",
+            backward_edge.bend_points.len()
+        );
+
+        // Both edges should have at least 2 points (start and end)
+        assert!(
+            forward_edge.bend_points.len() >= 2,
+            "Forward edge should have at least 2 bend points, got {}",
+            forward_edge.bend_points.len()
+        );
+        assert!(
+            backward_edge.bend_points.len() >= 2,
+            "Backward edge should have at least 2 bend points, got {}",
+            backward_edge.bend_points.len()
+        );
+    }
 }
