@@ -580,12 +580,14 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         if let Some(ref svg) = diagram.selkie_svg {
             let path = type_dir.join(format!("{}_selkie.svg", safe_name));
             fs::write(&path, svg)?;
+            eprintln!("SVG: {}", path.display());
         }
 
         // Write reference SVG if available
         if let Some(ref svg) = diagram.reference_svg {
             let path = type_dir.join(format!("{}_reference.svg", safe_name));
             fs::write(&path, svg)?;
+            eprintln!("Ref SVG: {}", path.display());
         }
     }
     eprintln!(" done");
@@ -599,8 +601,12 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             svg_pairs.len()
         );
         match eval::png::write_comparison_pngs(&output_dir, &svg_pairs, runner.cache()) {
-            Ok(_) => {
+            Ok(manifest) => {
                 eprintln!(" done");
+                for entry in manifest.diagrams {
+                    let path = output_dir.join(entry.png);
+                    eprintln!("Comparison PNG: {}", path.display());
+                }
             }
             Err(e) => {
                 eprintln!(" failed");
