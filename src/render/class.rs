@@ -396,9 +396,9 @@ fn render_class_box(
     // Attributes section (left-aligned)
     // Position text centered within each row
     if !class.members.is_empty() {
-        current_y = divider1_y + member_height / 2.0;
+        current_y = divider1_y;
         for member in &class.members {
-            current_y += member_height / 2.0;
+            current_y += member_height / 2.0; // Move to center of row
             let display = member.get_display_details();
             children.push(SvgElement::Text {
                 x: left_x,
@@ -409,7 +409,7 @@ fn render_class_box(
                     .with_attr("dominant-baseline", "middle")
                     .with_attr("font-size", &member_font_size.to_string()),
             });
-            current_y += member_height / 2.0;
+            current_y += member_height / 2.0; // Move to end of row
         }
     }
 
@@ -425,9 +425,9 @@ fn render_class_box(
     // Methods section (left-aligned)
     // Position text centered within each row
     if !class.methods.is_empty() {
-        current_y = divider2_y + member_height / 2.0;
+        current_y = divider2_y;
         for method in &class.methods {
-            current_y += member_height / 2.0;
+            current_y += member_height / 2.0; // Move to center of row
             let display = method.get_display_details();
             children.push(SvgElement::Text {
                 x: left_x,
@@ -438,7 +438,7 @@ fn render_class_box(
                     .with_attr("dominant-baseline", "middle")
                     .with_attr("font-size", &member_font_size.to_string()),
             });
-            current_y += member_height / 2.0;
+            current_y += member_height / 2.0; // Move to end of row
         }
     }
 
@@ -506,8 +506,9 @@ fn render_relation(
 ) -> SvgElement {
     let mut children = Vec::new();
 
-    // Marker length in user units (markers are now 20 units wide to match reference)
-    let marker_offset = 18.0;
+    // No marker offset needed - refX is now at the arrow tip, so path endpoints
+    // should be exactly at node boundaries
+    let marker_offset = 0.0;
 
     // Calculate path from bend points or fallback to direct line
     // When using bend points, we need to adjust the first and last points
@@ -979,22 +980,42 @@ fn create_class_markers() -> Vec<SvgElement> {
         }],
     ));
     // Inheritance - large hollow triangle (20x28)
-    markers.extend(create_marker_pair_with_size(
-        "inheritance",
-        "0 0 20 14",
-        18.0,
-        1.0,
-        7.0,
-        20.0,
-        28.0,
-        vec![SvgElement::Path {
+    // Start marker: tip points backward (toward start node) - tip at x=1
+    markers.push(SvgElement::Marker {
+        id: "inheritance-start".to_string(),
+        view_box: "0 0 20 14".to_string(),
+        ref_x: 1.0,
+        ref_y: 7.0,
+        marker_width: 20.0,
+        marker_height: 28.0,
+        orient: "auto".to_string(),
+        marker_units: None,
+        children: vec![SvgElement::Path {
             d: "M 1 7 L 18 13 V 1 Z".to_string(),
             attrs: Attrs::new()
                 .with_fill("#ECECFF")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
-    ));
+    });
+    // End marker: tip points forward (toward end node) - tip at x=18
+    markers.push(SvgElement::Marker {
+        id: "inheritance-end".to_string(),
+        view_box: "0 0 20 14".to_string(),
+        ref_x: 18.0,
+        ref_y: 7.0,
+        marker_width: 20.0,
+        marker_height: 28.0,
+        orient: "auto".to_string(),
+        marker_units: None,
+        children: vec![SvgElement::Path {
+            d: "M 18 7 L 1 13 V 1 Z".to_string(),
+            attrs: Attrs::new()
+                .with_fill("#ECECFF")
+                .with_stroke("#333333")
+                .with_stroke_width(1.0),
+        }],
+    });
     // Composition - filled diamond, medium size (18x14)
     markers.extend(create_marker_pair_with_size(
         "composition",
@@ -1013,22 +1034,42 @@ fn create_class_markers() -> Vec<SvgElement> {
         }],
     ));
     // Dependency - small arrow/chevron (10x10)
-    markers.extend(create_marker_pair_with_size(
-        "dependency",
-        "0 0 20 20",
-        18.0,
-        1.0,
-        10.0,
-        10.0,
-        10.0,
-        vec![SvgElement::Path {
-            d: "M 0 0 L 20 10 L 0 20".to_string(),
+    // Start marker: tip points backward (toward start node) - tip at x=0
+    markers.push(SvgElement::Marker {
+        id: "dependency-start".to_string(),
+        view_box: "0 0 20 20".to_string(),
+        ref_x: 0.0,
+        ref_y: 10.0,
+        marker_width: 10.0,
+        marker_height: 10.0,
+        orient: "auto".to_string(),
+        marker_units: None,
+        children: vec![SvgElement::Path {
+            d: "M 0 10 L 20 0 L 20 20 Z".to_string(),
             attrs: Attrs::new()
                 .with_fill("none")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
-    ));
+    });
+    // End marker: tip points forward (toward end node) - tip at x=20
+    markers.push(SvgElement::Marker {
+        id: "dependency-end".to_string(),
+        view_box: "0 0 20 20".to_string(),
+        ref_x: 20.0,
+        ref_y: 10.0,
+        marker_width: 10.0,
+        marker_height: 10.0,
+        orient: "auto".to_string(),
+        marker_units: None,
+        children: vec![SvgElement::Path {
+            d: "M 20 10 L 0 0 L 0 20 Z".to_string(),
+            attrs: Attrs::new()
+                .with_fill("none")
+                .with_stroke("#333333")
+                .with_stroke_width(1.0),
+        }],
+    });
     // Lollipop - circle, medium size
     markers.extend(create_marker_pair_with_size(
         "lollipop",
