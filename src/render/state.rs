@@ -384,9 +384,13 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
 
     // First, render composite state containers (behind everything else)
     for composite_id in &composite_states {
-        if let Some(composite_elem) =
-            render_composite_state(composite_id, db, &state_positions, &layout_result)
-        {
+        if let Some(composite_elem) = render_composite_state(
+            composite_id,
+            db,
+            &state_positions,
+            &layout_result,
+            &composite_states,
+        ) {
             doc.add_element(composite_elem);
         }
     }
@@ -474,9 +478,17 @@ fn render_composite_state(
     db: &StateDb,
     state_positions: &HashMap<String, (f64, f64, f64, f64)>,
     layout_result: &LayoutGraph,
+    composite_states: &std::collections::HashSet<&str>,
 ) -> Option<SvgElement> {
     // Find all child states (states whose parent is this composite)
     let states = db.get_states();
+
+    // Check if this composite is nested inside another composite (for alternate styling)
+    let is_nested = states
+        .get(composite_id)
+        .and_then(|s| s.parent.as_deref())
+        .map(|parent_id| composite_states.contains(parent_id))
+        .unwrap_or(false);
     let child_ids: Vec<&str> = states
         .iter()
         .filter(|(_, state)| state.parent.as_deref() == Some(composite_id))
@@ -554,10 +566,15 @@ fn render_composite_state(
         attrs: Attrs::new().with_class("state-composite-outer"),
     };
 
-    // Create the inner rect (white fill, below title area)
+    // Create the inner rect (white fill, or gray for nested composites)
     // The inner rect has a small padding at the bottom to match mermaid's style
     // which creates a visible border around the entire composite state
     let bottom_padding = 4.0;
+    let inner_class = if is_nested {
+        "state-composite-inner-alt"
+    } else {
+        "state-composite-inner"
+    };
     let inner_rect = SvgElement::Rect {
         x: min_x,
         y: min_y + title_height - 4.0, // Start below the title
@@ -565,7 +582,7 @@ fn render_composite_state(
         height: height - title_height + 4.0 - bottom_padding,
         rx: Some(0.0),
         ry: Some(0.0),
-        attrs: Attrs::new().with_class("state-composite-inner"),
+        attrs: Attrs::new().with_class(inner_class),
     };
 
     // Get the composite state's label (name or description)
@@ -1290,6 +1307,11 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
   stroke: none;
 }}
 
+.state-composite-inner-alt {{
+  fill: #f0f0f0;
+  stroke: none;
+}}
+
 .state-composite-label {{
   fill: {text_color};
   font-weight: bold;
@@ -1729,5 +1751,127 @@ mod tests {
                 label, x, label_right, vb_x + vb_width, vb_x, vb_y, vb_width, vb_height
             );
         }
+    }
+
+    #[test]
+    fn test_composite_state_bounds_include_all_children() {
+        // Verify that the Idle composite state includes Active (all children)
+        let input = r#"stateDiagram-v2
+    [*] --> Idle
+    state Idle {
+        [*] --> Ready
+        Ready --> Active: Start Job
+    }
+    Idle --> fork_state
+    state fork_state <<fork>>
+"#;
+        let db = parse(input).expect("Should parse");
+
+        // Check that Active has Idle as parent in the parsed data
+        let active_state = db.get_state("Active");
+        assert!(active_state.is_some(), "Active state should exist");
+        assert_eq!(
+            active_state.unwrap().parent.as_deref(),
+            Some("Idle"),
+            "Active should have Idle as parent"
+        );
+
+        let config = crate::render::RenderConfig::default();
+        let svg = render_state(&db, &config).expect("Should render");
+
+        // Extract Idle composite state bounds from SVG
+        // Look for: <g class="composite-state" id="composite-Idle">
+        //           <rect x="..." y="..." width="..." height="..."
+        let idle_re = regex::Regex::new(
+            r#"id="composite-Idle"[^>]*>\s*<rect[^>]*x="([^"]+)"[^>]*y="([^"]+)"[^>]*width="([^"]+)"[^>]*height="([^"]+)""#
+        ).unwrap();
+
+        let idle_cap = idle_re
+            .captures(&svg)
+            .expect("Should find Idle composite rect");
+        let idle_x: f64 = idle_cap[1].parse().unwrap();
+        let idle_y: f64 = idle_cap[2].parse().unwrap();
+        let idle_w: f64 = idle_cap[3].parse().unwrap();
+        let idle_h: f64 = idle_cap[4].parse().unwrap();
+
+        eprintln!(
+            "Idle bounds: x={}, y={}, w={}, h={}",
+            idle_x, idle_y, idle_w, idle_h
+        );
+
+        // Extract Active state bounds
+        let active_re = regex::Regex::new(
+            r#"id="state-Active"[^>]*>\s*<rect[^>]*x="([^"]+)"[^>]*y="([^"]+)"[^>]*width="([^"]+)"[^>]*height="([^"]+)""#
+        ).unwrap();
+
+        let active_cap = active_re
+            .captures(&svg)
+            .expect("Should find Active state rect");
+        let active_x: f64 = active_cap[1].parse().unwrap();
+        let active_y: f64 = active_cap[2].parse().unwrap();
+        let active_w: f64 = active_cap[3].parse().unwrap();
+        let active_h: f64 = active_cap[4].parse().unwrap();
+
+        eprintln!(
+            "Active bounds: x={}, y={}, w={}, h={}",
+            active_x, active_y, active_w, active_h
+        );
+
+        // Verify Active is fully contained within Idle
+        assert!(
+            active_x >= idle_x,
+            "Active left edge ({}) should be >= Idle left edge ({})",
+            active_x,
+            idle_x
+        );
+        assert!(
+            active_y >= idle_y,
+            "Active top edge ({}) should be >= Idle top edge ({})",
+            active_y,
+            idle_y
+        );
+        assert!(
+            active_x + active_w <= idle_x + idle_w,
+            "Active right edge ({}) should be <= Idle right edge ({})",
+            active_x + active_w,
+            idle_x + idle_w
+        );
+        assert!(
+            active_y + active_h <= idle_y + idle_h,
+            "Active bottom edge ({}) should be <= Idle bottom edge ({})",
+            active_y + active_h,
+            idle_y + idle_h
+        );
+    }
+
+    #[test]
+    fn test_nested_composite_has_alternate_background() {
+        // Nested composite states (like Executing inside Processing) should have
+        // gray alternate background (#f0f0f0) instead of white
+        let input = r#"stateDiagram-v2
+    state Processing {
+        [*] --> Validating
+        Validating --> Executing
+        state Executing {
+            [*] --> Init
+            Init --> Done
+        }
+    }
+"#;
+        let db = parse(input).expect("Should parse");
+        let config = crate::render::RenderConfig::default();
+        let svg = render_state(&db, &config).expect("Should render");
+
+        // Executing is nested inside Processing, so it should use alternate inner class
+        assert!(
+            svg.contains("state-composite-inner-alt"),
+            "Nested composite state should use alternate inner class"
+        );
+
+        // Verify the CSS includes the alternate background color
+        assert!(
+            svg.contains("#f0f0f0"),
+            "CSS should include alternate background color #f0f0f0"
+        );
     }
 }
