@@ -30,7 +30,9 @@ jobs:
         run: cargo install wasm-pack@0.12.1
 
       - name: Build WASM package
-        run: wasm-pack build --target web --features wasm --out-dir playground/pkg
+        run: |
+          wasm-pack build --target web --features wasm
+          mv pkg playground/pkg
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
