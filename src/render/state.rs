@@ -502,11 +502,14 @@ fn render_composite_state(
     };
 
     // Create the inner rect (white fill, below title area)
+    // The inner rect has a small padding at the bottom to match mermaid's style
+    // which creates a visible border around the entire composite state
+    let bottom_padding = 4.0;
     let inner_rect = SvgElement::Rect {
         x: min_x,
         y: min_y + title_height - 4.0, // Start below the title
         width,
-        height: height - title_height + 4.0,
+        height: height - title_height + 4.0 - bottom_padding,
         rx: Some(0.0),
         ry: Some(0.0),
         attrs: Attrs::new().with_class("state-composite-inner"),
