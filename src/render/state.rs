@@ -12,6 +12,77 @@ use crate::layout::{
 use crate::render::svg::edges::build_curved_path;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
+/// Calculate the rendered bounds of a composite state
+/// Returns (x, y, width, height) of the composite box
+fn calculate_composite_bounds(
+    composite_id: &str,
+    db: &StateDb,
+    state_positions: &HashMap<String, (f64, f64, f64, f64)>,
+    layout_result: &LayoutGraph,
+) -> Option<(f64, f64, f64, f64)> {
+    let states = db.get_states();
+    let child_ids: Vec<&str> = states
+        .iter()
+        .filter(|(_, state)| state.parent.as_deref() == Some(composite_id))
+        .map(|(id, _)| id.as_str())
+        .collect();
+
+    if child_ids.is_empty() {
+        return None;
+    }
+
+    let mut min_x = f64::MAX;
+    let mut min_y = f64::MAX;
+    let mut max_x = f64::MIN;
+    let mut max_y = f64::MIN;
+
+    for child_id in &child_ids {
+        if let Some(&(x, y, w, h)) = state_positions.get(*child_id) {
+            min_x = min_x.min(x);
+            min_y = min_y.min(y);
+            max_x = max_x.max(x + w);
+            max_y = max_y.max(y + h);
+        }
+    }
+
+    // Include nested composite bounds
+    let nested_composites: Vec<&str> = states
+        .iter()
+        .filter(|(_, state)| state.parent.as_deref() == Some(composite_id))
+        .filter(|(id, _)| {
+            states
+                .values()
+                .any(|s| s.parent.as_deref() == Some(id.as_str()))
+        })
+        .map(|(id, _)| id.as_str())
+        .collect();
+
+    for nested_id in &nested_composites {
+        if let Some(node) = layout_result.get_node(nested_id) {
+            if let (Some(x), Some(y)) = (node.x, node.y) {
+                min_x = min_x.min(x);
+                min_y = min_y.min(y);
+                max_x = max_x.max(x + node.width);
+                max_y = max_y.max(y + node.height);
+            }
+        }
+    }
+
+    if min_x == f64::MAX {
+        return None;
+    }
+
+    // Apply padding matching render_composite_state
+    let padding = 15.0;
+    let title_height = 25.0;
+    min_x -= padding;
+    min_y -= padding + title_height;
+    max_x += padding;
+    max_y += padding;
+
+    Some((min_x, min_y, max_x - min_x, max_y - min_y))
+}
+
 /// Implement ToLayoutGraph for StateDb to enable proper DAG layout
 impl ToLayoutGraph for StateDb {
     fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
@@ -325,6 +396,20 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 } else if !bend_points.is_empty() {
                     // For non-composite targets, just shift the first point
                     bend_points[0].x += offset_x;
+                }
+            }
+
+            // If the source is a composite state, adjust the first bend point
+            // to exit from the center-bottom of the rendered composite box
+            if composite_ids.contains(source) && !bend_points.is_empty() {
+                if let Some((comp_x, comp_y, comp_w, comp_h)) =
+                    calculate_composite_bounds(source, db, &state_positions, &layout_result)
+                {
+                    let comp_center_x = comp_x + comp_w / 2.0;
+                    let comp_bottom_y = comp_y + comp_h;
+                    // Set the first bend point to the center-bottom of the composite
+                    bend_points[0].x = comp_center_x;
+                    bend_points[0].y = comp_bottom_y;
                 }
             }
 
