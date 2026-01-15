@@ -15,6 +15,7 @@ fn render_git_graph_basic() {
     assert!(svg.contains("<svg"));
     assert!(svg.contains("commit-bullets"));
     assert!(svg.contains("commit-labels"));
+    assert!(svg.contains("text-anchor=\"middle\""));
 }
 
 #[test]

@@ -890,44 +890,44 @@ fn draw_branches(
 
         let (bbox_w, bbox_h) = estimator.estimate_text_size(&branch.name, branch_font_size);
         let rotate_offset = if rotate_commit_label { 30.0 } else { 0.0 };
-        let (label_x, label_y, bkg_x, bkg_y) = match dir {
+        let (bkg_x, bkg_y, label_w) = match dir {
             DiagramOrientation::LeftToRight => {
                 let label_x = -bbox_w - 14.0 - rotate_offset;
-                let label_y = position.pos + bbox_h / 2.0 - 1.0;
                 let bkg_x = label_x - 5.0;
                 let bkg_y = position.pos - bbox_h / 2.0 - 2.0;
-                (label_x, label_y, bkg_x, bkg_y)
+                (bkg_x, bkg_y, bbox_w + 18.0)
             }
             DiagramOrientation::TopToBottom => {
-                let label_x = position.pos - bbox_w / 2.0 - 5.0;
-                let label_y = bbox_h;
                 let bkg_x = position.pos - bbox_w / 2.0 - 10.0;
                 let bkg_y = 0.0;
-                (label_x, label_y, bkg_x, bkg_y)
+                (bkg_x, bkg_y, bbox_w + 18.0)
             }
             DiagramOrientation::BottomToTop => {
-                let label_x = position.pos - bbox_w / 2.0 - 5.0;
-                let label_y = max_pos + bbox_h;
                 let bkg_x = position.pos - bbox_w / 2.0 - 10.0;
                 let bkg_y = max_pos;
-                (label_x, label_y, bkg_x, bkg_y)
+                (bkg_x, bkg_y, bbox_w + 18.0)
             }
         };
 
         let rect = SvgElement::Rect {
             x: bkg_x,
             y: bkg_y,
-            width: bbox_w + 18.0,
+            width: label_w,
             height: bbox_h + 4.0,
             rx: Some(4.0),
             ry: Some(4.0),
             attrs: Attrs::new().with_class(&format!("branchLabelBkg label{}", adjust_index)),
         };
+        let label_center_x = bkg_x + label_w / 2.0;
+        let label_center_y = bkg_y + (bbox_h + 4.0) / 2.0;
         let text = SvgElement::Text {
-            x: label_x,
-            y: label_y,
+            x: label_center_x,
+            y: label_center_y,
             content: branch.name.clone(),
-            attrs: Attrs::new().with_class(&format!("branch-label{}", adjust_index)),
+            attrs: Attrs::new()
+                .with_class(&format!("branch-label{}", adjust_index))
+                .with_attr("text-anchor", "middle")
+                .with_attr("dominant-baseline", "middle"),
         };
         elements.push(rect);
         elements.push(text);
@@ -1965,8 +1965,6 @@ fn compute_git_palette(theme: &Theme) -> GitPalette {
     let primary = Color::parse(&theme.primary_color).unwrap_or(Color::rgb(236, 236, 255));
     let secondary = Color::parse(&theme.secondary_color).unwrap_or(Color::rgb(255, 255, 222));
     let tertiary = Color::parse(&theme.tertiary_color).unwrap_or(Color::rgb(250, 250, 250));
-    let label_text = Color::parse(&theme.primary_text_color).unwrap_or(Color::rgb(51, 51, 51));
-
     let dark_mode = Color::parse(&theme.background)
         .map(|c| c.is_dark())
         .unwrap_or(false);
@@ -2002,6 +2000,7 @@ fn compute_git_palette(theme: &Theme) -> GitPalette {
         })
         .collect::<Vec<_>>();
 
+    let label_text = crate::render::svg::color::contrasting_text(&primary);
     let label_inv = invert(&label_text);
     let branch_label = vec![
         label_inv.to_hex(),
@@ -2014,15 +2013,19 @@ fn compute_git_palette(theme: &Theme) -> GitPalette {
         label_text.to_hex(),
     ];
 
+    let secondary_text = invert(&secondary);
+    let tag_label_color = invert(&primary);
+    let tag_border = crate::render::svg::color::mk_border(&primary, dark_mode);
+
     GitPalette {
         git: git_colors.iter().map(|c| c.to_hex()).collect(),
         git_inv,
         branch_label,
-        tag_label_color: theme.primary_text_color.clone(),
+        tag_label_color: tag_label_color.to_hex(),
         tag_label_background: theme.primary_color.clone(),
-        tag_label_border: theme.primary_border_color.clone(),
+        tag_label_border: tag_border.to_hex(),
         tag_label_font_size: "10px".to_string(),
-        commit_label_color: theme.primary_text_color.clone(),
+        commit_label_color: secondary_text.to_hex(),
         commit_label_background: theme.secondary_color.clone(),
         commit_label_font_size: "10px".to_string(),
         line_color: theme.line_color.clone(),
