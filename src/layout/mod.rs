@@ -14,7 +14,8 @@ pub use adapter::{NodeSizeConfig, SizeEstimator, ToLayoutGraph};
 pub use graph::LayoutGraph;
 pub use size::CharacterSizeEstimator;
 pub use types::{
-    LayoutDirection, LayoutEdge, LayoutNode, LayoutOptions, NodeShape, Padding, Point,
+    geometric_midpoint, LayoutDirection, LayoutEdge, LayoutNode, LayoutOptions, NodeShape, Padding,
+    Point,
 };
 
 use crate::error::Result;
@@ -297,21 +298,10 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
                     .collect();
 
                 // Compute label position from the actual edge path (bend_points)
-                // This is more accurate than dagre's dummy node position, which doesn't
-                // account for shape boundary intersections (e.g., diamond corners)
+                // Use geometric midpoint (point at half the total path length) for accurate
+                // positioning, matching mermaid's traverseEdge approach
                 if edge.label.is_some() && !edge.bend_points.is_empty() {
-                    // Use the midpoint of the actual edge path as label position
-                    let mid_idx = edge.bend_points.len() / 2;
-                    if mid_idx > 0 {
-                        // Average the two middle points if even number of points
-                        let p1 = &edge.bend_points[mid_idx - 1];
-                        let p2 = &edge.bend_points[mid_idx];
-                        edge.label_position =
-                            Some(Point::new((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0));
-                    } else {
-                        // Use the middle point if odd number
-                        edge.label_position = Some(edge.bend_points[mid_idx]);
-                    }
+                    edge.label_position = types::geometric_midpoint(&edge.bend_points);
                 }
                 // Fallback to dagre's position if no bend points (shouldn't happen)
                 else if edge.label.is_some() {

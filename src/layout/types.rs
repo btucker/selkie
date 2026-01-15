@@ -13,6 +13,55 @@ impl Point {
     pub fn new(x: f64, y: f64) -> Self {
         Self { x, y }
     }
+
+    /// Calculate the Euclidean distance to another point
+    pub fn distance_to(&self, other: &Point) -> f64 {
+        let dx = other.x - self.x;
+        let dy = other.y - self.y;
+        (dx * dx + dy * dy).sqrt()
+    }
+}
+
+/// Find the geometric midpoint of a path (point at half the total path length)
+/// This is more accurate than array index midpoint for paths with varying segment lengths
+pub fn geometric_midpoint(points: &[Point]) -> Option<Point> {
+    if points.is_empty() {
+        return None;
+    }
+    if points.len() == 1 {
+        return Some(points[0]);
+    }
+
+    // Calculate total path length
+    let mut total_length = 0.0;
+    for i in 1..points.len() {
+        total_length += points[i - 1].distance_to(&points[i]);
+    }
+
+    if total_length == 0.0 {
+        return Some(points[0]);
+    }
+
+    // Find the point at half the total distance
+    let target_distance = total_length / 2.0;
+    let mut accumulated = 0.0;
+
+    for i in 1..points.len() {
+        let segment_length = points[i - 1].distance_to(&points[i]);
+        if accumulated + segment_length >= target_distance {
+            // The midpoint is on this segment
+            let remaining = target_distance - accumulated;
+            let t = remaining / segment_length;
+            return Some(Point::new(
+                points[i - 1].x + t * (points[i].x - points[i - 1].x),
+                points[i - 1].y + t * (points[i].y - points[i - 1].y),
+            ));
+        }
+        accumulated += segment_length;
+    }
+
+    // Fallback to last point (shouldn't happen)
+    Some(points[points.len() - 1])
 }
 
 /// Padding specification for compound nodes
@@ -300,5 +349,95 @@ impl Default for LayoutOptions {
             layer_spacing: 50.0,
             padding: Padding::uniform(20.0),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_point_distance() {
+        let p1 = Point::new(0.0, 0.0);
+        let p2 = Point::new(3.0, 4.0);
+        assert!((p1.distance_to(&p2) - 5.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_geometric_midpoint_empty() {
+        assert!(geometric_midpoint(&[]).is_none());
+    }
+
+    #[test]
+    fn test_geometric_midpoint_single_point() {
+        let points = vec![Point::new(10.0, 20.0)];
+        let mid = geometric_midpoint(&points).unwrap();
+        assert!((mid.x - 10.0).abs() < 0.001);
+        assert!((mid.y - 20.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_geometric_midpoint_two_points() {
+        let points = vec![Point::new(0.0, 0.0), Point::new(100.0, 0.0)];
+        let mid = geometric_midpoint(&points).unwrap();
+        assert!((mid.x - 50.0).abs() < 0.001);
+        assert!((mid.y - 0.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_geometric_midpoint_unequal_segments() {
+        // Path: A(0,0) -> B(10,0) -> C(100,0)
+        // Total length = 10 + 90 = 100
+        // Midpoint should be at distance 50 from A
+        // That's 10 units on segment AB, then 40 units on segment BC
+        // So midpoint = (10 + 40, 0) = (50, 0)
+        let points = vec![
+            Point::new(0.0, 0.0),
+            Point::new(10.0, 0.0),
+            Point::new(100.0, 0.0),
+        ];
+        let mid = geometric_midpoint(&points).unwrap();
+        assert!(
+            (mid.x - 50.0).abs() < 0.001,
+            "Expected x=50, got x={}",
+            mid.x
+        );
+        assert!((mid.y - 0.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_geometric_midpoint_vertical_path() {
+        // Vertical path with equal segments
+        let points = vec![
+            Point::new(0.0, 0.0),
+            Point::new(0.0, 50.0),
+            Point::new(0.0, 100.0),
+        ];
+        let mid = geometric_midpoint(&points).unwrap();
+        assert!((mid.x - 0.0).abs() < 0.001);
+        assert!(
+            (mid.y - 50.0).abs() < 0.001,
+            "Expected y=50, got y={}",
+            mid.y
+        );
+    }
+
+    #[test]
+    fn test_geometric_midpoint_diagonal() {
+        // Diagonal path: (0,0) to (100,100)
+        // Length = sqrt(100^2 + 100^2) = 141.42
+        // Midpoint = (50, 50)
+        let points = vec![Point::new(0.0, 0.0), Point::new(100.0, 100.0)];
+        let mid = geometric_midpoint(&points).unwrap();
+        assert!(
+            (mid.x - 50.0).abs() < 0.001,
+            "Expected x=50, got x={}",
+            mid.x
+        );
+        assert!(
+            (mid.y - 50.0).abs() < 0.001,
+            "Expected y=50, got y={}",
+            mid.y
+        );
     }
 }
