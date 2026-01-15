@@ -1,4 +1,10 @@
-# Selkie (Still actively under development)
+<p align="center">
+    <img src="docs/images/selkie-logo.png" width="250">
+</p>
+
+# Selkie
+
+**⚠️ Still actively under development ⚠️**
 
 A 100% Rust implementation of the [Mermaid](https://mermaid.js.org/) diagram parser and renderer.
 
