@@ -214,15 +214,62 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         }
     }
 
+    // Post-process: Center start nodes above the composite states they connect to
+    // This improves visual alignment matching the mermaid reference
+    let composite_ids: std::collections::HashSet<&str> = layout_result
+        .nodes
+        .iter()
+        .filter(|n| {
+            n.metadata
+                .get("is_group")
+                .map(|v| v == "true")
+                .unwrap_or(false)
+        })
+        .map(|n| n.id.as_str())
+        .collect();
+
+    // Track which start nodes were repositioned and by how much
+    let mut start_node_offsets: HashMap<String, f64> = HashMap::new();
+
+    for edge in &layout_result.edges {
+        if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
+            // Check if this is a start node connecting to a composite
+            if source.contains("_start_") && composite_ids.contains(target) {
+                if let (Some((start_x, start_y, start_w, start_h)), Some((comp_x, _, comp_w, _))) = (
+                    state_positions.get(source).copied(),
+                    state_positions.get(target).copied(),
+                ) {
+                    // Center the start node horizontally above the composite
+                    let comp_center_x = comp_x + comp_w / 2.0;
+                    let new_start_x = comp_center_x - start_w / 2.0;
+                    let offset_x = new_start_x - start_x;
+                    state_positions
+                        .insert(source.to_string(), (new_start_x, start_y, start_w, start_h));
+                    start_node_offsets.insert(source.to_string(), offset_x);
+                }
+            }
+        }
+    }
+
     // Extract edge bend points and label positions from layout
+    // Adjust bend points for edges from repositioned start nodes
     let mut edge_bend_points: HashMap<(String, String), Vec<Point>> = HashMap::new();
     let mut edge_label_positions: HashMap<(String, String), Point> = HashMap::new();
     for edge in &layout_result.edges {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
-            edge_bend_points.insert(
-                (source.to_string(), target.to_string()),
-                edge.bend_points.clone(),
-            );
+            let mut bend_points = edge.bend_points.clone();
+
+            // If the source was repositioned, adjust the first bend point(s)
+            if let Some(&offset_x) = start_node_offsets.get(source) {
+                // Adjust all bend points to create a straight line from new position
+                // The first point should match the new start node center
+                if !bend_points.is_empty() {
+                    // Shift only the first point to match new start position
+                    bend_points[0].x += offset_x;
+                }
+            }
+
+            edge_bend_points.insert((source.to_string(), target.to_string()), bend_points);
             if let Some(label_pos) = &edge.label_position {
                 edge_label_positions.insert((source.to_string(), target.to_string()), *label_pos);
             }
