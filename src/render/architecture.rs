@@ -19,7 +19,6 @@ pub const ARCH_GROUP_ICON_SCALE: f64 = 0.75;
 pub const ARCH_GROUP_PADDING_EXTRA: f64 = ARCH_PADDING / 16.0;
 pub const ARCH_GROUP_PADDING: f64 = ARCH_PADDING + ARCH_GROUP_PADDING_EXTRA;
 pub const ARCH_NODE_SPACING: f64 = ARCH_ICON_SIZE * 2.5;
-pub const ARCH_CROSS_GROUP_OFFSET: f64 = ARCH_PADDING * ARCH_GROUP_ICON_SCALE;
 pub const ARCH_EDGE_GROUP_LABEL_SHIFT: f64 = 18.0;
 
 impl ToLayoutGraph for ArchitectureDb {
@@ -178,8 +177,6 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
         }
     }
 
-    apply_cross_group_offsets(db, &mut positions);
-
     let half_icon = ARCH_ICON_SIZE / 2.0;
     for (id, (cx, cy)) in positions {
         if let Some(node) = graph.get_node_mut(&id) {
@@ -204,22 +201,30 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
 fn build_adjacency(
     db: &ArchitectureDb,
     node_ids: &[String],
-) -> HashMap<String, Vec<(ArchitectureDirectionPair, String)>> {
-    let mut adj: HashMap<String, Vec<(ArchitectureDirectionPair, String)>> = HashMap::new();
+) -> HashMap<String, Vec<(ArchitectureDirectionPair, String, i32)>> {
+    let mut adj: HashMap<String, Vec<(ArchitectureDirectionPair, String, i32)>> = HashMap::new();
     for id in node_ids {
         adj.insert(id.clone(), Vec::new());
     }
 
+    let node_groups = build_node_group_map(db);
+
     for edge in db.get_edges() {
+        let lhs_group = node_groups.get(&edge.lhs_id).and_then(|g| g.as_deref());
+        let rhs_group = node_groups.get(&edge.rhs_id).and_then(|g| g.as_deref());
+
+        // Increase distance if crossing group boundaries to separate subgraphs
+        let distance = if lhs_group != rhs_group { 2 } else { 1 };
+
         if let Some(pair) = ArchitectureDirectionPair::new(edge.lhs_dir, edge.rhs_dir) {
             adj.entry(edge.lhs_id.clone())
                 .or_default()
-                .push((pair, edge.rhs_id.clone()));
+                .push((pair, edge.rhs_id.clone(), distance));
         }
         if let Some(pair) = ArchitectureDirectionPair::new(edge.rhs_dir, edge.lhs_dir) {
             adj.entry(edge.rhs_id.clone())
                 .or_default()
-                .push((pair, edge.lhs_id.clone()));
+                .push((pair, edge.lhs_id.clone(), distance));
         }
     }
 
@@ -227,7 +232,7 @@ fn build_adjacency(
 }
 
 fn build_spatial_maps(
-    adj: &HashMap<String, Vec<(ArchitectureDirectionPair, String)>>,
+    adj: &HashMap<String, Vec<(ArchitectureDirectionPair, String, i32)>>,
     node_ids: &[String],
 ) -> Vec<HashMap<String, (i32, i32)>> {
     let mut visited: HashSet<String> = HashSet::new();
@@ -254,12 +259,12 @@ fn build_spatial_maps(
             let (x, y) = spatial_map.get(&curr).copied().unwrap_or((0, 0));
 
             if let Some(neighbors) = adj.get(&curr) {
-                for (pair, neighbor) in neighbors {
+                for (pair, neighbor, distance) in neighbors {
                     if visited.contains(neighbor) || spatial_map.contains_key(neighbor) {
                         continue;
                     }
 
-                    let (tx, ty) = pair.shift_position(x, y);
+                    let (tx, ty) = pair.shift_position(x, y, *distance);
                     let (nx, ny) = if occupied.contains(&(tx, ty)) {
                         find_alternative_position((tx, ty), pair.source, &occupied)
                     } else {
@@ -314,60 +319,6 @@ fn find_alternative_position(
             // Safety break, give up and overlap if too crowded
             return target;
         }
-    }
-}
-
-fn apply_cross_group_offsets(db: &ArchitectureDb, positions: &mut HashMap<String, (f64, f64)>) {
-    let node_groups = build_node_group_map(db);
-    let mut offsets: HashMap<String, (f64, f64)> = HashMap::new();
-
-    for edge in db.get_edges() {
-        let lhs_group = node_groups.get(&edge.lhs_id).and_then(|g| g.as_deref());
-        let rhs_group = node_groups.get(&edge.rhs_id).and_then(|g| g.as_deref());
-
-        if lhs_group == rhs_group {
-            continue;
-        }
-
-        let (target_id, dir, magnitude, sign) = if lhs_group.is_none() && rhs_group.is_some() {
-            (
-                edge.lhs_id.as_str(),
-                edge.lhs_dir,
-                ARCH_CROSS_GROUP_OFFSET,
-                -1.0,
-            )
-        } else if rhs_group.is_none() && lhs_group.is_some() {
-            (
-                edge.rhs_id.as_str(),
-                edge.rhs_dir,
-                ARCH_CROSS_GROUP_OFFSET,
-                -1.0,
-            )
-        } else {
-            // Both in different groups: push rhs away (forward) by a full node spacing
-            (edge.rhs_id.as_str(), edge.lhs_dir, ARCH_NODE_SPACING, 1.0)
-        };
-
-        let (dx, dy) = architecture_direction_vector(dir);
-        let entry = offsets.entry(target_id.to_string()).or_insert((0.0, 0.0));
-        entry.0 += sign * dx * magnitude;
-        entry.1 += sign * dy * magnitude;
-    }
-
-    for (id, (dx, dy)) in offsets {
-        if let Some((x, y)) = positions.get_mut(&id) {
-            *x += dx;
-            *y += dy;
-        }
-    }
-}
-
-fn architecture_direction_vector(dir: ArchitectureDirection) -> (f64, f64) {
-    match dir {
-        ArchitectureDirection::Left => (-1.0, 0.0),
-        ArchitectureDirection::Right => (1.0, 0.0),
-        ArchitectureDirection::Top => (0.0, -1.0),
-        ArchitectureDirection::Bottom => (0.0, 1.0),
     }
 }
 
@@ -507,14 +458,14 @@ impl ArchitectureDirectionPair {
         }
     }
 
-    fn shift_position(&self, x: i32, y: i32) -> (i32, i32) {
+    fn shift_position(&self, x: i32, y: i32, distance: i32) -> (i32, i32) {
         let source = self.source;
         let target = self.target;
         if source.is_x() {
             let dx = if source == ArchitectureDirection::Left {
-                -1
+                -distance
             } else {
-                1
+                distance
             };
             if target.is_y() {
                 let dy = if target == ArchitectureDirection::Top {
@@ -528,9 +479,9 @@ impl ArchitectureDirectionPair {
             }
         } else {
             let dy = if source == ArchitectureDirection::Top {
-                1
+                distance
             } else {
-                -1
+                -distance
             };
             if target.is_x() {
                 let dx = if target == ArchitectureDirection::Left {
