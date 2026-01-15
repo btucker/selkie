@@ -418,15 +418,26 @@ fn render_composite_state(
     let width = max_x - min_x;
     let height = max_y - min_y;
 
-    // Create the background rect
-    let rect = SvgElement::Rect {
+    // Create the outer rect (border with fill matching reference)
+    let outer_rect = SvgElement::Rect {
         x: min_x,
         y: min_y,
         width,
         height,
-        rx: Some(8.0),
-        ry: Some(8.0),
-        attrs: Attrs::new().with_class("state-composite"),
+        rx: Some(5.0),
+        ry: Some(5.0),
+        attrs: Attrs::new().with_class("state-composite-outer"),
+    };
+
+    // Create the inner rect (white fill, below title area)
+    let inner_rect = SvgElement::Rect {
+        x: min_x,
+        y: min_y + title_height - 4.0, // Start below the title
+        width,
+        height: height - title_height + 4.0,
+        rx: Some(0.0),
+        ry: Some(0.0),
+        attrs: Attrs::new().with_class("state-composite-inner"),
     };
 
     // Get the composite state's label (name or description)
@@ -445,9 +456,9 @@ fn render_composite_state(
             .with_attr("font-size", "14"),
     };
 
-    // Wrap in a group
+    // Wrap in a group - outer first, then inner, then title on top
     Some(SvgElement::Group {
-        children: vec![rect, title],
+        children: vec![outer_rect, inner_rect, title],
         attrs: Attrs::new()
             .with_class("composite-state")
             .with_id(&format!("composite-{}", composite_id)),
@@ -1088,9 +1099,15 @@ fn generate_state_css() -> String {
   fill: #333333;
 }
 
-.state-composite {
-  fill: #ffffde;
-  stroke: #aaaa33;
+.state-composite-outer {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.state-composite-inner {
+  fill: white;
+  stroke: none;
 }
 
 .state-composite-label {
