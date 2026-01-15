@@ -12,8 +12,8 @@ architecture-beta
     service auth(server)[Auth] in edge
 
     service core(server)[Core] in platform
-    service cache "MEM" [Cache] in platform
-    service queue "MQ" [Queue] in platform
+    service cache(disk)[Cache] in platform
+    service queue(server)[Queue] in platform
     junction hub in platform
 
     service db(database)[Main DB] in data
