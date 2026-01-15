@@ -322,7 +322,8 @@ fn render_task_bars(
             // Determine if text fits inside bar, or needs to go outside
             let text_fits_inside = estimated_text_width <= final_width;
             let end_x = final_x + final_width;
-            let room_on_right = end_x + estimated_text_width + 1.5 * left_padding <= TARGET_WIDTH;
+            // Use a small margin (10px) - the text is placed at end_x + 5, so need 5px gap + some buffer
+            let room_on_right = end_x + estimated_text_width + 10.0 <= TARGET_WIDTH;
 
             // Calculate text position and class based on fit
             let (text_x, text_position) = if text_fits_inside {
