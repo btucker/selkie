@@ -413,15 +413,50 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 }
             }
 
-            // If the target is a fork/join state, adjust the last bend point
-            // to connect to the top-center of the fork/join bar
+            // If the target is a fork/join state, use rectangle intersection algorithm
+            // (same approach as mermaid reference: intersect-rect.js)
             if fork_join_ids.contains(&target) && !bend_points.is_empty() {
-                if let Some(&(fj_x, fj_y, fj_w, _fj_h)) = state_positions.get(target) {
-                    let fj_center_x = fj_x + fj_w / 2.0;
-                    let fj_top_y = fj_y;
+                if let Some(&(fj_x, fj_y, fj_w, fj_h)) = state_positions.get(target) {
                     let last_idx = bend_points.len() - 1;
-                    bend_points[last_idx].x = fj_center_x;
-                    bend_points[last_idx].y = fj_top_y;
+                    // Get the source point for intersection calculation
+                    let (point_x, point_y) = if bend_points.len() > 1 {
+                        (bend_points[last_idx - 1].x, bend_points[last_idx - 1].y)
+                    } else if let Some(&(sx, sy, sw, sh)) = state_positions.get(source) {
+                        (sx + sw / 2.0, sy + sh / 2.0)
+                    } else {
+                        (bend_points[last_idx].x, bend_points[last_idx].y - 50.0)
+                    };
+
+                    // Rectangle intersection algorithm (mermaid style)
+                    let node_x = fj_x + fj_w / 2.0;
+                    let node_y = fj_y + fj_h / 2.0;
+                    let dx = point_x - node_x;
+                    let dy = point_y - node_y;
+                    let w = fj_w / 2.0;
+                    let h = fj_h / 2.0;
+
+                    let (sx, sy) = if (dy.abs() * w) > (dx.abs() * h) {
+                        // Intersection is top or bottom
+                        let h_signed = if dy < 0.0 { -h } else { h };
+                        let sx = if dy.abs() < 0.001 {
+                            0.0
+                        } else {
+                            (h_signed * dx) / dy
+                        };
+                        (sx, h_signed)
+                    } else {
+                        // Intersection is left or right
+                        let w_signed = if dx < 0.0 { -w } else { w };
+                        let sy = if dx.abs() < 0.001 {
+                            0.0
+                        } else {
+                            (w_signed * dy) / dx
+                        };
+                        (w_signed, sy)
+                    };
+
+                    bend_points[last_idx].x = node_x + sx;
+                    bend_points[last_idx].y = node_y + sy;
                 }
             }
 
@@ -439,14 +474,49 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 }
             }
 
-            // If the source is a fork/join state, adjust the first bend point
-            // to come from the bottom-center of the fork/join bar
+            // If the source is a fork/join state, use rectangle intersection algorithm
+            // (same approach as mermaid reference: intersect-rect.js)
             if fork_join_ids.contains(&source) && !bend_points.is_empty() {
                 if let Some(&(fj_x, fj_y, fj_w, fj_h)) = state_positions.get(source) {
-                    let fj_center_x = fj_x + fj_w / 2.0;
-                    let fj_bottom_y = fj_y + fj_h;
-                    bend_points[0].x = fj_center_x;
-                    bend_points[0].y = fj_bottom_y;
+                    // Get the target point for intersection calculation
+                    let (point_x, point_y) = if bend_points.len() > 1 {
+                        (bend_points[1].x, bend_points[1].y)
+                    } else if let Some(&(tx, ty, tw, th)) = state_positions.get(target) {
+                        (tx + tw / 2.0, ty + th / 2.0)
+                    } else {
+                        (bend_points[0].x, bend_points[0].y + 50.0)
+                    };
+
+                    // Rectangle intersection algorithm (mermaid style)
+                    let node_x = fj_x + fj_w / 2.0;
+                    let node_y = fj_y + fj_h / 2.0;
+                    let dx = point_x - node_x;
+                    let dy = point_y - node_y;
+                    let w = fj_w / 2.0;
+                    let h = fj_h / 2.0;
+
+                    let (sx, sy) = if (dy.abs() * w) > (dx.abs() * h) {
+                        // Intersection is top or bottom
+                        let h_signed = if dy < 0.0 { -h } else { h };
+                        let sx = if dy.abs() < 0.001 {
+                            0.0
+                        } else {
+                            (h_signed * dx) / dy
+                        };
+                        (sx, h_signed)
+                    } else {
+                        // Intersection is left or right
+                        let w_signed = if dx < 0.0 { -w } else { w };
+                        let sy = if dx.abs() < 0.001 {
+                            0.0
+                        } else {
+                            (w_signed * dy) / dx
+                        };
+                        (w_signed, sy)
+                    };
+
+                    bend_points[0].x = node_x + sx;
+                    bend_points[0].y = node_y + sy;
                 }
             }
 
@@ -727,8 +797,9 @@ fn render_composite_state(
     };
 
     // Create the inner rect (white fill, or gray for nested composites)
-    // The inner rect has a small padding at the bottom to match mermaid's style
-    // which creates a visible border around the entire composite state
+    // The inner rect is inset horizontally so the outer rect's border shows through
+    // on the left and right sides. It's also padded at the bottom.
+    let stroke_width = 1.0;
     let bottom_padding = 4.0;
     let inner_class = if is_nested {
         "state-composite-inner-alt"
@@ -736,9 +807,9 @@ fn render_composite_state(
         "state-composite-inner"
     };
     let inner_rect = SvgElement::Rect {
-        x: min_x,
+        x: min_x + stroke_width,
         y: min_y + title_height - 4.0, // Start below the title
-        width,
+        width: width - 2.0 * stroke_width,
         height: height - title_height + 4.0 - bottom_padding,
         rx: Some(0.0),
         ry: Some(0.0),
@@ -761,9 +832,19 @@ fn render_composite_state(
             .with_attr("font-size", "14"),
     };
 
-    // Wrap in a group - outer first, then inner, then title on top
+    // Create a divider line between title and content
+    let divider_y = min_y + title_height - 4.0;
+    let divider = SvgElement::Line {
+        x1: min_x,
+        y1: divider_y,
+        x2: min_x + width,
+        y2: divider_y,
+        attrs: Attrs::new().with_class("state-composite-divider"),
+    };
+
+    // Wrap in a group - outer first, then inner, then divider, then title on top
     Some(SvgElement::Group {
-        children: vec![outer_rect, inner_rect, title],
+        children: vec![outer_rect, inner_rect, divider, title],
         attrs: Attrs::new()
             .with_class("composite-state")
             .with_id(&format!("composite-{}", composite_id)),
@@ -1475,6 +1556,11 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
 .state-composite-label {{
   fill: {text_color};
   font-weight: bold;
+}}
+
+.state-composite-divider {{
+  stroke: {primary_border_color};
+  stroke-width: 1px;
 }}
 "#,
         text_color = theme.primary_text_color,
