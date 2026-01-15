@@ -36,7 +36,7 @@ pub struct RenderConfig {
     /// # Example
     ///
     /// ```
-    /// use mermaid::render::RenderConfig;
+    /// use selkie::render::RenderConfig;
     ///
     /// let config = RenderConfig {
     ///     theme_css: Some(".node rect { rx: 10; }".to_string()),

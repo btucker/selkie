@@ -9,7 +9,7 @@ keywords = ["diagram", "chart", "flowchart", "sequence", "mermaid"]
 categories = ["visualization", "parsing"]
 
 [lib]
-name = "mermaid"
+name = "selkie"
 path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 

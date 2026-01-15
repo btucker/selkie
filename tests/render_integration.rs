@@ -1,7 +1,7 @@
 //! Integration tests for the rendering engine
 
-use mermaid::render::{RenderConfig, Theme};
-use mermaid::{parse, render, render_text, render_with_config};
+use selkie::render::{RenderConfig, Theme};
+use selkie::{parse, render, render_text, render_with_config};
 
 // ============================================================================
 // Output Format Tests (PNG/PDF)
