@@ -729,19 +729,20 @@ fn render_transition(
             .with_class("transition-path"),
     });
 
-    // Transition label with background (matching flowchart style)
+    // Transition label with background (matching flowchart edge label style)
     if let Some(text) = label {
         if !text.is_empty() {
-            // Estimate text dimensions for background
-            let char_width = 9.6; // Approximate for font-size 16 (0.6 ratio)
-            let text_width = text.len() as f64 * char_width;
-            let text_height = 14.0;
+            // Estimate text dimensions for background (matching flowchart render_edge_parts)
+            let font_size = 16.0;
+            let char_width_ratio = 0.6;
+            let text_width = text.len() as f64 * font_size * char_width_ratio;
+            let text_height = font_size * 1.5;
             let padding = 4.0;
 
-            // Background rect
+            // Background rect (centered on label position)
             children.push(SvgElement::Rect {
                 x: label_x - text_width / 2.0 - padding,
-                y: label_y - text_height - padding / 2.0,
+                y: label_y - text_height / 2.0 - padding / 2.0,
                 width: text_width + padding * 2.0,
                 height: text_height + padding,
                 rx: Some(2.0),
@@ -749,13 +750,14 @@ fn render_transition(
                 attrs: Attrs::new().with_class("transition-label-bg"),
             });
 
-            // Label text
+            // Label text (centered with dominant-baseline)
             children.push(SvgElement::Text {
                 x: label_x,
-                y: label_y - 5.0,
+                y: label_y,
                 content: text.to_string(),
                 attrs: Attrs::new()
                     .with_attr("text-anchor", "middle")
+                    .with_attr("dominant-baseline", "central")
                     .with_class("transition-label")
                     .with_attr("font-size", "16"),
             });
