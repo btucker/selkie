@@ -483,6 +483,22 @@ fn render_grid_and_axis(
     let px_per_day = chart_width / days_range;
     let start_date = start.date();
 
+    // Estimate label width for overlap detection
+    // Date format "YYYY-MM-DD" = 10 chars, font-size 10, average char width ~0.6 * font-size
+    let estimated_label_width = 10.0 * 10.0 * 0.6; // ~60px per label
+
+    // Calculate minimum spacing between ticks
+    let min_tick_spacing = if tick_dates.len() > 1 {
+        let first_x = (tick_dates[0] - start_date).num_days() as f64 * px_per_day;
+        let second_x = (tick_dates[1] - start_date).num_days() as f64 * px_per_day;
+        (second_x - first_x).abs()
+    } else {
+        chart_width // Single tick, no overlap possible
+    };
+
+    // If labels would overlap, rotate them
+    let should_rotate = estimated_label_width > min_tick_spacing * 0.9;
+
     // Grid group
     let mut grid_children = Vec::new();
 
@@ -512,18 +528,31 @@ fn render_grid_and_axis(
             attrs: Attrs::new().with_attr("stroke", "currentColor"),
         });
 
-        // Tick label
+        // Tick label - rotate if labels would overlap
         let label = format!("{:04}-{:02}-{:02}", date.year(), date.month(), date.day());
-        grid_children.push(SvgElement::Text {
-            x,
-            y: 3.0,
-            content: label,
-            attrs: Attrs::new()
+        let label_attrs = if should_rotate {
+            // Rotate -45 degrees around the label position
+            // Use text-anchor: end so text extends up-left from the anchor point
+            Attrs::new()
+                .with_attr("fill", "#000")
+                .with_attr("dy", "0.5em")
+                .with_attr("stroke", "none")
+                .with_attr("font-size", "10")
+                .with_attr("style", "text-anchor: end;")
+                .with_attr("transform", &format!("rotate(-45 {} 3)", x))
+        } else {
+            Attrs::new()
                 .with_attr("fill", "#000")
                 .with_attr("dy", "1em")
                 .with_attr("stroke", "none")
                 .with_attr("font-size", "10")
-                .with_attr("style", "text-anchor: middle;"),
+                .with_attr("style", "text-anchor: middle;")
+        };
+        grid_children.push(SvgElement::Text {
+            x,
+            y: 3.0,
+            content: label,
+            attrs: label_attrs,
         });
     }
 
