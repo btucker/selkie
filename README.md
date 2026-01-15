@@ -8,6 +8,17 @@ Selkie aims to provide a fast, native alternative to Mermaid.js for parsing and 
 
 This project has been built entirely with coding agents, mostly [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, toward visual and structural parity.
 
+## Live Playground
+
+Try Selkie in your browser: **[btucker.github.io/selkie](https://btucker.github.io/selkie/)**
+
+The playground runs entirely client-side using WebAssembly, featuring:
+- Real-time diagram rendering as you type
+- Multiple theme support (default, dark, forest, neutral, base)
+- Example diagrams for all supported types
+- URL sharing for diagrams
+- SVG download
+
 ## Performance
 
 Selkie provides significant performance improvements over mermaid-js in both CLI and browser environments.
@@ -58,7 +69,7 @@ Selkie could not exist without all the human effort that has gone into these exc
 Selkie supports parsing and rendering for all major Mermaid diagram types. These examples showcase Selkie's rendering capabilities.
 
 ### Flowchart
-<img src="docs/images/flowchart.svg" alt="Flowchart" width="800">
+<img src="docs/images/flowchart_complex.svg" alt="Flowchart" width="800">
 
 ### Sequence Diagram
 <img src="docs/images/sequence.svg" alt="Sequence Diagram" width="800">

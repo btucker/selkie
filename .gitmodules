@@ -1,9 +1,9 @@
-[submodule "reference-implementations/mermaid"]
-	path = reference-implementations/mermaid
-	url = https://github.com/mermaid-js/mermaid.git
 [submodule "reference-implementations/dagre"]
 	path = reference-implementations/dagre
 	url = https://github.com/dagrejs/dagre.git
 [submodule "reference-implementations/elkjs"]
 	path = reference-implementations/elkjs
 	url = https://github.com/kieler/elkjs.git
+[submodule "reference-implementations/mermaid"]
+	path = reference-implementations/mermaid
+	url = https://github.com/mermaid-js/mermaid.git

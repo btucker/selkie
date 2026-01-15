@@ -656,7 +656,7 @@ marker path {{
     /// # Example
     /// ```
     /// use std::collections::HashMap;
-    /// use mermaid::render::svg::Theme;
+    /// use selkie::render::svg::Theme;
     ///
     /// let mut overrides = HashMap::new();
     /// overrides.insert("primaryColor".to_string(), "#ff0000".to_string());
@@ -927,8 +927,8 @@ marker path {{
     /// # Example
     ///
     /// ```
-    /// use mermaid::diagrams::DiagramConfig;
-    /// use mermaid::render::svg::Theme;
+    /// use selkie::diagrams::DiagramConfig;
+    /// use selkie::render::svg::Theme;
     /// use std::collections::HashMap;
     ///
     /// let mut config = DiagramConfig::default();

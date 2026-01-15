@@ -18,9 +18,9 @@ use clap::{Parser, Subcommand, ValueEnum};
 use serde::Deserialize;
 use uuid::Uuid;
 
-use mermaid::eval::{self, runner::DiagramInput, samples};
-use mermaid::render::{RenderConfig, Theme};
-use mermaid::{parse, render_with_config};
+use selkie::eval::{self, runner::DiagramInput, samples};
+use selkie::render::{RenderConfig, Theme};
+use selkie::{parse, render_with_config};
 
 /// Configuration file format (compatible with mermaid-cli)
 #[derive(Debug, Default, Deserialize)]
@@ -287,7 +287,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
         #[cfg(feature = "kitty")]
         ThemeArg::Auto => {
             // Auto-detect based on terminal background
-            if mermaid::kitty::is_terminal_dark() {
+            if selkie::kitty::is_terminal_dark() {
                 if args.verbose {
                     eprintln!("Auto-detected dark terminal, using dark theme");
                 }
@@ -371,7 +371,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(feature = "kitty")]
     if args.display || args.force_display {
         // Check for kitty support
-        if !args.force_display && !mermaid::kitty::is_supported() {
+        if !args.force_display && !selkie::kitty::is_supported() {
             return Err("Terminal does not support kitty graphics protocol. Use --force-display to override.".into());
         }
 
@@ -381,7 +381,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
 
         // Convert to PNG for display
         let png_data = svg_to_png(&svg, args.width, args.height)?;
-        mermaid::kitty::display_png(&png_data)
+        selkie::kitty::display_png(&png_data)
             .map_err(|e| format!("Failed to display image: {}", e))?;
 
         // Also write to file if output was specified

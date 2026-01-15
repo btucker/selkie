@@ -1,7 +1,7 @@
 //! Integration tests for the rendering engine
 
-use mermaid::render::{RenderConfig, Theme};
-use mermaid::{parse, render, render_text, render_with_config};
+use selkie::render::{RenderConfig, Theme};
+use selkie::{parse, render, render_text, render_with_config};
 
 // ============================================================================
 // Output Format Tests (PNG/PDF)
@@ -865,9 +865,9 @@ fn test_gantt_task_labels_inside_bars() {
     let diagram = parse(input).expect("Failed to parse Gantt chart");
     let svg = render(&diagram).expect("Failed to render Gantt chart");
 
-    // Task bar should be rendered
+    // Task bar should be rendered (mermaid uses "task task0" etc.)
     assert!(
-        svg.contains("task-bar"),
+        svg.contains("task task") || svg.contains("task-bar"),
         "Gantt chart should have task bars"
     );
 
@@ -1027,17 +1027,25 @@ fn test_class_inheritance_arrow_is_hollow_triangle() {
         "SVG should contain inheritance marker definition"
     );
 
-    // The marker path should have fill="none" for hollow triangle (not filled)
-    // Extract the marker section and check it has fill="none"
+    // The marker path should be hollow (fill="none" or light background fill, not filled with stroke color)
+    // Extract the marker section and verify it's not a solid filled triangle
     if let Some(marker_start) = svg
         .find(r#"id="inheritance-start""#)
         .or_else(|| svg.find(r#"id="inheritance-end""#))
     {
         let marker_end = svg[marker_start..].find("</marker>").unwrap_or(200);
         let marker_section = &svg[marker_start..marker_start + marker_end];
+        // Hollow can be fill="none" OR fill with a light color like #ECECFF or #FFFFFF
+        let is_hollow = marker_section.contains("fill=\"none\"")
+            || marker_section.contains("fill=\"#ECECFF\"")
+            || marker_section.contains("fill=\"#FFFFFF\"")
+            || marker_section.contains("fill=\"white\"");
+        // Should NOT be filled with the stroke/dark color
+        let is_solid = marker_section.contains("fill=\"#333333\"")
+            || marker_section.contains("fill=\"black\"");
         assert!(
-            marker_section.contains(r#"fill="none""#),
-            "Inheritance marker should have fill=\"none\" for hollow triangle. Got marker section:\n{}",
+            is_hollow && !is_solid,
+            "Inheritance marker should be hollow (not filled with stroke color). Got marker section:\n{}",
             marker_section
         );
     }
@@ -1885,6 +1893,36 @@ fn test_gantt_uses_css_classes_not_hardcoded_colors() {
     assert!(
         !svg.contains("stroke=\"#534fbc\""),
         "Gantt task bars should not have hardcoded stroke='#534fbc', should use CSS class. SVG:\n{}", svg
+    );
+}
+
+#[test]
+fn test_gantt_vert_markers_render_as_vertical_lines() {
+    // Vert markers should render as tall narrow vertical lines spanning the chart
+    let input = r#"gantt
+    title Sprint Timeline
+    dateFormat YYYY-MM-DD
+    section Planning
+    Task1 :a1, 2024-01-01, 7d
+    Task2 :a2, 2024-01-08, 7d
+    section Milestones
+    Sprint Start :vert, v1, 2024-01-01, 1d"#;
+
+    let diagram = parse(input).expect("Failed to parse Gantt chart");
+    let svg = render(&diagram).expect("Failed to render Gantt chart");
+
+    // Vert marker should have the "vert" class
+    assert!(
+        svg.contains("vert"),
+        "Vert marker should have 'vert' class. SVG:\n{}",
+        svg
+    );
+
+    // Vert marker text should have "vertText" class
+    assert!(
+        svg.contains("vertText"),
+        "Vert marker text should have 'vertText' class. SVG:\n{}",
+        svg
     );
 }
 

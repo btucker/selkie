@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1047" height="1020" viewBox="0 0 1047 1020" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="588" height="636" viewBox="0 0 588 636" class="mermaid">
   <style>
 
 .mermaid {
@@ -41,11 +41,10 @@
 .edge-label {
   fill: #333333;
   font-family: trebuchet ms, verdana, arial, sans-serif;
-  font-size: 12px;
 }
 
 .edge-label-bg {
-  fill: #ffffff;
+  fill: rgba(232, 232, 232, 0.8);
 }
 
 .subgraph {
@@ -129,35 +128,35 @@ marker path {
 
   </style>
   <defs>
-    <marker id="aggregation-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke="#333333" fill="none" stroke-width="1"/>
+    <marker id="aggregation-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="18" markerHeight="14" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="none" stroke="#333333" stroke-width="1"/>
     </marker>
-    <marker id="aggregation-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke="#333333" fill="none" stroke-width="1"/>
+    <marker id="aggregation-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="18" markerHeight="14" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="none" stroke="#333333" stroke-width="1"/>
     </marker>
-    <marker id="inheritance-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 1 7 L 18 13 V 1 Z" stroke="#333333" fill="none" stroke-width="1"/>
+    <marker id="inheritance-start" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="20" markerHeight="28" orient="auto">
+      <path d="M 1 7 L 18 13 V 1 Z" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
     </marker>
-    <marker id="inheritance-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 1 7 L 18 13 V 1 Z" stroke="#333333" fill="none" stroke-width="1"/>
+    <marker id="inheritance-end" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="20" markerHeight="28" orient="auto">
+      <path d="M 18 7 L 1 13 V 1 Z" fill="#ECECFF" stroke-width="1" stroke="#333333"/>
     </marker>
-    <marker id="composition-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke="#333333" stroke-width="1"/>
+    <marker id="composition-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="18" markerHeight="14" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke-width="1" stroke="#333333"/>
     </marker>
-    <marker id="composition-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke="#333333" stroke-width="1"/>
+    <marker id="composition-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="18" markerHeight="14" orient="auto">
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke-width="1" stroke="#333333"/>
     </marker>
-    <marker id="dependency-start" viewBox="0 0 20 20" refX="18" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 0 0 L 20 10 L 0 20" stroke="#333333" fill="none" stroke-width="1"/>
+    <marker id="dependency-start" viewBox="0 0 20 20" refX="0" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 10 L 20 0 L 20 20 Z" stroke="#333333" stroke-width="1" fill="none"/>
     </marker>
-    <marker id="dependency-end" viewBox="0 0 20 20" refX="1" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 0 0 L 20 10 L 0 20" stroke="#333333" fill="none" stroke-width="1"/>
+    <marker id="dependency-end" viewBox="0 0 20 20" refX="20" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 20 10 L 0 0 L 0 20 Z" stroke="#333333" fill="none" stroke-width="1"/>
     </marker>
-    <marker id="lollipop-start" viewBox="0 0 20 20" refX="13" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <circle cx="10" cy="10" r="8" stroke-width="1" stroke="#333333" fill="#FFFFFF"/>
+    <marker id="lollipop-start" viewBox="0 0 20 20" refX="13" refY="10" markerWidth="14" markerHeight="14" orient="auto">
+      <circle cx="10" cy="10" r="8" stroke="#333333" stroke-width="1" fill="#FFFFFF"/>
     </marker>
-    <marker id="lollipop-end" viewBox="0 0 20 20" refX="1" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <circle cx="10" cy="10" r="8" stroke-width="1" stroke="#333333" fill="#FFFFFF"/>
+    <marker id="lollipop-end" viewBox="0 0 20 20" refX="1" refY="10" markerWidth="14" markerHeight="14" orient="auto">
+      <circle cx="10" cy="10" r="8" stroke="#333333" stroke-width="1" fill="#FFFFFF"/>
     </marker>
   </defs>
   <g class="root">
@@ -173,168 +172,66 @@ marker path {
     <g class="nodes">
 
     </g>
-    <g class="class-node" id="class-RateLimitMiddleware">
-      <path d="M 813.9999999999999 247 H 1044 A 3 3 0 0 1 1047 250 V 348 A 3 3 0 0 1 1044 351 H 813.9999999999999 A 3 3 0 0 1 810.9999999999999 348 V 250 A 3 3 0 0 1 813.9999999999999 247 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
-      <path d="M 813.9999999999999 247 H 1044 A 3 3 0 0 1 1047 250 V 348 A 3 3 0 0 1 1044 351 H 813.9999999999999 A 3 3 0 0 1 810.9999999999999 348 V 250 A 3 3 0 0 1 813.9999999999999 247 Z" class="class-box" stroke="#333333" fill="none" stroke-width="1"/>
-      <foreignObject x="849.1999999999999" y="249.5" width="159.6" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">RateLimitMiddleware</p></span></div></foreignObject>
-      <path d="M 810.9999999999999 277 L 1047 277" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <foreignObject x="889.3999999999999" y="286" width="79.2" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-limit: int</p></span></div></foreignObject>
-      <foreignObject x="867.7999999999998" y="304" width="122.39999999999999" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-window: Duration</p></span></div></foreignObject>
-      <path d="M 810.9999999999999 323 L 1047 323" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <foreignObject x="820.9999999999999" y="332" width="216" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+process(req, next) : Response</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-Handler">
-      <path d="M 447.40000000000003 705 H 655.8000000000001 A 3 3 0 0 1 658.8000000000001 708 V 788 A 3 3 0 0 1 655.8000000000001 791 H 447.40000000000003 A 3 3 0 0 1 444.40000000000003 788 V 708 A 3 3 0 0 1 447.40000000000003 705 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
-      <path d="M 447.40000000000003 705 H 655.8000000000001 A 3 3 0 0 1 658.8000000000001 708 V 788 A 3 3 0 0 1 655.8000000000001 791 H 447.40000000000003 A 3 3 0 0 1 444.40000000000003 788 V 708 A 3 3 0 0 1 447.40000000000003 705 Z" class="class-box" fill="none" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="508.70000000000005" y="709.25" width="85.8" height="16.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 11px;"><span class="nodeLabel markdown-node-label" style="font-style: italic;"><p style="margin:0;">&lt;&lt;interface&gt;&gt;</p></span></div></foreignObject>
-      <foreignObject x="522.2" y="725.5" width="58.8" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Handler</p></span></div></foreignObject>
-      <path d="M 444.40000000000003 735 L 658.8000000000001 735" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <path d="M 444.40000000000003 763 L 658.8000000000001 763" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="454.40000000000003" y="772" width="194.4" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+handle(request) : Response</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-UserService">
-      <path d="M 760.8 678 H 969.1999999999999 A 3 3 0 0 1 972.1999999999999 681 V 815 A 3 3 0 0 1 969.1999999999999 818 H 760.8 A 3 3 0 0 1 757.8 815 V 681 A 3 3 0 0 1 760.8 678 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
-      <path d="M 760.8 678 H 969.1999999999999 A 3 3 0 0 1 972.1999999999999 681 V 815 A 3 3 0 0 1 969.1999999999999 818 H 760.8 A 3 3 0 0 1 757.8 815 V 681 A 3 3 0 0 1 760.8 678 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
-      <foreignObject x="818.8" y="680.5" width="92.39999999999999" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">UserService</p></span></div></foreignObject>
-      <path d="M 757.8 708 L 972.1999999999999 708" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="767.8" y="717" width="194.4" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-repository: UserRepository</p></span></div></foreignObject>
-      <foreignObject x="818.1999999999999" y="735" width="93.6" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-cache: Cache</p></span></div></foreignObject>
-      <path d="M 757.8 754 L 972.1999999999999 754" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="793" y="763" width="144" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+findById(id) : User</p></span></div></foreignObject>
-      <foreignObject x="800.1999999999999" y="781" width="129.6" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+save(user) : User</p></span></div></foreignObject>
-      <foreignObject x="800.1999999999999" y="799" width="129.6" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+delete(id) : void</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-Logger">
-      <path d="M 335.40000000000003 220 H 479 A 3 3 0 0 1 482 223 V 375 A 3 3 0 0 1 479 378 H 335.40000000000003 A 3 3 0 0 1 332.40000000000003 375 V 223 A 3 3 0 0 1 335.40000000000003 220 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 335.40000000000003 220 H 479 A 3 3 0 0 1 482 223 V 375 A 3 3 0 0 1 479 378 H 335.40000000000003 A 3 3 0 0 1 332.40000000000003 375 V 223 A 3 3 0 0 1 335.40000000000003 220 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
-      <foreignObject x="382" y="222.5" width="50.4" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Logger</p></span></div></foreignObject>
-      <path d="M 332.40000000000003 250 L 482 250" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <foreignObject x="349.6" y="259" width="115.19999999999999" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-level: LogLevel</p></span></div></foreignObject>
-      <foreignObject x="342.40000000000003" y="277" width="129.6" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-outputs: Output[]</p></span></div></foreignObject>
-      <path d="M 332.40000000000003 296 L 482 296" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="367.6" y="305" width="79.2" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+debug(msg)</p></span></div></foreignObject>
-      <foreignObject x="371.20000000000005" y="323" width="72" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+info(msg)</p></span></div></foreignObject>
-      <foreignObject x="371.20000000000005" y="341" width="72" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+warn(msg)</p></span></div></foreignObject>
-      <foreignObject x="367.6" y="359" width="79.2" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+error(msg)</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-Middleware">
-      <path d="M 455.4000000000001 485 H 685.4000000000001 A 3 3 0 0 1 688.4000000000001 488 V 568 A 3 3 0 0 1 685.4000000000001 571 H 455.4000000000001 A 3 3 0 0 1 452.4000000000001 568 V 488 A 3 3 0 0 1 455.4000000000001 485 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 455.4000000000001 485 H 685.4000000000001 A 3 3 0 0 1 688.4000000000001 488 V 568 A 3 3 0 0 1 685.4000000000001 571 H 455.4000000000001 A 3 3 0 0 1 452.4000000000001 568 V 488 A 3 3 0 0 1 455.4000000000001 485 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
-      <foreignObject x="527.5000000000001" y="489.25" width="85.8" height="16.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 11px;"><span class="nodeLabel markdown-node-label" style="font-style: italic;"><p style="margin:0;">&lt;&lt;interface&gt;&gt;</p></span></div></foreignObject>
-      <foreignObject x="528.4000000000001" y="505.5" width="84" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Middleware</p></span></div></foreignObject>
-      <path d="M 452.4000000000001 515 L 688.4000000000001 515" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <path d="M 452.4000000000001 543 L 688.4000000000001 543" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="462.4000000000001" y="552" width="216" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+process(req, next) : Response</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-UserController">
-      <path d="M 625.2 458 H 840.8000000000001 A 3 3 0 0 1 843.8000000000001 461 V 595 A 3 3 0 0 1 840.8000000000001 598 H 625.2 A 3 3 0 0 1 622.2 595 V 461 A 3 3 0 0 1 625.2 458 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 625.2 458 H 840.8000000000001 A 3 3 0 0 1 843.8000000000001 461 V 595 A 3 3 0 0 1 840.8000000000001 598 H 625.2 A 3 3 0 0 1 622.2 595 V 461 A 3 3 0 0 1 625.2 458 Z" class="class-box" fill="none" stroke-width="1" stroke="#333333"/>
-      <foreignObject x="674.2" y="460.5" width="117.6" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 201.6px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">UserController</p></span></div></foreignObject>
-      <path d="M 622.2 488 L 843.8000000000001 488" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <foreignObject x="643" y="497" width="180" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 201.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-userService: UserService</p></span></div></foreignObject>
-      <path d="M 622.2 516 L 843.8000000000001 516" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <foreignObject x="664.6" y="525" width="136.79999999999998" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 201.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+getUser(id) : User</p></span></div></foreignObject>
-      <foreignObject x="646.6" y="543" width="172.79999999999998" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 201.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+createUser(data) : User</p></span></div></foreignObject>
-      <foreignObject x="632.2" y="561" width="201.6" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 201.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+updateUser(id, data) : User</p></span></div></foreignObject>
-      <foreignObject x="653.8000000000001" y="579" width="158.4" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 201.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+deleteUser(id) : void</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-UserRepository">
-      <path d="M 793.2 898 H 936.8000000000001 A 3 3 0 0 1 939.8000000000001 901 V 1017 A 3 3 0 0 1 936.8000000000001 1020 H 793.2 A 3 3 0 0 1 790.2 1017 V 901 A 3 3 0 0 1 793.2 898 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 793.2 898 H 936.8000000000001 A 3 3 0 0 1 939.8000000000001 901 V 1017 A 3 3 0 0 1 936.8000000000001 1020 H 793.2 A 3 3 0 0 1 790.2 1017 V 901 A 3 3 0 0 1 793.2 898 Z" class="class-box" fill="none" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="822.1" y="902.25" width="85.8" height="16.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 11px;"><span class="nodeLabel markdown-node-label" style="font-style: italic;"><p style="margin:0;">&lt;&lt;interface&gt;&gt;</p></span></div></foreignObject>
-      <foreignObject x="806.2" y="918.5" width="117.6" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">UserRepository</p></span></div></foreignObject>
-      <path d="M 790.2 928 L 939.8000000000001 928" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <path d="M 790.2 956 L 939.8000000000001 956" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <foreignObject x="807.4000000000001" y="965" width="115.19999999999999" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+find(id) : User</p></span></div></foreignObject>
-      <foreignObject x="800.2" y="983" width="129.6" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+save(user) : User</p></span></div></foreignObject>
-      <foreignObject x="800.2" y="1001" width="129.6" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129.6px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+delete(id) : void</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-Config">
-      <path d="M 2.9999999999999147 238 H 132.1999999999999 A 3 3 0 0 1 135.1999999999999 241 V 357 A 3 3 0 0 1 132.1999999999999 360 H 2.9999999999999147 A 3 3 0 0 1 -0.00000000000008526512829121202 357 V 241 A 3 3 0 0 1 2.9999999999999147 238 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 2.9999999999999147 238 H 132.1999999999999 A 3 3 0 0 1 135.1999999999999 241 V 357 A 3 3 0 0 1 132.1999999999999 360 H 2.9999999999999147 A 3 3 0 0 1 -0.00000000000008526512829121202 357 V 241 A 3 3 0 0 1 2.9999999999999147 238 Z" class="class-box" stroke-width="1" stroke="#333333" fill="none"/>
-      <foreignObject x="42.399999999999906" y="240.5" width="50.4" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 115.19999999999999px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Config</p></span></div></foreignObject>
-      <path d="M -0.00000000000008526512829121202 268 L 135.1999999999999 268" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="17.19999999999991" y="277" width="100.8" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 115.19999999999999px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-settings: Map</p></span></div></foreignObject>
-      <path d="M -0.00000000000008526512829121202 296 L 135.1999999999999 296" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <foreignObject x="13.599999999999909" y="305" width="108" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 115.19999999999999px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+get(key) : any</p></span></div></foreignObject>
-      <foreignObject x="9.999999999999915" y="323" width="115.19999999999999" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 115.19999999999999px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+set(key, value)</p></span></div></foreignObject>
-      <foreignObject x="27.999999999999908" y="341" width="79.2" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 115.19999999999999px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+load(path)</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-Application">
-      <path d="M 293.80000000000007 0 H 459.00000000000006 A 3 3 0 0 1 462.00000000000006 3 V 137 A 3 3 0 0 1 459.00000000000006 140 H 293.80000000000007 A 3 3 0 0 1 290.80000000000007 137 V 3 A 3 3 0 0 1 293.80000000000007 0 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 293.80000000000007 0 H 459.00000000000006 A 3 3 0 0 1 462.00000000000006 3 V 137 A 3 3 0 0 1 459.00000000000006 140 H 293.80000000000007 A 3 3 0 0 1 290.80000000000007 137 V 3 A 3 3 0 0 1 293.80000000000007 0 Z" class="class-box" stroke="#333333" fill="none" stroke-width="1"/>
-      <foreignObject x="330.20000000000005" y="2.5" width="92.39999999999999" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 151.2px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Application</p></span></div></foreignObject>
-      <path d="M 290.80000000000007 30 L 462.00000000000006 30" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="322.4000000000001" y="39" width="108" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 151.2px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-config: Config</p></span></div></foreignObject>
-      <foreignObject x="322.4000000000001" y="57" width="108" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 151.2px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-logger: Logger</p></span></div></foreignObject>
-      <path d="M 290.80000000000007 76 L 462.00000000000006 76" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="347.6000000000001" y="85" width="57.599999999999994" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 151.2px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+start()</p></span></div></foreignObject>
-      <foreignObject x="351.20000000000005" y="103" width="50.4" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 151.2px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+stop()</p></span></div></foreignObject>
-      <foreignObject x="300.80000000000007" y="121" width="151.2" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 151.2px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+getStatus() : Status</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-AuthMiddleware">
-      <path d="M 518 256 H 748 A 3 3 0 0 1 751 259 V 339 A 3 3 0 0 1 748 342 H 518 A 3 3 0 0 1 515 339 V 259 A 3 3 0 0 1 518 256 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 518 256 H 748 A 3 3 0 0 1 751 259 V 339 A 3 3 0 0 1 748 342 H 518 A 3 3 0 0 1 515 339 V 259 A 3 3 0 0 1 518 256 Z" class="class-box" fill="none" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="574.2" y="258.5" width="117.6" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">AuthMiddleware</p></span></div></foreignObject>
-      <path d="M 515 286 L 751 286" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="535.8" y="295" width="194.4" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-tokenService: TokenService</p></span></div></foreignObject>
-      <path d="M 515 314 L 751 314" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="525" y="323" width="216" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 216px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+process(req, next) : Response</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-Router">
-      <path d="M 303.00000000000006 229 H 511.4000000000001 A 3 3 0 0 1 514.4000000000001 232 V 366 A 3 3 0 0 1 511.4000000000001 369 H 303.00000000000006 A 3 3 0 0 1 300.00000000000006 366 V 232 A 3 3 0 0 1 303.00000000000006 229 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 303.00000000000006 229 H 511.4000000000001 A 3 3 0 0 1 514.4000000000001 232 V 366 A 3 3 0 0 1 511.4000000000001 369 H 303.00000000000006 A 3 3 0 0 1 300.00000000000006 366 V 232 A 3 3 0 0 1 303.00000000000006 229 Z" class="class-box" fill="none" stroke-width="1" stroke="#333333"/>
-      <foreignObject x="382.00000000000006" y="231.5" width="50.4" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Router</p></span></div></foreignObject>
-      <path d="M 300.00000000000006 259 L 514.4000000000001 259" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="349.6000000000001" y="268" width="115.19999999999999" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-routes: Route[]</p></span></div></foreignObject>
-      <foreignObject x="317.20000000000005" y="286" width="180" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">-middleware: Middleware[]</p></span></div></foreignObject>
-      <path d="M 300.00000000000006 305 L 514.4000000000001 305" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="349.6000000000001" y="314" width="115.19999999999999" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+addRoute(route)</p></span></div></foreignObject>
-      <foreignObject x="349.6000000000001" y="332" width="115.19999999999999" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+use(middleware)</p></span></div></foreignObject>
-      <foreignObject x="310.00000000000006" y="350" width="194.4" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 194.4px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+handle(request) : Response</p></span></div></foreignObject>
-    </g>
-    <g class="class-node" id="class-Route">
-      <path d="M 232.60000000000002 476 H 383.4 A 3 3 0 0 1 386.4 479 V 577 A 3 3 0 0 1 383.4 580 H 232.60000000000002 A 3 3 0 0 1 229.60000000000002 577 V 479 A 3 3 0 0 1 232.60000000000002 476 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 232.60000000000002 476 H 383.4 A 3 3 0 0 1 386.4 479 V 577 A 3 3 0 0 1 383.4 580 H 232.60000000000002 A 3 3 0 0 1 229.60000000000002 577 V 479 A 3 3 0 0 1 232.60000000000002 476 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
-      <foreignObject x="287" y="478.5" width="42" height="21"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136.79999999999998px; text-align: center; font-size: 14px;"><span class="nodeLabel markdown-node-label" style="font-weight: bolder;"><p style="margin:0;">Route</p></span></div></foreignObject>
-      <path d="M 229.60000000000002 506 L 386.4 506" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <foreignObject x="261.20000000000005" y="515" width="93.6" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136.79999999999998px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+path: string</p></span></div></foreignObject>
-      <foreignObject x="239.60000000000002" y="533" width="136.79999999999998" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136.79999999999998px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+method: HttpMethod</p></span></div></foreignObject>
-      <foreignObject x="246.8" y="551" width="122.39999999999999" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136.79999999999998px; text-align: center; font-size: 12px;"><span class="nodeLabel markdown-node-label" style=""><p style="margin:0;">+handler: Handler</p></span></div></foreignObject>
-      <path d="M 229.60000000000002 570 L 386.4 570" class="class-divider" stroke="#333333" stroke-width="1"/>
+    <g class="relation">
+      <path d="M 234.00 96.00 C 184.40 141.33, 134.80 186.67, 110.00 216.00 C 85.20 245.33, 85.20 258.67, 85.20 272.00" class="relation-line" marker-start="url(#inheritance-start)" stroke="#333333" fill="none" stroke-width="1"/>
     </g>
     <g class="relation">
-      <path d="M 290.80 116.52 C 251.87 137.68, 212.93 158.84, 184.82 179.09 C 156.71 199.33, 139.43 218.67, 122.14 238.00" class="relation-line" stroke="#333333" marker-end="url(#dependency-end)" fill="none" stroke-width="1"/>
+      <path d="M 308.40 192.00 C 308.40 205.33, 308.40 218.67, 308.40 234.00 C 308.40 249.33, 308.40 266.67, 308.40 284.00" class="relation-line" stroke-width="1" stroke="#333333" fill="none" marker-start="url(#inheritance-start)"/>
     </g>
     <g class="relation">
-      <path d="M 376.40 140.00 C 376.40 153.33, 376.40 166.67, 378.13 180.00 C 379.85 193.33, 383.30 206.67, 386.75 220.00" class="relation-line" fill="none" stroke="#333333" marker-end="url(#dependency-end)" stroke-width="1"/>
+      <path d="M 382.80 96.00 C 427.60 141.33, 472.40 186.67, 494.80 218.00 C 517.20 249.33, 517.20 266.67, 517.20 284.00" class="relation-line" stroke-width="1" stroke="#333333" fill="none" marker-start="url(#inheritance-start)"/>
     </g>
     <g class="relation">
-      <path d="M 401.73 140.00 C 406.55 153.33, 411.38 166.67, 413.17 181.50 C 414.96 196.33, 413.73 212.67, 412.49 229.00" class="relation-line" stroke="#333333" marker-end="url(#dependency-end)" stroke-width="1" fill="none"/>
+      <path d="M 85.20 440.00 C 85.20 456.67, 85.20 473.33, 85.20 490.00 C 85.20 506.67, 85.20 523.33, 85.20 540.00" class="relation-line" stroke-width="1" fill="none" stroke="#333333" marker-start="url(#composition-start)"/>
+      <text x="73.19999999999999" y="460" class="cardinality-label" font-size="11" text-anchor="middle">1</text>
+      <text x="73.19999999999999" y="520" class="cardinality-label" text-anchor="middle" font-size="11">many</text>
+      <text x="85.19999999999999" y="490" class="relation-label" dominant-baseline="central" font-size="11" text-anchor="middle">has</text>
     </g>
-    <g class="relation">
-      <path d="M 418.38 369.00 C 420.98 385.33, 423.59 401.67, 414.51 419.50 C 405.43 437.33, 384.65 456.67, 363.88 476.00" class="relation-line" marker-end="url(#dependency-end)" stroke-width="1" stroke="#333333" fill="none"/>
+    <g class="class-node" id="class-Egg">
+      <path d="M 38.19999999999999 540 H 132.2 A 3 3 0 0 1 135.2 543 V 633 A 3 3 0 0 1 132.2 636 H 38.19999999999999 A 3 3 0 0 1 35.19999999999999 633 V 543 A 3 3 0 0 1 38.19999999999999 540 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
+      <path d="M 38.19999999999999 540 H 132.2 A 3 3 0 0 1 135.2 543 V 633 A 3 3 0 0 1 132.2 636 H 38.19999999999999 A 3 3 0 0 1 35.19999999999999 633 V 543 A 3 3 0 0 1 38.19999999999999 540 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
+      <text x="85.19999999999999" y="564" font-weight="bold" text-anchor="middle" dominant-baseline="middle" font-size="16">Egg</text>
+      <path d="M 35.19999999999999 588 L 135.2 588" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <path d="M 35.19999999999999 636 L 135.2 636" class="class-divider" stroke="#333333" stroke-width="1"/>
     </g>
-    <g class="relation">
-      <path d="M 481.91 369.00 C 499.34 385.33, 516.77 401.67, 529.16 421.00 C 541.55 440.33, 548.90 462.67, 556.25 485.00" class="relation-line" fill="none" stroke-width="1" marker-end="url(#dependency-end)" stroke="#333333"/>
+    <g class="class-node" id="class-Animal">
+      <path d="M 236.99999999999997 0 H 379.79999999999995 A 3 3 0 0 1 382.79999999999995 3 V 189 A 3 3 0 0 1 379.79999999999995 192 H 236.99999999999997 A 3 3 0 0 1 233.99999999999997 189 V 3 A 3 3 0 0 1 236.99999999999997 0 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 236.99999999999997 0 H 379.79999999999995 A 3 3 0 0 1 382.79999999999995 3 V 189 A 3 3 0 0 1 379.79999999999995 192 H 236.99999999999997 A 3 3 0 0 1 233.99999999999997 189 V 3 A 3 3 0 0 1 236.99999999999997 0 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
+      <text x="308.4" y="24" text-anchor="middle" font-weight="bold" dominant-baseline="middle" font-size="16">Animal</text>
+      <path d="M 233.99999999999997 48 L 382.79999999999995 48" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="258" y="60" font-size="16" text-anchor="start" dominant-baseline="middle">+int age</text>
+      <text x="258" y="84" dominant-baseline="middle" font-size="16" text-anchor="start">+String gender</text>
+      <path d="M 233.99999999999997 120 L 382.79999999999995 120" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="258" y="132" dominant-baseline="middle" font-size="16" text-anchor="start">+isMammal()</text>
+      <text x="258" y="156" dominant-baseline="middle" font-size="16" text-anchor="start">+mate()</text>
     </g>
-    <g class="relation">
-      <path d="M 606.19 342.00 C 590.39 367.33, 574.60 392.67, 567.88 416.50 C 561.16 440.33, 563.51 462.67, 565.87 485.00" class="relation-line" stroke="#333333" fill="none" stroke-dasharray="5,5" marker-end="url(#inheritance-end)" stroke-width="1"/>
+    <g class="class-node" id="class-Fish">
+      <path d="M 233.39999999999998 284 H 383.4 A 3 3 0 0 1 386.4 287 V 425 A 3 3 0 0 1 383.4 428 H 233.39999999999998 A 3 3 0 0 1 230.39999999999998 425 V 287 A 3 3 0 0 1 233.39999999999998 284 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 233.39999999999998 284 H 383.4 A 3 3 0 0 1 386.4 287 V 425 A 3 3 0 0 1 383.4 428 H 233.39999999999998 A 3 3 0 0 1 230.39999999999998 425 V 287 A 3 3 0 0 1 233.39999999999998 284 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
+      <text x="308.4" y="308" text-anchor="middle" dominant-baseline="middle" font-size="16" font-weight="bold">Fish</text>
+      <path d="M 230.39999999999998 332 L 386.4 332" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="254.39999999999998" y="344" text-anchor="start" dominant-baseline="middle" font-size="16">-int sizeInFeet</text>
+      <path d="M 230.39999999999998 380 L 386.4 380" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="254.39999999999998" y="392" font-size="16" text-anchor="start" dominant-baseline="middle">-canEat()</text>
     </g>
-    <g class="relation">
-      <path d="M 840.64 351.00 C 802.70 373.33, 764.75 395.67, 729.90 418.00 C 695.05 440.33, 663.29 462.67, 631.54 485.00" class="relation-line" stroke-width="1" stroke="#333333" stroke-dasharray="5,5" fill="none" marker-end="url(#inheritance-end)"/>
+    <g class="class-node" id="class-Zebra">
+      <path d="M 449.40000000000003 284 H 585 A 3 3 0 0 1 588 287 V 425 A 3 3 0 0 1 585 428 H 449.40000000000003 A 3 3 0 0 1 446.40000000000003 425 V 287 A 3 3 0 0 1 449.40000000000003 284 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
+      <path d="M 449.40000000000003 284 H 585 A 3 3 0 0 1 588 287 V 425 A 3 3 0 0 1 585 428 H 449.40000000000003 A 3 3 0 0 1 446.40000000000003 425 V 287 A 3 3 0 0 1 449.40000000000003 284 Z" class="class-box" stroke-width="1" stroke="#333333" fill="none"/>
+      <text x="517.2" y="308" font-weight="bold" dominant-baseline="middle" text-anchor="middle" font-size="16">Zebra</text>
+      <path d="M 446.40000000000003 332 L 588 332" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="470.40000000000003" y="344" font-size="16" text-anchor="start" dominant-baseline="middle">+bool is_wild</text>
+      <path d="M 446.40000000000003 380 L 588 380" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="470.40000000000003" y="392" font-size="16" text-anchor="start" dominant-baseline="middle">+run()</text>
     </g>
-    <g class="relation">
-      <path d="M 367.28 580.00 C 389.32 599.33, 411.36 618.67, 434.38 639.50 C 457.40 660.33, 481.40 682.67, 505.39 705.00" class="relation-line" fill="none" stroke="#333333" stroke-width="1" marker-end="url(#dependency-end)"/>
-    </g>
-    <g class="relation">
-      <path d="M 731.35 598.00 C 731.03 611.33, 730.72 624.67, 712.41 642.50 C 694.10 660.33, 657.80 682.67, 621.49 705.00" class="relation-line" stroke-width="1" stroke-dasharray="5,5" marker-end="url(#inheritance-end)" stroke="#333333" fill="none"/>
-    </g>
-    <g class="relation">
-      <path d="M 812.29 598.00 C 827.39 611.33, 842.50 624.67, 850.50 638.00 C 858.50 651.33, 859.39 664.67, 860.29 678.00" class="relation-line" marker-end="url(#dependency-end)" stroke="#333333" stroke-width="1" fill="none"/>
-    </g>
-    <g class="relation">
-      <path d="M 865.00 818.00 C 865.00 831.33, 865.00 844.67, 865.00 858.00 C 865.00 871.33, 865.00 884.67, 865.00 898.00" class="relation-line" stroke="#333333" stroke-width="1" marker-end="url(#dependency-end)" fill="none"/>
+    <g class="class-node" id="class-Duck">
+      <path d="M 3 272 H 167.39999999999998 A 3 3 0 0 1 170.39999999999998 275 V 437 A 3 3 0 0 1 167.39999999999998 440 H 3 A 3 3 0 0 1 0 437 V 275 A 3 3 0 0 1 3 272 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 3 272 H 167.39999999999998 A 3 3 0 0 1 170.39999999999998 275 V 437 A 3 3 0 0 1 167.39999999999998 440 H 3 A 3 3 0 0 1 0 437 V 275 A 3 3 0 0 1 3 272 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
+      <text x="85.19999999999999" y="296" text-anchor="middle" font-size="16" dominant-baseline="middle" font-weight="bold">Duck</text>
+      <path d="M 0 320 L 170.39999999999998 320" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="24" y="332" text-anchor="start" dominant-baseline="middle" font-size="16">+String beakColor</text>
+      <path d="M 0 368 L 170.39999999999998 368" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="24" y="380" text-anchor="start" dominant-baseline="middle" font-size="16">+swim()</text>
+      <text x="24" y="404" font-size="16" dominant-baseline="middle" text-anchor="start">+quack()</text>
     </g>
   </g>
 </svg>

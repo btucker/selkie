@@ -17,9 +17,9 @@ use crate::render::svg::{edges, Attrs, RenderConfig, SvgDocument, SvgElement};
 impl ToLayoutGraph for ClassDb {
     fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
         let config = NodeSizeConfig {
-            font_size: 12.0,
-            padding_horizontal: 10.0,
-            padding_vertical: 10.0,
+            font_size: 16.0,
+            padding_horizontal: 24.0,
+            padding_vertical: 24.0,
             min_width: 100.0,
             min_height: 60.0,
             max_width: Some(200.0),
@@ -53,15 +53,14 @@ impl ToLayoutGraph for ClassDb {
             };
 
             // Estimate size: header + members + methods
-            let header_height = 30.0;
-            let member_height = 18.0;
+            // Header includes annotations (e.g. «interface») + class name
+            let base_header_height = 48.0;
+            let member_height = 24.0;
+            let annotation_line_height = 20.0;
             let num_members = class.members.len() + class.methods.len();
-            let annotations_height = if class.annotations.is_empty() {
-                0.0
-            } else {
-                (class.annotations.len() as f64) * member_height
-            };
-            let content_height = (num_members as f64) * member_height + annotations_height;
+            let annotations_height = (class.annotations.len() as f64) * annotation_line_height;
+            let header_height = base_header_height + annotations_height;
+            let content_height = (num_members as f64) * member_height;
             let total_height = (header_height + content_height + config.padding_vertical * 2.0)
                 .max(config.min_height);
 
@@ -72,12 +71,12 @@ impl ToLayoutGraph for ClassDb {
             };
             let class_text = format!("{}{}", label, type_suffix);
 
-            let mut max_text_width = size_estimator.estimate_text_size(&class_text, 14.0).0;
+            let mut max_text_width = size_estimator.estimate_text_size(&class_text, 16.0).0;
 
             for annotation in &class.annotations {
-                let text = format!("<<{}>>", annotation);
+                let text = format!("«{}»", annotation);
                 max_text_width =
-                    max_text_width.max(size_estimator.estimate_text_size(&text, 11.0).0);
+                    max_text_width.max(size_estimator.estimate_text_size(&text, 16.0).0);
             }
 
             for member in &class.members {
@@ -148,12 +147,12 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
     // Layout constants
-    let class_padding = 10.0;
-    let member_height = 18.0;
-    let header_height = 30.0;
-    let annotation_font_size = 11.0;
-    let class_name_font_size = 14.0;
-    let member_font_size = 12.0;
+    let class_padding = 24.0;
+    let member_height = 24.0;
+    let header_height = 48.0;
+    let annotation_font_size = 16.0;
+    let class_name_font_size = 16.0;
+    let member_font_size = 16.0;
 
     let classes: Vec<_> = db.classes.values().collect();
 
@@ -206,33 +205,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     // Add marker definitions for relations
     doc.add_defs(create_class_markers());
 
-    // Render each class at dagre-computed position
-    for class in &classes {
-        if let Some(&(x, y)) = class_positions.get(&class.id) {
-            let (width, height) = class_dimensions
-                .get(&class.id)
-                .copied()
-                .unwrap_or((180.0, 60.0));
-
-            let class_elem = render_class_box(
-                class,
-                x,
-                y,
-                width,
-                height,
-                class_padding,
-                member_height,
-                header_height,
-                annotation_font_size,
-                class_name_font_size,
-                member_font_size,
-                &size_estimator,
-            );
-            doc.add_element(class_elem);
-        }
-    }
-
-    // Render relations using edge bend points from dagre
+    // Render relations FIRST so they appear behind class nodes
     for relation in &db.relations {
         let key = (relation.id1.clone(), relation.id2.clone());
 
@@ -273,6 +246,32 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
         }
     }
 
+    // Render class nodes AFTER relations so they appear on top
+    for class in &classes {
+        if let Some(&(x, y)) = class_positions.get(&class.id) {
+            let (width, height) = class_dimensions
+                .get(&class.id)
+                .copied()
+                .unwrap_or((180.0, 60.0));
+
+            let class_elem = render_class_box(
+                class,
+                x,
+                y,
+                width,
+                height,
+                class_padding,
+                member_height,
+                header_height,
+                annotation_font_size,
+                class_name_font_size,
+                member_font_size,
+                &size_estimator,
+            );
+            doc.add_element(class_elem);
+        }
+    }
+
     // Render notes
     for note in db.notes.values() {
         if let Some(&(x, y)) = class_positions.get(&note.class) {
@@ -302,7 +301,7 @@ fn render_class_box(
     annotation_font_size: f64,
     class_name_font_size: f64,
     member_font_size: f64,
-    size_estimator: &dyn SizeEstimator,
+    _size_estimator: &dyn SizeEstimator,
 ) -> SvgElement {
     let mut children = Vec::new();
 
@@ -324,33 +323,38 @@ fn render_class_box(
             .with_class("class-box"),
     });
 
-    let mut current_y = y;
+    let center_x = x + width / 2.0;
+    let left_x = x + padding;
 
-    // Annotations (<<interface>>, <<abstract>>, etc.)
-    if !class.annotations.is_empty() {
-        for annotation in &class.annotations {
-            current_y += member_height;
-            let annotation_text = format!("<<{}>>", annotation);
-            let text_width = size_estimator
-                .estimate_text_size(&annotation_text, annotation_font_size)
-                .0;
-            let text_x = x + (width - text_width) / 2.0;
-            let available_width = width - padding * 2.0;
-            children.push(foreign_object_label(
-                text_x,
-                current_y,
-                text_width,
-                annotation_font_size,
-                available_width,
-                &annotation_text,
-                "center",
-                "font-style: italic;",
-            ));
-        }
+    // Calculate header section height (annotations + class name)
+    let annotation_line_height = 20.0;
+    let annotations_total_height = (class.annotations.len() as f64) * annotation_line_height;
+    let actual_header_height = header_height + annotations_total_height;
+
+    // Position annotations and class name within the header section
+    // Annotations appear first, then the class name below them
+    let num_header_lines = class.annotations.len() + 1; // annotations + class name
+    let header_line_spacing = actual_header_height / (num_header_lines as f64 + 1.0);
+
+    let mut header_y = y + header_line_spacing;
+
+    // Annotations (e.g. «interface», «abstract») - centered in header
+    for annotation in &class.annotations {
+        let annotation_text = format!("«{}»", annotation);
+        children.push(SvgElement::Text {
+            x: center_x,
+            y: header_y,
+            content: annotation_text,
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_attr("dominant-baseline", "middle")
+                .with_attr("font-size", &annotation_font_size.to_string())
+                .with_attr("font-style", "italic"),
+        });
+        header_y += header_line_spacing;
     }
 
-    // Class name
-    current_y += header_height / 2.0 + 5.0;
+    // Class name (centered, below annotations)
     let class_label = if !class.label.is_empty() {
         &class.label
     } else {
@@ -363,25 +367,22 @@ fn render_class_box(
     };
 
     let class_text = format!("{}{}", class_label, type_suffix);
-    let text_width = size_estimator
-        .estimate_text_size(&class_text, class_name_font_size)
-        .0;
-    let text_x = x + (width - text_width) / 2.0;
-    let available_width = width - padding * 2.0;
-    children.push(foreign_object_label(
-        text_x,
-        current_y,
-        text_width,
-        class_name_font_size,
-        available_width,
-        &class_text,
-        "center",
-        "font-weight: bolder;",
-    ));
+    children.push(SvgElement::Text {
+        x: center_x,
+        y: header_y,
+        content: class_text,
+        attrs: Attrs::new()
+            .with_attr("text-anchor", "middle")
+            .with_attr("dominant-baseline", "middle")
+            .with_attr("font-size", &class_name_font_size.to_string())
+            .with_attr("font-weight", "bold"),
+    });
 
-    let divider1_y = y + header_height;
+    // First divider is after the header section (annotations + name)
+    let divider1_y = y + actual_header_height;
     let members_section_height = (class.members.len().max(1) as f64) * member_height + padding;
     let divider2_y = divider1_y + members_section_height;
+    let mut current_y; // For positioning members and methods
 
     // Divider after name (always present)
     children.push(SvgElement::Path {
@@ -392,27 +393,23 @@ fn render_class_box(
             .with_class("class-divider"),
     });
 
-    // Attributes section
+    // Attributes section (left-aligned)
+    // Position text centered within each row
     if !class.members.is_empty() {
-        current_y = divider1_y + padding;
+        current_y = divider1_y;
         for member in &class.members {
-            current_y += member_height;
+            current_y += member_height / 2.0; // Move to center of row
             let display = member.get_display_details();
-            let text_width = size_estimator
-                .estimate_text_size(&display.display_text, member_font_size)
-                .0;
-            let text_x = x + (width - text_width) / 2.0;
-            let available_width = width - padding * 2.0;
-            children.push(foreign_object_label(
-                text_x,
-                current_y - 4.0,
-                text_width,
-                member_font_size,
-                available_width,
-                &display.display_text,
-                "center",
-                &display.css_style,
-            ));
+            children.push(SvgElement::Text {
+                x: left_x,
+                y: current_y,
+                content: display.display_text,
+                attrs: Attrs::new()
+                    .with_attr("text-anchor", "start")
+                    .with_attr("dominant-baseline", "middle")
+                    .with_attr("font-size", &member_font_size.to_string()),
+            });
+            current_y += member_height / 2.0; // Move to end of row
         }
     }
 
@@ -425,27 +422,23 @@ fn render_class_box(
             .with_class("class-divider"),
     });
 
-    // Methods section
+    // Methods section (left-aligned)
+    // Position text centered within each row
     if !class.methods.is_empty() {
-        current_y = divider2_y + padding;
+        current_y = divider2_y;
         for method in &class.methods {
-            current_y += member_height;
+            current_y += member_height / 2.0; // Move to center of row
             let display = method.get_display_details();
-            let text_width = size_estimator
-                .estimate_text_size(&display.display_text, member_font_size)
-                .0;
-            let text_x = x + (width - text_width) / 2.0;
-            let available_width = width - padding * 2.0;
-            children.push(foreign_object_label(
-                text_x,
-                current_y - 4.0,
-                text_width,
-                member_font_size,
-                available_width,
-                &display.display_text,
-                "center",
-                &display.css_style,
-            ));
+            children.push(SvgElement::Text {
+                x: left_x,
+                y: current_y,
+                content: display.display_text,
+                attrs: Attrs::new()
+                    .with_attr("text-anchor", "start")
+                    .with_attr("dominant-baseline", "middle")
+                    .with_attr("font-size", &member_font_size.to_string()),
+            });
+            current_y += member_height / 2.0; // Move to end of row
         }
     }
 
@@ -509,19 +502,75 @@ fn render_relation(
     type2: i32,
     line_type: LineType,
     bend_points: Option<&Vec<Point>>,
-    size_estimator: &dyn SizeEstimator,
+    _size_estimator: &dyn SizeEstimator,
 ) -> SvgElement {
     let mut children = Vec::new();
 
+    // No marker offset needed - refX is now at the arrow tip, so path endpoints
+    // should be exactly at node boundaries
+    let marker_offset = 0.0;
+
     // Calculate path from bend points or fallback to direct line
+    // When using bend points, we need to adjust the first and last points
+    // to properly intersect with the node boundaries, offset by marker length
     let path_d = if let Some(points) = bend_points {
         if !points.is_empty() {
-            edges::build_curved_path(points)
+            // Create adjusted points with proper node boundary intersections
+            let mut adjusted_points = points.clone();
+
+            // Adjust first point: exit from source node toward next bend point
+            // Use the second bend point (if available) to determine exit direction
+            // This respects the actual path curvature
+            let (depart_x, depart_y) = if points.len() > 1 {
+                // Use second bend point for direction
+                (points[1].x, points[1].y)
+            } else {
+                // Fallback to target center if only one point
+                (x2 + w2 / 2.0, y2 + h2 / 2.0)
+            };
+            let (exit_x, exit_y) = calculate_exit_point(x1, y1, w1, h1, depart_x, depart_y);
+
+            // Offset exit point inward by marker length if there's a start marker
+            let (adj_exit_x, adj_exit_y) = if type1 != -1 {
+                offset_point_toward(exit_x, exit_y, depart_x, depart_y, marker_offset)
+            } else {
+                (exit_x, exit_y)
+            };
+            adjusted_points[0] = Point {
+                x: adj_exit_x,
+                y: adj_exit_y,
+            };
+
+            // Adjust last point: entry into target node
+            // Use the second-to-last bend point to determine entry direction
+            // This respects the actual path curvature rather than the straight line to source
+            let last_idx = adjusted_points.len() - 1;
+            let (approach_x, approach_y) = if last_idx > 0 {
+                // Use previous bend point for direction
+                (points[last_idx - 1].x, points[last_idx - 1].y)
+            } else {
+                // Fallback to source center if only one point
+                (x1 + w1 / 2.0, y1 + h1 / 2.0)
+            };
+            let (entry_x, entry_y) = calculate_entry_point(x2, y2, w2, h2, approach_x, approach_y);
+
+            // Offset entry point inward by marker length if there's an end marker
+            let (adj_entry_x, adj_entry_y) = if type2 != -1 {
+                offset_point_toward(entry_x, entry_y, approach_x, approach_y, marker_offset)
+            } else {
+                (entry_x, entry_y)
+            };
+            adjusted_points[last_idx] = Point {
+                x: adj_entry_x,
+                y: adj_entry_y,
+            };
+
+            edges::build_curved_path(&adjusted_points)
         } else {
-            build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2)
+            build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2, type1, type2, marker_offset)
         }
     } else {
-        build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2)
+        build_direct_path(x1, y1, h1, w1, x2, y2, h2, w2, type1, type2, marker_offset)
     };
 
     // Determine marker based on relation type
@@ -649,23 +698,6 @@ fn render_relation(
     if !label.is_empty() {
         let mid_x = (start_x + end_x) / 2.0;
         let mid_y = (start_y + end_y) / 2.0;
-        let font_size = 11.0;
-        let text_width = size_estimator.estimate_text_size(label, font_size).0;
-        let text_height = font_size * 1.5;
-        let padding = 4.0;
-
-        children.push(SvgElement::Rect {
-            x: mid_x - text_width / 2.0 - padding,
-            y: mid_y - text_height / 2.0 - padding / 2.0,
-            width: text_width + padding * 2.0,
-            height: text_height + padding,
-            rx: None,
-            ry: None,
-            attrs: Attrs::new()
-                .with_class("edge-label-bg")
-                .with_attr("fill-opacity", "0.8"),
-        });
-
         children.push(SvgElement::Text {
             x: mid_x,
             y: mid_y,
@@ -684,6 +716,18 @@ fn render_relation(
     }
 }
 
+/// Offset a point toward a target by a given distance
+fn offset_point_toward(x: f64, y: f64, target_x: f64, target_y: f64, distance: f64) -> (f64, f64) {
+    let dx = target_x - x;
+    let dy = target_y - y;
+    let len = (dx * dx + dy * dy).sqrt();
+    if len > 0.0 {
+        (x + dx / len * distance, y + dy / len * distance)
+    } else {
+        (x, y)
+    }
+}
+
 /// Build direct path when no bend points available
 #[allow(clippy::too_many_arguments)]
 fn build_direct_path(
@@ -695,10 +739,31 @@ fn build_direct_path(
     y2: f64,
     h2: f64,
     w2: f64,
+    type1: i32,
+    type2: i32,
+    marker_offset: f64,
 ) -> String {
     let (start_x, start_y, end_x, end_y) =
         calculate_connection_points(x1, y1, h1, w1, x2, y2, h2, w2);
-    format!("M {} {} L {} {}", start_x, start_y, end_x, end_y)
+
+    // Offset start point if there's a start marker
+    let (adj_start_x, adj_start_y) = if type1 != -1 {
+        offset_point_toward(start_x, start_y, end_x, end_y, marker_offset)
+    } else {
+        (start_x, start_y)
+    };
+
+    // Offset end point if there's an end marker
+    let (adj_end_x, adj_end_y) = if type2 != -1 {
+        offset_point_toward(end_x, end_y, start_x, start_y, marker_offset)
+    } else {
+        (end_x, end_y)
+    };
+
+    format!(
+        "M {} {} L {} {}",
+        adj_start_x, adj_start_y, adj_end_x, adj_end_y
+    )
 }
 
 /// Calculate connection points on class box edges
@@ -751,6 +816,80 @@ fn calculate_connection_points(
     };
 
     (start_x, start_y, end_x, end_y)
+}
+
+/// Calculate the exit point from a rectangular node toward a target point
+/// This finds where a line from the node center to target_point intersects the node boundary
+fn calculate_exit_point(
+    x: f64,
+    y: f64,
+    w: f64,
+    h: f64,
+    target_x: f64,
+    target_y: f64,
+) -> (f64, f64) {
+    let cx = x + w / 2.0;
+    let cy = y + h / 2.0;
+    let dx = target_x - cx;
+    let dy = target_y - cy;
+
+    if dx.abs() < 0.001 && dy.abs() < 0.001 {
+        // Target is at center, default to bottom edge
+        return (cx, y + h);
+    }
+
+    if dx.abs() > dy.abs() {
+        // Exit through left or right edge
+        if dx > 0.0 {
+            (x + w, cy) // Right edge
+        } else {
+            (x, cy) // Left edge
+        }
+    } else {
+        // Exit through top or bottom edge
+        if dy > 0.0 {
+            (cx, y + h) // Bottom edge
+        } else {
+            (cx, y) // Top edge
+        }
+    }
+}
+
+/// Calculate the entry point into a rectangular node from a source point
+/// This finds where a line from source_point to node center intersects the node boundary
+fn calculate_entry_point(
+    x: f64,
+    y: f64,
+    w: f64,
+    h: f64,
+    source_x: f64,
+    source_y: f64,
+) -> (f64, f64) {
+    let cx = x + w / 2.0;
+    let cy = y + h / 2.0;
+    let dx = source_x - cx;
+    let dy = source_y - cy;
+
+    if dx.abs() < 0.001 && dy.abs() < 0.001 {
+        // Source is at center, default to top edge
+        return (cx, y);
+    }
+
+    if dx.abs() > dy.abs() {
+        // Enter through left or right edge
+        if dx > 0.0 {
+            (x + w, cy) // Right edge (source is to the right)
+        } else {
+            (x, cy) // Left edge (source is to the left)
+        }
+    } else {
+        // Enter through top or bottom edge
+        if dy > 0.0 {
+            (cx, y + h) // Bottom edge (source is below)
+        } else {
+            (cx, y) // Top edge (source is above)
+        }
+    }
 }
 
 /// Render a note attached to a class
@@ -823,12 +962,15 @@ fn render_note(x: f64, y: f64, text: &str) -> SvgElement {
 
 fn create_class_markers() -> Vec<SvgElement> {
     let mut markers = Vec::new();
-    markers.extend(create_marker_pair(
+    // Aggregation - diamond shape, medium size (18x14)
+    markers.extend(create_marker_pair_with_size(
         "aggregation",
         "0 0 20 14",
         18.0,
         1.0,
         7.0,
+        18.0,
+        14.0,
         vec![SvgElement::Path {
             d: "M 18 7 L 9 13 L 1 7 L 9 1 Z".to_string(),
             attrs: Attrs::new()
@@ -837,26 +979,52 @@ fn create_class_markers() -> Vec<SvgElement> {
                 .with_stroke_width(1.0),
         }],
     ));
-    markers.extend(create_marker_pair(
-        "inheritance",
-        "0 0 20 14",
-        18.0,
-        1.0,
-        7.0,
-        vec![SvgElement::Path {
+    // Inheritance - large hollow triangle (20x28)
+    // Start marker: tip points backward (toward start node) - tip at x=1
+    markers.push(SvgElement::Marker {
+        id: "inheritance-start".to_string(),
+        view_box: "0 0 20 14".to_string(),
+        ref_x: 1.0,
+        ref_y: 7.0,
+        marker_width: 20.0,
+        marker_height: 28.0,
+        orient: "auto".to_string(),
+        marker_units: None,
+        children: vec![SvgElement::Path {
             d: "M 1 7 L 18 13 V 1 Z".to_string(),
             attrs: Attrs::new()
-                .with_fill("none")
+                .with_fill("#ECECFF")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
-    ));
-    markers.extend(create_marker_pair(
+    });
+    // End marker: tip points forward (toward end node) - tip at x=18
+    markers.push(SvgElement::Marker {
+        id: "inheritance-end".to_string(),
+        view_box: "0 0 20 14".to_string(),
+        ref_x: 18.0,
+        ref_y: 7.0,
+        marker_width: 20.0,
+        marker_height: 28.0,
+        orient: "auto".to_string(),
+        marker_units: None,
+        children: vec![SvgElement::Path {
+            d: "M 18 7 L 1 13 V 1 Z".to_string(),
+            attrs: Attrs::new()
+                .with_fill("#ECECFF")
+                .with_stroke("#333333")
+                .with_stroke_width(1.0),
+        }],
+    });
+    // Composition - filled diamond, medium size (18x14)
+    markers.extend(create_marker_pair_with_size(
         "composition",
         "0 0 20 14",
         18.0,
         1.0,
         7.0,
+        18.0,
+        14.0,
         vec![SvgElement::Path {
             d: "M 18 7 L 9 13 L 1 7 L 9 1 Z".to_string(),
             attrs: Attrs::new()
@@ -865,26 +1033,52 @@ fn create_class_markers() -> Vec<SvgElement> {
                 .with_stroke_width(1.0),
         }],
     ));
-    markers.extend(create_marker_pair(
-        "dependency",
-        "0 0 20 20",
-        18.0,
-        1.0,
-        10.0,
-        vec![SvgElement::Path {
-            d: "M 0 0 L 20 10 L 0 20".to_string(),
+    // Dependency - small arrow/chevron (10x10)
+    // Start marker: tip points backward (toward start node) - tip at x=0
+    markers.push(SvgElement::Marker {
+        id: "dependency-start".to_string(),
+        view_box: "0 0 20 20".to_string(),
+        ref_x: 0.0,
+        ref_y: 10.0,
+        marker_width: 10.0,
+        marker_height: 10.0,
+        orient: "auto".to_string(),
+        marker_units: None,
+        children: vec![SvgElement::Path {
+            d: "M 0 10 L 20 0 L 20 20 Z".to_string(),
             attrs: Attrs::new()
                 .with_fill("none")
                 .with_stroke("#333333")
                 .with_stroke_width(1.0),
         }],
-    ));
-    markers.extend(create_marker_pair(
+    });
+    // End marker: tip points forward (toward end node) - tip at x=20
+    markers.push(SvgElement::Marker {
+        id: "dependency-end".to_string(),
+        view_box: "0 0 20 20".to_string(),
+        ref_x: 20.0,
+        ref_y: 10.0,
+        marker_width: 10.0,
+        marker_height: 10.0,
+        orient: "auto".to_string(),
+        marker_units: None,
+        children: vec![SvgElement::Path {
+            d: "M 20 10 L 0 0 L 0 20 Z".to_string(),
+            attrs: Attrs::new()
+                .with_fill("none")
+                .with_stroke("#333333")
+                .with_stroke_width(1.0),
+        }],
+    });
+    // Lollipop - circle, medium size
+    markers.extend(create_marker_pair_with_size(
         "lollipop",
         "0 0 20 20",
         13.0,
         1.0,
         10.0,
+        14.0,
+        14.0,
         vec![SvgElement::Circle {
             cx: 10.0,
             cy: 10.0,
@@ -898,12 +1092,15 @@ fn create_class_markers() -> Vec<SvgElement> {
     markers
 }
 
-fn create_marker_pair(
+#[allow(clippy::too_many_arguments)]
+fn create_marker_pair_with_size(
     name: &str,
     view_box: &str,
     start_ref_x: f64,
     end_ref_x: f64,
     ref_y: f64,
+    marker_width: f64,
+    marker_height: f64,
     children: Vec<SvgElement>,
 ) -> Vec<SvgElement> {
     vec![
@@ -912,8 +1109,8 @@ fn create_marker_pair(
             view_box: view_box.to_string(),
             ref_x: start_ref_x,
             ref_y,
-            marker_width: 10.0,
-            marker_height: 10.0,
+            marker_width,
+            marker_height,
             orient: "auto".to_string(),
             marker_units: None,
             children: children.clone(),
@@ -923,8 +1120,8 @@ fn create_marker_pair(
             view_box: view_box.to_string(),
             ref_x: end_ref_x,
             ref_y,
-            marker_width: 10.0,
-            marker_height: 10.0,
+            marker_width,
+            marker_height,
             orient: "auto".to_string(),
             marker_units: None,
             children,
@@ -982,38 +1179,6 @@ fn generate_class_css() -> String {
 }
 "#
     .to_string()
-}
-
-#[allow(clippy::too_many_arguments)]
-fn foreign_object_label(
-    x: f64,
-    y: f64,
-    width: f64,
-    font_size: f64,
-    max_width: f64,
-    text: &str,
-    align: &str,
-    style: &str,
-) -> SvgElement {
-    let line_height = font_size * 1.5;
-    let height = line_height;
-    let y_top = y - line_height + (line_height - font_size) / 2.0;
-    let text = escape_html(text);
-    let html = format!(
-        "<foreignObject x=\"{x}\" y=\"{y_top}\" width=\"{width}\" height=\"{height}\">\
-<div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: {max_width}px; text-align: {align}; font-size: {font_size}px;\">\
-<span class=\"nodeLabel markdown-node-label\" style=\"{style}\"><p style=\"margin:0;\">{text}</p></span>\
-</div></foreignObject>"
-    );
-    SvgElement::Raw { content: html }
-}
-
-fn escape_html(text: &str) -> String {
-    text.replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
-        .replace('\'', "&apos;")
 }
 
 #[cfg(test)]
