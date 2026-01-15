@@ -269,6 +269,11 @@ fn render_task_bars(
             (bar_x, bar_width, "")
         };
 
+        // Calculate transform-origin for proper rotation (needed for milestones)
+        let center_x = final_x + final_width / 2.0;
+        let center_y = bar_y + BAR_HEIGHT / 2.0;
+        let transform_origin = format!("{}px {}px", center_x, center_y);
+
         let bar_elem = SvgElement::Rect {
             x: final_x,
             y: bar_y,
@@ -278,7 +283,8 @@ fn render_task_bars(
             ry: Some(3.0),
             attrs: Attrs::new()
                 .with_class(&format!("{}{}", bar_class, extra_class))
-                .with_attr("id", &task.id),
+                .with_attr("id", &task.id)
+                .with_attr("transform-origin", &transform_origin),
         };
         doc.add_element(bar_elem);
 
