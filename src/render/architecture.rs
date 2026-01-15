@@ -239,8 +239,11 @@ fn build_spatial_maps(
         }
 
         let mut spatial_map: HashMap<String, (i32, i32)> = HashMap::new();
+        let mut occupied: HashSet<(i32, i32)> = HashSet::new();
         let mut queue: VecDeque<String> = VecDeque::new();
+
         spatial_map.insert(id.clone(), (0, 0));
+        occupied.insert((0, 0));
         queue.push_back(id.clone());
 
         while let Some(curr) = queue.pop_front() {
@@ -255,8 +258,16 @@ fn build_spatial_maps(
                     if visited.contains(neighbor) || spatial_map.contains_key(neighbor) {
                         continue;
                     }
-                    let (nx, ny) = pair.shift_position(x, y);
+
+                    let (tx, ty) = pair.shift_position(x, y);
+                    let (nx, ny) = if occupied.contains(&(tx, ty)) {
+                        find_alternative_position((tx, ty), pair.source, &occupied)
+                    } else {
+                        (tx, ty)
+                    };
+
                     spatial_map.insert(neighbor.clone(), (nx, ny));
+                    occupied.insert((nx, ny));
                     queue.push_back(neighbor.clone());
                 }
             }
@@ -266,6 +277,44 @@ fn build_spatial_maps(
     }
 
     maps
+}
+
+fn find_alternative_position(
+    target: (i32, i32),
+    direction: ArchitectureDirection,
+    occupied: &HashSet<(i32, i32)>,
+) -> (i32, i32) {
+    let (tx, ty) = target;
+    let mut offset = 1;
+    let is_horizontal = direction.is_x();
+
+    loop {
+        // Try +offset (perpendicular to direction)
+        let p1 = if is_horizontal {
+            (tx, ty + offset)
+        } else {
+            (tx + offset, ty)
+        };
+        if !occupied.contains(&p1) {
+            return p1;
+        }
+
+        // Try -offset
+        let p2 = if is_horizontal {
+            (tx, ty - offset)
+        } else {
+            (tx - offset, ty)
+        };
+        if !occupied.contains(&p2) {
+            return p2;
+        }
+
+        offset += 1;
+        if offset > 100 {
+            // Safety break, give up and overlap if too crowded
+            return target;
+        }
+    }
 }
 
 fn apply_cross_group_offsets(db: &ArchitectureDb, positions: &mut HashMap<String, (f64, f64)>) {
@@ -573,5 +622,45 @@ mod tests {
             gateway_x < server_x,
             "gateway should be to the left of server"
         );
+    }
+
+    #[test]
+    fn test_overlapping_nodes_same_direction() {
+        let mut db = ArchitectureDb::new();
+        // A -> B (Right)
+        // A -> C (Right)
+        db.add_service(ArchitectureService::new("A".to_string()))
+            .unwrap();
+        db.add_service(ArchitectureService::new("B".to_string()))
+            .unwrap();
+        db.add_service(ArchitectureService::new("C".to_string()))
+            .unwrap();
+
+        db.add_edge(ArchitectureEdge::new(
+            "A".to_string(),
+            ArchitectureDirection::Right,
+            "B".to_string(),
+            ArchitectureDirection::Left,
+        ))
+        .unwrap();
+
+        db.add_edge(ArchitectureEdge::new(
+            "A".to_string(),
+            ArchitectureDirection::Right,
+            "C".to_string(),
+            ArchitectureDirection::Left,
+        ))
+        .unwrap();
+
+        let estimator = CharacterSizeEstimator::default();
+        let graph = layout_architecture(&db, &estimator).unwrap();
+
+        let node_b = graph.get_node("B").unwrap();
+        let node_c = graph.get_node("C").unwrap();
+
+        let b_pos = (node_b.x.unwrap(), node_b.y.unwrap());
+        let c_pos = (node_c.x.unwrap(), node_c.y.unwrap());
+
+        assert_ne!(b_pos, c_pos, "Nodes B and C should not overlap");
     }
 }
