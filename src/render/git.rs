@@ -488,6 +488,8 @@ fn calculate_bounds(
             let (bbox_w, bbox_h) = text_ctx
                 .estimator
                 .estimate_text_size(&branch.name, branch_font_size);
+            let label_bbox_h = bbox_h + 3.0;
+            let label_height = label_bbox_h + 4.0;
             let rotate_offset = if text_ctx.rotate_commit_label {
                 30.0
             } else {
@@ -497,7 +499,7 @@ fn calculate_bounds(
                 DiagramOrientation::LeftToRight => {
                     let label_x = -bbox_w - 14.0 - rotate_offset;
                     let bkg_x = label_x - 5.0;
-                    let bkg_y = pos.pos - bbox_h / 2.0 - 2.0;
+                    let bkg_y = pos.pos - label_bbox_h / 2.0 - 2.0;
                     (bkg_x, bkg_y)
                 }
                 DiagramOrientation::TopToBottom => {
@@ -511,7 +513,7 @@ fn calculate_bounds(
                     (bkg_x, bkg_y)
                 }
             };
-            bounds.include_rect(bkg_x, bkg_y, bbox_w + 18.0, bbox_h + 4.0);
+            bounds.include_rect(bkg_x, bkg_y, bbox_w + 18.0, label_height);
 
             match text_ctx.dir {
                 DiagramOrientation::LeftToRight => {
@@ -889,12 +891,14 @@ fn draw_branches(
         elements.push(line);
 
         let (bbox_w, bbox_h) = estimator.estimate_text_size(&branch.name, branch_font_size);
+        let label_bbox_h = bbox_h + 3.0;
+        let label_height = label_bbox_h + 4.0;
         let rotate_offset = if rotate_commit_label { 30.0 } else { 0.0 };
         let (bkg_x, bkg_y, label_w) = match dir {
             DiagramOrientation::LeftToRight => {
                 let label_x = -bbox_w - 14.0 - rotate_offset;
                 let bkg_x = label_x - 5.0;
-                let bkg_y = position.pos - bbox_h / 2.0 - 2.0;
+                let bkg_y = position.pos - label_bbox_h / 2.0 - 2.0;
                 (bkg_x, bkg_y, bbox_w + 18.0)
             }
             DiagramOrientation::TopToBottom => {
@@ -913,13 +917,13 @@ fn draw_branches(
             x: bkg_x,
             y: bkg_y,
             width: label_w,
-            height: bbox_h + 4.0,
+            height: label_height,
             rx: Some(4.0),
             ry: Some(4.0),
             attrs: Attrs::new().with_class(&format!("branchLabelBkg label{}", adjust_index)),
         };
         let label_center_x = bkg_x + label_w / 2.0;
-        let label_center_y = bkg_y + (bbox_h + 4.0) / 2.0;
+        let label_center_y = bkg_y + label_height / 2.0;
         let text = SvgElement::Text {
             x: label_center_x,
             y: label_center_y,
