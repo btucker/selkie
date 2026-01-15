@@ -159,13 +159,14 @@ impl LayoutGraph {
         self.nodes.iter().filter(|n| !n.is_dummy)
     }
 
-    /// Compute bounding box after layout
+    /// Compute bounding box after layout (includes nodes and edge labels)
     pub fn compute_bounds(&mut self) {
         let mut min_x = f64::MAX;
         let mut min_y = f64::MAX;
         let mut max_x = f64::MIN;
         let mut max_y = f64::MIN;
 
+        // Include node bounds
         self.traverse_nodes(|node| {
             if let (Some(x), Some(y)) = (node.x, node.y) {
                 min_x = min_x.min(x);
@@ -174,6 +175,24 @@ impl LayoutGraph {
                 max_y = max_y.max(y + node.height);
             }
         });
+
+        // Include edge label bounds (labels can extend beyond nodes)
+        for edge in &self.edges {
+            if let Some(label_pos) = &edge.label_position {
+                if edge.label_width > 0.0 {
+                    // Labels are centered on their position
+                    let label_left = label_pos.x - edge.label_width / 2.0;
+                    let label_right = label_pos.x + edge.label_width / 2.0;
+                    let label_top = label_pos.y - edge.label_height / 2.0;
+                    let label_bottom = label_pos.y + edge.label_height / 2.0;
+
+                    min_x = min_x.min(label_left);
+                    max_x = max_x.max(label_right);
+                    min_y = min_y.min(label_top);
+                    max_y = max_y.max(label_bottom);
+                }
+            }
+        }
 
         if min_x != f64::MAX {
             // Content bounds only - padding is applied in the renderer

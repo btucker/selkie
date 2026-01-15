@@ -221,6 +221,10 @@ pub struct LayoutEdge {
     pub bend_points: Vec<Point>,
     /// Label position (set by routing phase)
     pub label_position: Option<Point>,
+    /// Label width (estimated from text)
+    pub label_width: f64,
+    /// Label height (estimated from text)
+    pub label_height: f64,
     /// Edge weight for layout prioritization
     pub weight: u32,
     /// Whether this edge was reversed for cycle removal
@@ -242,6 +246,8 @@ impl LayoutEdge {
             label: None,
             bend_points: Vec::new(),
             label_position: None,
+            label_width: 0.0,
+            label_height: 0.0,
             weight: 1,
             reversed: false,
             metadata: HashMap::new(),
@@ -249,7 +255,11 @@ impl LayoutEdge {
     }
 
     pub fn with_label(mut self, label: impl Into<String>) -> Self {
-        self.label = Some(label.into());
+        let text = label.into();
+        // Estimate label dimensions (same as renderer: 16px font, 0.6 char ratio)
+        self.label_width = text.len() as f64 * 16.0 * 0.6 + 4.0; // + padding
+        self.label_height = 16.0 * 1.1 + 4.0; // + padding
+        self.label = Some(text);
         self
     }
 

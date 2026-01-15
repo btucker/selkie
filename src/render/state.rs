@@ -236,7 +236,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         0.0
     };
 
-    // Calculate diagram bounds
+    // Calculate diagram bounds (layout now includes edge labels)
     let max_width = layout_result.width.unwrap_or(400.0) + margin * 2.0;
     let max_height = layout_result.height.unwrap_or(200.0) + margin * 2.0 + title_offset;
 
@@ -1557,5 +1557,59 @@ mod tests {
             "Parent compound should have width > 0 after layout, got {}",
             parent.width
         );
+    }
+
+    #[test]
+    fn test_edge_labels_within_viewbox() {
+        // Edge labels at the sides of the diagram should not be cut off
+        // This tests that the SVG viewBox includes all edge label positions
+        let input = r#"stateDiagram-v2
+    [*] --> Idle
+    Idle --> Running: start
+    Running --> Idle: stop
+    Running --> Error: error
+    Error --> Idle: reset
+    Error --> [*]
+"#;
+        let db = parse(input).expect("Should parse");
+        let config = crate::render::RenderConfig::default();
+        let svg = render_state(&db, &config).expect("Should render");
+
+        // Extract viewBox dimensions
+        let viewbox_re = regex::Regex::new(r#"viewBox="([^"]+)""#).unwrap();
+        let viewbox_cap = viewbox_re.captures(&svg).expect("Should have viewBox");
+        let viewbox_parts: Vec<f64> = viewbox_cap[1]
+            .split_whitespace()
+            .map(|s| s.parse().unwrap())
+            .collect();
+        let (vb_x, vb_y, vb_width, vb_height) = (
+            viewbox_parts[0],
+            viewbox_parts[1],
+            viewbox_parts[2],
+            viewbox_parts[3],
+        );
+
+        // Extract all text elements and their positions
+        let text_re = regex::Regex::new(r#"<text[^>]*x="([^"]+)"[^>]*>([^<]+)</text>"#).unwrap();
+        for cap in text_re.captures_iter(&svg) {
+            let x: f64 = cap[1].parse().unwrap();
+            let label = &cap[2];
+
+            // Skip non-label text (like state names which are centered)
+            if ["Idle", "Running", "Error"].contains(&label) {
+                continue;
+            }
+
+            // Edge labels should be within the viewBox
+            // Account for label width (approximate)
+            let approx_width = label.len() as f64 * 9.6; // 16px * 0.6 char ratio
+            let label_right = x + approx_width / 2.0;
+
+            assert!(
+                label_right <= vb_x + vb_width + 5.0, // 5px tolerance
+                "Label '{}' at x={} (right edge ~{}) extends beyond viewBox width {} (viewBox: {} {} {} {})",
+                label, x, label_right, vb_width, vb_x, vb_y, vb_width, vb_height
+            );
+        }
     }
 }
