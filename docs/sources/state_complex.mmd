@@ -1,40 +1,32 @@
 stateDiagram-v2
+    %% State diagram with composite states, fork/join, and nested composites
+    direction TB
+
     [*] --> Idle
 
     state Idle {
         [*] --> Ready
-        Ready --> Processing: Start Job
+        Ready --> Active: Start Job
     }
+
+    %% Fork and join for parallel processing
+    state fork_state <<fork>>
+    state join_state <<join>>
+
+    Idle --> fork_state
+    fork_state --> Validation
+    fork_state --> ResourceAlloc
+
+    Validation --> join_state
+    ResourceAlloc --> join_state
+    join_state --> Processing
 
     state Processing {
         [*] --> Validating
-        Validating --> Queued: Valid
-        Validating --> Failed: Invalid
-        Queued --> Running: Worker Available
-        Running --> Completed: Success
-        Running --> Failed: Error
-        Running --> Paused: Pause Request
+        Validating --> Executing
 
-        state Running {
-            [*] --> Initializing
-            Initializing --> Executing
-            Executing --> Finalizing
-            Finalizing --> [*]
+        state Executing {
+            [*] --> Init
+            Init --> Done
         }
     }
-
-    state Paused {
-        [*] --> WaitingResume
-        WaitingResume --> Timeout: 1 hour
-    }
-
-    Paused --> Running: Resume
-    Paused --> Cancelled: Cancel Request
-    Timeout --> Cancelled
-
-    Completed --> Idle: Reset
-    Failed --> Idle: Retry
-    Cancelled --> Idle: Reset
-
-    Completed --> [*]
-    Cancelled --> [*]

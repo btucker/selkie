@@ -15,6 +15,8 @@ use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 /// Implement ToLayoutGraph for StateDb to enable proper DAG layout
 impl ToLayoutGraph for StateDb {
     fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
+        use std::collections::HashSet;
+
         let config = NodeSizeConfig::default();
         let mut graph = LayoutGraph::new("state");
 
@@ -29,13 +31,20 @@ impl ToLayoutGraph for StateDb {
         // Determine start/end states based on transitions
         let start_end_states = determine_start_end_states(self);
 
-        // Convert states to layout nodes (sorted for deterministic order)
+        // Identify composite states (states that are parents of other states)
         let states = self.get_states();
+        let composite_states: HashSet<&str> = states
+            .values()
+            .filter_map(|s| s.parent.as_deref())
+            .collect();
+
+        // Convert states to layout nodes (sorted for deterministic order)
         let mut state_ids: Vec<&String> = states.keys().collect();
         state_ids.sort();
 
         for id in state_ids {
             let state = states.get(id).unwrap();
+            let is_composite = composite_states.contains(id.as_str());
 
             // Determine shape based on state type
             let (shape, label) = match state.state_type {
@@ -64,7 +73,13 @@ impl ToLayoutGraph for StateDb {
             };
 
             let label_text = label.unwrap_or(if id.starts_with("[*]") { "" } else { &state.id });
-            let (width, height) = if id.starts_with("[*]")
+
+            // Composite states get a placeholder size - dagre will resize based on children
+            // Non-composite states get estimated sizes based on content
+            let (width, height) = if is_composite {
+                // Placeholder size that will be expanded by compound layout
+                (100.0, 60.0)
+            } else if id.starts_with("[*]")
                 || matches!(state.state_type, StateType::Start | StateType::End)
             {
                 // Small fixed size for start/end circles
@@ -81,9 +96,18 @@ impl ToLayoutGraph for StateDb {
                 node = node.with_label(label_text);
             }
 
-            // Store state type in metadata
+            // Set parent relationship for compound graph layout
+            if let Some(parent_id) = &state.parent {
+                node = node.with_parent(parent_id);
+            }
+
+            // Store state type and composite flag in metadata
             node.metadata
                 .insert("state_type".to_string(), format!("{:?}", state.state_type));
+            if is_composite {
+                node.metadata
+                    .insert("is_composite".to_string(), "true".to_string());
+            }
 
             graph.add_node(node);
         }
@@ -206,12 +230,32 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         doc.add_element(title_elem);
     }
 
+    // Identify composite states (states that are parents of other states)
+    let composite_states: std::collections::HashSet<&str> = states
+        .values()
+        .filter_map(|s| s.parent.as_deref())
+        .collect();
+
     // Sort states for consistent ordering
     let mut sorted_states: Vec<_> = states.iter().collect();
     sorted_states.sort_by(|a, b| a.0.cmp(b.0));
 
-    // Render each state
+    // First, render composite state containers (behind everything else)
+    for composite_id in &composite_states {
+        if let Some(composite_elem) =
+            render_composite_state(composite_id, db, &state_positions, &layout_result)
+        {
+            doc.add_element(composite_elem);
+        }
+    }
+
+    // Render each non-composite state
     for (id, state) in &sorted_states {
+        // Skip composite states - they're rendered as containers above
+        if composite_states.contains(id.as_str()) {
+            continue;
+        }
+
         if let Some(&(x, y, width, height)) = state_positions.get(*id) {
             // Check if this [*] state is a start or end
             let state_info = start_end_states.get(id.as_str());
@@ -277,6 +321,117 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     }
 
     Ok(doc.to_string())
+}
+
+/// Render a composite state as a container box with a title
+fn render_composite_state(
+    composite_id: &str,
+    db: &StateDb,
+    state_positions: &HashMap<String, (f64, f64, f64, f64)>,
+    layout_result: &LayoutGraph,
+) -> Option<SvgElement> {
+    // Find all child states (states whose parent is this composite)
+    let states = db.get_states();
+    let child_ids: Vec<&str> = states
+        .iter()
+        .filter(|(_, state)| state.parent.as_deref() == Some(composite_id))
+        .map(|(id, _)| id.as_str())
+        .collect();
+
+    if child_ids.is_empty() {
+        return None;
+    }
+
+    // Calculate bounding box from child positions
+    let mut min_x = f64::MAX;
+    let mut min_y = f64::MAX;
+    let mut max_x = f64::MIN;
+    let mut max_y = f64::MIN;
+
+    for child_id in &child_ids {
+        if let Some(&(x, y, w, h)) = state_positions.get(*child_id) {
+            min_x = min_x.min(x);
+            min_y = min_y.min(y);
+            max_x = max_x.max(x + w);
+            max_y = max_y.max(y + h);
+        }
+    }
+
+    // Also include nested composite states' bounds
+    // (recursively check if any child is also a composite)
+    let nested_composites: Vec<&str> = states
+        .iter()
+        .filter(|(_, state)| state.parent.as_deref() == Some(composite_id))
+        .filter(|(id, _)| {
+            // Check if this child is also a composite (has children)
+            states
+                .values()
+                .any(|s| s.parent.as_deref() == Some(id.as_str()))
+        })
+        .map(|(id, _)| id.as_str())
+        .collect();
+
+    // For nested composites, we need to use their computed bounds from layout
+    for nested_id in &nested_composites {
+        if let Some(node) = layout_result.get_node(nested_id) {
+            if let (Some(x), Some(y)) = (node.x, node.y) {
+                min_x = min_x.min(x);
+                min_y = min_y.min(y);
+                max_x = max_x.max(x + node.width);
+                max_y = max_y.max(y + node.height);
+            }
+        }
+    }
+
+    if min_x == f64::MAX {
+        return None;
+    }
+
+    // Add padding around child states
+    let padding = 15.0;
+    let title_height = 25.0;
+    min_x -= padding;
+    min_y -= padding + title_height;
+    max_x += padding;
+    max_y += padding;
+
+    let width = max_x - min_x;
+    let height = max_y - min_y;
+
+    // Create the background rect
+    let rect = SvgElement::Rect {
+        x: min_x,
+        y: min_y,
+        width,
+        height,
+        rx: Some(8.0),
+        ry: Some(8.0),
+        attrs: Attrs::new().with_class("state-composite"),
+    };
+
+    // Get the composite state's label (name or description)
+    let label = states
+        .get(composite_id)
+        .and_then(|s| s.descriptions.first().cloned())
+        .unwrap_or_else(|| composite_id.to_string());
+
+    // Create the title label
+    let title = SvgElement::Text {
+        x: min_x + padding,
+        y: min_y + 16.0,
+        content: label,
+        attrs: Attrs::new()
+            .with_class("state-composite-label")
+            .with_attr("font-size", "14"),
+    };
+
+    // Wrap in a group
+    Some(SvgElement::Group {
+        children: vec![rect, title],
+        attrs: Attrs::new()
+            .with_class("composite-state")
+            .with_id(&format!("composite-{}", composite_id)),
+    })
 }
 
 /// Render a state node based on its type
@@ -912,6 +1067,216 @@ fn generate_state_css() -> String {
 .note-text {
   fill: #333333;
 }
+
+.state-composite {
+  fill: #ffffde;
+  stroke: #aaaa33;
+}
+
+.state-composite-label {
+  fill: #333333;
+  font-weight: bold;
+}
 "#
     .to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::diagrams::state::parser::parse;
+    use crate::layout::CharacterSizeEstimator;
+
+    #[test]
+    fn test_composite_state_has_parent_id_in_layout() {
+        // Parse a simple composite state diagram
+        let input = r#"stateDiagram-v2
+    state Idle {
+        [*] --> Ready
+        Ready --> Processing
+    }
+"#;
+        let db = parse(input).expect("Should parse");
+        let size_estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
+
+        // Find the Ready and Processing nodes
+        let ready_node = graph
+            .nodes
+            .iter()
+            .find(|n| n.id == "Ready")
+            .expect("Should have Ready node");
+        let processing_node = graph
+            .nodes
+            .iter()
+            .find(|n| n.id == "Processing")
+            .expect("Should have Processing node");
+
+        // They should have Idle as their parent
+        assert_eq!(
+            ready_node.parent_id.as_deref(),
+            Some("Idle"),
+            "Ready should have Idle as parent"
+        );
+        assert_eq!(
+            processing_node.parent_id.as_deref(),
+            Some("Idle"),
+            "Processing should have Idle as parent"
+        );
+
+        // Idle should be marked as composite
+        let idle_node = graph
+            .nodes
+            .iter()
+            .find(|n| n.id == "Idle")
+            .expect("Should have Idle node");
+        assert_eq!(
+            idle_node.metadata.get("is_composite").map(String::as_str),
+            Some("true"),
+            "Idle should be marked as composite"
+        );
+    }
+
+    #[test]
+    fn test_composite_state_has_placeholder_size() {
+        // Composite states get a placeholder size that will be expanded by compound layout
+        let input = r#"stateDiagram-v2
+    state Parent {
+        [*] --> Child
+    }
+"#;
+        let db = parse(input).expect("Should parse");
+        let size_estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
+
+        let parent_node = graph
+            .nodes
+            .iter()
+            .find(|n| n.id == "Parent")
+            .expect("Should have Parent node");
+        // Placeholder size is set for composite states
+        assert!(
+            parent_node.width > 0.0,
+            "Composite state should have non-zero width"
+        );
+        assert!(
+            parent_node.height > 0.0,
+            "Composite state should have non-zero height"
+        );
+    }
+
+    #[test]
+    fn test_nested_composite_states() {
+        // Test multi-level nesting
+        let input = r#"stateDiagram-v2
+    state Outer {
+        state Inner {
+            [*] --> Deep
+        }
+    }
+"#;
+        let db = parse(input).expect("Should parse");
+        let size_estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
+
+        let inner_node = graph
+            .nodes
+            .iter()
+            .find(|n| n.id == "Inner")
+            .expect("Should have Inner node");
+        let deep_node = graph
+            .nodes
+            .iter()
+            .find(|n| n.id == "Deep")
+            .expect("Should have Deep node");
+
+        // Inner should have Outer as parent
+        assert_eq!(inner_node.parent_id.as_deref(), Some("Outer"));
+        // Deep should have Inner as parent
+        assert_eq!(deep_node.parent_id.as_deref(), Some("Inner"));
+    }
+
+    #[test]
+    fn test_complex_nested_with_fork_join() {
+        // This test case previously triggered a recursion overflow bug in network simplex
+        // when there are:
+        // 1. Multiple composite states
+        // 2. Fork/join states
+        // 3. 3-level nesting with transitions inside deepest composite
+        let input = r#"stateDiagram-v2
+    [*] --> Idle
+    state Idle {
+        [*] --> Ready
+        Ready --> Active: Start Job
+    }
+    state fork_state <<fork>>
+    Idle --> fork_state
+    fork_state --> Validation
+    fork_state --> B
+    state join_state <<join>>
+    Validation --> join_state
+    B --> join_state
+    join_state --> Processing
+    state Processing {
+        [*] --> Checking
+        Checking --> Executing
+        state Executing {
+            [*] --> Init
+            Init --> Done
+        }
+    }
+"#;
+        let db = parse(input).expect("Should parse");
+        let size_estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
+
+        // Verify composite states are marked correctly
+        let executing = graph.nodes.iter().find(|n| n.id == "Executing").unwrap();
+        assert_eq!(
+            executing.metadata.get("is_composite").map(String::as_str),
+            Some("true")
+        );
+
+        // This should not panic with recursion overflow
+        let result = layout(graph);
+        assert!(
+            result.is_ok(),
+            "Layout should succeed without recursion overflow"
+        );
+
+        // Check for invalid coordinates
+        let layout_graph = result.unwrap();
+        let mut invalid_coords = Vec::new();
+        for node in &layout_graph.nodes {
+            let x_invalid = node
+                .x
+                .map(|x| x.is_nan() || x.is_infinite())
+                .unwrap_or(true);
+            let y_invalid = node
+                .y
+                .map(|y| y.is_nan() || y.is_infinite())
+                .unwrap_or(true);
+            if x_invalid || y_invalid {
+                invalid_coords.push((node.id.clone(), node.x, node.y));
+            }
+        }
+        if !invalid_coords.is_empty() {
+            eprintln!("Nodes with invalid coordinates:");
+            for (id, x, y) in &invalid_coords {
+                eprintln!("  {} -> x={:?}, y={:?}", id, x, y);
+            }
+        }
+        assert!(
+            invalid_coords.is_empty(),
+            "All nodes should have valid coordinates"
+        );
+    }
 }

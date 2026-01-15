@@ -159,7 +159,22 @@ pub fn run(g: &mut DagreGraph) {
         }
         iterations += 1;
 
-        if let Some(enter) = enter_edge(&tree, g, &leave) {
+        // Try to find an entering edge, with fallback to exclude problematic edges
+        let mut excluded_edges: Vec<(String, String)> = Vec::new();
+        let mut found_valid_exchange = false;
+
+        loop {
+            let exclude = if excluded_edges.is_empty() {
+                None
+            } else {
+                excluded_edges.last()
+            };
+
+            let Some(enter) = enter_edge_with_exclusion(&tree, g, &leave, exclude) else {
+                // No valid entering edge found
+                break;
+            };
+
             // Create normalized exchange record for cycle detection
             let exchange = (
                 if leave.0 < leave.1 {
@@ -182,9 +197,30 @@ pub fn run(g: &mut DagreGraph) {
                 break;
             }
 
-            exchange_edges(&mut tree, g, &leave, &enter);
-        } else {
-            break;
+            // Try the exchange
+            if exchange_edges(&mut tree, g, &leave, &enter) {
+                found_valid_exchange = true;
+                break;
+            }
+
+            // Exchange created a cycle and was reverted, try a different edge
+            excluded_edges.push((enter.v.clone(), enter.w.clone()));
+
+            // Limit attempts to prevent infinite loops
+            if excluded_edges.len() > 10 {
+                break;
+            }
+        }
+
+        if !found_valid_exchange {
+            // Couldn't find a valid exchange for this leaving edge
+            // Set its cutvalue to 0 to prevent it from being selected again
+            if let Some(edge) = tree.edge_mut(&leave.0, &leave.1) {
+                edge.cutvalue = Some(0);
+            }
+            if let Some(edge) = tree.edge_mut(&leave.1, &leave.0) {
+                edge.cutvalue = Some(0);
+            }
         }
     }
 }
@@ -321,11 +357,10 @@ pub fn init_low_lim_values(tree: &mut SpanningTree, root: Option<String>) {
 fn dfs_assign(tree: &mut SpanningTree, v: &str, parent: Option<&str>, counter: &mut i32) {
     // Check recursion depth to detect infinite recursion
     if *counter > 1000 {
-        eprintln!(
-            "[dfs_assign] OVERFLOW: counter={}, v={}, parent={:?}",
+        panic!(
+            "dfs_assign recursion overflow: counter={}, v={}, parent={:?}",
             counter, v, parent
         );
-        panic!("dfs_assign recursion overflow");
     }
 
     *counter += 1;
@@ -553,18 +588,84 @@ pub fn enter_edge_with_exclusion(
     best_edge
 }
 
+/// Check if the tree has a cycle using DFS
+fn has_cycle(tree: &SpanningTree) -> bool {
+    use std::collections::HashSet;
+
+    let nodes: Vec<String> = tree.nodes().into_iter().cloned().collect();
+    if nodes.is_empty() {
+        return false;
+    }
+
+    let mut visited = HashSet::new();
+
+    fn dfs_cycle(
+        tree: &SpanningTree,
+        v: &str,
+        parent: Option<&str>,
+        visited: &mut HashSet<String>,
+        depth: usize,
+    ) -> bool {
+        if depth > 1000 {
+            return true; // Cycle detected via depth limit
+        }
+
+        if visited.contains(v) {
+            return true; // Cycle detected
+        }
+
+        visited.insert(v.to_string());
+
+        for w in tree.neighbors(v) {
+            if parent.is_some_and(|p| p == w.as_str()) {
+                continue; // Skip parent
+            }
+            if dfs_cycle(tree, &w, Some(v), visited, depth + 1) {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    dfs_cycle(tree, &nodes[0], None, &mut visited, 0)
+}
+
 /// Exchange edges in the tree and update the graph
+/// Returns true if the exchange was successful, false if reverted due to cycle
 pub fn exchange_edges(
     tree: &mut SpanningTree,
     g: &mut DagreGraph,
     leave: &(String, String),
     enter: &EdgeKey,
-) {
+) -> bool {
     // Remove leaving edge from tree
     tree.remove_edge(&leave.0, &leave.1);
 
     // Add entering edge to tree
     tree.set_edge(&enter.v, &enter.w, TreeEdge::default());
+
+    // Safety check: verify no cycle was created
+    // This can happen in complex compound graphs where enter_edge selects
+    // an edge that doesn't properly cross the cut
+    if has_cycle(tree) {
+        // Revert: remove entering edge and restore leaving edge
+        tree.remove_edge(&enter.v, &enter.w);
+        tree.set_edge(&leave.0, &leave.1, TreeEdge::default());
+
+        // Recompute values for the reverted tree
+        init_low_lim_values(tree, tree.root.clone());
+        init_cut_values(tree, g);
+
+        // Set a neutral cutvalue on the leaving edge to prevent it from being selected again
+        if let Some(edge) = tree.edge_mut(&leave.0, &leave.1) {
+            edge.cutvalue = Some(0);
+        }
+        if let Some(edge) = tree.edge_mut(&leave.1, &leave.0) {
+            edge.cutvalue = Some(0);
+        }
+        return false;
+    }
 
     // Recompute low/lim values
     init_low_lim_values(tree, tree.root.clone());
@@ -574,6 +675,8 @@ pub fn exchange_edges(
 
     // Update ranks based on the new tree structure
     update_ranks(tree, g);
+
+    true
 }
 
 fn update_ranks(tree: &SpanningTree, g: &mut DagreGraph) {
