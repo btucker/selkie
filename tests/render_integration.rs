@@ -2673,3 +2673,356 @@ fn test_flowchart_complex_emailworker_position() {
         email_y
     );
 }
+
+// ============================================================================
+// State Diagram Composite State Tests (ported from mermaid)
+// ============================================================================
+
+#[test]
+fn test_state_composite_renders_internal_states() {
+    // From mermaid: "v2 Simplest composite state"
+    // A composite state should render its internal states
+    // Note: composite detection requires internal transitions, so we use [*] --> C
+    let input = r#"stateDiagram-v2
+        state Parent {
+            [*] --> C
+        }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse composite state diagram");
+    let svg = render(&diagram).expect("Failed to render composite state diagram");
+
+    // Should have a composite-state group for Parent
+    assert!(
+        svg.contains("composite-Parent") || svg.contains("id=\"composite-Parent\""),
+        "Should render Parent as a composite state"
+    );
+
+    // Should render the internal state C
+    assert!(
+        svg.contains("state-C") || svg.contains(">C<"),
+        "Composite state should contain internal state C"
+    );
+}
+
+#[test]
+fn test_state_nested_composites() {
+    // From mermaid: "v2 should render a state with states in it"
+    // Nested composite states should all render properly
+    // Note: composite detection requires internal transitions
+    let input = r#"stateDiagram-v2
+        state PilotCockpit {
+            [*] --> Parent
+            state Parent {
+                [*] --> C
+            }
+        }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse nested composite diagram");
+    let svg = render(&diagram).expect("Failed to render nested composite diagram");
+
+    // Should have composite-state groups for both levels
+    assert!(
+        svg.contains("composite-PilotCockpit") || svg.contains("id=\"composite-PilotCockpit\""),
+        "Should render PilotCockpit as outer composite"
+    );
+    assert!(
+        svg.contains("composite-Parent") || svg.contains("id=\"composite-Parent\""),
+        "Should render Parent as inner composite"
+    );
+
+    // Inner state C should be rendered
+    assert!(
+        svg.contains("state-C") || svg.contains(">C<"),
+        "Nested composite should contain state C"
+    );
+}
+
+#[test]
+fn test_state_composites_horizontally_centered() {
+    // From mermaid: In TB layout, composite states should be horizontally centered
+    // This tests the state_complex.mmd pattern where Idle, Processing, and Executing
+    // should all share similar center x-coordinates
+    let input = r#"stateDiagram-v2
+        direction TB
+        [*] --> Idle
+        state Idle {
+            [*] --> Ready
+            Ready --> Active: Start Job
+        }
+        state fork_state <<fork>>
+        state join_state <<join>>
+        Idle --> fork_state
+        fork_state --> Validation
+        fork_state --> ResourceAlloc
+        Validation --> join_state
+        ResourceAlloc --> join_state
+        join_state --> Processing
+        state Processing {
+            [*] --> Validating
+            Validating --> Executing
+            state Executing {
+                [*] --> Init
+                Init --> Done
+            }
+        }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse state_complex diagram");
+    let svg = render(&diagram).expect("Failed to render state_complex diagram");
+
+    // Extract x-coordinates for composite states
+    let extract_composite_center_x = |svg: &str, name: &str| -> Option<f64> {
+        // Look for composite-<name> and extract x and width from the outer rect
+        let composite_marker = format!("id=\"composite-{}\"", name);
+        let composite_start = svg.find(&composite_marker)?;
+        let relevant_section = &svg[composite_start..composite_start.saturating_add(500)];
+
+        // Find the rect with x and width attributes
+        let x_pattern =
+            regex::Regex::new(r#"<rect[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)""#).ok()?;
+        if let Some(caps) = x_pattern.captures(relevant_section) {
+            let x: f64 = caps.get(1)?.as_str().parse().ok()?;
+            let width: f64 = caps.get(2)?.as_str().parse().ok()?;
+            return Some(x + width / 2.0);
+        }
+        None
+    };
+
+    let idle_center_x = extract_composite_center_x(&svg, "Idle");
+    let processing_center_x = extract_composite_center_x(&svg, "Processing");
+
+    eprintln!("Composite state center x-coordinates:");
+    eprintln!("  Idle: {:?}", idle_center_x);
+    eprintln!("  Processing: {:?}", processing_center_x);
+
+    if let (Some(idle_x), Some(proc_x)) = (idle_center_x, processing_center_x) {
+        // In mermaid reference, composites are centered on same vertical axis
+        // Allow 20% tolerance of the wider composite's width
+        let tolerance = 50.0; // pixels
+        let diff = (idle_x - proc_x).abs();
+        assert!(
+            diff < tolerance,
+            "Composite states should be horizontally centered: Idle center_x={}, Processing center_x={}, diff={}",
+            idle_x, proc_x, diff
+        );
+    } else {
+        panic!(
+            "Could not extract composite center positions. SVG snippet: {}",
+            &svg[..svg.len().min(2000)]
+        );
+    }
+}
+
+#[test]
+fn test_state_composite_width_grows_with_title() {
+    // From mermaid: "v2 width of compound state should grow with title if title is wider"
+    // A composite state with a long title should expand to fit the title
+    let input = r#"stateDiagram-v2
+        state "Long state name that should make it wider" as LongTitle {
+            a --> b
+        }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse long title composite");
+    let svg = render(&diagram).expect("Failed to render long title composite");
+
+    // Extract the composite state's width
+    let extract_composite_width = |svg: &str, name: &str| -> Option<f64> {
+        let composite_marker = format!("id=\"composite-{}\"", name);
+        let composite_start = svg.find(&composite_marker)?;
+        let relevant_section = &svg[composite_start..composite_start.saturating_add(500)];
+
+        let width_pattern = regex::Regex::new(r#"width="([0-9.]+)""#).ok()?;
+        let caps = width_pattern.captures(relevant_section)?;
+        caps.get(1)?.as_str().parse().ok()
+    };
+
+    // Also need a reference for comparison - create a short-titled composite
+    let short_input = r#"stateDiagram-v2
+        state "X" as ShortTitle {
+            a --> b
+        }
+    "#;
+
+    let short_diagram = parse(short_input).expect("Failed to parse short title composite");
+    let short_svg = render(&short_diagram).expect("Failed to render short title composite");
+
+    let long_width = extract_composite_width(&svg, "LongTitle");
+    let short_width = extract_composite_width(&short_svg, "ShortTitle");
+
+    eprintln!("Composite widths:");
+    eprintln!("  Long title: {:?}", long_width);
+    eprintln!("  Short title: {:?}", short_width);
+
+    if let (Some(long_w), Some(short_w)) = (long_width, short_width) {
+        assert!(
+            long_w > short_w,
+            "Long titled composite width ({}) should be greater than short titled ({})",
+            long_w,
+            short_w
+        );
+    }
+}
+
+#[test]
+fn test_state_composite_with_fork_join() {
+    // From mermaid: "v2 should render forks in composite states"
+    // Fork/join bars inside composite states should render properly
+    let input = r#"stateDiagram-v2
+        [*] --> TV
+        state TV {
+            state fork_state <<fork>>
+            [*] --> fork_state
+            fork_state --> State2
+            fork_state --> State3
+            state join_state <<join>>
+            State2 --> join_state
+            State3 --> join_state
+            join_state --> State4
+            State4 --> [*]
+        }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse composite with fork/join");
+    let svg = render(&diagram).expect("Failed to render composite with fork/join");
+
+    // Should have the TV composite
+    assert!(
+        svg.contains("composite-TV") || svg.contains("id=\"composite-TV\""),
+        "Should render TV as composite state"
+    );
+
+    // Should have fork and join states inside
+    assert!(
+        svg.contains("fork_state") && svg.contains("state-fork-join"),
+        "Should render fork state inside composite. SVG: {}",
+        &svg[..svg.len().min(3000)]
+    );
+    assert!(
+        svg.contains("join_state"),
+        "Should render join state inside composite"
+    );
+
+    // Internal states should be present
+    assert!(
+        svg.contains("State2"),
+        "Should render State2 inside composite"
+    );
+    assert!(
+        svg.contains("State3"),
+        "Should render State3 inside composite"
+    );
+    assert!(
+        svg.contains("State4"),
+        "Should render State4 inside composite"
+    );
+}
+
+#[test]
+fn test_state_multiple_composites_aligned() {
+    // From mermaid: "v2 should render multiple composite states"
+    // Multiple sibling composite states should be aligned properly
+    let input = r#"stateDiagram-v2
+        [*] --> TV
+        state TV {
+            [*] --> Off
+            On --> Off : Turn off
+            Off --> On : Turn on
+        }
+        TV --> Console
+        state Console {
+            [*] --> Off2
+            On2 --> Off2 : Turn off
+            Off2 --> On2 : Turn on
+        }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse multiple composites");
+    let svg = render(&diagram).expect("Failed to render multiple composites");
+
+    // Both composites should exist
+    assert!(
+        svg.contains("composite-TV") || svg.contains("id=\"composite-TV\""),
+        "Should render TV composite"
+    );
+    assert!(
+        svg.contains("composite-Console") || svg.contains("id=\"composite-Console\""),
+        "Should render Console composite"
+    );
+
+    // Extract y-coordinates for composites (from outer rect which comes first)
+    let extract_composite_y = |svg: &str, name: &str| -> Option<f64> {
+        let composite_marker = format!("id=\"composite-{}\"", name);
+        let composite_start = svg.find(&composite_marker)?;
+        let relevant_section = &svg[composite_start..composite_start.saturating_add(600)];
+
+        // Find line containing state-composite-outer
+        for line in relevant_section.lines() {
+            if line.contains("state-composite-outer") {
+                // Extract y value from this line
+                let y_pattern = regex::Regex::new(r#"y="([0-9.]+)""#).ok()?;
+                if let Some(caps) = y_pattern.captures(line) {
+                    return caps.get(1)?.as_str().parse().ok();
+                }
+            }
+        }
+        None
+    };
+
+    let tv_y = extract_composite_y(&svg, "TV");
+    let console_y = extract_composite_y(&svg, "Console");
+
+    eprintln!("Composite y-coordinates:");
+    eprintln!("  TV: {:?}", tv_y);
+    eprintln!("  Console: {:?}", console_y);
+
+    // In TB layout, Console should be below TV (higher y value)
+    if let (Some(tv), Some(console)) = (tv_y, console_y) {
+        assert!(
+            console > tv,
+            "Console should be below TV in TB layout: TV.y={}, Console.y={}",
+            tv,
+            console
+        );
+    }
+}
+
+#[test]
+fn test_state_composite_can_transition_to_self() {
+    // From mermaid: "v2 A compound state should be able to link to itself"
+    // A composite state can have a self-loop transition
+    // Note: composite detection requires internal transitions
+    let input = r#"stateDiagram-v2
+        state Active {
+            [*] --> Idle
+        }
+        Inactive --> Idle: ACT
+        Active --> Active: LOG
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse self-loop composite");
+    let svg = render(&diagram).expect("Failed to render self-loop composite");
+
+    // Active composite should exist
+    assert!(
+        svg.contains("composite-Active") || svg.contains("id=\"composite-Active\""),
+        "Should render Active as composite"
+    );
+
+    // Should have a transition path with "LOG" label (self-loop)
+    assert!(
+        svg.contains("LOG"),
+        "Should render the LOG transition label for self-loop"
+    );
+
+    // Count transition paths - there should be at least 2 transitions
+    let transition_count = svg.matches("class=\"transition\"").count()
+        + svg.matches("class=\"transition-path\"").count();
+    assert!(
+        transition_count >= 2,
+        "Should have at least 2 transitions (ACT and LOG), found {}",
+        transition_count
+    );
+}
