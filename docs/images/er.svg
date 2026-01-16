@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="558" viewBox="0 0 480 558" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="536" height="732.75" viewBox="0 0 536 732.75" class="mermaid">
   <style>
 
 .mermaid {
@@ -167,60 +167,74 @@ marker path {
 
     </g>
     <g class="entity-node" id="entity-CUSTOMER-0">
-      <rect x="0" y="0" width="160" height="106" rx="0" ry="0" class="entity-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
-      <rect x="0" y="0" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" fill="#9370DB" stroke-width="1"/>
-      <text x="80" y="20" class="entity-name" text-anchor="middle" font-weight="bold" font-size="14" fill="#FFFFFF">CUSTOMER</text>
-      <text x="8" y="54" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="58" y="54" class="entity-attr attribute-name" text-anchor="start" font-size="11">name</text>
-      <text x="8" y="74" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="58" y="74" class="entity-attr attribute-name" font-size="11" text-anchor="start">email</text>
-      <text x="132" y="74" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
-      <text x="8" y="94" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="58" y="94" class="entity-attr attribute-name" text-anchor="start" font-size="11">address</text>
+      <rect x="0" y="0" width="188" height="187" rx="0" ry="0" class="entity-box" stroke-width="1.3" fill="#ECECFF" stroke="#9370DB"/>
+      <rect x="0" y="42.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke-width="1.3" fill="hsl(240, 100%, 100%)" stroke="#9370DB"/>
+      <rect x="0" y="85.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke="#9370DB" fill="hsl(240, 100%, 97.27%)" stroke-width="1.3"/>
+      <rect x="0" y="128.25" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke-width="1.3" fill="hsl(240, 100%, 100%)" stroke="#9370DB"/>
+      <line x1="0" y1="42.75" x2="188" y2="42.75" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="65.8" y1="42.75" x2="65.8" y2="187" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <line x1="141" y1="42.75" x2="141" y2="187" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <text x="94" y="26.375" class="entity-name" font-size="14" text-anchor="middle" font-weight="bold">CUSTOMER</text>
+      <text x="12" y="68.125" class="entity-attr attribute-type" font-size="12" text-anchor="start">string</text>
+      <text x="77.8" y="68.125" class="entity-attr attribute-name" font-size="12" text-anchor="start">name</text>
+      <text x="12" y="110.875" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="77.8" y="110.875" class="entity-attr attribute-name" font-size="12" text-anchor="start">email</text>
+      <text x="153" y="110.875" class="entity-attr attribute-key" text-anchor="start" font-size="12">PK</text>
+      <text x="12" y="153.625" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="77.8" y="153.625" class="entity-attr attribute-name" text-anchor="start" font-size="12">address</text>
     </g>
     <g class="entity-node" id="entity-LINE-ITEM-2">
-      <rect x="110" y="412" width="160" height="46" rx="0" ry="0" class="entity-box" stroke="#333333" fill="#ECECFF" stroke-width="1"/>
-      <rect x="110" y="412" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke-width="1" stroke="#333333"/>
-      <text x="190" y="432" class="entity-name" font-size="14" fill="#FFFFFF" font-weight="bold" text-anchor="middle">LINE-ITEM</text>
+      <rect x="124" y="574" width="188" height="58.75" rx="0" ry="0" class="entity-box" stroke-width="1.3" stroke="#9370DB" fill="#ECECFF"/>
+      <text x="218" y="608.375" class="entity-name" font-size="14" text-anchor="middle" font-weight="bold">LINE-ITEM</text>
     </g>
     <g class="entity-node" id="entity-ORDER-1">
-      <rect x="0" y="206" width="160" height="106" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
-      <rect x="0" y="206" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke-width="1" stroke="#333333"/>
-      <text x="80" y="226" class="entity-name" font-weight="bold" text-anchor="middle" font-size="14" fill="#FFFFFF">ORDER</text>
-      <text x="8" y="260" class="entity-attr attribute-type" font-size="11" text-anchor="start">int</text>
-      <text x="58" y="260" class="entity-attr attribute-name" text-anchor="start" font-size="11">orderNumber</text>
-      <text x="132" y="260" class="entity-attr attribute-key" font-size="11" text-anchor="start">PK</text>
-      <text x="8" y="280" class="entity-attr attribute-type" font-size="11" text-anchor="start">date</text>
-      <text x="58" y="280" class="entity-attr attribute-name" text-anchor="start" font-size="11">orderDate</text>
-      <text x="8" y="300" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="58" y="300" class="entity-attr attribute-name" text-anchor="start" font-size="11">status</text>
+      <rect x="0" y="287" width="188" height="187" rx="0" ry="0" class="entity-box" stroke="#9370DB" fill="#ECECFF" stroke-width="1.3"/>
+      <rect x="0" y="329.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke-width="1.3" stroke="#9370DB"/>
+      <rect x="0" y="372.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB"/>
+      <rect x="0" y="415.25" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="0" y1="329.75" x2="188" y2="329.75" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <line x1="65.8" y1="329.75" x2="65.8" y2="474" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <line x1="141" y1="329.75" x2="141" y2="474" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <text x="94" y="313.375" class="entity-name" text-anchor="middle" font-size="14" font-weight="bold">ORDER</text>
+      <text x="12" y="355.125" class="entity-attr attribute-type" text-anchor="start" font-size="12">int</text>
+      <text x="77.8" y="355.125" class="entity-attr attribute-name" text-anchor="start" font-size="12">orderNumber</text>
+      <text x="153" y="355.125" class="entity-attr attribute-key" text-anchor="start" font-size="12">PK</text>
+      <text x="12" y="397.875" class="entity-attr attribute-type" font-size="12" text-anchor="start">date</text>
+      <text x="77.8" y="397.875" class="entity-attr attribute-name" font-size="12" text-anchor="start">orderDate</text>
+      <text x="12" y="440.625" class="entity-attr attribute-type" font-size="12" text-anchor="start">string</text>
+      <text x="77.8" y="440.625" class="entity-attr attribute-name" text-anchor="start" font-size="12">status</text>
     </g>
     <g class="entity-node" id="entity-PRODUCT-3">
-      <rect x="220" y="206" width="160" height="106" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
-      <rect x="220" y="206" width="160" height="30" rx="0" ry="0" class="entity-header" stroke-width="1" fill="#9370DB" stroke="#333333"/>
-      <text x="300" y="226" class="entity-name" font-size="14" text-anchor="middle" fill="#FFFFFF" font-weight="bold">PRODUCT</text>
-      <text x="228" y="260" class="entity-attr attribute-type" text-anchor="start" font-size="11">int</text>
-      <text x="278" y="260" class="entity-attr attribute-name" font-size="11" text-anchor="start">id</text>
-      <text x="352" y="260" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
-      <text x="228" y="280" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="278" y="280" class="entity-attr attribute-name" font-size="11" text-anchor="start">name</text>
-      <text x="228" y="300" class="entity-attr attribute-type" font-size="11" text-anchor="start">float</text>
-      <text x="278" y="300" class="entity-attr attribute-name" font-size="11" text-anchor="start">price</text>
+      <rect x="248" y="287" width="188" height="187" rx="0" ry="0" class="entity-box" stroke="#9370DB" fill="#ECECFF" stroke-width="1.3"/>
+      <rect x="248" y="329.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke-width="1.3" fill="hsl(240, 100%, 100%)" stroke="#9370DB"/>
+      <rect x="248" y="372.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke="#9370DB" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)"/>
+      <rect x="248" y="415.25" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="248" y1="329.75" x2="436" y2="329.75" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="313.8" y1="329.75" x2="313.8" y2="474" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <line x1="389" y1="329.75" x2="389" y2="474" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <text x="342" y="313.375" class="entity-name" text-anchor="middle" font-size="14" font-weight="bold">PRODUCT</text>
+      <text x="260" y="355.125" class="entity-attr attribute-type" text-anchor="start" font-size="12">int</text>
+      <text x="325.8" y="355.125" class="entity-attr attribute-name" text-anchor="start" font-size="12">id</text>
+      <text x="401" y="355.125" class="entity-attr attribute-key" font-size="12" text-anchor="start">PK</text>
+      <text x="260" y="397.875" class="entity-attr attribute-type" font-size="12" text-anchor="start">string</text>
+      <text x="325.8" y="397.875" class="entity-attr attribute-name" text-anchor="start" font-size="12">name</text>
+      <text x="260" y="440.625" class="entity-attr attribute-type" font-size="12" text-anchor="start">float</text>
+      <text x="325.8" y="440.625" class="entity-attr attribute-name" text-anchor="start" font-size="12">price</text>
     </g>
     <g class="relationship">
-      <path d="M80,106 C80,156 80,156 80,206" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/>
-      <rect x="55" y="144" width="50" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="80" y="160" class="relationship-label" text-anchor="middle" font-size="14">places</text>
+      <path d="M94,187 C94,237 94,237 94,287" class="relationshipLine" marker-end="url(#er-zeroOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
+      <rect x="69" y="225" width="50" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="94" y="241" class="relationship-label" text-anchor="middle" font-size="14">places</text>
     </g>
     <g class="relationship">
-      <path d="M80,312 C80,362 190,362 190,412" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-oneOrMoreEnd)"/>
-      <rect x="103" y="350" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="135" y="366" class="relationship-label" font-size="14" text-anchor="middle">contains</text>
+      <path d="M94,474 C94,524 218,524 218,574" class="relationshipLine" marker-end="url(#er-oneOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
+      <rect x="124" y="512" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="156" y="528" class="relationship-label" text-anchor="middle" font-size="14">contains</text>
     </g>
     <g class="relationship">
-      <path d="M300,312 C300,362 190,362 190,412" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/>
-      <rect x="213" y="350" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="245" y="366" class="relationship-label" text-anchor="middle" font-size="14">includes</text>
+      <path d="M342,474 C342,524 218,524 218,574" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/>
+      <rect x="248" y="512" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="280" y="528" class="relationship-label" text-anchor="middle" font-size="14">includes</text>
     </g>
   </g>
 </svg>

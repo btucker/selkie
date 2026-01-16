@@ -43,7 +43,7 @@ bd sync               # Sync with git
 
 ## Development Process (focus on one diagram type)
 
-1. Use `cargo run --bin selkie -- eval --verbose --type <diagram_type>` evaluate where our implementation is relative to the reference.
+1. Use `cargo run --bin selkie -- eval --type <diagram_type>` evaluate where our implementation is relative to the reference.
 2. Log new issues to log in bd & resolve completed ones
 3. Confirm our changes in this branch are increasing scores.
 4. When you resolve a rendering issue, update the svg in docs/images

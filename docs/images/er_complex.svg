@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="700" height="1310" viewBox="0 0 700 1310" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="784" height="2033.5" viewBox="0 0 784 2033.5" class="mermaid">
   <style>
 
 .mermaid {
@@ -167,190 +167,250 @@ marker path {
 
     </g>
     <g class="entity-node" id="entity-ADDRESS-6">
-      <rect x="220" y="532" width="160" height="206" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
-      <rect x="220" y="532" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke="#333333" stroke-width="1"/>
-      <text x="300" y="552" class="entity-name" text-anchor="middle" fill="#FFFFFF" font-weight="bold" font-size="14">ADDRESS</text>
-      <text x="228" y="586" class="entity-attr attribute-type" font-size="11" text-anchor="start">uuid</text>
-      <text x="278" y="586" class="entity-attr attribute-name" text-anchor="start" font-size="11">id</text>
-      <text x="352" y="586" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
-      <text x="228" y="606" class="entity-attr attribute-type" font-size="11" text-anchor="start">uuid</text>
-      <text x="278" y="606" class="entity-attr attribute-name" font-size="11" text-anchor="start">customer_id</text>
-      <text x="352" y="606" class="entity-attr attribute-key" font-size="11" text-anchor="start">FK</text>
-      <text x="228" y="626" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="278" y="626" class="entity-attr attribute-name" font-size="11" text-anchor="start">type</text>
-      <text x="228" y="646" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="278" y="646" class="entity-attr attribute-name" text-anchor="start" font-size="11">street</text>
-      <text x="228" y="666" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="278" y="666" class="entity-attr attribute-name" text-anchor="start" font-size="11">city</text>
-      <text x="228" y="686" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="278" y="686" class="entity-attr attribute-name" text-anchor="start" font-size="11">state</text>
-      <text x="228" y="706" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="278" y="706" class="entity-attr attribute-name" font-size="11" text-anchor="start">zip</text>
-      <text x="228" y="726" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="278" y="726" class="entity-attr attribute-name" text-anchor="start" font-size="11">country</text>
+      <rect x="248" y="830.5" width="188" height="400.75" rx="0" ry="0" class="entity-box" stroke="#9370DB" fill="#ECECFF" stroke-width="1.3"/>
+      <rect x="248" y="873.25" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke-width="1.3" fill="hsl(240, 100%, 100%)" stroke="#9370DB"/>
+      <rect x="248" y="916" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" fill="hsl(240, 100%, 97.27%)" stroke-width="1.3" stroke="#9370DB"/>
+      <rect x="248" y="958.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke="#9370DB" stroke-width="1.3"/>
+      <rect x="248" y="1001.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB" stroke-width="1.3"/>
+      <rect x="248" y="1044.25" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" stroke-width="1.3" fill="hsl(240, 100%, 100%)"/>
+      <rect x="248" y="1087" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB" stroke-width="1.3"/>
+      <rect x="248" y="1129.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" stroke-width="1.3" fill="hsl(240, 100%, 100%)"/>
+      <rect x="248" y="1172.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="248" y1="873.25" x2="436" y2="873.25" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="313.8" y1="873.25" x2="313.8" y2="1231.25" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="389" y1="873.25" x2="389" y2="1231.25" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <text x="342" y="856.875" class="entity-name" font-size="14" font-weight="bold" text-anchor="middle">ADDRESS</text>
+      <text x="260" y="898.625" class="entity-attr attribute-type" text-anchor="start" font-size="12">uuid</text>
+      <text x="325.8" y="898.625" class="entity-attr attribute-name" font-size="12" text-anchor="start">id</text>
+      <text x="401" y="898.625" class="entity-attr attribute-key" font-size="12" text-anchor="start">PK</text>
+      <text x="260" y="941.375" class="entity-attr attribute-type" font-size="12" text-anchor="start">uuid</text>
+      <text x="325.8" y="941.375" class="entity-attr attribute-name" text-anchor="start" font-size="12">customer_id</text>
+      <text x="401" y="941.375" class="entity-attr attribute-key" text-anchor="start" font-size="12">FK</text>
+      <text x="260" y="984.125" class="entity-attr attribute-type" font-size="12" text-anchor="start">string</text>
+      <text x="325.8" y="984.125" class="entity-attr attribute-name" font-size="12" text-anchor="start">type</text>
+      <text x="260" y="1026.875" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="325.8" y="1026.875" class="entity-attr attribute-name" text-anchor="start" font-size="12">street</text>
+      <text x="260" y="1069.625" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="325.8" y="1069.625" class="entity-attr attribute-name" text-anchor="start" font-size="12">city</text>
+      <text x="260" y="1112.375" class="entity-attr attribute-type" font-size="12" text-anchor="start">string</text>
+      <text x="325.8" y="1112.375" class="entity-attr attribute-name" font-size="12" text-anchor="start">state</text>
+      <text x="260" y="1155.125" class="entity-attr attribute-type" font-size="12" text-anchor="start">string</text>
+      <text x="325.8" y="1155.125" class="entity-attr attribute-name" text-anchor="start" font-size="12">zip</text>
+      <text x="260" y="1197.875" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="325.8" y="1197.875" class="entity-attr attribute-name" text-anchor="start" font-size="12">country</text>
     </g>
     <g class="entity-node" id="entity-CATEGORY-5">
-      <rect x="220" y="868" width="160" height="126" rx="0" ry="0" class="entity-box" stroke-width="1" stroke="#333333" fill="#ECECFF"/>
-      <rect x="220" y="868" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" fill="#9370DB" stroke-width="1"/>
-      <text x="300" y="888" class="entity-name" fill="#FFFFFF" text-anchor="middle" font-size="14" font-weight="bold">CATEGORY</text>
-      <text x="228" y="922" class="entity-attr attribute-type" font-size="11" text-anchor="start">uuid</text>
-      <text x="278" y="922" class="entity-attr attribute-name" font-size="11" text-anchor="start">id</text>
-      <text x="352" y="922" class="entity-attr attribute-key" font-size="11" text-anchor="start">PK</text>
-      <text x="228" y="942" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="278" y="942" class="entity-attr attribute-name" text-anchor="start" font-size="11">name</text>
-      <text x="352" y="942" class="entity-attr attribute-key" font-size="11" text-anchor="start">UK</text>
-      <text x="228" y="962" class="entity-attr attribute-type" font-size="11" text-anchor="start">uuid</text>
-      <text x="278" y="962" class="entity-attr attribute-name" text-anchor="start" font-size="11">parent_id</text>
-      <text x="352" y="962" class="entity-attr attribute-key" text-anchor="start" font-size="11">FK</text>
-      <text x="228" y="982" class="entity-attr attribute-type" font-size="11" text-anchor="start">int</text>
-      <text x="278" y="982" class="entity-attr attribute-name" font-size="11" text-anchor="start">sort_order</text>
+      <rect x="248" y="1395.375" width="188" height="229.75" rx="0" ry="0" class="entity-box" stroke="#9370DB" stroke-width="1.3" fill="#ECECFF"/>
+      <rect x="248" y="1438.125" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke-width="1.3" stroke="#9370DB" fill="hsl(240, 100%, 100%)"/>
+      <rect x="248" y="1480.875" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke="#9370DB" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)"/>
+      <rect x="248" y="1523.625" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke="#9370DB" stroke-width="1.3"/>
+      <rect x="248" y="1566.375" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" stroke="#9370DB" fill="hsl(240, 100%, 97.27%)"/>
+      <line x1="248" y1="1438.125" x2="436" y2="1438.125" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="313.8" y1="1438.125" x2="313.8" y2="1625.125" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="389" y1="1438.125" x2="389" y2="1625.125" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <text x="342" y="1421.75" class="entity-name" font-weight="bold" text-anchor="middle" font-size="14">CATEGORY</text>
+      <text x="260" y="1463.5" class="entity-attr attribute-type" font-size="12" text-anchor="start">uuid</text>
+      <text x="325.8" y="1463.5" class="entity-attr attribute-name" text-anchor="start" font-size="12">id</text>
+      <text x="401" y="1463.5" class="entity-attr attribute-key" text-anchor="start" font-size="12">PK</text>
+      <text x="260" y="1506.25" class="entity-attr attribute-type" font-size="12" text-anchor="start">string</text>
+      <text x="325.8" y="1506.25" class="entity-attr attribute-name" text-anchor="start" font-size="12">name</text>
+      <text x="401" y="1506.25" class="entity-attr attribute-key" text-anchor="start" font-size="12">UK</text>
+      <text x="260" y="1549" class="entity-attr attribute-type" text-anchor="start" font-size="12">uuid</text>
+      <text x="325.8" y="1549" class="entity-attr attribute-name" text-anchor="start" font-size="12">parent_id</text>
+      <text x="401" y="1549" class="entity-attr attribute-key" text-anchor="start" font-size="12">FK</text>
+      <text x="260" y="1591.75" class="entity-attr attribute-type" text-anchor="start" font-size="12">int</text>
+      <text x="325.8" y="1591.75" class="entity-attr attribute-name" font-size="12" text-anchor="start">sort_order</text>
     </g>
     <g class="entity-node" id="entity-CUSTOMER-0">
-      <rect x="248.5" y="0" width="160" height="166" rx="0" ry="0" class="entity-box" stroke="#333333" fill="#ECECFF" stroke-width="1"/>
-      <rect x="248.5" y="0" width="160" height="30" rx="0" ry="0" class="entity-header" stroke-width="1" stroke="#333333" fill="#9370DB"/>
-      <text x="328.5" y="20" class="entity-name" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">CUSTOMER</text>
-      <text x="256.5" y="54" class="entity-attr attribute-type" text-anchor="start" font-size="11">uuid</text>
-      <text x="306.5" y="54" class="entity-attr attribute-name" font-size="11" text-anchor="start">id</text>
-      <text x="380.5" y="54" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
-      <text x="256.5" y="74" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="306.5" y="74" class="entity-attr attribute-name" text-anchor="start" font-size="11">email</text>
-      <text x="380.5" y="74" class="entity-attr attribute-key" font-size="11" text-anchor="start">UK</text>
-      <text x="256.5" y="94" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="306.5" y="94" class="entity-attr attribute-name" text-anchor="start" font-size="11">name</text>
-      <text x="256.5" y="114" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="306.5" y="114" class="entity-attr attribute-name" text-anchor="start" font-size="11">phone</text>
-      <text x="256.5" y="134" class="entity-attr attribute-type" text-anchor="start" font-size="11">date</text>
-      <text x="306.5" y="134" class="entity-attr attribute-name" text-anchor="start" font-size="11">created_at</text>
-      <text x="256.5" y="154" class="entity-attr attribute-type" text-anchor="start" font-size="11">boolean</text>
-      <text x="306.5" y="154" class="entity-attr attribute-name" font-size="11" text-anchor="start">active</text>
+      <rect x="262.5" y="0" width="188" height="315.25" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke-width="1.3" stroke="#9370DB"/>
+      <rect x="262.5" y="42.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke="#9370DB" stroke-width="1.3"/>
+      <rect x="262.5" y="85.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB" stroke-width="1.3"/>
+      <rect x="262.5" y="128.25" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" fill="hsl(240, 100%, 100%)" stroke-width="1.3"/>
+      <rect x="262.5" y="171" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB"/>
+      <rect x="262.5" y="213.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" fill="hsl(240, 100%, 100%)" stroke-width="1.3"/>
+      <rect x="262.5" y="256.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" fill="hsl(240, 100%, 97.27%)" stroke-width="1.3" stroke="#9370DB"/>
+      <line x1="262.5" y1="42.75" x2="450.5" y2="42.75" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="328.3" y1="42.75" x2="328.3" y2="315.25" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <line x1="403.5" y1="42.75" x2="403.5" y2="315.25" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <text x="356.5" y="26.375" class="entity-name" font-weight="bold" text-anchor="middle" font-size="14">CUSTOMER</text>
+      <text x="274.5" y="68.125" class="entity-attr attribute-type" font-size="12" text-anchor="start">uuid</text>
+      <text x="340.3" y="68.125" class="entity-attr attribute-name" font-size="12" text-anchor="start">id</text>
+      <text x="415.5" y="68.125" class="entity-attr attribute-key" text-anchor="start" font-size="12">PK</text>
+      <text x="274.5" y="110.875" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="340.3" y="110.875" class="entity-attr attribute-name" text-anchor="start" font-size="12">email</text>
+      <text x="415.5" y="110.875" class="entity-attr attribute-key" font-size="12" text-anchor="start">UK</text>
+      <text x="274.5" y="153.625" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="340.3" y="153.625" class="entity-attr attribute-name" text-anchor="start" font-size="12">name</text>
+      <text x="274.5" y="196.375" class="entity-attr attribute-type" font-size="12" text-anchor="start">string</text>
+      <text x="340.3" y="196.375" class="entity-attr attribute-name" font-size="12" text-anchor="start">phone</text>
+      <text x="274.5" y="239.125" class="entity-attr attribute-type" font-size="12" text-anchor="start">date</text>
+      <text x="340.3" y="239.125" class="entity-attr attribute-name" text-anchor="start" font-size="12">created_at</text>
+      <text x="274.5" y="281.875" class="entity-attr attribute-type" font-size="12" text-anchor="start">boolean</text>
+      <text x="340.3" y="281.875" class="entity-attr attribute-name" text-anchor="start" font-size="12">active</text>
     </g>
     <g class="entity-node" id="entity-ORDER-1">
-      <rect x="165" y="266" width="160" height="166" rx="0" ry="0" class="entity-box" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
-      <rect x="165" y="266" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" fill="#9370DB" stroke-width="1"/>
-      <text x="245" y="286" class="entity-name" font-weight="bold" fill="#FFFFFF" font-size="14" text-anchor="middle">ORDER</text>
-      <text x="173" y="320" class="entity-attr attribute-type" text-anchor="start" font-size="11">uuid</text>
-      <text x="223" y="320" class="entity-attr attribute-name" font-size="11" text-anchor="start">id</text>
-      <text x="297" y="320" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
-      <text x="173" y="340" class="entity-attr attribute-type" font-size="11" text-anchor="start">uuid</text>
-      <text x="223" y="340" class="entity-attr attribute-name" font-size="11" text-anchor="start">customer_id</text>
-      <text x="297" y="340" class="entity-attr attribute-key" font-size="11" text-anchor="start">FK</text>
-      <text x="173" y="360" class="entity-attr attribute-type" text-anchor="start" font-size="11">decimal</text>
-      <text x="223" y="360" class="entity-attr attribute-name" text-anchor="start" font-size="11">total</text>
-      <text x="173" y="380" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="223" y="380" class="entity-attr attribute-name" text-anchor="start" font-size="11">status</text>
-      <text x="173" y="400" class="entity-attr attribute-type" text-anchor="start" font-size="11">date</text>
-      <text x="223" y="400" class="entity-attr attribute-name" font-size="11" text-anchor="start">ordered_at</text>
-      <text x="173" y="420" class="entity-attr attribute-type" text-anchor="start" font-size="11">date</text>
-      <text x="223" y="420" class="entity-attr attribute-name" text-anchor="start" font-size="11">shipped_at</text>
+      <rect x="179" y="415.25" width="188" height="315.25" rx="0" ry="0" class="entity-box" stroke="#9370DB" stroke-width="1.3" fill="#ECECFF"/>
+      <rect x="179" y="458" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke-width="1.3" fill="hsl(240, 100%, 100%)" stroke="#9370DB"/>
+      <rect x="179" y="500.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB"/>
+      <rect x="179" y="543.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke-width="1.3" stroke="#9370DB"/>
+      <rect x="179" y="586.25" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB"/>
+      <rect x="179" y="629" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" fill="hsl(240, 100%, 100%)" stroke-width="1.3"/>
+      <rect x="179" y="671.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB"/>
+      <line x1="179" y1="458" x2="367" y2="458" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="244.8" y1="458" x2="244.8" y2="730.5" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="320" y1="458" x2="320" y2="730.5" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <text x="273" y="441.625" class="entity-name" font-weight="bold" text-anchor="middle" font-size="14">ORDER</text>
+      <text x="191" y="483.375" class="entity-attr attribute-type" font-size="12" text-anchor="start">uuid</text>
+      <text x="256.8" y="483.375" class="entity-attr attribute-name" text-anchor="start" font-size="12">id</text>
+      <text x="332" y="483.375" class="entity-attr attribute-key" text-anchor="start" font-size="12">PK</text>
+      <text x="191" y="526.125" class="entity-attr attribute-type" text-anchor="start" font-size="12">uuid</text>
+      <text x="256.8" y="526.125" class="entity-attr attribute-name" font-size="12" text-anchor="start">customer_id</text>
+      <text x="332" y="526.125" class="entity-attr attribute-key" text-anchor="start" font-size="12">FK</text>
+      <text x="191" y="568.875" class="entity-attr attribute-type" text-anchor="start" font-size="12">decimal</text>
+      <text x="256.8" y="568.875" class="entity-attr attribute-name" text-anchor="start" font-size="12">total</text>
+      <text x="191" y="611.625" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="256.8" y="611.625" class="entity-attr attribute-name" text-anchor="start" font-size="12">status</text>
+      <text x="191" y="654.375" class="entity-attr attribute-type" text-anchor="start" font-size="12">date</text>
+      <text x="256.8" y="654.375" class="entity-attr attribute-name" text-anchor="start" font-size="12">ordered_at</text>
+      <text x="191" y="697.125" class="entity-attr attribute-type" text-anchor="start" font-size="12">date</text>
+      <text x="256.8" y="697.125" class="entity-attr attribute-name" font-size="12" text-anchor="start">shipped_at</text>
     </g>
     <g class="entity-node" id="entity-ORDER_ITEM-2">
-      <rect x="0" y="562" width="160" height="146" rx="0" ry="0" class="entity-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
-      <rect x="0" y="562" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" fill="#9370DB" stroke-width="1"/>
-      <text x="80" y="582" class="entity-name" fill="#FFFFFF" text-anchor="middle" font-size="14" font-weight="bold">ORDER_ITEM</text>
-      <text x="8" y="616" class="entity-attr attribute-type" font-size="11" text-anchor="start">uuid</text>
-      <text x="58" y="616" class="entity-attr attribute-name" text-anchor="start" font-size="11">id</text>
-      <text x="132" y="616" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK</text>
-      <text x="8" y="636" class="entity-attr attribute-type" text-anchor="start" font-size="11">uuid</text>
-      <text x="58" y="636" class="entity-attr attribute-name" text-anchor="start" font-size="11">order_id</text>
-      <text x="132" y="636" class="entity-attr attribute-key" text-anchor="start" font-size="11">FK</text>
-      <text x="8" y="656" class="entity-attr attribute-type" font-size="11" text-anchor="start">uuid</text>
-      <text x="58" y="656" class="entity-attr attribute-name" font-size="11" text-anchor="start">product_id</text>
-      <text x="132" y="656" class="entity-attr attribute-key" font-size="11" text-anchor="start">FK</text>
-      <text x="8" y="676" class="entity-attr attribute-type" font-size="11" text-anchor="start">int</text>
-      <text x="58" y="676" class="entity-attr attribute-name" font-size="11" text-anchor="start">quantity</text>
-      <text x="8" y="696" class="entity-attr attribute-type" font-size="11" text-anchor="start">decimal</text>
-      <text x="58" y="696" class="entity-attr attribute-name" text-anchor="start" font-size="11">price</text>
+      <rect x="0" y="894.625" width="188" height="272.5" rx="0" ry="0" class="entity-box" stroke="#9370DB" stroke-width="1.3" fill="#ECECFF"/>
+      <rect x="0" y="937.375" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke-width="1.3" stroke="#9370DB"/>
+      <rect x="0" y="980.125" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke="#9370DB" fill="hsl(240, 100%, 97.27%)" stroke-width="1.3"/>
+      <rect x="0" y="1022.875" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke-width="1.3" stroke="#9370DB" fill="hsl(240, 100%, 100%)"/>
+      <rect x="0" y="1065.625" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke="#9370DB" fill="hsl(240, 100%, 97.27%)" stroke-width="1.3"/>
+      <rect x="0" y="1108.375" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" fill="hsl(240, 100%, 100%)" stroke-width="1.3"/>
+      <line x1="0" y1="937.375" x2="188" y2="937.375" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="65.8" y1="937.375" x2="65.8" y2="1167.125" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="141" y1="937.375" x2="141" y2="1167.125" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <text x="94" y="921" class="entity-name" font-weight="bold" font-size="14" text-anchor="middle">ORDER_ITEM</text>
+      <text x="12" y="962.75" class="entity-attr attribute-type" font-size="12" text-anchor="start">uuid</text>
+      <text x="77.8" y="962.75" class="entity-attr attribute-name" text-anchor="start" font-size="12">id</text>
+      <text x="153" y="962.75" class="entity-attr attribute-key" text-anchor="start" font-size="12">PK</text>
+      <text x="12" y="1005.5" class="entity-attr attribute-type" font-size="12" text-anchor="start">uuid</text>
+      <text x="77.8" y="1005.5" class="entity-attr attribute-name" text-anchor="start" font-size="12">order_id</text>
+      <text x="153" y="1005.5" class="entity-attr attribute-key" font-size="12" text-anchor="start">FK</text>
+      <text x="12" y="1048.25" class="entity-attr attribute-type" text-anchor="start" font-size="12">uuid</text>
+      <text x="77.8" y="1048.25" class="entity-attr attribute-name" text-anchor="start" font-size="12">product_id</text>
+      <text x="153" y="1048.25" class="entity-attr attribute-key" text-anchor="start" font-size="12">FK</text>
+      <text x="12" y="1091" class="entity-attr attribute-type" font-size="12" text-anchor="start">int</text>
+      <text x="77.8" y="1091" class="entity-attr attribute-name" font-size="12" text-anchor="start">quantity</text>
+      <text x="12" y="1133.75" class="entity-attr attribute-type" text-anchor="start" font-size="12">decimal</text>
+      <text x="77.8" y="1133.75" class="entity-attr attribute-name" font-size="12" text-anchor="start">price</text>
     </g>
     <g class="entity-node" id="entity-PAYMENT-7">
-      <rect x="440" y="552" width="160" height="166" rx="0" ry="0" class="entity-box" stroke="#333333" fill="#ECECFF" stroke-width="1"/>
-      <rect x="440" y="552" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke-width="1" stroke="#333333"/>
-      <text x="520" y="572" class="entity-name" text-anchor="middle" font-weight="bold" font-size="14" fill="#FFFFFF">PAYMENT</text>
-      <text x="448" y="606" class="entity-attr attribute-type" text-anchor="start" font-size="11">uuid</text>
-      <text x="498" y="606" class="entity-attr attribute-name" text-anchor="start" font-size="11">id</text>
-      <text x="572" y="606" class="entity-attr attribute-key" font-size="11" text-anchor="start">PK</text>
-      <text x="448" y="626" class="entity-attr attribute-type" font-size="11" text-anchor="start">uuid</text>
-      <text x="498" y="626" class="entity-attr attribute-name" font-size="11" text-anchor="start">order_id</text>
-      <text x="572" y="626" class="entity-attr attribute-key" text-anchor="start" font-size="11">FK</text>
-      <text x="448" y="646" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="498" y="646" class="entity-attr attribute-name" font-size="11" text-anchor="start">method</text>
-      <text x="448" y="666" class="entity-attr attribute-type" text-anchor="start" font-size="11">decimal</text>
-      <text x="498" y="666" class="entity-attr attribute-name" font-size="11" text-anchor="start">amount</text>
-      <text x="448" y="686" class="entity-attr attribute-type" text-anchor="start" font-size="11">string</text>
-      <text x="498" y="686" class="entity-attr attribute-name" font-size="11" text-anchor="start">status</text>
-      <text x="448" y="706" class="entity-attr attribute-type" font-size="11" text-anchor="start">date</text>
-      <text x="498" y="706" class="entity-attr attribute-name" text-anchor="start" font-size="11">processed_at</text>
+      <rect x="496" y="873.25" width="188" height="315.25" rx="0" ry="0" class="entity-box" stroke="#9370DB" fill="#ECECFF" stroke-width="1.3"/>
+      <rect x="496" y="916" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke-width="1.3" fill="hsl(240, 100%, 100%)" stroke="#9370DB"/>
+      <rect x="496" y="958.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" fill="hsl(240, 100%, 97.27%)" stroke-width="1.3" stroke="#9370DB"/>
+      <rect x="496" y="1001.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" fill="hsl(240, 100%, 100%)" stroke-width="1.3"/>
+      <rect x="496" y="1044.25" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke="#9370DB" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)"/>
+      <rect x="496" y="1087" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke="#9370DB" stroke-width="1.3"/>
+      <rect x="496" y="1129.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke="#9370DB" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)"/>
+      <line x1="496" y1="916" x2="684" y2="916" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="561.8" y1="916" x2="561.8" y2="1188.5" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <line x1="637" y1="916" x2="637" y2="1188.5" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <text x="590" y="899.625" class="entity-name" font-weight="bold" font-size="14" text-anchor="middle">PAYMENT</text>
+      <text x="508" y="941.375" class="entity-attr attribute-type" font-size="12" text-anchor="start">uuid</text>
+      <text x="573.8" y="941.375" class="entity-attr attribute-name" font-size="12" text-anchor="start">id</text>
+      <text x="649" y="941.375" class="entity-attr attribute-key" font-size="12" text-anchor="start">PK</text>
+      <text x="508" y="984.125" class="entity-attr attribute-type" text-anchor="start" font-size="12">uuid</text>
+      <text x="573.8" y="984.125" class="entity-attr attribute-name" font-size="12" text-anchor="start">order_id</text>
+      <text x="649" y="984.125" class="entity-attr attribute-key" font-size="12" text-anchor="start">FK</text>
+      <text x="508" y="1026.875" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="573.8" y="1026.875" class="entity-attr attribute-name" font-size="12" text-anchor="start">method</text>
+      <text x="508" y="1069.625" class="entity-attr attribute-type" font-size="12" text-anchor="start">decimal</text>
+      <text x="573.8" y="1069.625" class="entity-attr attribute-name" font-size="12" text-anchor="start">amount</text>
+      <text x="508" y="1112.375" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="573.8" y="1112.375" class="entity-attr attribute-name" text-anchor="start" font-size="12">status</text>
+      <text x="508" y="1155.125" class="entity-attr attribute-type" text-anchor="start" font-size="12">date</text>
+      <text x="573.8" y="1155.125" class="entity-attr attribute-name" font-size="12" text-anchor="start">processed_at</text>
     </g>
     <g class="entity-node" id="entity-PRODUCT-3">
-      <rect x="0" y="838" width="160" height="186" rx="0" ry="0" class="entity-box" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
-      <rect x="0" y="838" width="160" height="30" rx="0" ry="0" class="entity-header" fill="#9370DB" stroke="#333333" stroke-width="1"/>
-      <text x="80" y="858" class="entity-name" fill="#FFFFFF" font-weight="bold" font-size="14" text-anchor="middle">PRODUCT</text>
-      <text x="8" y="892" class="entity-attr attribute-type" text-anchor="start" font-size="11">uuid</text>
-      <text x="58" y="892" class="entity-attr attribute-name" text-anchor="start" font-size="11">id</text>
-      <text x="132" y="892" class="entity-attr attribute-key" font-size="11" text-anchor="start">PK</text>
-      <text x="8" y="912" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="58" y="912" class="entity-attr attribute-name" font-size="11" text-anchor="start">sku</text>
-      <text x="132" y="912" class="entity-attr attribute-key" text-anchor="start" font-size="11">UK</text>
-      <text x="8" y="932" class="entity-attr attribute-type" font-size="11" text-anchor="start">string</text>
-      <text x="58" y="932" class="entity-attr attribute-name" font-size="11" text-anchor="start">name</text>
-      <text x="8" y="952" class="entity-attr attribute-type" text-anchor="start" font-size="11">text</text>
-      <text x="58" y="952" class="entity-attr attribute-name" font-size="11" text-anchor="start">description</text>
-      <text x="8" y="972" class="entity-attr attribute-type" font-size="11" text-anchor="start">decimal</text>
-      <text x="58" y="972" class="entity-attr attribute-name" font-size="11" text-anchor="start">price</text>
-      <text x="8" y="992" class="entity-attr attribute-type" font-size="11" text-anchor="start">int</text>
-      <text x="58" y="992" class="entity-attr attribute-name" font-size="11" text-anchor="start">stock</text>
-      <text x="8" y="1012" class="entity-attr attribute-type" text-anchor="start" font-size="11">boolean</text>
-      <text x="58" y="1012" class="entity-attr attribute-name" font-size="11" text-anchor="start">available</text>
+      <rect x="0" y="1331.25" width="188" height="358" rx="0" ry="0" class="entity-box" stroke="#9370DB" stroke-width="1.3" fill="#ECECFF"/>
+      <rect x="0" y="1374" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" stroke-width="1.3" fill="hsl(240, 100%, 100%)"/>
+      <rect x="0" y="1416.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB"/>
+      <rect x="0" y="1459.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke="#9370DB" stroke-width="1.3"/>
+      <rect x="0" y="1502.25" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" stroke="#9370DB" fill="hsl(240, 100%, 97.27%)"/>
+      <rect x="0" y="1545" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" fill="hsl(240, 100%, 100%)" stroke-width="1.3"/>
+      <rect x="0" y="1587.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" stroke="#9370DB" fill="hsl(240, 100%, 97.27%)"/>
+      <rect x="0" y="1630.5" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" fill="hsl(240, 100%, 100%)" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="0" y1="1374" x2="188" y2="1374" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <line x1="65.8" y1="1374" x2="65.8" y2="1689.25" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="141" y1="1374" x2="141" y2="1689.25" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <text x="94" y="1357.625" class="entity-name" font-weight="bold" text-anchor="middle" font-size="14">PRODUCT</text>
+      <text x="12" y="1399.375" class="entity-attr attribute-type" text-anchor="start" font-size="12">uuid</text>
+      <text x="77.8" y="1399.375" class="entity-attr attribute-name" font-size="12" text-anchor="start">id</text>
+      <text x="153" y="1399.375" class="entity-attr attribute-key" font-size="12" text-anchor="start">PK</text>
+      <text x="12" y="1442.125" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="77.8" y="1442.125" class="entity-attr attribute-name" font-size="12" text-anchor="start">sku</text>
+      <text x="153" y="1442.125" class="entity-attr attribute-key" font-size="12" text-anchor="start">UK</text>
+      <text x="12" y="1484.875" class="entity-attr attribute-type" text-anchor="start" font-size="12">string</text>
+      <text x="77.8" y="1484.875" class="entity-attr attribute-name" font-size="12" text-anchor="start">name</text>
+      <text x="12" y="1527.625" class="entity-attr attribute-type" font-size="12" text-anchor="start">text</text>
+      <text x="77.8" y="1527.625" class="entity-attr attribute-name" text-anchor="start" font-size="12">description</text>
+      <text x="12" y="1570.375" class="entity-attr attribute-type" font-size="12" text-anchor="start">decimal</text>
+      <text x="77.8" y="1570.375" class="entity-attr attribute-name" text-anchor="start" font-size="12">price</text>
+      <text x="12" y="1613.125" class="entity-attr attribute-type" text-anchor="start" font-size="12">int</text>
+      <text x="77.8" y="1613.125" class="entity-attr attribute-name" text-anchor="start" font-size="12">stock</text>
+      <text x="12" y="1655.875" class="entity-attr attribute-type" font-size="12" text-anchor="start">boolean</text>
+      <text x="77.8" y="1655.875" class="entity-attr attribute-name" text-anchor="start" font-size="12">available</text>
     </g>
     <g class="entity-node" id="entity-PRODUCT_CATEGORY-4">
-      <rect x="66" y="1124" width="160" height="86" rx="0" ry="0" class="entity-box" stroke-width="1" fill="#ECECFF" stroke="#333333"/>
-      <rect x="66" y="1124" width="160" height="30" rx="0" ry="0" class="entity-header" stroke="#333333" stroke-width="1" fill="#9370DB"/>
-      <text x="146" y="1144" class="entity-name" text-anchor="middle" font-weight="bold" font-size="14" fill="#FFFFFF">PRODUCT_CATEGORY</text>
-      <text x="74" y="1178" class="entity-attr attribute-type" text-anchor="start" font-size="11">uuid</text>
-      <text x="124" y="1178" class="entity-attr attribute-name" text-anchor="start" font-size="11">product_id</text>
-      <text x="198" y="1178" class="entity-attr attribute-key" font-size="11" text-anchor="start">PK,FK</text>
-      <text x="74" y="1198" class="entity-attr attribute-type" text-anchor="start" font-size="11">uuid</text>
-      <text x="124" y="1198" class="entity-attr attribute-name" font-size="11" text-anchor="start">category_id</text>
-      <text x="198" y="1198" class="entity-attr attribute-key" text-anchor="start" font-size="11">PK,FK</text>
+      <rect x="59" y="1789.25" width="188" height="144.25" rx="0" ry="0" class="entity-box" stroke-width="1.3" fill="#ECECFF" stroke="#9370DB"/>
+      <rect x="59" y="1832" width="188" height="42.75" rx="0" ry="0" class="row-rect-odd" stroke="#9370DB" stroke-width="1.3" fill="hsl(240, 100%, 100%)"/>
+      <rect x="59" y="1874.75" width="188" height="42.75" rx="0" ry="0" class="row-rect-even" stroke-width="1.3" fill="hsl(240, 100%, 97.27%)" stroke="#9370DB"/>
+      <line x1="59" y1="1832" x2="247" y2="1832" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <line x1="124.8" y1="1832" x2="124.8" y2="1933.5" class="divider" stroke-width="1.3" stroke="#9370DB"/>
+      <line x1="200" y1="1832" x2="200" y2="1933.5" class="divider" stroke="#9370DB" stroke-width="1.3"/>
+      <text x="153" y="1815.625" class="entity-name" text-anchor="middle" font-weight="bold" font-size="14">PRODUCT_CATEGORY</text>
+      <text x="71" y="1857.375" class="entity-attr attribute-type" text-anchor="start" font-size="12">uuid</text>
+      <text x="136.8" y="1857.375" class="entity-attr attribute-name" font-size="12" text-anchor="start">product_id</text>
+      <text x="212" y="1857.375" class="entity-attr attribute-key" text-anchor="start" font-size="12">PK,FK</text>
+      <text x="71" y="1900.125" class="entity-attr attribute-type" text-anchor="start" font-size="12">uuid</text>
+      <text x="136.8" y="1900.125" class="entity-attr attribute-name" text-anchor="start" font-size="12">category_id</text>
+      <text x="212" y="1900.125" class="entity-attr attribute-key" text-anchor="start" font-size="12">PK,FK</text>
     </g>
     <g class="relationship">
-      <path d="M328.5,166 C328.5,216 245,216 245,266" class="relationshipLine" marker-end="url(#er-zeroOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
-      <rect x="261.75" y="204" width="50" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="286.75" y="220" class="relationship-label" text-anchor="middle" font-size="14">places</text>
+      <path d="M356.5,315.25 C356.5,365.25 273,365.25 273,415.25" class="relationshipLine" marker-end="url(#er-zeroOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
+      <rect x="289.75" y="353.25" width="50" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="314.75" y="369.25" class="relationship-label" text-anchor="middle" font-size="14">places</text>
     </g>
     <g class="relationship">
-      <path d="M245,432 C245,497 80,497 80,562" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-oneOrMoreEnd)"/>
-      <rect x="130.5" y="485" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="162.5" y="501" class="relationship-label" font-size="14" text-anchor="middle">contains</text>
+      <path d="M273,730.5 C273,812.5625 94,812.5625 94,894.625" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-oneOrMoreEnd)"/>
+      <rect x="151.5" y="800.5625" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="183.5" y="816.5625" class="relationship-label" font-size="14" text-anchor="middle">contains</text>
     </g>
     <g class="relationship">
-      <path d="M80,708 C80,773 80,773 80,838" class="relationshipLine" marker-start="url(#er-oneOrMoreStart)" marker-end="url(#er-onlyOneEnd)"/>
-      <rect x="41" y="761" width="78" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="80" y="777" class="relationship-label" text-anchor="middle" font-size="14">references</text>
+      <path d="M94,1167.125 C94,1249.1875 94,1249.1875 94,1331.25" class="relationshipLine" marker-start="url(#er-oneOrMoreStart)" marker-end="url(#er-onlyOneEnd)"/>
+      <rect x="55" y="1237.1875" width="78" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="94" y="1253.1875" class="relationship-label" text-anchor="middle" font-size="14">references</text>
     </g>
     <g class="relationship">
-      <path d="M80,1024 C80,1074 146,1074 146,1124" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/>
-      <rect x="74" y="1062" width="78" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="113" y="1078" class="relationship-label" text-anchor="middle" font-size="14">belongs_to</text>
+      <path d="M94,1689.25 C94,1739.25 153,1739.25 153,1789.25" class="relationshipLine" marker-end="url(#er-zeroOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
+      <rect x="84.5" y="1727.25" width="78" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="123.5" y="1743.25" class="relationship-label" font-size="14" text-anchor="middle">belongs_to</text>
     </g>
     <g class="relationship">
-      <path d="M300,994 C300,1059 146,1059 146,1124" class="relationshipLine" marker-end="url(#er-zeroOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
-      <rect x="191" y="1047" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="223" y="1063" class="relationship-label" font-size="14" text-anchor="middle">contains</text>
+      <path d="M342,1625.125 C342,1707.1875 153,1707.1875 153,1789.25" class="relationshipLine" marker-end="url(#er-zeroOrMoreEnd)" marker-start="url(#er-onlyOneStart)"/>
+      <rect x="215.5" y="1695.1875" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="247.5" y="1711.1875" class="relationship-label" text-anchor="middle" font-size="14">contains</text>
     </g>
     <g class="relationship">
-      <path d="M328.5,166 C328.5,349 300,349 300,532" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/>
-      <rect x="299.75" y="337" width="29" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="314.25" y="353" class="relationship-label" text-anchor="middle" font-size="14">has</text>
+      <path d="M356.5,315.25 C356.5,572.875 342,572.875 342,830.5" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/>
+      <rect x="334.75" y="560.875" width="29" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="349.25" y="576.875" class="relationship-label" font-size="14" text-anchor="middle">has</text>
     </g>
     <g class="relationship">
-      <path d="M245,432 C245,482 300,482 300,532" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-onlyOneEnd)"/>
-      <rect x="240.5" y="470" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="272.5" y="486" class="relationship-label" text-anchor="middle" font-size="14">ships_to</text>
+      <path d="M273,730.5 C273,780.5 342,780.5 342,830.5" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-onlyOneEnd)"/>
+      <rect x="275.5" y="768.5" width="64" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="307.5" y="784.5" class="relationship-label" text-anchor="middle" font-size="14">ships_to</text>
     </g>
     <g class="relationship">
-      <path d="M245,432 C245,492 520,492 520,552" class="relationshipLine" marker-end="url(#er-zeroOrOneEnd)" marker-start="url(#er-onlyOneStart)"/>
-      <rect x="354" y="480" width="57" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
-      <text x="382.5" y="496" class="relationship-label" text-anchor="middle" font-size="14">paid_by</text>
+      <path d="M273,730.5 C273,801.875 590,801.875 590,873.25" class="relationshipLine" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrOneEnd)"/>
+      <rect x="403" y="789.875" width="57" height="23" rx="0" ry="0" class="background" fill="#FFFFFF"/>
+      <text x="431.5" y="805.875" class="relationship-label" font-size="14" text-anchor="middle">paid_by</text>
     </g>
   </g>
 </svg>

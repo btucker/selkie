@@ -24,10 +24,10 @@ impl ToLayoutGraph for ErDb {
             ..Default::default()
         };
 
-        // Layout constants for entity sizing
-        let entity_width = 160.0;
-        let entity_header_height = 30.0;
-        let attr_row_height = 20.0;
+        // Layout constants for entity sizing (matching mermaid.js)
+        let entity_width = 188.0;
+        let entity_header_height = 42.75;
+        let attr_row_height = 42.75;
         let padding = 8.0;
 
         // Convert entities to layout nodes
@@ -86,10 +86,10 @@ impl ToLayoutGraph for ErDb {
 pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
-    // Layout constants
-    let entity_width = 160.0;
-    let entity_header_height = 30.0;
-    let attr_row_height = 20.0;
+    // Layout constants matching mermaid.js dimensions
+    let entity_width = 188.0; // Matches mermaid's typical entity width
+    let entity_header_height = 42.75; // Matches mermaid's row height
+    let attr_row_height = 42.75; // Each attribute row is same height as header
     let margin = 50.0;
     let padding = 8.0;
 
@@ -257,7 +257,8 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     Ok(doc.to_string())
 }
 
-/// Render an entity box with attributes
+/// Render an entity box with attributes in table-style layout
+/// Matches mermaid.js with alternating row colors and column dividers
 #[allow(clippy::too_many_arguments)]
 fn render_entity(
     entity: &Entity,
@@ -267,12 +268,71 @@ fn render_entity(
     height: f64,
     header_height: f64,
     attr_row_height: f64,
-    padding: f64,
+    _padding: f64,
 ) -> SvgElement {
-    let mut children = Vec::new();
+    // Collect shapes and text separately for correct z-order
+    // SVG renders elements in document order - shapes must come before text
+    let mut shapes = Vec::new();
+    let mut text_elements = Vec::new();
 
-    // Entity box
-    children.push(SvgElement::Rect {
+    // Colors matching mermaid.js
+    let fill_color = "#ECECFF";
+    let stroke_color = "#9370DB";
+    let row_odd_color = "hsl(240, 100%, 100%)"; // white
+    let row_even_color = "hsl(240, 100%, 97.27%)"; // very light blue
+
+    let num_attrs = entity.attributes.len();
+
+    // Entity name for display
+    let display_name = if !entity.alias.is_empty() {
+        &entity.alias
+    } else {
+        &entity.label
+    };
+
+    // Entities without attributes: simple box with centered name (like mermaid.js)
+    if num_attrs == 0 {
+        shapes.push(SvgElement::Rect {
+            x,
+            y,
+            width,
+            height,
+            rx: Some(0.0),
+            ry: Some(0.0),
+            attrs: Attrs::new()
+                .with_fill(fill_color)
+                .with_stroke(stroke_color)
+                .with_stroke_width(1.3)
+                .with_class("entity-box"),
+        });
+
+        text_elements.push(SvgElement::Text {
+            x: x + width / 2.0,
+            y: y + height / 2.0 + 5.0,
+            content: display_name.clone(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("entity-name")
+                .with_attr("font-size", "14")
+                .with_attr("font-weight", "bold"),
+        });
+
+        let mut children = shapes;
+        children.extend(text_elements);
+
+        return SvgElement::Group {
+            children,
+            attrs: Attrs::new().with_class("entity-node").with_id(&entity.id),
+        };
+    }
+
+    // Column positions (percentages of width, matching mermaid.js layout)
+    // Type column: ~35%, Name column: ~40%, Keys column: ~25%
+    let type_col_end = x + width * 0.35;
+    let name_col_end = x + width * 0.75;
+
+    // Main entity box (background)
+    shapes.push(SvgElement::Rect {
         x,
         y,
         width,
@@ -280,81 +340,70 @@ fn render_entity(
         rx: Some(0.0),
         ry: Some(0.0),
         attrs: Attrs::new()
-            .with_fill("#ECECFF")
-            .with_stroke("#333333")
-            .with_stroke_width(1.0)
+            .with_fill(fill_color)
+            .with_stroke(stroke_color)
+            .with_stroke_width(1.3)
             .with_class("entity-box"),
     });
 
-    // Header background
-    children.push(SvgElement::Rect {
-        x,
-        y,
-        width,
-        height: header_height,
-        rx: Some(0.0),
-        ry: Some(0.0),
-        attrs: Attrs::new()
-            .with_fill("#9370DB")
-            .with_stroke("#333333")
-            .with_stroke_width(1.0)
-            .with_class("entity-header"),
-    });
+    // Attribute rows with alternating backgrounds (starting after header)
+    let content_y = y + header_height;
 
-    // Entity name
-    let display_name = if !entity.alias.is_empty() {
-        &entity.alias
-    } else {
-        &entity.label
-    };
-    children.push(SvgElement::Text {
-        x: x + width / 2.0,
-        y: y + header_height / 2.0 + 5.0,
-        content: display_name.clone(),
-        attrs: Attrs::new()
-            .with_attr("text-anchor", "middle")
-            .with_class("entity-name")
-            .with_attr("font-size", "14")
-            .with_attr("font-weight", "bold")
-            .with_fill("#FFFFFF"),
-    });
+    for (i, attr) in entity.attributes.iter().enumerate() {
+        let row_y = content_y + (i as f64) * attr_row_height;
+        let row_color = if i % 2 == 0 {
+            row_odd_color
+        } else {
+            row_even_color
+        };
 
-    // Attributes - rendered as separate text elements per mermaid.js format
-    // Column positions within the entity box
-    let type_x = x + padding;
-    let name_x = x + padding + 50.0; // After type column
-    let keys_x = x + width - padding - 20.0; // Right-aligned
+        // Row background rectangle
+        shapes.push(SvgElement::Rect {
+            x,
+            y: row_y,
+            width,
+            height: attr_row_height,
+            rx: Some(0.0),
+            ry: Some(0.0),
+            attrs: Attrs::new()
+                .with_fill(row_color)
+                .with_stroke(stroke_color)
+                .with_stroke_width(1.3)
+                .with_class(if i % 2 == 0 {
+                    "row-rect-odd"
+                } else {
+                    "row-rect-even"
+                }),
+        });
 
-    let mut attr_y = y + header_height + padding;
-    for attr in &entity.attributes {
-        attr_y += attr_row_height;
-        let text_y = attr_y - 4.0;
+        // Text y position (vertically centered in row)
+        let text_y = row_y + attr_row_height / 2.0 + 4.0;
 
-        // Type column (e.g., "string", "int", "date")
-        children.push(SvgElement::Text {
-            x: type_x,
+        // Type column text
+        text_elements.push(SvgElement::Text {
+            x: x + 12.0, // left padding
             y: text_y,
             content: attr.attr_type.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
                 .with_class("entity-attr")
                 .with_class("attribute-type")
-                .with_attr("font-size", "11"),
+                .with_attr("font-size", "12"),
         });
 
-        // Name column (e.g., "name", "email", "id")
-        children.push(SvgElement::Text {
-            x: name_x,
+        // Name column text
+        text_elements.push(SvgElement::Text {
+            x: type_col_end + 12.0,
             y: text_y,
             content: attr.name.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
                 .with_class("entity-attr")
                 .with_class("attribute-name")
-                .with_attr("font-size", "11"),
+                .with_attr("font-size", "12"),
         });
 
-        // Keys column (e.g., "PK", "FK", "UK" - if present)
+        // Keys column text (if present)
         if !attr.keys.is_empty() {
             let key_str = attr
                 .keys
@@ -362,18 +411,76 @@ fn render_entity(
                 .map(|k| k.as_str())
                 .collect::<Vec<_>>()
                 .join(",");
-            children.push(SvgElement::Text {
-                x: keys_x,
+            text_elements.push(SvgElement::Text {
+                x: name_col_end + 12.0,
                 y: text_y,
                 content: key_str,
                 attrs: Attrs::new()
                     .with_attr("text-anchor", "start")
                     .with_class("entity-attr")
                     .with_class("attribute-key")
-                    .with_attr("font-size", "11"),
+                    .with_attr("font-size", "12"),
             });
         }
     }
+
+    // Divider lines
+    let divider_bottom = y + height;
+
+    // Horizontal divider under header
+    shapes.push(SvgElement::Line {
+        x1: x,
+        y1: content_y,
+        x2: x + width,
+        y2: content_y,
+        attrs: Attrs::new()
+            .with_stroke(stroke_color)
+            .with_stroke_width(1.3)
+            .with_class("divider"),
+    });
+
+    // Vertical divider between type and name columns
+    shapes.push(SvgElement::Line {
+        x1: type_col_end,
+        y1: content_y,
+        x2: type_col_end,
+        y2: divider_bottom,
+        attrs: Attrs::new()
+            .with_stroke(stroke_color)
+            .with_stroke_width(1.3)
+            .with_class("divider"),
+    });
+
+    // Vertical divider between name and keys columns
+    shapes.push(SvgElement::Line {
+        x1: name_col_end,
+        y1: content_y,
+        x2: name_col_end,
+        y2: divider_bottom,
+        attrs: Attrs::new()
+            .with_stroke(stroke_color)
+            .with_stroke_width(1.3)
+            .with_class("divider"),
+    });
+
+    // Entity name (centered in header) - text comes after shapes
+    text_elements.insert(
+        0,
+        SvgElement::Text {
+            x: x + width / 2.0,
+            y: y + header_height / 2.0 + 5.0,
+            content: display_name.clone(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("entity-name")
+                .with_attr("font-size", "14")
+                .with_attr("font-weight", "bold"),
+        },
+    );
+
+    // Combine shapes first, then text (correct z-order)
+    let mut children = shapes;
+    children.extend(text_elements);
 
     SvgElement::Group {
         children,
