@@ -285,39 +285,14 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
         doc.add_element(title_elem);
     }
 
-    // Render each entity
-    for (name, entity) in &sorted_entities {
-        if let Some(&(x, y)) = entity_positions.get(*name) {
-            let dims = entity_dimensions
-                .get(*name)
-                .cloned()
-                .unwrap_or(EntityDimensions {
-                    width: 188.0,
-                    height: entity_header_height + padding * 2.0,
-                    col_widths: [65.8, 75.2, 47.0],
-                });
-            let entity_elem = render_entity(
-                entity,
-                x,
-                y,
-                dims.width,
-                dims.height,
-                entity_header_height,
-                attr_row_height,
-                padding,
-                &dims.col_widths,
-            );
-            doc.add_element(entity_elem);
-        }
-    }
-
     // Create entity id to name mapping for relationship rendering
     let entity_id_to_name: HashMap<String, String> = entities
         .iter()
         .map(|(name, entity)| (entity.id.clone(), name.clone()))
         .collect();
 
-    // Render relationships
+    // Render relationships FIRST so entity boxes paint on top and clip markers
+    // (SVG renders later elements on top of earlier ones)
     for relationship in db.get_relationships() {
         // Look up entity names from IDs
         let entity_a_name = entity_id_to_name.get(&relationship.entity_a);
@@ -350,6 +325,33 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
                 );
                 doc.add_element(rel_elem);
             }
+        }
+    }
+
+    // Render entities AFTER relationships so entity boxes paint on top,
+    // clipping the crow's feet markers behind the entity boxes
+    for (name, entity) in &sorted_entities {
+        if let Some(&(x, y)) = entity_positions.get(*name) {
+            let dims = entity_dimensions
+                .get(*name)
+                .cloned()
+                .unwrap_or(EntityDimensions {
+                    width: 188.0,
+                    height: entity_header_height + padding * 2.0,
+                    col_widths: [65.8, 75.2, 47.0],
+                });
+            let entity_elem = render_entity(
+                entity,
+                x,
+                y,
+                dims.width,
+                dims.height,
+                entity_header_height,
+                attr_row_height,
+                padding,
+                &dims.col_widths,
+            );
+            doc.add_element(entity_elem);
         }
     }
 
