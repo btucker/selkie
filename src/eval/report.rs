@@ -207,7 +207,9 @@ fn get_reference_paths(diagram_type: &str) -> ReferencePathInfo {
             renderer: format!("{}/flowchart/flowRenderer-v2.ts", mermaid_base),
             db: format!("{}/flowchart/flowDb.ts", mermaid_base),
             styles: Some(format!("{}/flowchart/styles.ts", mermaid_base)),
-            layout_hint: Some("Uses dagre for layout: reference-implementations/dagre/".to_string()),
+            layout_hint: Some(
+                "Uses dagre for layout: reference-implementations/dagre/".to_string(),
+            ),
         },
         "sequence" => ReferencePathInfo {
             parser: format!("{}/sequence/sequenceParser.ts", mermaid_base),
@@ -255,7 +257,10 @@ fn get_reference_paths(diagram_type: &str) -> ReferencePathInfo {
             parser: format!("{}/architecture/architectureParser.ts", mermaid_base),
             renderer: format!("{}/architecture/architectureRenderer.ts", mermaid_base),
             db: format!("{}/architecture/architectureDb.ts", mermaid_base),
-            styles: Some(format!("{}/architecture/architectureStyles.ts", mermaid_base)),
+            styles: Some(format!(
+                "{}/architecture/architectureStyles.ts",
+                mermaid_base
+            )),
             layout_hint: None,
         },
         _ => ReferencePathInfo {
@@ -340,43 +345,59 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
     let mut output = String::new();
 
     // Header with clear machine-parseable format
-    output.push_str("================================================================================\n");
+    output.push_str(
+        "================================================================================\n",
+    );
     output.push_str("SELKIE EVALUATION REPORT (AI-AGENT FORMAT)\n");
-    output.push_str("================================================================================\n\n");
+    output.push_str(
+        "================================================================================\n\n",
+    );
 
     // Report file locations (important for AI agents to know where to read more)
     if let Some(dir) = output_dir {
         output.push_str("## REPORT FILES\n\n");
-        output.push_str(&format!("- **JSON Report**: {}\n", dir.join("report.json").display()));
-        output.push_str(&format!("- **HTML Report**: {}\n", dir.join("index.html").display()));
-        output.push_str(&format!("- **SVG Files**: {}/{{diagram_type}}/\n", dir.display()));
+        output.push_str(&format!(
+            "- **JSON Report**: {}\n",
+            dir.join("report.json").display()
+        ));
+        output.push_str(&format!(
+            "- **HTML Report**: {}\n",
+            dir.join("index.html").display()
+        ));
+        output.push_str(&format!(
+            "- **SVG Files**: {}/{{diagram_type}}/\n",
+            dir.display()
+        ));
         output.push('\n');
     }
 
     // Quick summary for prioritization
     output.push_str("## SUMMARY\n\n");
-    output.push_str(&format!(
-        "- Total diagrams: {}\n",
-        result.total
-    ));
+    output.push_str(&format!("- Total diagrams: {}\n", result.total));
     output.push_str(&format!(
         "- Passing: {} ({:.1}%)\n",
         result.matching, result.parity_percent
     ));
-    output.push_str(&format!(
-        "- Errors: {}\n",
-        result.issue_counts.errors
-    ));
-    output.push_str(&format!(
-        "- Warnings: {}\n",
-        result.issue_counts.warnings
-    ));
+    output.push_str(&format!("- Errors: {}\n", result.issue_counts.errors));
+    output.push_str(&format!("- Warnings: {}\n", result.issue_counts.warnings));
     output.push('\n');
 
     // Group diagrams by status for easy prioritization
-    let errors: Vec<_> = result.diagrams.iter().filter(|d| d.status == Status::Error).collect();
-    let warnings: Vec<_> = result.diagrams.iter().filter(|d| d.status == Status::Warning).collect();
-    let matches: Vec<_> = result.diagrams.iter().filter(|d| d.status == Status::Match).collect();
+    let errors: Vec<_> = result
+        .diagrams
+        .iter()
+        .filter(|d| d.status == Status::Error)
+        .collect();
+    let warnings: Vec<_> = result
+        .diagrams
+        .iter()
+        .filter(|d| d.status == Status::Warning)
+        .collect();
+    let matches: Vec<_> = result
+        .diagrams
+        .iter()
+        .filter(|d| d.status == Status::Match)
+        .collect();
 
     // Priority order for fixing
     if !errors.is_empty() {
@@ -397,15 +418,22 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
     if !matches.is_empty() {
         output.push_str(&format!("## PASSING ({} diagrams)\n\n", matches.len()));
         for diagram in matches.iter() {
-            output.push_str(&format!("- [OK] {} ({})\n", diagram.name, diagram.diagram_type));
+            output.push_str(&format!(
+                "- [OK] {} ({})\n",
+                diagram.name, diagram.diagram_type
+            ));
         }
         output.push('\n');
     }
 
     // Investigation guide at the end
-    output.push_str("================================================================================\n");
+    output.push_str(
+        "================================================================================\n",
+    );
     output.push_str("## INVESTIGATION GUIDE FOR AI AGENTS\n");
-    output.push_str("================================================================================\n\n");
+    output.push_str(
+        "================================================================================\n\n",
+    );
 
     output.push_str("### Setting Up Reference Implementations\n\n");
     output.push_str("If reference implementations are not initialized, run:\n");
@@ -416,9 +444,12 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
 
     output.push_str("### Issue Types and What They Mean\n\n");
     output.push_str("- **node_count**: Mismatch in number of shapes/boxes rendered\n");
-    output.push_str("  → Check: Parser may not be extracting all nodes, or renderer skipping them\n\n");
+    output.push_str(
+        "  → Check: Parser may not be extracting all nodes, or renderer skipping them\n\n",
+    );
     output.push_str("- **edge_count**: Mismatch in number of connecting lines/arrows\n");
-    output.push_str("  → Check: Parser may miss edge definitions, or renderer not drawing them\n\n");
+    output
+        .push_str("  → Check: Parser may miss edge definitions, or renderer not drawing them\n\n");
     output.push_str("- **labels_missing**: Text labels present in reference but not in selkie\n");
     output.push_str("  → Check: Parser may not extract label text, or renderer not placing it\n\n");
     output.push_str("- **dimensions**: SVG size significantly different from reference\n");
@@ -433,7 +464,9 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
     output.push_str("### Debugging Workflow\n\n");
     output.push_str("1. Read the diagram source to understand what should be rendered\n");
     output.push_str("2. Compare the selkie SVG vs reference SVG (paths shown per-diagram above)\n");
-    output.push_str("3. For parsing issues: Check the parser file and compare with reference parser\n");
+    output.push_str(
+        "3. For parsing issues: Check the parser file and compare with reference parser\n",
+    );
     output.push_str("4. For rendering issues: Check the renderer and compare output structure\n");
     output.push_str("5. Use `cargo test -p selkie -- <diagram_type>` to run related tests\n\n");
 
@@ -441,20 +474,32 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
 }
 
 /// Format a single diagram for agent-friendly output
-fn format_diagram_for_agent(diagram: &super::DiagramResult, index: usize, output_dir: Option<&Path>) -> String {
+fn format_diagram_for_agent(
+    diagram: &super::DiagramResult,
+    index: usize,
+    output_dir: Option<&Path>,
+) -> String {
     let mut output = String::new();
 
-    output.push_str("--------------------------------------------------------------------------------\n");
+    output.push_str(
+        "--------------------------------------------------------------------------------\n",
+    );
     output.push_str(&format!("### Diagram {}: {}\n\n", index, diagram.name));
 
     output.push_str(&format!("**Type:** {}\n", diagram.diagram_type));
     output.push_str(&format!("**Status:** {:?}\n", diagram.status));
 
     if let Some(ssim) = diagram.visual_similarity {
-        output.push_str(&format!("**Visual Similarity (SSIM):** {:.1}%\n", ssim * 100.0));
+        output.push_str(&format!(
+            "**Visual Similarity (SSIM):** {:.1}%\n",
+            ssim * 100.0
+        ));
     }
     if let Some(structural) = diagram.structural_similarity {
-        output.push_str(&format!("**Structural Similarity:** {:.1}%\n", structural * 100.0));
+        output.push_str(&format!(
+            "**Structural Similarity:** {:.1}%\n",
+            structural * 100.0
+        ));
     }
     output.push('\n');
 
@@ -473,7 +518,9 @@ fn format_diagram_for_agent(diagram: &super::DiagramResult, index: usize, output
         if diagram.reference_svg.is_some() {
             output.push_str(&format!(
                 "- Reference SVG: {}\n",
-                type_dir.join(format!("{}_reference.svg", safe_name)).display()
+                type_dir
+                    .join(format!("{}_reference.svg", safe_name))
+                    .display()
             ));
         }
         let png_path = type_dir.join(format!("{}.png", safe_name));
@@ -492,7 +539,10 @@ fn format_diagram_for_agent(diagram: &super::DiagramResult, index: usize, output
                 Level::Warning => "WARN",
                 Level::Info => "INFO",
             };
-            output.push_str(&format!("- [{}] **{}**: {}\n", level_str, issue.check, issue.message));
+            output.push_str(&format!(
+                "- [{}] **{}**: {}\n",
+                level_str, issue.check, issue.message
+            ));
             if let (Some(expected), Some(actual)) = (&issue.expected, &issue.actual) {
                 output.push_str(&format!("  - Expected: {}\n", expected));
                 output.push_str(&format!("  - Actual: {}\n", actual));
@@ -880,7 +930,7 @@ pub fn write_pngs(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::eval::{DiagramResult, IssueCounts, Issue, Level, ParseResult, Status};
+    use crate::eval::{DiagramResult, Issue, IssueCounts, Level, ParseResult, Status};
     use std::collections::HashMap;
 
     fn make_test_result() -> EvalResult {
@@ -927,18 +977,16 @@ mod tests {
             matching: 1,
             parity_percent: 33.3,
             avg_visual_similarity: 0.75,
-            by_type: HashMap::from([
-                (
-                    "flowchart".to_string(),
-                    TypeStats {
-                        total: 3,
-                        matching: 1,
-                        parity_percent: 33.3,
-                        avg_ssim: 0.75,
-                        avg_structural: 0.60,
-                    },
-                ),
-            ]),
+            by_type: HashMap::from([(
+                "flowchart".to_string(),
+                TypeStats {
+                    total: 3,
+                    matching: 1,
+                    parity_percent: 33.3,
+                    avg_ssim: 0.75,
+                    avg_structural: 0.60,
+                },
+            )]),
             issue_counts: IssueCounts {
                 errors: 2,
                 warnings: 1,
@@ -980,10 +1028,11 @@ mod tests {
                     visual_similarity: Some(0.80),
                     structural_similarity: Some(0.85),
                     structural_match: true,
-                    issues: vec![
-                        Issue::warning("dimensions", "Width differs by 25%: expected 400, got 500")
-                            .with_values("400", "500"),
-                    ],
+                    issues: vec![Issue::warning(
+                        "dimensions",
+                        "Width differs by 25%: expected 400, got 500",
+                    )
+                    .with_values("400", "500")],
                     parse_result: ParseResult {
                         selkie_success: true,
                         selkie_error: None,

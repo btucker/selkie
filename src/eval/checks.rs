@@ -280,12 +280,13 @@ fn check_z_order(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut V
             ));
         }
 
-        issues.push(
-            Issue::warning("z_order", msg).with_values(
-                format!("text_before_shapes: {}", reference.z_order.text_before_shapes),
-                format!("text_before_shapes: {}", selkie.z_order.text_before_shapes),
+        issues.push(Issue::warning("z_order", msg).with_values(
+            format!(
+                "text_before_shapes: {}",
+                reference.z_order.text_before_shapes
             ),
-        );
+            format!("text_before_shapes: {}", selkie.z_order.text_before_shapes),
+        ));
     }
 
     // Also warn if the overall text/shape ordering pattern differs significantly
@@ -296,7 +297,8 @@ fn check_z_order(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut V
         1.0
     };
 
-    let ref_ratio = if reference.z_order.text_after_shapes + reference.z_order.text_before_shapes > 0
+    let ref_ratio = if reference.z_order.text_after_shapes + reference.z_order.text_before_shapes
+        > 0
     {
         reference.z_order.text_after_shapes as f64
             / (reference.z_order.text_after_shapes + reference.z_order.text_before_shapes) as f64

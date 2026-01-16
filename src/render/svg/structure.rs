@@ -332,10 +332,13 @@ fn collect_text_content(node: &roxmltree::Node) -> String {
 /// In SVG, later elements are rendered on top of earlier ones
 fn analyze_z_order(doc: &roxmltree::Document) -> ZOrderAnalysis {
     let mut analysis = ZOrderAnalysis::default();
-    let mut element_counts: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
+    let mut element_counts: std::collections::HashMap<String, usize> =
+        std::collections::HashMap::new();
 
     // Shape element types that could obscure text
-    const SHAPE_TAGS: &[&str] = &["rect", "circle", "ellipse", "polygon", "path", "line", "polyline"];
+    const SHAPE_TAGS: &[&str] = &[
+        "rect", "circle", "ellipse", "polygon", "path", "line", "polyline",
+    ];
     const TEXT_TAGS: &[&str] = &["text", "tspan", "foreignObject"];
 
     // Analyze each group (g element) for text/shape ordering
@@ -359,7 +362,9 @@ fn analyze_z_order(doc: &roxmltree::Document) -> ZOrderAnalysis {
                                 .split_whitespace()
                                 .collect::<Vec<_>>()
                                 .join(" ");
-                            if !label.is_empty() && !analysis.potentially_obscured_labels.contains(&label) {
+                            if !label.is_empty()
+                                && !analysis.potentially_obscured_labels.contains(&label)
+                            {
                                 analysis.potentially_obscured_labels.push(label);
                             }
                         }
