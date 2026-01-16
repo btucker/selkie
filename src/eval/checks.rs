@@ -43,6 +43,7 @@ pub fn check_structure(
     // WARNING checks - significant differences
     check_dimensions(selkie, reference, config, &mut issues);
     check_shape_counts(selkie, reference, &mut issues);
+    check_z_order(selkie, reference, &mut issues);
 
     // INFO checks - acceptable variations
     check_extra_labels(selkie, reference, &mut issues);
@@ -261,6 +262,61 @@ fn check_markers(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut V
     }
 }
 
+/// Check z-order (element rendering order) - WARNING if text may be obscured
+fn check_z_order(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
+    // Check if selkie has text rendered before shapes when reference doesn't
+    // This would cause text to be hidden behind shapes
+    if selkie.z_order.text_before_shapes > reference.z_order.text_before_shapes {
+        let diff = selkie.z_order.text_before_shapes - reference.z_order.text_before_shapes;
+        let mut msg = format!(
+            "Z-order issue: {} text element(s) rendered before shapes (may be obscured)",
+            diff
+        );
+
+        if !selkie.z_order.potentially_obscured_labels.is_empty() {
+            msg.push_str(&format!(
+                ". Potentially affected labels: {:?}",
+                selkie.z_order.potentially_obscured_labels
+            ));
+        }
+
+        issues.push(
+            Issue::warning("z_order", msg).with_values(
+                format!("text_before_shapes: {}", reference.z_order.text_before_shapes),
+                format!("text_before_shapes: {}", selkie.z_order.text_before_shapes),
+            ),
+        );
+    }
+
+    // Also warn if the overall text/shape ordering pattern differs significantly
+    let selkie_ratio = if selkie.z_order.text_after_shapes + selkie.z_order.text_before_shapes > 0 {
+        selkie.z_order.text_after_shapes as f64
+            / (selkie.z_order.text_after_shapes + selkie.z_order.text_before_shapes) as f64
+    } else {
+        1.0
+    };
+
+    let ref_ratio = if reference.z_order.text_after_shapes + reference.z_order.text_before_shapes > 0
+    {
+        reference.z_order.text_after_shapes as f64
+            / (reference.z_order.text_after_shapes + reference.z_order.text_before_shapes) as f64
+    } else {
+        1.0
+    };
+
+    // If reference has >80% text-after-shapes but selkie has <50%, that's a significant difference
+    if ref_ratio > 0.8 && selkie_ratio < 0.5 {
+        issues.push(Issue::warning(
+            "z_order_pattern",
+            format!(
+                "Z-order pattern differs: reference has {:.0}% text after shapes, selkie has {:.0}%",
+                ref_ratio * 100.0,
+                selkie_ratio * 100.0
+            ),
+        ));
+    }
+}
+
 /// Calculate structural similarity score (0-1)
 pub fn calculate_similarity(selkie: &SvgStructure, reference: &SvgStructure) -> f64 {
     let mut score_parts: Vec<f64> = Vec::new();
@@ -311,7 +367,7 @@ pub fn calculate_similarity(selkie: &SvgStructure, reference: &SvgStructure) -> 
 mod tests {
     use super::*;
     use crate::eval::Level;
-    use crate::render::svg::structure::ShapeCounts;
+    use crate::render::svg::structure::{ShapeCounts, ZOrderAnalysis};
 
     fn make_structure(nodes: usize, edges: usize, labels: Vec<&str>) -> SvgStructure {
         SvgStructure {
@@ -324,6 +380,7 @@ mod tests {
             marker_count: 0,
             has_defs: true,
             has_style: true,
+            z_order: ZOrderAnalysis::default(),
         }
     }
 

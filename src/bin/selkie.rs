@@ -135,13 +135,12 @@ struct RenderArgs {
 #[derive(Parser, Debug)]
 #[command(after_help = "\
 Examples:
-  selkie eval                     Run with gallery samples, output to ./eval-report
+  selkie eval                     Run with gallery samples (AI-agent friendly output)
   selkie eval -o ./reports        Output to custom directory
   selkie eval --type flowchart    Evaluate only flowchart samples
   selkie eval ./diagrams/         Evaluate .mmd files from directory
-  selkie eval --json report.json  Also generate JSON report
+  selkie eval --brief             Compact summary output
   selkie eval --verbose           Show detailed per-diagram diffs
-  selkie eval --agent             AI-agent friendly output with investigation guidance
 ")]
 struct EvalArgs {
     /// Input to evaluate: JSON file, directory, .mmd file, or omit for gallery samples
@@ -156,17 +155,13 @@ struct EvalArgs {
     #[arg(short, long, value_name = "DIR")]
     output: Option<PathBuf>,
 
-    /// Write JSON report to file (in addition to HTML report)
-    #[arg(long)]
-    json: Option<PathBuf>,
-
-    /// Show detailed diff per diagram
+    /// Show detailed diff per diagram (legacy format)
     #[arg(short, long)]
     verbose: bool,
 
-    /// AI-agent friendly output with per-diagram details, file paths, and investigation guidance
+    /// Compact summary output (disables default AI-agent friendly format)
     #[arg(short, long)]
-    agent: bool,
+    brief: bool,
 
     /// Clear cache and re-render all reference SVGs
     #[arg(long)]
@@ -553,12 +548,6 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     fs::create_dir_all(&output_dir)?;
 
-    // Write JSON if requested
-    if let Some(ref path) = args.json {
-        eval::report::write_json(&result, path)?;
-        eprintln!("Wrote JSON report to {}", path.display());
-    }
-
     // Write HTML report as index.html
     eprint!("Writing HTML report...");
     let html_path = output_dir.join("index.html");
@@ -611,19 +600,26 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(not(feature = "png"))]
     let _ = svg_pairs; // Suppress unused warning
 
-    // Output results to stderr (agent, verbose, or summary)
-    if args.agent {
-        eprintln!(
-            "{}",
-            eval::report::text_agent_friendly(&result, Some(&output_dir))
-        );
+    // Always write JSON report to the output directory
+    let json_path = output_dir.join("report.json");
+    eval::report::write_json(&result, &json_path)?;
+
+    // Output results to stderr (default=agent, --verbose, or --brief)
+    if args.brief {
+        // Compact summary (old default)
+        eprintln!("{}", eval::report::text_summary(&result, Some(&output_dir)));
     } else if args.verbose {
+        // Detailed diff per diagram (legacy format)
         eprintln!(
             "{}",
             eval::report::text_detailed(&result, Some(&output_dir))
         );
     } else {
-        eprintln!("{}", eval::report::text_summary(&result, Some(&output_dir)));
+        // Default: AI-agent friendly output
+        eprintln!(
+            "{}",
+            eval::report::text_agent_friendly(&result, Some(&output_dir))
+        );
     }
 
     // Print the output directory path

@@ -26,6 +26,22 @@ pub struct SvgStructure {
     pub has_defs: bool,
     /// Whether the SVG has embedded styles
     pub has_style: bool,
+    /// Z-order analysis: tracks element rendering order
+    pub z_order: ZOrderAnalysis,
+}
+
+/// Analysis of SVG element rendering order (z-order)
+/// In SVG, later elements are drawn on top of earlier ones
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct ZOrderAnalysis {
+    /// Text elements that appear before shapes in the same group (potentially obscured)
+    pub text_before_shapes: usize,
+    /// Text elements that appear after shapes in the same group (correct order)
+    pub text_after_shapes: usize,
+    /// Labels that may be obscured (text rendered before overlapping shapes)
+    pub potentially_obscured_labels: Vec<String>,
+    /// Element order summary: list of (element_type, count) in render order
+    pub element_order: Vec<(String, usize)>,
 }
 
 /// Counts of different SVG shape elements
@@ -70,6 +86,9 @@ impl SvgStructure {
         let has_defs = doc.descendants().any(|n| n.tag_name().name() == "defs");
         let has_style = doc.descendants().any(|n| n.tag_name().name() == "style");
 
+        // Analyze z-order (element rendering order)
+        let z_order = analyze_z_order(&doc);
+
         Ok(SvgStructure {
             width,
             height,
@@ -80,6 +99,7 @@ impl SvgStructure {
             marker_count,
             has_defs,
             has_style,
+            z_order,
         })
     }
 }
@@ -306,6 +326,72 @@ fn collect_text_content(node: &roxmltree::Node) -> String {
     }
 
     result
+}
+
+/// Analyze z-order (rendering order) of SVG elements
+/// In SVG, later elements are rendered on top of earlier ones
+fn analyze_z_order(doc: &roxmltree::Document) -> ZOrderAnalysis {
+    let mut analysis = ZOrderAnalysis::default();
+    let mut element_counts: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
+
+    // Shape element types that could obscure text
+    const SHAPE_TAGS: &[&str] = &["rect", "circle", "ellipse", "polygon", "path", "line", "polyline"];
+    const TEXT_TAGS: &[&str] = &["text", "tspan", "foreignObject"];
+
+    // Analyze each group (g element) for text/shape ordering
+    for group in doc.descendants().filter(|n| n.tag_name().name() == "g") {
+        let mut last_shape_index: Option<usize> = None;
+        let mut last_text_index: Option<usize> = None;
+
+        for (i, child) in group.children().enumerate() {
+            let tag = child.tag_name().name();
+
+            if SHAPE_TAGS.contains(&tag) {
+                last_shape_index = Some(i);
+
+                // If text was rendered before this shape, it might be obscured
+                if let Some(text_idx) = last_text_index {
+                    if text_idx < i {
+                        analysis.text_before_shapes += 1;
+                        // Try to extract the label that might be obscured
+                        if let Some(text_node) = group.children().nth(text_idx) {
+                            let label = collect_text_content(&text_node)
+                                .split_whitespace()
+                                .collect::<Vec<_>>()
+                                .join(" ");
+                            if !label.is_empty() && !analysis.potentially_obscured_labels.contains(&label) {
+                                analysis.potentially_obscured_labels.push(label);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if TEXT_TAGS.contains(&tag) {
+                last_text_index = Some(i);
+
+                // Check if text comes after shapes (correct order)
+                if last_shape_index.is_some() {
+                    analysis.text_after_shapes += 1;
+                }
+            }
+        }
+    }
+
+    // Build element order summary (top-level elements in the main SVG)
+    for node in doc.root_element().children() {
+        let tag = node.tag_name().name();
+        if !tag.is_empty() {
+            *element_counts.entry(tag.to_string()).or_insert(0) += 1;
+        }
+    }
+
+    // Convert to ordered list
+    let mut order: Vec<_> = element_counts.into_iter().collect();
+    order.sort_by(|a, b| a.0.cmp(&b.0));
+    analysis.element_order = order;
+
+    analysis
 }
 
 #[cfg(test)]

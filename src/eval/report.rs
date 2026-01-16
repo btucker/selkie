@@ -344,6 +344,15 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
     output.push_str("SELKIE EVALUATION REPORT (AI-AGENT FORMAT)\n");
     output.push_str("================================================================================\n\n");
 
+    // Report file locations (important for AI agents to know where to read more)
+    if let Some(dir) = output_dir {
+        output.push_str("## REPORT FILES\n\n");
+        output.push_str(&format!("- **JSON Report**: {}\n", dir.join("report.json").display()));
+        output.push_str(&format!("- **HTML Report**: {}\n", dir.join("index.html").display()));
+        output.push_str(&format!("- **SVG Files**: {}/{{diagram_type}}/\n", dir.display()));
+        output.push('\n');
+    }
+
     // Quick summary for prioritization
     output.push_str("## SUMMARY\n\n");
     output.push_str(&format!(
@@ -416,6 +425,10 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
     output.push_str("  → Check: Layout algorithm, padding, or font metrics differ\n\n");
     output.push_str("- **shapes**: Different number of specific SVG elements (rect, path, etc.)\n");
     output.push_str("  → Check: Renderer using different primitives than reference\n\n");
+    output.push_str("- **z_order**: Text rendered before shapes (may be hidden behind them)\n");
+    output.push_str("  → SVG renders elements in document order - later elements appear on top\n");
+    output.push_str("  → Fix: In renderer, emit shapes BEFORE text labels within each group\n");
+    output.push_str("  → Check: Compare element order in selkie vs reference SVG files\n\n");
 
     output.push_str("### Debugging Workflow\n\n");
     output.push_str("1. Read the diagram source to understand what should be rendered\n");
