@@ -77,7 +77,7 @@ fn calculate_composite_bounds_recursive(
     }
 
     // Apply padding matching render_composite_state
-    let padding = 8.0; // Match mermaid's state padding
+    let padding = 12.0; // Balance between mermaid's 8px and visual spacing needs
     let title_height = 25.0;
     min_x -= padding;
     min_y -= padding + title_height;
@@ -112,7 +112,7 @@ impl ToLayoutGraph for StateDb {
             direction: self.preferred_direction(),
             node_spacing: 15.0, // Tighter horizontal spacing for narrower diagrams
             layer_spacing: 50.0, // Vertical spacing matching mermaid reference height
-            padding: Padding::uniform(8.0), // Match mermaid's state padding (8px)
+            padding: Padding::uniform(12.0), // Balanced padding for composite states
             ranker: LayoutRanker::LongestPath, // Use longest-path (mermaid's tight-tree base)
         };
 
@@ -564,7 +564,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     // Use proper DAG layout with state-specific estimator
     // State diagrams use SVG text (not foreignObject) so line height is tighter
     let size_estimator = CharacterSizeEstimator {
-        char_width_ratio: 0.5,  // Tighter estimate for proportional fonts
+        char_width_ratio: 0.55, // Balanced estimate for proportional fonts
         line_height_ratio: 1.4, // SVG text vs 2.3 for HTML foreignObject
     };
     let layout_input = db.to_layout_graph(&size_estimator)?;
@@ -1154,7 +1154,7 @@ fn render_composite_state(
     }
 
     // Add padding around child states
-    let padding = 8.0; // Match mermaid's state padding
+    let padding = 12.0; // Balance between mermaid's 8px and visual spacing needs
     let title_height = 25.0;
     min_x -= padding;
     min_y -= padding + title_height;
