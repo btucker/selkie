@@ -14,7 +14,7 @@ Try it in your browser: **[btucker.github.io/selkie](https://btucker.github.io/s
 
 Selkie aims to provide a fast, native alternative to Mermaid.js for parsing and rendering diagrams. The entire implementation is written in Rust, with no JavaScript dependencies at runtime.
 
-This project has been built entirely with coding agents, mostly [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an evaluation system that compares Selkie's output against the reference Mermaid.js implementation, toward visual and structural parity.
+This project has been built entirely with coding agents, mostly [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an [evaluation system](EVAL.md) that compares Selkie's output against the reference Mermaid.js implementation, providing automated feedback on structural and visual parity. The eval system serves as the primary guidance mechanism—agents run `selkie eval` to see prioritized issues, investigate differences by comparing generated SVGs against reference implementations, and verify that changes improve scores without introducing regressions. This creates a tight feedback loop where the agent can autonomously identify what needs work and measure its progress.
 
 ## Performance
 
