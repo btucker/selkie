@@ -46,12 +46,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let content_height = actor_height  // Top actor
         + message_spacing  // Gap before first message
         + (messages.len() as f64) * message_spacing  // Messages
-        + 20.0  // Gap after last message to bottom actor
         + actor_height; // Bottom actor
 
     // Add visual padding via width/viewBox (mermaid.js style)
     let width = content_width + 100.0; // Total viewBox width with padding
-    let height = content_height + 20.0; // Total viewBox height with padding
+    let height = content_height + margin_top; // Add top margin to account for padding offset
 
     doc.set_size(width, height);
 
@@ -97,9 +96,9 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
 
     let actor_y = padding_y + title_offset;
     let lifeline_start_y = actor_y + actor_height;
-    // Bottom actor position: after all messages + 20px gap
+    // Bottom actor position: after all messages
     let bottom_actor_y =
-        lifeline_start_y + message_spacing + (messages.len() as f64) * message_spacing + 20.0;
+        lifeline_start_y + message_spacing + (messages.len() as f64) * message_spacing;
     let lifeline_end_y = bottom_actor_y;
 
     // Create actor position map
