@@ -4,6 +4,8 @@
 
 use pest::Parser;
 use pest_derive::Parser;
+use regex::Regex;
+use std::sync::LazyLock;
 
 use super::{
     ArchitectureDb, ArchitectureDirection, ArchitectureEdge, ArchitectureGroup,
@@ -68,7 +70,7 @@ fn process_statement(
 fn process_title(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::title_text {
-            db.set_title(inner.as_str().trim());
+            db.set_title(&normalize_inline_text(inner.as_str()));
         }
     }
 }
@@ -76,7 +78,7 @@ fn process_title(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
 fn process_acc_title(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::acc_title_text {
-            db.set_acc_title(inner.as_str().trim());
+            db.set_acc_title(&normalize_inline_text(inner.as_str()));
         }
     }
 }
@@ -84,7 +86,7 @@ fn process_acc_title(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb)
 fn process_acc_descr(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::acc_descr_text {
-            db.set_acc_description(inner.as_str().trim());
+            db.set_acc_description(&normalize_inline_text(inner.as_str()));
         }
     }
 }
@@ -92,7 +94,7 @@ fn process_acc_descr(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb)
 fn process_acc_descr_multiline(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::acc_descr_multiline_text {
-            db.set_acc_description(inner.as_str().trim());
+            db.set_acc_description(&normalize_multiline_text(inner.as_str()));
         }
     }
 }
@@ -117,9 +119,7 @@ fn process_group(
                 icon = Some(s[1..s.len() - 1].to_string());
             }
             Rule::arch_title => {
-                // Remove surrounding brackets
-                let s = inner.as_str();
-                title = Some(s[1..s.len() - 1].to_string());
+                title = Some(strip_arch_title(inner.as_str()));
             }
             Rule::in_clause => {
                 for clause_inner in inner.into_inner() {
@@ -176,9 +176,7 @@ fn process_service(
                 icon_text = Some(unescape_arch_string(inner.as_str()));
             }
             Rule::arch_title => {
-                // Remove surrounding brackets
-                let s = inner.as_str();
-                title = Some(s[1..s.len() - 1].to_string());
+                title = Some(strip_arch_title(inner.as_str()));
             }
             Rule::in_clause => {
                 for clause_inner in inner.into_inner() {
@@ -361,12 +359,7 @@ fn process_arrow(
                     if line_inner.as_rule() == Rule::arrow_line_with_label {
                         for label_inner in line_inner.into_inner() {
                             if label_inner.as_rule() == Rule::arrow_label {
-                                let s = label_inner.as_str().trim();
-                                if s.starts_with('[') && s.ends_with(']') {
-                                    title = Some(s[1..s.len() - 1].to_string());
-                                } else {
-                                    title = Some(s.to_string());
-                                }
+                                title = Some(strip_arch_title(label_inner.as_str()));
                             }
                         }
                     }
@@ -426,6 +419,31 @@ fn unescape_arch_string(input: &str) -> String {
     output
 }
 
+static MULTI_SPACE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[\t ]{2,}").unwrap());
+static LEADING_WS_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?m)^\s*").unwrap());
+static TRAILING_WS_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?m)\s+$").unwrap());
+static MULTI_NEWLINE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?m)[\n\r]{2,}").unwrap());
+
+fn normalize_inline_text(input: &str) -> String {
+    let trimmed = input.trim();
+    MULTI_SPACE_RE.replace_all(trimmed, " ").to_string()
+}
+
+fn normalize_multiline_text(input: &str) -> String {
+    let normalized = LEADING_WS_RE.replace_all(input, "");
+    let normalized = TRAILING_WS_RE.replace_all(&normalized, "");
+    let normalized = MULTI_SPACE_RE.replace_all(&normalized, " ");
+    let normalized = MULTI_NEWLINE_RE.replace_all(&normalized, "\n");
+    normalized.to_string()
+}
+
+fn strip_arch_title(input: &str) -> String {
+    input
+        .trim_matches(|c| c == '[' || c == ']')
+        .trim()
+        .to_string()
+}
+
 fn validate_arch_id(id: &str) -> Result<(), Box<dyn std::error::Error>> {
     if id.is_empty() {
         return Err("Architecture id cannot be empty".into());
@@ -442,9 +460,16 @@ mod tests {
 
     #[test]
     fn test_architecture_keyword() {
-        let input = "architecture-beta";
-        let result = parse(input);
-        assert!(result.is_ok());
+        let inputs = [
+            "architecture-beta",
+            "  architecture-beta  ",
+            "\tarchitecture-beta\t",
+            "\n\tarchitecture-beta\n",
+        ];
+        for input in inputs {
+            let result = parse(input);
+            assert!(result.is_ok());
+        }
     }
 
     #[test]
@@ -472,6 +497,13 @@ mod tests {
             ";
         let result = parse(input).unwrap();
         assert_eq!(result.get_title(), "Simple Architecture Diagram");
+    }
+
+    #[test]
+    fn test_title_whitespace_normalization() {
+        let input = "architecture-beta   title   sample   title  ";
+        let result = parse(input).unwrap();
+        assert_eq!(result.get_title(), "sample title");
     }
 
     #[test]
@@ -505,11 +537,15 @@ mod tests {
     fn test_accessibility_description_multiline() {
         let input = "architecture-beta
             accDescr {
-                Accessibility Description
+                Detailed description
+                across multiple lines
             }
             ";
         let result = parse(input).unwrap();
-        assert_eq!(result.get_acc_description(), "Accessibility Description");
+        assert_eq!(
+            result.get_acc_description(),
+            "Detailed description\nacross multiple lines"
+        );
     }
 
     #[test]

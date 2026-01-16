@@ -326,31 +326,31 @@ fn separate_group_overlaps(
                             .map(|pref| (gid_b.as_str(), gid_a.as_str(), *pref))
                     }) {
                     let (_lhs, rhs, pref) = pref;
-                    let (shift_x, shift_y) = match pref.axis {
-                        GroupAxis::Horizontal => {
-                            let delta = overlap_x + ARCH_GROUP_PADDING;
-                            (if pref.dir > 0 { delta } else { -delta }, 0.0)
-                        }
-                        GroupAxis::Vertical => {
-                            let delta = overlap_y + ARCH_GROUP_PADDING;
-                            (0.0, if pref.dir > 0 { delta } else { -delta })
-                        }
+                    let shift_group = rhs;
+                    let (moving, fixed) = if shift_group == gid_a.as_str() {
+                        (a, b)
+                    } else {
+                        (b, a)
                     };
-                    (shift_x, shift_y, rhs)
+                    let (shift_x, shift_y) =
+                        compute_group_separation(moving, fixed, pref.axis, pref.dir);
+                    (shift_x, shift_y, shift_group)
                 } else if dx.abs() >= dy.abs() {
-                    let delta = overlap_x + ARCH_GROUP_PADDING;
                     if center_ax <= center_bx {
-                        (delta, 0.0, gid_b.as_str())
+                        let (shift_x, shift_y) =
+                            compute_group_separation(b, a, GroupAxis::Horizontal, 1);
+                        (shift_x, shift_y, gid_b.as_str())
                     } else {
-                        (-delta, 0.0, gid_a.as_str())
+                        let (shift_x, shift_y) =
+                            compute_group_separation(a, b, GroupAxis::Horizontal, 1);
+                        (shift_x, shift_y, gid_a.as_str())
                     }
+                } else if center_ay <= center_by {
+                    let (shift_x, shift_y) = compute_group_separation(b, a, GroupAxis::Vertical, 1);
+                    (shift_x, shift_y, gid_b.as_str())
                 } else {
-                    let delta = overlap_y + ARCH_GROUP_PADDING;
-                    if center_ay <= center_by {
-                        (0.0, delta, gid_b.as_str())
-                    } else {
-                        (0.0, -delta, gid_a.as_str())
-                    }
+                    let (shift_x, shift_y) = compute_group_separation(a, b, GroupAxis::Vertical, 1);
+                    (shift_x, shift_y, gid_a.as_str())
                 };
 
                 if shift_x != 0.0 || shift_y != 0.0 {
@@ -476,6 +476,32 @@ enum GroupAxis {
 struct GroupPreference {
     axis: GroupAxis,
     dir: i32,
+}
+
+fn compute_group_separation(
+    moving: &GroupBounds,
+    fixed: &GroupBounds,
+    axis: GroupAxis,
+    dir: i32,
+) -> (f64, f64) {
+    match axis {
+        GroupAxis::Horizontal => {
+            let shift = if dir >= 0 {
+                (fixed.x + fixed.width) - moving.x + ARCH_GROUP_PADDING
+            } else {
+                fixed.x - (moving.x + moving.width) - ARCH_GROUP_PADDING
+            };
+            (shift, 0.0)
+        }
+        GroupAxis::Vertical => {
+            let shift = if dir >= 0 {
+                (fixed.y + fixed.height) - moving.y + ARCH_GROUP_PADDING
+            } else {
+                fixed.y - (moving.y + moving.height) - ARCH_GROUP_PADDING
+            };
+            (0.0, shift)
+        }
+    }
 }
 
 fn build_group_preferences(db: &ArchitectureDb) -> HashMap<(String, String), GroupPreference> {

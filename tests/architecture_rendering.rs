@@ -72,6 +72,54 @@ fn test_architecture_simple_with_groups() {
 }
 
 #[test]
+fn test_architecture_ids() {
+    let input = r#"architecture-beta
+        group api(cloud)[API]
+
+        service db(database)[Database] in api
+        service disk1(disk)[Storage] in api
+        service disk2(disk)[Storage] in api
+        service server(server)[Server] in api
+
+        db:L -- R:server
+        disk1:T -- B:server
+        disk2:T -- B:db
+    "#;
+
+    let svg = render_architecture_svg(input);
+    let doc = parse_svg(&svg);
+
+    assert!(has_id(&doc, "group-api"));
+    for id in [
+        "service-db",
+        "service-disk1",
+        "service-disk2",
+        "service-server",
+    ] {
+        assert!(has_id(&doc, id));
+    }
+
+    let mut edge_ids: Vec<String> = doc
+        .descendants()
+        .filter(|node| {
+            node.attribute("class")
+                .map(|class| class.split_whitespace().any(|c| c == "edge"))
+                .unwrap_or(false)
+        })
+        .filter_map(|node| node.attribute("id").map(|id| id.to_string()))
+        .collect();
+    edge_ids.sort();
+    assert_eq!(
+        edge_ids,
+        vec![
+            "L_db_server_0".to_string(),
+            "L_disk1_server_0".to_string(),
+            "L_disk2_db_0".to_string(),
+        ]
+    );
+}
+
+#[test]
 fn test_architecture_title_and_accessibility() {
     let input = r#"architecture-beta
         title Simple Architecture Diagram
