@@ -186,7 +186,7 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
         sim.run(300);
         positions = sim.get_positions();
     }
-    apply_overlap_jitter(&mut positions);
+    apply_overlap_jitter(&mut positions, &node_root_groups);
 
     let half_icon = ARCH_ICON_SIZE / 2.0;
     for (id, (cx, cy)) in positions.iter() {
@@ -212,14 +212,18 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
     graph.compute_bounds();
 }
 
-fn apply_overlap_jitter(positions: &mut HashMap<String, (f64, f64)>) {
-    let mut counts: HashMap<(i64, i64), usize> = HashMap::new();
+fn apply_overlap_jitter(
+    positions: &mut HashMap<String, (f64, f64)>,
+    node_root_groups: &HashMap<String, Option<String>>,
+) {
+    let mut counts: HashMap<(i64, i64, Option<String>), usize> = HashMap::new();
     let mut ids: Vec<String> = positions.keys().cloned().collect();
     ids.sort();
 
     for id in ids {
         if let Some((x, y)) = positions.get_mut(&id) {
-            let key = (x.round() as i64, y.round() as i64);
+            let root = node_root_groups.get(&id).cloned().unwrap_or(None);
+            let key = (x.round() as i64, y.round() as i64, root);
             let count = counts.entry(key).or_insert(0);
             if *count > 0 {
                 let offset = ARCH_ICON_SIZE * 0.25 * (*count as f64);
