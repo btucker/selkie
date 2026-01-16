@@ -135,7 +135,7 @@ struct RenderArgs {
 #[derive(Parser, Debug)]
 #[command(after_help = "\
 Examples:
-  selkie eval                     Run with gallery samples, output to /tmp
+  selkie eval                     Run with gallery samples, output to ./eval-report
   selkie eval -o ./reports        Output to custom directory
   selkie eval --type flowchart    Evaluate only flowchart samples
   selkie eval ./diagrams/         Evaluate .mmd files from directory
@@ -151,7 +151,7 @@ struct EvalArgs {
     #[arg(short = 't', long = "type")]
     diagram_type: Option<String>,
 
-    /// Output directory for report (default: /tmp). Creates selkie-eval-XXXX subdirectory.
+    /// Output directory for report (default: ./eval-report). Creates selkie-eval-XXXX subdirectory.
     #[arg(short, long, value_name = "DIR")]
     output: Option<PathBuf>,
 
@@ -540,7 +540,9 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     let result = runner.evaluate(&inputs);
 
     // Create output directory with random ID
-    let base_dir = args.output.unwrap_or_else(|| PathBuf::from("/tmp"));
+    let base_dir = args
+        .output
+        .unwrap_or_else(|| PathBuf::from("./eval-report"));
     let random_id = &Uuid::new_v4().to_string()[..8];
     let output_dir = base_dir.join(format!("selkie-eval-{}", random_id));
 
