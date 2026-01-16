@@ -179,28 +179,24 @@ pub(crate) fn build_curved_path_with_options(
         points.to_vec()
     };
 
-    // Add subtle curvature to straight edges (matching mermaid's visual style)
-    // When points are perfectly aligned vertically/horizontally, basis spline
-    // produces a straight line. Mermaid's dagre has slight floating-point
-    // variations that create subtle curves. We replicate this effect.
-    let adjusted = add_subtle_curvature(&working_points);
-
     // Use basis spline interpolation (like d3's curveBasis)
     // This creates smooth curves through the control points
-    build_basis_path(&adjusted)
+    // Note: Mermaid keeps perfectly aligned coordinates for straight edges -
+    // the visual curve comes only from the basis spline interpolation, not
+    // from adding artificial x/y variations.
+    build_basis_path(&working_points)
 }
 
 /// Simplify bend points by removing intermediate points that are nearly collinear
 /// with their neighbors. This produces straighter edges.
-/// Only applies to edges with significant existing curvature - straight edges
-/// are passed through unchanged so add_subtle_curvature can work on them.
+/// Edges that are already nearly straight are passed through unchanged.
 fn simplify_collinear_points(points: &[crate::layout::Point]) -> Vec<crate::layout::Point> {
     if points.len() <= 2 {
         return points.to_vec();
     }
 
     // First check if the edge is already nearly straight overall
-    // If so, don't simplify - let add_subtle_curvature handle it
+    // If so, don't simplify - preserve the original points for clean vertical/horizontal edges
     let first = &points[0];
     let last = &points[points.len() - 1];
     let max_overall_deviation = points[1..points.len() - 1]
@@ -209,7 +205,7 @@ fn simplify_collinear_points(points: &[crate::layout::Point]) -> Vec<crate::layo
         .fold(0.0_f64, f64::max);
 
     // If the edge is already nearly straight (all points close to the line),
-    // keep all points for subtle curvature processing
+    // keep all points to preserve alignment
     if max_overall_deviation < 5.0 {
         return points.to_vec();
     }
@@ -257,52 +253,6 @@ fn perpendicular_distance(
 
     // Calculate perpendicular distance using cross product formula
     ((b.x - a.x) * (a.y - p.y) - (a.x - p.x) * (b.y - a.y)).abs() / len_sq.sqrt()
-}
-
-/// Add subtle curvature to edge points when they're too straight
-/// This creates the visual "S" curve effect matching mermaid reference outputs
-fn add_subtle_curvature(points: &[crate::layout::Point]) -> Vec<crate::layout::Point> {
-    use crate::layout::Point;
-
-    if points.len() < 3 {
-        return points.to_vec();
-    }
-
-    // Check if points are vertically aligned (all same x within tolerance)
-    let first_x = points[0].x;
-    let is_vertical = points.iter().all(|p| (p.x - first_x).abs() < 0.1);
-
-    // Check if points are horizontally aligned (all same y within tolerance)
-    let first_y = points[0].y;
-    let is_horizontal = points.iter().all(|p| (p.y - first_y).abs() < 0.1);
-
-    if !is_vertical && !is_horizontal {
-        // Points already have variation, no adjustment needed
-        return points.to_vec();
-    }
-
-    // Calculate a small offset based on edge length for subtle curve
-    // Mermaid uses about 0.5 pixel offset which creates a gentle curve
-    let offset = 0.5;
-
-    let mut adjusted: Vec<Point> = Vec::with_capacity(points.len());
-
-    for (i, p) in points.iter().enumerate() {
-        if i == 0 || i == points.len() - 1 {
-            // Keep endpoints unchanged
-            adjusted.push(*p);
-        } else {
-            // Add alternating offset to intermediate points for S-curve effect
-            let sign = if i % 2 == 1 { -1.0 } else { 1.0 };
-            if is_vertical {
-                adjusted.push(Point::new(p.x + offset * sign, p.y));
-            } else {
-                adjusted.push(Point::new(p.x, p.y + offset * sign));
-            }
-        }
-    }
-
-    adjusted
 }
 
 /// Build a basis spline path (B-spline) through the given points
@@ -564,49 +514,9 @@ mod tests {
     }
 
     #[test]
-    fn test_add_subtle_curvature_vertical_edge() {
-        // Vertical edges (same x) should get subtle x offsets on interior points
-        let points = vec![
-            Point::new(100.0, 0.0),
-            Point::new(100.0, 50.0),
-            Point::new(100.0, 100.0),
-        ];
-
-        let adjusted = add_subtle_curvature(&points);
-
-        // First and last points should be unchanged
-        assert_eq!(adjusted[0].x, 100.0);
-        assert_eq!(adjusted[2].x, 100.0);
-
-        // Middle point should have a small offset
-        assert!(
-            (adjusted[1].x - 100.0).abs() > 0.01,
-            "Middle point should have x offset, got: {}",
-            adjusted[1].x
-        );
-    }
-
-    #[test]
-    fn test_add_subtle_curvature_non_aligned_unchanged() {
-        // Non-aligned points should be unchanged
-        let points = vec![
-            Point::new(0.0, 0.0),
-            Point::new(50.0, 25.0),
-            Point::new(100.0, 50.0),
-        ];
-
-        let adjusted = add_subtle_curvature(&points);
-
-        assert_eq!(adjusted.len(), points.len());
-        for (orig, adj) in points.iter().zip(adjusted.iter()) {
-            assert_eq!(orig.x, adj.x);
-            assert_eq!(orig.y, adj.y);
-        }
-    }
-
-    #[test]
     fn test_vertical_edge_produces_curved_path() {
         // Vertical points should produce a curved path (C commands), not straight (L)
+        // but x-coordinates should remain constant (matching mermaid reference behavior)
         let points = vec![
             Point::new(100.0, 0.0),
             Point::new(100.0, 50.0),
@@ -622,16 +532,19 @@ mod tests {
             path
         );
 
-        // Should have varying x coordinates due to subtle curvature
-        // Extract all x coordinates from the path
-        let has_variation = path
-            .split(&['C', 'M', ' ', ','][..])
-            .filter_map(|s| s.parse::<f64>().ok())
-            .any(|x| (x - 100.0).abs() > 0.01 && (x - 100.0).abs() < 10.0);
-
+        // X-coordinates should all be 100.0 (no artificial variation)
+        // Mermaid keeps vertical edges perfectly aligned
+        // The path format is "M x y C x1 y1, x2 y2, x y C ..."
+        // All x values should be 100.00
         assert!(
-            has_variation,
-            "Curved path should have subtle x variation, got: {}",
+            path.contains("100.00"),
+            "Path should contain x-coordinate 100.00, got: {}",
+            path
+        );
+        // And there should be no other x values (variations)
+        assert!(
+            !path.contains("99.") && !path.contains("101."),
+            "Vertical edge should not have x variations, got: {}",
             path
         );
     }

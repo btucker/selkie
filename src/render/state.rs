@@ -77,7 +77,7 @@ fn calculate_composite_bounds_recursive(
     }
 
     // Apply padding matching render_composite_state
-    let padding = 15.0;
+    let padding = 8.0; // Match mermaid's state padding
     let title_height = 25.0;
     min_x -= padding;
     min_y -= padding + title_height;
@@ -112,7 +112,7 @@ impl ToLayoutGraph for StateDb {
             direction: self.preferred_direction(),
             node_spacing: 15.0, // Tighter horizontal spacing for narrower diagrams
             layer_spacing: 50.0, // Maintain vertical spacing for proper height
-            padding: Padding::uniform(20.0),
+            padding: Padding::uniform(8.0), // Match mermaid's state padding (8px)
             ranker: LayoutRanker::LongestPath, // Use longest-path (mermaid's tight-tree base)
         };
 
@@ -250,13 +250,16 @@ impl ToLayoutGraph for StateDb {
 /// Mermaid's state diagrams center all composite states at the same X position.
 /// This post-processing step shifts composites and their children to align on
 /// a common vertical centerline, creating a narrower, more balanced diagram.
+/// Returns a HashMap of composite ID to X offset applied, so edge bend points can be shifted.
 fn center_composite_states(
     db: &StateDb,
     state_positions: &mut HashMap<String, (f64, f64, f64, f64)>,
     composite_ids: &std::collections::HashSet<&str>,
-) {
+) -> HashMap<String, f64> {
+    let mut composite_offsets: HashMap<String, f64> = HashMap::new();
+
     if composite_ids.is_empty() {
-        return;
+        return composite_offsets;
     }
 
     let states = db.get_states();
@@ -276,7 +279,7 @@ fn center_composite_states(
         .collect();
 
     if top_level_composites.is_empty() {
-        return;
+        return composite_offsets;
     }
 
     // Calculate the bounds of each composite (including nested children)
@@ -306,7 +309,7 @@ fn center_composite_states(
     }
 
     if diagram_min_x >= diagram_max_x {
-        return;
+        return composite_offsets;
     }
 
     // The diagram center X
@@ -318,10 +321,15 @@ fn center_composite_states(
             let comp_center = (left + right) / 2.0;
             let offset_x = diagram_center_x - comp_center;
 
+            // Track the offset applied to this composite
+            composite_offsets.insert(comp_id.to_string(), offset_x);
+
             // Shift all nodes belonging to this composite (and nested composites)
             shift_composite_and_children(comp_id, offset_x, db, state_positions, composite_ids);
         }
     }
+
+    composite_offsets
 }
 
 /// Calculate the X bounds of a composite state including all nested children
@@ -423,11 +431,13 @@ fn shift_composite_and_children(
 /// After dagre layout, nested composites may not be horizontally centered within
 /// their parent. This post-processing step shifts nested composites (and their
 /// children) so they are centered within their parent's bounds.
+/// Returns a HashMap of nested composite ID to X offset applied.
 fn center_nested_composites(
     db: &StateDb,
     state_positions: &mut HashMap<String, (f64, f64, f64, f64)>,
     composite_ids: &std::collections::HashSet<&str>,
-) {
+) -> HashMap<String, f64> {
+    let mut nested_offsets: HashMap<String, f64> = HashMap::new();
     let states = db.get_states();
 
     // Find nested composites (composites whose parent is also a composite)
@@ -503,6 +513,9 @@ fn center_nested_composites(
 
         // Only shift if there's a meaningful offset
         if offset_x.abs() > 0.5 {
+            // Track the offset applied to this nested composite
+            nested_offsets.insert(nested_id.to_string(), offset_x);
+
             // Shift the nested composite itself
             if let Some((x, y, w, h)) = state_positions.get(nested_id).copied() {
                 state_positions.insert(nested_id.to_string(), (x + offset_x, y, w, h));
@@ -512,6 +525,8 @@ fn center_nested_composites(
             shift_composite_and_children(nested_id, offset_x, db, state_positions, composite_ids);
         }
     }
+
+    nested_offsets
 }
 
 /// Render a state diagram to SVG
@@ -520,7 +535,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
 
     // Layout constants (matching mermaid reference: r=7 for start/end circles)
     let start_end_radius = 7.0;
-    let margin = 20.0;
+    let margin = 8.0; // Match mermaid's viewport padding (8px)
 
     // Determine which [*] states are starts vs ends based on transitions
     let start_end_states = determine_start_end_states(db);
@@ -578,11 +593,24 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
 
     // Post-process: Center all composite states on a common vertical axis
     // This matches mermaid's rendering where all composites align vertically
-    center_composite_states(db, &mut state_positions, &composite_ids);
+    // Returns offsets per composite so we can shift edge bend points too
+    let mut composite_offsets = center_composite_states(db, &mut state_positions, &composite_ids);
 
     // Post-process: Center nested composites within their parent composites
     // Dagre layout doesn't inherently center nested content, so we do it here
-    center_nested_composites(db, &mut state_positions, &composite_ids);
+    // Merge nested offsets into composite_offsets for edge bend point adjustment
+    // Note: nested offsets need to include parent's offset for correct edge positioning
+    let nested_offsets = center_nested_composites(db, &mut state_positions, &composite_ids);
+    for (id, nested_offset) in nested_offsets {
+        // Get the parent's total offset (if any) and add to this nested offset
+        let parent_offset = states
+            .get(&id)
+            .and_then(|s| s.parent.as_ref())
+            .and_then(|parent| composite_offsets.get(parent))
+            .copied()
+            .unwrap_or(0.0);
+        composite_offsets.insert(id, parent_offset + nested_offset);
+    }
 
     // Post-process: Center start nodes above the composite states they connect to
     // This improves visual alignment matching the mermaid reference
@@ -594,9 +622,11 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
             // Check if this is a start node connecting to a composite
             if source.contains("_start_") && composite_ids.contains(target) {
+                // Use calculate_composite_bounds to get actual rendered composite bounds
+                // (not dagre's placeholder position which doesn't account for children)
                 if let (Some((start_x, start_y, start_w, start_h)), Some((comp_x, _, comp_w, _))) = (
                     state_positions.get(source).copied(),
-                    state_positions.get(target).copied(),
+                    calculate_composite_bounds(target, db, &state_positions, &layout_result),
                 ) {
                     // Center the start node horizontally above the composite
                     let comp_center_x = comp_x + comp_w / 2.0;
@@ -671,6 +701,26 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
             let mut bend_points = edge.bend_points.clone();
 
+            // If both source and target are inside a shifted composite,
+            // apply the composite offset to all edge bend points
+            // This keeps edges aligned with their shifted parent states
+            if !bend_points.is_empty() {
+                let source_parent = states.get(source).and_then(|s| s.parent.as_deref());
+                let target_parent = states.get(target).and_then(|s| s.parent.as_deref());
+
+                // Check if they share a common ancestor composite that was shifted
+                if let (Some(sp), Some(tp)) = (source_parent, target_parent) {
+                    // If both have the same parent composite
+                    if sp == tp {
+                        if let Some(&offset_x) = composite_offsets.get(sp) {
+                            for point in &mut bend_points {
+                                point.x += offset_x;
+                            }
+                        }
+                    }
+                }
+            }
+
             // If the source is a repositioned start node going to a composite,
             // make the edge a straight vertical line by aligning all points
             if let Some(&offset_x) = start_node_offsets.get(source) {
@@ -695,9 +745,29 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 {
                     let comp_center_x = comp_x + comp_w / 2.0;
                     let comp_bottom_y = comp_y + comp_h;
-                    // Set the first bend point to the center-bottom of the composite
-                    bend_points[0].x = comp_center_x;
+
+                    // If target is a fork/join, use the fork's center X for a straight edge
+                    // Otherwise use the composite's center
+                    let target_x = if fork_join_ids.contains(&target) {
+                        state_positions
+                            .get(target)
+                            .map(|(x, _, w, _)| x + w / 2.0)
+                            .unwrap_or(comp_center_x)
+                    } else {
+                        comp_center_x
+                    };
+
+                    // Set the first bend point to exit from composite at target's X
+                    bend_points[0].x = target_x;
                     bend_points[0].y = comp_bottom_y;
+
+                    // If target is a fork/join, make all points align vertically
+                    // for a straight edge (matches mermaid behavior)
+                    if fork_join_ids.contains(&target) {
+                        for point in &mut bend_points {
+                            point.x = target_x;
+                        }
+                    }
                 }
             }
 
@@ -756,9 +826,29 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 {
                     let comp_center_x = comp_x + comp_w / 2.0;
                     let comp_top_y = comp_y;
+
+                    // If source is a fork/join, use the fork's center X for a straight edge
+                    // Otherwise use the composite's center
+                    let source_x = if fork_join_ids.contains(&source) {
+                        state_positions
+                            .get(source)
+                            .map(|(x, _, w, _)| x + w / 2.0)
+                            .unwrap_or(comp_center_x)
+                    } else {
+                        comp_center_x
+                    };
+
                     let last_idx = bend_points.len() - 1;
-                    bend_points[last_idx].x = comp_center_x;
+                    bend_points[last_idx].x = source_x;
                     bend_points[last_idx].y = comp_top_y;
+
+                    // If source is a fork/join, make all points align vertically
+                    // for a straight edge (matches mermaid behavior)
+                    if fork_join_ids.contains(&source) {
+                        for point in &mut bend_points {
+                            point.x = source_x;
+                        }
+                    }
                 }
             }
 
@@ -1058,7 +1148,7 @@ fn render_composite_state(
     }
 
     // Add padding around child states
-    let padding = 15.0;
+    let padding = 8.0; // Match mermaid's state padding
     let title_height = 25.0;
     min_x -= padding;
     min_y -= padding + title_height;
