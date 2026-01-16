@@ -665,7 +665,7 @@ pub fn write_json_by_type(result: &EvalResult, output_dir: &Path) -> std::io::Re
         diagram_index.push(DiagramIndexEntry {
             name: diagram.name.clone(),
             diagram_type: diagram.diagram_type.clone(),
-            status: diagram.status.clone(),
+            status: diagram.status,
             json_file: format!("{}/{}", diagram.diagram_type, filename),
             error_count: errors,
             warning_count: warnings,
