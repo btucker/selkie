@@ -357,9 +357,24 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
     if let Some(dir) = output_dir {
         output.push_str("## REPORT FILES\n\n");
         output.push_str(&format!(
-            "- **JSON Report**: {}\n",
+            "- **Summary JSON**: {}\n",
             dir.join("report.json").display()
         ));
+
+        // List per-type JSON files
+        let mut types: Vec<_> = result.by_type.keys().collect();
+        types.sort();
+        if !types.is_empty() {
+            output.push_str("- **Per-Type JSON** (smaller, focused files):\n");
+            for dtype in types {
+                output.push_str(&format!(
+                    "  - {}: {}\n",
+                    dtype,
+                    dir.join(format!("{}.json", dtype)).display()
+                ));
+            }
+        }
+
         output.push_str(&format!(
             "- **HTML Report**: {}\n",
             dir.join("index.html").display()
@@ -597,6 +612,164 @@ fn format_diagram_for_agent(
 pub fn write_json(result: &EvalResult, path: &Path) -> std::io::Result<()> {
     let json = serde_json::to_string_pretty(result).map_err(std::io::Error::other)?;
     fs::write(path, json)
+}
+
+/// Summary report structure (without full SVG data)
+#[derive(Debug, serde::Serialize)]
+struct SummaryReport {
+    total: usize,
+    matching: usize,
+    parity_percent: f64,
+    avg_visual_similarity: f64,
+    by_type: std::collections::HashMap<String, super::TypeStats>,
+    issue_counts: super::IssueCounts,
+    /// Paths to per-type JSON files
+    type_reports: Vec<TypeReportInfo>,
+}
+
+/// Info about a per-type JSON report file
+#[derive(Debug, serde::Serialize)]
+struct TypeReportInfo {
+    diagram_type: String,
+    file: String,
+    diagram_count: usize,
+    error_count: usize,
+    warning_count: usize,
+}
+
+/// Per-type report structure (subset of diagrams for one type)
+#[derive(Debug, serde::Serialize)]
+struct TypeReport {
+    diagram_type: String,
+    total: usize,
+    matching: usize,
+    parity_percent: f64,
+    avg_visual_similarity: f64,
+    avg_structural_similarity: f64,
+    issue_counts: TypeIssueCounts,
+    diagrams: Vec<super::DiagramResult>,
+}
+
+/// Issue counts for a single type
+#[derive(Debug, serde::Serialize)]
+struct TypeIssueCounts {
+    errors: usize,
+    warnings: usize,
+    info: usize,
+}
+
+/// Write JSON reports split by diagram type
+///
+/// Creates:
+/// - `report.json` - Summary with overall stats and pointers to type files
+/// - `{type}.json` - Full diagram results for each type (e.g., flowchart.json)
+pub fn write_json_by_type(result: &EvalResult, output_dir: &Path) -> std::io::Result<()> {
+    use std::collections::HashMap;
+
+    // Group diagrams by type
+    let mut by_type: HashMap<String, Vec<&super::DiagramResult>> = HashMap::new();
+    for diagram in &result.diagrams {
+        by_type
+            .entry(diagram.diagram_type.clone())
+            .or_default()
+            .push(diagram);
+    }
+
+    // Write per-type JSON files and collect info for summary
+    let mut type_reports: Vec<TypeReportInfo> = Vec::new();
+
+    for (dtype, diagrams) in &by_type {
+        let matching = diagrams.iter().filter(|d| d.structural_match).count();
+        let total = diagrams.len();
+        let parity_percent = if total > 0 {
+            (matching as f64 / total as f64) * 100.0
+        } else {
+            0.0
+        };
+
+        // Calculate averages
+        let visual_sims: Vec<f64> = diagrams
+            .iter()
+            .filter_map(|d| d.visual_similarity)
+            .collect();
+        let avg_visual = if !visual_sims.is_empty() {
+            visual_sims.iter().sum::<f64>() / visual_sims.len() as f64
+        } else {
+            0.0
+        };
+
+        let structural_sims: Vec<f64> = diagrams
+            .iter()
+            .filter_map(|d| d.structural_similarity)
+            .collect();
+        let avg_structural = if !structural_sims.is_empty() {
+            structural_sims.iter().sum::<f64>() / structural_sims.len() as f64
+        } else {
+            0.0
+        };
+
+        // Count issues
+        let mut errors = 0;
+        let mut warnings = 0;
+        let mut info = 0;
+        for diagram in diagrams {
+            for issue in &diagram.issues {
+                match issue.level {
+                    super::Level::Error => errors += 1,
+                    super::Level::Warning => warnings += 1,
+                    super::Level::Info => info += 1,
+                }
+            }
+        }
+
+        let type_report = TypeReport {
+            diagram_type: dtype.clone(),
+            total,
+            matching,
+            parity_percent,
+            avg_visual_similarity: avg_visual,
+            avg_structural_similarity: avg_structural,
+            issue_counts: TypeIssueCounts {
+                errors,
+                warnings,
+                info,
+            },
+            diagrams: diagrams.iter().map(|d| (*d).clone()).collect(),
+        };
+
+        let filename = format!("{}.json", dtype);
+        let path = output_dir.join(&filename);
+        let json = serde_json::to_string_pretty(&type_report).map_err(std::io::Error::other)?;
+        fs::write(&path, json)?;
+
+        type_reports.push(TypeReportInfo {
+            diagram_type: dtype.clone(),
+            file: filename,
+            diagram_count: total,
+            error_count: errors,
+            warning_count: warnings,
+        });
+    }
+
+    // Sort type reports for consistent output
+    type_reports.sort_by(|a, b| a.diagram_type.cmp(&b.diagram_type));
+
+    // Write summary report.json (without full diagram data)
+    let summary = SummaryReport {
+        total: result.total,
+        matching: result.matching,
+        parity_percent: result.parity_percent,
+        avg_visual_similarity: result.avg_visual_similarity,
+        by_type: result.by_type.clone(),
+        issue_counts: result.issue_counts.clone(),
+        type_reports,
+    };
+
+    let summary_path = output_dir.join("report.json");
+    let json = serde_json::to_string_pretty(&summary).map_err(std::io::Error::other)?;
+    fs::write(&summary_path, json)?;
+
+    Ok(())
 }
 
 /// Generate and write HTML comparison report
@@ -930,7 +1103,7 @@ pub fn write_pngs(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::eval::{DiagramResult, Issue, IssueCounts, Level, ParseResult, Status};
+    use crate::eval::{DiagramResult, Issue, IssueCounts, ParseResult, Status};
     use std::collections::HashMap;
 
     fn make_test_result() -> EvalResult {

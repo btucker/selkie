@@ -600,9 +600,8 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(not(feature = "png"))]
     let _ = svg_pairs; // Suppress unused warning
 
-    // Always write JSON report to the output directory
-    let json_path = output_dir.join("report.json");
-    eval::report::write_json(&result, &json_path)?;
+    // Write JSON reports split by diagram type (easier for AI agents to read specific types)
+    eval::report::write_json_by_type(&result, &output_dir)?;
 
     // Output results to stderr (default=agent, --verbose, or --brief)
     if args.brief {
