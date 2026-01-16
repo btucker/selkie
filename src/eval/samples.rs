@@ -395,6 +395,8 @@ fn detect_diagram_type(source: &str) -> String {
         "timeline".to_string()
     } else if first_line.starts_with("journey") {
         "journey".to_string()
+    } else if first_line.starts_with("architecture") {
+        "architecture".to_string()
     } else {
         "unknown".to_string()
     }
@@ -453,5 +455,9 @@ mod tests {
         );
         assert_eq!(detect_diagram_type("pie\n  \"A\": 50"), "pie");
         assert_eq!(detect_diagram_type("stateDiagram-v2\n  [*]-->A"), "state");
+        assert_eq!(
+            detect_diagram_type("architecture-beta\n  service db(database)[DB]"),
+            "architecture"
+        );
     }
 }

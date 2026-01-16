@@ -1,0 +1,36 @@
+architecture-beta
+    title Complex Architecture
+
+    group edge(cloud)[Edge]
+    group platform(server)[Platform]
+    group data(database)[Data]
+    group observability(disk)[Observability] in platform
+
+    service gateway(internet)[Gateway] in edge
+    service web(internet)[Web App] in edge
+    service api(server)[API] in edge
+    service auth(server)[Auth] in edge
+
+    service core(server)[Core] in platform
+    service cache(disk)[Cache] in platform
+    service queue(server)[Queue] in platform
+    junction hub in platform
+
+    service db(database)[Main DB] in data
+    service search(disk)[Search] in data
+
+    service metrics(disk)[Metrics] in observability
+    service logs(disk)[Logs] in observability
+
+    gateway:R --> L:web
+    web:R --> L:api
+    api:R -- L:auth
+    api{group}:B -[jwt]- T:core{group}
+    core:L -- R:queue
+    core:R -- L:cache
+    core:B -- T:hub
+    hub:R -- L:metrics
+    metrics:R -- L:logs
+    core{group}:R -[sql]- L:db{group}
+    db:B -- T:search
+    cache{group}:B -[replicate]- R:db{group}
