@@ -201,11 +201,11 @@ async function runBenchmark() {
     // Benchmark mermaid
     const mermaidTimes = [];
     for (let i = 0; i < WARMUP_RUNS + BENCHMARK_RUNS; i++) {
-      const time = await page.evaluate(async (diagram, idx) => {
+      const time = await page.evaluate(async ({ diagram, idx }) => {
         const start = performance.now();
         await window.mermaidRender(`bench-${idx}`, diagram);
         return performance.now() - start;
-      }, tc.diagram, i);
+      }, { diagram: tc.diagram, idx: i });
       if (i >= WARMUP_RUNS) mermaidTimes.push(time);
     }
     const mermaidMedian = median(mermaidTimes);

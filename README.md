@@ -24,34 +24,34 @@ Selkie provides significant performance improvements over mermaid-js in both CLI
 
 Compared to [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) (`mmdc`):
 
-| Diagram | mmdc | Selkie |
-|---------|------|--------|
-| Simple flowchart (5 nodes) | 3.21s | 7ms |
-| Medium flowchart (15 nodes) | 4.89s | 8ms |
-| Large flowchart (100 nodes) | 3.67s | 18ms |
-| Sequence diagram (4 actors) | 2.86s | 6ms |
-| Class diagram (5 classes) | 4.10s | 5ms |
+| Diagram | mmdc | Selkie | Speedup |
+|---------|------|--------|---------|
+| Simple flowchart (5 nodes) | 1.53s | 6ms | **246x** |
+| Medium flowchart (15 nodes) | 1.54s | 7ms | **213x** |
+| Sequence diagram (4 actors) | 1.52s | 5ms | **313x** |
+| Class diagram (5 classes) | 1.55s | 5ms | **303x** |
+| Large flowchart (100 nodes) | 1.82s | 27ms | **67x** |
 
 _CLI-to-CLI comparison. Median of 5 runs after 2 warmup runs._
 
-The dramatic speedup comes from avoiding the browser entirely—mermaid-cli spawns Puppeteer + Chromium for each render (~3-5 seconds overhead).
+The dramatic speedup comes from avoiding the browser entirely—mermaid-cli spawns Puppeteer + Chromium for each render.
 
 ### Browser Benchmark
 
-For client-side rendering, Selkie compiles to WebAssembly. Both run in the same Chromium browser for a fair comparison:
+For client-side rendering, Selkie compiles to WebAssembly. Both run in the same Chromium browser for a fair comparison. [Run it yourself →](https://btucker.github.io/selkie/benchmark.html)
 
 | Diagram | Mermaid.js | Selkie WASM | Speedup |
 |---------|------------|-------------|---------|
-| Simple flowchart (5 nodes) | 45ms | 3ms | 15x |
-| Medium flowchart (15 nodes) | 82ms | 5ms | 16x |
-| Sequence diagram (4 actors) | 38ms | 2ms | 19x |
-| Class diagram (5 classes) | 52ms | 3ms | 17x |
-| State diagram (8 states) | 41ms | 2ms | 20x |
-| Pie chart (5 slices) | 35ms | 1ms | 35x |
+| Simple flowchart (5 nodes) | 10ms | 1ms | 10x |
+| Medium flowchart (15 nodes) | 21ms | 1.6ms | 13x |
+| Sequence diagram (4 actors) | 4.5ms | 0.3ms | 15x |
+| Class diagram (5 classes) | 16ms | 0.5ms | 33x |
+| State diagram (8 states) | 22ms | 0.75ms | 29x |
+| Pie chart (5 slices) | 1.6ms | 0.1ms | 16x |
 
 _Median of 10 runs after 2 warmup runs. Chromium via Playwright._
 
-**Bundle Size:** ~350 KB (WASM + JS glue) vs ~2.5 MB for mermaid.min.js
+**Bundle Size:** ~350 KB gzipped (WASM + JS glue) vs ~2.5 MB for mermaid.min.js
 
 ## Credits
 
