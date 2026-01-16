@@ -9,16 +9,28 @@ use crate::layout::{
     layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
     LayoutOptions, LayoutRanker, NodeShape, NodeSizeConfig, Padding, SizeEstimator, ToLayoutGraph,
 };
-use crate::render::svg::edges::build_curved_path;
+use crate::render::svg::edges::{build_curved_path, build_curved_path_with_options};
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
 /// Calculate the rendered bounds of a composite state
 /// Returns (x, y, width, height) of the composite box
+///
+/// This function recursively calculates bounds from state_positions to ensure
+/// all positions are consistent after any post-processing shifts.
 fn calculate_composite_bounds(
     composite_id: &str,
     db: &StateDb,
     state_positions: &HashMap<String, (f64, f64, f64, f64)>,
-    layout_result: &LayoutGraph,
+    _layout_result: &LayoutGraph,
+) -> Option<(f64, f64, f64, f64)> {
+    calculate_composite_bounds_recursive(composite_id, db, state_positions)
+}
+
+/// Recursively calculate composite bounds from state_positions only
+fn calculate_composite_bounds_recursive(
+    composite_id: &str,
+    db: &StateDb,
+    state_positions: &HashMap<String, (f64, f64, f64, f64)>,
 ) -> Option<(f64, f64, f64, f64)> {
     let states = db.get_states();
     let child_ids: Vec<&str> = states
@@ -43,27 +55,19 @@ fn calculate_composite_bounds(
             max_x = max_x.max(x + w);
             max_y = max_y.max(y + h);
         }
-    }
 
-    // Include nested composite bounds
-    let nested_composites: Vec<&str> = states
-        .iter()
-        .filter(|(_, state)| state.parent.as_deref() == Some(composite_id))
-        .filter(|(id, _)| {
-            states
-                .values()
-                .any(|s| s.parent.as_deref() == Some(id.as_str()))
-        })
-        .map(|(id, _)| id.as_str())
-        .collect();
-
-    for nested_id in &nested_composites {
-        if let Some(node) = layout_result.get_node(nested_id) {
-            if let (Some(x), Some(y)) = (node.x, node.y) {
-                min_x = min_x.min(x);
-                min_y = min_y.min(y);
-                max_x = max_x.max(x + node.width);
-                max_y = max_y.max(y + node.height);
+        // If this child is a composite, recursively include its bounds
+        let is_composite = states
+            .values()
+            .any(|s| s.parent.as_deref() == Some(child_id));
+        if is_composite {
+            if let Some((nested_x, nested_y, nested_w, nested_h)) =
+                calculate_composite_bounds_recursive(child_id, db, state_positions)
+            {
+                min_x = min_x.min(nested_x);
+                min_y = min_y.min(nested_y);
+                max_x = max_x.max(nested_x + nested_w);
+                max_y = max_y.max(nested_y + nested_h);
             }
         }
     }
@@ -321,6 +325,37 @@ fn center_composite_states(
 }
 
 /// Calculate the X bounds of a composite state including all nested children
+/// Calculate x bounds for a composite's content (excluding nested composites for centering)
+/// This is used during centering to find where to center nested composites within
+fn calculate_composite_x_bounds_for_centering(
+    comp_id: &str,
+    db: &StateDb,
+    state_positions: &HashMap<String, (f64, f64, f64, f64)>,
+    composite_ids: &std::collections::HashSet<&str>,
+) -> (f64, f64) {
+    let states = db.get_states();
+    let mut min_x = f64::MAX;
+    let mut max_x = f64::MIN;
+
+    // For centering, we only consider NON-composite direct children
+    // Nested composites will be centered within these bounds, so don't include them
+    for (id, state) in states.iter() {
+        if state.parent.as_deref() == Some(comp_id) {
+            let is_nested_composite = composite_ids.contains(id.as_str());
+
+            if !is_nested_composite {
+                // For non-composite children, use state_positions directly
+                if let Some(&(x, _, w, _)) = state_positions.get(id) {
+                    min_x = min_x.min(x);
+                    max_x = max_x.max(x + w);
+                }
+            }
+        }
+    }
+
+    (min_x, max_x)
+}
+
 fn calculate_composite_x_bounds(
     comp_id: &str,
     db: &StateDb,
@@ -334,17 +369,23 @@ fn calculate_composite_x_bounds(
     // Find all states that belong to this composite (direct children)
     for (id, state) in states.iter() {
         if state.parent.as_deref() == Some(comp_id) {
-            if let Some(&(x, _, w, _)) = state_positions.get(id) {
-                min_x = min_x.min(x);
-                max_x = max_x.max(x + w);
-            }
+            // Check if this child is a nested composite
+            let is_nested_composite = composite_ids.contains(id.as_str());
 
-            // If this is a nested composite, recursively include its bounds
-            if composite_ids.contains(id.as_str()) {
+            if is_nested_composite {
+                // For nested composites, ONLY use recursive bounds calculation
+                // Don't use state_positions entry as it's the dagre node position,
+                // which may not match the rendered bounds after post-processing
                 let (nested_min, nested_max) =
                     calculate_composite_x_bounds(id, db, state_positions, composite_ids);
                 min_x = min_x.min(nested_min);
                 max_x = max_x.max(nested_max);
+            } else {
+                // For non-composite children, use state_positions directly
+                if let Some(&(x, _, w, _)) = state_positions.get(id) {
+                    min_x = min_x.min(x);
+                    max_x = max_x.max(x + w);
+                }
             }
         }
     }
@@ -373,6 +414,102 @@ fn shift_composite_and_children(
             if composite_ids.contains(id.as_str()) {
                 shift_composite_and_children(id, offset_x, db, state_positions, composite_ids);
             }
+        }
+    }
+}
+
+/// Center nested composite states within their parent composites
+///
+/// After dagre layout, nested composites may not be horizontally centered within
+/// their parent. This post-processing step shifts nested composites (and their
+/// children) so they are centered within their parent's bounds.
+fn center_nested_composites(
+    db: &StateDb,
+    state_positions: &mut HashMap<String, (f64, f64, f64, f64)>,
+    composite_ids: &std::collections::HashSet<&str>,
+) {
+    let states = db.get_states();
+
+    // Find nested composites (composites whose parent is also a composite)
+    // Sort by depth so we process deepest nested first (innermost to outermost)
+    let mut nested_composites: Vec<(&str, &str, usize)> = composite_ids
+        .iter()
+        .filter_map(|&id| {
+            let parent = states.get(id)?.parent.as_deref()?;
+            if composite_ids.contains(parent) {
+                // Calculate depth
+                let mut depth = 1;
+                let mut current = parent;
+                while let Some(grandparent) = states.get(current).and_then(|s| s.parent.as_deref())
+                {
+                    if composite_ids.contains(grandparent) {
+                        depth += 1;
+                    }
+                    current = grandparent;
+                }
+                Some((id, parent, depth))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    // Sort by depth descending (deepest first) so inner composites are centered
+    // before their parents, ensuring consistent bounds calculations
+    nested_composites.sort_by(|a, b| b.2.cmp(&a.2));
+
+    // Process from innermost to outermost
+    for (nested_id, parent_id, _depth) in nested_composites {
+        // Calculate parent's content bounds from NON-composite children only
+        // This gives us the bounds that determine the parent's rendered width,
+        // excluding nested composites which will be centered within this space
+        let (parent_non_composite_min_x, parent_non_composite_max_x) =
+            calculate_composite_x_bounds_for_centering(
+                parent_id,
+                db,
+                state_positions,
+                composite_ids,
+            );
+
+        // Calculate nested composite's content bounds (from its children)
+        let (nested_content_min_x, nested_content_max_x) =
+            calculate_composite_x_bounds(nested_id, db, state_positions, composite_ids);
+
+        if nested_content_min_x >= nested_content_max_x {
+            continue;
+        }
+
+        // Check if parent has valid non-composite content bounds
+        let nested_width = nested_content_max_x - nested_content_min_x;
+        let parent_non_composite_width = parent_non_composite_max_x - parent_non_composite_min_x;
+
+        // Only center if parent has substantial non-composite content that's wider than the nested composite
+        // Otherwise, the nested composite IS the main content and shouldn't be shifted
+        if parent_non_composite_min_x >= parent_non_composite_max_x
+            || parent_non_composite_width < nested_width + 20.0
+        {
+            // Parent's content is dominated by the nested composite, skip centering
+            continue;
+        }
+
+        // Parent's visual center is determined by its non-composite content bounds
+        let parent_center_x = (parent_non_composite_min_x + parent_non_composite_max_x) / 2.0;
+
+        // The nested composite's rendered box center
+        let nested_center_x = (nested_content_min_x + nested_content_max_x) / 2.0;
+
+        // Calculate offset to center the nested composite within parent's bounds
+        let offset_x = parent_center_x - nested_center_x;
+
+        // Only shift if there's a meaningful offset
+        if offset_x.abs() > 0.5 {
+            // Shift the nested composite itself
+            if let Some((x, y, w, h)) = state_positions.get(nested_id).copied() {
+                state_positions.insert(nested_id.to_string(), (x + offset_x, y, w, h));
+            }
+
+            // Shift all children of the nested composite
+            shift_composite_and_children(nested_id, offset_x, db, state_positions, composite_ids);
         }
     }
 }
@@ -442,6 +579,10 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     // Post-process: Center all composite states on a common vertical axis
     // This matches mermaid's rendering where all composites align vertically
     center_composite_states(db, &mut state_positions, &composite_ids);
+
+    // Post-process: Center nested composites within their parent composites
+    // Dagre layout doesn't inherently center nested content, so we do it here
+    center_nested_composites(db, &mut state_positions, &composite_ids);
 
     // Post-process: Center start nodes above the composite states they connect to
     // This improves visual alignment matching the mermaid reference
@@ -854,7 +995,7 @@ fn render_composite_state(
     composite_id: &str,
     db: &StateDb,
     state_positions: &HashMap<String, (f64, f64, f64, f64)>,
-    layout_result: &LayoutGraph,
+    _layout_result: &LayoutGraph,
     composite_states: &std::collections::HashSet<&str>,
 ) -> Option<SvgElement> {
     // Find all child states (states whose parent is this composite)
@@ -892,27 +1033,22 @@ fn render_composite_state(
     }
 
     // Also include nested composite states' bounds
-    // (recursively check if any child is also a composite)
-    let nested_composites: Vec<&str> = states
-        .iter()
-        .filter(|(_, state)| state.parent.as_deref() == Some(composite_id))
-        .filter(|(id, _)| {
-            // Check if this child is also a composite (has children)
-            states
-                .values()
-                .any(|s| s.parent.as_deref() == Some(id.as_str()))
-        })
-        .map(|(id, _)| id.as_str())
-        .collect();
+    // Use recursive calculation from state_positions to ensure consistency after shifts
+    for child_id in &child_ids {
+        // Check if this child is a composite (has children)
+        let is_composite = states
+            .values()
+            .any(|s| s.parent.as_deref() == Some(*child_id));
 
-    // For nested composites, we need to use their computed bounds from layout
-    for nested_id in &nested_composites {
-        if let Some(node) = layout_result.get_node(nested_id) {
-            if let (Some(x), Some(y)) = (node.x, node.y) {
-                min_x = min_x.min(x);
-                min_y = min_y.min(y);
-                max_x = max_x.max(x + node.width);
-                max_y = max_y.max(y + node.height);
+        if is_composite {
+            // Recursively calculate the nested composite's bounds
+            if let Some((nested_x, nested_y, nested_w, nested_h)) =
+                calculate_composite_bounds_recursive(child_id, db, state_positions)
+            {
+                min_x = min_x.min(nested_x);
+                min_y = min_y.min(nested_y);
+                max_x = max_x.max(nested_x + nested_w);
+                max_y = max_y.max(nested_y + nested_h);
             }
         }
     }
@@ -969,14 +1105,15 @@ fn render_composite_state(
         .and_then(|s| s.descriptions.first().cloned())
         .unwrap_or_else(|| composite_id.to_string());
 
-    // Create the title label
+    // Create the title label (centered horizontally, matching mermaid reference)
     let title = SvgElement::Text {
-        x: min_x + padding,
+        x: min_x + width / 2.0, // Center horizontally
         y: min_y + 16.0,
         content: label,
         attrs: Attrs::new()
             .with_class("state-composite-label")
-            .with_attr("font-size", "14"),
+            .with_attr("font-size", "14")
+            .with_attr("text-anchor", "middle"), // Center the text
     };
 
     // Create a divider line between title and content
@@ -1194,8 +1331,15 @@ fn render_transition(
     // Use bend points from layout if available, otherwise calculate connection points
     let (path_d, label_x, label_y) = if let Some(points) = bend_points {
         if !points.is_empty() {
+            // Check if this edge involves a fork/join state
+            // Fork/join edges need curves, so skip simplification (matching mermaid behavior)
+            let is_fork_join_edge =
+                matches!(state1_type, Some(StateType::Fork) | Some(StateType::Join))
+                    || matches!(state2_type, Some(StateType::Fork) | Some(StateType::Join));
+
             // Use dagre's bend points to create a curved path
-            let curved_path = build_curved_path(points);
+            // Skip simplification for fork/join edges to preserve the fan-out curve
+            let curved_path = build_curved_path_with_options(points, !is_fork_join_edge);
 
             // Use layout-provided label position if available, otherwise calculate midpoint
             let (lx, ly) = if let Some(pos) = label_position {
@@ -2301,6 +2445,135 @@ mod tests {
              Processing at {}, Executing at {}",
             processing_pos,
             executing_pos
+        );
+    }
+
+    #[test]
+    fn test_fork_edge_order_preserved_in_layout_graph() {
+        // Test that fork edges are added to the layout graph in definition order.
+        // This is critical for ensuring the first fork target appears on the left.
+        let input = r#"stateDiagram-v2
+    direction TB
+    [*] --> Start
+    state fork_state <<fork>>
+    Start --> fork_state
+    fork_state --> Validation
+    fork_state --> ResourceAlloc
+"#;
+        let db = parse(input).expect("Should parse");
+
+        // Check relations order in StateDb
+        let relations = db.get_relations();
+        let fork_edges: Vec<_> = relations
+            .iter()
+            .filter(|r| r.state1 == "fork_state")
+            .collect();
+
+        assert_eq!(fork_edges.len(), 2, "Should have 2 edges from fork_state");
+        assert_eq!(
+            fork_edges[0].state2, "Validation",
+            "First fork edge should target Validation"
+        );
+        assert_eq!(
+            fork_edges[1].state2, "ResourceAlloc",
+            "Second fork edge should target ResourceAlloc"
+        );
+
+        // Check layout graph edge order
+        let size_estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
+
+        // Find edges from fork_state
+        let fork_edges: Vec<_> = graph
+            .edges
+            .iter()
+            .filter(|e| e.source() == Some("fork_state"))
+            .collect();
+
+        assert_eq!(
+            fork_edges.len(),
+            2,
+            "Should have 2 edges from fork_state in layout graph"
+        );
+        assert_eq!(
+            fork_edges[0].target(),
+            Some("Validation"),
+            "First layout edge should target Validation"
+        );
+        assert_eq!(
+            fork_edges[1].target(),
+            Some("ResourceAlloc"),
+            "Second layout edge should target ResourceAlloc"
+        );
+    }
+
+    #[test]
+    fn test_fork_order_after_dagre_layout() {
+        // Test that fork targets maintain correct order after full dagre layout.
+        // This is the actual rendering test - Validation should be on the LEFT of ResourceAlloc.
+        let input = r#"stateDiagram-v2
+    direction TB
+    [*] --> Start
+    state fork_state <<fork>>
+    Start --> fork_state
+    fork_state --> Validation
+    fork_state --> ResourceAlloc
+    state join_state <<join>>
+    Validation --> join_state
+    ResourceAlloc --> join_state
+    join_state --> [*]
+"#;
+        let db = parse(input).expect("Should parse");
+        let size_estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
+
+        // Debug: print layout graph edge order
+        eprintln!("LayoutGraph edges from fork_state:");
+        for (i, edge) in graph.edges.iter().enumerate() {
+            if edge.source() == Some("fork_state") {
+                eprintln!(
+                    "  {}: {} -> {}",
+                    i,
+                    edge.source().unwrap_or("?"),
+                    edge.target().unwrap_or("?")
+                );
+            }
+        }
+
+        // Run layout
+        let result = layout(graph).expect("Layout should succeed");
+
+        // Find Validation and ResourceAlloc nodes
+        let validation = result
+            .nodes
+            .iter()
+            .find(|n| n.id == "Validation")
+            .expect("Should have Validation node");
+        let resource = result
+            .nodes
+            .iter()
+            .find(|n| n.id == "ResourceAlloc")
+            .expect("Should have ResourceAlloc node");
+
+        let val_x = validation.x.expect("Validation should have x position");
+        let res_x = resource.x.expect("ResourceAlloc should have x position");
+
+        eprintln!(
+            "After layout: Validation.x={}, ResourceAlloc.x={}",
+            val_x, res_x
+        );
+
+        // Validation (first edge target) should have smaller x (be on LEFT) in TB layout
+        assert!(
+            val_x < res_x,
+            "Validation (first fork target) should be LEFT of ResourceAlloc. \
+             Validation.x={}, ResourceAlloc.x={}",
+            val_x,
+            res_x
         );
     }
 }

@@ -11,25 +11,36 @@ use crate::layout::NodeShape;
 
 /// Run normalization: break long edges into unit-length segments
 pub fn run(graph: &mut DagreGraph) {
-    // Collect edges that need normalization
-    let edges_to_normalize: Vec<_> = graph
-        .edges()
-        .iter()
-        .filter_map(|key| {
-            let v = &key.v;
+    // Collect edges that need normalization.
+    // IMPORTANT: We iterate through nodes and use out_edges() for each node,
+    // NOT graph.edges(), because out_edges() preserves edge insertion order
+    // (it's stored as a Vec) while graph.edges() uses HashMap which doesn't.
+    // This is critical for fork/join nodes where edge definition order
+    // determines the visual layout order of parallel states.
+    let nodes: Vec<String> = graph.nodes().iter().map(|s| (*s).clone()).collect();
+    let mut edges_to_normalize: Vec<_> = Vec::new();
+
+    for v in &nodes {
+        let v_rank = match graph.node(v).and_then(|n| n.rank) {
+            Some(r) => r,
+            None => continue,
+        };
+
+        // Use out_edges to preserve insertion order
+        for key in graph.out_edges(v) {
             let w = &key.w;
             let name = key.name.clone();
-            let v_rank = graph.node(v).and_then(|n| n.rank)?;
-            let w_rank = graph.node(w).and_then(|n| n.rank)?;
+            let w_rank = match graph.node(w).and_then(|n| n.rank) {
+                Some(r) => r,
+                None => continue,
+            };
 
             // Only normalize edges that span more than 1 rank
             if w_rank != v_rank + 1 {
-                Some((v.clone(), w.clone(), name, v_rank, w_rank))
-            } else {
-                None
+                edges_to_normalize.push((v.clone(), w.clone(), name, v_rank, w_rank));
             }
-        })
-        .collect();
+        }
+    }
 
     // Initialize dummy chains storage
     let mut dummy_chains: Vec<String> = Vec::new();

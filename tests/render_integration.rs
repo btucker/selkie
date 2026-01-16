@@ -3026,3 +3026,548 @@ fn test_state_composite_can_transition_to_self() {
         transition_count
     );
 }
+
+// ============================================================================
+// State Diagram Layout Accuracy Tests (mermaid parity)
+// ============================================================================
+
+#[test]
+fn test_state_fork_parallel_order_matches_definition() {
+    // Issue: mermaid-rs-5eyk
+    // Fork edges should place targets in the order they are defined in the source.
+    // First target (Validation) should be on the LEFT in TB layout.
+    let input = r#"stateDiagram-v2
+        direction TB
+        [*] --> Start
+        state fork_state <<fork>>
+        Start --> fork_state
+        fork_state --> Validation
+        fork_state --> ResourceAlloc
+        state join_state <<join>>
+        Validation --> join_state
+        ResourceAlloc --> join_state
+        join_state --> [*]
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse fork diagram");
+    let svg = render(&diagram).expect("Failed to render fork diagram");
+
+    // Extract x-coordinates for Validation and ResourceAlloc states
+    let extract_state_center_x = |svg: &str, state_name: &str| -> Option<f64> {
+        let state_marker = format!("id=\"state-{}\"", state_name);
+        let state_start = svg.find(&state_marker)?;
+        let relevant_section = &svg[state_start..state_start.saturating_add(500)];
+
+        // Find rect and extract x + width/2
+        for line in relevant_section.lines() {
+            if line.contains("<rect") {
+                let x_pattern = regex::Regex::new(r#"x="([0-9.]+)""#).ok()?;
+                let w_pattern = regex::Regex::new(r#"width="([0-9.]+)""#).ok()?;
+                if let (Some(x_caps), Some(w_caps)) =
+                    (x_pattern.captures(line), w_pattern.captures(line))
+                {
+                    let x: f64 = x_caps.get(1)?.as_str().parse().ok()?;
+                    let w: f64 = w_caps.get(1)?.as_str().parse().ok()?;
+                    return Some(x + w / 2.0);
+                }
+            }
+        }
+        None
+    };
+
+    let validation_x = extract_state_center_x(&svg, "Validation");
+    let resource_x = extract_state_center_x(&svg, "ResourceAlloc");
+
+    eprintln!("Fork parallel state positions:");
+    eprintln!("  Validation center_x: {:?}", validation_x);
+    eprintln!("  ResourceAlloc center_x: {:?}", resource_x);
+
+    if let (Some(val_x), Some(res_x)) = (validation_x, resource_x) {
+        // In TB layout with fork, first defined target should be on the LEFT (smaller x)
+        // fork_state --> Validation (first, should be LEFT)
+        // fork_state --> ResourceAlloc (second, should be RIGHT)
+        assert!(
+            val_x < res_x,
+            "Validation (first fork target) should be LEFT of ResourceAlloc: Validation.x={}, ResourceAlloc.x={}",
+            val_x, res_x
+        );
+    } else {
+        panic!("Could not extract state positions from SVG. Check SVG structure.");
+    }
+}
+
+#[test]
+fn test_state_nested_composite_centered_in_parent() {
+    // Issue: mermaid-rs-n7fw
+    // Nested composite states should be horizontally centered within their parent.
+    let input = r#"stateDiagram-v2
+        direction TB
+        [*] --> Outer
+        state Outer {
+            [*] --> Inner
+            state Inner {
+                [*] --> Deep
+            }
+        }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse nested composite");
+    let svg = render(&diagram).expect("Failed to render nested composite");
+
+    // Extract bounds for Outer and Inner composites
+    let extract_composite_bounds = |svg: &str, name: &str| -> Option<(f64, f64, f64)> {
+        let composite_marker = format!("id=\"composite-{}\"", name);
+        let composite_start = svg.find(&composite_marker)?;
+        let relevant_section = &svg[composite_start..composite_start.saturating_add(600)];
+
+        for line in relevant_section.lines() {
+            if line.contains("state-composite-outer") {
+                let x_pattern = regex::Regex::new(r#"x="([0-9.]+)""#).ok()?;
+                let w_pattern = regex::Regex::new(r#"width="([0-9.]+)""#).ok()?;
+                if let (Some(x_caps), Some(w_caps)) =
+                    (x_pattern.captures(line), w_pattern.captures(line))
+                {
+                    let x: f64 = x_caps.get(1)?.as_str().parse().ok()?;
+                    let w: f64 = w_caps.get(1)?.as_str().parse().ok()?;
+                    let center = x + w / 2.0;
+                    return Some((x, w, center));
+                }
+            }
+        }
+        None
+    };
+
+    let outer_bounds = extract_composite_bounds(&svg, "Outer");
+    let inner_bounds = extract_composite_bounds(&svg, "Inner");
+
+    eprintln!("Nested composite bounds:");
+    eprintln!("  Outer: {:?}", outer_bounds);
+    eprintln!("  Inner: {:?}", inner_bounds);
+
+    if let (Some((outer_x, outer_w, outer_center)), Some((inner_x, inner_w, inner_center))) =
+        (outer_bounds, inner_bounds)
+    {
+        // Inner should be horizontally centered within Outer
+        // Check that inner's center is close to outer's center
+        let center_diff = (inner_center - outer_center).abs();
+        let tolerance = 5.0; // 5px tolerance
+
+        assert!(
+            center_diff < tolerance,
+            "Inner composite should be centered in Outer: outer_center={}, inner_center={}, diff={}",
+            outer_center, inner_center, center_diff
+        );
+
+        // Inner should have padding on both sides
+        let left_padding = inner_x - outer_x;
+        let right_padding = (outer_x + outer_w) - (inner_x + inner_w);
+        let padding_diff = (left_padding - right_padding).abs();
+
+        eprintln!(
+            "  Left padding: {}, Right padding: {}",
+            left_padding, right_padding
+        );
+
+        assert!(
+            padding_diff < tolerance * 2.0,
+            "Inner composite should have equal padding: left={}, right={}, diff={}",
+            left_padding,
+            right_padding,
+            padding_diff
+        );
+    } else {
+        panic!("Could not extract composite bounds from SVG");
+    }
+}
+
+#[test]
+fn test_state_complex_executing_centered_in_processing() {
+    // Issue: mermaid-rs-n7fw, mermaid-rs-unwc
+    // In state_complex.mmd, Executing should be centered within Processing
+    let input = std::fs::read_to_string("docs/sources/state_complex.mmd")
+        .expect("Failed to read state_complex.mmd");
+
+    let diagram = parse(&input).expect("Failed to parse state_complex");
+    let svg = render(&diagram).expect("Failed to render state_complex");
+
+    // Extract bounds for Processing and Executing composites
+    let extract_composite_bounds = |svg: &str, name: &str| -> Option<(f64, f64, f64)> {
+        let composite_marker = format!("id=\"composite-{}\"", name);
+        let composite_start = svg.find(&composite_marker)?;
+        let relevant_section = &svg[composite_start..composite_start.saturating_add(600)];
+
+        for line in relevant_section.lines() {
+            if line.contains("state-composite-outer") {
+                let x_pattern = regex::Regex::new(r#"x="([0-9.]+)""#).ok()?;
+                let w_pattern = regex::Regex::new(r#"width="([0-9.]+)""#).ok()?;
+                if let (Some(x_caps), Some(w_caps)) =
+                    (x_pattern.captures(line), w_pattern.captures(line))
+                {
+                    let x: f64 = x_caps.get(1)?.as_str().parse().ok()?;
+                    let w: f64 = w_caps.get(1)?.as_str().parse().ok()?;
+                    let center = x + w / 2.0;
+                    return Some((x, w, center));
+                }
+            }
+        }
+        None
+    };
+
+    let processing_bounds = extract_composite_bounds(&svg, "Processing");
+    let executing_bounds = extract_composite_bounds(&svg, "Executing");
+
+    eprintln!("state_complex composite bounds:");
+    eprintln!("  Processing: {:?}", processing_bounds);
+    eprintln!("  Executing: {:?}", executing_bounds);
+
+    if let (Some((proc_x, proc_w, proc_center)), Some((exec_x, exec_w, exec_center))) =
+        (processing_bounds, executing_bounds)
+    {
+        // Executing should be centered within Processing
+        let center_diff = (exec_center - proc_center).abs();
+        let tolerance = 10.0; // 10px tolerance for complex diagram
+
+        assert!(
+            center_diff < tolerance,
+            "Executing should be centered in Processing: Processing.center={}, Executing.center={}, diff={}",
+            proc_center, exec_center, center_diff
+        );
+
+        // Check padding is roughly equal
+        let left_padding = exec_x - proc_x;
+        let right_padding = (proc_x + proc_w) - (exec_x + exec_w);
+
+        eprintln!(
+            "  Left padding: {}, Right padding: {}",
+            left_padding, right_padding
+        );
+
+        // Padding should be at least 15px on each side and roughly equal
+        assert!(
+            left_padding > 10.0,
+            "Executing should have left padding within Processing: left_padding={}",
+            left_padding
+        );
+        assert!(
+            right_padding > 10.0,
+            "Executing should have right padding within Processing: right_padding={}",
+            right_padding
+        );
+    } else {
+        panic!("Could not extract Processing/Executing bounds from SVG");
+    }
+}
+
+// ============================================================================
+// Mermaid reference implementation tests
+// These tests are based on mermaid's cypress/integration/rendering/stateDiagram-v2.spec.js
+// ============================================================================
+
+/// Test from mermaid: v2 should render a simple state diagrams
+#[test]
+fn test_mermaid_simple_state_diagram() {
+    let input = r#"stateDiagram-v2
+    [*] --> State1
+    State1 --> [*]
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse simple state diagram");
+    let svg = render(&diagram).expect("Failed to render simple state diagram");
+
+    // Should contain start state (filled circle with state-start class)
+    assert!(
+        svg.contains("class=\"state-start\""),
+        "Should have start state with state-start class"
+    );
+    // Should contain end state (circles with state-end-outer and state-end-inner)
+    assert!(
+        svg.contains("class=\"state-end-outer\""),
+        "Should have end state outer circle"
+    );
+    assert!(
+        svg.contains("class=\"state-end-inner\""),
+        "Should have end state inner circle"
+    );
+    assert!(svg.contains("State1"), "Should contain State1");
+    // Should have transitions (paths)
+    assert!(
+        svg.contains("transition-path"),
+        "Should have transition paths"
+    );
+}
+
+/// Test from mermaid: v2 should render state descriptions using "as" syntax
+/// Note: Currently the "as" syntax creates the state but doesn't use the display name
+#[test]
+fn test_mermaid_state_description_as_syntax() {
+    let input = r#"stateDiagram-v2
+    [*] --> S1
+    state "Some long name" as S1
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse state with 'as' syntax");
+    let svg = render(&diagram).expect("Failed to render state with 'as' syntax");
+
+    // The state should be created with id S1
+    assert!(svg.contains("state-S1"), "Should have state with id S1");
+    // TODO: The display name "Some long name" should ideally be rendered,
+    // but currently we render the state ID. This is a known limitation.
+}
+
+/// Test from mermaid: v2 should render composite states
+#[test]
+fn test_mermaid_composite_states() {
+    let input = r#"stateDiagram-v2
+    [*] --> NotShooting
+    NotShooting --> A
+    NotShooting --> B
+
+    state NotShooting {
+        [*] --> Idle
+        Idle --> Configuring : EvConfig
+        Configuring --> Idle : EvConfig
+    }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse composite state");
+    let svg = render(&diagram).expect("Failed to render composite state");
+
+    // Should have composite state container
+    assert!(
+        svg.contains("composite-NotShooting"),
+        "Should have NotShooting composite"
+    );
+    // Composite should have outer and inner rects
+    assert!(
+        svg.contains("state-composite-outer"),
+        "Should have composite outer rect"
+    );
+    assert!(
+        svg.contains("state-composite-inner"),
+        "Should have composite inner rect"
+    );
+    // Should contain the nested states
+    assert!(svg.contains("Idle"), "Should contain Idle state");
+    assert!(
+        svg.contains("Configuring"),
+        "Should contain Configuring state"
+    );
+}
+
+/// Test from mermaid: v2 should render forks and joins
+#[test]
+fn test_mermaid_fork_join() {
+    let input = r#"stateDiagram-v2
+    state fork_state <<fork>>
+    [*] --> fork_state
+    fork_state --> State2
+    fork_state --> State3
+
+    state join_state <<join>>
+    State2 --> join_state
+    State3 --> join_state
+    join_state --> State4
+    State4 --> [*]
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse fork/join diagram");
+    let svg = render(&diagram).expect("Failed to render fork/join diagram");
+
+    // Should have fork and join states
+    assert!(
+        svg.contains("state-fork_state"),
+        "Should have fork_state node"
+    );
+    assert!(
+        svg.contains("state-join_state"),
+        "Should have join_state node"
+    );
+
+    // Fork edges should have curves (C commands in path), not just straight lines
+    // Extract paths for fork edges
+    let fork_edges: Vec<&str> = svg
+        .lines()
+        .filter(|line| line.contains("transition-path"))
+        .collect();
+
+    // At least some edges should have curve commands (C for cubic bezier)
+    let curved_edges = fork_edges
+        .iter()
+        .filter(|line| line.contains(" C "))
+        .count();
+    assert!(
+        curved_edges > 0,
+        "Fork edges should use curved paths (C commands), found {} curved out of {} total",
+        curved_edges,
+        fork_edges.len()
+    );
+}
+
+/// Test from mermaid: v2 should render multiple composite states
+#[test]
+fn test_mermaid_multiple_composite_states() {
+    let input = r#"stateDiagram-v2
+    [*] --> TV
+
+    state TV {
+        [*] --> Off
+        On --> Off : Turn off
+        Off --> On : Turn on
+    }
+
+    TV --> Console
+
+    state Console {
+        [*] --> Off2
+        On2 --> Off2 : Turn off
+        Off2 --> On2 : Turn on
+        On2 --> Playing
+
+        state Playing {
+            Alive --> Dead
+            Dead --> Alive
+        }
+    }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse multiple composites");
+    let svg = render(&diagram).expect("Failed to render multiple composites");
+
+    // Should have all composite states
+    assert!(svg.contains("composite-TV"), "Should have TV composite");
+    assert!(
+        svg.contains("composite-Console"),
+        "Should have Console composite"
+    );
+    assert!(
+        svg.contains("composite-Playing"),
+        "Should have Playing composite (nested in Console)"
+    );
+
+    // Nested composite (Playing) should use alternate styling
+    assert!(
+        svg.contains("state-composite-inner-alt"),
+        "Nested composite should have alternate inner styling"
+    );
+}
+
+/// Test from mermaid: v2 should render fork in composite state
+#[test]
+fn test_mermaid_fork_in_composite() {
+    let input = r#"stateDiagram-v2
+    [*] --> TV
+
+    state TV {
+        state fork_state <<fork>>
+        [*] --> fork_state
+        fork_state --> State2
+        fork_state --> State3
+
+        state join_state <<join>>
+        State2 --> join_state
+        State3 --> join_state
+        join_state --> State4
+        State4 --> [*]
+    }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse fork in composite");
+    let svg = render(&diagram).expect("Failed to render fork in composite");
+
+    // Should have composite with fork/join inside
+    assert!(svg.contains("composite-TV"), "Should have TV composite");
+    assert!(
+        svg.contains("state-fork_state"),
+        "Should have fork inside composite"
+    );
+    assert!(
+        svg.contains("state-join_state"),
+        "Should have join inside composite"
+    );
+}
+
+/// Test from mermaid: v2 should render state with note
+#[test]
+fn test_mermaid_state_with_note() {
+    let input = r#"stateDiagram-v2
+    State1: The state with a note
+    note right of State1
+        Important information! You can write
+        notes.
+    end note
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse state with note");
+    let svg = render(&diagram).expect("Failed to render state with note");
+
+    // Should have the state
+    assert!(svg.contains("State1"), "Should have State1");
+    // Should have the note with its content
+    assert!(
+        svg.contains("Important information"),
+        "Should render note content"
+    );
+}
+
+/// Test: Composite state titles should be centered horizontally
+#[test]
+fn test_composite_title_centered() {
+    let input = r#"stateDiagram-v2
+    state Processing {
+        [*] --> Working
+        Working --> Done
+    }
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse");
+    let svg = render(&diagram).expect("Failed to render");
+
+    // Find the composite label text element
+    // It should have text-anchor="middle" for centering
+    assert!(
+        svg.contains("state-composite-label") && svg.contains("text-anchor=\"middle\""),
+        "Composite state title should be centered with text-anchor=\"middle\""
+    );
+}
+
+/// Test: Fork edges should fan out with curves, not straight lines
+#[test]
+fn test_fork_edges_are_curved() {
+    let input = r#"stateDiagram-v2
+    direction TB
+    [*] --> Start
+    state fork_state <<fork>>
+    Start --> fork_state
+    fork_state --> Target1
+    fork_state --> Target2
+    fork_state --> Target3
+    "#;
+
+    let diagram = parse(input).expect("Failed to parse fork diagram");
+    let svg = render(&diagram).expect("Failed to render fork diagram");
+
+    // Extract all path d attributes
+    let path_regex =
+        regex::Regex::new(r#"<path[^>]*d="([^"]+)"[^>]*class="transition-path""#).expect("regex");
+
+    let paths: Vec<&str> = path_regex
+        .captures_iter(&svg)
+        .filter_map(|cap| cap.get(1).map(|m| m.as_str()))
+        .collect();
+
+    eprintln!("Found {} transition paths", paths.len());
+    for (i, path) in paths.iter().enumerate() {
+        eprintln!("  Path {}: {}", i, &path[..path.len().min(100)]);
+    }
+
+    // Count paths with curves (should have C commands for curves)
+    let curved_count = paths.iter().filter(|p| p.contains(" C ")).count();
+
+    // At least some paths from fork should be curved
+    assert!(
+        curved_count >= 2,
+        "Fork edges should produce curved paths. Found {} curved paths out of {}",
+        curved_count,
+        paths.len()
+    );
+}

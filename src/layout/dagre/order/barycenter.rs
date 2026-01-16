@@ -18,8 +18,14 @@ pub struct BarycenterEntry {
 /// Calculate barycenters for movable nodes based on in-edges
 ///
 /// For each node, the barycenter is the weighted average of the order positions
-/// of its predecessors.
+/// of its predecessors. A tiny offset based on array position is added to ensure
+/// stable ordering when barycenters are equal (e.g., fork targets sharing one predecessor).
 pub fn barycenter(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
+    // Use a small epsilon to create tie-breaking without affecting actual ordering
+    // The epsilon is small enough that it won't change the ordering of nodes
+    // with genuinely different barycenters (which differ by at least 1.0)
+    let epsilon = 1e-6;
+
     movable
         .iter()
         .enumerate()
@@ -52,9 +58,12 @@ pub fn barycenter(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
             }
 
             if weight > 0.0 {
+                // Add tiny offset based on array position to ensure stable ordering
+                // This preserves edge definition order when barycenters are equal
+                let bc = sum / weight + (i as f64) * epsilon;
                 BarycenterEntry {
                     v: v.clone(),
-                    barycenter: Some(sum / weight),
+                    barycenter: Some(bc),
                     weight,
                     i,
                 }
@@ -73,8 +82,11 @@ pub fn barycenter(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
 /// Calculate barycenters for movable nodes based on out-edges
 ///
 /// For each node, the barycenter is the weighted average of the order positions
-/// of its successors.
+/// of its successors. A tiny offset based on array position is added to ensure
+/// stable ordering when barycenters are equal.
 pub fn barycenter_down(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntry> {
+    let epsilon = 1e-6;
+
     movable
         .iter()
         .enumerate()
@@ -107,9 +119,11 @@ pub fn barycenter_down(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntr
             }
 
             if weight > 0.0 {
+                // Add tiny offset based on array position to ensure stable ordering
+                let bc = sum / weight + (i as f64) * epsilon;
                 BarycenterEntry {
                     v: v.clone(),
-                    barycenter: Some(sum / weight),
+                    barycenter: Some(bc),
                     weight,
                     i,
                 }

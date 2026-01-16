@@ -146,6 +146,15 @@ fn build_path(points: &[crate::layout::Point]) -> String {
 /// Build curved SVG path from bend points using basis spline interpolation
 /// This matches d3's curveBasis for smooth curves like mermaid.js
 pub(crate) fn build_curved_path(points: &[crate::layout::Point]) -> String {
+    build_curved_path_with_options(points, true)
+}
+
+/// Build curved SVG path with optional simplification
+/// Set `simplify` to false for fork/join edges that need to preserve curvature
+pub(crate) fn build_curved_path_with_options(
+    points: &[crate::layout::Point],
+    simplify: bool,
+) -> String {
     if points.is_empty() {
         return String::new();
     }
@@ -162,15 +171,19 @@ pub(crate) fn build_curved_path(points: &[crate::layout::Point]) -> String {
         );
     }
 
-    // Simplify bend points by removing nearly-collinear intermediate points
-    // This produces straighter edges when dagre routes unnecessarily
-    let simplified = simplify_collinear_points(points);
+    let working_points = if simplify {
+        // Simplify bend points by removing nearly-collinear intermediate points
+        // This produces straighter edges when dagre routes unnecessarily
+        simplify_collinear_points(points)
+    } else {
+        points.to_vec()
+    };
 
     // Add subtle curvature to straight edges (matching mermaid's visual style)
     // When points are perfectly aligned vertically/horizontally, basis spline
     // produces a straight line. Mermaid's dagre has slight floating-point
     // variations that create subtle curves. We replicate this effect.
-    let adjusted = add_subtle_curvature(&simplified);
+    let adjusted = add_subtle_curvature(&working_points);
 
     // Use basis spline interpolation (like d3's curveBasis)
     // This creates smooth curves through the control points
