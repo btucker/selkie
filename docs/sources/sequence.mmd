@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant A as Alice
+    participant B as Bob
+    participant C as Server
+    A->>B: Hello Bob!
+    B-->>A: Hi Alice!
+    Note over A,B: Authentication
+    A->>+C: Login request
+    C-->>-A: Token
+    A->>B: How are you?
+    B-->>A: I'm good, thanks!
+    Note right of B: Bob thinks

@@ -253,40 +253,40 @@ marker path {
 
     </g>
     <text x="392" y="25" class="titleText" text-anchor="middle">Project Timeline</text>
-    <g class="grid" fill="none" transform="translate(75, 218)" font-size="10" font-family="sans-serif" text-anchor="middle">
+    <g class="grid" text-anchor="middle" transform="translate(75, 218)" fill="none" font-size="10" font-family="sans-serif">
       <path d="M0.5,-183V0.5H635V-183" class="domain" stroke="currentColor"/>
       <line x1="0.5" y1="0" x2="0.5" y2="-183" stroke="currentColor"/>
-      <text x="0.5" y="3" fill="#000" font-size="10" transform="rotate(-45 0.5 3)" stroke="none" style="text-anchor: end;" dy="0.5em">2024-01-01</text>
+      <text x="0.5" y="3" font-size="10" dy="0.5em" style="text-anchor: end;" transform="rotate(-45 0.5 3)" fill="#000" stroke="none">2024-01-01</text>
       <line x1="42.766666666666666" y1="0" x2="42.766666666666666" y2="-183" stroke="currentColor"/>
-      <text x="42.766666666666666" y="3" transform="rotate(-45 42.766666666666666 3)" stroke="none" style="text-anchor: end;" fill="#000" dy="0.5em" font-size="10">2024-01-03</text>
+      <text x="42.766666666666666" y="3" font-size="10" dy="0.5em" style="text-anchor: end;" fill="#000" stroke="none" transform="rotate(-45 42.766666666666666 3)">2024-01-03</text>
       <line x1="85.03333333333333" y1="0" x2="85.03333333333333" y2="-183" stroke="currentColor"/>
-      <text x="85.03333333333333" y="3" stroke="none" transform="rotate(-45 85.03333333333333 3)" dy="0.5em" fill="#000" font-size="10" style="text-anchor: end;">2024-01-05</text>
+      <text x="85.03333333333333" y="3" fill="#000" transform="rotate(-45 85.03333333333333 3)" stroke="none" style="text-anchor: end;" dy="0.5em" font-size="10">2024-01-05</text>
       <line x1="127.3" y1="0" x2="127.3" y2="-183" stroke="currentColor"/>
-      <text x="127.3" y="3" style="text-anchor: end;" stroke="none" dy="0.5em" fill="#000" font-size="10" transform="rotate(-45 127.3 3)">2024-01-07</text>
+      <text x="127.3" y="3" font-size="10" fill="#000" dy="0.5em" transform="rotate(-45 127.3 3)" stroke="none" style="text-anchor: end;">2024-01-07</text>
       <line x1="169.56666666666666" y1="0" x2="169.56666666666666" y2="-183" stroke="currentColor"/>
-      <text x="169.56666666666666" y="3" font-size="10" transform="rotate(-45 169.56666666666666 3)" stroke="none" dy="0.5em" fill="#000" style="text-anchor: end;">2024-01-09</text>
+      <text x="169.56666666666666" y="3" stroke="none" font-size="10" style="text-anchor: end;" fill="#000" dy="0.5em" transform="rotate(-45 169.56666666666666 3)">2024-01-09</text>
       <line x1="211.83333333333331" y1="0" x2="211.83333333333331" y2="-183" stroke="currentColor"/>
-      <text x="211.83333333333331" y="3" fill="#000" style="text-anchor: end;" dy="0.5em" transform="rotate(-45 211.83333333333331 3)" font-size="10" stroke="none">2024-01-11</text>
+      <text x="211.83333333333331" y="3" fill="#000" font-size="10" style="text-anchor: end;" dy="0.5em" transform="rotate(-45 211.83333333333331 3)" stroke="none">2024-01-11</text>
       <line x1="254.1" y1="0" x2="254.1" y2="-183" stroke="currentColor"/>
-      <text x="254.1" y="3" font-size="10" stroke="none" fill="#000" transform="rotate(-45 254.1 3)" dy="0.5em" style="text-anchor: end;">2024-01-13</text>
+      <text x="254.1" y="3" dy="0.5em" fill="#000" font-size="10" stroke="none" style="text-anchor: end;" transform="rotate(-45 254.1 3)">2024-01-13</text>
       <line x1="296.3666666666667" y1="0" x2="296.3666666666667" y2="-183" stroke="currentColor"/>
-      <text x="296.3666666666667" y="3" dy="0.5em" font-size="10" stroke="none" style="text-anchor: end;" transform="rotate(-45 296.3666666666667 3)" fill="#000">2024-01-15</text>
+      <text x="296.3666666666667" y="3" font-size="10" fill="#000" dy="0.5em" style="text-anchor: end;" transform="rotate(-45 296.3666666666667 3)" stroke="none">2024-01-15</text>
       <line x1="338.6333333333333" y1="0" x2="338.6333333333333" y2="-183" stroke="currentColor"/>
-      <text x="338.6333333333333" y="3" fill="#000" stroke="none" dy="0.5em" style="text-anchor: end;" transform="rotate(-45 338.6333333333333 3)" font-size="10">2024-01-17</text>
+      <text x="338.6333333333333" y="3" dy="0.5em" fill="#000" style="text-anchor: end;" font-size="10" stroke="none" transform="rotate(-45 338.6333333333333 3)">2024-01-17</text>
       <line x1="380.9" y1="0" x2="380.9" y2="-183" stroke="currentColor"/>
-      <text x="380.9" y="3" fill="#000" dy="0.5em" transform="rotate(-45 380.9 3)" stroke="none" style="text-anchor: end;" font-size="10">2024-01-19</text>
+      <text x="380.9" y="3" stroke="none" dy="0.5em" font-size="10" transform="rotate(-45 380.9 3)" style="text-anchor: end;" fill="#000">2024-01-19</text>
       <line x1="423.16666666666663" y1="0" x2="423.16666666666663" y2="-183" stroke="currentColor"/>
-      <text x="423.16666666666663" y="3" transform="rotate(-45 423.16666666666663 3)" style="text-anchor: end;" stroke="none" dy="0.5em" fill="#000" font-size="10">2024-01-21</text>
+      <text x="423.16666666666663" y="3" dy="0.5em" font-size="10" style="text-anchor: end;" stroke="none" fill="#000" transform="rotate(-45 423.16666666666663 3)">2024-01-21</text>
       <line x1="465.43333333333334" y1="0" x2="465.43333333333334" y2="-183" stroke="currentColor"/>
-      <text x="465.43333333333334" y="3" fill="#000" stroke="none" dy="0.5em" font-size="10" style="text-anchor: end;" transform="rotate(-45 465.43333333333334 3)">2024-01-23</text>
+      <text x="465.43333333333334" y="3" style="text-anchor: end;" dy="0.5em" stroke="none" font-size="10" fill="#000" transform="rotate(-45 465.43333333333334 3)">2024-01-23</text>
       <line x1="507.7" y1="0" x2="507.7" y2="-183" stroke="currentColor"/>
-      <text x="507.7" y="3" dy="0.5em" stroke="none" font-size="10" style="text-anchor: end;" transform="rotate(-45 507.7 3)" fill="#000">2024-01-25</text>
+      <text x="507.7" y="3" fill="#000" transform="rotate(-45 507.7 3)" font-size="10" dy="0.5em" stroke="none" style="text-anchor: end;">2024-01-25</text>
       <line x1="549.9666666666667" y1="0" x2="549.9666666666667" y2="-183" stroke="currentColor"/>
-      <text x="549.9666666666667" y="3" style="text-anchor: end;" stroke="none" fill="#000" transform="rotate(-45 549.9666666666667 3)" font-size="10" dy="0.5em">2024-01-27</text>
+      <text x="549.9666666666667" y="3" stroke="none" transform="rotate(-45 549.9666666666667 3)" style="text-anchor: end;" dy="0.5em" font-size="10" fill="#000">2024-01-27</text>
       <line x1="592.2333333333333" y1="0" x2="592.2333333333333" y2="-183" stroke="currentColor"/>
-      <text x="592.2333333333333" y="3" stroke="none" style="text-anchor: end;" font-size="10" fill="#000" transform="rotate(-45 592.2333333333333 3)" dy="0.5em">2024-01-29</text>
+      <text x="592.2333333333333" y="3" stroke="none" style="text-anchor: end;" transform="rotate(-45 592.2333333333333 3)" font-size="10" dy="0.5em" fill="#000">2024-01-29</text>
       <line x1="634.5" y1="0" x2="634.5" y2="-183" stroke="currentColor"/>
-      <text x="634.5" y="3" fill="#000" stroke="none" style="text-anchor: end;" transform="rotate(-45 634.5 3)" font-size="10" dy="0.5em">2024-01-31</text>
+      <text x="634.5" y="3" dy="0.5em" fill="#000" stroke="none" font-size="10" style="text-anchor: end;" transform="rotate(-45 634.5 3)">2024-01-31</text>
     </g>
     <rect x="0" y="48" width="746.5" height="24" class="section section0"/>
     <rect x="0" y="72" width="746.5" height="24" class="section section0"/>
@@ -297,18 +297,18 @@ marker path {
     <rect x="0" y="192" width="746.5" height="24" class="section section2"/>
     <rect x="75" y="50" width="147.93333333333334" height="20" rx="3" ry="3" class="task task0" transform-origin="148.96666666666667px 60px" id="a1"/>
     <text x="148.96666666666667" y="63.5" class="taskText taskText0" font-size="11" id="a1-text">Requirements</text>
-    <rect x="222.93333333333334" y="74" width="105.66666666666666" height="20" rx="3" ry="3" class="task task0" id="a2" transform-origin="275.76666666666665px 84px"/>
-    <text x="275.76666666666665" y="87.5" class="taskText taskText0" id="a2-text" font-size="11">Design</text>
-    <rect x="328.6" y="98" width="211.33333333333331" height="20" rx="3" ry="3" class="task crit1" id="b1" transform-origin="434.26666666666665px 108px"/>
+    <rect x="222.93333333333334" y="74" width="105.66666666666666" height="20" rx="3" ry="3" class="task task0" transform-origin="275.76666666666665px 84px" id="a2"/>
+    <text x="275.76666666666665" y="87.5" class="taskText taskText0" font-size="11" id="a2-text">Design</text>
+    <rect x="328.6" y="98" width="211.33333333333331" height="20" rx="3" ry="3" class="task crit1" transform-origin="434.26666666666665px 108px" id="b1"/>
     <text x="434.26666666666665" y="111.5" class="taskText taskText1 critText1" font-size="11" id="b1-text">Backend</text>
     <rect x="328.6" y="122" width="169.06666666666666" height="20" rx="3" ry="3" class="task task1" id="b2" transform-origin="413.1333333333333px 132px"/>
     <text x="413.1333333333333" y="135.5" class="taskText taskText1" font-size="11" id="b2-text">Frontend</text>
     <rect x="539.9333333333334" y="146" width="63.4" height="20" rx="3" ry="3" class="task task1" id="b3" transform-origin="571.6333333333334px 156px"/>
-    <text x="608.3333333333334" y="159.5" class="taskTextOutsideRight taskTextOutside1" font-size="11" id="b3-text">API Integration</text>
+    <text x="608.3333333333334" y="159.5" class="taskTextOutsideRight taskTextOutside1" id="b3-text" font-size="11">API Integration</text>
     <rect x="497.66666666666663" y="170" width="63.4" height="20" rx="3" ry="3" class="task task2" id="c1" transform-origin="529.3666666666667px 180px"/>
     <text x="529.3666666666667" y="183.5" class="taskText taskText2" id="c1-text" font-size="11">Unit Tests</text>
-    <rect x="603.3333333333334" y="194" width="105.66666666666666" height="20" rx="3" ry="3" class="task task2" id="c2" transform-origin="656.1666666666667px 204px"/>
-    <text x="656.1666666666667" y="207.5" class="taskText taskText2" id="c2-text" font-size="11">QA</text>
+    <rect x="603.3333333333334" y="194" width="105.66666666666666" height="20" rx="3" ry="3" class="task task2" transform-origin="656.1666666666667px 204px" id="c2"/>
+    <text x="656.1666666666667" y="207.5" class="taskText taskText2" font-size="11" id="c2-text">QA</text>
     <text x="10" y="74" class="sectionTitle sectionTitle0" font-size="11">Planning</text>
     <text x="10" y="134" class="sectionTitle sectionTitle1" font-size="11">Development</text>
     <text x="10" y="194" class="sectionTitle sectionTitle2" font-size="11">Testing</text>

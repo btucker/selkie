@@ -1,0 +1,13 @@
+gantt
+    title Project Timeline
+    dateFormat YYYY-MM-DD
+    section Planning
+    Requirements :a1, 2024-01-01, 7d
+    Design      :a2, after a1, 5d
+    section Development
+    Backend     :crit, b1, after a2, 10d
+    Frontend    :b2, after a2, 8d
+    API Integration :b3, after b1, 3d
+    section Testing
+    Unit Tests  :c1, after b2, 3d
+    QA          :c2, after b3, 5d

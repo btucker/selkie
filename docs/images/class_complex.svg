@@ -129,34 +129,34 @@ marker path {
   </style>
   <defs>
     <marker id="aggregation-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="18" markerHeight="14" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" fill="none" stroke="#333333"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="none" stroke="#333333" stroke-width="1"/>
     </marker>
     <marker id="aggregation-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="18" markerHeight="14" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" fill="none" stroke="#333333"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="none" stroke="#333333" stroke-width="1"/>
     </marker>
     <marker id="inheritance-start" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="20" markerHeight="28" orient="auto">
-      <path d="M 1 7 L 18 13 V 1 Z" fill="#ECECFF" stroke-width="1" stroke="#333333"/>
+      <path d="M 1 7 L 18 13 V 1 Z" stroke="#333333" fill="#ECECFF" stroke-width="1"/>
     </marker>
     <marker id="inheritance-end" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="20" markerHeight="28" orient="auto">
-      <path d="M 18 7 L 1 13 V 1 Z" stroke-width="1" stroke="#333333" fill="#ECECFF"/>
+      <path d="M 18 7 L 1 13 V 1 Z" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
     </marker>
     <marker id="composition-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="18" markerHeight="14" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke="#333333" stroke-width="1"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" stroke="#333333" fill="#333333"/>
     </marker>
     <marker id="composition-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="18" markerHeight="14" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke="#333333" stroke-width="1"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" stroke="#333333" fill="#333333"/>
     </marker>
     <marker id="dependency-start" viewBox="0 0 20 20" refX="0" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 0 10 L 20 0 L 20 20 Z" fill="none" stroke="#333333" stroke-width="1"/>
+      <path d="M 0 10 L 20 0 L 20 20 Z" stroke-width="1" fill="none" stroke="#333333"/>
     </marker>
     <marker id="dependency-end" viewBox="0 0 20 20" refX="20" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 20 10 L 0 0 L 0 20 Z" stroke="#333333" fill="none" stroke-width="1"/>
+      <path d="M 20 10 L 0 0 L 0 20 Z" stroke-width="1" stroke="#333333" fill="none"/>
     </marker>
     <marker id="lollipop-start" viewBox="0 0 20 20" refX="13" refY="10" markerWidth="14" markerHeight="14" orient="auto">
-      <circle cx="10" cy="10" r="8" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+      <circle cx="10" cy="10" r="8" fill="#FFFFFF" stroke-width="1" stroke="#333333"/>
     </marker>
     <marker id="lollipop-end" viewBox="0 0 20 20" refX="1" refY="10" markerWidth="14" markerHeight="14" orient="auto">
-      <circle cx="10" cy="10" r="8" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+      <circle cx="10" cy="10" r="8" fill="#FFFFFF" stroke-width="1" stroke="#333333"/>
     </marker>
   </defs>
   <g class="root">
@@ -173,167 +173,167 @@ marker path {
 
     </g>
     <g class="relation">
-      <path d="M 196.80 216.00 C 158.40 229.33, 120.00 242.67, 100.80 260.00 C 81.60 277.33, 81.60 298.67, 81.60 320.00" class="relation-line" stroke-width="1" fill="none" marker-end="url(#dependency-end)" stroke="#333333"/>
+      <path d="M 196.80 216.00 C 158.40 229.33, 120.00 242.67, 100.80 260.00 C 81.60 277.33, 81.60 298.67, 81.60 320.00" class="relation-line" fill="none" stroke-width="1" stroke="#333333" marker-end="url(#dependency-end)"/>
     </g>
     <g class="relation">
       <path d="M 196.80 216.00 C 235.20 229.33, 273.60 242.67, 292.80 256.00 C 312.00 269.33, 312.00 282.67, 312.00 296.00" class="relation-line" marker-end="url(#dependency-end)" fill="none" stroke="#333333" stroke-width="1"/>
     </g>
     <g class="relation">
-      <path d="M 296.40 108.00 C 391.60 157.33, 486.80 206.67, 534.40 240.00 C 582.00 273.33, 582.00 290.67, 582.00 308.00" class="relation-line" fill="none" stroke-width="1" marker-end="url(#dependency-end)" stroke="#333333"/>
+      <path d="M 296.40 108.00 C 391.60 157.33, 486.80 206.67, 534.40 240.00 C 582.00 273.33, 582.00 290.67, 582.00 308.00" class="relation-line" stroke-width="1" marker-end="url(#dependency-end)" stroke="#333333" fill="none"/>
     </g>
     <g class="relation">
-      <path d="M 582.00 524.00 C 578.67 541.33, 575.33 558.67, 573.67 578.00 C 572.00 597.33, 572.00 618.67, 572.00 640.00" class="relation-line" stroke="#333333" fill="none" stroke-width="1" marker-end="url(#dependency-end)"/>
+      <path d="M 582.00 524.00 L 572.00 640.00" class="relation-line" fill="none" stroke="#333333" marker-end="url(#dependency-end)" stroke-width="1"/>
     </g>
     <g class="relation">
-      <path d="M 582.00 524.00 C 629.40 541.33, 676.80 558.67, 707.00 592.00 C 737.20 625.33, 750.20 674.67, 763.20 724.00" class="relation-line" stroke-width="1" fill="none" marker-end="url(#dependency-end)" stroke="#333333"/>
+      <path d="M 582.00 524.00 C 629.40 541.33, 676.80 558.67, 707.00 592.00 C 737.20 625.33, 750.20 674.67, 763.20 724.00" class="relation-line" stroke="#333333" fill="none" marker-end="url(#dependency-end)" stroke-width="1"/>
     </g>
     <g class="relation">
-      <path d="M 895.20 488.00 C 895.20 517.33, 895.20 546.67, 895.20 574.33 C 895.20 602.00, 895.20 628.00, 895.20 654.00" class="relation-line" stroke="#333333" fill="none" marker-end="url(#inheritance-end)" stroke-width="1" stroke-dasharray="5,5"/>
+      <path d="M 895.20 488.00 C 895.20 517.33, 895.20 546.67, 895.20 574.33 C 895.20 602.00, 895.20 628.00, 895.20 654.00" class="relation-line" stroke="#333333" stroke-width="1" fill="none" stroke-dasharray="5,5" marker-end="url(#inheritance-end)"/>
     </g>
     <g class="relation">
-      <path d="M 1219.20 500.00 C 1219.20 525.33, 1219.20 550.67, 1187.20 588.00 C 1155.20 625.33, 1091.20 674.67, 1027.20 724.00" class="relation-line" stroke="#333333" stroke-width="1" stroke-dasharray="5,5" marker-end="url(#inheritance-end)" fill="none"/>
+      <path d="M 1219.20 500.00 C 1219.20 525.33, 1219.20 550.67, 1187.20 588.00 C 1155.20 625.33, 1091.20 674.67, 1027.20 724.00" class="relation-line" marker-end="url(#inheritance-end)" stroke="#333333" fill="none" stroke-dasharray="5,5" stroke-width="1"/>
     </g>
     <g class="relation">
-      <path d="M 572.00 808.00 C 572.00 829.33, 572.00 850.67, 573.67 874.33 C 575.33 898.00, 578.67 924.00, 582.00 950.00" class="relation-line" fill="none" stroke="#333333" stroke-width="1" marker-end="url(#dependency-end)"/>
+      <path d="M 572.00 808.00 C 572.00 829.33, 572.00 850.67, 573.67 874.33 C 575.33 898.00, 578.67 924.00, 582.00 950.00" class="relation-line" fill="none" stroke="#333333" marker-end="url(#dependency-end)" stroke-width="1"/>
     </g>
     <g class="relation">
-      <path d="M 1090.80 724.00 C 1021.40 773.33, 952.00 822.67, 887.40 872.00 C 822.80 921.33, 763.00 970.67, 703.20 1020.00" class="relation-line" stroke-dasharray="5,5" stroke="#333333" stroke-width="1" fill="none" marker-end="url(#inheritance-end)"/>
+      <path d="M 1087.20 724.00 L 703.20 1020.00" class="relation-line" stroke-width="1" marker-end="url(#inheritance-end)" stroke="#333333" fill="none" stroke-dasharray="5,5"/>
     </g>
     <g class="relation">
-      <path d="M 1215.60 832.00 C 1216.80 845.33, 1218.00 858.67, 1218.60 872.00 C 1219.20 885.33, 1219.20 898.67, 1219.20 912.00" class="relation-line" stroke="#333333" marker-end="url(#dependency-end)" stroke-width="1" fill="none"/>
+      <path d="M 1212.00 832.00 C 1213.20 845.33, 1214.40 858.67, 1215.00 872.00 C 1215.60 885.33, 1215.60 898.67, 1215.60 912.00" class="relation-line" stroke="#333333" fill="none" stroke-width="1" marker-end="url(#dependency-end)"/>
     </g>
     <g class="relation">
-      <path d="M 1219.20 1128.00 C 1219.20 1141.33, 1219.20 1154.67, 1219.20 1168.00 C 1219.20 1181.33, 1219.20 1194.67, 1219.20 1208.00" class="relation-line" stroke-width="1" fill="none" stroke="#333333" marker-end="url(#dependency-end)"/>
-    </g>
-    <g class="class-node" id="class-UserService">
-      <path d="M 1100.9999999999998 912 H 1337.3999999999999 A 3 3 0 0 1 1340.3999999999999 915 V 1125 A 3 3 0 0 1 1337.3999999999999 1128 H 1100.9999999999998 A 3 3 0 0 1 1097.9999999999998 1125 V 915 A 3 3 0 0 1 1100.9999999999998 912 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 1100.9999999999998 912 H 1337.3999999999999 A 3 3 0 0 1 1340.3999999999999 915 V 1125 A 3 3 0 0 1 1337.3999999999999 1128 H 1100.9999999999998 A 3 3 0 0 1 1097.9999999999998 1125 V 915 A 3 3 0 0 1 1100.9999999999998 912 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
-      <text x="1219.1999999999998" y="936" dominant-baseline="middle" text-anchor="middle" font-size="16" font-weight="bold">UserService</text>
-      <path d="M 1097.9999999999998 960 L 1340.3999999999999 960" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="1121.9999999999998" y="972" text-anchor="start" dominant-baseline="middle" font-size="16">-repository: UserRepository</text>
-      <text x="1121.9999999999998" y="996" dominant-baseline="middle" text-anchor="start" font-size="16">-cache: Cache</text>
-      <path d="M 1097.9999999999998 1032 L 1340.3999999999999 1032" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="1121.9999999999998" y="1044" text-anchor="start" font-size="16" dominant-baseline="middle">+findById(id) : User</text>
-      <text x="1121.9999999999998" y="1068" dominant-baseline="middle" font-size="16" text-anchor="start">+save(user) : User</text>
-      <text x="1121.9999999999998" y="1092" dominant-baseline="middle" font-size="16" text-anchor="start">+delete(id) : void</text>
-    </g>
-    <g class="class-node" id="class-Config">
-      <path d="M 2.9999999999999147 320 H 160.1999999999999 A 3 3 0 0 1 163.1999999999999 323 V 509 A 3 3 0 0 1 160.1999999999999 512 H 2.9999999999999147 A 3 3 0 0 1 -0.00000000000008526512829121202 509 V 323 A 3 3 0 0 1 2.9999999999999147 320 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 2.9999999999999147 320 H 160.1999999999999 A 3 3 0 0 1 163.1999999999999 323 V 509 A 3 3 0 0 1 160.1999999999999 512 H 2.9999999999999147 A 3 3 0 0 1 -0.00000000000008526512829121202 509 V 323 A 3 3 0 0 1 2.9999999999999147 320 Z" class="class-box" fill="none" stroke="#333333" stroke-width="1"/>
-      <text x="81.59999999999991" y="344" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Config</text>
-      <path d="M -0.00000000000008526512829121202 368 L 163.1999999999999 368" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="23.999999999999915" y="380" dominant-baseline="middle" text-anchor="start" font-size="16">-settings: Map</text>
-      <path d="M -0.00000000000008526512829121202 416 L 163.1999999999999 416" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="23.999999999999915" y="428" font-size="16" text-anchor="start" dominant-baseline="middle">+get(key) : any</text>
-      <text x="23.999999999999915" y="452" text-anchor="start" dominant-baseline="middle" font-size="16">+set(key, value)</text>
-      <text x="23.999999999999915" y="476" text-anchor="start" font-size="16" dominant-baseline="middle">+load(path)</text>
-    </g>
-    <g class="class-node" id="class-Application">
-      <path d="M 100.19999999999996 0 H 293.4 A 3 3 0 0 1 296.4 3 V 213 A 3 3 0 0 1 293.4 216 H 100.19999999999996 A 3 3 0 0 1 97.19999999999996 213 V 3 A 3 3 0 0 1 100.19999999999996 0 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
-      <path d="M 100.19999999999996 0 H 293.4 A 3 3 0 0 1 296.4 3 V 213 A 3 3 0 0 1 293.4 216 H 100.19999999999996 A 3 3 0 0 1 97.19999999999996 213 V 3 A 3 3 0 0 1 100.19999999999996 0 Z" class="class-box" fill="none" stroke-width="1" stroke="#333333"/>
-      <text x="196.79999999999995" y="24" dominant-baseline="middle" font-size="16" font-weight="bold" text-anchor="middle">Application</text>
-      <path d="M 97.19999999999996 48 L 296.4 48" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="121.19999999999996" y="60" dominant-baseline="middle" font-size="16" text-anchor="start">-config: Config</text>
-      <text x="121.19999999999996" y="84" font-size="16" dominant-baseline="middle" text-anchor="start">-logger: Logger</text>
-      <path d="M 97.19999999999996 120 L 296.4 120" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="121.19999999999996" y="132" font-size="16" text-anchor="start" dominant-baseline="middle">+start()</text>
-      <text x="121.19999999999996" y="156" text-anchor="start" dominant-baseline="middle" font-size="16">+stop()</text>
-      <text x="121.19999999999996" y="180" text-anchor="start" dominant-baseline="middle" font-size="16">+getStatus() : Status</text>
+      <path d="M 1215.60 1128.00 C 1215.60 1141.33, 1215.60 1154.67, 1215.60 1168.00 C 1215.60 1181.33, 1215.60 1194.67, 1215.60 1208.00" class="relation-line" stroke="#333333" marker-end="url(#dependency-end)" stroke-width="1" fill="none"/>
     </g>
     <g class="class-node" id="class-Logger">
-      <path d="M 226.19999999999976 296 H 397.7999999999997 A 3 3 0 0 1 400.7999999999997 299 V 533 A 3 3 0 0 1 397.7999999999997 536 H 226.19999999999976 A 3 3 0 0 1 223.19999999999976 533 V 299 A 3 3 0 0 1 226.19999999999976 296 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
-      <path d="M 226.19999999999976 296 H 397.7999999999997 A 3 3 0 0 1 400.7999999999997 299 V 533 A 3 3 0 0 1 397.7999999999997 536 H 226.19999999999976 A 3 3 0 0 1 223.19999999999976 533 V 299 A 3 3 0 0 1 226.19999999999976 296 Z" class="class-box" fill="none" stroke="#333333" stroke-width="1"/>
-      <text x="311.9999999999998" y="320" dominant-baseline="middle" font-weight="bold" text-anchor="middle" font-size="16">Logger</text>
-      <path d="M 223.19999999999976 344 L 400.7999999999997 344" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="247.19999999999976" y="356" font-size="16" dominant-baseline="middle" text-anchor="start">-level: LogLevel</text>
-      <text x="247.19999999999976" y="380" dominant-baseline="middle" font-size="16" text-anchor="start">-outputs: Output[]</text>
-      <path d="M 223.19999999999976 416 L 400.7999999999997 416" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="247.19999999999976" y="428" dominant-baseline="middle" font-size="16" text-anchor="start">+debug(msg)</text>
-      <text x="247.19999999999976" y="452" dominant-baseline="middle" font-size="16" text-anchor="start">+info(msg)</text>
-      <text x="247.19999999999976" y="476" dominant-baseline="middle" font-size="16" text-anchor="start">+warn(msg)</text>
-      <text x="247.19999999999976" y="500" dominant-baseline="middle" font-size="16" text-anchor="start">+error(msg)</text>
+      <path d="M 226.19999999999987 296 H 397.79999999999984 A 3 3 0 0 1 400.79999999999984 299 V 533 A 3 3 0 0 1 397.79999999999984 536 H 226.19999999999987 A 3 3 0 0 1 223.19999999999987 533 V 299 A 3 3 0 0 1 226.19999999999987 296 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 226.19999999999987 296 H 397.79999999999984 A 3 3 0 0 1 400.79999999999984 299 V 533 A 3 3 0 0 1 397.79999999999984 536 H 226.19999999999987 A 3 3 0 0 1 223.19999999999987 533 V 299 A 3 3 0 0 1 226.19999999999987 296 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
+      <text x="311.9999999999999" y="320" text-anchor="middle" font-size="16" dominant-baseline="middle" font-weight="bold">Logger</text>
+      <path d="M 223.19999999999987 344 L 400.79999999999984 344" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="247.19999999999987" y="356" dominant-baseline="middle" font-size="16" text-anchor="start">-level: LogLevel</text>
+      <text x="247.19999999999987" y="380" text-anchor="start" dominant-baseline="middle" font-size="16">-outputs: Output[]</text>
+      <path d="M 223.19999999999987 416 L 400.79999999999984 416" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="247.19999999999987" y="428" dominant-baseline="middle" font-size="16" text-anchor="start">+debug(msg)</text>
+      <text x="247.19999999999987" y="452" font-size="16" text-anchor="start" dominant-baseline="middle">+info(msg)</text>
+      <text x="247.19999999999987" y="476" text-anchor="start" dominant-baseline="middle" font-size="16">+warn(msg)</text>
+      <text x="247.19999999999987" y="500" font-size="16" dominant-baseline="middle" text-anchor="start">+error(msg)</text>
     </g>
     <g class="class-node" id="class-Router">
-      <path d="M 463.7999999999998 308 H 700.1999999999998 A 3 3 0 0 1 703.1999999999998 311 V 521 A 3 3 0 0 1 700.1999999999998 524 H 463.7999999999998 A 3 3 0 0 1 460.7999999999998 521 V 311 A 3 3 0 0 1 463.7999999999998 308 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 463.7999999999998 308 H 700.1999999999998 A 3 3 0 0 1 703.1999999999998 311 V 521 A 3 3 0 0 1 700.1999999999998 524 H 463.7999999999998 A 3 3 0 0 1 460.7999999999998 521 V 311 A 3 3 0 0 1 463.7999999999998 308 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
-      <text x="581.9999999999998" y="332" text-anchor="middle" dominant-baseline="middle" font-size="16" font-weight="bold">Router</text>
-      <path d="M 460.7999999999998 356 L 703.1999999999998 356" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="484.7999999999998" y="368" font-size="16" dominant-baseline="middle" text-anchor="start">-routes: Route[]</text>
-      <text x="484.7999999999998" y="392" dominant-baseline="middle" font-size="16" text-anchor="start">-middleware: Middleware[]</text>
-      <path d="M 460.7999999999998 428 L 703.1999999999998 428" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="484.7999999999998" y="440" font-size="16" text-anchor="start" dominant-baseline="middle">+addRoute(route)</text>
-      <text x="484.7999999999998" y="464" dominant-baseline="middle" text-anchor="start" font-size="16">+use(middleware)</text>
-      <text x="484.7999999999998" y="488" text-anchor="start" dominant-baseline="middle" font-size="16">+handle(request) : Response</text>
-    </g>
-    <g class="class-node" id="class-Route">
-      <path d="M 482.5999999999998 640 H 661.3999999999997 A 3 3 0 0 1 664.3999999999997 643 V 805 A 3 3 0 0 1 661.3999999999997 808 H 482.5999999999998 A 3 3 0 0 1 479.5999999999998 805 V 643 A 3 3 0 0 1 482.5999999999998 640 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 482.5999999999998 640 H 661.3999999999997 A 3 3 0 0 1 664.3999999999997 643 V 805 A 3 3 0 0 1 661.3999999999997 808 H 482.5999999999998 A 3 3 0 0 1 479.5999999999998 805 V 643 A 3 3 0 0 1 482.5999999999998 640 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
-      <text x="571.9999999999998" y="664" font-weight="bold" font-size="16" dominant-baseline="middle" text-anchor="middle">Route</text>
-      <path d="M 479.5999999999998 688 L 664.3999999999997 688" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="503.5999999999998" y="700" dominant-baseline="middle" font-size="16" text-anchor="start">+path: string</text>
-      <text x="503.5999999999998" y="724" text-anchor="start" dominant-baseline="middle" font-size="16">+method: HttpMethod</text>
-      <text x="503.5999999999998" y="748" text-anchor="start" dominant-baseline="middle" font-size="16">+handler: Handler</text>
-      <path d="M 479.5999999999998 784 L 664.3999999999997 784" class="class-divider" stroke-width="1" stroke="#333333"/>
-    </g>
-    <g class="class-node" id="class-UserRepository">
-      <path d="M 1130.9999999999998 1208 H 1307.3999999999999 A 3 3 0 0 1 1310.3999999999999 1211 V 1393 A 3 3 0 0 1 1307.3999999999999 1396 H 1130.9999999999998 A 3 3 0 0 1 1127.9999999999998 1393 V 1211 A 3 3 0 0 1 1130.9999999999998 1208 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 1130.9999999999998 1208 H 1307.3999999999999 A 3 3 0 0 1 1310.3999999999999 1211 V 1393 A 3 3 0 0 1 1307.3999999999999 1396 H 1130.9999999999998 A 3 3 0 0 1 1127.9999999999998 1393 V 1211 A 3 3 0 0 1 1130.9999999999998 1208 Z" class="class-box" stroke-width="1" stroke="#333333" fill="none"/>
-      <text x="1219.1999999999998" y="1230.6666666666667" text-anchor="middle" dominant-baseline="middle" font-style="italic" font-size="16">«interface»</text>
-      <text x="1219.1999999999998" y="1253.3333333333335" dominant-baseline="middle" font-weight="bold" font-size="16" text-anchor="middle">UserRepository</text>
-      <path d="M 1127.9999999999998 1276 L 1310.3999999999999 1276" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <path d="M 1127.9999999999998 1324 L 1310.3999999999999 1324" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="1151.9999999999998" y="1336" dominant-baseline="middle" text-anchor="start" font-size="16">+find(id) : User</text>
-      <text x="1151.9999999999998" y="1360" text-anchor="start" font-size="16" dominant-baseline="middle">+save(user) : User</text>
-      <text x="1151.9999999999998" y="1384" text-anchor="start" dominant-baseline="middle" font-size="16">+delete(id) : void</text>
-    </g>
-    <g class="class-node" id="class-UserController">
-      <path d="M 1093.8 616 H 1337.3999999999999 A 3 3 0 0 1 1340.3999999999999 619 V 829 A 3 3 0 0 1 1337.3999999999999 832 H 1093.8 A 3 3 0 0 1 1090.8 829 V 619 A 3 3 0 0 1 1093.8 616 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
-      <path d="M 1093.8 616 H 1337.3999999999999 A 3 3 0 0 1 1340.3999999999999 619 V 829 A 3 3 0 0 1 1337.3999999999999 832 H 1093.8 A 3 3 0 0 1 1090.8 829 V 619 A 3 3 0 0 1 1093.8 616 Z" class="class-box" fill="none" stroke="#333333" stroke-width="1"/>
-      <text x="1215.6" y="640" font-weight="bold" font-size="16" dominant-baseline="middle" text-anchor="middle">UserController</text>
-      <path d="M 1090.8 664 L 1340.3999999999999 664" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="1114.8" y="676" dominant-baseline="middle" font-size="16" text-anchor="start">-userService: UserService</text>
-      <path d="M 1090.8 712 L 1340.3999999999999 712" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="1114.8" y="724" text-anchor="start" font-size="16" dominant-baseline="middle">+getUser(id) : User</text>
-      <text x="1114.8" y="748" text-anchor="start" font-size="16" dominant-baseline="middle">+createUser(data) : User</text>
-      <text x="1114.8" y="772" text-anchor="start" dominant-baseline="middle" font-size="16">+updateUser(id, data) : User</text>
-      <text x="1114.8" y="796" text-anchor="start" dominant-baseline="middle" font-size="16">+deleteUser(id) : void</text>
-    </g>
-    <g class="class-node" id="class-RateLimitMiddleware">
-      <path d="M 1090.1999999999998 332 H 1348.1999999999998 A 3 3 0 0 1 1351.1999999999998 335 V 497 A 3 3 0 0 1 1348.1999999999998 500 H 1090.1999999999998 A 3 3 0 0 1 1087.1999999999998 497 V 335 A 3 3 0 0 1 1090.1999999999998 332 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 1090.1999999999998 332 H 1348.1999999999998 A 3 3 0 0 1 1351.1999999999998 335 V 497 A 3 3 0 0 1 1348.1999999999998 500 H 1090.1999999999998 A 3 3 0 0 1 1087.1999999999998 497 V 335 A 3 3 0 0 1 1090.1999999999998 332 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
-      <text x="1219.1999999999998" y="356" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">RateLimitMiddleware</text>
-      <path d="M 1087.1999999999998 380 L 1351.1999999999998 380" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="1111.1999999999998" y="392" dominant-baseline="middle" font-size="16" text-anchor="start">-limit: int</text>
-      <text x="1111.1999999999998" y="416" font-size="16" text-anchor="start" dominant-baseline="middle">-window: Duration</text>
-      <path d="M 1087.1999999999998 452 L 1351.1999999999998 452" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="1111.1999999999998" y="464" text-anchor="start" font-size="16" dominant-baseline="middle">+process(req, next) : Response</text>
+      <path d="M 463.7999999999999 308 H 700.1999999999999 A 3 3 0 0 1 703.1999999999999 311 V 521 A 3 3 0 0 1 700.1999999999999 524 H 463.7999999999999 A 3 3 0 0 1 460.7999999999999 521 V 311 A 3 3 0 0 1 463.7999999999999 308 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
+      <path d="M 463.7999999999999 308 H 700.1999999999999 A 3 3 0 0 1 703.1999999999999 311 V 521 A 3 3 0 0 1 700.1999999999999 524 H 463.7999999999999 A 3 3 0 0 1 460.7999999999999 521 V 311 A 3 3 0 0 1 463.7999999999999 308 Z" class="class-box" fill="none" stroke="#333333" stroke-width="1"/>
+      <text x="581.9999999999999" y="332" font-weight="bold" dominant-baseline="middle" text-anchor="middle" font-size="16">Router</text>
+      <path d="M 460.7999999999999 356 L 703.1999999999999 356" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="484.7999999999999" y="368" text-anchor="start" font-size="16" dominant-baseline="middle">-routes: Route[]</text>
+      <text x="484.7999999999999" y="392" dominant-baseline="middle" font-size="16" text-anchor="start">-middleware: Middleware[]</text>
+      <path d="M 460.7999999999999 428 L 703.1999999999999 428" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="484.7999999999999" y="440" font-size="16" text-anchor="start" dominant-baseline="middle">+addRoute(route)</text>
+      <text x="484.7999999999999" y="464" text-anchor="start" dominant-baseline="middle" font-size="16">+use(middleware)</text>
+      <text x="484.7999999999999" y="488" text-anchor="start" dominant-baseline="middle" font-size="16">+handle(request) : Response</text>
     </g>
     <g class="class-node" id="class-Middleware">
-      <path d="M 766.1999999999998 654 H 1024.1999999999998 A 3 3 0 0 1 1027.1999999999998 657 V 791 A 3 3 0 0 1 1024.1999999999998 794 H 766.1999999999998 A 3 3 0 0 1 763.1999999999998 791 V 657 A 3 3 0 0 1 766.1999999999998 654 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
-      <path d="M 766.1999999999998 654 H 1024.1999999999998 A 3 3 0 0 1 1027.1999999999998 657 V 791 A 3 3 0 0 1 1024.1999999999998 794 H 766.1999999999998 A 3 3 0 0 1 763.1999999999998 791 V 657 A 3 3 0 0 1 766.1999999999998 654 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
-      <text x="895.1999999999998" y="676.6666666666666" text-anchor="middle" font-style="italic" dominant-baseline="middle" font-size="16">«interface»</text>
-      <text x="895.1999999999998" y="699.3333333333333" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="16">Middleware</text>
-      <path d="M 763.1999999999998 722 L 1027.1999999999998 722" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <path d="M 763.1999999999998 770 L 1027.1999999999998 770" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="787.1999999999998" y="782" font-size="16" text-anchor="start" dominant-baseline="middle">+process(req, next) : Response</text>
+      <path d="M 766.1999999999999 654 H 1024.1999999999998 A 3 3 0 0 1 1027.1999999999998 657 V 791 A 3 3 0 0 1 1024.1999999999998 794 H 766.1999999999999 A 3 3 0 0 1 763.1999999999999 791 V 657 A 3 3 0 0 1 766.1999999999999 654 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 766.1999999999999 654 H 1024.1999999999998 A 3 3 0 0 1 1027.1999999999998 657 V 791 A 3 3 0 0 1 1024.1999999999998 794 H 766.1999999999999 A 3 3 0 0 1 763.1999999999999 791 V 657 A 3 3 0 0 1 766.1999999999999 654 Z" class="class-box" stroke="#333333" fill="none" stroke-width="1"/>
+      <text x="895.1999999999999" y="676.6666666666666" font-size="16" font-style="italic" dominant-baseline="middle" text-anchor="middle">«interface»</text>
+      <text x="895.1999999999999" y="699.3333333333333" text-anchor="middle" dominant-baseline="middle" font-size="16" font-weight="bold">Middleware</text>
+      <path d="M 763.1999999999999 722 L 1027.1999999999998 722" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <path d="M 763.1999999999999 770 L 1027.1999999999998 770" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="787.1999999999999" y="782" dominant-baseline="middle" text-anchor="start" font-size="16">+process(req, next) : Response</text>
     </g>
-    <g class="class-node" id="class-AuthMiddleware">
-      <path d="M 766.1999999999998 344 H 1024.1999999999998 A 3 3 0 0 1 1027.1999999999998 347 V 485 A 3 3 0 0 1 1024.1999999999998 488 H 766.1999999999998 A 3 3 0 0 1 763.1999999999998 485 V 347 A 3 3 0 0 1 766.1999999999998 344 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 766.1999999999998 344 H 1024.1999999999998 A 3 3 0 0 1 1027.1999999999998 347 V 485 A 3 3 0 0 1 1024.1999999999998 488 H 766.1999999999998 A 3 3 0 0 1 763.1999999999998 485 V 347 A 3 3 0 0 1 766.1999999999998 344 Z" class="class-box" stroke="#333333" fill="none" stroke-width="1"/>
-      <text x="895.1999999999998" y="368" text-anchor="middle" font-weight="bold" font-size="16" dominant-baseline="middle">AuthMiddleware</text>
-      <path d="M 763.1999999999998 392 L 1027.1999999999998 392" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="787.1999999999998" y="404" text-anchor="start" font-size="16" dominant-baseline="middle">-tokenService: TokenService</text>
-      <path d="M 763.1999999999998 440 L 1027.1999999999998 440" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="787.1999999999998" y="452" font-size="16" text-anchor="start" dominant-baseline="middle">+process(req, next) : Response</text>
+    <g class="class-node" id="class-UserService">
+      <path d="M 1097.3999999999999 912 H 1333.8 A 3 3 0 0 1 1336.8 915 V 1125 A 3 3 0 0 1 1333.8 1128 H 1097.3999999999999 A 3 3 0 0 1 1094.3999999999999 1125 V 915 A 3 3 0 0 1 1097.3999999999999 912 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
+      <path d="M 1097.3999999999999 912 H 1333.8 A 3 3 0 0 1 1336.8 915 V 1125 A 3 3 0 0 1 1333.8 1128 H 1097.3999999999999 A 3 3 0 0 1 1094.3999999999999 1125 V 915 A 3 3 0 0 1 1097.3999999999999 912 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
+      <text x="1215.6" y="936" font-size="16" text-anchor="middle" dominant-baseline="middle" font-weight="bold">UserService</text>
+      <path d="M 1094.3999999999999 960 L 1336.8 960" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="1118.3999999999999" y="972" dominant-baseline="middle" text-anchor="start" font-size="16">-repository: UserRepository</text>
+      <text x="1118.3999999999999" y="996" font-size="16" text-anchor="start" dominant-baseline="middle">-cache: Cache</text>
+      <path d="M 1094.3999999999999 1032 L 1336.8 1032" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="1118.3999999999999" y="1044" font-size="16" text-anchor="start" dominant-baseline="middle">+findById(id) : User</text>
+      <text x="1118.3999999999999" y="1068" dominant-baseline="middle" font-size="16" text-anchor="start">+save(user) : User</text>
+      <text x="1118.3999999999999" y="1092" text-anchor="start" font-size="16" dominant-baseline="middle">+delete(id) : void</text>
     </g>
     <g class="class-node" id="class-Handler">
-      <path d="M 463.7999999999998 950 H 700.1999999999998 A 3 3 0 0 1 703.1999999999998 953 V 1087 A 3 3 0 0 1 700.1999999999998 1090 H 463.7999999999998 A 3 3 0 0 1 460.7999999999998 1087 V 953 A 3 3 0 0 1 463.7999999999998 950 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 463.7999999999998 950 H 700.1999999999998 A 3 3 0 0 1 703.1999999999998 953 V 1087 A 3 3 0 0 1 700.1999999999998 1090 H 463.7999999999998 A 3 3 0 0 1 460.7999999999998 1087 V 953 A 3 3 0 0 1 463.7999999999998 950 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
-      <text x="581.9999999999998" y="972.6666666666666" font-style="italic" text-anchor="middle" dominant-baseline="middle" font-size="16">«interface»</text>
-      <text x="581.9999999999998" y="995.3333333333333" dominant-baseline="middle" font-size="16" font-weight="bold" text-anchor="middle">Handler</text>
-      <path d="M 460.7999999999998 1018 L 703.1999999999998 1018" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <path d="M 460.7999999999998 1066 L 703.1999999999998 1066" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="484.7999999999998" y="1078" font-size="16" dominant-baseline="middle" text-anchor="start">+handle(request) : Response</text>
+      <path d="M 463.7999999999999 950 H 700.1999999999999 A 3 3 0 0 1 703.1999999999999 953 V 1087 A 3 3 0 0 1 700.1999999999999 1090 H 463.7999999999999 A 3 3 0 0 1 460.7999999999999 1087 V 953 A 3 3 0 0 1 463.7999999999999 950 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
+      <path d="M 463.7999999999999 950 H 700.1999999999999 A 3 3 0 0 1 703.1999999999999 953 V 1087 A 3 3 0 0 1 700.1999999999999 1090 H 463.7999999999999 A 3 3 0 0 1 460.7999999999999 1087 V 953 A 3 3 0 0 1 463.7999999999999 950 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
+      <text x="581.9999999999999" y="972.6666666666666" dominant-baseline="middle" text-anchor="middle" font-style="italic" font-size="16">«interface»</text>
+      <text x="581.9999999999999" y="995.3333333333333" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="16">Handler</text>
+      <path d="M 460.7999999999999 1018 L 703.1999999999999 1018" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <path d="M 460.7999999999999 1066 L 703.1999999999999 1066" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="484.7999999999999" y="1078" font-size="16" dominant-baseline="middle" text-anchor="start">+handle(request) : Response</text>
+    </g>
+    <g class="class-node" id="class-RateLimitMiddleware">
+      <path d="M 1090.1999999999998 332 H 1348.1999999999998 A 3 3 0 0 1 1351.1999999999998 335 V 497 A 3 3 0 0 1 1348.1999999999998 500 H 1090.1999999999998 A 3 3 0 0 1 1087.1999999999998 497 V 335 A 3 3 0 0 1 1090.1999999999998 332 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 1090.1999999999998 332 H 1348.1999999999998 A 3 3 0 0 1 1351.1999999999998 335 V 497 A 3 3 0 0 1 1348.1999999999998 500 H 1090.1999999999998 A 3 3 0 0 1 1087.1999999999998 497 V 335 A 3 3 0 0 1 1090.1999999999998 332 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
+      <text x="1219.1999999999998" y="356" font-weight="bold" dominant-baseline="middle" font-size="16" text-anchor="middle">RateLimitMiddleware</text>
+      <path d="M 1087.1999999999998 380 L 1351.1999999999998 380" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="1111.1999999999998" y="392" text-anchor="start" dominant-baseline="middle" font-size="16">-limit: int</text>
+      <text x="1111.1999999999998" y="416" dominant-baseline="middle" font-size="16" text-anchor="start">-window: Duration</text>
+      <path d="M 1087.1999999999998 452 L 1351.1999999999998 452" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="1111.1999999999998" y="464" text-anchor="start" dominant-baseline="middle" font-size="16">+process(req, next) : Response</text>
+    </g>
+    <g class="class-node" id="class-Config">
+      <path d="M 3 320 H 160.2 A 3 3 0 0 1 163.2 323 V 509 A 3 3 0 0 1 160.2 512 H 3 A 3 3 0 0 1 0 509 V 323 A 3 3 0 0 1 3 320 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
+      <path d="M 3 320 H 160.2 A 3 3 0 0 1 163.2 323 V 509 A 3 3 0 0 1 160.2 512 H 3 A 3 3 0 0 1 0 509 V 323 A 3 3 0 0 1 3 320 Z" class="class-box" stroke-width="1" stroke="#333333" fill="none"/>
+      <text x="81.6" y="344" font-weight="bold" dominant-baseline="middle" text-anchor="middle" font-size="16">Config</text>
+      <path d="M 0 368 L 163.2 368" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="24" y="380" font-size="16" text-anchor="start" dominant-baseline="middle">-settings: Map</text>
+      <path d="M 0 416 L 163.2 416" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="24" y="428" text-anchor="start" font-size="16" dominant-baseline="middle">+get(key) : any</text>
+      <text x="24" y="452" text-anchor="start" dominant-baseline="middle" font-size="16">+set(key, value)</text>
+      <text x="24" y="476" font-size="16" text-anchor="start" dominant-baseline="middle">+load(path)</text>
+    </g>
+    <g class="class-node" id="class-UserController">
+      <path d="M 1090.1999999999998 616 H 1333.7999999999997 A 3 3 0 0 1 1336.7999999999997 619 V 829 A 3 3 0 0 1 1333.7999999999997 832 H 1090.1999999999998 A 3 3 0 0 1 1087.1999999999998 829 V 619 A 3 3 0 0 1 1090.1999999999998 616 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 1090.1999999999998 616 H 1333.7999999999997 A 3 3 0 0 1 1336.7999999999997 619 V 829 A 3 3 0 0 1 1333.7999999999997 832 H 1090.1999999999998 A 3 3 0 0 1 1087.1999999999998 829 V 619 A 3 3 0 0 1 1090.1999999999998 616 Z" class="class-box" fill="none" stroke-width="1" stroke="#333333"/>
+      <text x="1211.9999999999998" y="640" font-weight="bold" text-anchor="middle" font-size="16" dominant-baseline="middle">UserController</text>
+      <path d="M 1087.1999999999998 664 L 1336.7999999999997 664" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="1111.1999999999998" y="676" font-size="16" text-anchor="start" dominant-baseline="middle">-userService: UserService</text>
+      <path d="M 1087.1999999999998 712 L 1336.7999999999997 712" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="1111.1999999999998" y="724" dominant-baseline="middle" text-anchor="start" font-size="16">+getUser(id) : User</text>
+      <text x="1111.1999999999998" y="748" font-size="16" text-anchor="start" dominant-baseline="middle">+createUser(data) : User</text>
+      <text x="1111.1999999999998" y="772" font-size="16" text-anchor="start" dominant-baseline="middle">+updateUser(id, data) : User</text>
+      <text x="1111.1999999999998" y="796" dominant-baseline="middle" font-size="16" text-anchor="start">+deleteUser(id) : void</text>
+    </g>
+    <g class="class-node" id="class-UserRepository">
+      <path d="M 1127.3999999999999 1208 H 1303.8 A 3 3 0 0 1 1306.8 1211 V 1393 A 3 3 0 0 1 1303.8 1396 H 1127.3999999999999 A 3 3 0 0 1 1124.3999999999999 1393 V 1211 A 3 3 0 0 1 1127.3999999999999 1208 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 1127.3999999999999 1208 H 1303.8 A 3 3 0 0 1 1306.8 1211 V 1393 A 3 3 0 0 1 1303.8 1396 H 1127.3999999999999 A 3 3 0 0 1 1124.3999999999999 1393 V 1211 A 3 3 0 0 1 1127.3999999999999 1208 Z" class="class-box" stroke="#333333" fill="none" stroke-width="1"/>
+      <text x="1215.6" y="1230.6666666666667" font-size="16" text-anchor="middle" dominant-baseline="middle" font-style="italic">«interface»</text>
+      <text x="1215.6" y="1253.3333333333335" text-anchor="middle" dominant-baseline="middle" font-size="16" font-weight="bold">UserRepository</text>
+      <path d="M 1124.3999999999999 1276 L 1306.8 1276" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <path d="M 1124.3999999999999 1324 L 1306.8 1324" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="1148.3999999999999" y="1336" text-anchor="start" dominant-baseline="middle" font-size="16">+find(id) : User</text>
+      <text x="1148.3999999999999" y="1360" font-size="16" text-anchor="start" dominant-baseline="middle">+save(user) : User</text>
+      <text x="1148.3999999999999" y="1384" text-anchor="start" dominant-baseline="middle" font-size="16">+delete(id) : void</text>
+    </g>
+    <g class="class-node" id="class-Application">
+      <path d="M 100.20000000000002 0 H 293.4 A 3 3 0 0 1 296.4 3 V 213 A 3 3 0 0 1 293.4 216 H 100.20000000000002 A 3 3 0 0 1 97.20000000000002 213 V 3 A 3 3 0 0 1 100.20000000000002 0 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 100.20000000000002 0 H 293.4 A 3 3 0 0 1 296.4 3 V 213 A 3 3 0 0 1 293.4 216 H 100.20000000000002 A 3 3 0 0 1 97.20000000000002 213 V 3 A 3 3 0 0 1 100.20000000000002 0 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
+      <text x="196.8" y="24" font-size="16" text-anchor="middle" dominant-baseline="middle" font-weight="bold">Application</text>
+      <path d="M 97.20000000000002 48 L 296.4 48" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="121.20000000000002" y="60" font-size="16" dominant-baseline="middle" text-anchor="start">-config: Config</text>
+      <text x="121.20000000000002" y="84" dominant-baseline="middle" text-anchor="start" font-size="16">-logger: Logger</text>
+      <path d="M 97.20000000000002 120 L 296.4 120" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="121.20000000000002" y="132" dominant-baseline="middle" text-anchor="start" font-size="16">+start()</text>
+      <text x="121.20000000000002" y="156" dominant-baseline="middle" text-anchor="start" font-size="16">+stop()</text>
+      <text x="121.20000000000002" y="180" text-anchor="start" font-size="16" dominant-baseline="middle">+getStatus() : Status</text>
+    </g>
+    <g class="class-node" id="class-Route">
+      <path d="M 482.5999999999999 640 H 661.3999999999999 A 3 3 0 0 1 664.3999999999999 643 V 805 A 3 3 0 0 1 661.3999999999999 808 H 482.5999999999999 A 3 3 0 0 1 479.5999999999999 805 V 643 A 3 3 0 0 1 482.5999999999999 640 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
+      <path d="M 482.5999999999999 640 H 661.3999999999999 A 3 3 0 0 1 664.3999999999999 643 V 805 A 3 3 0 0 1 661.3999999999999 808 H 482.5999999999999 A 3 3 0 0 1 479.5999999999999 805 V 643 A 3 3 0 0 1 482.5999999999999 640 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
+      <text x="571.9999999999999" y="664" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="16">Route</text>
+      <path d="M 479.5999999999999 688 L 664.3999999999999 688" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="503.5999999999999" y="700" dominant-baseline="middle" font-size="16" text-anchor="start">+path: string</text>
+      <text x="503.5999999999999" y="724" text-anchor="start" font-size="16" dominant-baseline="middle">+method: HttpMethod</text>
+      <text x="503.5999999999999" y="748" dominant-baseline="middle" text-anchor="start" font-size="16">+handler: Handler</text>
+      <path d="M 479.5999999999999 784 L 664.3999999999999 784" class="class-divider" stroke="#333333" stroke-width="1"/>
+    </g>
+    <g class="class-node" id="class-AuthMiddleware">
+      <path d="M 766.1999999999999 344 H 1024.1999999999998 A 3 3 0 0 1 1027.1999999999998 347 V 485 A 3 3 0 0 1 1024.1999999999998 488 H 766.1999999999999 A 3 3 0 0 1 763.1999999999999 485 V 347 A 3 3 0 0 1 766.1999999999999 344 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 766.1999999999999 344 H 1024.1999999999998 A 3 3 0 0 1 1027.1999999999998 347 V 485 A 3 3 0 0 1 1024.1999999999998 488 H 766.1999999999999 A 3 3 0 0 1 763.1999999999999 485 V 347 A 3 3 0 0 1 766.1999999999999 344 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
+      <text x="895.1999999999999" y="368" dominant-baseline="middle" text-anchor="middle" font-weight="bold" font-size="16">AuthMiddleware</text>
+      <path d="M 763.1999999999999 392 L 1027.1999999999998 392" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="787.1999999999999" y="404" font-size="16" text-anchor="start" dominant-baseline="middle">-tokenService: TokenService</text>
+      <path d="M 763.1999999999999 440 L 1027.1999999999998 440" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="787.1999999999999" y="452" text-anchor="start" font-size="16" dominant-baseline="middle">+process(req, next) : Response</text>
     </g>
   </g>
 </svg>
