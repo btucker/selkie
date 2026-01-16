@@ -4,6 +4,8 @@
 
 use pest::Parser;
 use pest_derive::Parser;
+use regex::Regex;
+use std::sync::LazyLock;
 
 use super::{
     ArchitectureDb, ArchitectureDirection, ArchitectureEdge, ArchitectureGroup,
@@ -68,7 +70,7 @@ fn process_statement(
 fn process_title(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::title_text {
-            db.set_title(inner.as_str().trim());
+            db.set_title(&normalize_inline_text(inner.as_str()));
         }
     }
 }
@@ -76,7 +78,7 @@ fn process_title(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
 fn process_acc_title(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::acc_title_text {
-            db.set_acc_title(inner.as_str().trim());
+            db.set_acc_title(&normalize_inline_text(inner.as_str()));
         }
     }
 }
@@ -84,7 +86,7 @@ fn process_acc_title(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb)
 fn process_acc_descr(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::acc_descr_text {
-            db.set_acc_description(inner.as_str().trim());
+            db.set_acc_description(&normalize_inline_text(inner.as_str()));
         }
     }
 }
@@ -92,7 +94,7 @@ fn process_acc_descr(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb)
 fn process_acc_descr_multiline(pair: pest::iterators::Pair<Rule>, db: &mut ArchitectureDb) {
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::acc_descr_multiline_text {
-            db.set_acc_description(inner.as_str().trim());
+            db.set_acc_description(&normalize_multiline_text(inner.as_str()));
         }
     }
 }
@@ -117,9 +119,7 @@ fn process_group(
                 icon = Some(s[1..s.len() - 1].to_string());
             }
             Rule::arch_title => {
-                // Remove surrounding brackets
-                let s = inner.as_str();
-                title = Some(s[1..s.len() - 1].to_string());
+                title = Some(strip_arch_title(inner.as_str()));
             }
             Rule::in_clause => {
                 for clause_inner in inner.into_inner() {
@@ -130,6 +130,11 @@ fn process_group(
             }
             _ => {}
         }
+    }
+
+    validate_arch_id(&id)?;
+    if let Some(ref p) = parent {
+        validate_arch_id(p)?;
     }
 
     let mut group = ArchitectureGroup::new(id);
@@ -168,14 +173,10 @@ fn process_service(
                 icon = Some(s[1..s.len() - 1].to_string());
             }
             Rule::icon_text => {
-                // Remove surrounding quotes
-                let s = inner.as_str();
-                icon_text = Some(s[1..s.len() - 1].to_string());
+                icon_text = Some(unescape_arch_string(inner.as_str()));
             }
             Rule::arch_title => {
-                // Remove surrounding brackets
-                let s = inner.as_str();
-                title = Some(s[1..s.len() - 1].to_string());
+                title = Some(strip_arch_title(inner.as_str()));
             }
             Rule::in_clause => {
                 for clause_inner in inner.into_inner() {
@@ -186,6 +187,11 @@ fn process_service(
             }
             _ => {}
         }
+    }
+
+    validate_arch_id(&id)?;
+    if let Some(ref p) = parent {
+        validate_arch_id(p)?;
     }
 
     let mut service = ArchitectureService::new(id);
@@ -227,6 +233,11 @@ fn process_junction(
             }
             _ => {}
         }
+    }
+
+    validate_arch_id(&id)?;
+    if let Some(ref p) = parent {
+        validate_arch_id(p)?;
     }
 
     let mut junction = ArchitectureJunction::new(id);
@@ -284,6 +295,9 @@ fn process_edge(
             _ => {}
         }
     }
+
+    validate_arch_id(&lhs_id)?;
+    validate_arch_id(&rhs_id)?;
 
     let mut edge = ArchitectureEdge::new(lhs_id, lhs_dir, rhs_id, rhs_dir);
     edge.lhs_into = lhs_into;
@@ -345,7 +359,7 @@ fn process_arrow(
                     if line_inner.as_rule() == Rule::arrow_line_with_label {
                         for label_inner in line_inner.into_inner() {
                             if label_inner.as_rule() == Rule::arrow_label {
-                                title = Some(label_inner.as_str().trim().to_string());
+                                title = Some(strip_arch_title(label_inner.as_str()));
                             }
                         }
                     }
@@ -368,15 +382,94 @@ fn parse_direction(s: &str) -> ArchitectureDirection {
     }
 }
 
+fn unescape_arch_string(input: &str) -> String {
+    let Some(quote) = input.chars().next() else {
+        return String::new();
+    };
+    let Some(last) = input.chars().last() else {
+        return String::new();
+    };
+    if (quote != '"' && quote != '\'') || last != quote || input.len() < 2 {
+        return input.to_string();
+    }
+
+    let mut output = String::new();
+    let mut iter = input[1..input.len() - 1].chars().peekable();
+    while let Some(ch) = iter.next() {
+        if ch == '\\' {
+            if let Some(next) = iter.next() {
+                let unescaped = match next {
+                    'n' => '\n',
+                    'r' => '\r',
+                    't' => '\t',
+                    'b' => '\u{0008}',
+                    'f' => '\u{000C}',
+                    '\\' => '\\',
+                    '"' => '"',
+                    '\'' => '\'',
+                    other => other,
+                };
+                output.push(unescaped);
+            }
+        } else {
+            output.push(ch);
+        }
+    }
+
+    output
+}
+
+static MULTI_SPACE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[\t ]{2,}").unwrap());
+static LEADING_WS_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?m)^\s*").unwrap());
+static TRAILING_WS_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?m)\s+$").unwrap());
+static MULTI_NEWLINE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?m)[\n\r]{2,}").unwrap());
+
+fn normalize_inline_text(input: &str) -> String {
+    let trimmed = input.trim();
+    MULTI_SPACE_RE.replace_all(trimmed, " ").to_string()
+}
+
+fn normalize_multiline_text(input: &str) -> String {
+    let normalized = LEADING_WS_RE.replace_all(input, "");
+    let normalized = TRAILING_WS_RE.replace_all(&normalized, "");
+    let normalized = MULTI_SPACE_RE.replace_all(&normalized, " ");
+    let normalized = MULTI_NEWLINE_RE.replace_all(&normalized, "\n");
+    normalized.to_string()
+}
+
+fn strip_arch_title(input: &str) -> String {
+    input
+        .trim_matches(|c| c == '[' || c == ']')
+        .trim()
+        .to_string()
+}
+
+fn validate_arch_id(id: &str) -> Result<(), Box<dyn std::error::Error>> {
+    if id.is_empty() {
+        return Err("Architecture id cannot be empty".into());
+    }
+    if id.ends_with('-') {
+        return Err(format!("Architecture id '{}' cannot end with '-'", id).into());
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_architecture_keyword() {
-        let input = "architecture-beta";
-        let result = parse(input);
-        assert!(result.is_ok());
+        let inputs = [
+            "architecture-beta",
+            "  architecture-beta  ",
+            "\tarchitecture-beta\t",
+            "\n\tarchitecture-beta\n",
+        ];
+        for input in inputs {
+            let result = parse(input);
+            assert!(result.is_ok());
+        }
     }
 
     #[test]
@@ -407,6 +500,22 @@ mod tests {
     }
 
     #[test]
+    fn test_title_whitespace_normalization() {
+        let input = "architecture-beta   title   sample   title  ";
+        let result = parse(input).unwrap();
+        assert_eq!(result.get_title(), "sample title");
+    }
+
+    #[test]
+    fn test_title_ignores_inline_comment() {
+        let input = "architecture-beta
+            title Simple Architecture Diagram %% comment
+            ";
+        let result = parse(input).unwrap();
+        assert_eq!(result.get_title(), "Simple Architecture Diagram");
+    }
+
+    #[test]
     fn test_accessibility_title() {
         let input = "architecture-beta
             accTitle: Accessibility Title
@@ -428,11 +537,15 @@ mod tests {
     fn test_accessibility_description_multiline() {
         let input = "architecture-beta
             accDescr {
-                Accessibility Description
+                Detailed description
+                across multiple lines
             }
             ";
         let result = parse(input).unwrap();
-        assert_eq!(result.get_acc_description(), "Accessibility Description");
+        assert_eq!(
+            result.get_acc_description(),
+            "Detailed description\nacross multiple lines"
+        );
     }
 
     #[test]
@@ -463,13 +576,24 @@ mod tests {
     #[test]
     fn test_service_with_icon_text() {
         let input = r#"architecture-beta
-            service db "DB"
+            service db 'DB'
             "#;
         let result = parse(input).unwrap();
         let services = result.get_services();
         assert_eq!(services.len(), 1);
         assert_eq!(services[0].id, "db");
         assert_eq!(services[0].icon_text, Some("DB".to_string()));
+    }
+
+    #[test]
+    fn test_service_with_icon_text_escape() {
+        let input = r#"architecture-beta
+            service db "A \"Quote\""
+            "#;
+        let result = parse(input).unwrap();
+        let services = result.get_services();
+        assert_eq!(services.len(), 1);
+        assert_eq!(services[0].icon_text, Some("A \"Quote\"".to_string()));
     }
 
     #[test]
@@ -554,7 +678,7 @@ mod tests {
         let input = "architecture-beta
             service db
             service api
-            db:R - connects - L:api
+            db:R -[connects]- L:api
             ";
         let result = parse(input).unwrap();
         let edges = result.get_edges();
@@ -714,5 +838,17 @@ mod tests {
         assert_eq!(result.get_groups().len(), 1);
         assert_eq!(result.get_services().len(), 3);
         assert_eq!(result.get_edges().len(), 2);
+    }
+
+    #[test]
+    fn test_edge_label_strip_brackets() {
+        let input = "architecture-beta
+            service A
+            service B
+            A:R -[label]- L:B
+            ";
+        let result = parse(input).unwrap();
+        let edges = result.get_edges();
+        assert_eq!(edges[0].title, Some("label".to_string()));
     }
 }

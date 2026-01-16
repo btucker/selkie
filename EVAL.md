@@ -51,7 +51,7 @@ The eval system serves as the primary guidance mechanism for Claude Code during 
 ## Quick Start
 
 ```bash
-# Run evaluation with built-in samples (outputs to /tmp/selkie-eval-XXXX/)
+# Run evaluation with built-in samples (outputs to ./eval-report/selkie-eval-XXXX/)
 selkie eval
 
 # Evaluate specific diagram types
@@ -215,9 +215,9 @@ Visual comparison report with:
 The HTML report is always generated as `index.html` in the output directory:
 
 ```bash
-selkie eval                    # Creates /tmp/selkie-eval-XXXX/index.html
+selkie eval                    # Creates ./eval-report/selkie-eval-XXXX/index.html
 selkie eval -o ./reports       # Creates ./reports/selkie-eval-XXXX/index.html
-open /tmp/selkie-eval-*/index.html
+open ./eval-report/selkie-eval-*/index.html
 ```
 
 ## Output Directory Structure
@@ -248,7 +248,7 @@ selkie-eval-a1b2c3d4/
 The output path is shown at the end of the evaluation:
 
 ```
-Evaluation report written to: /tmp/selkie-eval-a1b2c3d4
+Evaluation report written to: ./eval-report/selkie-eval-a1b2c3d4
 ```
 
 ## Built-in Samples

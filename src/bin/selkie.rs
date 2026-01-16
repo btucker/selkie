@@ -135,7 +135,7 @@ struct RenderArgs {
 #[derive(Parser, Debug)]
 #[command(after_help = "\
 Examples:
-  selkie eval                     Run with gallery samples, output to /tmp
+  selkie eval                     Run with gallery samples, output to ./eval-report
   selkie eval -o ./reports        Output to custom directory
   selkie eval --type flowchart    Evaluate only flowchart samples
   selkie eval ./diagrams/         Evaluate .mmd files from directory
@@ -151,7 +151,7 @@ struct EvalArgs {
     #[arg(short = 't', long = "type")]
     diagram_type: Option<String>,
 
-    /// Output directory for report (default: /tmp). Creates selkie-eval-XXXX subdirectory.
+    /// Output directory for report (default: ./eval-report). Creates selkie-eval-XXXX subdirectory.
     #[arg(short, long, value_name = "DIR")]
     output: Option<PathBuf>,
 
@@ -539,25 +539,20 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     // Run evaluation
     let result = runner.evaluate(&inputs);
 
-    // Output results to stderr (verbose or summary)
-    if args.verbose {
-        eprintln!("{}", eval::report::text_detailed(&result));
-    } else {
-        eprintln!("{}", eval::report::text_summary(&result));
-    }
+    // Create output directory with random ID
+    let base_dir = args
+        .output
+        .unwrap_or_else(|| PathBuf::from("./eval-report"));
+    let random_id = &Uuid::new_v4().to_string()[..8];
+    let output_dir = base_dir.join(format!("selkie-eval-{}", random_id));
+
+    fs::create_dir_all(&output_dir)?;
 
     // Write JSON if requested
     if let Some(ref path) = args.json {
         eval::report::write_json(&result, path)?;
         eprintln!("Wrote JSON report to {}", path.display());
     }
-
-    // Create output directory with random ID
-    let base_dir = args.output.unwrap_or_else(|| PathBuf::from("/tmp"));
-    let random_id = &Uuid::new_v4().to_string()[..8];
-    let output_dir = base_dir.join(format!("selkie-eval-{}", random_id));
-
-    fs::create_dir_all(&output_dir)?;
 
     // Write HTML report as index.html
     eprint!("Writing HTML report...");
@@ -610,6 +605,16 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     }
     #[cfg(not(feature = "png"))]
     let _ = svg_pairs; // Suppress unused warning
+
+    // Output results to stderr (verbose or summary)
+    if args.verbose {
+        eprintln!(
+            "{}",
+            eval::report::text_detailed(&result, Some(&output_dir))
+        );
+    } else {
+        eprintln!("{}", eval::report::text_summary(&result, Some(&output_dir)));
+    }
 
     // Print the output directory path
     let report_path = output_dir.join("index.html");

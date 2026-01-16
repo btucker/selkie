@@ -347,6 +347,9 @@ fn detect_diagram_type(text: &str) -> String {
     if text_lower.contains("block") {
         return "block".to_string();
     }
+    if text_lower.contains("architecture") {
+        return "architecture".to_string();
+    }
     if text_lower.contains("flowchart") {
         return "flowchart".to_string();
     }

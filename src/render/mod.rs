@@ -2,6 +2,7 @@
 //!
 //! This module provides SVG rendering for positioned diagram elements.
 
+mod architecture;
 mod class;
 mod er;
 mod flowchart;
@@ -72,6 +73,7 @@ pub fn render_text(text: &str) -> Result<String> {
 /// Render a diagram to SVG with custom configuration
 pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<String> {
     match diagram {
+        Diagram::Architecture(db) => render_architecture(db, config),
         Diagram::Flowchart(db) => render_flowchart(db, config),
         Diagram::Git(db) => git::render_git(db, config),
         Diagram::Pie(db) => pie::render_pie(db, config),
@@ -135,4 +137,17 @@ fn render_flowchart(
     // Render to SVG
     let renderer = SvgRenderer::new(config.clone());
     renderer.render_flowchart(db, &graph)
+}
+
+/// Render an architecture diagram
+fn render_architecture(
+    db: &crate::diagrams::architecture::ArchitectureDb,
+    config: &RenderConfig,
+) -> Result<String> {
+    let size_estimator = CharacterSizeEstimator::default();
+
+    let graph = architecture::layout_architecture(db, &size_estimator)?;
+
+    let renderer = SvgRenderer::new(config.clone());
+    renderer.render_architecture(db, &graph)
 }
