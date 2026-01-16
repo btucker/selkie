@@ -1,6 +1,6 @@
 //! Rendering tests for git graph diagrams
 
-use mermaid::{parse, render};
+use selkie::{parse, render};
 
 #[test]
 fn render_git_graph_basic() {
