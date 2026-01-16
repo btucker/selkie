@@ -564,7 +564,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     // Use proper DAG layout with state-specific estimator
     // State diagrams use SVG text (not foreignObject) so line height is tighter
     let size_estimator = CharacterSizeEstimator {
-        char_width_ratio: 0.6,
+        char_width_ratio: 0.5,  // Tighter estimate for proportional fonts
         line_height_ratio: 1.4, // SVG text vs 2.3 for HTML foreignObject
     };
     let layout_input = db.to_layout_graph(&size_estimator)?;
@@ -1501,7 +1501,7 @@ fn render_transition(
         if !text.is_empty() {
             // Estimate text dimensions for background
             let font_size = 16.0;
-            let char_width_ratio = 0.6;
+            let char_width_ratio = 0.5; // Tighter estimate for proportional fonts
             let text_width = text.len() as f64 * font_size * char_width_ratio;
             let text_height = font_size * 1.1; // Tighter for SVG text
             let padding = 2.0;
