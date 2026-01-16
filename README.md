@@ -63,49 +63,25 @@ Selkie could not exist without all the human effort that has gone into these exc
 
 ## Supported Diagram Types
 
-Selkie supports parsing and rendering for all major Mermaid diagram types. These examples showcase Selkie's rendering capabilities.
+Selkie supports parsing and rendering for all major Mermaid diagram types.
 
-### Flowchart
-<img src="docs/images/flowchart_complex.svg" alt="Flowchart" width="800">
+| Type | Example |
+|------|---------|
+| **Flowchart** | <img src="docs/images/flowchart_complex.svg" alt="Flowchart" width="500"> |
+| **Sequence** | <img src="docs/images/sequence.svg" alt="Sequence Diagram" width="500"> |
+| **Class** | <img src="docs/images/class.svg" alt="Class Diagram" width="500"> |
+| **State** | <img src="docs/images/state_complex.svg" alt="State Diagram" width="400"> |
+| **ER** | <img src="docs/images/er.svg" alt="ER Diagram" width="500"> |
+| **Gantt** | <img src="docs/images/gantt.svg" alt="Gantt Chart" width="500"> |
+| **Pie** | <img src="docs/images/pie.svg" alt="Pie Chart" width="300"> |
+| **Architecture** | <img src="docs/images/architecture_complex.svg" alt="Architecture Diagram" width="500"> |
+| **Git Graph** | <img src="docs/images/git_complex.svg" alt="Git Graph" width="500"> |
 
-### Sequence Diagram
-<img src="docs/images/sequence.svg" alt="Sequence Diagram" width="800">
+<details>
+<summary><strong>Parser Only</strong> (rendering in progress)</summary>
 
-### Class Diagram
-<img src="docs/images/class.svg" alt="Class Diagram" width="800">
-
-### State Diagram
-
-<img src="docs/images/state.svg" alt="State Diagram" width="400">
-
-**With composite states:**
-
-<img src="docs/images/state_complex.svg" alt="Complex State Diagram" width="400">
-
-### ER Diagram
-<img src="docs/images/er.svg" alt="ER Diagram" width="800">
-
-### Gantt Chart
-<img src="docs/images/gantt.svg" alt="Gantt Chart" width="800">
-
-### Pie Chart
-<img src="docs/images/pie.svg" alt="Pie Chart" width="400">
-
-### Architecture Diagram
-
-<img src="docs/images/architecture.svg" alt="Architecture Diagram" width="600">
-
-**With groups and multiple services:**
-
-<img src="docs/images/architecture_complex.svg" alt="Complex Architecture Diagram" width="800">
-
-### Additional Diagram Types (Parser Only)
-
-The following diagram types have parser support and rendering is in progress:
-
-| Diagram Type | Description |
-|--------------|-------------|
-| Git Graph | Git branch visualization |
+| Type | Description |
+|------|-------------|
 | Mindmap | Hierarchical mindmaps |
 | Timeline | Timeline visualizations |
 | Quadrant | Quadrant charts |
@@ -119,6 +95,8 @@ The following diagram types have parser support and rendering is in progress:
 | Journey | User journey maps |
 | Radar | Radar/spider charts |
 | Treemap | Treemap visualizations |
+
+</details>
 
 ## Installation
 
