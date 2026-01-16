@@ -141,6 +141,7 @@ Examples:
   selkie eval ./diagrams/         Evaluate .mmd files from directory
   selkie eval --json report.json  Also generate JSON report
   selkie eval --verbose           Show detailed per-diagram diffs
+  selkie eval --agent             AI-agent friendly output with investigation guidance
 ")]
 struct EvalArgs {
     /// Input to evaluate: JSON file, directory, .mmd file, or omit for gallery samples
@@ -162,6 +163,10 @@ struct EvalArgs {
     /// Show detailed diff per diagram
     #[arg(short, long)]
     verbose: bool,
+
+    /// AI-agent friendly output with per-diagram details, file paths, and investigation guidance
+    #[arg(short, long)]
+    agent: bool,
 
     /// Clear cache and re-render all reference SVGs
     #[arg(long)]
@@ -606,8 +611,13 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(not(feature = "png"))]
     let _ = svg_pairs; // Suppress unused warning
 
-    // Output results to stderr (verbose or summary)
-    if args.verbose {
+    // Output results to stderr (agent, verbose, or summary)
+    if args.agent {
+        eprintln!(
+            "{}",
+            eval::report::text_agent_friendly(&result, Some(&output_dir))
+        );
+    } else if args.verbose {
         eprintln!(
             "{}",
             eval::report::text_detailed(&result, Some(&output_dir))
