@@ -220,8 +220,9 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             current_y,
                             label,
                         );
+                        // Add fragment labels to edge_labels for proper z-order
                         for element in label_elements {
-                            doc.add_element(element);
+                            doc.add_edge_label(element);
                         }
                     }
                     current_y += message_spacing;
@@ -260,8 +261,9 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             fragment.start_y,
                             &fragment.label,
                         );
+                        // Add fragment labels to edge_labels for proper z-order
                         for element in label_elements {
-                            doc.add_element(element);
+                            doc.add_edge_label(element);
                         }
                     }
                     // Don't advance current_y after fragment end - content already positioned
@@ -281,7 +283,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                                 None
                             };
 
-                            let msg_element = render_message(
+                            let msg_elements = render_message(
                                 from_x,
                                 to_x,
                                 current_y,
@@ -289,7 +291,14 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                                 message.message_type,
                                 seq_num,
                             );
-                            doc.add_element(msg_element);
+                            // Add shapes first (edge_paths), then labels (edge_labels)
+                            // This ensures proper z-order: shapes render before text
+                            for shape in msg_elements.shapes {
+                                doc.add_edge_path(shape);
+                            }
+                            for label in msg_elements.labels {
+                                doc.add_edge_label(label);
+                            }
 
                             // Increment sequence number after each message
                             if autonumber_enabled {
@@ -435,6 +444,13 @@ struct FragmentState {
     min_actor_idx: Option<usize>,
     max_actor_idx: Option<usize>,
     color: Option<String>,
+}
+
+/// Message elements separated into shapes (lines/paths) and labels (text)
+/// This enables proper SVG z-order: shapes render before labels
+struct MessageElements {
+    shapes: Vec<SvgElement>,
+    labels: Vec<SvgElement>,
 }
 
 impl FragmentState {
@@ -622,6 +638,7 @@ fn render_actor(
 }
 
 /// Render a message between two actors
+/// Returns shapes and labels separately for proper z-order
 fn render_message(
     from_x: f64,
     to_x: f64,
@@ -629,8 +646,9 @@ fn render_message(
     label: &str,
     msg_type: LineType,
     sequence_num: Option<i32>,
-) -> SvgElement {
-    let mut children = Vec::new();
+) -> MessageElements {
+    let mut shapes = Vec::new();
+    let mut labels = Vec::new();
 
     let (is_dotted, marker_id) = match msg_type {
         LineType::Solid => (false, Some("arrow-filled")),
@@ -658,33 +676,7 @@ fn render_message(
         return render_self_message(from_x, y, label, is_dotted, sequence_num);
     }
 
-    // Sequence number (rendered at start of message line, like mermaid.js)
-    if let Some(num) = sequence_num {
-        let seq_x = from_x.min(to_x);
-        let seq_radius = 8.0;
-
-        // Circle background
-        children.push(SvgElement::Circle {
-            cx: seq_x,
-            cy: y,
-            r: seq_radius,
-            attrs: Attrs::new().with_class("sequenceNumber-circle"),
-        });
-
-        // Number text
-        children.push(SvgElement::Text {
-            x: seq_x,
-            y: y + 4.0,
-            content: num.to_string(),
-            attrs: Attrs::new()
-                .with_attr("text-anchor", "middle")
-                .with_class("sequenceNumber")
-                .with_attr("font-size", "12")
-                .with_attr("font-family", "sans-serif"),
-        });
-    }
-
-    // Message line
+    // Message line (shape - rendered first in edge_paths)
     let mut line_attrs = Attrs::new()
         .with_stroke_width(1.0)
         .with_class("message-line");
@@ -696,37 +688,47 @@ fn render_message(
         line_attrs = line_attrs.with_stroke_dasharray("5,5");
     }
 
-    // Adjust line start if sequence number is present
-    let line_start_x = if sequence_num.is_some() {
-        let seq_radius = 8.0;
-        if from_x < to_x {
-            from_x + seq_radius
-        } else {
-            from_x
-        }
-    } else {
-        from_x
-    };
-
-    let line_end_x = if sequence_num.is_some() && from_x > to_x {
-        to_x + 8.0
-    } else {
-        to_x
-    };
-
-    children.push(SvgElement::Line {
-        x1: line_start_x,
+    shapes.push(SvgElement::Line {
+        x1: from_x,
         y1: y,
-        x2: line_end_x,
+        x2: to_x,
         y2: y,
         attrs: line_attrs,
     });
 
-    // Message label
+    // Sequence number marker (shape - invisible line with marker-start)
+    if let Some(num) = sequence_num {
+        let seq_x = if from_x < to_x { from_x } else { to_x };
+
+        // Zero-length invisible line with marker-start for the circle
+        shapes.push(SvgElement::Line {
+            x1: seq_x,
+            y1: y,
+            x2: seq_x,
+            y2: y,
+            attrs: Attrs::new()
+                .with_stroke_width(0.0)
+                .with_attr("marker-start", "url(#sequencenumber)"),
+        });
+
+        // Number text (label - rendered after shapes in edge_labels)
+        labels.push(SvgElement::Text {
+            x: seq_x,
+            y: y + 4.0,
+            content: num.to_string(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("sequenceNumber")
+                .with_attr("font-size", "12")
+                .with_attr("font-family", "sans-serif"),
+        });
+    }
+
+    // Message label (text - rendered after shapes in edge_labels)
     let label_x = (from_x + to_x) / 2.0;
     let label_y = y - 10.0;
 
-    children.push(SvgElement::Text {
+    labels.push(SvgElement::Text {
         x: label_x,
         y: label_y,
         content: label.to_string(),
@@ -736,10 +738,7 @@ fn render_message(
             .with_attr("font-size", "16"),
     });
 
-    SvgElement::Group {
-        children,
-        attrs: Attrs::new().with_class("message"),
-    }
+    MessageElements { shapes, labels }
 }
 
 fn render_activation(actor_x: f64, start_y: f64, end_y: f64) -> SvgElement {
@@ -929,48 +928,24 @@ fn fragment_prefix(kind: FragmentKind) -> &'static str {
     }
 }
 
-/// Render a self-message (message to the same actor)
+/// Render a self-message (loop back to same actor)
+/// Returns shapes and labels separately for proper z-order
 fn render_self_message(
     x: f64,
     y: f64,
     label: &str,
     is_dotted: bool,
     sequence_num: Option<i32>,
-) -> SvgElement {
-    let mut children = Vec::new();
+) -> MessageElements {
+    let mut shapes = Vec::new();
+    let mut labels = Vec::new();
     let loop_width = 40.0;
     let loop_height = 30.0;
 
-    // Sequence number (rendered at start of message)
-    if let Some(num) = sequence_num {
-        let seq_radius = 8.0;
-
-        // Circle background
-        children.push(SvgElement::Circle {
-            cx: x,
-            cy: y,
-            r: seq_radius,
-            attrs: Attrs::new().with_class("sequenceNumber-circle"),
-        });
-
-        // Number text
-        children.push(SvgElement::Text {
-            x,
-            y: y + 4.0,
-            content: num.to_string(),
-            attrs: Attrs::new()
-                .with_attr("text-anchor", "middle")
-                .with_class("sequenceNumber")
-                .with_attr("font-size", "12")
-                .with_attr("font-family", "sans-serif"),
-        });
-    }
-
-    let start_x = if sequence_num.is_some() { x + 8.0 } else { x };
-
+    // Self-message path (shape - rendered first in edge_paths)
     let path = format!(
         "M {} {} L {} {} L {} {} L {} {}",
-        start_x,
+        x,
         y,
         x + loop_width,
         y,
@@ -990,12 +965,38 @@ fn render_self_message(
         path_attrs = path_attrs.with_stroke_dasharray("5,5");
     }
 
-    children.push(SvgElement::Path {
+    shapes.push(SvgElement::Path {
         d: path,
         attrs: path_attrs,
     });
 
-    children.push(SvgElement::Text {
+    // Sequence number marker (shape - invisible line with marker-start)
+    if let Some(num) = sequence_num {
+        shapes.push(SvgElement::Line {
+            x1: x,
+            y1: y,
+            x2: x,
+            y2: y,
+            attrs: Attrs::new()
+                .with_stroke_width(0.0)
+                .with_attr("marker-start", "url(#sequencenumber)"),
+        });
+
+        // Number text (label - rendered after shapes in edge_labels)
+        labels.push(SvgElement::Text {
+            x,
+            y: y + 4.0,
+            content: num.to_string(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("sequenceNumber")
+                .with_attr("font-size", "12")
+                .with_attr("font-family", "sans-serif"),
+        });
+    }
+
+    // Message label (text - rendered after shapes in edge_labels)
+    labels.push(SvgElement::Text {
         x: x + loop_width + 5.0,
         y: y + loop_height / 2.0,
         content: label.to_string(),
@@ -1005,10 +1006,7 @@ fn render_self_message(
             .with_attr("font-size", "16"),
     });
 
-    SvgElement::Group {
-        children,
-        attrs: Attrs::new().with_class("message self-message"),
-    }
+    MessageElements { shapes, labels }
 }
 
 /// Render a note
