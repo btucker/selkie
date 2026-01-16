@@ -146,7 +146,8 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
         .collect();
 
     let adj = build_adjacency(db, &node_ids);
-    let spatial_maps = build_spatial_maps(&adj, &node_ids);
+    let node_root_groups = build_node_root_group_map(db);
+    let spatial_maps = build_spatial_maps(&adj, &node_ids, &node_root_groups);
 
     let mut positions: HashMap<String, (f64, f64)> = HashMap::new();
     let mut max_x = 0.0;
@@ -949,6 +950,7 @@ fn build_adjacency(
 fn build_spatial_maps(
     adj: &HashMap<String, Vec<(ArchitectureDirectionPair, String, f64)>>,
     node_ids: &[String],
+    node_root_groups: &HashMap<String, Option<String>>,
 ) -> Vec<HashMap<String, (i32, i32)>> {
     let mut visited: HashSet<String> = HashSet::new();
     let mut maps = Vec::new();
@@ -993,7 +995,12 @@ fn build_spatial_maps(
             }
         }
 
-        resolve_spatial_collisions(&mut spatial_map, &insertion_order, &placement_pairs);
+        resolve_spatial_collisions(
+            &mut spatial_map,
+            &insertion_order,
+            &placement_pairs,
+            node_root_groups,
+        );
         maps.push(spatial_map);
     }
 
@@ -1006,8 +1013,13 @@ fn resolve_spatial_collisions(
     spatial_map: &mut HashMap<String, (i32, i32)>,
     insertion_order: &[String],
     placement_pairs: &HashMap<String, ArchitectureDirectionPair>,
+    node_root_groups: &HashMap<String, Option<String>>,
 ) {
-    let mut occupied: HashSet<(i32, i32)> = spatial_map.values().copied().collect();
+    let mut occupied_by_root: HashMap<Option<String>, HashSet<(i32, i32)>> = HashMap::new();
+    for (id, pos) in spatial_map.iter() {
+        let root = node_root_groups.get(id).cloned().unwrap_or(None);
+        occupied_by_root.entry(root).or_default().insert(*pos);
+    }
     let mut coord_nodes: HashMap<(i32, i32), Vec<String>> = HashMap::new();
 
     for id in insertion_order {
@@ -1017,22 +1029,31 @@ fn resolve_spatial_collisions(
     }
 
     for (pos, nodes) in coord_nodes {
-        if nodes.len() < 2 {
-            continue;
+        let mut nodes_by_root: HashMap<Option<String>, Vec<String>> = HashMap::new();
+        for node_id in nodes {
+            let root = node_root_groups.get(&node_id).cloned().unwrap_or(None);
+            nodes_by_root.entry(root).or_default().push(node_id);
         }
 
-        let Some((keep, relocate)) = nodes.split_last() else {
-            continue;
-        };
-        let _ = keep;
-
-        for node_id in relocate {
-            let pair = placement_pairs.get(node_id);
-            let new_pos = resolve_collision(&occupied, pos, pair);
-            if let Some(entry) = spatial_map.get_mut(node_id) {
-                *entry = new_pos;
+        for (root, nodes) in nodes_by_root {
+            if nodes.len() < 2 {
+                continue;
             }
-            occupied.insert(new_pos);
+
+            let Some((keep, relocate)) = nodes.split_last() else {
+                continue;
+            };
+            let _ = keep;
+
+            let occupied = occupied_by_root.entry(root).or_default();
+            for node_id in relocate {
+                let pair = placement_pairs.get(node_id);
+                let new_pos = resolve_collision(occupied, pos, pair);
+                if let Some(entry) = spatial_map.get_mut(node_id) {
+                    *entry = new_pos;
+                }
+                occupied.insert(new_pos);
+            }
         }
     }
 }
@@ -1266,6 +1287,42 @@ fn build_node_group_map(db: &ArchitectureDb) -> HashMap<String, Option<String>> 
     }
     for junction in db.get_junctions() {
         map.insert(junction.id.clone(), junction.parent.clone());
+    }
+    map
+}
+
+fn build_node_root_group_map(db: &ArchitectureDb) -> HashMap<String, Option<String>> {
+    let mut parent_map: HashMap<String, Option<String>> = HashMap::new();
+    for group in db.get_groups() {
+        parent_map.insert(group.id.clone(), group.parent.clone());
+    }
+
+    let mut root_cache: HashMap<String, String> = HashMap::new();
+    let mut resolve_root = |group_id: &str| -> String {
+        if let Some(root) = root_cache.get(group_id) {
+            return root.clone();
+        }
+        let mut current = group_id;
+        let mut path: Vec<String> = Vec::new();
+        while let Some(Some(parent)) = parent_map.get(current) {
+            path.push(current.to_string());
+            current = parent;
+        }
+        let root = current.to_string();
+        for id in path {
+            root_cache.insert(id, root.clone());
+        }
+        root
+    };
+
+    let mut map = HashMap::new();
+    for service in db.get_services() {
+        let root = service.parent.as_deref().map(&mut resolve_root);
+        map.insert(service.id.clone(), root);
+    }
+    for junction in db.get_junctions() {
+        let root = junction.parent.as_deref().map(&mut resolve_root);
+        map.insert(junction.id.clone(), root);
     }
     map
 }
