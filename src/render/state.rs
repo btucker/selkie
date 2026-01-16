@@ -21,7 +21,6 @@ fn calculate_composite_bounds(
     composite_id: &str,
     db: &StateDb,
     state_positions: &HashMap<String, (f64, f64, f64, f64)>,
-    _layout_result: &LayoutGraph,
 ) -> Option<(f64, f64, f64, f64)> {
     calculate_composite_bounds_recursive(composite_id, db, state_positions)
 }
@@ -87,6 +86,232 @@ fn calculate_composite_bounds_recursive(
     Some((min_x, min_y, max_x - min_x, max_y - min_y))
 }
 
+/// Result of recursively laying out a level of the state diagram
+/// Mermaid's approach: each composite level gets its own dagre layout
+#[derive(Clone, Debug)]
+struct LevelLayout {
+    /// Width of this level's content
+    width: f64,
+    /// Height of this level's content
+    height: f64,
+    /// Positions of nodes at this level (relative to level origin)
+    positions: HashMap<String, (f64, f64, f64, f64)>,
+    /// Edges at this level with their bend points
+    edges: Vec<LayoutEdge>,
+}
+
+/// Recursively compute layout for a level of the state diagram
+/// This mimics mermaid's renderDoc() which creates a dagre graph per composite level
+fn compute_level_layout(
+    parent_id: Option<&str>,
+    db: &StateDb,
+    size_estimator: &dyn SizeEstimator,
+    level_layouts: &mut HashMap<String, LevelLayout>,
+    depth: usize, // Nesting depth for spacing adjustment
+) -> Result<Option<LevelLayout>> {
+    use std::collections::HashSet;
+
+    let states = db.get_states();
+    let relations = db.get_relations();
+
+    // Find states at this level (direct children of parent_id, or root-level if None)
+    let level_state_ids: HashSet<&str> = states
+        .iter()
+        .filter(|(_, s)| s.parent.as_deref() == parent_id)
+        .map(|(id, _)| id.as_str())
+        .collect();
+
+    if level_state_ids.is_empty() {
+        return Ok(None);
+    }
+
+    // Identify which of these states are composites (have children)
+    let composite_ids: HashSet<&str> = states
+        .values()
+        .filter_map(|s| s.parent.as_deref())
+        .filter(|parent| level_state_ids.contains(parent))
+        .collect();
+
+    // First, recursively compute layouts for composite children at this level
+    for composite_id in &composite_ids {
+        if let Some(inner_layout) = compute_level_layout(
+            Some(composite_id),
+            db,
+            size_estimator,
+            level_layouts,
+            depth + 1, // Increment depth for nested composites
+        )? {
+            level_layouts.insert(composite_id.to_string(), inner_layout);
+        }
+    }
+
+    // Now create layout graph for this level
+    let config = NodeSizeConfig {
+        font_size: 16.0,
+        padding_horizontal: 8.0,
+        padding_vertical: 8.0,
+        min_width: 40.0,
+        min_height: 26.0,
+        max_width: Some(200.0),
+    };
+
+    let mut graph = LayoutGraph::new(parent_id.unwrap_or("root"));
+
+    // Mermaid v3 uses ranksep=50 at root level and adds 25 for each nesting level
+    // This creates natural spacing accumulation that matches reference diagrams
+    let base_ranksep = 50.0;
+    let ranksep_per_level = 25.0;
+    let layer_spacing = base_ranksep + (depth as f64 * ranksep_per_level);
+
+    graph.options = LayoutOptions {
+        direction: db.preferred_direction(),
+        node_spacing: 50.0, // mermaid's nodeSep
+        layer_spacing,      // mermaid-style: ranksep + 25 per nesting level
+        padding: Padding::uniform(8.0),
+        ranker: LayoutRanker::LongestPath,
+    };
+
+    let start_end_states = determine_start_end_states(db);
+
+    // Add nodes for states at this level
+    for state_id in &level_state_ids {
+        let state = states.get(*state_id).unwrap();
+
+        let (shape, label) = match state.state_type {
+            StateType::Start => (NodeShape::Circle, None),
+            StateType::End => (NodeShape::DoubleCircle, None),
+            StateType::Fork | StateType::Join => (NodeShape::Rectangle, None),
+            StateType::Choice => (NodeShape::Diamond, None),
+            StateType::Divider => (NodeShape::Rectangle, None),
+            StateType::Default => {
+                if state_id.starts_with("[*]") {
+                    if let Some(info) = start_end_states.get(*state_id) {
+                        if info.is_start {
+                            (NodeShape::Circle, None)
+                        } else {
+                            (NodeShape::DoubleCircle, None)
+                        }
+                    } else {
+                        (NodeShape::Circle, None)
+                    }
+                } else {
+                    let desc = state.description.as_deref().filter(|d| !d.is_empty());
+                    (NodeShape::RoundedRect, desc.or(Some(*state_id)))
+                }
+            }
+        };
+
+        let label_text = label.unwrap_or(if state_id.starts_with("[*]") {
+            ""
+        } else {
+            *state_id
+        });
+
+        // Determine dimensions - use pre-computed layout for composites
+        let (width, height) = if composite_ids.contains(state_id) {
+            if let Some(inner) = level_layouts.get(*state_id) {
+                let padding = 12.0;
+                let title_height = 25.0;
+                (
+                    inner.width + 2.0 * padding,
+                    inner.height + 2.0 * padding + title_height,
+                )
+            } else {
+                (100.0, 60.0)
+            }
+        } else if state_id.starts_with("[*]")
+            || matches!(state.state_type, StateType::Start | StateType::End)
+        {
+            (14.0, 14.0)
+        } else if matches!(state.state_type, StateType::Fork | StateType::Join) {
+            (70.0, 10.0)
+        } else {
+            size_estimator.estimate_node_size(Some(label_text), shape, &config)
+        };
+
+        let mut node = LayoutNode::new(*state_id, width, height).with_shape(shape);
+        if !label_text.is_empty() {
+            node = node.with_label(label_text);
+        }
+        if composite_ids.contains(state_id) {
+            node.metadata
+                .insert("is_group".to_string(), "true".to_string());
+        }
+        node.metadata
+            .insert("state_type".to_string(), format!("{:?}", state.state_type));
+
+        graph.add_node(node);
+    }
+
+    // Add edges for relations where BOTH endpoints are at this level
+    for (i, relation) in relations.iter().enumerate() {
+        let s1 = relation.state1.as_str();
+        let s2 = relation.state2.as_str();
+
+        if level_state_ids.contains(s1) && level_state_ids.contains(s2) {
+            let mut edge = LayoutEdge::new(
+                format!("e{}", i),
+                relation.state1.clone(),
+                relation.state2.clone(),
+            );
+            if let Some(ref desc) = relation.description {
+                edge = edge.with_label(desc);
+            }
+            graph.add_edge(edge);
+        }
+    }
+
+    // Run layout
+    let layout_result = layout(graph)?;
+
+    // Extract positions and compute bounding box
+    let mut positions: HashMap<String, (f64, f64, f64, f64)> = HashMap::new();
+    let mut min_x = f64::MAX;
+    let mut min_y = f64::MAX;
+    let mut max_x = f64::MIN;
+    let mut max_y = f64::MIN;
+
+    for node in &layout_result.nodes {
+        if let (Some(x), Some(y)) = (node.x, node.y) {
+            positions.insert(node.id.clone(), (x, y, node.width, node.height));
+            min_x = min_x.min(x);
+            min_y = min_y.min(y);
+            max_x = max_x.max(x + node.width);
+            max_y = max_y.max(y + node.height);
+        }
+    }
+
+    if min_x == f64::MAX {
+        return Ok(None);
+    }
+
+    // Normalize positions to start from (0, 0)
+    for (_, (x, y, _, _)) in positions.iter_mut() {
+        *x -= min_x;
+        *y -= min_y;
+    }
+
+    // Also normalize edge bend points and label positions
+    let mut edges = layout_result.edges;
+    for edge in &mut edges {
+        for point in &mut edge.bend_points {
+            point.x -= min_x;
+            point.y -= min_y;
+        }
+        if let Some(ref mut pos) = edge.label_position {
+            pos.x -= min_x;
+            pos.y -= min_y;
+        }
+    }
+
+    Ok(Some(LevelLayout {
+        width: max_x - min_x,
+        height: max_y - min_y,
+        positions,
+        edges,
+    }))
+}
+
 /// Implement ToLayoutGraph for StateDb to enable proper DAG layout
 impl ToLayoutGraph for StateDb {
     fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
@@ -111,7 +336,7 @@ impl ToLayoutGraph for StateDb {
         graph.options = LayoutOptions {
             direction: self.preferred_direction(),
             node_spacing: 15.0, // Tighter horizontal spacing for narrower diagrams
-            layer_spacing: 50.0, // Vertical spacing matching mermaid reference height
+            layer_spacing: 40.0, // Compromise between fork/join spacing and composite edges
             padding: Padding::uniform(12.0), // Balanced padding for composite states
             ranker: LayoutRanker::LongestPath, // Use longest-path (mermaid's tight-tree base)
         };
@@ -561,35 +786,94 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         return Ok(doc.to_string());
     }
 
-    // Use proper DAG layout with state-specific estimator
-    // State diagrams use SVG text (not foreignObject) so line height is tighter
+    // Use recursive layout like mermaid - each composite level gets its own dagre layout
+    // This naturally accumulates spacing at each nesting level
     let size_estimator = CharacterSizeEstimator {
         char_width_ratio: 0.55, // Balanced estimate for proportional fonts
         line_height_ratio: 1.4, // SVG text vs 2.3 for HTML foreignObject
     };
-    let layout_input = db.to_layout_graph(&size_estimator)?;
-    let layout_result = layout(layout_input)?;
 
-    // Extract positions from layout
+    // Compute recursive layouts starting from root level
+    let mut level_layouts: HashMap<String, LevelLayout> = HashMap::new();
+    let root_layout = compute_level_layout(None, db, &size_estimator, &mut level_layouts, 0)?
+        .ok_or_else(|| {
+            crate::error::MermaidError::LayoutError("No states to layout".to_string())
+        })?;
+
+    // Build final state_positions by combining all level layouts
     let mut state_positions: HashMap<String, (f64, f64, f64, f64)> = HashMap::new();
-    for node in &layout_result.nodes {
-        if let (Some(x), Some(y)) = (node.x, node.y) {
-            state_positions.insert(node.id.clone(), (x, y, node.width, node.height));
+
+    // Position all content starting from root AND collect edges with proper offsets
+    // We need to track offsets for each level so we can transform edge bend points
+    let mut level_offsets: HashMap<String, (f64, f64)> = HashMap::new();
+    level_offsets.insert("root".to_string(), (0.0, 0.0));
+
+    fn position_level_content_with_offsets(
+        level_layout: &LevelLayout,
+        offset_x: f64,
+        offset_y: f64,
+        level_layouts: &HashMap<String, LevelLayout>,
+        state_positions: &mut HashMap<String, (f64, f64, f64, f64)>,
+        level_offsets: &mut HashMap<String, (f64, f64)>,
+    ) {
+        for (id, (x, y, w, h)) in &level_layout.positions {
+            let final_x = offset_x + x;
+            let final_y = offset_y + y;
+            state_positions.insert(id.clone(), (final_x, final_y, *w, *h));
+
+            // If this is a composite, recursively position its contents
+            if let Some(inner_layout) = level_layouts.get(id) {
+                let padding = 12.0;
+                let title_height = 25.0;
+                let inner_offset_x = final_x + padding;
+                let inner_offset_y = final_y + padding + title_height;
+                level_offsets.insert(id.clone(), (inner_offset_x, inner_offset_y));
+                position_level_content_with_offsets(
+                    inner_layout,
+                    inner_offset_x,
+                    inner_offset_y,
+                    level_layouts,
+                    state_positions,
+                    level_offsets,
+                );
+            }
+        }
+    }
+
+    position_level_content_with_offsets(
+        &root_layout,
+        0.0,
+        0.0,
+        &level_layouts,
+        &mut state_positions,
+        &mut level_offsets,
+    );
+
+    // Collect all edges from all levels, applying parent offsets to bend points
+    let mut all_edges: Vec<LayoutEdge> = root_layout.edges.clone();
+    // Root level edges have no offset (already at origin)
+
+    // Add edges from nested levels with their offsets applied
+    for (level_id, level_layout) in &level_layouts {
+        if let Some(&(off_x, off_y)) = level_offsets.get(level_id) {
+            for edge in &level_layout.edges {
+                let mut transformed_edge = edge.clone();
+                for point in &mut transformed_edge.bend_points {
+                    point.x += off_x;
+                    point.y += off_y;
+                }
+                if let Some(ref mut pos) = transformed_edge.label_position {
+                    pos.x += off_x;
+                    pos.y += off_y;
+                }
+                all_edges.push(transformed_edge);
+            }
         }
     }
 
     // Identify composite states
-    let composite_ids: std::collections::HashSet<&str> = layout_result
-        .nodes
-        .iter()
-        .filter(|n| {
-            n.metadata
-                .get("is_group")
-                .map(|v| v == "true")
-                .unwrap_or(false)
-        })
-        .map(|n| n.id.as_str())
-        .collect();
+    let composite_ids: std::collections::HashSet<&str> =
+        level_layouts.keys().map(|s| s.as_str()).collect();
 
     // Post-process: Center all composite states on a common vertical axis
     // This matches mermaid's rendering where all composites align vertically
@@ -618,7 +902,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     // Track which start nodes were repositioned and by how much
     let mut start_node_offsets: HashMap<String, f64> = HashMap::new();
 
-    for edge in &layout_result.edges {
+    for edge in &all_edges {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
             // Check if this is a start node connecting to a composite
             if source.contains("_start_") && composite_ids.contains(target) {
@@ -626,7 +910,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 // (not dagre's placeholder position which doesn't account for children)
                 if let (Some((start_x, start_y, start_w, start_h)), Some((comp_x, _, comp_w, _))) = (
                     state_positions.get(source).copied(),
-                    calculate_composite_bounds(target, db, &state_positions, &layout_result),
+                    calculate_composite_bounds(target, db, &state_positions),
                 ) {
                     // Center the start node horizontally above the composite
                     let comp_center_x = comp_x + comp_w / 2.0;
@@ -661,7 +945,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         // Collect connected state centers (targets for fork, sources for join)
         let mut connected_centers: Vec<f64> = Vec::new();
 
-        for edge in &layout_result.edges {
+        for edge in &all_edges {
             if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
                 if is_fork && source == *fj_id {
                     // Fork: collect target centers
@@ -697,7 +981,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     // Adjust bend points for edges from repositioned start nodes
     let mut edge_bend_points: HashMap<(String, String), Vec<Point>> = HashMap::new();
     let mut edge_label_positions: HashMap<(String, String), Point> = HashMap::new();
-    for edge in &layout_result.edges {
+    for edge in &all_edges {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
             let mut bend_points = edge.bend_points.clone();
             let mut label_pos = edge.label_position;
@@ -746,7 +1030,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
             // to exit from the center-bottom of the rendered composite box
             if composite_ids.contains(source) && !bend_points.is_empty() {
                 if let Some((comp_x, comp_y, comp_w, comp_h)) =
-                    calculate_composite_bounds(source, db, &state_positions, &layout_result)
+                    calculate_composite_bounds(source, db, &state_positions)
                 {
                     let comp_center_x = comp_x + comp_w / 2.0;
                     let comp_bottom_y = comp_y + comp_h;
@@ -827,7 +1111,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
             // to hit the top-center of the rendered composite box (not the border node)
             if composite_ids.contains(target) && !bend_points.is_empty() {
                 if let Some((comp_x, comp_y, comp_w, _comp_h)) =
-                    calculate_composite_bounds(target, db, &state_positions, &layout_result)
+                    calculate_composite_bounds(target, db, &state_positions)
                 {
                     let comp_center_x = comp_x + comp_w / 2.0;
                     let comp_top_y = comp_y;
@@ -918,12 +1202,63 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         0.0
     };
 
-    // Calculate diagram bounds (layout now includes edge labels)
-    // Use bounds origin to handle content with negative coordinates (e.g., edge labels)
-    let bounds_x = layout_result.bounds_x.unwrap_or(0.0);
-    let bounds_y = layout_result.bounds_y.unwrap_or(0.0);
-    let max_width = layout_result.width.unwrap_or(400.0) + margin * 2.0;
-    let max_height = layout_result.height.unwrap_or(200.0) + margin * 2.0 + title_offset;
+    // Calculate diagram bounds from state positions, edge bend points, and labels
+    // Initialize bounds from all positioned elements
+    let mut min_x = f64::MAX;
+    let mut min_y = f64::MAX;
+    let mut max_x = f64::MIN;
+    let mut max_y = f64::MIN;
+
+    // Include all state positions
+    for &(x, y, w, h) in state_positions.values() {
+        min_x = min_x.min(x);
+        min_y = min_y.min(y);
+        max_x = max_x.max(x + w);
+        max_y = max_y.max(y + h);
+    }
+
+    // Include composite state bounds (they may extend beyond individual state positions)
+    for composite_id in &composite_ids {
+        if let Some((cx, cy, cw, ch)) =
+            calculate_composite_bounds(composite_id, db, &state_positions)
+        {
+            min_x = min_x.min(cx);
+            min_y = min_y.min(cy);
+            max_x = max_x.max(cx + cw);
+            max_y = max_y.max(cy + ch);
+        }
+    }
+
+    // Include edge bend points and labels
+    for points in edge_bend_points.values() {
+        for point in points {
+            min_x = min_x.min(point.x);
+            min_y = min_y.min(point.y);
+            max_x = max_x.max(point.x);
+            max_y = max_y.max(point.y);
+        }
+    }
+
+    // Include edge label positions (estimate label size)
+    for pos in edge_label_positions.values() {
+        min_x = min_x.min(pos.x - 50.0); // Estimate label half-width
+        min_y = min_y.min(pos.y - 10.0); // Estimate label half-height
+        max_x = max_x.max(pos.x + 50.0);
+        max_y = max_y.max(pos.y + 10.0);
+    }
+
+    // Handle empty diagram case
+    if min_x == f64::MAX {
+        min_x = 0.0;
+        min_y = 0.0;
+        max_x = 400.0;
+        max_y = 200.0;
+    }
+
+    let bounds_x = min_x;
+    let bounds_y = min_y;
+    let max_width = (max_x - min_x) + margin * 2.0;
+    let max_height = (max_y - min_y) + margin * 2.0 + title_offset;
 
     // ViewBox origin accounts for margin offset from content bounds
     let view_x = bounds_x - margin;
@@ -998,13 +1333,9 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     // First, render composite state containers (behind everything else)
     // Sorted by depth ensures parents render before children for correct z-order
     for composite_id in &sorted_composites {
-        if let Some(composite_elem) = render_composite_state(
-            composite_id,
-            db,
-            &state_positions,
-            &layout_result,
-            &composite_states,
-        ) {
+        if let Some(composite_elem) =
+            render_composite_state(composite_id, db, &state_positions, &composite_states)
+        {
             doc.add_element(composite_elem);
         }
     }
@@ -1091,7 +1422,6 @@ fn render_composite_state(
     composite_id: &str,
     db: &StateDb,
     state_positions: &HashMap<String, (f64, f64, f64, f64)>,
-    _layout_result: &LayoutGraph,
     composite_states: &std::collections::HashSet<&str>,
 ) -> Option<SvgElement> {
     // Find all child states (states whose parent is this composite)
