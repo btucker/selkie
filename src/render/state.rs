@@ -111,7 +111,7 @@ impl ToLayoutGraph for StateDb {
         graph.options = LayoutOptions {
             direction: self.preferred_direction(),
             node_spacing: 15.0, // Tighter horizontal spacing for narrower diagrams
-            layer_spacing: 50.0, // Maintain vertical spacing for proper height
+            layer_spacing: 50.0, // Vertical spacing matching mermaid reference height
             padding: Padding::uniform(8.0), // Match mermaid's state padding (8px)
             ranker: LayoutRanker::LongestPath, // Use longest-path (mermaid's tight-tree base)
         };
@@ -700,9 +700,10 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     for edge in &layout_result.edges {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
             let mut bend_points = edge.bend_points.clone();
+            let mut label_pos = edge.label_position;
 
             // If both source and target are inside a shifted composite,
-            // apply the composite offset to all edge bend points
+            // apply the composite offset to all edge bend points and label position
             // This keeps edges aligned with their shifted parent states
             if !bend_points.is_empty() {
                 let source_parent = states.get(source).and_then(|s| s.parent.as_deref());
@@ -715,6 +716,10 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                         if let Some(&offset_x) = composite_offsets.get(sp) {
                             for point in &mut bend_points {
                                 point.x += offset_x;
+                            }
+                            // Also shift the label position
+                            if let Some(ref mut lp) = label_pos {
+                                lp.x += offset_x;
                             }
                         }
                     }
@@ -899,8 +904,9 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
             }
 
             edge_bend_points.insert((source.to_string(), target.to_string()), bend_points);
-            if let Some(label_pos) = &edge.label_position {
-                edge_label_positions.insert((source.to_string(), target.to_string()), *label_pos);
+            // Use adjusted label position (shifted with composite offset if applicable)
+            if let Some(lp) = label_pos {
+                edge_label_positions.insert((source.to_string(), target.to_string()), lp);
             }
         }
     }
