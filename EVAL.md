@@ -81,8 +81,9 @@ The default output is designed for AI agents working on the codebase. It include
 5. **Investigation guide** - How to debug each issue type
 
 Every eval run outputs:
-- `report.json` - Machine-readable results for further processing
+- `report.json` - Summary with index of all diagram files
 - `index.html` - Visual comparison report
+- `{type}/{name}.json` - Full details for each diagram (small, focused files)
 - `{type}/{name}_selkie.svg` - Selkie-rendered SVGs
 - `{type}/{name}_reference.svg` - Reference SVGs from mermaid.js
 
@@ -217,26 +218,33 @@ Issues Summary:
     8 Info     - Acceptable variations
 ```
 
-### JSON Report
+### JSON Reports
 
-Machine-readable format for CI integration:
+JSON output is split into small, focused files for easy AI agent consumption:
 
+**Summary (`report.json`)** - Overall stats and index of all diagram files:
 ```json
 {
   "total": 20,
   "matching": 17,
   "parity_percent": 85.0,
-  "by_type": {
-    "flowchart": { "total": 5, "matching": 4, "parity_percent": 80.0 }
-  },
+  "by_type": { "flowchart": { "total": 5, "matching": 4 } },
   "diagrams": [
-    {
-      "name": "flowchart_basic",
-      "status": "match",
-      "structural_match": true,
-      "issues": []
-    }
+    { "name": "basic", "diagram_type": "flowchart", "status": "Match", "json_file": "flowchart/basic.json" }
   ]
+}
+```
+
+**Per-diagram (`{type}/{name}.json`)** - Full details for one diagram:
+```json
+{
+  "name": "basic",
+  "diagram_type": "flowchart",
+  "status": "Match",
+  "structural_match": true,
+  "visual_similarity": 0.95,
+  "issues": [],
+  "diagram_text": "flowchart LR\n    A --> B"
 }
 ```
 
@@ -263,29 +271,30 @@ Each eval run creates a unique directory with assets organized by diagram type:
 ```
 selkie-eval-a1b2c3d4/
 ├── index.html                      # Main HTML report (visual comparison)
-├── report.json                     # Machine-readable results (always generated)
+├── report.json                     # Summary with index of all diagrams
 ├── flowchart/
+│   ├── basic.json                  # Full details for this diagram
 │   ├── basic_selkie.svg            # Selkie-rendered SVG
 │   ├── basic_reference.svg         # Mermaid.js reference SVG
 │   ├── basic.png                   # Side-by-side comparison (if png feature)
+│   ├── styled.json
 │   ├── styled_selkie.svg
 │   ├── styled_reference.svg
 │   └── styled.png
 ├── sequence/
+│   ├── simple.json
 │   ├── simple_selkie.svg
 │   ├── simple_reference.svg
 │   └── simple.png
-├── pie/
-│   └── ...
-└── state/
-    └── ...
+└── ...
 ```
 
-The `report.json` file contains full results including:
-- Per-diagram parse/render success status
-- Structural similarity scores
-- Visual similarity (SSIM) scores
+Each per-diagram JSON file contains:
+- Full diagram source text
+- Parse/render success status
+- Structural and visual similarity scores
 - All issues with expected vs actual values
+- SVG content (for programmatic analysis)
 
 The output path is shown at the end of the evaluation:
 
