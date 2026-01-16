@@ -8,7 +8,7 @@ use crate::layout::{
     layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
     LayoutOptions, NodeShape, Padding, SizeEstimator, ToLayoutGraph,
 };
-use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
+use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement, Theme};
 
 /// Implement ToLayoutGraph for ErDb to enable proper DAG layout
 impl ToLayoutGraph for ErDb {
@@ -169,7 +169,7 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     // Add theme styles
     if config.embed_css {
         doc.add_style(&config.theme.generate_css());
-        doc.add_style(&generate_er_css());
+        doc.add_style(&generate_er_css(&config.theme));
     }
 
     // Add ER marker definitions
@@ -259,6 +259,7 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
 
 /// Render an entity box with attributes in table-style layout
 /// Matches mermaid.js with alternating row colors and column dividers
+/// Uses CSS classes for theming - colors are defined in generate_er_css()
 #[allow(clippy::too_many_arguments)]
 fn render_entity(
     entity: &Entity,
@@ -274,12 +275,6 @@ fn render_entity(
     // SVG renders elements in document order - shapes must come before text
     let mut shapes = Vec::new();
     let mut text_elements = Vec::new();
-
-    // Colors matching mermaid.js
-    let fill_color = "#ECECFF";
-    let stroke_color = "#9370DB";
-    let row_odd_color = "hsl(240, 100%, 100%)"; // white
-    let row_even_color = "hsl(240, 100%, 97.27%)"; // very light blue
 
     let num_attrs = entity.attributes.len();
 
@@ -299,11 +294,7 @@ fn render_entity(
             height,
             rx: Some(0.0),
             ry: Some(0.0),
-            attrs: Attrs::new()
-                .with_fill(fill_color)
-                .with_stroke(stroke_color)
-                .with_stroke_width(1.3)
-                .with_class("entity-box"),
+            attrs: Attrs::new().with_stroke_width(1.3).with_class("entity-box"),
         });
 
         text_elements.push(SvgElement::Text {
@@ -313,8 +304,7 @@ fn render_entity(
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
                 .with_class("entity-name")
-                .with_attr("font-size", "14")
-                .with_attr("font-weight", "bold"),
+                .with_attr("font-size", "14"),
         });
 
         let mut children = shapes;
@@ -339,11 +329,7 @@ fn render_entity(
         height,
         rx: Some(0.0),
         ry: Some(0.0),
-        attrs: Attrs::new()
-            .with_fill(fill_color)
-            .with_stroke(stroke_color)
-            .with_stroke_width(1.3)
-            .with_class("entity-box"),
+        attrs: Attrs::new().with_stroke_width(1.3).with_class("entity-box"),
     });
 
     // Attribute rows with alternating backgrounds (starting after header)
@@ -351,13 +337,8 @@ fn render_entity(
 
     for (i, attr) in entity.attributes.iter().enumerate() {
         let row_y = content_y + (i as f64) * attr_row_height;
-        let row_color = if i % 2 == 0 {
-            row_odd_color
-        } else {
-            row_even_color
-        };
 
-        // Row background rectangle
+        // Row background rectangle - CSS classes define colors
         shapes.push(SvgElement::Rect {
             x,
             y: row_y,
@@ -366,8 +347,6 @@ fn render_entity(
             rx: Some(0.0),
             ry: Some(0.0),
             attrs: Attrs::new()
-                .with_fill(row_color)
-                .with_stroke(stroke_color)
                 .with_stroke_width(1.3)
                 .with_class(if i % 2 == 0 {
                     "row-rect-odd"
@@ -424,7 +403,7 @@ fn render_entity(
         }
     }
 
-    // Divider lines
+    // Divider lines - CSS class defines stroke color
     let divider_bottom = y + height;
 
     // Horizontal divider under header
@@ -433,10 +412,7 @@ fn render_entity(
         y1: content_y,
         x2: x + width,
         y2: content_y,
-        attrs: Attrs::new()
-            .with_stroke(stroke_color)
-            .with_stroke_width(1.3)
-            .with_class("divider"),
+        attrs: Attrs::new().with_stroke_width(1.3).with_class("divider"),
     });
 
     // Vertical divider between type and name columns
@@ -445,10 +421,7 @@ fn render_entity(
         y1: content_y,
         x2: type_col_end,
         y2: divider_bottom,
-        attrs: Attrs::new()
-            .with_stroke(stroke_color)
-            .with_stroke_width(1.3)
-            .with_class("divider"),
+        attrs: Attrs::new().with_stroke_width(1.3).with_class("divider"),
     });
 
     // Vertical divider between name and keys columns
@@ -457,10 +430,7 @@ fn render_entity(
         y1: content_y,
         x2: name_col_end,
         y2: divider_bottom,
-        attrs: Attrs::new()
-            .with_stroke(stroke_color)
-            .with_stroke_width(1.3)
-            .with_class("divider"),
+        attrs: Attrs::new().with_stroke_width(1.3).with_class("divider"),
     });
 
     // Entity name (centered in header) - text comes after shapes
@@ -473,8 +443,7 @@ fn render_entity(
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
                 .with_class("entity-name")
-                .with_attr("font-size", "14")
-                .with_attr("font-weight", "bold"),
+                .with_attr("font-size", "14"),
         },
     );
 
@@ -489,6 +458,7 @@ fn render_entity(
 }
 
 /// Render a relationship line between two entities using SVG markers
+/// Uses CSS classes for theming - colors are defined in generate_er_css()
 #[allow(clippy::too_many_arguments)]
 fn render_relationship(
     x1: f64,
@@ -545,7 +515,7 @@ fn render_relationship(
         let mid_x = (start_x + end_x) / 2.0;
         let label_mid_y = mid_y;
 
-        // Background for label
+        // Background for label - uses CSS class for fill color
         let label_width = (label.len() as f64) * 7.0;
         children.push(SvgElement::Rect {
             x: mid_x - label_width / 2.0 - 4.0,
@@ -554,7 +524,7 @@ fn render_relationship(
             height: 23.0,
             rx: Some(0.0),
             ry: Some(0.0),
-            attrs: Attrs::new().with_class("background").with_fill("#FFFFFF"),
+            attrs: Attrs::new().with_class("relationship-label-background"),
         });
 
         children.push(SvgElement::Text {
@@ -620,52 +590,74 @@ fn calculate_connection_points(
     (start_x, start_y, end_x, end_y)
 }
 
-fn generate_er_css() -> String {
-    r#"
-.er-title {
-  fill: #333333;
-}
+fn generate_er_css(theme: &Theme) -> String {
+    format!(
+        r#"
+.er-title {{
+  fill: {text_color};
+}}
 
-.entity-box {
-  fill: #ECECFF;
-  stroke: #333333;
-}
+.entity-box {{
+  fill: {primary_color};
+  stroke: {border_color};
+}}
 
-.entity-header {
-  fill: #9370DB;
-  stroke: #333333;
-}
+.entity-header {{
+  fill: {border_color};
+  stroke: {border_color};
+}}
 
-.entity-name {
-  fill: #FFFFFF;
+.entity-name {{
+  fill: {text_color};
   font-weight: bold;
-}
+}}
 
-.entity-attr {
-  fill: #333333;
-}
+.entity-attr {{
+  fill: {text_color};
+}}
 
-.relationshipLine {
-  stroke: #333333;
+.relationshipLine {{
+  stroke: {line_color};
   stroke-width: 1;
   fill: none;
-}
+}}
 
-.relationship-label {
-  fill: #333333;
-}
+.relationship-label {{
+  fill: {text_color};
+}}
 
-.marker {
+.relationship-label-background {{
+  fill: {background};
+}}
+
+.marker {{
   fill: none;
-  stroke: #333333;
+  stroke: {line_color};
   stroke-width: 1;
-}
+}}
 
-.marker circle {
-  fill: white;
-}
-"#
-    .to_string()
+.marker circle {{
+  fill: {background};
+}}
+
+.row-rect-odd {{
+  fill: {background};
+}}
+
+.row-rect-even {{
+  fill: {primary_color};
+}}
+
+.divider {{
+  stroke: {border_color};
+}}
+"#,
+        text_color = theme.primary_text_color,
+        primary_color = theme.primary_color,
+        border_color = theme.primary_border_color,
+        line_color = theme.line_color,
+        background = theme.background,
+    )
 }
 
 /// Generate SVG marker definitions for ER diagram cardinality symbols
