@@ -31,6 +31,7 @@ impl ToLayoutGraph for ArchitectureDb {
             node_spacing: ARCH_NODE_SPACING,
             layer_spacing: ARCH_NODE_SPACING,
             padding: Padding::uniform(ARCH_PADDING),
+            ranker: crate::layout::LayoutRanker::default(),
         };
 
         let mut groups = self.get_groups();
