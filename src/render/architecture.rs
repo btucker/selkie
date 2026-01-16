@@ -933,9 +933,12 @@ fn build_spatial_maps(
         }
 
         let mut spatial_map: HashMap<String, (i32, i32)> = HashMap::new();
+        let mut insertion_order: Vec<String> = Vec::new();
+        let mut placement_pairs: HashMap<String, ArchitectureDirectionPair> = HashMap::new();
         let mut queue: VecDeque<String> = VecDeque::new();
 
         spatial_map.insert(id.clone(), (0, 0));
+        insertion_order.push(id.clone());
         queue.push_back(id.clone());
 
         while let Some(curr) = queue.pop_front() {
@@ -951,17 +954,133 @@ fn build_spatial_maps(
                         continue;
                     }
 
-                    let (nx, ny) = pair.shift_position(x, y, distance.round() as i32);
-                    spatial_map.insert(neighbor.clone(), (nx, ny));
+                    if spatial_map.contains_key(neighbor) {
+                        continue;
+                    }
+
+                    let next_pos = pair.shift_position(x, y, distance.round() as i32);
+                    spatial_map.insert(neighbor.clone(), next_pos);
+                    insertion_order.push(neighbor.clone());
+                    placement_pairs.insert(neighbor.clone(), *pair);
                     queue.push_back(neighbor.clone());
                 }
             }
         }
 
+        resolve_spatial_collisions(&mut spatial_map, &insertion_order, &placement_pairs);
         maps.push(spatial_map);
     }
 
     maps
+}
+
+const MAX_COLLISION_RADIUS: i32 = 6;
+
+fn resolve_spatial_collisions(
+    spatial_map: &mut HashMap<String, (i32, i32)>,
+    insertion_order: &[String],
+    placement_pairs: &HashMap<String, ArchitectureDirectionPair>,
+) {
+    let mut occupied: HashSet<(i32, i32)> = spatial_map.values().copied().collect();
+    let mut coord_nodes: HashMap<(i32, i32), Vec<String>> = HashMap::new();
+
+    for id in insertion_order {
+        if let Some(pos) = spatial_map.get(id) {
+            coord_nodes.entry(*pos).or_default().push(id.clone());
+        }
+    }
+
+    for (pos, nodes) in coord_nodes {
+        if nodes.len() < 2 {
+            continue;
+        }
+
+        let Some((keep, relocate)) = nodes.split_last() else {
+            continue;
+        };
+        let _ = keep;
+
+        for node_id in relocate {
+            let pair = placement_pairs.get(node_id);
+            let new_pos = resolve_collision(&occupied, pos, pair);
+            if let Some(entry) = spatial_map.get_mut(node_id) {
+                *entry = new_pos;
+            }
+            occupied.insert(new_pos);
+        }
+    }
+}
+
+fn resolve_collision(
+    occupied: &HashSet<(i32, i32)>,
+    start: (i32, i32),
+    pair: Option<&ArchitectureDirectionPair>,
+) -> (i32, i32) {
+    let primary = pair
+        .map(|p| opposite_dir(p.source))
+        .unwrap_or(ArchitectureDirection::Left);
+    let (primary_dx, primary_dy) = primary_axis_step(primary);
+
+    for step in 1..=MAX_COLLISION_RADIUS {
+        let candidate = (start.0 + primary_dx * step, start.1 + primary_dy * step);
+        if !occupied.contains(&candidate) {
+            return candidate;
+        }
+    }
+
+    let dirs = preferred_search_dirs(primary);
+
+    let mut queue: VecDeque<((i32, i32), i32)> = VecDeque::new();
+    let mut seen: HashSet<(i32, i32)> = HashSet::new();
+
+    queue.push_back((start, 0));
+    seen.insert(start);
+
+    while let Some(((x, y), dist)) = queue.pop_front() {
+        if dist >= MAX_COLLISION_RADIUS {
+            continue;
+        }
+
+        for (dx, dy) in dirs {
+            let next = (x + dx, y + dy);
+            if !seen.insert(next) {
+                continue;
+            }
+            if !occupied.contains(&next) {
+                return next;
+            }
+            queue.push_back((next, dist + 1));
+        }
+    }
+
+    start
+}
+
+fn opposite_dir(dir: ArchitectureDirection) -> ArchitectureDirection {
+    match dir {
+        ArchitectureDirection::Left => ArchitectureDirection::Right,
+        ArchitectureDirection::Right => ArchitectureDirection::Left,
+        ArchitectureDirection::Top => ArchitectureDirection::Bottom,
+        ArchitectureDirection::Bottom => ArchitectureDirection::Top,
+    }
+}
+
+fn preferred_search_dirs(dir: ArchitectureDirection) -> [(i32, i32); 4] {
+    match dir {
+        ArchitectureDirection::Left => [(-1, 0), (0, -1), (0, 1), (1, 0)],
+        ArchitectureDirection::Right => [(1, 0), (0, -1), (0, 1), (-1, 0)],
+        ArchitectureDirection::Top => [(0, 1), (-1, 0), (1, 0), (0, -1)],
+        ArchitectureDirection::Bottom => [(0, -1), (-1, 0), (1, 0), (0, 1)],
+    }
+}
+
+fn primary_axis_step(dir: ArchitectureDirection) -> (i32, i32) {
+    match dir {
+        ArchitectureDirection::Left => (-1, 0),
+        ArchitectureDirection::Right => (1, 0),
+        ArchitectureDirection::Top => (0, 1),
+        ArchitectureDirection::Bottom => (0, -1),
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
