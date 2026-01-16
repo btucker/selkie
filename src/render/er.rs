@@ -647,6 +647,8 @@ fn render_relationship(
 }
 
 /// Calculate connection points on entity box edges
+/// Uses a heuristic to prefer side attachment when there's significant horizontal offset,
+/// which better matches mermaid.js behavior for diagonal relationships.
 #[allow(clippy::too_many_arguments)]
 fn calculate_connection_points(
     x1: f64,
@@ -666,28 +668,39 @@ fn calculate_connection_points(
     let dx = center2_x - center1_x;
     let dy = center2_y - center1_y;
 
-    // Determine which edges to connect based on relative positions
-    let (start_x, start_y) = if dx.abs() > dy.abs() {
+    // Threshold for considering positions "significantly offset" horizontally
+    // If the x offset is more than 30% of the larger entity width, prefer side attachment
+    let x_threshold = w1.max(w2) * 0.3;
+
+    // Determine attachment for entity 1 (source)
+    let (start_x, start_y) = if dx.abs() > dy.abs() || dx.abs() > x_threshold {
+        // Horizontal offset is dominant or significant - use sides
         if dx > 0.0 {
             (x1 + w1, center1_y)
         } else {
             (x1, center1_y)
         }
     } else if dy > 0.0 {
+        // Vertical relationship going down - use bottom
         (center1_x, y1 + h1)
     } else {
+        // Vertical relationship going up - use top
         (center1_x, y1)
     };
 
-    let (end_x, end_y) = if dx.abs() > dy.abs() {
+    // Determine attachment for entity 2 (target)
+    let (end_x, end_y) = if dx.abs() > dy.abs() || dx.abs() > x_threshold {
+        // Horizontal offset is dominant or significant - use sides
         if dx > 0.0 {
             (x2, center2_y)
         } else {
             (x2 + w2, center2_y)
         }
     } else if dy > 0.0 {
+        // Vertical relationship - use top of target
         (center2_x, y2)
     } else {
+        // Vertical relationship going up - use bottom
         (center2_x, y2 + h2)
     };
 
