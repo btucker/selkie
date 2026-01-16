@@ -146,6 +146,9 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let sequence_step: i32 = autonumber_config.map_or(1, |c| c.step);
     let autonumber_enabled = autonumber_config.is_some();
 
+    // Collect activations to add after lifelines (for correct z-order)
+    let mut pending_activations: Vec<SvgElement> = Vec::new();
+
     for (_, event) in events {
         match event {
             TimelineEvent::Message(message) => match message.message_type {
@@ -164,10 +167,9 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             if let Some(start_y) = stack.pop() {
                                 if let Some(&actor_x) = actor_positions.get(actor) {
                                     let end_y = last_message_y.unwrap_or(current_y);
-                                    // Render activation in clusters layer (back) so message lines
-                                    // and autonumber circles render on top
+                                    // Collect activation to add after lifelines
                                     let activation = render_activation(actor_x, start_y, end_y);
-                                    doc.add_cluster(activation);
+                                    pending_activations.push(activation);
                                 }
                             }
                         }
@@ -393,6 +395,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
             actor_box_padding,
         );
         doc.add_element(bottom_actor);
+    }
+
+    // Add activations after lifelines (so activations render on top of lifelines)
+    for activation in pending_activations {
+        doc.add_cluster(activation);
     }
 
     // Set final SVG dimensions
@@ -699,21 +706,19 @@ fn render_message(
         attrs: line_attrs,
     });
 
-    // Sequence number circle and text
+    // Sequence number circle and text - always at the sender's position (from_x)
     if let Some(num) = sequence_num {
-        let seq_x = if from_x < to_x { from_x } else { to_x };
-
         // Circle background (shape - rendered first)
         shapes.push(SvgElement::Circle {
-            cx: seq_x,
+            cx: from_x,
             cy: y,
-            r: 8.0,
+            r: 11.0, // Slightly larger for better visibility
             attrs: Attrs::new().with_class("sequenceNumber-circle"),
         });
 
         // Number text (label - rendered after shapes in edge_labels)
         labels.push(SvgElement::Text {
-            x: seq_x,
+            x: from_x,
             y: y + 4.0,
             content: num.to_string(),
             attrs: Attrs::new()
@@ -970,13 +975,13 @@ fn render_self_message(
         attrs: path_attrs,
     });
 
-    // Sequence number circle and text
+    // Sequence number circle and text - at the actor's position
     if let Some(num) = sequence_num {
         // Circle background (shape - rendered first)
         shapes.push(SvgElement::Circle {
             cx: x,
             cy: y,
-            r: 8.0,
+            r: 11.0, // Match regular message size
             attrs: Attrs::new().with_class("sequenceNumber-circle"),
         });
 
@@ -1143,8 +1148,8 @@ fn create_arrow_marker(id: &str, filled: bool) -> SvgElement {
         view_box: "0 0 10 10".to_string(),
         ref_x: 10.0,
         ref_y: 5.0,
-        marker_width: 6.0,
-        marker_height: 6.0,
+        marker_width: 12.0,
+        marker_height: 12.0,
         orient: "auto".to_string(),
         marker_units: None,
         children: vec![SvgElement::Path {
@@ -1161,8 +1166,8 @@ fn create_cross_marker() -> SvgElement {
         view_box: "0 0 10 10".to_string(),
         ref_x: 5.0,
         ref_y: 5.0,
-        marker_width: 6.0,
-        marker_height: 6.0,
+        marker_width: 12.0,
+        marker_height: 12.0,
         orient: "auto".to_string(),
         marker_units: None,
         children: vec![
