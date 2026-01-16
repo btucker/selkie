@@ -34,6 +34,9 @@ jobs:
           wasm-pack build --target web --features wasm
           mv pkg playground/pkg
 
+      - name: Copy assets
+        run: cp docs/images/selkie-logo.png playground/logo.png
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
