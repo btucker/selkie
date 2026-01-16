@@ -188,12 +188,14 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
     apply_overlap_jitter(&mut positions);
 
     let half_icon = ARCH_ICON_SIZE / 2.0;
-    for (id, (cx, cy)) in positions {
-        if let Some(node) = graph.get_node_mut(&id) {
-            node.x = Some(cx - half_icon);
-            node.y = Some(cy - half_icon);
+    for (id, (cx, cy)) in positions.iter() {
+        if let Some(node) = graph.get_node_mut(id) {
+            node.x = Some(*cx - half_icon);
+            node.y = Some(*cy - half_icon);
         }
     }
+
+    separate_group_overlaps(db, graph, &mut positions);
 
     let group_bounds = compute_group_bounds(db, graph);
     for (group_id, bounds) in group_bounds {
@@ -224,6 +226,258 @@ fn apply_overlap_jitter(positions: &mut HashMap<String, (f64, f64)>) {
             *count += 1;
         }
     }
+}
+
+fn separate_group_overlaps(
+    db: &ArchitectureDb,
+    graph: &mut LayoutGraph,
+    positions: &mut HashMap<String, (f64, f64)>,
+) {
+    let mut group_children: HashMap<String, Vec<String>> = HashMap::new();
+    for group in db.get_groups() {
+        if let Some(parent) = group.parent.as_deref() {
+            group_children
+                .entry(parent.to_string())
+                .or_default()
+                .push(group.id.clone());
+        }
+    }
+
+    let mut direct_nodes: HashMap<String, Vec<String>> = HashMap::new();
+    for service in db.get_services() {
+        if let Some(parent) = service.parent.as_deref() {
+            direct_nodes
+                .entry(parent.to_string())
+                .or_default()
+                .push(service.id.clone());
+        }
+    }
+    for junction in db.get_junctions() {
+        if let Some(parent) = junction.parent.as_deref() {
+            direct_nodes
+                .entry(parent.to_string())
+                .or_default()
+                .push(junction.id.clone());
+        }
+    }
+
+    let mut group_nodes: HashMap<String, Vec<String>> = HashMap::new();
+    for group in db.get_groups() {
+        group_nodes.insert(
+            group.id.clone(),
+            collect_group_nodes(&group.id, &group_children, &direct_nodes),
+        );
+    }
+
+    let mut parent_map: HashMap<String, Option<String>> = HashMap::new();
+    for group in db.get_groups() {
+        parent_map.insert(group.id.clone(), group.parent.clone());
+    }
+
+    let group_preferences = build_group_preferences(db);
+
+    let mut group_ids: Vec<String> = db
+        .get_groups()
+        .iter()
+        .filter(|g| g.parent.is_none())
+        .map(|g| g.id.clone())
+        .collect();
+    group_ids.sort();
+    if group_ids.len() < 2 {
+        return;
+    }
+
+    let max_iterations = 6;
+    for _ in 0..max_iterations {
+        let group_bounds = compute_group_bounds(db, graph);
+        let mut shifted = false;
+
+        for i in 0..group_ids.len() {
+            for j in (i + 1)..group_ids.len() {
+                let gid_a = &group_ids[i];
+                let gid_b = &group_ids[j];
+                if groups_related(gid_a, gid_b, &parent_map) {
+                    continue;
+                }
+                let (Some(a), Some(b)) = (group_bounds.get(gid_a), group_bounds.get(gid_b)) else {
+                    continue;
+                };
+
+                let overlap_x = (a.x + a.width).min(b.x + b.width) - a.x.max(b.x);
+                let overlap_y = (a.y + a.height).min(b.y + b.height) - a.y.max(b.y);
+                if overlap_x <= 0.0 || overlap_y <= 0.0 {
+                    continue;
+                }
+
+                let center_ax = a.x + a.width / 2.0;
+                let center_ay = a.y + a.height / 2.0;
+                let center_bx = b.x + b.width / 2.0;
+                let center_by = b.y + b.height / 2.0;
+                let dx = center_bx - center_ax;
+                let dy = center_by - center_ay;
+
+                let (shift_x, shift_y, shift_group) = if let Some(pref) = group_preferences
+                    .get(&(gid_a.clone(), gid_b.clone()))
+                    .map(|pref| (gid_a.as_str(), gid_b.as_str(), *pref))
+                    .or_else(|| {
+                        group_preferences
+                            .get(&(gid_b.clone(), gid_a.clone()))
+                            .map(|pref| (gid_b.as_str(), gid_a.as_str(), *pref))
+                    }) {
+                    let (_lhs, rhs, pref) = pref;
+                    let (shift_x, shift_y) = match pref.axis {
+                        GroupAxis::Horizontal => {
+                            let delta = overlap_x + ARCH_GROUP_PADDING;
+                            (if pref.dir > 0 { delta } else { -delta }, 0.0)
+                        }
+                        GroupAxis::Vertical => {
+                            let delta = overlap_y + ARCH_GROUP_PADDING;
+                            (0.0, if pref.dir > 0 { delta } else { -delta })
+                        }
+                    };
+                    (shift_x, shift_y, rhs)
+                } else if dx.abs() >= dy.abs() {
+                    let delta = overlap_x + ARCH_GROUP_PADDING;
+                    if center_ax <= center_bx {
+                        (delta, 0.0, gid_b.as_str())
+                    } else {
+                        (-delta, 0.0, gid_a.as_str())
+                    }
+                } else {
+                    let delta = overlap_y + ARCH_GROUP_PADDING;
+                    if center_ay <= center_by {
+                        (0.0, delta, gid_b.as_str())
+                    } else {
+                        (0.0, -delta, gid_a.as_str())
+                    }
+                };
+
+                if shift_x != 0.0 || shift_y != 0.0 {
+                    shift_group_nodes(
+                        shift_group,
+                        shift_x,
+                        shift_y,
+                        positions,
+                        graph,
+                        &group_nodes,
+                    );
+                    shifted = true;
+                }
+            }
+        }
+
+        if !shifted {
+            break;
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+enum GroupAxis {
+    Horizontal,
+    Vertical,
+}
+
+#[derive(Clone, Copy)]
+struct GroupPreference {
+    axis: GroupAxis,
+    dir: i32,
+}
+
+fn build_group_preferences(db: &ArchitectureDb) -> HashMap<(String, String), GroupPreference> {
+    let node_groups = build_node_group_map(db);
+    let mut prefs: HashMap<(String, String), GroupPreference> = HashMap::new();
+
+    for edge in db.get_edges() {
+        let lhs_group = node_groups.get(&edge.lhs_id).and_then(|g| g.as_deref());
+        let rhs_group = node_groups.get(&edge.rhs_id).and_then(|g| g.as_deref());
+        let (Some(lhs_group), Some(rhs_group)) = (lhs_group, rhs_group) else {
+            continue;
+        };
+        if lhs_group == rhs_group {
+            continue;
+        }
+
+        let alignment = architecture_alignment(edge);
+        let (axis, dir) = match alignment {
+            ArchitectureAlignment::Horizontal => {
+                let dir = if edge.lhs_dir == ArchitectureDirection::Right {
+                    1
+                } else {
+                    -1
+                };
+                (GroupAxis::Horizontal, dir)
+            }
+            ArchitectureAlignment::Vertical => {
+                let dir = if edge.lhs_dir == ArchitectureDirection::Bottom {
+                    1
+                } else {
+                    -1
+                };
+                (GroupAxis::Vertical, dir)
+            }
+            ArchitectureAlignment::Bend => continue,
+        };
+
+        prefs
+            .entry((lhs_group.to_string(), rhs_group.to_string()))
+            .or_insert(GroupPreference { axis, dir });
+    }
+
+    prefs
+}
+
+fn shift_group_nodes(
+    group_id: &str,
+    dx: f64,
+    dy: f64,
+    positions: &mut HashMap<String, (f64, f64)>,
+    graph: &mut LayoutGraph,
+    group_nodes: &HashMap<String, Vec<String>>,
+) {
+    let Some(nodes) = group_nodes.get(group_id) else {
+        return;
+    };
+
+    for node_id in nodes {
+        if let Some((x, y)) = positions.get_mut(node_id) {
+            *x += dx;
+            *y += dy;
+        }
+        if let Some(node) = graph.get_node_mut(node_id) {
+            if let Some(x) = node.x {
+                node.x = Some(x + dx);
+            }
+            if let Some(y) = node.y {
+                node.y = Some(y + dy);
+            }
+        }
+    }
+}
+
+fn groups_related(
+    group_a: &str,
+    group_b: &str,
+    parent_map: &HashMap<String, Option<String>>,
+) -> bool {
+    if group_a == group_b {
+        return true;
+    }
+    let mut curr = Some(group_a.to_string());
+    while let Some(c) = curr {
+        if c == group_b {
+            return true;
+        }
+        curr = parent_map.get(&c).and_then(|p| p.clone());
+    }
+    let mut curr = Some(group_b.to_string());
+    while let Some(c) = curr {
+        if c == group_a {
+            return true;
+        }
+        curr = parent_map.get(&c).and_then(|p| p.clone());
+    }
+    false
 }
 
 // --- Simulation Logic ---
@@ -662,25 +916,50 @@ fn compute_group_bounds(db: &ArchitectureDb, graph: &LayoutGraph) -> HashMap<Str
 
     let mut bounds_map = HashMap::new();
     for group in db.get_groups() {
-        let nodes = collect_group_nodes(&group.id, &group_children, &direct_nodes);
-        if nodes.is_empty() {
+        if bounds_map.contains_key(&group.id) {
             continue;
         }
 
-        let mut min_x = f64::MAX;
-        let mut min_y = f64::MAX;
-        let mut max_x = f64::MIN;
-        let mut max_y = f64::MIN;
+        compute_group_bounds_for(
+            &group.id,
+            graph,
+            &group_children,
+            &direct_nodes,
+            &label_heights,
+            &mut bounds_map,
+        );
+    }
 
+    bounds_map
+}
+
+fn compute_group_bounds_for(
+    group_id: &str,
+    graph: &LayoutGraph,
+    group_children: &HashMap<String, Vec<String>>,
+    direct_nodes: &HashMap<String, Vec<String>>,
+    label_heights: &HashMap<String, f64>,
+    bounds_map: &mut HashMap<String, GroupBounds>,
+) -> Option<GroupBounds> {
+    if let Some(bounds) = bounds_map.get(group_id) {
+        return Some(*bounds);
+    }
+
+    let mut min_x = f64::MAX;
+    let mut min_y = f64::MAX;
+    let mut max_x = f64::MIN;
+    let mut max_y = f64::MIN;
+
+    if let Some(nodes) = direct_nodes.get(group_id) {
         for node_id in nodes {
-            let Some(node) = graph.get_node(&node_id) else {
+            let Some(node) = graph.get_node(node_id) else {
                 continue;
             };
             let (Some(x), Some(y)) = (node.x, node.y) else {
                 continue;
             };
             let mut height = node.height;
-            if let Some(label_height) = label_heights.get(&node_id) {
+            if let Some(label_height) = label_heights.get(node_id) {
                 height += label_height;
             }
             min_x = min_x.min(x);
@@ -688,28 +967,43 @@ fn compute_group_bounds(db: &ArchitectureDb, graph: &LayoutGraph) -> HashMap<Str
             max_x = max_x.max(x + node.width);
             max_y = max_y.max(y + height);
         }
-
-        if min_x == f64::MAX {
-            continue;
-        }
-
-        let rect_x = min_x - ARCH_GROUP_PADDING;
-        let rect_y = min_y - ARCH_GROUP_PADDING;
-        let rect_w = (max_x - min_x) + ARCH_GROUP_PADDING * 2.0;
-        let rect_h = (max_y - min_y) + ARCH_GROUP_PADDING * 2.0;
-
-        bounds_map.insert(
-            group.id.clone(),
-            GroupBounds {
-                x: rect_x,
-                y: rect_y,
-                width: rect_w,
-                height: rect_h,
-            },
-        );
     }
 
-    bounds_map
+    if let Some(children) = group_children.get(group_id) {
+        for child_id in children {
+            if let Some(child_bounds) = compute_group_bounds_for(
+                child_id,
+                graph,
+                group_children,
+                direct_nodes,
+                label_heights,
+                bounds_map,
+            ) {
+                min_x = min_x.min(child_bounds.x);
+                min_y = min_y.min(child_bounds.y);
+                max_x = max_x.max(child_bounds.x + child_bounds.width);
+                max_y = max_y.max(child_bounds.y + child_bounds.height);
+            }
+        }
+    }
+
+    if min_x == f64::MAX {
+        return None;
+    }
+
+    let rect_x = min_x - ARCH_GROUP_PADDING;
+    let rect_y = min_y - ARCH_GROUP_PADDING;
+    let rect_w = (max_x - min_x) + ARCH_GROUP_PADDING * 2.0;
+    let rect_h = (max_y - min_y) + ARCH_GROUP_PADDING * 2.0;
+
+    let bounds = GroupBounds {
+        x: rect_x,
+        y: rect_y,
+        width: rect_w,
+        height: rect_h,
+    };
+    bounds_map.insert(group_id.to_string(), bounds);
+    Some(bounds)
 }
 
 fn collect_group_nodes(
