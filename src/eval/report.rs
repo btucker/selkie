@@ -72,7 +72,7 @@ pub fn text_summary(result: &EvalResult, output_dir: Option<&Path>) -> String {
                     .filter(|d| &d.diagram_type == dtype)
                     .map(|d| {
                         let safe_name = d.name.replace(['/', ' '], "_");
-                        format!("{}.png", safe_name)
+                        format!("{}_comparison.png", safe_name)
                     })
                     .filter(|name| type_dir.join(name).exists())
                     .collect();
@@ -167,7 +167,7 @@ pub fn text_detailed(result: &EvalResult, output_dir: Option<&Path>) -> String {
                     ));
                 }
 
-                let png_path = type_dir.join(format!("{}.png", safe_name));
+                let png_path = type_dir.join(format!("{}_comparison.png", safe_name));
                 if png_path.exists() {
                     output.push_str(&format!("  PNG: {}\n", png_path.display()));
                 }
@@ -511,7 +511,9 @@ fn format_diagram_for_agent(
         output.push_str("**Files:**\n");
         output.push_str(&format!(
             "- Full details: {}\n",
-            type_dir.join(format!("{}.json", safe_name)).display()
+            type_dir
+                .join(format!("{}_comparison.json", safe_name))
+                .display()
         ));
         if diagram.selkie_svg.is_some() {
             output.push_str(&format!(
@@ -527,7 +529,7 @@ fn format_diagram_for_agent(
                     .display()
             ));
         }
-        let png_path = type_dir.join(format!("{}.png", safe_name));
+        let png_path = type_dir.join(format!("{}_comparison.png", safe_name));
         if png_path.exists() {
             output.push_str(&format!("- Comparison PNG: {}\n", png_path.display()));
         }
@@ -641,7 +643,7 @@ pub fn write_json_by_type(result: &EvalResult, output_dir: &Path) -> std::io::Re
         fs::create_dir_all(&type_dir)?;
 
         let safe_name = diagram.name.replace(['/', ' '], "_");
-        let filename = format!("{}.json", safe_name);
+        let filename = format!("{}_comparison.json", safe_name);
         let path = type_dir.join(&filename);
 
         // Count issues for index

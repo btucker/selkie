@@ -83,7 +83,8 @@ The default output is designed for AI agents working on the codebase. It include
 Every eval run outputs:
 - `report.json` - Summary with index of all diagram files
 - `index.html` - Visual comparison report
-- `{type}/{name}.json` - Full details for each diagram (small, focused files)
+- `{type}/{name}_comparison.json` - Full comparison details for each diagram
+- `{type}/{name}_comparison.png` - Side-by-side visual comparison
 - `{type}/{name}_selkie.svg` - Selkie-rendered SVGs
 - `{type}/{name}_reference.svg` - Reference SVGs from mermaid.js
 
@@ -230,12 +231,12 @@ JSON output is split into small, focused files for easy AI agent consumption:
   "parity_percent": 85.0,
   "by_type": { "flowchart": { "total": 5, "matching": 4 } },
   "diagrams": [
-    { "name": "basic", "diagram_type": "flowchart", "status": "Match", "json_file": "flowchart/basic.json" }
+    { "name": "basic", "diagram_type": "flowchart", "status": "Match", "json_file": "flowchart/basic_comparison.json" }
   ]
 }
 ```
 
-**Per-diagram (`{type}/{name}.json`)** - Full details for one diagram:
+**Per-diagram (`{type}/{name}_comparison.json`)** - Full details for one diagram:
 ```json
 {
   "name": "basic",
@@ -273,19 +274,19 @@ selkie-eval-a1b2c3d4/
 ├── index.html                      # Main HTML report (visual comparison)
 ├── report.json                     # Summary with index of all diagrams
 ├── flowchart/
-│   ├── basic.json                  # Full details for this diagram
+│   ├── basic_comparison.json       # Full comparison details for this diagram
+│   ├── basic_comparison.png        # Side-by-side visual comparison
 │   ├── basic_selkie.svg            # Selkie-rendered SVG
 │   ├── basic_reference.svg         # Mermaid.js reference SVG
-│   ├── basic.png                   # Side-by-side comparison (if png feature)
-│   ├── styled.json
+│   ├── styled_comparison.json
+│   ├── styled_comparison.png
 │   ├── styled_selkie.svg
-│   ├── styled_reference.svg
-│   └── styled.png
+│   └── styled_reference.svg
 ├── sequence/
-│   ├── simple.json
+│   ├── simple_comparison.json
+│   ├── simple_comparison.png
 │   ├── simple_selkie.svg
-│   ├── simple_reference.svg
-│   └── simple.png
+│   └── simple_reference.svg
 └── ...
 ```
 

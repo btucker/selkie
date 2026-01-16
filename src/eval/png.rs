@@ -727,7 +727,7 @@ pub fn write_comparison_pngs(
 
         // Write PNG file to type subdirectory
         let safe_name = name.replace(['/', ' '], "_");
-        let png_filename = format!("{}.png", safe_name);
+        let png_filename = format!("{}_comparison.png", safe_name);
         let png_path = type_dir.join(&png_filename);
         fs::write(&png_path, &png_data)
             .map_err(|e| format!("Failed to write PNG {}: {}", png_path.display(), e))?;
