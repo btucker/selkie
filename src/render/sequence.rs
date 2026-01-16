@@ -696,19 +696,16 @@ fn render_message(
         attrs: line_attrs,
     });
 
-    // Sequence number marker (shape - invisible line with marker-start)
+    // Sequence number circle and text
     if let Some(num) = sequence_num {
         let seq_x = if from_x < to_x { from_x } else { to_x };
 
-        // Zero-length invisible line with marker-start for the circle
-        shapes.push(SvgElement::Line {
-            x1: seq_x,
-            y1: y,
-            x2: seq_x,
-            y2: y,
-            attrs: Attrs::new()
-                .with_stroke_width(0.0)
-                .with_attr("marker-start", "url(#sequencenumber)"),
+        // Circle background (shape - rendered first)
+        shapes.push(SvgElement::Circle {
+            cx: seq_x,
+            cy: y,
+            r: 8.0,
+            attrs: Attrs::new().with_class("sequenceNumber-circle"),
         });
 
         // Number text (label - rendered after shapes in edge_labels)
@@ -970,16 +967,14 @@ fn render_self_message(
         attrs: path_attrs,
     });
 
-    // Sequence number marker (shape - invisible line with marker-start)
+    // Sequence number circle and text
     if let Some(num) = sequence_num {
-        shapes.push(SvgElement::Line {
-            x1: x,
-            y1: y,
-            x2: x,
-            y2: y,
-            attrs: Attrs::new()
-                .with_stroke_width(0.0)
-                .with_attr("marker-start", "url(#sequencenumber)"),
+        // Circle background (shape - rendered first)
+        shapes.push(SvgElement::Circle {
+            cx: x,
+            cy: y,
+            r: 8.0,
+            attrs: Attrs::new().with_class("sequenceNumber-circle"),
         });
 
         // Number text (label - rendered after shapes in edge_labels)
@@ -1193,9 +1188,10 @@ fn create_cross_marker() -> SvgElement {
 /// Create a sequence number marker (circle background for message numbering)
 /// Matches mermaid.js marker: <marker id="sequencenumber">
 fn create_sequence_number_marker() -> SvgElement {
+    // Matching mermaid.js marker definition (no viewBox)
     SvgElement::Marker {
         id: "sequencenumber".to_string(),
-        view_box: "0 0 30 30".to_string(),
+        view_box: String::new(), // No viewBox like mermaid.js
         ref_x: 15.0,
         ref_y: 15.0,
         marker_width: 60.0,
@@ -1320,13 +1316,12 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
 }}
 
 .sequenceNumber-circle {{
-  fill: {actor_bkg};
-  stroke: {actor_border};
-  stroke-width: 1.5px;
+  fill: {signal_color};
+  stroke: {signal_color};
 }}
 
 .sequenceNumber {{
-  fill: {actor_text_color};
+  fill: white;
 }}
 "#,
         signal_text_color = theme.signal_text_color,

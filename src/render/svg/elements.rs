@@ -593,9 +593,14 @@ impl SvgElement {
                     .as_ref()
                     .map(|u| format!(" markerUnits=\"{}\"", u))
                     .unwrap_or_default();
+                let view_box_str = if view_box.is_empty() {
+                    String::new()
+                } else {
+                    format!(" viewBox=\"{}\"", view_box)
+                };
                 format!(
-                    "{}<marker id=\"{}\" viewBox=\"{}\" refX=\"{}\" refY=\"{}\" markerWidth=\"{}\" markerHeight=\"{}\" orient=\"{}\"{}>\n{}\n{}</marker>",
-                    indent_str, id, view_box, ref_x, ref_y, marker_width, marker_height, orient, marker_units_str, children_str, indent_str
+                    "{}<marker id=\"{}\"{} refX=\"{}\" refY=\"{}\" markerWidth=\"{}\" markerHeight=\"{}\" orient=\"{}\"{}>\n{}\n{}</marker>",
+                    indent_str, id, view_box_str, ref_x, ref_y, marker_width, marker_height, orient, marker_units_str, children_str, indent_str
                 )
             }
             Self::Style { content } => {
