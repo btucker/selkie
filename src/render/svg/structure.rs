@@ -28,6 +28,10 @@ pub struct SvgStructure {
     pub has_style: bool,
     /// Z-order analysis: tracks element rendering order
     pub z_order: ZOrderAnalysis,
+    /// Stroke width analysis: tracks stroke-width values on key elements
+    pub stroke_analysis: StrokeAnalysis,
+    /// Edge geometry analysis: tracks edge endpoint positions
+    pub edge_geometry: EdgeGeometry,
 }
 
 /// Analysis of SVG element rendering order (z-order)
@@ -54,6 +58,44 @@ pub struct ShapeCounts {
     pub path: usize,
     pub line: usize,
     pub polyline: usize,
+}
+
+/// Analysis of stroke-width values across the SVG
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct StrokeAnalysis {
+    /// Stroke widths found on rect elements (typically entity/node borders)
+    pub rect_stroke_widths: Vec<f64>,
+    /// Stroke widths found on path elements (typically edges/lines)
+    pub path_stroke_widths: Vec<f64>,
+    /// Stroke widths found on line elements
+    pub line_stroke_widths: Vec<f64>,
+    /// Average stroke width on rects (0 if none)
+    pub avg_rect_stroke: f64,
+    /// Average stroke width on paths (0 if none)
+    pub avg_path_stroke: f64,
+}
+
+/// Analysis of edge/path geometry
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct EdgeGeometry {
+    /// Edge endpoints: list of (start_x, start_y, end_x, end_y)
+    pub edge_endpoints: Vec<(f64, f64, f64, f64)>,
+    /// Node bounding boxes: list of (x, y, width, height, id/class)
+    pub node_bounds: Vec<NodeBounds>,
+    /// Edges that attach to top/bottom of nodes (vertical attachment)
+    pub vertical_attachments: usize,
+    /// Edges that attach to left/right of nodes (horizontal attachment)
+    pub horizontal_attachments: usize,
+}
+
+/// Bounding box of a node element
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct NodeBounds {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+    pub id: String,
 }
 
 impl SvgStructure {
@@ -89,6 +131,12 @@ impl SvgStructure {
         // Analyze z-order (element rendering order)
         let z_order = analyze_z_order(&doc);
 
+        // Analyze stroke widths
+        let stroke_analysis = analyze_stroke_widths(&doc);
+
+        // Analyze edge geometry
+        let edge_geometry = analyze_edge_geometry(&doc);
+
         Ok(SvgStructure {
             width,
             height,
@@ -100,6 +148,8 @@ impl SvgStructure {
             has_defs,
             has_style,
             z_order,
+            stroke_analysis,
+            edge_geometry,
         })
     }
 }
@@ -397,6 +447,293 @@ fn analyze_z_order(doc: &roxmltree::Document) -> ZOrderAnalysis {
     analysis.element_order = order;
 
     analysis
+}
+
+/// Analyze stroke-width values across the SVG
+fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
+    let mut analysis = StrokeAnalysis::default();
+
+    for node in doc.descendants() {
+        let tag = node.tag_name().name();
+
+        // Get stroke-width attribute (default is 1.0 if stroke is visible)
+        let stroke_width = node
+            .attribute("stroke-width")
+            .and_then(|s| s.parse::<f64>().ok());
+
+        // Only count if element has a visible stroke
+        let has_stroke = node
+            .attribute("stroke")
+            .map(|s| s != "none")
+            .unwrap_or(false)
+            || stroke_width.is_some();
+
+        if !has_stroke {
+            continue;
+        }
+
+        let width = stroke_width.unwrap_or(1.0);
+
+        match tag {
+            "rect" => analysis.rect_stroke_widths.push(width),
+            "path" => analysis.path_stroke_widths.push(width),
+            "line" => analysis.line_stroke_widths.push(width),
+            _ => {}
+        }
+    }
+
+    // Calculate averages
+    if !analysis.rect_stroke_widths.is_empty() {
+        analysis.avg_rect_stroke = analysis.rect_stroke_widths.iter().sum::<f64>()
+            / analysis.rect_stroke_widths.len() as f64;
+    }
+    if !analysis.path_stroke_widths.is_empty() {
+        analysis.avg_path_stroke = analysis.path_stroke_widths.iter().sum::<f64>()
+            / analysis.path_stroke_widths.len() as f64;
+    }
+
+    analysis
+}
+
+/// Analyze edge geometry - endpoints and attachment points
+fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
+    let mut geometry = EdgeGeometry::default();
+
+    // Collect node bounding boxes from rects with node-related classes
+    for node in doc.descendants() {
+        if node.tag_name().name() == "rect" {
+            let class = node.attribute("class").unwrap_or("");
+            // Look for entity boxes, node boxes, etc.
+            if class.contains("entity-box")
+                || class.contains("node")
+                || class.contains("actor")
+                || class.contains("label-container")
+            {
+                let x = node
+                    .attribute("x")
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(0.0);
+                let y = node
+                    .attribute("y")
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(0.0);
+                let width = node
+                    .attribute("width")
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(0.0);
+                let height = node
+                    .attribute("height")
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(0.0);
+                let id = node.attribute("id").unwrap_or("").to_string();
+
+                if width > 0.0 && height > 0.0 {
+                    geometry.node_bounds.push(NodeBounds {
+                        x,
+                        y,
+                        width,
+                        height,
+                        id,
+                    });
+                }
+            }
+        }
+    }
+
+    // Collect edge endpoints from paths
+    for node in doc.descendants() {
+        if node.tag_name().name() == "path" {
+            let class = node.attribute("class").unwrap_or("");
+            // Look for relationship/edge paths
+            if class.contains("relationship")
+                || class.contains("edge")
+                || class.contains("link")
+                || class.contains("transition")
+            {
+                if let Some(d) = node.attribute("d") {
+                    if let Some((start, end)) = parse_path_endpoints(d) {
+                        geometry
+                            .edge_endpoints
+                            .push((start.0, start.1, end.0, end.1));
+
+                        // Determine attachment type based on node positions
+                        for bounds in &geometry.node_bounds {
+                            let (attach_type_start, _) = classify_attachment(start, bounds);
+                            let (attach_type_end, _) = classify_attachment(end, bounds);
+
+                            if attach_type_start == AttachmentType::Vertical
+                                || attach_type_end == AttachmentType::Vertical
+                            {
+                                geometry.vertical_attachments += 1;
+                            }
+                            if attach_type_start == AttachmentType::Horizontal
+                                || attach_type_end == AttachmentType::Horizontal
+                            {
+                                geometry.horizontal_attachments += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    geometry
+}
+
+#[derive(Debug, PartialEq)]
+enum AttachmentType {
+    Vertical,   // top or bottom
+    Horizontal, // left or right
+    None,
+}
+
+/// Classify how a point attaches to a node bounds
+fn classify_attachment(point: (f64, f64), bounds: &NodeBounds) -> (AttachmentType, f64) {
+    let (px, py) = point;
+    let tolerance = 5.0; // pixels
+
+    let left = bounds.x;
+    let right = bounds.x + bounds.width;
+    let top = bounds.y;
+    let bottom = bounds.y + bounds.height;
+
+    // Check if point is near the node
+    let near_left = (px - left).abs() < tolerance;
+    let near_right = (px - right).abs() < tolerance;
+    let near_top = (py - top).abs() < tolerance;
+    let near_bottom = (py - bottom).abs() < tolerance;
+
+    let within_x = px >= left - tolerance && px <= right + tolerance;
+    let within_y = py >= top - tolerance && py <= bottom + tolerance;
+
+    // Vertical attachment (top or bottom edge)
+    if (near_top || near_bottom) && within_x {
+        let dist = if near_top {
+            (py - top).abs()
+        } else {
+            (py - bottom).abs()
+        };
+        return (AttachmentType::Vertical, dist);
+    }
+
+    // Horizontal attachment (left or right edge)
+    if (near_left || near_right) && within_y {
+        let dist = if near_left {
+            (px - left).abs()
+        } else {
+            (px - right).abs()
+        };
+        return (AttachmentType::Horizontal, dist);
+    }
+
+    (AttachmentType::None, f64::MAX)
+}
+
+/// Parse start and end points from an SVG path d attribute
+fn parse_path_endpoints(d: &str) -> Option<((f64, f64), (f64, f64))> {
+    let parts: Vec<&str> = d.split_whitespace().collect();
+    if parts.is_empty() {
+        return None;
+    }
+
+    let mut start: Option<(f64, f64)> = None;
+    let mut end: Option<(f64, f64)> = None;
+    let mut i = 0;
+
+    while i < parts.len() {
+        let part = parts[i];
+
+        // Handle M (moveto) command - sets start point
+        if part == "M" || part.starts_with('M') {
+            let (x, y) = if part == "M" {
+                i += 1;
+                parse_coord_pair(&parts, &mut i)?
+            } else {
+                // M followed directly by coords like "M10,20"
+                parse_inline_coords(&part[1..])?
+            };
+            if start.is_none() {
+                start = Some((x, y));
+            }
+            end = Some((x, y));
+        }
+        // Handle L (lineto) command
+        else if part == "L" || part.starts_with('L') {
+            let (x, y) = if part == "L" {
+                i += 1;
+                parse_coord_pair(&parts, &mut i)?
+            } else {
+                parse_inline_coords(&part[1..])?
+            };
+            end = Some((x, y));
+        }
+        // Handle C (curveto) command - takes 3 coordinate pairs
+        else if part == "C" || part.starts_with('C') {
+            if part == "C" {
+                i += 1;
+                // Skip first two control points
+                parse_coord_pair(&parts, &mut i)?;
+                parse_coord_pair(&parts, &mut i)?;
+                // Third point is the endpoint
+                let (x, y) = parse_coord_pair(&parts, &mut i)?;
+                end = Some((x, y));
+            } else {
+                // Inline coords after C
+                let coords_str = &part[1..];
+                let coords: Vec<f64> = coords_str
+                    .split([',', ' '])
+                    .filter_map(|s| s.parse().ok())
+                    .collect();
+                if coords.len() >= 6 {
+                    end = Some((coords[4], coords[5]));
+                }
+            }
+        }
+        // Handle numbers that might be continuation of previous command
+        else if let Some((x, y)) = parse_inline_coords(part) {
+            end = Some((x, y));
+        }
+
+        i += 1;
+    }
+
+    match (start, end) {
+        (Some(s), Some(e)) => Some((s, e)),
+        _ => None,
+    }
+}
+
+fn parse_coord_pair(parts: &[&str], i: &mut usize) -> Option<(f64, f64)> {
+    if *i >= parts.len() {
+        return None;
+    }
+
+    let part = parts[*i];
+
+    // Try to parse as "x,y" or "x y"
+    if let Some((x, y)) = parse_inline_coords(part) {
+        return Some((x, y));
+    }
+
+    // Try separate x and y values
+    let x: f64 = part.parse().ok()?;
+    *i += 1;
+    if *i >= parts.len() {
+        return None;
+    }
+    let y: f64 = parts[*i].trim_start_matches(',').parse().ok()?;
+    Some((x, y))
+}
+
+fn parse_inline_coords(s: &str) -> Option<(f64, f64)> {
+    let parts: Vec<&str> = s.split(',').collect();
+    if parts.len() == 2 {
+        let x: f64 = parts[0].parse().ok()?;
+        let y: f64 = parts[1].parse().ok()?;
+        return Some((x, y));
+    }
+    None
 }
 
 #[cfg(test)]

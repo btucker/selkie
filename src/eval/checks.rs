@@ -44,6 +44,8 @@ pub fn check_structure(
     check_dimensions(selkie, reference, config, &mut issues);
     check_shape_counts(selkie, reference, &mut issues);
     check_z_order(selkie, reference, &mut issues);
+    check_stroke_widths(selkie, reference, &mut issues);
+    check_edge_attachments(selkie, reference, &mut issues);
 
     // INFO checks - acceptable variations
     check_extra_labels(selkie, reference, &mut issues);
@@ -319,6 +321,125 @@ fn check_z_order(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut V
     }
 }
 
+/// Check stroke-width differences - WARNING if significantly different
+fn check_stroke_widths(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
+    let selkie_stroke = &selkie.stroke_analysis;
+    let ref_stroke = &reference.stroke_analysis;
+
+    // Check rect (border) stroke width differences
+    if ref_stroke.avg_rect_stroke > 0.0 && selkie_stroke.avg_rect_stroke > 0.0 {
+        let diff = (selkie_stroke.avg_rect_stroke - ref_stroke.avg_rect_stroke).abs();
+        let pct_diff = diff / ref_stroke.avg_rect_stroke * 100.0;
+
+        // Warn if >30% difference in border stroke width
+        if pct_diff > 30.0 {
+            issues.push(
+                Issue::warning(
+                    "stroke_width",
+                    format!(
+                        "Border stroke-width differs: expected {:.1}, got {:.1} ({:.0}% diff)",
+                        ref_stroke.avg_rect_stroke, selkie_stroke.avg_rect_stroke, pct_diff
+                    ),
+                )
+                .with_values(
+                    format!("{:.1}", ref_stroke.avg_rect_stroke),
+                    format!("{:.1}", selkie_stroke.avg_rect_stroke),
+                ),
+            );
+        }
+    }
+
+    // Check path (edge) stroke width differences
+    if ref_stroke.avg_path_stroke > 0.0 && selkie_stroke.avg_path_stroke > 0.0 {
+        let diff = (selkie_stroke.avg_path_stroke - ref_stroke.avg_path_stroke).abs();
+        let pct_diff = diff / ref_stroke.avg_path_stroke * 100.0;
+
+        // Warn if >30% difference in edge stroke width
+        if pct_diff > 30.0 {
+            issues.push(
+                Issue::warning(
+                    "stroke_width",
+                    format!(
+                        "Edge stroke-width differs: expected {:.1}, got {:.1} ({:.0}% diff)",
+                        ref_stroke.avg_path_stroke, selkie_stroke.avg_path_stroke, pct_diff
+                    ),
+                )
+                .with_values(
+                    format!("{:.1}", ref_stroke.avg_path_stroke),
+                    format!("{:.1}", selkie_stroke.avg_path_stroke),
+                ),
+            );
+        }
+    }
+}
+
+/// Check edge attachment points - WARNING if edges attach differently
+fn check_edge_attachments(
+    selkie: &SvgStructure,
+    reference: &SvgStructure,
+    issues: &mut Vec<Issue>,
+) {
+    let selkie_geo = &selkie.edge_geometry;
+    let ref_geo = &reference.edge_geometry;
+
+    // Only compare if both have edges
+    if selkie_geo.edge_endpoints.is_empty() || ref_geo.edge_endpoints.is_empty() {
+        return;
+    }
+
+    let selkie_total = selkie_geo.vertical_attachments + selkie_geo.horizontal_attachments;
+    let ref_total = ref_geo.vertical_attachments + ref_geo.horizontal_attachments;
+
+    // Check if attachment pattern is significantly different
+    if selkie_total > 0 && ref_total > 0 {
+        let selkie_vert_ratio = selkie_geo.vertical_attachments as f64 / selkie_total as f64;
+        let ref_vert_ratio = ref_geo.vertical_attachments as f64 / ref_total as f64;
+
+        // Warn if the ratio of vertical to horizontal differs significantly
+        // e.g., reference has mostly horizontal (sides) but selkie has mostly vertical (top/bottom)
+        let ratio_diff = (selkie_vert_ratio - ref_vert_ratio).abs();
+
+        if ratio_diff > 0.3 {
+            let selkie_pattern = if selkie_vert_ratio > 0.6 {
+                "mostly top/bottom"
+            } else if selkie_vert_ratio < 0.4 {
+                "mostly sides"
+            } else {
+                "mixed"
+            };
+            let ref_pattern = if ref_vert_ratio > 0.6 {
+                "mostly top/bottom"
+            } else if ref_vert_ratio < 0.4 {
+                "mostly sides"
+            } else {
+                "mixed"
+            };
+
+            if selkie_pattern != ref_pattern {
+                issues.push(
+                    Issue::warning(
+                        "edge_attachment",
+                        format!(
+                            "Edge attachment pattern differs: reference is {}, selkie is {}",
+                            ref_pattern, selkie_pattern
+                        ),
+                    )
+                    .with_values(
+                        format!(
+                            "vertical: {}, horizontal: {}",
+                            ref_geo.vertical_attachments, ref_geo.horizontal_attachments
+                        ),
+                        format!(
+                            "vertical: {}, horizontal: {}",
+                            selkie_geo.vertical_attachments, selkie_geo.horizontal_attachments
+                        ),
+                    ),
+                );
+            }
+        }
+    }
+}
+
 /// Calculate structural similarity score (0-1)
 pub fn calculate_similarity(selkie: &SvgStructure, reference: &SvgStructure) -> f64 {
     let mut score_parts: Vec<f64> = Vec::new();
@@ -372,6 +493,7 @@ mod tests {
     use crate::render::svg::structure::{ShapeCounts, ZOrderAnalysis};
 
     fn make_structure(nodes: usize, edges: usize, labels: Vec<&str>) -> SvgStructure {
+        use crate::render::svg::structure::{EdgeGeometry, StrokeAnalysis};
         SvgStructure {
             width: 400.0,
             height: 300.0,
@@ -383,6 +505,8 @@ mod tests {
             has_defs: true,
             has_style: true,
             z_order: ZOrderAnalysis::default(),
+            stroke_analysis: StrokeAnalysis::default(),
+            edge_geometry: EdgeGeometry::default(),
         }
     }
 
