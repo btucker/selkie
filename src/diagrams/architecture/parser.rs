@@ -431,11 +431,7 @@ fn validate_arch_id(id: &str) -> Result<(), Box<dyn std::error::Error>> {
         return Err("Architecture id cannot be empty".into());
     }
     if id.ends_with('-') {
-        return Err(format!(
-            "Architecture id '{}' cannot end with '-'",
-            id
-        )
-        .into());
+        return Err(format!("Architecture id '{}' cannot end with '-'", id).into());
     }
     Ok(())
 }
