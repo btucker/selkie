@@ -24,13 +24,13 @@ Selkie provides significant performance improvements over mermaid-js in both CLI
 
 Compared to [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) (`mmdc`):
 
-| Diagram | mmdc | Selkie | Speedup |
-|---------|------|--------|---------|
-| Simple flowchart (5 nodes) | 1.53s | 6ms | **246x** |
-| Medium flowchart (15 nodes) | 1.54s | 7ms | **213x** |
-| Sequence diagram (4 actors) | 1.52s | 5ms | **313x** |
-| Class diagram (5 classes) | 1.55s | 5ms | **303x** |
-| Large flowchart (100 nodes) | 1.82s | 27ms | **67x** |
+| Diagram | mmdc | Selkie |
+|---------|------|--------|
+| Simple flowchart (5 nodes) | 1.53s | 6ms |
+| Medium flowchart (15 nodes) | 1.54s | 7ms |
+| Sequence diagram (4 actors) | 1.52s | 5ms |
+| Class diagram (5 classes) | 1.55s | 5ms |
+| Large flowchart (100 nodes) | 1.82s | 27ms |
 
 _CLI-to-CLI comparison. Median of 5 runs after 2 warmup runs._
 
@@ -40,14 +40,14 @@ The dramatic speedup comes from avoiding the browser entirely—mermaid-cli spaw
 
 For client-side rendering, Selkie compiles to WebAssembly. Both run in the same Chromium browser for a fair comparison. [Run it yourself →](https://btucker.github.io/selkie/benchmark.html)
 
-| Diagram | Mermaid.js | Selkie WASM | Speedup |
-|---------|------------|-------------|---------|
-| Simple flowchart (5 nodes) | 10ms | 1ms | 10x |
-| Medium flowchart (15 nodes) | 21ms | 1.6ms | 13x |
-| Sequence diagram (4 actors) | 4.5ms | 0.3ms | 15x |
-| Class diagram (5 classes) | 16ms | 0.5ms | 33x |
-| State diagram (8 states) | 22ms | 0.75ms | 29x |
-| Pie chart (5 slices) | 1.6ms | 0.1ms | 16x |
+| Diagram | Mermaid.js | Selkie WASM |
+|---------|------------|-------------|
+| Simple flowchart (5 nodes) | 10ms | 1ms |
+| Medium flowchart (15 nodes) | 21ms | 1.6ms |
+| Sequence diagram (4 actors) | 4.5ms | 0.3ms |
+| Class diagram (5 classes) | 16ms | 0.5ms |
+| State diagram (8 states) | 22ms | 0.75ms |
+| Pie chart (5 slices) | 1.6ms | 0.1ms |
 
 _Median of 10 runs after 2 warmup runs. Chromium via Playwright._
 
