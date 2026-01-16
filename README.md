@@ -86,6 +86,10 @@ Selkie supports parsing and rendering for all major Mermaid diagram types. These
 ### Pie Chart
 <img src="docs/images/pie.svg" alt="Pie Chart" width="400">
 
+### Architecture Diagram
+<img src="docs/images/architecture.svg" alt="Architecture Diagram" width="800">
+<img src="docs/images/architecture_complex.svg" alt="Architecture Complex Diagram" width="800">
+
 ### Additional Diagram Types (Parser Only)
 
 The following diagram types have parser support and rendering is in progress:

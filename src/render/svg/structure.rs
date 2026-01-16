@@ -187,6 +187,8 @@ fn count_nodes_and_edges(doc: &roxmltree::Document) -> (usize, usize) {
         "class-node",     // class diagram (selkie)
         "state-node",     // state diagram (selkie)
         "entity-node",    // ER diagram (selkie)
+        "architecture-service",
+        "architecture-junction",
     ];
 
     // Edge class patterns used by different diagram types
@@ -212,11 +214,14 @@ fn count_nodes_and_edges(doc: &roxmltree::Document) -> (usize, usize) {
                 node_count += 1;
             }
 
-            // Count edges - only count edge group containers, not child elements
+            // Count edges - handle group containers and architecture edge paths
             // mermaid.js uses "flowchart-link" on <path> elements with data-edge
             // (handled above with data-edge attribute check)
-            if node.tag_name().name() == "g" && classes.iter().any(|c| EDGE_CLASSES.contains(c)) {
-                edge_count += 1;
+            if classes.iter().any(|c| EDGE_CLASSES.contains(c)) {
+                let tag = node.tag_name().name();
+                if tag == "g" || tag == "path" {
+                    edge_count += 1;
+                }
             }
         }
     }
@@ -391,6 +396,23 @@ mod tests {
             "Should count only visible rects, not helper elements. Mermaid has {} rects, clean has {}",
             mermaid_structure.shapes.rect, clean_structure.shapes.rect
         );
+    }
+
+    #[test]
+    fn test_architecture_counts_nodes_and_edges() {
+        let svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <g class="architecture-edges">
+                <g><path class="edge" d="M 0 0 L 10 10"/></g>
+            </g>
+            <g class="architecture-services">
+                <g class="architecture-service"></g>
+                <g class="architecture-junction"></g>
+            </g>
+        </svg>"#;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        assert_eq!(structure.node_count, 2);
+        assert_eq!(structure.edge_count, 1);
     }
 
     #[test]

@@ -11,7 +11,7 @@ use std::fs;
 use std::path::Path;
 
 /// Generate a text summary report
-pub fn text_summary(result: &EvalResult) -> String {
+pub fn text_summary(result: &EvalResult, output_dir: Option<&Path>) -> String {
     let mut output = String::new();
 
     // Header
@@ -60,6 +60,34 @@ pub fn text_summary(result: &EvalResult) -> String {
                 "  {:<12} {} {}\n",
                 dtype, structural_str, visual_str
             ));
+
+            if let Some(base_dir) = output_dir {
+                let type_dir = base_dir.join(dtype);
+                output.push_str(&format!("    SVG Location: {}\n", type_dir.display()));
+
+                // List comparison PNGs for this type
+                let mut pngs: Vec<String> = result
+                    .diagrams
+                    .iter()
+                    .filter(|d| &d.diagram_type == dtype)
+                    .map(|d| {
+                        let safe_name = d.name.replace(['/', ' '], "_");
+                        format!("{}.png", safe_name)
+                    })
+                    .filter(|name| type_dir.join(name).exists())
+                    .collect();
+
+                // Sort for consistent output
+                pngs.sort();
+
+                if !pngs.is_empty() {
+                    output.push_str("    Comparison PNGs:\n");
+                    for png in pngs {
+                        output.push_str(&format!("      {}\n", type_dir.join(png).display()));
+                    }
+                }
+                output.push('\n');
+            }
         }
 
         output.push('\n');
@@ -90,8 +118,8 @@ pub fn text_summary(result: &EvalResult) -> String {
 }
 
 /// Generate a detailed text report with issues
-pub fn text_detailed(result: &EvalResult) -> String {
-    let mut output = text_summary(result);
+pub fn text_detailed(result: &EvalResult, output_dir: Option<&Path>) -> String {
+    let mut output = text_summary(result, output_dir);
 
     // Show diagrams with issues
     let problem_diagrams: Vec<_> = result
@@ -118,6 +146,31 @@ pub fn text_detailed(result: &EvalResult) -> String {
 
             if let Some(ssim) = diagram.visual_similarity {
                 output.push_str(&format!("  SSIM: {:.1}%\n", ssim * 100.0));
+            }
+
+            if let Some(base_dir) = output_dir {
+                let safe_name = diagram.name.replace(['/', ' '], "_");
+                let type_dir = base_dir.join(&diagram.diagram_type);
+
+                if diagram.selkie_svg.is_some() {
+                    output.push_str(&format!(
+                        "  SVG: {}\n",
+                        type_dir.join(format!("{}_selkie.svg", safe_name)).display()
+                    ));
+                }
+                if diagram.reference_svg.is_some() {
+                    output.push_str(&format!(
+                        "  Ref: {}\n",
+                        type_dir
+                            .join(format!("{}_reference.svg", safe_name))
+                            .display()
+                    ));
+                }
+
+                let png_path = type_dir.join(format!("{}.png", safe_name));
+                if png_path.exists() {
+                    output.push_str(&format!("  PNG: {}\n", png_path.display()));
+                }
             }
 
             for issue in &diagram.issues {
@@ -525,7 +578,7 @@ mod tests {
     #[test]
     fn test_text_summary() {
         let result = make_test_result();
-        let summary = text_summary(&result);
+        let summary = text_summary(&result, None);
         assert!(summary.contains("80.0%"));
         assert!(summary.contains("8/10"));
         assert!(summary.contains("flowchart"));
