@@ -196,6 +196,7 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
     }
 
     separate_group_overlaps(db, graph, &mut positions);
+    separate_group_node_overlaps(db, graph, &mut positions);
 
     let group_bounds = compute_group_bounds(db, graph);
     for (group_id, bounds) in group_bounds {
@@ -361,6 +362,99 @@ fn separate_group_overlaps(
                         graph,
                         &group_nodes,
                     );
+                    shifted = true;
+                }
+            }
+        }
+
+        if !shifted {
+            break;
+        }
+    }
+}
+
+fn separate_group_node_overlaps(
+    db: &ArchitectureDb,
+    graph: &mut LayoutGraph,
+    positions: &mut HashMap<String, (f64, f64)>,
+) {
+    let node_groups = build_node_group_map(db);
+    let group_ids: Vec<String> = db.get_groups().iter().map(|g| g.id.clone()).collect();
+    if group_ids.is_empty() {
+        return;
+    }
+
+    let max_iterations = 6;
+    for _ in 0..max_iterations {
+        let group_bounds = compute_group_bounds(db, graph);
+        let mut shifted = false;
+
+        for group_id in &group_ids {
+            let Some(bounds) = group_bounds.get(group_id) else {
+                continue;
+            };
+            let parent = db
+                .get_groups()
+                .iter()
+                .find(|g| &g.id == group_id)
+                .and_then(|g| g.parent.clone());
+
+            for (node_id, node_parent) in &node_groups {
+                if node_parent.as_deref() == Some(group_id.as_str()) {
+                    continue;
+                }
+                if node_parent.as_deref() != parent.as_deref() {
+                    continue;
+                }
+
+                let Some(node) = graph.get_node(node_id) else {
+                    continue;
+                };
+                let (Some(nx), Some(ny)) = (node.x, node.y) else {
+                    continue;
+                };
+
+                let node_min_x = nx;
+                let node_max_x = nx + node.width;
+                let node_min_y = ny;
+                let node_max_y = ny + node.height;
+
+                let overlap_x =
+                    (node_max_x).min(bounds.x + bounds.width) - node_min_x.max(bounds.x);
+                let overlap_y =
+                    (node_max_y).min(bounds.y + bounds.height) - node_min_y.max(bounds.y);
+                if overlap_x <= 0.0 || overlap_y <= 0.0 {
+                    continue;
+                }
+
+                let node_center_x = node_min_x + node.width / 2.0;
+                let node_center_y = node_min_y + node.height / 2.0;
+                let group_center_x = bounds.x + bounds.width / 2.0;
+                let group_center_y = bounds.y + bounds.height / 2.0;
+                let dx = node_center_x - group_center_x;
+                let dy = node_center_y - group_center_y;
+
+                let (shift_x, shift_y) = if dx.abs() >= dy.abs() {
+                    let delta = overlap_x + ARCH_GROUP_PADDING;
+                    (if dx >= 0.0 { delta } else { -delta }, 0.0)
+                } else {
+                    let delta = overlap_y + ARCH_GROUP_PADDING;
+                    (0.0, if dy >= 0.0 { delta } else { -delta })
+                };
+
+                if shift_x != 0.0 || shift_y != 0.0 {
+                    if let Some((x, y)) = positions.get_mut(node_id) {
+                        *x += shift_x;
+                        *y += shift_y;
+                    }
+                    if let Some(node) = graph.get_node_mut(node_id) {
+                        if let Some(x) = node.x {
+                            node.x = Some(x + shift_x);
+                        }
+                        if let Some(y) = node.y {
+                            node.y = Some(y + shift_y);
+                        }
+                    }
                     shifted = true;
                 }
             }
