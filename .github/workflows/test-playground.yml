@@ -70,12 +70,6 @@ jobs:
           cd playground-tests
           npm ci
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('playground-tests/package-lock.json') }}
-
       - name: Install Playwright browsers
         run: |
           cd playground-tests
