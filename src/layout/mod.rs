@@ -14,8 +14,8 @@ pub use adapter::{NodeSizeConfig, SizeEstimator, ToLayoutGraph};
 pub use graph::LayoutGraph;
 pub use size::CharacterSizeEstimator;
 pub use types::{
-    geometric_midpoint, LayoutDirection, LayoutEdge, LayoutNode, LayoutOptions, NodeShape, Padding,
-    Point,
+    geometric_midpoint, LayoutDirection, LayoutEdge, LayoutNode, LayoutOptions, LayoutRanker,
+    NodeShape, Padding, Point,
 };
 
 use crate::error::Result;
@@ -265,6 +265,8 @@ fn add_nodes_recursive(dg: &mut DagreGraph, nodes: &[LayoutNode], parent: Option
 
 /// Convert LayoutOptions to DagreConfig
 fn to_dagre_config(options: &LayoutOptions) -> DagreConfig {
+    use types::LayoutRanker;
+
     DagreConfig {
         rankdir: match options.direction {
             LayoutDirection::TopToBottom => RankDir::TB,
@@ -274,7 +276,10 @@ fn to_dagre_config(options: &LayoutOptions) -> DagreConfig {
         },
         nodesep: options.node_spacing,
         ranksep: options.layer_spacing,
-        ranker: Ranker::NetworkSimplex,
+        ranker: match options.ranker {
+            LayoutRanker::NetworkSimplex => Ranker::NetworkSimplex,
+            LayoutRanker::LongestPath => Ranker::LongestPath,
+        },
         // Use DFS-based cycle detection instead of greedy
         // Greedy can incorrectly reverse forward edges in graphs with back edges
         acyclicer: dagre::Acyclicer::Dfs,

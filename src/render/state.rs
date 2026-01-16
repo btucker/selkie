@@ -7,7 +7,7 @@ use crate::error::Result;
 use crate::layout::Point;
 use crate::layout::{
     layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
-    LayoutOptions, NodeShape, NodeSizeConfig, Padding, SizeEstimator, ToLayoutGraph,
+    LayoutOptions, LayoutRanker, NodeShape, NodeSizeConfig, Padding, SizeEstimator, ToLayoutGraph,
 };
 use crate::render::svg::edges::build_curved_path;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
@@ -100,11 +100,16 @@ impl ToLayoutGraph for StateDb {
         let mut graph = LayoutGraph::new("state");
 
         // Set layout options from diagram direction
+        // Optimized for state diagrams with compound graph support:
+        // - Tighter horizontal spacing to reduce width
+        // - Reasonable vertical spacing for proper height
+        // - LongestPath ranker (mermaid's tight-tree base algorithm)
         graph.options = LayoutOptions {
             direction: self.preferred_direction(),
-            node_spacing: 50.0,
-            layer_spacing: 60.0,
+            node_spacing: 15.0, // Tighter horizontal spacing for narrower diagrams
+            layer_spacing: 50.0, // Maintain vertical spacing for proper height
             padding: Padding::uniform(20.0),
+            ranker: LayoutRanker::LongestPath, // Use longest-path (mermaid's tight-tree base)
         };
 
         // Determine start/end states based on transitions
@@ -236,6 +241,142 @@ impl ToLayoutGraph for StateDb {
     }
 }
 
+/// Center all composite states on a common vertical axis
+///
+/// Mermaid's state diagrams center all composite states at the same X position.
+/// This post-processing step shifts composites and their children to align on
+/// a common vertical centerline, creating a narrower, more balanced diagram.
+fn center_composite_states(
+    db: &StateDb,
+    state_positions: &mut HashMap<String, (f64, f64, f64, f64)>,
+    composite_ids: &std::collections::HashSet<&str>,
+) {
+    if composite_ids.is_empty() {
+        return;
+    }
+
+    let states = db.get_states();
+
+    // Find top-level composites (those not nested inside other composites)
+    let top_level_composites: Vec<&str> = composite_ids
+        .iter()
+        .filter(|id| {
+            // Check if this composite's parent is also a composite
+            states
+                .get(**id)
+                .and_then(|s| s.parent.as_deref())
+                .map(|parent| !composite_ids.contains(parent))
+                .unwrap_or(true)
+        })
+        .copied()
+        .collect();
+
+    if top_level_composites.is_empty() {
+        return;
+    }
+
+    // Calculate the bounds of each composite (including nested children)
+    // and find the diagram's ideal center X
+    let mut composite_bounds: HashMap<&str, (f64, f64)> = HashMap::new(); // (left_x, right_x)
+    let mut diagram_min_x = f64::MAX;
+    let mut diagram_max_x = f64::MIN;
+
+    for &comp_id in &top_level_composites {
+        // Calculate the bounding box of this composite and all its children
+        let (left, right) =
+            calculate_composite_x_bounds(comp_id, db, state_positions, composite_ids);
+        if left < f64::MAX && right > f64::MIN {
+            composite_bounds.insert(comp_id, (left, right));
+            diagram_min_x = diagram_min_x.min(left);
+            diagram_max_x = diagram_max_x.max(right);
+        }
+    }
+
+    // Also include non-composite nodes at root level (start/end, fork/join)
+    for (id, (x, _, w, _)) in state_positions.iter() {
+        let parent = states.get(id).and_then(|s| s.parent.as_deref());
+        if parent.is_none() && !composite_ids.contains(id.as_str()) {
+            diagram_min_x = diagram_min_x.min(*x);
+            diagram_max_x = diagram_max_x.max(*x + w);
+        }
+    }
+
+    if diagram_min_x >= diagram_max_x {
+        return;
+    }
+
+    // The diagram center X
+    let diagram_center_x = (diagram_min_x + diagram_max_x) / 2.0;
+
+    // Center each top-level composite at the diagram center
+    for &comp_id in &top_level_composites {
+        if let Some(&(left, right)) = composite_bounds.get(comp_id) {
+            let comp_center = (left + right) / 2.0;
+            let offset_x = diagram_center_x - comp_center;
+
+            // Shift all nodes belonging to this composite (and nested composites)
+            shift_composite_and_children(comp_id, offset_x, db, state_positions, composite_ids);
+        }
+    }
+}
+
+/// Calculate the X bounds of a composite state including all nested children
+fn calculate_composite_x_bounds(
+    comp_id: &str,
+    db: &StateDb,
+    state_positions: &HashMap<String, (f64, f64, f64, f64)>,
+    composite_ids: &std::collections::HashSet<&str>,
+) -> (f64, f64) {
+    let states = db.get_states();
+    let mut min_x = f64::MAX;
+    let mut max_x = f64::MIN;
+
+    // Find all states that belong to this composite (direct children)
+    for (id, state) in states.iter() {
+        if state.parent.as_deref() == Some(comp_id) {
+            if let Some(&(x, _, w, _)) = state_positions.get(id) {
+                min_x = min_x.min(x);
+                max_x = max_x.max(x + w);
+            }
+
+            // If this is a nested composite, recursively include its bounds
+            if composite_ids.contains(id.as_str()) {
+                let (nested_min, nested_max) =
+                    calculate_composite_x_bounds(id, db, state_positions, composite_ids);
+                min_x = min_x.min(nested_min);
+                max_x = max_x.max(nested_max);
+            }
+        }
+    }
+
+    (min_x, max_x)
+}
+
+/// Shift a composite and all its children by offset_x
+fn shift_composite_and_children(
+    comp_id: &str,
+    offset_x: f64,
+    db: &StateDb,
+    state_positions: &mut HashMap<String, (f64, f64, f64, f64)>,
+    composite_ids: &std::collections::HashSet<&str>,
+) {
+    let states = db.get_states();
+
+    // Shift all states that belong to this composite
+    for (id, state) in states.iter() {
+        if state.parent.as_deref() == Some(comp_id) {
+            if let Some((x, y, w, h)) = state_positions.get(id).copied() {
+                state_positions.insert(id.clone(), (x + offset_x, y, w, h));
+            }
+
+            // If this is a nested composite, recursively shift its children
+            if composite_ids.contains(id.as_str()) {
+                shift_composite_and_children(id, offset_x, db, state_positions, composite_ids);
+            }
+        }
+    }
+}
+
 /// Render a state diagram to SVG
 pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
@@ -285,8 +426,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         }
     }
 
-    // Post-process: Center start nodes above the composite states they connect to
-    // This improves visual alignment matching the mermaid reference
+    // Identify composite states
     let composite_ids: std::collections::HashSet<&str> = layout_result
         .nodes
         .iter()
@@ -298,6 +438,13 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
         })
         .map(|n| n.id.as_str())
         .collect();
+
+    // Post-process: Center all composite states on a common vertical axis
+    // This matches mermaid's rendering where all composites align vertically
+    center_composite_states(db, &mut state_positions, &composite_ids);
+
+    // Post-process: Center start nodes above the composite states they connect to
+    // This improves visual alignment matching the mermaid reference
 
     // Track which start nodes were repositioned and by how much
     let mut start_node_offsets: HashMap<String, f64> = HashMap::new();

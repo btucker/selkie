@@ -328,6 +328,16 @@ impl LayoutEdge {
     }
 }
 
+/// Layout ranker algorithm
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum LayoutRanker {
+    /// Network simplex algorithm (default, more optimization)
+    #[default]
+    NetworkSimplex,
+    /// Longest path algorithm (simpler, used by mermaid's tight-tree)
+    LongestPath,
+}
+
 /// Layout options for the graph
 #[derive(Debug, Clone)]
 pub struct LayoutOptions {
@@ -339,6 +349,8 @@ pub struct LayoutOptions {
     pub layer_spacing: f64,
     /// Padding around the entire graph
     pub padding: Padding,
+    /// Ranker algorithm to use
+    pub ranker: LayoutRanker,
 }
 
 impl Default for LayoutOptions {
@@ -348,6 +360,7 @@ impl Default for LayoutOptions {
             node_spacing: 50.0,
             layer_spacing: 50.0,
             padding: Padding::uniform(20.0),
+            ranker: LayoutRanker::default(),
         }
     }
 }
