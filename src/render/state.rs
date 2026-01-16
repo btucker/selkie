@@ -989,6 +989,7 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
             // If both source and target are inside a shifted composite,
             // apply the composite offset to all edge bend points and label position
             // This keeps edges aligned with their shifted parent states
+            // We need to accumulate offsets from ALL ancestor composites, not just the direct parent
             if !bend_points.is_empty() {
                 let source_parent = states.get(source).and_then(|s| s.parent.as_deref());
                 let target_parent = states.get(target).and_then(|s| s.parent.as_deref());
@@ -997,13 +998,27 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
                 if let (Some(sp), Some(tp)) = (source_parent, target_parent) {
                     // If both have the same parent composite
                     if sp == tp {
-                        if let Some(&offset_x) = composite_offsets.get(sp) {
+                        // Accumulate offsets from this parent and all ancestor composites
+                        let mut total_offset = 0.0;
+                        let mut current_composite: Option<&str> = Some(sp);
+                        while let Some(comp) = current_composite {
+                            if let Some(&offset_x) = composite_offsets.get(comp) {
+                                total_offset += offset_x;
+                            }
+                            // Move to parent composite
+                            current_composite = states
+                                .get(comp)
+                                .and_then(|s| s.parent.as_deref())
+                                .filter(|p| composite_ids.contains(p));
+                        }
+
+                        if total_offset.abs() > 0.001 {
                             for point in &mut bend_points {
-                                point.x += offset_x;
+                                point.x += total_offset;
                             }
                             // Also shift the label position
                             if let Some(ref mut lp) = label_pos {
-                                lp.x += offset_x;
+                                lp.x += total_offset;
                             }
                         }
                     }
