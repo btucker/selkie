@@ -19,6 +19,10 @@ pub struct LayoutGraph {
     pub width: Option<f64>,
     /// Computed graph height (set after layout)
     pub height: Option<f64>,
+    /// Bounds origin X (min_x from compute_bounds, for viewBox)
+    pub bounds_x: Option<f64>,
+    /// Bounds origin Y (min_y from compute_bounds, for viewBox)
+    pub bounds_y: Option<f64>,
 }
 
 impl LayoutGraph {
@@ -30,6 +34,8 @@ impl LayoutGraph {
             options: LayoutOptions::default(),
             width: None,
             height: None,
+            bounds_x: None,
+            bounds_y: None,
         }
     }
 
@@ -159,13 +165,14 @@ impl LayoutGraph {
         self.nodes.iter().filter(|n| !n.is_dummy)
     }
 
-    /// Compute bounding box after layout
+    /// Compute bounding box after layout (includes nodes and edge labels)
     pub fn compute_bounds(&mut self) {
         let mut min_x = f64::MAX;
         let mut min_y = f64::MAX;
         let mut max_x = f64::MIN;
         let mut max_y = f64::MIN;
 
+        // Include node bounds
         self.traverse_nodes(|node| {
             if let (Some(x), Some(y)) = (node.x, node.y) {
                 min_x = min_x.min(x);
@@ -175,10 +182,30 @@ impl LayoutGraph {
             }
         });
 
+        // Include edge label bounds (labels can extend beyond nodes)
+        for edge in &self.edges {
+            if let Some(label_pos) = &edge.label_position {
+                if edge.label_width > 0.0 {
+                    // Labels are centered on their position
+                    let label_left = label_pos.x - edge.label_width / 2.0;
+                    let label_right = label_pos.x + edge.label_width / 2.0;
+                    let label_top = label_pos.y - edge.label_height / 2.0;
+                    let label_bottom = label_pos.y + edge.label_height / 2.0;
+
+                    min_x = min_x.min(label_left);
+                    max_x = max_x.max(label_right);
+                    min_y = min_y.min(label_top);
+                    max_y = max_y.max(label_bottom);
+                }
+            }
+        }
+
         if min_x != f64::MAX {
             // Content bounds only - padding is applied in the renderer
             self.width = Some(max_x - min_x);
             self.height = Some(max_y - min_y);
+            self.bounds_x = Some(min_x);
+            self.bounds_y = Some(min_y);
         }
     }
 

@@ -100,7 +100,7 @@ fn process_statement(
             process_note(db, pair)?;
         }
         Rule::transition_stmt => {
-            process_transition(db, pair)?;
+            process_transition(db, pair, parent)?;
         }
         Rule::state_with_description => {
             process_state_with_description(db, pair)?;
@@ -373,7 +373,11 @@ fn process_note(db: &mut StateDb, pair: pest::iterators::Pair<Rule>) -> Result<(
     Ok(())
 }
 
-fn process_transition(db: &mut StateDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
+fn process_transition(
+    db: &mut StateDb,
+    pair: pest::iterators::Pair<Rule>,
+    parent: Option<&str>,
+) -> Result<(), String> {
     let mut from = String::new();
     let mut to = String::new();
     let mut label: Option<String> = None;
@@ -419,15 +423,23 @@ fn process_transition(db: &mut StateDb, pair: pest::iterators::Pair<Rule>) -> Re
     }
 
     // Ensure non-[*] states exist (add_relation handles [*] states specially)
+    // Also set parent relationship for states inside composite states
     if from != "[*]" {
         db.add_state(&from);
+        if let Some(p) = parent {
+            db.set_parent(&from, p);
+        }
     }
     if to != "[*]" {
         db.add_state(&to);
+        if let Some(p) = parent {
+            db.set_parent(&to, p);
+        }
     }
 
     // Add the relation - this handles [*] states by creating unique start/end IDs
-    db.add_relation(&from, &to, label.as_deref());
+    // Pass parent so [*] states inside composites get the correct parent
+    db.add_relation(&from, &to, label.as_deref(), parent);
     Ok(())
 }
 

@@ -70,6 +70,10 @@ pub fn undo(g: &mut DagreGraph) {
             let forward_name = label.forward_name.take();
             label.reversed = false;
 
+            // Note: Points are reversed by reverse_points_for_reversed_edges()
+            // BEFORE this function is called, so we don't reverse them here.
+            // This matches the reference dagre implementation.
+
             // Create edge in original direction
             let key = if let Some(name) = forward_name {
                 EdgeKey::with_name(&edge_key.w, &edge_key.v, &name)
@@ -79,7 +83,7 @@ pub fn undo(g: &mut DagreGraph) {
 
             g.edges.insert(key.clone(), label);
             g.out_edges.get_mut(&edge_key.w).unwrap().push(key.clone());
-            g.in_edges.get_mut(&edge_key.v).unwrap().push(key);
+            g.in_edges.get_mut(&edge_key.v).unwrap().push(key.clone());
         }
     }
 }

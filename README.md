@@ -75,7 +75,12 @@ Selkie supports parsing and rendering for all major Mermaid diagram types. These
 <img src="docs/images/class.svg" alt="Class Diagram" width="800">
 
 ### State Diagram
-<img src="docs/images/state.svg" alt="State Diagram" width="800">
+
+<img src="docs/images/state.svg" alt="State Diagram" width="400">
+
+**With composite states:**
+
+<img src="docs/images/state_complex.svg" alt="Complex State Diagram" width="400">
 
 ### ER Diagram
 <img src="docs/images/er.svg" alt="ER Diagram" width="800">
@@ -87,8 +92,12 @@ Selkie supports parsing and rendering for all major Mermaid diagram types. These
 <img src="docs/images/pie.svg" alt="Pie Chart" width="400">
 
 ### Architecture Diagram
-<img src="docs/images/architecture.svg" alt="Architecture Diagram" width="800">
-<img src="docs/images/architecture_complex.svg" alt="Architecture Complex Diagram" width="800">
+
+<img src="docs/images/architecture.svg" alt="Architecture Diagram" width="600">
+
+**With groups and multiple services:**
+
+<img src="docs/images/architecture_complex.svg" alt="Complex Architecture Diagram" width="800">
 
 ### Additional Diagram Types (Parser Only)
 
@@ -107,7 +116,6 @@ The following diagram types have parser support and rendering is in progress:
 | Block | Block diagrams |
 | Packet | Network packet diagrams |
 | Kanban | Kanban boards |
-| Architecture | Architecture diagrams |
 | Journey | User journey maps |
 | Radar | Radar/spider charts |
 | Treemap | Treemap visualizations |

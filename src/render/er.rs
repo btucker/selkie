@@ -21,6 +21,7 @@ impl ToLayoutGraph for ErDb {
             node_spacing: 60.0,
             layer_spacing: 80.0,
             padding: Padding::uniform(30.0),
+            ..Default::default()
         };
 
         // Layout constants for entity sizing

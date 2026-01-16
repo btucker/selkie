@@ -119,6 +119,10 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     let is_compound = graph.is_compound();
     if is_compound {
         nesting_graph::run(graph);
+
+        // Phase 3.5: Redirect edges to/from compound nodes to their border nodes
+        // This ensures edges like "[*] --> CompositeState" properly constrain ranking
+        compound::redirect_edges_to_border_nodes(graph);
     }
 
     // Phase 4: Assign ranks to nodes
@@ -177,6 +181,12 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
 
     // Phase 15: Denormalize (collect dummy node positions into edge points)
     normalize::undo(graph);
+
+    // Phase 15.5: Restore edges to their original source/target
+    // This undoes the redirect_edges_to_border_nodes transformation
+    if is_compound {
+        compound::restore_redirected_edges(graph);
+    }
 
     // Phase 16: Fix up edge label coordinates based on labelpos
     edge_labels::fixup_edge_label_coords(graph, config.rankdir);

@@ -168,6 +168,10 @@ pub struct EdgeLabel {
     pub label_rank: Option<i32>,
     /// Whether this is a nesting edge (compound graph support)
     pub nesting_edge: bool,
+    /// Original source node before edge redirection (for compound graphs)
+    pub original_source: Option<String>,
+    /// Original target node before edge redirection (for compound graphs)
+    pub original_target: Option<String>,
 }
 
 impl Default for EdgeLabel {
@@ -187,6 +191,8 @@ impl Default for EdgeLabel {
             cutvalue: None,
             label_rank: None,
             nesting_edge: false,
+            original_source: None,
+            original_target: None,
         }
     }
 }
@@ -322,10 +328,16 @@ impl DagreGraph {
     // --- Edge operations ---
 
     /// Get all edges (sorted for deterministic iteration order)
+    /// Get all edge keys in insertion order
+    ///
+    /// Preserves the order edges were added to maintain proper edge ordering
+    /// through normalization and other phases.
     pub fn edges(&self) -> Vec<&EdgeKey> {
-        let mut edges: Vec<&EdgeKey> = self.edges.keys().collect();
-        edges.sort();
-        edges
+        // Note: We no longer sort alphabetically here because it breaks edge
+        // definition order when normalize creates dummy edges. The edge order
+        // is important for fork/join layout where the first defined edge target
+        // should appear on the left.
+        self.edges.keys().collect()
     }
 
     /// Get number of edges
@@ -442,59 +454,54 @@ impl DagreGraph {
         }
     }
 
-    /// Get outgoing edges from a node (sorted for deterministic iteration)
+    /// Get outgoing edges from a node in insertion order
+    ///
+    /// Preserves the order edges were added to maintain proper fork/join ordering
+    /// where the first defined edge should appear first in layout.
     pub fn out_edges(&self, v: &str) -> Vec<&EdgeKey> {
-        let mut edges: Vec<&EdgeKey> = self
-            .out_edges
+        self.out_edges
             .get(v)
             .map(|edges| edges.iter().collect())
-            .unwrap_or_default();
-        edges.sort();
-        edges
+            .unwrap_or_default()
     }
 
-    /// Get outgoing edges from v to w specifically (sorted for deterministic iteration)
+    /// Get outgoing edges from v to w specifically in insertion order
     pub fn out_edges_to(&self, v: &str, w: &str) -> Vec<&EdgeKey> {
-        let mut edges: Vec<&EdgeKey> = self
-            .out_edges
+        self.out_edges
             .get(v)
             .map(|edges| edges.iter().filter(|e| e.w == w).collect())
-            .unwrap_or_default();
-        edges.sort();
-        edges
+            .unwrap_or_default()
     }
 
-    /// Get incoming edges to a node (sorted for deterministic iteration)
+    /// Get incoming edges to a node in insertion order
+    ///
+    /// Preserves the order edges were added to maintain consistency with out_edges.
     pub fn in_edges(&self, w: &str) -> Vec<&EdgeKey> {
-        let mut edges: Vec<&EdgeKey> = self
-            .in_edges
+        self.in_edges
             .get(w)
             .map(|edges| edges.iter().collect())
-            .unwrap_or_default();
-        edges.sort();
-        edges
+            .unwrap_or_default()
     }
 
-    /// Get predecessor nodes (sorted for deterministic iteration)
+    /// Get predecessor nodes in edge insertion order
+    ///
+    /// Preserves the order edges were added for deterministic behavior.
     pub fn predecessors(&self, v: &str) -> Vec<&String> {
-        let mut preds: Vec<&String> = self
-            .in_edges
+        self.in_edges
             .get(v)
             .map(|edges| edges.iter().map(|e| &e.v).collect())
-            .unwrap_or_default();
-        preds.sort();
-        preds
+            .unwrap_or_default()
     }
 
-    /// Get successor nodes (sorted for deterministic iteration)
+    /// Get successor nodes in edge insertion order
+    ///
+    /// Preserves the order edges were added to maintain proper fork/join ordering
+    /// where the first defined edge target should appear on the left in TB layout.
     pub fn successors(&self, v: &str) -> Vec<&String> {
-        let mut succs: Vec<&String> = self
-            .out_edges
+        self.out_edges
             .get(v)
             .map(|edges| edges.iter().map(|e| &e.w).collect())
-            .unwrap_or_default();
-        succs.sort();
-        succs
+            .unwrap_or_default()
     }
 
     /// Get neighbor nodes (predecessors + successors, sorted for deterministic iteration)

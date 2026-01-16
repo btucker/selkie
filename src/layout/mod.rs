@@ -14,7 +14,8 @@ pub use adapter::{NodeSizeConfig, SizeEstimator, ToLayoutGraph};
 pub use graph::LayoutGraph;
 pub use size::CharacterSizeEstimator;
 pub use types::{
-    LayoutDirection, LayoutEdge, LayoutNode, LayoutOptions, NodeShape, Padding, Point,
+    geometric_midpoint, LayoutDirection, LayoutEdge, LayoutNode, LayoutOptions, LayoutRanker,
+    NodeShape, Padding, Point,
 };
 
 use crate::error::Result;
@@ -264,6 +265,8 @@ fn add_nodes_recursive(dg: &mut DagreGraph, nodes: &[LayoutNode], parent: Option
 
 /// Convert LayoutOptions to DagreConfig
 fn to_dagre_config(options: &LayoutOptions) -> DagreConfig {
+    use types::LayoutRanker;
+
     DagreConfig {
         rankdir: match options.direction {
             LayoutDirection::TopToBottom => RankDir::TB,
@@ -273,7 +276,10 @@ fn to_dagre_config(options: &LayoutOptions) -> DagreConfig {
         },
         nodesep: options.node_spacing,
         ranksep: options.layer_spacing,
-        ranker: Ranker::NetworkSimplex,
+        ranker: match options.ranker {
+            LayoutRanker::NetworkSimplex => Ranker::NetworkSimplex,
+            LayoutRanker::LongestPath => Ranker::LongestPath,
+        },
         // Use DFS-based cycle detection instead of greedy
         // Greedy can incorrectly reverse forward edges in graphs with back edges
         acyclicer: dagre::Acyclicer::Dfs,
@@ -297,21 +303,10 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
                     .collect();
 
                 // Compute label position from the actual edge path (bend_points)
-                // This is more accurate than dagre's dummy node position, which doesn't
-                // account for shape boundary intersections (e.g., diamond corners)
+                // Use geometric midpoint (point at half the total path length) for accurate
+                // positioning, matching mermaid's traverseEdge approach
                 if edge.label.is_some() && !edge.bend_points.is_empty() {
-                    // Use the midpoint of the actual edge path as label position
-                    let mid_idx = edge.bend_points.len() / 2;
-                    if mid_idx > 0 {
-                        // Average the two middle points if even number of points
-                        let p1 = &edge.bend_points[mid_idx - 1];
-                        let p2 = &edge.bend_points[mid_idx];
-                        edge.label_position =
-                            Some(Point::new((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0));
-                    } else {
-                        // Use the middle point if odd number
-                        edge.label_position = Some(edge.bend_points[mid_idx]);
-                    }
+                    edge.label_position = types::geometric_midpoint(&edge.bend_points);
                 }
                 // Fallback to dagre's position if no bend points (shouldn't happen)
                 else if edge.label.is_some() {
@@ -805,6 +800,233 @@ mod tests {
             (error_x - mean_x).abs() < max_deviation,
             "Error x ({:.1}) should be near mean ({:.1}). States should be vertically aligned in TB layout.",
             error_x, mean_x
+        );
+    }
+
+    #[test]
+    fn test_bidirectional_edges_both_have_points() {
+        // Test that edges A→B and B→A both get bend points after layout
+        // This is important for state diagrams with transitions in both directions
+        let mut graph = LayoutGraph::new("bidirectional");
+        graph.options.direction = LayoutDirection::TopToBottom;
+        graph.options.node_spacing = 50.0;
+        graph.options.layer_spacing = 60.0;
+
+        // Create nodes
+        graph.add_node(LayoutNode::new("Idle", 60.0, 40.0));
+        graph.add_node(LayoutNode::new("Running", 80.0, 40.0));
+
+        // Create bidirectional edges
+        graph.add_edge(LayoutEdge::new("forward", "Idle", "Running").with_label("start"));
+        graph.add_edge(LayoutEdge::new("backward", "Running", "Idle").with_label("stop"));
+
+        let result = layout(graph).unwrap();
+
+        // Find both edges
+        let forward_edge = result
+            .edges
+            .iter()
+            .find(|e| e.id == "forward")
+            .expect("Should have forward edge");
+        let backward_edge = result
+            .edges
+            .iter()
+            .find(|e| e.id == "backward")
+            .expect("Should have backward edge");
+
+        eprintln!(
+            "Forward edge (Idle→Running) has {} bend points",
+            forward_edge.bend_points.len()
+        );
+        eprintln!(
+            "Backward edge (Running→Idle) has {} bend points",
+            backward_edge.bend_points.len()
+        );
+
+        // Both edges should have at least 2 points (start and end)
+        assert!(
+            forward_edge.bend_points.len() >= 2,
+            "Forward edge should have at least 2 bend points, got {}",
+            forward_edge.bend_points.len()
+        );
+        assert!(
+            backward_edge.bend_points.len() >= 2,
+            "Backward edge should have at least 2 bend points, got {}",
+            backward_edge.bend_points.len()
+        );
+    }
+
+    #[test]
+    fn test_dagre_graph_preserves_edge_order() {
+        // Test that edge order is preserved when converting LayoutGraph to DagreGraph.
+        // This is critical for fork/join ordering.
+        let mut graph = LayoutGraph::new("test_edge_order");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        // Create fork pattern
+        graph.add_node(LayoutNode::new("fork", 70.0, 10.0)); // Fork bar
+        graph.add_node(LayoutNode::new("first_target", 100.0, 40.0));
+        graph.add_node(LayoutNode::new("second_target", 100.0, 40.0));
+
+        // Add edges in specific order
+        graph.add_edge(LayoutEdge::new("e1", "fork", "first_target")); // First
+        graph.add_edge(LayoutEdge::new("e2", "fork", "second_target")); // Second
+
+        // Convert to DagreGraph
+        let dg = to_dagre_graph(&graph);
+
+        // Check successors order
+        let successors = dg.successors("fork");
+        eprintln!("DagreGraph successors of fork: {:?}", successors);
+
+        assert_eq!(successors.len(), 2, "Should have 2 successors");
+        assert_eq!(
+            successors[0], "first_target",
+            "First successor should be first_target"
+        );
+        assert_eq!(
+            successors[1], "second_target",
+            "Second successor should be second_target"
+        );
+    }
+
+    #[test]
+    fn test_fork_layout_position_order() {
+        // Test that fork targets are positioned in edge definition order.
+        // First defined target should be on the LEFT (smaller x).
+        let mut graph = LayoutGraph::new("test_fork_positions");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        // Create fork pattern
+        graph.add_node(LayoutNode::new("start", 50.0, 30.0));
+        graph.add_node(LayoutNode::new("fork", 70.0, 10.0)); // Fork bar
+        graph.add_node(LayoutNode::new("first_target", 100.0, 40.0));
+        graph.add_node(LayoutNode::new("second_target", 100.0, 40.0));
+        graph.add_node(LayoutNode::new("join", 70.0, 10.0)); // Join bar
+
+        // Add edges in specific order
+        graph.add_edge(LayoutEdge::new("e0", "start", "fork"));
+        graph.add_edge(LayoutEdge::new("e1", "fork", "first_target")); // First fork edge
+        graph.add_edge(LayoutEdge::new("e2", "fork", "second_target")); // Second fork edge
+        graph.add_edge(LayoutEdge::new("e3", "first_target", "join"));
+        graph.add_edge(LayoutEdge::new("e4", "second_target", "join"));
+
+        // Run layout
+        let result = layout(graph).expect("Layout should succeed");
+
+        let first = result
+            .get_node("first_target")
+            .expect("Should have first_target");
+        let second = result
+            .get_node("second_target")
+            .expect("Should have second_target");
+
+        let first_x = first.x.expect("first_target should have x position");
+        let second_x = second.x.expect("second_target should have x position");
+
+        eprintln!(
+            "Fork layout: first_target.x={}, second_target.x={}",
+            first_x, second_x
+        );
+
+        // First defined edge target should be on the left (smaller x)
+        assert!(
+            first_x < second_x,
+            "first_target (first edge) should be LEFT of second_target. \
+             first_target.x={}, second_target.x={}",
+            first_x,
+            second_x
+        );
+    }
+
+    #[test]
+    fn test_fork_layout_alphabetical_order_reversed() {
+        // Test fork layout when alphabetical order is OPPOSITE to edge definition order.
+        // This matches the state diagram case where:
+        // - Edge 1: fork_state -> Validation (first edge)
+        // - Edge 2: fork_state -> ResourceAlloc (second edge)
+        // Alphabetically: "ResourceAlloc" < "Validation" (R < V)
+        // So if alphabetical sorting happens, ResourceAlloc would be placed first.
+        //
+        // We want edge definition order, so Validation should be on the LEFT.
+        let mut graph = LayoutGraph::new("test_alphabetical");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        // Use names where alphabetical order is opposite to edge order
+        // ZZZ should be FIRST (edge order) but comes LAST alphabetically
+        // AAA should be SECOND (edge order) but comes FIRST alphabetically
+        graph.add_node(LayoutNode::new("start", 50.0, 30.0));
+        graph.add_node(LayoutNode::new("fork", 70.0, 10.0));
+        graph.add_node(LayoutNode::new("ZZZ", 100.0, 40.0)); // First edge target
+        graph.add_node(LayoutNode::new("AAA", 100.0, 40.0)); // Second edge target
+        graph.add_node(LayoutNode::new("join", 70.0, 10.0));
+
+        // Add edges in specific order - ZZZ first, AAA second
+        graph.add_edge(LayoutEdge::new("e0", "start", "fork"));
+        graph.add_edge(LayoutEdge::new("e1", "fork", "ZZZ")); // First fork edge
+        graph.add_edge(LayoutEdge::new("e2", "fork", "AAA")); // Second fork edge
+        graph.add_edge(LayoutEdge::new("e3", "ZZZ", "join"));
+        graph.add_edge(LayoutEdge::new("e4", "AAA", "join"));
+
+        // Convert to DagreGraph and check intermediate state
+        let dg = to_dagre_graph(&graph);
+        eprintln!("DagreGraph successors of fork: {:?}", dg.successors("fork"));
+
+        // Check init_order
+        use crate::layout::dagre::order::{assign_order, init_order};
+        use crate::layout::dagre::rank;
+        let mut dg = to_dagre_graph(&graph);
+        let config = to_dagre_config(&graph.options);
+        rank::assign_ranks(&mut dg, config.ranker.clone());
+
+        let layering = init_order(&dg);
+        eprintln!("init_order layer 2: {:?}", layering.get(2));
+
+        assign_order(&mut dg, &layering);
+        eprintln!(
+            "After assign_order: ZZZ.order={:?}, AAA.order={:?}",
+            dg.node("ZZZ").and_then(|n| n.order),
+            dg.node("AAA").and_then(|n| n.order)
+        );
+
+        // Run layout step by step to trace where order gets lost
+        let mut dg2 = to_dagre_graph(&graph);
+        let config2 = to_dagre_config(&graph.options);
+        crate::layout::dagre::layout(&mut dg2, &config2);
+
+        eprintln!(
+            "After dagre::layout: ZZZ.order={:?}, AAA.order={:?}",
+            dg2.node("ZZZ").and_then(|n| n.order),
+            dg2.node("AAA").and_then(|n| n.order)
+        );
+        eprintln!(
+            "After dagre::layout: ZZZ.x={:?}, AAA.x={:?}",
+            dg2.node("ZZZ").and_then(|n| n.x),
+            dg2.node("AAA").and_then(|n| n.x)
+        );
+
+        // Run full layout
+        let result = layout(graph).expect("Layout should succeed");
+
+        let zzz = result.get_node("ZZZ").expect("Should have ZZZ");
+        let aaa = result.get_node("AAA").expect("Should have AAA");
+
+        let zzz_x = zzz.x.expect("ZZZ should have x position");
+        let aaa_x = aaa.x.expect("AAA should have x position");
+
+        eprintln!(
+            "Fork layout (reversed alpha): ZZZ.x={}, AAA.x={}",
+            zzz_x, aaa_x
+        );
+
+        // ZZZ (first defined edge target) should be on the LEFT (smaller x)
+        // even though "AAA" < "ZZZ" alphabetically
+        assert!(
+            zzz_x < aaa_x,
+            "ZZZ (first edge) should be LEFT of AAA even though A < Z alphabetically. \
+             ZZZ.x={}, AAA.x={}",
+            zzz_x,
+            aaa_x
         );
     }
 }

@@ -21,6 +21,7 @@ impl ToLayoutGraph for FlowchartDb {
             node_spacing: 50.0,
             layer_spacing: 50.0,
             padding: Padding::uniform(20.0),
+            ..Default::default()
         };
 
         // Build map of node_id -> subgraph_id for setting parent relationships

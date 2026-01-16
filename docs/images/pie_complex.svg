@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450" viewBox="0 0 600 450" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.pieCircle {
+  stroke: black;
+  stroke-width: 2px;
+  opacity: 0.7;
+}
+
+.pieOuterCircle {
+  stroke: black;
+  stroke-width: 2px;
+  fill: none;
+}
+
+.pieTitleText {
+  text-anchor: middle;
+  font-size: 25px;
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.slice {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  fill: #333333;
+  font-size: 17px;
+}
+
+.legend text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 17px;
+}
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <circle cx="210" cy="225" r="186" class="pieOuterCircle" stroke="black" fill="none" stroke-width="2"/>
+    <path d="M 210 225 L 210 40 A 185 185 0 0 1 359.66814395936524 333.74027167410753 Z" class="pieCircle" stroke-width="2" stroke="black" fill="#ECECFF" opacity="0.7"/>
+    <text x="333.62715523113604" y="162.00881816113787" class="slice" font-size="17" text-anchor="middle" dominant-baseline="middle">35%</text>
+    <path d="M 210 225 L 359.66814395936524 333.74027167410753 A 185 185 0 0 1 131.23083106046155 392.39300470621356 Z" class="pieCircle" opacity="0.7" stroke="black" stroke-width="2" fill="#b9b9ff"/>
+    <text x="244.5057218441236" y="359.39091360659756" class="slice" font-size="17" text-anchor="middle" dominant-baseline="middle">22%</text>
+    <path d="M 210 225 L 131.23083106046155 392.39300470621356 A 185 185 0 0 1 25 225.00000000000003 Z" class="pieCircle" fill="#ffffde" stroke-width="2" opacity="0.7" stroke="black"/>
+    <text x="92.84950033659541" y="299.3459678033358" class="slice" font-size="17" text-anchor="middle" dominant-baseline="middle">18%</text>
+    <path d="M 210 225 L 25 225.00000000000003 A 185 185 0 0 1 47.88326419188522 135.87557029118273 Z" class="pieCircle" fill="#b5ff20" opacity="0.7" stroke-width="2" stroke="black"/>
+    <text x="75.60908639340244" y="190.49427815587643" class="slice" text-anchor="middle" font-size="17" dominant-baseline="middle">8%</text>
+    <path d="M 210 225 L 47.88326419188522 135.87557029118273 A 185 185 0 0 1 92.07656189649231 82.45505008647908 Z" class="pieCircle" stroke="black" stroke-width="2" fill="#d4ffb2" opacity="0.7"/>
+    <text x="103.0912875648592" y="136.55742142236937" class="slice" dominant-baseline="middle" font-size="17" text-anchor="middle">6%</text>
+    <path d="M 210 225 L 92.07656189649231 82.45505008647908 A 185 185 0 0 1 141.89695775333445 52.99135011067355 Z" class="pieCircle" stroke="black" fill="#ffb3e6" stroke-width="2" opacity="0.7"/>
+    <text x="139.3705035646359" y="105.57204375320286" class="slice" dominant-baseline="middle" font-size="17" text-anchor="middle">5%</text>
+    <path d="M 210 225 L 141.89695775333445 52.99135011067355 A 185 185 0 0 1 186.81335179060366 41.458780256821626 Z" class="pieCircle" stroke-width="2" fill="#ffd700" stroke="black" opacity="0.7"/>
+    <text x="175.49427815587632" y="90.60908639340246" class="slice" dominant-baseline="middle" text-anchor="middle" font-size="17">4%</text>
+    <path d="M 210 225 L 186.81335179060366 41.458780256821626 A 185 185 0 0 1 209.99999999999997 40 Z" class="pieCircle" stroke="black" stroke-width="2" opacity="0.7" fill="#c4c4ff"/>
+    <text x="201.28781541530768" y="86.52379143057732" class="slice" text-anchor="middle" font-size="17" dominant-baseline="middle">2%</text>
+    <g class="legend">
+      <rect x="430" y="175" width="18" height="18" class="legend" stroke="#ECECFF" fill="#ECECFF"/>
+      <text x="452" y="189" class="legend" font-size="17">Compute (EC2/GKE)</text>
+      <rect x="430" y="197" width="18" height="18" class="legend" stroke="#ffffde" fill="#ffffde"/>
+      <text x="452" y="211" class="legend" font-size="17">Storage (S3/GCS)</text>
+      <rect x="430" y="219" width="18" height="18" class="legend" fill="#b9b9ff" stroke="#b9b9ff"/>
+      <text x="452" y="233" class="legend" font-size="17">Database (RDS)</text>
+      <rect x="430" y="241" width="18" height="18" class="legend" fill="#b5ff20" stroke="#b5ff20"/>
+      <text x="452" y="255" class="legend" font-size="17">Networking</text>
+      <rect x="430" y="263" width="18" height="18" class="legend" fill="#d4ffb2" stroke="#d4ffb2"/>
+      <text x="452" y="277" class="legend" font-size="17">CDN &amp; Edge</text>
+      <rect x="430" y="285" width="18" height="18" class="legend" stroke="#ffb3e6" fill="#ffb3e6"/>
+      <text x="452" y="299" class="legend" font-size="17">Monitoring</text>
+      <rect x="430" y="307" width="18" height="18" class="legend" stroke="#ffd700" fill="#ffd700"/>
+      <text x="452" y="321" class="legend" font-size="17">Security</text>
+      <rect x="430" y="329" width="18" height="18" class="legend" stroke="#c4c4ff" fill="#c4c4ff"/>
+      <text x="452" y="343" class="legend" font-size="17">Other</text>
+    </g>
+  </g>
+</svg>

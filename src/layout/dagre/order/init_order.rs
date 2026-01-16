@@ -42,7 +42,7 @@ pub fn init_order(g: &DagreGraph) -> Vec<Vec<String>> {
             }
         }
 
-        // Visit successors
+        // Visit successors in edge definition order
         for succ in g.successors(v) {
             dfs(g, succ, visited, layers);
         }
@@ -139,5 +139,38 @@ mod tests {
         assert!(g.node("b").unwrap().order.is_some());
         assert!(g.node("c").unwrap().order.is_some());
         assert_eq!(g.node("d").unwrap().order, Some(0));
+    }
+
+    #[test]
+    fn test_init_order_fork_preserves_edge_order() {
+        // Tests that when a node has multiple outgoing edges (like a fork),
+        // the successors are visited in edge definition order.
+        // First edge target should get lower order (appear on LEFT in TB layout).
+        use crate::layout::dagre::graph::EdgeLabel;
+
+        let mut g = DagreGraph::new();
+        // Create fork pattern: start -> fork, fork -> first_target, fork -> second_target
+        g.set_edge("start", "fork", EdgeLabel::default());
+        g.set_edge("fork", "first_target", EdgeLabel::default()); // First edge
+        g.set_edge("fork", "second_target", EdgeLabel::default()); // Second edge
+        rank::assign_ranks(&mut g, Ranker::LongestPath);
+
+        let layers = init_order(&g);
+
+        // All nodes should be in layers
+        assert_eq!(layers[0], vec!["start"]);
+        assert_eq!(layers[1], vec!["fork"]);
+
+        // Layer 2 should have first_target BEFORE second_target
+        // because edges were defined in that order
+        assert_eq!(layers[2].len(), 2);
+        let first_idx = layers[2].iter().position(|x| x == "first_target");
+        let second_idx = layers[2].iter().position(|x| x == "second_target");
+
+        assert!(
+            first_idx.unwrap() < second_idx.unwrap(),
+            "first_target should come before second_target in layer. Layer: {:?}",
+            layers[2]
+        );
     }
 }

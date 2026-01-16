@@ -127,7 +127,7 @@ mod tests {
         #[test]
         fn should_add_relation() {
             let mut db = StateDb::new();
-            db.add_relation("state1", "state2", None);
+            db.add_relation("state1", "state2", None, None);
 
             let relations = db.get_relations();
             assert_eq!(relations.len(), 1);
@@ -138,7 +138,7 @@ mod tests {
         #[test]
         fn should_add_relation_with_description() {
             let mut db = StateDb::new();
-            db.add_relation("state1", "state2", Some("transition label"));
+            db.add_relation("state1", "state2", Some("transition label"), None);
 
             let relations = db.get_relations();
             assert_eq!(
@@ -150,7 +150,7 @@ mod tests {
         #[test]
         fn should_auto_create_states_from_relation() {
             let mut db = StateDb::new();
-            db.add_relation("s1", "s2", None);
+            db.add_relation("s1", "s2", None, None);
 
             assert!(db.get_states().contains_key("s1"));
             assert!(db.get_states().contains_key("s2"));
@@ -320,7 +320,7 @@ mod tests {
         fn should_clear_all_state() {
             let mut db = StateDb::new();
             db.add_state("state1");
-            db.add_relation("s1", "s2", None);
+            db.add_relation("s1", "s2", None, None);
             db.add_style_class("cls", "fill:#f00");
             db.set_direction(Direction::LeftToRight);
             db.acc_title = "Title".to_string();

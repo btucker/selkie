@@ -91,7 +91,8 @@ fn sweep_down_hierarchical(g: &mut DagreGraph, max_rank: usize, bias_right: bool
 
     for rank in 1..=max_rank {
         // Get nodes at this rank (the "movable" layer)
-        let layer_nodes: Vec<String> = g
+        // Sort by current order to preserve init_order's edge-based ordering for tie-breaking
+        let mut layer_nodes: Vec<String> = g
             .nodes()
             .iter()
             .filter(|v| {
@@ -101,6 +102,8 @@ fn sweep_down_hierarchical(g: &mut DagreGraph, max_rank: usize, bias_right: bool
             })
             .map(|s| s.to_string())
             .collect();
+        // Sort by current order to preserve edge definition order for tie-breaking
+        layer_nodes.sort_by_key(|v| g.node(v).and_then(|n| n.order).unwrap_or(i32::MAX as usize));
 
         if layer_nodes.is_empty() {
             continue;
@@ -131,7 +134,8 @@ fn sweep_up_hierarchical(g: &mut DagreGraph, max_rank: usize, bias_right: bool) 
 
     for rank in (0..max_rank).rev() {
         // Get nodes at this rank (the "movable" layer)
-        let layer_nodes: Vec<String> = g
+        // Sort by current order to preserve init_order's edge-based ordering for tie-breaking
+        let mut layer_nodes: Vec<String> = g
             .nodes()
             .iter()
             .filter(|v| {
@@ -141,6 +145,8 @@ fn sweep_up_hierarchical(g: &mut DagreGraph, max_rank: usize, bias_right: bool) 
             })
             .map(|s| s.to_string())
             .collect();
+        // Sort by current order to preserve edge definition order for tie-breaking
+        layer_nodes.sort_by_key(|v| g.node(v).and_then(|n| n.order).unwrap_or(i32::MAX as usize));
 
         if layer_nodes.is_empty() {
             continue;
@@ -188,6 +194,21 @@ fn sort_layer_hierarchical(
         // Sort nodes within this parent by current order for stability
         nodes.sort_by_key(|v| g.node(v).and_then(|n| n.order).unwrap_or(usize::MAX));
 
+        // Debug: trace sorted nodes
+        #[cfg(test)]
+        {
+            if nodes.iter().any(|v| v == "ZZZ" || v == "AAA") {
+                eprintln!(
+                    "    After sort by order: {:?}, orders: {:?}",
+                    nodes,
+                    nodes
+                        .iter()
+                        .map(|v| g.node(v).and_then(|n| n.order))
+                        .collect::<Vec<_>>()
+                );
+            }
+        }
+
         // Calculate barycenters
         let entries: Vec<BarycenterEntry> = if use_predecessors {
             barycenter(g, &nodes)
@@ -195,8 +216,33 @@ fn sort_layer_hierarchical(
             barycenter_down(g, &nodes)
         };
 
+        // Debug: trace barycenters
+        #[cfg(test)]
+        {
+            if nodes.iter().any(|v| v == "ZZZ" || v == "AAA") {
+                eprintln!(
+                    "    Barycenters: {:?}",
+                    entries
+                        .iter()
+                        .map(|e| (&e.v, e.barycenter, e.i))
+                        .collect::<Vec<_>>()
+                );
+            }
+        }
+
         // Sort by barycenter
         let sorted = sort(entries, bias_right);
+
+        // Debug: trace sorted result
+        #[cfg(test)]
+        {
+            if nodes.iter().any(|v| v == "ZZZ" || v == "AAA") {
+                eprintln!(
+                    "    After sort (bias_right={}): {:?}",
+                    bias_right, sorted.vs
+                );
+            }
+        }
 
         // Ensure border nodes at edges for this parent
         let reordered = if parent.is_some() {
@@ -450,6 +496,47 @@ mod tests {
             c_order.unwrap() < d_order.unwrap(),
             "C (Action 1, first edge) should have lower order than D (Action 2, second edge). C order: {:?}, D order: {:?}",
             c_order, d_order
+        );
+    }
+
+    #[test]
+    fn test_order_fork_pattern_preserves_edge_order() {
+        // Fork pattern like state diagrams:
+        // start -> fork -> first_target
+        //              \-> second_target
+        // -> join
+        //
+        // When both targets have same barycenter (both connected to single fork node),
+        // the first-defined edge target should appear on the left (lower order).
+        let mut g = DagreGraph::new();
+
+        g.set_edge("start", "fork", EdgeLabel::default());
+        g.set_edge("fork", "first_target", EdgeLabel::default()); // First fork edge
+        g.set_edge("fork", "second_target", EdgeLabel::default()); // Second fork edge
+        g.set_edge("first_target", "join", EdgeLabel::default());
+        g.set_edge("second_target", "join", EdgeLabel::default());
+
+        rank::assign_ranks(&mut g, Ranker::LongestPath);
+
+        // Check initial order
+        let init_layering = init_order(&g);
+        eprintln!("init_order layer 2: {:?}", init_layering[2]);
+
+        order(&mut g);
+
+        let first_order = g.node("first_target").unwrap().order;
+        let second_order = g.node("second_target").unwrap().order;
+
+        eprintln!(
+            "After order(): first_target order={:?}, second_target order={:?}",
+            first_order, second_order
+        );
+
+        assert!(first_order.is_some() && second_order.is_some());
+        assert!(
+            first_order.unwrap() < second_order.unwrap(),
+            "first_target (first edge) should have lower order than second_target. first={:?}, second={:?}",
+            first_order, second_order
         );
     }
 }

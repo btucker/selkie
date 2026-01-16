@@ -37,6 +37,7 @@ impl ToLayoutGraph for ClassDb {
                 bottom: 58.0,
                 left: 33.0,
             },
+            ..Default::default()
         };
 
         // Convert classes to layout nodes (sorted for deterministic order)
