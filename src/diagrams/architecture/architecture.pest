@@ -8,10 +8,9 @@
 diagram = { SOI ~ leading_content* ~ keyword_architecture ~ document ~ EOI }
 
 // Allow comments and newlines before the keyword
-leading_content = _{ leading_comment | NEWLINE }
-leading_comment = _{ "%%" ~ (!NEWLINE ~ ANY)* ~ NEWLINE? }
+leading_content = _{ comment_stmt | NEWLINE }
 
-keyword_architecture = _{ ^"architecture-beta" }
+keyword_architecture = _{ "architecture-beta" }
 
 document = { (NEWLINE | statement)* }
 
@@ -35,32 +34,32 @@ statement = {
 // Comments
 // ==================
 
-comment_stmt = { "%%" ~ (!NEWLINE ~ ANY)* }
+comment_stmt = { "%%" ~ (!NEWLINE ~ ANY)* ~ EOL }
 
 // ==================
 // Title and Accessibility
 // ==================
 
 title_stmt = {
-    ^"title" ~ title_text
+    "title" ~ title_text ~ comment_tail? ~ EOL
 }
 
-title_text = @{ (!NEWLINE ~ ANY)* }
+title_text = @{ (!NEWLINE ~ !comment_start ~ ANY)* }
 
 acc_title_stmt = {
-    ^"accTitle" ~ ":" ~ acc_title_text
+    "accTitle" ~ ":" ~ acc_title_text ~ comment_tail? ~ EOL
 }
 
-acc_title_text = @{ (!NEWLINE ~ ANY)* }
+acc_title_text = @{ (!NEWLINE ~ !comment_start ~ ANY)* }
 
 acc_descr_stmt = {
-    ^"accDescr" ~ ":" ~ acc_descr_text
+    "accDescr" ~ ":" ~ acc_descr_text ~ comment_tail? ~ EOL
 }
 
-acc_descr_text = @{ (!NEWLINE ~ ANY)* }
+acc_descr_text = @{ (!NEWLINE ~ !comment_start ~ ANY)* }
 
 acc_descr_multiline_stmt = {
-    ^"accDescr" ~ "{" ~ acc_descr_multiline_text ~ "}"
+    "accDescr" ~ "{" ~ acc_descr_multiline_text ~ "}" ~ comment_tail? ~ EOL
 }
 
 acc_descr_multiline_text = @{ (!"}" ~ ANY)* }
@@ -70,7 +69,7 @@ acc_descr_multiline_text = @{ (!"}" ~ ANY)* }
 // ==================
 
 group_stmt = {
-    ^"group" ~ arch_id ~ arch_icon? ~ arch_title? ~ in_clause?
+    "group" ~ arch_id ~ arch_icon? ~ arch_title? ~ in_clause? ~ comment_tail? ~ EOL
 }
 
 // ==================
@@ -78,19 +77,17 @@ group_stmt = {
 // ==================
 
 service_stmt = {
-    ^"service" ~ arch_id ~ (icon_text | arch_icon)? ~ arch_title? ~ in_clause?
+    "service" ~ arch_id ~ (icon_text | arch_icon)? ~ arch_title? ~ in_clause? ~ comment_tail? ~ EOL
 }
 
-icon_text = @{ "\"" ~ inner_quoted ~ "\"" }
-
-inner_quoted = @{ (!"\"" ~ ANY)* }
+icon_text = @{ arch_string }
 
 // ==================
 // Junctions
 // ==================
 
 junction_stmt = {
-    ^"junction" ~ arch_id ~ in_clause?
+    "junction" ~ arch_id ~ in_clause? ~ comment_tail? ~ EOL
 }
 
 // ==================
@@ -98,7 +95,7 @@ junction_stmt = {
 // ==================
 
 in_clause = {
-    ^"in" ~ arch_id
+    "in" ~ arch_id
 }
 
 // ==================
@@ -106,7 +103,7 @@ in_clause = {
 // ==================
 
 edge_stmt = {
-    arch_id ~ arrow_group? ~ arrow ~ arch_id ~ arrow_group?
+    arch_id ~ arrow_group? ~ arrow ~ arch_id ~ arrow_group? ~ comment_tail? ~ EOL
 }
 
 arrow = {
@@ -131,9 +128,9 @@ arrow_line_with_label = {
     "-" ~ arrow_label ~ "-"
 }
 
-arrow_label = @{ (!"-" ~ ANY)+ }
+arrow_label = { arch_title }
 
-arrow_group = { "{" ~ ^"group" ~ "}" }
+arrow_group = { "{" ~ "group" ~ "}" }
 
 // ==================
 // Common elements
@@ -148,12 +145,22 @@ arch_icon = @{
 }
 
 arch_title = @{
-    "[" ~ (ASCII_ALPHANUMERIC | " " | "_" | "-")+ ~ "]"
+    "[" ~ (ASCII_ALPHANUMERIC | " " | "_")+ ~ "]"
 }
 
 // ==================
 // Whitespace
 // ==================
 
+comment_start = { "%%" }
+comment_tail = { "%%" ~ (!NEWLINE ~ ANY)* }
+arch_string = { double_quoted | single_quoted }
+double_quoted = { "\"" ~ double_inner* ~ "\"" }
+single_quoted = { "'" ~ single_inner* ~ "'" }
+double_inner = { escaped_char | (!"\"" ~ !"\\" ~ ANY) }
+single_inner = { escaped_char | (!"'" ~ !"\\" ~ ANY) }
+escaped_char = { "\\" ~ ANY }
+
 WHITESPACE = _{ " " | "\t" }
 NEWLINE = _{ "\r\n" | "\n" }
+EOL = _{ NEWLINE+ | EOI }

@@ -132,6 +132,11 @@ fn process_group(
         }
     }
 
+    validate_arch_id(&id)?;
+    if let Some(ref p) = parent {
+        validate_arch_id(p)?;
+    }
+
     let mut group = ArchitectureGroup::new(id);
     if let Some(i) = icon {
         group = group.with_icon(&i);
@@ -168,9 +173,7 @@ fn process_service(
                 icon = Some(s[1..s.len() - 1].to_string());
             }
             Rule::icon_text => {
-                // Remove surrounding quotes
-                let s = inner.as_str();
-                icon_text = Some(s[1..s.len() - 1].to_string());
+                icon_text = Some(unescape_arch_string(inner.as_str()));
             }
             Rule::arch_title => {
                 // Remove surrounding brackets
@@ -186,6 +189,11 @@ fn process_service(
             }
             _ => {}
         }
+    }
+
+    validate_arch_id(&id)?;
+    if let Some(ref p) = parent {
+        validate_arch_id(p)?;
     }
 
     let mut service = ArchitectureService::new(id);
@@ -227,6 +235,11 @@ fn process_junction(
             }
             _ => {}
         }
+    }
+
+    validate_arch_id(&id)?;
+    if let Some(ref p) = parent {
+        validate_arch_id(p)?;
     }
 
     let mut junction = ArchitectureJunction::new(id);
@@ -284,6 +297,9 @@ fn process_edge(
             _ => {}
         }
     }
+
+    validate_arch_id(&lhs_id)?;
+    validate_arch_id(&rhs_id)?;
 
     let mut edge = ArchitectureEdge::new(lhs_id, lhs_dir, rhs_id, rhs_dir);
     edge.lhs_into = lhs_into;
@@ -373,6 +389,57 @@ fn parse_direction(s: &str) -> ArchitectureDirection {
     }
 }
 
+fn unescape_arch_string(input: &str) -> String {
+    let Some(quote) = input.chars().next() else {
+        return String::new();
+    };
+    let Some(last) = input.chars().last() else {
+        return String::new();
+    };
+    if (quote != '"' && quote != '\'') || last != quote || input.len() < 2 {
+        return input.to_string();
+    }
+
+    let mut output = String::new();
+    let mut iter = input[1..input.len() - 1].chars().peekable();
+    while let Some(ch) = iter.next() {
+        if ch == '\\' {
+            if let Some(next) = iter.next() {
+                let unescaped = match next {
+                    'n' => '\n',
+                    'r' => '\r',
+                    't' => '\t',
+                    'b' => '\u{0008}',
+                    'f' => '\u{000C}',
+                    '\\' => '\\',
+                    '"' => '"',
+                    '\'' => '\'',
+                    other => other,
+                };
+                output.push(unescaped);
+            }
+        } else {
+            output.push(ch);
+        }
+    }
+
+    output
+}
+
+fn validate_arch_id(id: &str) -> Result<(), Box<dyn std::error::Error>> {
+    if id.is_empty() {
+        return Err("Architecture id cannot be empty".into());
+    }
+    if id.ends_with('-') {
+        return Err(format!(
+            "Architecture id '{}' cannot end with '-'",
+            id
+        )
+        .into());
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -406,6 +473,15 @@ mod tests {
     fn test_title_on_separate_line() {
         let input = "architecture-beta
             title Simple Architecture Diagram
+            ";
+        let result = parse(input).unwrap();
+        assert_eq!(result.get_title(), "Simple Architecture Diagram");
+    }
+
+    #[test]
+    fn test_title_ignores_inline_comment() {
+        let input = "architecture-beta
+            title Simple Architecture Diagram %% comment
             ";
         let result = parse(input).unwrap();
         assert_eq!(result.get_title(), "Simple Architecture Diagram");
@@ -468,13 +544,24 @@ mod tests {
     #[test]
     fn test_service_with_icon_text() {
         let input = r#"architecture-beta
-            service db "DB"
+            service db 'DB'
             "#;
         let result = parse(input).unwrap();
         let services = result.get_services();
         assert_eq!(services.len(), 1);
         assert_eq!(services[0].id, "db");
         assert_eq!(services[0].icon_text, Some("DB".to_string()));
+    }
+
+    #[test]
+    fn test_service_with_icon_text_escape() {
+        let input = r#"architecture-beta
+            service db "A \"Quote\""
+            "#;
+        let result = parse(input).unwrap();
+        let services = result.get_services();
+        assert_eq!(services.len(), 1);
+        assert_eq!(services[0].icon_text, Some("A \"Quote\"".to_string()));
     }
 
     #[test]
@@ -559,7 +646,7 @@ mod tests {
         let input = "architecture-beta
             service db
             service api
-            db:R - connects - L:api
+            db:R -[connects]- L:api
             ";
         let result = parse(input).unwrap();
         let edges = result.get_edges();
