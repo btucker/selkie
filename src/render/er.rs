@@ -10,6 +10,85 @@ use crate::layout::{
 };
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement, Theme};
 
+/// Entity dimensions calculated from content
+#[derive(Debug, Clone)]
+struct EntityDimensions {
+    width: f64,
+    height: f64,
+    /// Column widths: [type_col, name_col, keys_col]
+    col_widths: [f64; 3],
+}
+
+/// Calculate entity dimensions based on content
+fn calculate_entity_dimensions(
+    entity: &Entity,
+    display_name: &str,
+    header_height: f64,
+    row_height: f64,
+    font_size: f64,
+    padding: f64,
+) -> EntityDimensions {
+    // Character width estimation (matching trebuchet ms at 0.6 ratio)
+    let char_width = font_size * 0.6;
+    let header_char_width = 14.0 * 0.6; // Header uses font-size 14
+
+    // Calculate column widths from content
+    let mut max_type_width = 0.0_f64;
+    let mut max_name_width = 0.0_f64;
+    let mut max_keys_width = 0.0_f64;
+
+    for attr in &entity.attributes {
+        let type_width = attr.attr_type.len() as f64 * char_width;
+        let name_width = attr.name.len() as f64 * char_width;
+        let keys_str: String = attr
+            .keys
+            .iter()
+            .map(|k| k.as_str())
+            .collect::<Vec<_>>()
+            .join(",");
+        let keys_width = keys_str.len() as f64 * char_width;
+
+        max_type_width = max_type_width.max(type_width);
+        max_name_width = max_name_width.max(name_width);
+        max_keys_width = max_keys_width.max(keys_width);
+    }
+
+    // Add padding to each column (12px left padding in each)
+    let col_padding = 12.0;
+    let col_right_padding = 8.0;
+    let type_col_width = max_type_width + col_padding + col_right_padding;
+    let name_col_width = max_name_width + col_padding + col_right_padding;
+    let keys_col_width = if max_keys_width > 0.0 {
+        max_keys_width + col_padding + col_right_padding
+    } else {
+        col_padding * 2.0 // Minimum width for empty keys column
+    };
+
+    // Calculate header width requirement
+    let header_width = display_name.len() as f64 * header_char_width + padding * 4.0;
+
+    // Total entity width is max of header and sum of columns
+    let content_width = type_col_width + name_col_width + keys_col_width;
+    let total_width = content_width.max(header_width);
+
+    // Minimum width matches mermaid baseline
+    let min_width = 120.0;
+    let width = total_width.max(min_width);
+
+    // Height based on rows
+    let height = if entity.attributes.is_empty() {
+        header_height + padding * 2.0
+    } else {
+        header_height + (entity.attributes.len() as f64) * row_height + padding * 2.0
+    };
+
+    EntityDimensions {
+        width,
+        height,
+        col_widths: [type_col_width, name_col_width, keys_col_width],
+    }
+}
+
 /// Implement ToLayoutGraph for ErDb to enable proper DAG layout
 impl ToLayoutGraph for ErDb {
     fn to_layout_graph(&self, _size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
@@ -24,10 +103,10 @@ impl ToLayoutGraph for ErDb {
             ..Default::default()
         };
 
-        // Layout constants for entity sizing (matching mermaid.js)
-        let entity_width = 188.0;
+        // Layout constants (matching mermaid.js)
         let entity_header_height = 42.75;
         let attr_row_height = 42.75;
+        let attr_font_size = 12.0;
         let padding = 8.0;
 
         // Convert entities to layout nodes
@@ -38,13 +117,22 @@ impl ToLayoutGraph for ErDb {
         sorted_entities.sort_by(|a, b| a.0.cmp(b.0));
 
         for (name, entity) in &sorted_entities {
-            // Calculate entity height based on attributes
-            let height = entity_header_height
-                + (entity.attributes.len() as f64) * attr_row_height
-                + padding * 2.0;
-            let height = height.max(entity_header_height + padding * 2.0);
+            // Calculate dynamic entity dimensions
+            let display_name = if !entity.alias.is_empty() {
+                &entity.alias
+            } else {
+                &entity.label
+            };
+            let dims = calculate_entity_dimensions(
+                entity,
+                display_name,
+                entity_header_height,
+                attr_row_height,
+                attr_font_size,
+                padding,
+            );
 
-            let node = LayoutNode::new(&entity.id, entity_width, height)
+            let node = LayoutNode::new(&entity.id, dims.width, dims.height)
                 .with_shape(NodeShape::Rectangle)
                 .with_label(name.as_str());
 
@@ -87,9 +175,9 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
     // Layout constants matching mermaid.js dimensions
-    let entity_width = 188.0; // Matches mermaid's typical entity width
     let entity_header_height = 42.75; // Matches mermaid's row height
     let attr_row_height = 42.75; // Each attribute row is same height as header
+    let attr_font_size = 12.0;
     let margin = 50.0;
     let padding = 8.0;
 
@@ -114,16 +202,23 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
         return Ok(doc.to_string());
     }
 
-    // Calculate entity heights
-    let mut entity_heights: HashMap<String, f64> = HashMap::new();
+    // Calculate entity dimensions (width, height, column widths)
+    let mut entity_dimensions: HashMap<String, EntityDimensions> = HashMap::new();
     for (name, entity) in entities {
-        let height = entity_header_height
-            + (entity.attributes.len() as f64) * attr_row_height
-            + padding * 2.0;
-        entity_heights.insert(
-            name.clone(),
-            height.max(entity_header_height + padding * 2.0),
+        let display_name = if !entity.alias.is_empty() {
+            &entity.alias
+        } else {
+            &entity.label
+        };
+        let dims = calculate_entity_dimensions(
+            entity,
+            display_name,
+            entity_header_height,
+            attr_row_height,
+            attr_font_size,
+            padding,
         );
+        entity_dimensions.insert(name.clone(), dims);
     }
 
     // Sort entities for consistent ordering
@@ -193,19 +288,24 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     // Render each entity
     for (name, entity) in &sorted_entities {
         if let Some(&(x, y)) = entity_positions.get(*name) {
-            let height = entity_heights
+            let dims = entity_dimensions
                 .get(*name)
-                .copied()
-                .unwrap_or(entity_header_height);
+                .cloned()
+                .unwrap_or(EntityDimensions {
+                    width: 188.0,
+                    height: entity_header_height + padding * 2.0,
+                    col_widths: [65.8, 75.2, 47.0],
+                });
             let entity_elem = render_entity(
                 entity,
                 x,
                 y,
-                entity_width,
-                height,
+                dims.width,
+                dims.height,
                 entity_header_height,
                 attr_row_height,
                 padding,
+                &dims.col_widths,
             );
             doc.add_element(entity_elem);
         }
@@ -227,23 +327,22 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
             if let (Some(&(x1, y1)), Some(&(x2, y2))) =
                 (entity_positions.get(a_name), entity_positions.get(b_name))
             {
-                let h1 = entity_heights
-                    .get(a_name)
-                    .copied()
-                    .unwrap_or(entity_header_height);
-                let h2 = entity_heights
-                    .get(b_name)
-                    .copied()
-                    .unwrap_or(entity_header_height);
+                let dims1 = entity_dimensions.get(a_name);
+                let dims2 = entity_dimensions.get(b_name);
+                let h1 = dims1.map(|d| d.height).unwrap_or(entity_header_height);
+                let h2 = dims2.map(|d| d.height).unwrap_or(entity_header_height);
+                let w1 = dims1.map(|d| d.width).unwrap_or(188.0);
+                let w2 = dims2.map(|d| d.width).unwrap_or(188.0);
 
                 let rel_elem = render_relationship(
                     x1,
                     y1,
                     h1,
+                    w1,
                     x2,
                     y2,
                     h2,
-                    entity_width,
+                    w2,
                     &relationship.role_a,
                     relationship.rel_spec.card_a,
                     relationship.rel_spec.card_b,
@@ -270,6 +369,7 @@ fn render_entity(
     header_height: f64,
     attr_row_height: f64,
     _padding: f64,
+    col_widths: &[f64; 3],
 ) -> SvgElement {
     // Collect shapes and text separately for correct z-order
     // SVG renders elements in document order - shapes must come before text
@@ -316,10 +416,9 @@ fn render_entity(
         };
     }
 
-    // Column positions (percentages of width, matching mermaid.js layout)
-    // Type column: ~35%, Name column: ~40%, Keys column: ~25%
-    let type_col_end = x + width * 0.35;
-    let name_col_end = x + width * 0.75;
+    // Column positions calculated from col_widths [type, name, keys]
+    let type_col_end = x + col_widths[0];
+    let name_col_end = type_col_end + col_widths[1];
 
     // Main entity box (background)
     shapes.push(SvgElement::Rect {
@@ -464,10 +563,11 @@ fn render_relationship(
     x1: f64,
     y1: f64,
     h1: f64,
+    w1: f64,
     x2: f64,
     y2: f64,
     h2: f64,
-    width: f64,
+    w2: f64,
     label: &str,
     card_a: Cardinality,
     card_b: Cardinality,
@@ -477,7 +577,7 @@ fn render_relationship(
 
     // Calculate connection points
     let (start_x, start_y, end_x, end_y) =
-        calculate_connection_points(x1, y1, h1, x2, y2, h2, width);
+        calculate_connection_points(x1, y1, h1, w1, x2, y2, h2, w2);
 
     // Calculate midpoint for Bezier curves (like mermaid.js)
     let mid_y = (start_y + end_y) / 2.0;
@@ -545,18 +645,20 @@ fn render_relationship(
 }
 
 /// Calculate connection points on entity box edges
+#[allow(clippy::too_many_arguments)]
 fn calculate_connection_points(
     x1: f64,
     y1: f64,
     h1: f64,
+    w1: f64,
     x2: f64,
     y2: f64,
     h2: f64,
-    width: f64,
+    w2: f64,
 ) -> (f64, f64, f64, f64) {
-    let center1_x = x1 + width / 2.0;
+    let center1_x = x1 + w1 / 2.0;
     let center1_y = y1 + h1 / 2.0;
-    let center2_x = x2 + width / 2.0;
+    let center2_x = x2 + w2 / 2.0;
     let center2_y = y2 + h2 / 2.0;
 
     let dx = center2_x - center1_x;
@@ -565,7 +667,7 @@ fn calculate_connection_points(
     // Determine which edges to connect based on relative positions
     let (start_x, start_y) = if dx.abs() > dy.abs() {
         if dx > 0.0 {
-            (x1 + width, center1_y)
+            (x1 + w1, center1_y)
         } else {
             (x1, center1_y)
         }
@@ -579,7 +681,7 @@ fn calculate_connection_points(
         if dx > 0.0 {
             (x2, center2_y)
         } else {
-            (x2 + width, center2_y)
+            (x2 + w2, center2_y)
         }
     } else if dy > 0.0 {
         (center2_x, y2)
@@ -628,6 +730,7 @@ fn generate_er_css(theme: &Theme) -> String {
 
 .relationship-label-background {{
   fill: {background};
+  opacity: 0.7;
 }}
 
 .marker {{
