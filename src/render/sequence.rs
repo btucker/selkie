@@ -164,8 +164,10 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             if let Some(start_y) = stack.pop() {
                                 if let Some(&actor_x) = actor_positions.get(actor) {
                                     let end_y = last_message_y.unwrap_or(current_y);
+                                    // Render activation in clusters layer (back) so message lines
+                                    // and autonumber circles render on top
                                     let activation = render_activation(actor_x, start_y, end_y);
-                                    doc.add_element(activation);
+                                    doc.add_cluster(activation);
                                 }
                             }
                         }
@@ -367,7 +369,8 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         let x = padding_x + (i as f64) * actor_spacing;
         let center_x = x + actor_width / 2.0;
 
-        // Lifeline (mermaid.js style)
+        // Lifeline (mermaid.js style) - rendered in clusters layer (back)
+        // so message lines and autonumbers render on top
         let lifeline = SvgElement::Line {
             x1: center_x,
             y1: lifeline_start_y,
@@ -377,7 +380,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 .with_attr("stroke-width", "0.5px")
                 .with_class("actor-line"),
         };
-        doc.add_element(lifeline);
+        doc.add_cluster(lifeline);
 
         // Bottom actor box/stick figure
         let bottom_actor = render_actor(
