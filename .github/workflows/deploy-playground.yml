@@ -34,6 +34,14 @@ jobs:
           wasm-pack build --target web --features wasm
           mv pkg playground/pkg
 
+      - name: Install mermaid-cli for eval
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Generate eval report
+        run: |
+          cargo run --release --features eval --bin selkie -- eval -o /tmp/selkie-eval
+          mv /tmp/selkie-eval/selkie-eval-*/  playground/eval
+
       - name: Copy assets
         run: cp docs/images/selkie-logo.png playground/logo.png
 
