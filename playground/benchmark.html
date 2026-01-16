@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selkie Benchmark - Selkie vs Mermaid.js</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: #0f3460;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --accent: #e94560;
+            --accent-green: #4ecca3;
+            --border: #2a2a4a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .config {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .config label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .config input {
+            width: 60px;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #ff6b6b;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .status.loading {
+            color: var(--accent);
+        }
+
+        .status.ready {
+            color: var(--accent-green);
+        }
+
+        .progress-container {
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .progress-text {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .results {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .results-header {
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .results-header h2 {
+            font-size: 1.25rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-card);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .speedup {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .diagram-name {
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .bundle-size {
+            margin-top: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .bundle-size h3 {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .size-comparison {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .size-item {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .size-item .label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .size-item .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .size-item.selkie .value {
+            color: var(--accent-green);
+        }
+
+        .links {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .links a {
+            color: var(--accent);
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+
+            .config {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            th, td {
+                padding: 0.75rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Selkie Benchmark</h1>
+            <p class="subtitle">Compare Selkie WASM vs Mermaid.js rendering performance</p>
+        </header>
+
+        <div class="config">
+            <label>
+                Warmup runs:
+                <input type="number" id="warmup-runs" value="2" min="0" max="10">
+            </label>
+            <label>
+                Benchmark runs:
+                <input type="number" id="benchmark-runs" value="10" min="1" max="50">
+            </label>
+            <button id="run-btn" class="btn btn-primary" disabled>Loading...</button>
+        </div>
+
+        <div id="status" class="status loading">
+            Loading libraries...
+        </div>
+
+        <div id="progress-section" class="progress-container hidden">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div id="progress-text" class="progress-text"></div>
+        </div>
+
+        <div id="results" class="results hidden">
+            <div class="results-header">
+                <h2>Results</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Diagram</th>
+                        <th>Mermaid.js</th>
+                        <th>Selkie</th>
+                        <th>Speedup</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body"></tbody>
+            </table>
+        </div>
+
+        <div id="bundle-size" class="bundle-size hidden">
+            <h3>Bundle Size Comparison</h3>
+            <div class="size-comparison">
+                <div class="size-item selkie">
+                    <div class="label">Selkie (WASM + JS)</div>
+                    <div id="selkie-size" class="value">-</div>
+                </div>
+                <div class="size-item">
+                    <div class="label">Mermaid.js</div>
+                    <div id="mermaid-size" class="value">~2.5 MB</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="./">Playground</a>
+            <a href="https://github.com/btucker/selkie">GitHub</a>
+        </div>
+    </div>
+
+    <!-- Hidden container for mermaid rendering -->
+    <div id="mermaid-container" style="position: absolute; left: -9999px;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script type="module">
+        // Test cases
+        const testCases = [
+            {
+                name: 'Simple flowchart (5 nodes)',
+                diagram: `flowchart LR
+    A[Start] --> B{Decision}
+    B -->|Yes| C[OK]
+    B -->|No| D[Cancel]
+    C --> E[End]
+    D --> E`,
+            },
+            {
+                name: 'Medium flowchart (15 nodes)',
+                diagram: `flowchart TB
+    A[Start] --> B{Check 1}
+    B -->|Yes| C[Process 1]
+    B -->|No| D[Process 2]
+    C --> E{Check 2}
+    D --> E
+    E -->|Yes| F[Action 1]
+    E -->|No| G[Action 2]
+    F --> H[Step 1]
+    G --> H
+    H --> I{Check 3}
+    I -->|Yes| J[Final 1]
+    I -->|No| K[Final 2]
+    J --> L[End]
+    K --> L
+    L --> M[Done]`,
+            },
+            {
+                name: 'Sequence diagram (4 actors)',
+                diagram: `sequenceDiagram
+    participant A as Alice
+    participant B as Bob
+    participant C as Charlie
+    participant D as Dave
+    A->>B: Hello Bob!
+    B-->>A: Hi Alice!
+    A->>C: Hello Charlie
+    C->>D: Forward to Dave
+    D-->>C: Response
+    C-->>A: Got response
+    A->>B: Update Bob
+    B-->>A: Acknowledged`,
+            },
+            {
+                name: 'Class diagram (5 classes)',
+                diagram: `classDiagram
+    Animal <|-- Dog
+    Animal <|-- Cat
+    Animal <|-- Bird
+    Animal : +String name
+    Animal : +int age
+    Animal: +eat()
+    Animal: +sleep()
+    class Dog{
+        +String breed
+        +bark()
+        +fetch()
+    }
+    class Cat{
+        +bool indoor
+        +meow()
+        +scratch()
+    }
+    class Bird{
+        +float wingspan
+        +fly()
+        +sing()
+    }`,
+            },
+            {
+                name: 'State diagram (8 states)',
+                diagram: `stateDiagram-v2
+    [*] --> Idle
+    Idle --> Starting : start
+    Starting --> Running : initialized
+    Running --> Paused : pause
+    Paused --> Running : resume
+    Running --> Stopping : stop
+    Stopping --> Idle : stopped
+    Idle --> [*] : shutdown`,
+            },
+            {
+                name: 'Pie chart (5 slices)',
+                diagram: `pie title Browser Market Share
+    "Chrome" : 65
+    "Safari" : 19
+    "Firefox" : 8
+    "Edge" : 5
+    "Other" : 3`,
+            },
+        ];
+
+        // DOM elements
+        const runBtn = document.getElementById('run-btn');
+        const statusEl = document.getElementById('status');
+        const progressSection = document.getElementById('progress-section');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const resultsEl = document.getElementById('results');
+        const resultsBody = document.getElementById('results-body');
+        const bundleSizeEl = document.getElementById('bundle-size');
+        const selkieSizeEl = document.getElementById('selkie-size');
+        const warmupInput = document.getElementById('warmup-runs');
+        const benchmarkInput = document.getElementById('benchmark-runs');
+
+        let selkie = null;
+        let selkieBundleSize = 0;
+
+        function median(values) {
+            const sorted = [...values].sort((a, b) => a - b);
+            const mid = Math.floor(sorted.length / 2);
+            return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+        }
+
+        function formatTime(ms) {
+            if (ms < 1) return `${(ms * 1000).toFixed(0)}μs`;
+            if (ms < 1000) return `${ms.toFixed(1)}ms`;
+            return `${(ms / 1000).toFixed(2)}s`;
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+        }
+
+        async function initLibraries() {
+            try {
+                // Initialize Mermaid
+                mermaid.initialize({ startOnLoad: false });
+
+                // Load Selkie WASM
+                const { default: initWasm, render_text } = await import('./pkg/selkie.js');
+                await initWasm();
+                selkie = { render_text };
+
+                // Estimate bundle size by fetching the files
+                const [jsResponse, wasmResponse] = await Promise.all([
+                    fetch('./pkg/selkie.js'),
+                    fetch('./pkg/selkie_bg.wasm')
+                ]);
+                const jsSize = parseInt(jsResponse.headers.get('content-length') || '0');
+                const wasmSize = parseInt(wasmResponse.headers.get('content-length') || '0');
+                selkieBundleSize = jsSize + wasmSize;
+
+                // If content-length not available, estimate from response
+                if (selkieBundleSize === 0) {
+                    const [jsBlob, wasmBlob] = await Promise.all([
+                        jsResponse.clone().blob(),
+                        wasmResponse.clone().blob()
+                    ]);
+                    selkieBundleSize = jsBlob.size + wasmBlob.size;
+                }
+
+                statusEl.textContent = 'Ready to benchmark';
+                statusEl.classList.remove('loading');
+                statusEl.classList.add('ready');
+                runBtn.textContent = 'Run Benchmark';
+                runBtn.disabled = false;
+            } catch (error) {
+                statusEl.textContent = `Error: ${error.message}`;
+                console.error('Init error:', error);
+            }
+        }
+
+        async function runBenchmark() {
+            const warmupRuns = parseInt(warmupInput.value) || 2;
+            const benchmarkRuns = parseInt(benchmarkInput.value) || 10;
+            const totalRuns = testCases.length * (warmupRuns + benchmarkRuns) * 2;
+            let currentRun = 0;
+
+            runBtn.disabled = true;
+            runBtn.textContent = 'Running...';
+            resultsEl.classList.add('hidden');
+            bundleSizeEl.classList.add('hidden');
+            progressSection.classList.remove('hidden');
+            resultsBody.innerHTML = '';
+
+            const results = [];
+            let renderCounter = 0;
+
+            for (const tc of testCases) {
+                progressText.textContent = `Testing: ${tc.name}`;
+
+                // Benchmark Selkie
+                const selkieTimes = [];
+                for (let i = 0; i < warmupRuns + benchmarkRuns; i++) {
+                    const start = performance.now();
+                    selkie.render_text(tc.diagram);
+                    const elapsed = performance.now() - start;
+                    if (i >= warmupRuns) selkieTimes.push(elapsed);
+                    currentRun++;
+                    progressFill.style.width = `${(currentRun / totalRuns) * 100}%`;
+                    await new Promise(r => setTimeout(r, 0)); // Yield to UI
+                }
+
+                // Benchmark Mermaid
+                const mermaidTimes = [];
+                const container = document.getElementById('mermaid-container');
+                for (let i = 0; i < warmupRuns + benchmarkRuns; i++) {
+                    container.innerHTML = '';
+                    const start = performance.now();
+                    await mermaid.render(`bench-${renderCounter++}`, tc.diagram);
+                    const elapsed = performance.now() - start;
+                    if (i >= warmupRuns) mermaidTimes.push(elapsed);
+                    currentRun++;
+                    progressFill.style.width = `${(currentRun / totalRuns) * 100}%`;
+                    await new Promise(r => setTimeout(r, 0)); // Yield to UI
+                }
+
+                const selkieMedian = median(selkieTimes);
+                const mermaidMedian = median(mermaidTimes);
+                const speedup = mermaidMedian / selkieMedian;
+
+                results.push({
+                    name: tc.name,
+                    selkie: selkieMedian,
+                    mermaid: mermaidMedian,
+                    speedup,
+                });
+            }
+
+            // Display results
+            for (const r of results) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="diagram-name">${r.name}</td>
+                    <td>${formatTime(r.mermaid)}</td>
+                    <td>${formatTime(r.selkie)}</td>
+                    <td class="speedup">${r.speedup.toFixed(0)}x</td>
+                `;
+                resultsBody.appendChild(row);
+            }
+
+            // Show bundle size
+            selkieSizeEl.textContent = formatSize(selkieBundleSize);
+
+            progressSection.classList.add('hidden');
+            resultsEl.classList.remove('hidden');
+            bundleSizeEl.classList.remove('hidden');
+            statusEl.textContent = `Benchmark complete (${warmupRuns} warmup, ${benchmarkRuns} runs, median reported)`;
+            runBtn.textContent = 'Run Again';
+            runBtn.disabled = false;
+        }
+
+        runBtn.addEventListener('click', runBenchmark);
+        initLibraries();
+    </script>
+</body>
+</html>

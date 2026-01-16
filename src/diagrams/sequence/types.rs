@@ -490,6 +490,11 @@ impl SequenceDb {
         self.sequence_numbers_enabled
     }
 
+    /// Get autonumber configuration
+    pub fn get_autonumber(&self) -> Option<&AutonumberConfig> {
+        self.autonumber.as_ref()
+    }
+
     /// Set global wrap
     pub fn set_wrap(&mut self, wrap: bool) {
         self.wrap_enabled = wrap;

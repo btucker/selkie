@@ -921,7 +921,7 @@ fn escape_xml(text: &str) -> String {
 /// - Blocks `javascript:` and `data:` URLs
 /// - Validates balanced braces
 /// - Removes potentially dangerous properties like `expression()`
-fn sanitize_css(css: &str) -> String {
+pub(crate) fn sanitize_css(css: &str) -> String {
     // Check for dangerous patterns
     let lower = css.to_lowercase();
 

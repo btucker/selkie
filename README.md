@@ -26,32 +26,32 @@ Compared to [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) (`mmdc`):
 
 | Diagram | mmdc | Selkie |
 |---------|------|--------|
-| Simple flowchart (5 nodes) | 3.21s | 7ms |
-| Medium flowchart (15 nodes) | 4.89s | 8ms |
-| Large flowchart (100 nodes) | 3.67s | 18ms |
-| Sequence diagram (4 actors) | 2.86s | 6ms |
-| Class diagram (5 classes) | 4.10s | 5ms |
+| Simple flowchart (5 nodes) | 1.53s | 6ms |
+| Medium flowchart (15 nodes) | 1.54s | 7ms |
+| Sequence diagram (4 actors) | 1.52s | 5ms |
+| Class diagram (5 classes) | 1.55s | 5ms |
+| Large flowchart (100 nodes) | 1.82s | 27ms |
 
 _CLI-to-CLI comparison. Median of 5 runs after 2 warmup runs._
 
-The dramatic speedup comes from avoiding the browser entirely—mermaid-cli spawns Puppeteer + Chromium for each render (~3-5 seconds overhead).
+The dramatic speedup comes from avoiding the browser entirely—mermaid-cli spawns Puppeteer + Chromium for each render.
 
 ### Browser Benchmark
 
-For client-side rendering, Selkie compiles to WebAssembly. Both run in the same Chromium browser for a fair comparison:
+For client-side rendering, Selkie compiles to WebAssembly. Both run in the same Chromium browser for a fair comparison. [Run it yourself →](https://btucker.github.io/selkie/benchmark.html)
 
-| Diagram | Mermaid.js | Selkie WASM | Speedup |
-|---------|------------|-------------|---------|
-| Simple flowchart (5 nodes) | 45ms | 3ms | 15x |
-| Medium flowchart (15 nodes) | 82ms | 5ms | 16x |
-| Sequence diagram (4 actors) | 38ms | 2ms | 19x |
-| Class diagram (5 classes) | 52ms | 3ms | 17x |
-| State diagram (8 states) | 41ms | 2ms | 20x |
-| Pie chart (5 slices) | 35ms | 1ms | 35x |
+| Diagram | Mermaid.js | Selkie WASM |
+|---------|------------|-------------|
+| Simple flowchart (5 nodes) | 10ms | 1ms |
+| Medium flowchart (15 nodes) | 21ms | 1.6ms |
+| Sequence diagram (4 actors) | 4.5ms | 0.3ms |
+| Class diagram (5 classes) | 16ms | 0.5ms |
+| State diagram (8 states) | 22ms | 0.75ms |
+| Pie chart (5 slices) | 1.6ms | 0.1ms |
 
 _Median of 10 runs after 2 warmup runs. Chromium via Playwright._
 
-**Bundle Size:** ~350 KB (WASM + JS glue) vs ~2.5 MB for mermaid.min.js
+**Bundle Size:** ~350 KB gzipped (WASM + JS glue) vs ~2.5 MB for mermaid.min.js
 
 ## Credits
 
@@ -63,49 +63,25 @@ Selkie could not exist without all the human effort that has gone into these exc
 
 ## Supported Diagram Types
 
-Selkie supports parsing and rendering for all major Mermaid diagram types. These examples showcase Selkie's rendering capabilities.
+Selkie supports parsing and rendering for all major Mermaid diagram types.
 
-### Flowchart
-<img src="docs/images/flowchart_complex.svg" alt="Flowchart" width="800">
+| Type | Example |
+|------|---------|
+| **Flowchart** | <img src="docs/images/flowchart_complex.svg" alt="Flowchart" width="500"> |
+| **Sequence** | <img src="docs/images/sequence.svg" alt="Sequence Diagram" width="500"> |
+| **Class** | <img src="docs/images/class.svg" alt="Class Diagram" width="500"> |
+| **State** | <img src="docs/images/state_complex.svg" alt="State Diagram" width="400"> |
+| **ER** | <img src="docs/images/er.svg" alt="ER Diagram" width="500"> |
+| **Gantt** | <img src="docs/images/gantt.svg" alt="Gantt Chart" width="500"> |
+| **Pie** | <img src="docs/images/pie.svg" alt="Pie Chart" width="300"> |
+| **Architecture** | <img src="docs/images/architecture_complex.svg" alt="Architecture Diagram" width="500"> |
+| **Git Graph** | <img src="docs/images/git_complex.svg" alt="Git Graph" width="500"> |
 
-### Sequence Diagram
-<img src="docs/images/sequence.svg" alt="Sequence Diagram" width="800">
+<details>
+<summary><strong>Parser Only</strong> (rendering in progress)</summary>
 
-### Class Diagram
-<img src="docs/images/class.svg" alt="Class Diagram" width="800">
-
-### State Diagram
-
-<img src="docs/images/state.svg" alt="State Diagram" width="400">
-
-**With composite states:**
-
-<img src="docs/images/state_complex.svg" alt="Complex State Diagram" width="400">
-
-### ER Diagram
-<img src="docs/images/er.svg" alt="ER Diagram" width="800">
-
-### Gantt Chart
-<img src="docs/images/gantt.svg" alt="Gantt Chart" width="800">
-
-### Pie Chart
-<img src="docs/images/pie.svg" alt="Pie Chart" width="400">
-
-### Architecture Diagram
-
-<img src="docs/images/architecture.svg" alt="Architecture Diagram" width="600">
-
-**With groups and multiple services:**
-
-<img src="docs/images/architecture_complex.svg" alt="Complex Architecture Diagram" width="800">
-
-### Additional Diagram Types (Parser Only)
-
-The following diagram types have parser support and rendering is in progress:
-
-| Diagram Type | Description |
-|--------------|-------------|
-| Git Graph | Git branch visualization |
+| Type | Description |
+|------|-------------|
 | Mindmap | Hierarchical mindmaps |
 | Timeline | Timeline visualizations |
 | Quadrant | Quadrant charts |
@@ -119,6 +95,8 @@ The following diagram types have parser support and rendering is in progress:
 | Journey | User journey maps |
 | Radar | Radar/spider charts |
 | Treemap | Treemap visualizations |
+
+</details>
 
 ## Installation
 

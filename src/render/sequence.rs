@@ -43,17 +43,10 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     // Calculate dimensions (mimicking mermaid.js layout)
     // mermaid.js uses negative viewBox offset for visual padding
     let content_width = (actors.len() as f64 - 1.0) * actor_spacing + actor_width;
-    let content_height = actor_height  // Top actor
-        + message_spacing  // Gap before first message
-        + (messages.len() as f64) * message_spacing  // Messages
-        + 20.0  // Gap after last message to bottom actor
-        + actor_height; // Bottom actor
 
     // Add visual padding via width/viewBox (mermaid.js style)
     let width = content_width + 100.0; // Total viewBox width with padding
-    let height = content_height + 20.0; // Total viewBox height with padding
-
-    doc.set_size(width, height);
+                                       // Height will be set later after we know the actual content height
 
     // Add theme styles
     if config.embed_css {
@@ -97,10 +90,6 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
 
     let actor_y = padding_y + title_offset;
     let lifeline_start_y = actor_y + actor_height;
-    // Bottom actor position: after all messages + 20px gap
-    let bottom_actor_y =
-        lifeline_start_y + message_spacing + (messages.len() as f64) * message_spacing + 20.0;
-    let lifeline_end_y = bottom_actor_y;
 
     // Create actor position map
     let mut actor_positions: std::collections::HashMap<String, f64> =
@@ -115,7 +104,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         actor_index.insert(actor.name.clone(), i);
     }
 
-    // Render actors at top and bottom
+    // Render top actors only (bottom actors rendered after we know the final height)
     for (i, actor) in actors.iter().enumerate() {
         let x = padding_x + (i as f64) * actor_spacing;
         let center_x = x + actor_width / 2.0;
@@ -131,30 +120,6 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
             actor_box_padding,
         );
         doc.add_element(top_actor);
-
-        // Lifeline (mermaid.js style)
-        let lifeline = SvgElement::Line {
-            x1: center_x,
-            y1: lifeline_start_y,
-            x2: center_x,
-            y2: lifeline_end_y,
-            attrs: Attrs::new()
-                .with_attr("stroke-width", "0.5px")
-                .with_class("actor-line"),
-        };
-        doc.add_element(lifeline);
-
-        // Bottom actor box/stick figure
-        let bottom_actor = render_actor(
-            center_x,
-            bottom_actor_y,
-            actor_width,
-            actor_height,
-            &actor.description,
-            actor.actor_type,
-            actor_box_padding,
-        );
-        doc.add_element(bottom_actor);
     }
 
     // Render messages and notes in timeline order
@@ -174,6 +139,13 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let fragment_left = padding_x;
     let fragment_width = content_width;
     let mut fragment_stack: Vec<FragmentState> = Vec::new();
+
+    // Autonumber state
+    let autonumber_config = db.get_autonumber();
+    let mut sequence_index: i32 = autonumber_config.map_or(1, |c| c.start);
+    let sequence_step: i32 = autonumber_config.map_or(1, |c| c.step);
+    let autonumber_enabled = autonumber_config.is_some();
+
     for (_, event) in events {
         match event {
             TimelineEvent::Message(message) => match message.message_type {
@@ -262,6 +234,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 | LineType::BreakEnd
                 | LineType::RectEnd => {
                     if let Some(fragment) = fragment_stack.pop() {
+                        // End fragment at current position (no extra spacing like mermaid.js)
                         let end_y = current_y - message_spacing / 2.0;
                         let depth = fragment_stack.len();
                         let (frame_x, frame_width) = fragment_bounds_for_state(
@@ -291,22 +264,37 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             doc.add_element(element);
                         }
                     }
-                    current_y += message_spacing;
+                    // Don't advance current_y after fragment end - content already positioned
                 }
-                LineType::Autonumber => {}
+                LineType::Autonumber => {
+                    // Autonumber is handled at parse time, nothing to render
+                }
                 _ => {
                     if let (Some(from), Some(to)) = (&message.from, &message.to) {
                         if let (Some(&from_x), Some(&to_x)) =
                             (actor_positions.get(from), actor_positions.get(to))
                         {
+                            // Get sequence number if autonumber is enabled
+                            let seq_num = if autonumber_enabled {
+                                Some(sequence_index)
+                            } else {
+                                None
+                            };
+
                             let msg_element = render_message(
                                 from_x,
                                 to_x,
                                 current_y,
                                 &message.message,
                                 message.message_type,
+                                seq_num,
                             );
                             doc.add_element(msg_element);
+
+                            // Increment sequence number after each message
+                            if autonumber_enabled {
+                                sequence_index += sequence_step;
+                            }
                         }
                     }
                     if let (Some(from_idx), Some(to_idx)) = (
@@ -360,6 +348,44 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
             }
         }
     }
+
+    // Calculate final bottom actor position based on actual content
+    let bottom_actor_y = current_y;
+    let lifeline_end_y = bottom_actor_y;
+
+    // Render lifelines and bottom actors now that we know the final height
+    for (i, actor) in actors.iter().enumerate() {
+        let x = padding_x + (i as f64) * actor_spacing;
+        let center_x = x + actor_width / 2.0;
+
+        // Lifeline (mermaid.js style)
+        let lifeline = SvgElement::Line {
+            x1: center_x,
+            y1: lifeline_start_y,
+            x2: center_x,
+            y2: lifeline_end_y,
+            attrs: Attrs::new()
+                .with_attr("stroke-width", "0.5px")
+                .with_class("actor-line"),
+        };
+        doc.add_element(lifeline);
+
+        // Bottom actor box/stick figure
+        let bottom_actor = render_actor(
+            center_x,
+            bottom_actor_y,
+            actor_width,
+            actor_height,
+            &actor.description,
+            actor.actor_type,
+            actor_box_padding,
+        );
+        doc.add_element(bottom_actor);
+    }
+
+    // Set final SVG dimensions
+    let height = bottom_actor_y + actor_height + margin_top;
+    doc.set_size(width, height);
 
     Ok(doc.to_string())
 }
@@ -596,7 +622,14 @@ fn render_actor(
 }
 
 /// Render a message between two actors
-fn render_message(from_x: f64, to_x: f64, y: f64, label: &str, msg_type: LineType) -> SvgElement {
+fn render_message(
+    from_x: f64,
+    to_x: f64,
+    y: f64,
+    label: &str,
+    msg_type: LineType,
+    sequence_num: Option<i32>,
+) -> SvgElement {
     let mut children = Vec::new();
 
     let (is_dotted, marker_id) = match msg_type {
@@ -608,7 +641,13 @@ fn render_message(from_x: f64, to_x: f64, y: f64, label: &str, msg_type: LineTyp
         LineType::DottedCross => (true, Some("arrow-cross")),
         LineType::SolidPoint | LineType::DottedPoint => {
             // Self-message (loop back to same actor)
-            return render_self_message(from_x, y, label, msg_type == LineType::DottedPoint);
+            return render_self_message(
+                from_x,
+                y,
+                label,
+                msg_type == LineType::DottedPoint,
+                sequence_num,
+            );
         }
         _ => (false, Some("arrow-filled")),
     };
@@ -616,7 +655,33 @@ fn render_message(from_x: f64, to_x: f64, y: f64, label: &str, msg_type: LineTyp
     // Determine direction
     let is_self_message = (from_x - to_x).abs() < 1.0;
     if is_self_message {
-        return render_self_message(from_x, y, label, is_dotted);
+        return render_self_message(from_x, y, label, is_dotted, sequence_num);
+    }
+
+    // Sequence number (rendered at start of message line, like mermaid.js)
+    if let Some(num) = sequence_num {
+        let seq_x = from_x.min(to_x);
+        let seq_radius = 8.0;
+
+        // Circle background
+        children.push(SvgElement::Circle {
+            cx: seq_x,
+            cy: y,
+            r: seq_radius,
+            attrs: Attrs::new().with_class("sequenceNumber-circle"),
+        });
+
+        // Number text
+        children.push(SvgElement::Text {
+            x: seq_x,
+            y: y + 4.0,
+            content: num.to_string(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("sequenceNumber")
+                .with_attr("font-size", "12")
+                .with_attr("font-family", "sans-serif"),
+        });
     }
 
     // Message line
@@ -631,10 +696,28 @@ fn render_message(from_x: f64, to_x: f64, y: f64, label: &str, msg_type: LineTyp
         line_attrs = line_attrs.with_stroke_dasharray("5,5");
     }
 
+    // Adjust line start if sequence number is present
+    let line_start_x = if sequence_num.is_some() {
+        let seq_radius = 8.0;
+        if from_x < to_x {
+            from_x + seq_radius
+        } else {
+            from_x
+        }
+    } else {
+        from_x
+    };
+
+    let line_end_x = if sequence_num.is_some() && from_x > to_x {
+        to_x + 8.0
+    } else {
+        to_x
+    };
+
     children.push(SvgElement::Line {
-        x1: from_x,
+        x1: line_start_x,
         y1: y,
-        x2: to_x,
+        x2: line_end_x,
         y2: y,
         attrs: line_attrs,
     });
@@ -847,14 +930,47 @@ fn fragment_prefix(kind: FragmentKind) -> &'static str {
 }
 
 /// Render a self-message (message to the same actor)
-fn render_self_message(x: f64, y: f64, label: &str, is_dotted: bool) -> SvgElement {
+fn render_self_message(
+    x: f64,
+    y: f64,
+    label: &str,
+    is_dotted: bool,
+    sequence_num: Option<i32>,
+) -> SvgElement {
     let mut children = Vec::new();
     let loop_width = 40.0;
     let loop_height = 30.0;
 
+    // Sequence number (rendered at start of message)
+    if let Some(num) = sequence_num {
+        let seq_radius = 8.0;
+
+        // Circle background
+        children.push(SvgElement::Circle {
+            cx: x,
+            cy: y,
+            r: seq_radius,
+            attrs: Attrs::new().with_class("sequenceNumber-circle"),
+        });
+
+        // Number text
+        children.push(SvgElement::Text {
+            x,
+            y: y + 4.0,
+            content: num.to_string(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("sequenceNumber")
+                .with_attr("font-size", "12")
+                .with_attr("font-family", "sans-serif"),
+        });
+    }
+
+    let start_x = if sequence_num.is_some() { x + 8.0 } else { x };
+
     let path = format!(
         "M {} {} L {} {} L {} {} L {} {}",
-        x,
+        start_x,
         y,
         x + loop_width,
         y,
@@ -1203,6 +1319,16 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
 
 .sequence-number {{
   fill: {signal_color};
+}}
+
+.sequenceNumber-circle {{
+  fill: {actor_bkg};
+  stroke: {actor_border};
+  stroke-width: 1.5px;
+}}
+
+.sequenceNumber {{
+  fill: {actor_text_color};
 }}
 "#,
         signal_text_color = theme.signal_text_color,

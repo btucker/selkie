@@ -104,6 +104,7 @@ impl Commit {
 pub struct BranchConfig {
     pub name: String,
     pub order: Option<i32>,
+    pub created_seq: usize,
 }
 
 /// The git graph database
@@ -123,6 +124,8 @@ pub struct GitGraphDb {
     direction: DiagramOrientation,
     /// Commit sequence counter
     seq: usize,
+    /// Branch sequence counter (for deterministic ordering)
+    branch_seq: usize,
     /// Accessibility title
     pub acc_title: String,
     /// Accessibility description
@@ -147,12 +150,22 @@ impl GitGraphDb {
             current_branch: "main".to_string(),
             direction: DiagramOrientation::LeftToRight,
             seq: 0,
+            branch_seq: 0,
             acc_title: String::new(),
             acc_descr: String::new(),
             diagram_title: String::new(),
         };
         // Initialize main branch
         db.branches.insert("main".to_string(), None);
+        db.branch_config.insert(
+            "main".to_string(),
+            BranchConfig {
+                name: "main".to_string(),
+                order: Some(0),
+                created_seq: db.branch_seq,
+            },
+        );
+        db.branch_seq += 1;
         db
     }
 
@@ -164,11 +177,21 @@ impl GitGraphDb {
         self.current_branch = "main".to_string();
         self.direction = DiagramOrientation::LeftToRight;
         self.seq = 0;
+        self.branch_seq = 0;
         self.acc_title.clear();
         self.acc_descr.clear();
         self.diagram_title.clear();
         // Re-initialize main branch
         self.branches.insert("main".to_string(), None);
+        self.branch_config.insert(
+            "main".to_string(),
+            BranchConfig {
+                name: "main".to_string(),
+                order: Some(0),
+                created_seq: self.branch_seq,
+            },
+        );
+        self.branch_seq += 1;
     }
 
     /// Set the diagram direction
@@ -198,7 +221,21 @@ impl GitGraphDb {
 
     /// Get branches as array of objects (for compatibility)
     pub fn get_branches_as_obj_array(&self) -> Vec<BranchConfig> {
-        self.branch_config.values().cloned().collect()
+        let mut branches: Vec<BranchConfig> = self.branch_config.values().cloned().collect();
+        branches.sort_by(|a, b| {
+            let order_a = a
+                .order
+                .map(|o| o as f64)
+                .unwrap_or(0.0 + (a.created_seq as f64 / 1000.0));
+            let order_b = b
+                .order
+                .map(|o| o as f64)
+                .unwrap_or(0.0 + (b.created_seq as f64 / 1000.0));
+            order_a
+                .partial_cmp(&order_b)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        branches
     }
 
     /// Get the HEAD commit
@@ -242,8 +279,15 @@ impl GitGraphDb {
         // New branch points to the same commit as current branch
         let current_head = self.branches.get(&self.current_branch).cloned().flatten();
         self.branches.insert(name.clone(), current_head);
-        self.branch_config
-            .insert(name.clone(), BranchConfig { name, order });
+        self.branch_config.insert(
+            name.clone(),
+            BranchConfig {
+                name,
+                order,
+                created_seq: self.branch_seq,
+            },
+        );
+        self.branch_seq += 1;
     }
 
     /// Checkout/switch to a branch
