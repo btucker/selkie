@@ -28,6 +28,17 @@ const PLOT_COLORS: &[&str] = &[
     "#FF9DA6", // Pink
 ];
 
+/// Chart area dimensions and data range
+struct ChartArea {
+    plot_left: f64,
+    plot_top: f64,
+    plot_width: f64,
+    plot_height: f64,
+    y_min: f64,
+    y_max: f64,
+    num_points: usize,
+}
+
 /// Render an XY chart to SVG
 pub fn render_xychart(db: &XYChartDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
@@ -96,36 +107,21 @@ pub fn render_xychart(db: &XYChartDb, config: &RenderConfig) -> Result<String> {
         return Ok(doc.to_string());
     }
 
-    // Create scaling functions
-    let is_horizontal = db.orientation == ChartOrientation::Horizontal;
+    let area = ChartArea {
+        plot_left,
+        plot_top,
+        plot_width,
+        plot_height,
+        y_min,
+        y_max,
+        num_points,
+    };
 
     // Render based on orientation
-    if is_horizontal {
-        render_horizontal_chart(
-            &mut doc,
-            db,
-            config,
-            plot_left,
-            plot_top,
-            plot_width,
-            plot_height,
-            y_min,
-            y_max,
-            num_points,
-        );
+    if db.orientation == ChartOrientation::Horizontal {
+        render_horizontal_chart(&mut doc, db, config, &area);
     } else {
-        render_vertical_chart(
-            &mut doc,
-            db,
-            config,
-            plot_left,
-            plot_top,
-            plot_width,
-            plot_height,
-            y_min,
-            y_max,
-            num_points,
-        );
+        render_vertical_chart(&mut doc, db, config, &area);
     }
 
     Ok(doc.to_string())
@@ -136,80 +132,21 @@ fn render_vertical_chart(
     doc: &mut SvgDocument,
     db: &XYChartDb,
     config: &RenderConfig,
-    plot_left: f64,
-    plot_top: f64,
-    plot_width: f64,
-    plot_height: f64,
-    y_min: f64,
-    y_max: f64,
-    num_points: usize,
+    area: &ChartArea,
 ) {
-    let plot_bottom = plot_top + plot_height;
-    let _plot_right = plot_left + plot_width;
+    let plot_bottom = area.plot_top + area.plot_height;
 
     // Render axes
-    render_y_axis(
-        doc,
-        db,
-        config,
-        plot_left,
-        plot_top,
-        plot_height,
-        y_min,
-        y_max,
-        false,
-    );
-    render_x_axis(
-        doc,
-        db,
-        config,
-        plot_left,
-        plot_bottom,
-        plot_width,
-        num_points,
-        false,
-    );
+    render_y_axis(doc, db, config, area.plot_left, area.plot_top, area.plot_height, area.y_min, area.y_max, false);
+    render_x_axis(doc, db, config, area.plot_left, plot_bottom, area.plot_width, area.num_points, false);
 
     // Render plots
-    let mut bar_index = 0;
-    let mut line_index = 0;
-
     for (plot_idx, plot) in db.get_plots().iter().enumerate() {
         let color = PLOT_COLORS[plot_idx % PLOT_COLORS.len()];
 
         match plot.plot_type {
-            PlotType::Bar => {
-                render_vertical_bars(
-                    doc,
-                    plot,
-                    color,
-                    plot_left,
-                    plot_top,
-                    plot_width,
-                    plot_height,
-                    y_min,
-                    y_max,
-                    num_points,
-                    bar_index,
-                );
-                bar_index += 1;
-            }
-            PlotType::Line => {
-                render_vertical_line(
-                    doc,
-                    plot,
-                    color,
-                    plot_left,
-                    plot_top,
-                    plot_width,
-                    plot_height,
-                    y_min,
-                    y_max,
-                    num_points,
-                    line_index,
-                );
-                line_index += 1;
-            }
+            PlotType::Bar => render_vertical_bars(doc, plot, color, area),
+            PlotType::Line => render_vertical_line(doc, plot, color, area),
         }
     }
 }
@@ -219,116 +156,46 @@ fn render_horizontal_chart(
     doc: &mut SvgDocument,
     db: &XYChartDb,
     config: &RenderConfig,
-    plot_left: f64,
-    plot_top: f64,
-    plot_width: f64,
-    plot_height: f64,
-    y_min: f64,
-    y_max: f64,
-    num_points: usize,
+    area: &ChartArea,
 ) {
     // In horizontal mode, x and y are swapped visually
     // X-axis (categories) goes on the left (vertical)
     // Y-axis (values) goes on the top (horizontal)
 
-    render_y_axis(
-        doc,
-        db,
-        config,
-        plot_left,
-        plot_top,
-        plot_width,
-        y_min,
-        y_max,
-        true,
-    );
-    render_x_axis(
-        doc,
-        db,
-        config,
-        plot_left,
-        plot_top,
-        plot_height,
-        num_points,
-        true,
-    );
+    render_y_axis(doc, db, config, area.plot_left, area.plot_top, area.plot_width, area.y_min, area.y_max, true);
+    render_x_axis(doc, db, config, area.plot_left, area.plot_top, area.plot_height, area.num_points, true);
 
     // Render plots
-    let mut bar_index = 0;
-    let mut line_index = 0;
-
     for (plot_idx, plot) in db.get_plots().iter().enumerate() {
         let color = PLOT_COLORS[plot_idx % PLOT_COLORS.len()];
 
         match plot.plot_type {
-            PlotType::Bar => {
-                render_horizontal_bars(
-                    doc,
-                    plot,
-                    color,
-                    plot_left,
-                    plot_top,
-                    plot_width,
-                    plot_height,
-                    y_min,
-                    y_max,
-                    num_points,
-                    bar_index,
-                );
-                bar_index += 1;
-            }
-            PlotType::Line => {
-                render_horizontal_line(
-                    doc,
-                    plot,
-                    color,
-                    plot_left,
-                    plot_top,
-                    plot_width,
-                    plot_height,
-                    y_min,
-                    y_max,
-                    num_points,
-                    line_index,
-                );
-                line_index += 1;
-            }
+            PlotType::Bar => render_horizontal_bars(doc, plot, color, area),
+            PlotType::Line => render_horizontal_line(doc, plot, color, area),
         }
     }
 }
 
 /// Render vertical bars for a bar plot
-fn render_vertical_bars(
-    doc: &mut SvgDocument,
-    plot: &Plot,
-    color: &str,
-    plot_left: f64,
-    plot_top: f64,
-    plot_width: f64,
-    plot_height: f64,
-    y_min: f64,
-    y_max: f64,
-    num_points: usize,
-    _bar_index: usize,
-) {
-    let bar_spacing = plot_width / num_points as f64;
+fn render_vertical_bars(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &ChartArea) {
+    let bar_spacing = area.plot_width / area.num_points as f64;
     let bar_padding = 0.1; // 10% padding on each side
     let bar_width = bar_spacing * (1.0 - 2.0 * bar_padding);
 
-    let plot_bottom = plot_top + plot_height;
-    let y_range = y_max - y_min;
+    let plot_bottom = area.plot_top + area.plot_height;
+    let y_range = area.y_max - area.y_min;
 
     for (i, data_point) in plot.data.iter().enumerate() {
-        let x = plot_left + bar_spacing * (i as f64 + 0.5) - bar_width / 2.0;
+        let x = area.plot_left + bar_spacing * (i as f64 + 0.5) - bar_width / 2.0;
 
         // Calculate bar height and y position
         let value_ratio = if y_range != 0.0 {
-            (data_point.value - y_min) / y_range
+            (data_point.value - area.y_min) / y_range
         } else {
             0.5
         };
 
-        let bar_height = plot_height * value_ratio;
+        let bar_height = area.plot_height * value_ratio;
         let y = plot_bottom - bar_height;
 
         // Handle negative values
@@ -337,7 +204,7 @@ fn render_vertical_bars(
         } else {
             // For negative values, the bar goes down from the zero line
             let zero_y = if y_range != 0.0 {
-                plot_bottom - plot_height * ((0.0 - y_min) / y_range)
+                plot_bottom - area.plot_height * ((0.0 - area.y_min) / y_range)
             } else {
                 plot_bottom
             };
@@ -360,39 +227,27 @@ fn render_vertical_bars(
 }
 
 /// Render horizontal bars for a bar plot
-fn render_horizontal_bars(
-    doc: &mut SvgDocument,
-    plot: &Plot,
-    color: &str,
-    plot_left: f64,
-    plot_top: f64,
-    plot_width: f64,
-    plot_height: f64,
-    y_min: f64,
-    y_max: f64,
-    num_points: usize,
-    _bar_index: usize,
-) {
-    let bar_spacing = plot_height / num_points as f64;
+fn render_horizontal_bars(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &ChartArea) {
+    let bar_spacing = area.plot_height / area.num_points as f64;
     let bar_padding = 0.1;
     let bar_height = bar_spacing * (1.0 - 2.0 * bar_padding);
 
-    let y_range = y_max - y_min;
+    let y_range = area.y_max - area.y_min;
 
     for (i, data_point) in plot.data.iter().enumerate() {
-        let y = plot_top + bar_spacing * (i as f64 + 0.5) - bar_height / 2.0;
+        let y = area.plot_top + bar_spacing * (i as f64 + 0.5) - bar_height / 2.0;
 
         // Calculate bar width
         let value_ratio = if y_range != 0.0 {
-            (data_point.value - y_min) / y_range
+            (data_point.value - area.y_min) / y_range
         } else {
             0.5
         };
 
-        let bar_width_calc = plot_width * value_ratio;
+        let bar_width_calc = area.plot_width * value_ratio;
 
         let bar = SvgElement::Rect {
-            x: plot_left,
+            x: area.plot_left,
             y,
             width: bar_width_calc.max(0.0),
             height: bar_height.max(1.0),
@@ -407,47 +262,35 @@ fn render_horizontal_bars(
 }
 
 /// Render a line for a line plot (vertical orientation)
-fn render_vertical_line(
-    doc: &mut SvgDocument,
-    plot: &Plot,
-    color: &str,
-    plot_left: f64,
-    plot_top: f64,
-    plot_width: f64,
-    plot_height: f64,
-    y_min: f64,
-    y_max: f64,
-    num_points: usize,
-    _line_index: usize,
-) {
+fn render_vertical_line(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &ChartArea) {
     if plot.data.is_empty() {
         return;
     }
 
-    let x_spacing = if num_points > 1 {
-        plot_width / (num_points - 1) as f64
+    let x_spacing = if area.num_points > 1 {
+        area.plot_width / (area.num_points - 1) as f64
     } else {
-        plot_width
+        area.plot_width
     };
 
-    let plot_bottom = plot_top + plot_height;
-    let y_range = y_max - y_min;
+    let plot_bottom = area.plot_top + area.plot_height;
+    let y_range = area.y_max - area.y_min;
 
     let mut path_data = String::new();
 
     for (i, data_point) in plot.data.iter().enumerate() {
-        let x = if num_points > 1 {
-            plot_left + x_spacing * i as f64
+        let x = if area.num_points > 1 {
+            area.plot_left + x_spacing * i as f64
         } else {
-            plot_left + plot_width / 2.0
+            area.plot_left + area.plot_width / 2.0
         };
 
         let value_ratio = if y_range != 0.0 {
-            (data_point.value - y_min) / y_range
+            (data_point.value - area.y_min) / y_range
         } else {
             0.5
         };
-        let y = plot_bottom - plot_height * value_ratio;
+        let y = plot_bottom - area.plot_height * value_ratio;
 
         if i == 0 {
             path_data.push_str(&format!("M {} {}", x, y));
@@ -468,18 +311,18 @@ fn render_vertical_line(
 
     // Add circles at data points
     for (i, data_point) in plot.data.iter().enumerate() {
-        let x = if num_points > 1 {
-            plot_left + x_spacing * i as f64
+        let x = if area.num_points > 1 {
+            area.plot_left + x_spacing * i as f64
         } else {
-            plot_left + plot_width / 2.0
+            area.plot_left + area.plot_width / 2.0
         };
 
         let value_ratio = if y_range != 0.0 {
-            (data_point.value - y_min) / y_range
+            (data_point.value - area.y_min) / y_range
         } else {
             0.5
         };
-        let y = plot_bottom - plot_height * value_ratio;
+        let y = plot_bottom - area.plot_height * value_ratio;
 
         let point = SvgElement::Circle {
             cx: x,
@@ -495,46 +338,34 @@ fn render_vertical_line(
 }
 
 /// Render a line for a line plot (horizontal orientation)
-fn render_horizontal_line(
-    doc: &mut SvgDocument,
-    plot: &Plot,
-    color: &str,
-    plot_left: f64,
-    plot_top: f64,
-    plot_width: f64,
-    plot_height: f64,
-    y_min: f64,
-    y_max: f64,
-    num_points: usize,
-    _line_index: usize,
-) {
+fn render_horizontal_line(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &ChartArea) {
     if plot.data.is_empty() {
         return;
     }
 
-    let y_spacing = if num_points > 1 {
-        plot_height / (num_points - 1) as f64
+    let y_spacing = if area.num_points > 1 {
+        area.plot_height / (area.num_points - 1) as f64
     } else {
-        plot_height
+        area.plot_height
     };
 
-    let y_range = y_max - y_min;
+    let y_range = area.y_max - area.y_min;
 
     let mut path_data = String::new();
 
     for (i, data_point) in plot.data.iter().enumerate() {
-        let y = if num_points > 1 {
-            plot_top + y_spacing * i as f64
+        let y = if area.num_points > 1 {
+            area.plot_top + y_spacing * i as f64
         } else {
-            plot_top + plot_height / 2.0
+            area.plot_top + area.plot_height / 2.0
         };
 
         let value_ratio = if y_range != 0.0 {
-            (data_point.value - y_min) / y_range
+            (data_point.value - area.y_min) / y_range
         } else {
             0.5
         };
-        let x = plot_left + plot_width * value_ratio;
+        let x = area.plot_left + area.plot_width * value_ratio;
 
         if i == 0 {
             path_data.push_str(&format!("M {} {}", x, y));
@@ -555,18 +386,18 @@ fn render_horizontal_line(
 
     // Add circles at data points
     for (i, data_point) in plot.data.iter().enumerate() {
-        let y = if num_points > 1 {
-            plot_top + y_spacing * i as f64
+        let y = if area.num_points > 1 {
+            area.plot_top + y_spacing * i as f64
         } else {
-            plot_top + plot_height / 2.0
+            area.plot_top + area.plot_height / 2.0
         };
 
         let value_ratio = if y_range != 0.0 {
-            (data_point.value - y_min) / y_range
+            (data_point.value - area.y_min) / y_range
         } else {
             0.5
         };
-        let x = plot_left + plot_width * value_ratio;
+        let x = area.plot_left + area.plot_width * value_ratio;
 
         let point = SvgElement::Circle {
             cx: x,
@@ -582,6 +413,7 @@ fn render_horizontal_line(
 }
 
 /// Render the Y-axis
+#[allow(clippy::too_many_arguments)]
 fn render_y_axis(
     doc: &mut SvgDocument,
     db: &XYChartDb,
@@ -688,6 +520,7 @@ fn render_y_axis(
 }
 
 /// Render the X-axis
+#[allow(clippy::too_many_arguments)]
 fn render_x_axis(
     doc: &mut SvgDocument,
     db: &XYChartDb,
@@ -866,9 +699,7 @@ fn get_x_axis_categories(db: &XYChartDb, num_points: usize) -> Vec<String> {
 
 /// Format a number for display
 fn format_number(value: f64) -> String {
-    if value.abs() >= 1000.0 {
-        format!("{:.0}", value)
-    } else if value.fract() == 0.0 {
+    if value.fract() == 0.0 || value.abs() >= 1000.0 {
         format!("{:.0}", value)
     } else {
         format!("{:.1}", value)
