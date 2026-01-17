@@ -577,18 +577,27 @@ fn render_relationship(
 ) -> SvgElement {
     let mut children = Vec::new();
 
-    // Calculate connection points
-    let (start_x, start_y, end_x, end_y) =
+    // Calculate connection points and attachment type
+    let (start_x, start_y, end_x, end_y, is_side_attachment) =
         calculate_connection_points(x1, y1, h1, w1, x2, y2, h2, w2);
 
-    // Calculate midpoint for Bezier curves (like mermaid.js)
-    let mid_y = (start_y + end_y) / 2.0;
-
-    // Create path data for the relationship line (using bezier curves like mermaid.js)
-    let path_d = format!(
-        "M{},{} C{},{} {},{} {},{}",
-        start_x, start_y, start_x, mid_y, end_x, mid_y, end_x, end_y
-    );
+    // Create path data for the relationship line
+    // The Bezier curve must approach endpoints perpendicularly for markers to display correctly
+    let path_d = if is_side_attachment {
+        // Side attachment: curve approaches horizontally (perpendicular to side of box)
+        let mid_x = (start_x + end_x) / 2.0;
+        format!(
+            "M{},{} C{},{} {},{} {},{}",
+            start_x, start_y, mid_x, start_y, mid_x, end_y, end_x, end_y
+        )
+    } else {
+        // Top/bottom attachment: curve approaches vertically (perpendicular to top/bottom)
+        let mid_y = (start_y + end_y) / 2.0;
+        format!(
+            "M{},{} C{},{} {},{} {},{}",
+            start_x, start_y, start_x, mid_y, end_x, mid_y, end_x, end_y
+        )
+    };
 
     // Get marker IDs for cardinalities
     // Note: Due to parser semantics, card_b is the left cardinality (for entity_a/start)
@@ -612,15 +621,15 @@ fn render_relationship(
         attrs: path_attrs,
     });
 
-    // Relationship label
+    // Relationship label (positioned at midpoint of path)
     if !label.is_empty() {
-        let mid_x = (start_x + end_x) / 2.0;
-        let label_mid_y = mid_y;
+        let label_mid_x = (start_x + end_x) / 2.0;
+        let label_mid_y = (start_y + end_y) / 2.0;
 
         // Background for label - uses CSS class for fill color
         let label_width = (label.len() as f64) * 7.0;
         children.push(SvgElement::Rect {
-            x: mid_x - label_width / 2.0 - 4.0,
+            x: label_mid_x - label_width / 2.0 - 4.0,
             y: label_mid_y - 12.0,
             width: label_width + 8.0,
             height: 23.0,
@@ -630,7 +639,7 @@ fn render_relationship(
         });
 
         children.push(SvgElement::Text {
-            x: mid_x,
+            x: label_mid_x,
             y: label_mid_y + 4.0,
             content: label.to_string(),
             attrs: Attrs::new()
@@ -649,6 +658,7 @@ fn render_relationship(
 /// Calculate connection points on entity box edges
 /// Uses a heuristic to prefer side attachment when there's significant horizontal offset,
 /// which better matches mermaid.js behavior for diagonal relationships.
+/// Returns (start_x, start_y, end_x, end_y, is_side_attachment)
 #[allow(clippy::too_many_arguments)]
 fn calculate_connection_points(
     x1: f64,
@@ -659,7 +669,7 @@ fn calculate_connection_points(
     y2: f64,
     h2: f64,
     w2: f64,
-) -> (f64, f64, f64, f64) {
+) -> (f64, f64, f64, f64, bool) {
     let center1_x = x1 + w1 / 2.0;
     let center1_y = y1 + h1 / 2.0;
     let center2_x = x2 + w2 / 2.0;
@@ -672,8 +682,11 @@ fn calculate_connection_points(
     // If the x offset is more than 30% of the larger entity width, prefer side attachment
     let x_threshold = w1.max(w2) * 0.3;
 
+    // Determine if this is a side attachment (horizontal approach needed)
+    let is_side_attachment = dx.abs() > dy.abs() || dx.abs() > x_threshold;
+
     // Determine attachment for entity 1 (source)
-    let (start_x, start_y) = if dx.abs() > dy.abs() || dx.abs() > x_threshold {
+    let (start_x, start_y) = if is_side_attachment {
         // Horizontal offset is dominant or significant - use sides
         if dx > 0.0 {
             (x1 + w1, center1_y)
@@ -689,7 +702,7 @@ fn calculate_connection_points(
     };
 
     // Determine attachment for entity 2 (target)
-    let (end_x, end_y) = if dx.abs() > dy.abs() || dx.abs() > x_threshold {
+    let (end_x, end_y) = if is_side_attachment {
         // Horizontal offset is dominant or significant - use sides
         if dx > 0.0 {
             (x2, center2_y)
@@ -704,7 +717,7 @@ fn calculate_connection_points(
         (center2_x, y2 + h2)
     };
 
-    (start_x, start_y, end_x, end_y)
+    (start_x, start_y, end_x, end_y, is_side_attachment)
 }
 
 fn generate_er_css(theme: &Theme) -> String {
