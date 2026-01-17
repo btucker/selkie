@@ -516,8 +516,9 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
     analysis
 }
 
-/// Extract stroke-width values from CSS <style> blocks using simplecss
+/// Extract stroke-width values from CSS <style> blocks
 /// Returns a map of selector component -> stroke-width value
+#[cfg(feature = "eval")]
 fn extract_css_stroke_widths(doc: &roxmltree::Document) -> std::collections::HashMap<String, f64> {
     use simplecss::StyleSheet;
 
@@ -569,6 +570,12 @@ fn extract_css_stroke_widths(doc: &roxmltree::Document) -> std::collections::Has
     }
 
     css_strokes
+}
+
+/// Fallback when eval feature is disabled - returns empty map
+#[cfg(not(feature = "eval"))]
+fn extract_css_stroke_widths(_doc: &roxmltree::Document) -> std::collections::HashMap<String, f64> {
+    std::collections::HashMap::new()
 }
 
 /// Analyze edge geometry - endpoints and attachment points
