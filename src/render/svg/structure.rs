@@ -450,23 +450,44 @@ fn analyze_z_order(doc: &roxmltree::Document) -> ZOrderAnalysis {
 }
 
 /// Analyze stroke-width values across the SVG
+/// Extracts from both inline attributes and CSS <style> blocks
 fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
     let mut analysis = StrokeAnalysis::default();
+
+    // First, extract stroke-width values from CSS <style> blocks
+    let css_stroke_widths = extract_css_stroke_widths(doc);
 
     for node in doc.descendants() {
         let tag = node.tag_name().name();
 
-        // Get stroke-width attribute (default is 1.0 if stroke is visible)
-        let stroke_width = node
+        // Get stroke-width from inline attribute
+        let inline_stroke_width = node
             .attribute("stroke-width")
             .and_then(|s| s.parse::<f64>().ok());
+
+        // Get stroke-width from CSS class or element type selector
+        let class = node.attribute("class").unwrap_or("");
+        let css_stroke_width = class
+            .split_whitespace()
+            .find_map(|c| css_stroke_widths.get(c).copied())
+            .or_else(|| {
+                css_stroke_widths
+                    .get(&format!("__element_{}", tag))
+                    .copied()
+            });
+
+        // Use inline if present, otherwise CSS, otherwise check if has stroke
+        let stroke_width = inline_stroke_width.or(css_stroke_width);
 
         // Only count if element has a visible stroke
         let has_stroke = node
             .attribute("stroke")
             .map(|s| s != "none")
             .unwrap_or(false)
-            || stroke_width.is_some();
+            || stroke_width.is_some()
+            || class
+                .split_whitespace()
+                .any(|c| css_stroke_widths.contains_key(c));
 
         if !has_stroke {
             continue;
@@ -493,6 +514,69 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
     }
 
     analysis
+}
+
+/// Extract stroke-width values from CSS <style> blocks
+/// Returns a map of class name -> stroke-width value
+fn extract_css_stroke_widths(doc: &roxmltree::Document) -> std::collections::HashMap<String, f64> {
+    let mut css_strokes = std::collections::HashMap::new();
+
+    for node in doc.descendants() {
+        if node.tag_name().name() == "style" {
+            if let Some(css_text) = node.text() {
+                // Simple regex-like parsing for stroke-width in CSS rules
+                // Format: .className { ... stroke-width: value; ... }
+                // or: .className { ... stroke-width:value; ... }
+                for rule in css_text.split('}') {
+                    // Find the selector part (before {)
+                    if let Some(brace_pos) = rule.find('{') {
+                        let selector = rule[..brace_pos].trim();
+                        let properties = &rule[brace_pos + 1..];
+
+                        // Extract class names from selector (handle .class, #id .class, etc.)
+                        let class_names: Vec<&str> = selector
+                            .split(|c: char| c.is_whitespace() || c == ',' || c == '>')
+                            .filter(|s| s.starts_with('.'))
+                            .map(|s| s.trim_start_matches('.'))
+                            .collect();
+
+                        // Look for stroke-width property
+                        if let Some(stroke_pos) = properties.find("stroke-width") {
+                            let after_prop = &properties[stroke_pos + 12..]; // "stroke-width".len() = 12
+                                                                             // Skip colon and whitespace
+                            let value_start = after_prop
+                                .find(|c: char| c.is_ascii_digit() || c == '.')
+                                .unwrap_or(0);
+                            let value_str = &after_prop[value_start..];
+                            // Parse until non-numeric (stops at 'px', ';', etc.)
+                            let value_end = value_str
+                                .find(|c: char| !c.is_ascii_digit() && c != '.')
+                                .unwrap_or(value_str.len());
+                            if let Ok(width) = value_str[..value_end].parse::<f64>() {
+                                for class in &class_names {
+                                    css_strokes.insert(class.to_string(), width);
+                                }
+                                // Also try element type selectors like "rect", "path", "line"
+                                // from selectors like "#my-svg .node rect"
+                                for part in selector.split_whitespace() {
+                                    let part = part.trim_start_matches('#');
+                                    match part {
+                                        "rect" | "path" | "line" | "circle" | "ellipse" => {
+                                            css_strokes
+                                                .insert(format!("__element_{}", part), width);
+                                        }
+                                        _ => {}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    css_strokes
 }
 
 /// Analyze edge geometry - endpoints and attachment points
