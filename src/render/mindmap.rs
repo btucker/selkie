@@ -339,7 +339,7 @@ fn render_node(node: &PositionedNode, _config: &RenderConfig) -> SvgElement {
     };
 
     // Build node class
-    let mut classes = vec!["mindmap-node".to_string(), section_class];
+    let mut classes = vec!["mindmap-node".to_string(), section_class.clone()];
     if let Some(ref class) = node.class {
         classes.push(class.clone());
     }
@@ -347,6 +347,12 @@ fn render_node(node: &PositionedNode, _config: &RenderConfig) -> SvgElement {
     // Render shape based on node type
     let shape = render_node_shape(node);
     node_children.push(shape);
+
+    // Render icon if present
+    if let Some(ref icon) = node.icon {
+        let icon_elem = render_node_icon(node, icon, &section_class);
+        node_children.push(icon_elem);
+    }
 
     // Render text label
     let text = render_node_text(node);
@@ -520,6 +526,34 @@ fn render_node_text(node: &PositionedNode) -> SvgElement {
     }
 }
 
+/// Render an icon for the node using foreignObject with Font Awesome classes
+fn render_node_icon(node: &PositionedNode, icon: &str, section_class: &str) -> SvgElement {
+    // Mermaid.js uses foreignObject with an <i> tag for Font Awesome icons
+    // This approach allows the icon to render properly in browsers that support foreignObject
+    let icon_class = format!("node-icon-{} {}", section_class.replace("section-", ""), icon);
+    let icon_size = 40.0;
+
+    // Position icon above the text
+    let y_offset = -10.0;
+
+    // Create foreignObject containing a div with the icon
+    let html_content = format!(
+        r#"<div xmlns="http://www.w3.org/1999/xhtml" class="icon-container" style="height:100%;display:flex;justify-content:center;align-items:center;"><i class="{}"></i></div>"#,
+        icon_class
+    );
+
+    SvgElement::Raw {
+        content: format!(
+            r#"<foreignObject x="{}" y="{}" width="{}" height="{}" style="text-align:center;">{}</foreignObject>"#,
+            (node.width - icon_size) / 2.0,
+            y_offset,
+            icon_size,
+            icon_size,
+            html_content
+        ),
+    }
+}
+
 /// Generate CSS for mindmap diagrams
 fn generate_mindmap_css(config: &RenderConfig) -> String {
     let theme = &config.theme;
@@ -592,6 +626,15 @@ fn generate_mindmap_css(config: &RenderConfig) -> String {
 .edge {{
   fill: none;
   stroke-width: 3px;
+}}
+.icon-container {{
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}}
+.icon-container i {{
+  font-size: 40px;
 }}
 {section_css}
 "#,
