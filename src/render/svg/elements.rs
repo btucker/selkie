@@ -119,8 +119,10 @@ pub enum SvgElement {
         ry: f64,
         attrs: Attrs,
     },
-    /// Polygon element
+    /// Polygon element with Point vector
     Polygon { points: Vec<Point>, attrs: Attrs },
+    /// Polygon element with points as string (for complex shapes)
+    PolygonStr { points: String, attrs: Attrs },
     /// Path element
     Path { d: String, attrs: Attrs },
     /// Line element
@@ -287,6 +289,10 @@ impl SvgElement {
                 points,
                 attrs: attrs.with_style(style),
             },
+            Self::PolygonStr { points, attrs } => Self::PolygonStr {
+                points,
+                attrs: attrs.with_style(style),
+            },
             Self::Path { d, attrs } => Self::Path {
                 d,
                 attrs: attrs.with_style(style),
@@ -356,6 +362,7 @@ impl SvgElement {
                 attrs,
             },
             Self::Polygon { points, .. } => Self::Polygon { points, attrs },
+            Self::PolygonStr { points, .. } => Self::PolygonStr { points, attrs },
             Self::Path { d, .. } => Self::Path { d, attrs },
             Self::Line { x1, y1, x2, y2, .. } => Self::Line {
                 x1,
@@ -441,6 +448,14 @@ impl SvgElement {
                     "{}<polygon points=\"{}\"{}/>",
                     indent_str,
                     points_str,
+                    attrs.to_string()
+                )
+            }
+            Self::PolygonStr { points, attrs } => {
+                format!(
+                    "{}<polygon points=\"{}\"{}/>",
+                    indent_str,
+                    points,
                     attrs.to_string()
                 )
             }

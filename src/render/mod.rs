@@ -8,6 +8,7 @@ mod er;
 mod flowchart;
 mod gantt;
 mod git;
+mod mindmap;
 mod pie;
 mod sequence;
 mod state;
@@ -85,6 +86,7 @@ pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<St
             let mut db_clone = db.clone();
             gantt::render_gantt(&mut db_clone, config)
         }
+        Diagram::Mindmap(db) => mindmap::render_mindmap(db, config),
         _ => Err(MermaidError::RenderError(format!(
             "Diagram type {:?} not yet supported for rendering",
             diagram_type_name(diagram)
