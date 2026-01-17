@@ -363,7 +363,7 @@
                     </tr>
                 </tbody>
             </table>
-            <p class="size-note">Selkie's WASM bundle is larger but renders significantly faster.</p>
+            <p class="size-note">Selkie is smaller than Mermaid.js when gzipped, and renders significantly faster.</p>
         </div>
 
         <div class="links">
@@ -497,7 +497,7 @@
         const MERMAID_SIZE_GZIPPED = 789334; // 770 KB
 
         // Typical WASM gzip compression ratio (WASM compresses very well)
-        const WASM_GZIP_RATIO = 0.25;
+        const WASM_GZIP_RATIO = 0.23;
 
         function median(values) {
             const sorted = [...values].sort((a, b) => a - b);
