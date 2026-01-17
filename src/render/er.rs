@@ -30,9 +30,9 @@ fn calculate_entity_dimensions(
 ) -> EntityDimensions {
     // Character width estimation for trebuchet ms font
     // Mermaid uses actual getBBox() measurements, we estimate based on font metrics
-    // Average character width is ~0.55-0.7 of font size for proportional fonts
-    let char_width = font_size * 0.7;
-    let header_char_width = 14.0 * 0.7; // Header uses font-size 14
+    // Average character width is ~0.55-0.65 of font size for proportional fonts
+    let char_width = font_size * 0.65;
+    let header_char_width = 14.0 * 0.65; // Header uses font-size 14
 
     // Calculate column widths from content
     let mut max_type_width = 0.0_f64;
@@ -58,9 +58,9 @@ fn calculate_entity_dimensions(
     // Column padding matching mermaid's entityPadding behavior
     // Mermaid uses: widthPadding = entityPadding / 3 (default 10/3 ≈ 3.33)
     // And applies widthPaddingFactor (4-8 depending on columns)
-    // We use larger padding for visual match
-    let col_padding = 15.0;
-    let col_right_padding = 12.0;
+    // Tuned for visual match
+    let col_padding = 12.0;
+    let col_right_padding = 10.0;
     let type_col_width = max_type_width + col_padding + col_right_padding;
     let name_col_width = max_name_width + col_padding + col_right_padding;
     let keys_col_width = if max_keys_width > 0.0 {
@@ -100,11 +100,11 @@ impl ToLayoutGraph for ErDb {
         let mut graph = LayoutGraph::new("er");
 
         // Set layout options from diagram direction
-        // Spacing values match mermaid.js: nodesep=100, edgesep=100, ranksep=100
+        // Spacing tuned to match mermaid.js visual output
         graph.options = LayoutOptions {
             direction: self.preferred_direction(),
-            node_spacing: 100.0,
-            layer_spacing: 100.0,
+            node_spacing: 75.0,
+            layer_spacing: 70.0,
             padding: Padding::uniform(20.0),
             ..Default::default()
         };
