@@ -949,7 +949,7 @@ mod tests {
         }
 
         #[test]
-        fn test_cypress_classDef_and_class() {
+        fn test_cypress_class_def_and_class() {
             // From Cypress: should support classDef and class statements
             let input = r#"stateDiagram-v2
     classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow

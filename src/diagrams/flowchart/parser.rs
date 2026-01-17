@@ -2097,7 +2097,7 @@ A[\LeanLeft\]"#;
     // Unit tests ported from mermaid parser specs (flow*.spec.js)
     mod unit_tests {
         use super::*;
-        use crate::diagrams::flowchart::types::{Direction, EdgeStroke};
+        use crate::diagrams::flowchart::types::EdgeStroke;
 
         // From flow.spec.js
         mod basic_parsing {
