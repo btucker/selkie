@@ -58,8 +58,6 @@ _Median of 10 runs after 2 warmup runs. Chromium via Playwright._
 | Selkie (WASM + JS) | ~5.0 MB | ~1.2 MB |
 | Mermaid.js | ~2.6 MB | ~775 KB |
 
-Selkie's WASM bundle is larger but offers significantly faster render times.
-
 ## Credits
 
 Selkie could not exist without all the human effort that has gone into these excellent projects:
