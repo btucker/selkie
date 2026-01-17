@@ -19,6 +19,175 @@ struct EntityDimensions {
     col_widths: [f64; 3],
 }
 
+/// Side of an entity box where edges can attach
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum AttachmentSide {
+    Top,
+    Bottom,
+    Left,
+    Right,
+}
+
+/// Information about an edge's attachment points for distribution calculation
+#[derive(Debug, Clone)]
+struct EdgeAttachment {
+    /// Index in the relationships list
+    relationship_idx: usize,
+    /// Side of entity A where this edge attaches
+    side_a: AttachmentSide,
+    /// Side of entity B where this edge attaches
+    side_b: AttachmentSide,
+    /// Entity A name
+    entity_a: String,
+    /// Entity B name
+    entity_b: String,
+}
+
+/// Pre-computed attachment position for an edge endpoint
+#[derive(Debug, Clone, Copy)]
+struct AttachmentPosition {
+    x: f64,
+    y: f64,
+}
+
+/// Determine which side of an entity box an edge should attach to
+/// Based on relative positions of the two entities
+#[allow(clippy::too_many_arguments)]
+fn determine_attachment_sides(
+    x1: f64,
+    y1: f64,
+    w1: f64,
+    h1: f64,
+    x2: f64,
+    y2: f64,
+    w2: f64,
+    h2: f64,
+) -> (AttachmentSide, AttachmentSide) {
+    let center1_x = x1 + w1 / 2.0;
+    let center1_y = y1 + h1 / 2.0;
+    let center2_x = x2 + w2 / 2.0;
+    let center2_y = y2 + h2 / 2.0;
+
+    let dx = center2_x - center1_x;
+    let dy = center2_y - center1_y;
+
+    // Determine if this is a side (horizontal) or top/bottom (vertical) attachment
+    let is_side_attachment = dx.abs() > dy.abs();
+
+    if is_side_attachment {
+        if dx > 0.0 {
+            (AttachmentSide::Right, AttachmentSide::Left)
+        } else {
+            (AttachmentSide::Left, AttachmentSide::Right)
+        }
+    } else if dy > 0.0 {
+        (AttachmentSide::Bottom, AttachmentSide::Top)
+    } else {
+        (AttachmentSide::Top, AttachmentSide::Bottom)
+    }
+}
+
+/// Calculate distributed attachment positions for edges that share the same entity side
+/// Returns a HashMap from (entity_name, side, edge_index) to attachment position
+fn calculate_distributed_attachments(
+    edge_attachments: &[EdgeAttachment],
+    entity_positions: &HashMap<String, (f64, f64)>,
+    entity_dimensions: &HashMap<String, EntityDimensions>,
+    marker_offset: f64,
+) -> HashMap<(String, AttachmentSide, usize), AttachmentPosition> {
+    let mut result = HashMap::new();
+
+    // Group edges by (entity, side) for both endpoints
+    // Key: (entity_name, side), Value: list of (edge_index, is_start_point)
+    let mut side_edges: HashMap<(String, AttachmentSide), Vec<(usize, bool)>> = HashMap::new();
+
+    for attachment in edge_attachments {
+        // Add entity A attachment (start point)
+        side_edges
+            .entry((attachment.entity_a.clone(), attachment.side_a))
+            .or_default()
+            .push((attachment.relationship_idx, true));
+
+        // Add entity B attachment (end point)
+        side_edges
+            .entry((attachment.entity_b.clone(), attachment.side_b))
+            .or_default()
+            .push((attachment.relationship_idx, false));
+    }
+
+    // Calculate distributed positions for each group
+    for ((entity_name, side), edges) in side_edges.iter() {
+        let Some(&(x, y)) = entity_positions.get(entity_name) else {
+            continue;
+        };
+        let Some(dims) = entity_dimensions.get(entity_name) else {
+            continue;
+        };
+
+        let count = edges.len();
+        if count == 0 {
+            continue;
+        }
+
+        // Calculate attachment positions distributed along the side
+        for (i, &(edge_idx, _is_start)) in edges.iter().enumerate() {
+            let position = calculate_distributed_position(
+                x,
+                y,
+                dims.width,
+                dims.height,
+                *side,
+                i,
+                count,
+                marker_offset,
+            );
+            result.insert((entity_name.clone(), *side, edge_idx), position);
+        }
+    }
+
+    result
+}
+
+/// Calculate a single distributed attachment position
+#[allow(clippy::too_many_arguments)]
+fn calculate_distributed_position(
+    entity_x: f64,
+    entity_y: f64,
+    entity_width: f64,
+    entity_height: f64,
+    side: AttachmentSide,
+    index: usize,
+    total: usize,
+    marker_offset: f64,
+) -> AttachmentPosition {
+    // Distribute points evenly along the side
+    // For N points, divide the side into N+1 segments and place points at segment boundaries
+    let fraction = (index as f64 + 1.0) / (total as f64 + 1.0);
+
+    match side {
+        AttachmentSide::Top => {
+            let x = entity_x + entity_width * fraction;
+            let y = entity_y - marker_offset;
+            AttachmentPosition { x, y }
+        }
+        AttachmentSide::Bottom => {
+            let x = entity_x + entity_width * fraction;
+            let y = entity_y + entity_height + marker_offset;
+            AttachmentPosition { x, y }
+        }
+        AttachmentSide::Left => {
+            let x = entity_x - marker_offset;
+            let y = entity_y + entity_height * fraction;
+            AttachmentPosition { x, y }
+        }
+        AttachmentSide::Right => {
+            let x = entity_x + entity_width + marker_offset;
+            let y = entity_y + entity_height * fraction;
+            AttachmentPosition { x, y }
+        }
+    }
+}
+
 /// Calculate entity dimensions based on content
 fn calculate_entity_dimensions(
     entity: &Entity,
@@ -297,10 +466,14 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
         .map(|(name, entity)| (entity.id.clone(), name.clone()))
         .collect();
 
-    // Render relationships FIRST so entity boxes paint on top and clip markers
-    // (SVG renders later elements on top of earlier ones)
-    for relationship in db.get_relationships() {
-        // Look up entity names from IDs
+    // Marker offset for edge endpoints (space for marker symbols)
+    let marker_offset = 18.0;
+
+    // First pass: collect all edge attachments to calculate distributed positions
+    let mut edge_attachments = Vec::new();
+    let relationships = db.get_relationships();
+
+    for (idx, relationship) in relationships.iter().enumerate() {
         let entity_a_name = entity_id_to_name.get(&relationship.entity_a);
         let entity_b_name = entity_id_to_name.get(&relationship.entity_b);
 
@@ -315,21 +488,64 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
                 let w1 = dims1.map(|d| d.width).unwrap_or(188.0);
                 let w2 = dims2.map(|d| d.width).unwrap_or(188.0);
 
-                let rel_elem = render_relationship(
-                    x1,
-                    y1,
-                    h1,
-                    w1,
-                    x2,
-                    y2,
-                    h2,
-                    w2,
-                    &relationship.role_a,
-                    relationship.rel_spec.card_a,
-                    relationship.rel_spec.card_b,
-                    relationship.rel_spec.rel_type,
-                );
-                doc.add_element(rel_elem);
+                let (side_a, side_b) = determine_attachment_sides(x1, y1, w1, h1, x2, y2, w2, h2);
+
+                edge_attachments.push(EdgeAttachment {
+                    relationship_idx: idx,
+                    side_a,
+                    side_b,
+                    entity_a: a_name.clone(),
+                    entity_b: b_name.clone(),
+                });
+            }
+        }
+    }
+
+    // Calculate distributed attachment positions
+    let distributed_positions = calculate_distributed_attachments(
+        &edge_attachments,
+        &entity_positions,
+        &entity_dimensions,
+        marker_offset,
+    );
+
+    // Render relationships FIRST so entity boxes paint on top and clip markers
+    // (SVG renders later elements on top of earlier ones)
+    for (idx, relationship) in relationships.iter().enumerate() {
+        // Look up entity names from IDs
+        let entity_a_name = entity_id_to_name.get(&relationship.entity_a);
+        let entity_b_name = entity_id_to_name.get(&relationship.entity_b);
+
+        if let (Some(a_name), Some(b_name)) = (entity_a_name, entity_b_name) {
+            // Find the attachment info for this relationship
+            let attachment = edge_attachments.iter().find(|a| a.relationship_idx == idx);
+
+            if let Some(attachment) = attachment {
+                // Look up the pre-computed distributed positions
+                let start_pos =
+                    distributed_positions.get(&(a_name.clone(), attachment.side_a, idx));
+                let end_pos = distributed_positions.get(&(b_name.clone(), attachment.side_b, idx));
+
+                if let (Some(start), Some(end)) = (start_pos, end_pos) {
+                    // Determine if this is a side (horizontal) attachment
+                    let is_side_attachment = matches!(
+                        attachment.side_a,
+                        AttachmentSide::Left | AttachmentSide::Right
+                    );
+
+                    let rel_elem = render_relationship_with_positions(
+                        start.x,
+                        start.y,
+                        end.x,
+                        end.y,
+                        is_side_attachment,
+                        &relationship.role_a,
+                        relationship.rel_spec.card_a,
+                        relationship.rel_spec.card_b,
+                        relationship.rel_spec.rel_type,
+                    );
+                    doc.add_element(rel_elem);
+                }
             }
         }
     }
@@ -564,8 +780,99 @@ fn render_entity(
     }
 }
 
-/// Render a relationship line between two entities using SVG markers
+/// Render a relationship line with pre-computed attachment positions
 /// Uses CSS classes for theming - colors are defined in generate_er_css()
+#[allow(clippy::too_many_arguments)]
+fn render_relationship_with_positions(
+    start_x: f64,
+    start_y: f64,
+    end_x: f64,
+    end_y: f64,
+    is_side_attachment: bool,
+    label: &str,
+    card_a: Cardinality,
+    card_b: Cardinality,
+    rel_type: Identification,
+) -> SvgElement {
+    let mut children = Vec::new();
+
+    // Create path data for the relationship line
+    // The Bezier curve must approach endpoints perpendicularly for markers to display correctly
+    let path_d = if is_side_attachment {
+        // Side attachment: curve approaches horizontally (perpendicular to side of box)
+        let mid_x = (start_x + end_x) / 2.0;
+        format!(
+            "M{},{} C{},{} {},{} {},{}",
+            start_x, start_y, mid_x, start_y, mid_x, end_y, end_x, end_y
+        )
+    } else {
+        // Top/bottom attachment: curve approaches vertically (perpendicular to top/bottom)
+        let mid_y = (start_y + end_y) / 2.0;
+        format!(
+            "M{},{} C{},{} {},{} {},{}",
+            start_x, start_y, start_x, mid_y, end_x, mid_y, end_x, end_y
+        )
+    };
+
+    // Get marker IDs for cardinalities
+    // Note: Due to parser semantics, card_b is the left cardinality (for entity_a/start)
+    // and card_a is the right cardinality (for entity_b/end)
+    let marker_start = cardinality_to_marker_id(card_b, false);
+    let marker_end = cardinality_to_marker_id(card_a, true);
+
+    // Build path attributes with markers
+    let mut path_attrs = Attrs::new()
+        .with_class("relationshipLine")
+        .with_attr("marker-start", &format!("url(#{})", marker_start))
+        .with_attr("marker-end", &format!("url(#{})", marker_end));
+
+    // Dotted line for non-identifying relationships
+    if rel_type == Identification::NonIdentifying {
+        path_attrs = path_attrs.with_stroke_dasharray("3");
+    }
+
+    children.push(SvgElement::Path {
+        d: path_d,
+        attrs: path_attrs,
+    });
+
+    // Relationship label (positioned at midpoint of path)
+    if !label.is_empty() {
+        let label_mid_x = (start_x + end_x) / 2.0;
+        let label_mid_y = (start_y + end_y) / 2.0;
+
+        // Background for label - uses CSS class for fill color
+        let label_width = (label.len() as f64) * 7.0;
+        children.push(SvgElement::Rect {
+            x: label_mid_x - label_width / 2.0 - 4.0,
+            y: label_mid_y - 12.0,
+            width: label_width + 8.0,
+            height: 23.0,
+            rx: Some(0.0),
+            ry: Some(0.0),
+            attrs: Attrs::new().with_class("relationship-label-background"),
+        });
+
+        children.push(SvgElement::Text {
+            x: label_mid_x,
+            y: label_mid_y + 4.0,
+            content: label.to_string(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("relationship-label")
+                .with_attr("font-size", "14"),
+        });
+    }
+
+    SvgElement::Group {
+        children,
+        attrs: Attrs::new().with_class("relationship"),
+    }
+}
+
+/// Render a relationship line between two entities using SVG markers (legacy)
+/// Uses CSS classes for theming - colors are defined in generate_er_css()
+#[allow(dead_code)]
 #[allow(clippy::too_many_arguments)]
 fn render_relationship(
     x1: f64,
@@ -1118,6 +1425,85 @@ mod tests {
             structure.labels.iter().any(|l| l == "id"),
             "Should have 'id' as a separate label. Got: {:?}",
             structure.labels
+        );
+    }
+
+    #[test]
+    fn test_converging_edges_distribute_attachment_points() {
+        // When multiple edges connect to the same entity side (like ORDER and PRODUCT
+        // both connecting to LINE-ITEM's top), they should be distributed across the
+        // edge rather than all centering at the same point.
+        //
+        // Mermaid behavior (from reference SVG):
+        //   Edge 2: ORDER -> LINE-ITEM: ends at x=237 on LINE-ITEM top
+        //   Edge 3: PRODUCT -> LINE-ITEM: ends at x=348 on LINE-ITEM top
+        // The two edges don't share the same endpoint x coordinate.
+
+        let input = r#"erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    PRODUCT ||--o{ LINE-ITEM : includes
+    CUSTOMER {
+        string name
+        string email PK
+        string address
+    }
+    ORDER {
+        int orderNumber PK
+        date orderDate
+        string status
+    }
+    PRODUCT {
+        int id PK
+        string name
+        float price
+    }
+"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // Parse the SVG structure to extract edge endpoints
+        let structure = SvgStructure::from_svg(&svg).unwrap();
+        let edge_details = &structure.edge_geometry.edge_details;
+
+        // Get edges that connect to LINE-ITEM (the entity at the bottom)
+        // These should have different endpoint x coordinates if properly distributed
+        // LINE-ITEM is at the bottom of the diagram, so we look for edges
+        // whose endpoints are in the lower Y region
+        let line_item_edges: Vec<_> = edge_details
+            .iter()
+            .filter(|e| {
+                // Filter for edges whose end points are at high Y (near LINE-ITEM)
+                e.end.1 > 400.0 // Approximate Y threshold for LINE-ITEM top
+            })
+            .collect();
+
+        // Should have at least 2 edges connecting to LINE-ITEM
+        assert!(
+            line_item_edges.len() >= 2,
+            "Should have at least 2 edges connecting to LINE-ITEM. \
+             Found {} total edges, {} matching filter. \
+             All edges: {:?}",
+            edge_details.len(),
+            line_item_edges.len(),
+            edge_details
+        );
+
+        // The endpoint X coordinates should NOT be the same
+        // (they should be distributed across LINE-ITEM's top edge)
+        let end_x1 = line_item_edges[0].end.0;
+        let end_x2 = line_item_edges[1].end.0;
+        let x_diff = (end_x1 - end_x2).abs();
+
+        assert!(
+            x_diff > 10.0,
+            "Converging edges should have distributed endpoints. \
+             Edge 1 ends at x={:.1}, Edge 2 ends at x={:.1}, diff={:.1}px. \
+             Expected >10px difference for proper distribution.",
+            end_x1,
+            end_x2,
+            x_diff
         );
     }
 
