@@ -1378,6 +1378,7 @@ dependencies = [
  "roxmltree",
  "serde",
  "serde_json",
+ "simplecss",
  "svg2pdf",
  "tempfile",
  "thiserror",

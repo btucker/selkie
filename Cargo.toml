@@ -51,6 +51,7 @@ tempfile = "3"
 
 # XML parsing (for SVG analysis)
 roxmltree = "0.20"
+simplecss = "0.2.2"
 
 [dev-dependencies]
 # Testing

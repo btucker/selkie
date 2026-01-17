@@ -516,58 +516,50 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
     analysis
 }
 
-/// Extract stroke-width values from CSS <style> blocks
-/// Returns a map of class name -> stroke-width value
+/// Extract stroke-width values from CSS <style> blocks using simplecss
+/// Returns a map of selector component -> stroke-width value
 fn extract_css_stroke_widths(doc: &roxmltree::Document) -> std::collections::HashMap<String, f64> {
+    use simplecss::StyleSheet;
+
     let mut css_strokes = std::collections::HashMap::new();
 
     for node in doc.descendants() {
         if node.tag_name().name() == "style" {
             if let Some(css_text) = node.text() {
-                // Simple regex-like parsing for stroke-width in CSS rules
-                // Format: .className { ... stroke-width: value; ... }
-                // or: .className { ... stroke-width:value; ... }
-                for rule in css_text.split('}') {
-                    // Find the selector part (before {)
-                    if let Some(brace_pos) = rule.find('{') {
-                        let selector = rule[..brace_pos].trim();
-                        let properties = &rule[brace_pos + 1..];
+                // Parse CSS using simplecss
+                let stylesheet = StyleSheet::parse(css_text);
 
-                        // Extract class names from selector (handle .class, #id .class, etc.)
-                        let class_names: Vec<&str> = selector
-                            .split(|c: char| c.is_whitespace() || c == ',' || c == '>')
-                            .filter(|s| s.starts_with('.'))
-                            .map(|s| s.trim_start_matches('.'))
-                            .collect();
+                for rule in stylesheet.rules {
+                    // Check if this rule has a stroke-width declaration
+                    let mut stroke_width: Option<f64> = None;
 
-                        // Look for stroke-width property
-                        if let Some(stroke_pos) = properties.find("stroke-width") {
-                            let after_prop = &properties[stroke_pos + 12..]; // "stroke-width".len() = 12
-                                                                             // Skip colon and whitespace
-                            let value_start = after_prop
-                                .find(|c: char| c.is_ascii_digit() || c == '.')
-                                .unwrap_or(0);
-                            let value_str = &after_prop[value_start..];
-                            // Parse until non-numeric (stops at 'px', ';', etc.)
-                            let value_end = value_str
-                                .find(|c: char| !c.is_ascii_digit() && c != '.')
-                                .unwrap_or(value_str.len());
-                            if let Ok(width) = value_str[..value_end].parse::<f64>() {
-                                for class in &class_names {
-                                    css_strokes.insert(class.to_string(), width);
+                    for decl in &rule.declarations {
+                        if decl.name == "stroke-width" {
+                            // Parse value, stripping 'px' suffix if present
+                            let value = decl.value.trim().trim_end_matches("px");
+                            if let Ok(width) = value.parse::<f64>() {
+                                stroke_width = Some(width);
+                            }
+                        }
+                    }
+
+                    // If we found a stroke-width, associate it with selector components
+                    if let Some(width) = stroke_width {
+                        let selector_str = rule.selector.to_string();
+
+                        // Extract class names from selector
+                        for part in selector_str.split(&[' ', ',', '>', '+', '~'][..]) {
+                            let part = part.trim();
+                            if part.starts_with('.') {
+                                let class = part.trim_start_matches('.');
+                                css_strokes.insert(class.to_string(), width);
+                            }
+                            // Also track element type selectors
+                            match part {
+                                "rect" | "path" | "line" | "circle" | "ellipse" => {
+                                    css_strokes.insert(format!("__element_{}", part), width);
                                 }
-                                // Also try element type selectors like "rect", "path", "line"
-                                // from selectors like "#my-svg .node rect"
-                                for part in selector.split_whitespace() {
-                                    let part = part.trim_start_matches('#');
-                                    match part {
-                                        "rect" | "path" | "line" | "circle" | "ellipse" => {
-                                            css_strokes
-                                                .insert(format!("__element_{}", part), width);
-                                        }
-                                        _ => {}
-                                    }
-                                }
+                                _ => {}
                             }
                         }
                     }
