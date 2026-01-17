@@ -88,6 +88,29 @@ pub struct EdgeGeometry {
     pub vertical_attachments: usize,
     /// Edges that attach to left/right of nodes (horizontal attachment)
     pub horizontal_attachments: usize,
+    /// Detailed edge attachment information
+    pub edge_details: Vec<EdgeDetail>,
+}
+
+/// Detailed information about a single edge
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct EdgeDetail {
+    /// Start point coordinates
+    pub start: (f64, f64),
+    /// End point coordinates
+    pub end: (f64, f64),
+    /// Node ID at start (if identified)
+    pub start_node: Option<String>,
+    /// Node ID at end (if identified)
+    pub end_node: Option<String>,
+    /// Which edge of the start node (top, bottom, left, right)
+    pub start_edge: String,
+    /// Which edge of the end node (top, bottom, left, right)
+    pub end_edge: String,
+    /// Offset from center of start edge (0 = centered)
+    pub start_center_offset: f64,
+    /// Offset from center of end edge (0 = centered)
+    pub end_center_offset: f64,
 }
 
 /// Bounding box of a node element
@@ -647,6 +670,67 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                 }
             }
         }
+
+        // Also check for mermaid.js node containers (<g class="node" transform="translate(x,y)">)
+        // These contain child <path> elements that define the box bounds relative to center
+        if node.tag_name().name() == "g" {
+            let class = node.attribute("class").unwrap_or("");
+            let id = node.attribute("id").unwrap_or("");
+
+            if class.contains("node") && id.contains("entity") {
+                // Parse transform="translate(x, y)"
+                if let Some(transform) = node.attribute("transform") {
+                    if let Some((cx, cy)) = parse_translate(transform) {
+                        // Find first child path to get bounds
+                        for child in node.children() {
+                            if child.tag_name().name() == "path" {
+                                if let Some(d) = child.attribute("d") {
+                                    if let Some((half_w, half_h)) = parse_rect_path_dimensions(d) {
+                                        geometry.node_bounds.push(NodeBounds {
+                                            x: cx - half_w,
+                                            y: cy - half_h,
+                                            width: half_w * 2.0,
+                                            height: half_h * 2.0,
+                                            id: id.to_string(),
+                                        });
+                                        break;
+                                    }
+                                }
+                            }
+                            // Also check for rect child (LINE-ITEM uses this)
+                            if child.tag_name().name() == "rect" {
+                                let rx = child
+                                    .attribute("x")
+                                    .and_then(|s| s.parse::<f64>().ok())
+                                    .unwrap_or(0.0);
+                                let ry = child
+                                    .attribute("y")
+                                    .and_then(|s| s.parse::<f64>().ok())
+                                    .unwrap_or(0.0);
+                                let rw = child
+                                    .attribute("width")
+                                    .and_then(|s| s.parse::<f64>().ok())
+                                    .unwrap_or(0.0);
+                                let rh = child
+                                    .attribute("height")
+                                    .and_then(|s| s.parse::<f64>().ok())
+                                    .unwrap_or(0.0);
+                                if rw > 0.0 && rh > 0.0 {
+                                    geometry.node_bounds.push(NodeBounds {
+                                        x: cx + rx,
+                                        y: cy + ry,
+                                        width: rw,
+                                        height: rh,
+                                        id: id.to_string(),
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Collect edge endpoints from paths
@@ -665,8 +749,28 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                             .edge_endpoints
                             .push((start.0, start.1, end.0, end.1));
 
-                        // Determine attachment type based on node positions
+                        // Find best matching nodes for start and end
+                        let mut best_start: Option<AttachmentInfo> = None;
+                        let mut best_end: Option<AttachmentInfo> = None;
+
                         for bounds in &geometry.node_bounds {
+                            let start_info = classify_attachment_detailed(start, bounds);
+                            let end_info = classify_attachment_detailed(end, bounds);
+
+                            if start_info.attach_type != AttachmentType::None
+                                && (best_start.is_none()
+                                    || start_info.distance < best_start.as_ref().unwrap().distance)
+                            {
+                                best_start = Some(start_info);
+                            }
+                            if end_info.attach_type != AttachmentType::None
+                                && (best_end.is_none()
+                                    || end_info.distance < best_end.as_ref().unwrap().distance)
+                            {
+                                best_end = Some(end_info);
+                            }
+
+                            // Count attachment types
                             let (attach_type_start, _) = classify_attachment(start, bounds);
                             let (attach_type_end, _) = classify_attachment(end, bounds);
 
@@ -681,6 +785,31 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                                 geometry.horizontal_attachments += 1;
                             }
                         }
+
+                        // Create edge detail
+                        let detail = EdgeDetail {
+                            start,
+                            end,
+                            start_node: best_start.as_ref().and_then(|i| i.node_id.clone()),
+                            end_node: best_end.as_ref().and_then(|i| i.node_id.clone()),
+                            start_edge: best_start
+                                .as_ref()
+                                .map(|i| i.edge_name.clone())
+                                .unwrap_or_else(|| "none".to_string()),
+                            end_edge: best_end
+                                .as_ref()
+                                .map(|i| i.edge_name.clone())
+                                .unwrap_or_else(|| "none".to_string()),
+                            start_center_offset: best_start
+                                .as_ref()
+                                .map(|i| i.center_offset)
+                                .unwrap_or(0.0),
+                            end_center_offset: best_end
+                                .as_ref()
+                                .map(|i| i.center_offset)
+                                .unwrap_or(0.0),
+                        };
+                        geometry.edge_details.push(detail);
                     }
                 }
             }
@@ -697,51 +826,155 @@ enum AttachmentType {
     None,
 }
 
-/// Classify how a point attaches to a node bounds
-fn classify_attachment(point: (f64, f64), bounds: &NodeBounds) -> (AttachmentType, f64) {
+/// Detailed attachment info for an edge endpoint
+struct AttachmentInfo {
+    attach_type: AttachmentType,
+    edge_name: String,       // "top", "bottom", "left", "right", "none"
+    node_id: Option<String>, // ID of the node this attaches to
+    center_offset: f64,      // Distance from center of that edge (0 = centered)
+    distance: f64,           // Distance from the edge
+}
+
+/// Classify how a point attaches to a node bounds with detailed info
+fn classify_attachment_detailed(point: (f64, f64), bounds: &NodeBounds) -> AttachmentInfo {
     let (px, py) = point;
-    let tolerance = 5.0; // pixels
+    let tolerance = 25.0; // Increased tolerance to account for marker offsets
 
     let left = bounds.x;
     let right = bounds.x + bounds.width;
     let top = bounds.y;
     let bottom = bounds.y + bounds.height;
+    let center_x = bounds.x + bounds.width / 2.0;
+    let center_y = bounds.y + bounds.height / 2.0;
 
-    // Check if point is near the node
-    let near_left = (px - left).abs() < tolerance;
-    let near_right = (px - right).abs() < tolerance;
-    let near_top = (py - top).abs() < tolerance;
-    let near_bottom = (py - bottom).abs() < tolerance;
+    // Check proximity to each edge
+    let dist_top = (py - top).abs();
+    let dist_bottom = (py - bottom).abs();
+    let dist_left = (px - left).abs();
+    let dist_right = (px - right).abs();
 
     let within_x = px >= left - tolerance && px <= right + tolerance;
     let within_y = py >= top - tolerance && py <= bottom + tolerance;
 
-    // Vertical attachment (top or bottom edge)
-    if (near_top || near_bottom) && within_x {
-        let dist = if near_top {
-            (py - top).abs()
-        } else {
-            (py - bottom).abs()
+    // Find the closest edge
+    if dist_top < tolerance && within_x {
+        return AttachmentInfo {
+            attach_type: AttachmentType::Vertical,
+            edge_name: "top".to_string(),
+            node_id: Some(bounds.id.clone()),
+            center_offset: px - center_x,
+            distance: dist_top,
         };
-        return (AttachmentType::Vertical, dist);
+    }
+    if dist_bottom < tolerance && within_x {
+        return AttachmentInfo {
+            attach_type: AttachmentType::Vertical,
+            edge_name: "bottom".to_string(),
+            node_id: Some(bounds.id.clone()),
+            center_offset: px - center_x,
+            distance: dist_bottom,
+        };
+    }
+    if dist_left < tolerance && within_y {
+        return AttachmentInfo {
+            attach_type: AttachmentType::Horizontal,
+            edge_name: "left".to_string(),
+            node_id: Some(bounds.id.clone()),
+            center_offset: py - center_y,
+            distance: dist_left,
+        };
+    }
+    if dist_right < tolerance && within_y {
+        return AttachmentInfo {
+            attach_type: AttachmentType::Horizontal,
+            edge_name: "right".to_string(),
+            node_id: Some(bounds.id.clone()),
+            center_offset: py - center_y,
+            distance: dist_right,
+        };
     }
 
-    // Horizontal attachment (left or right edge)
-    if (near_left || near_right) && within_y {
-        let dist = if near_left {
-            (px - left).abs()
-        } else {
-            (px - right).abs()
-        };
-        return (AttachmentType::Horizontal, dist);
+    AttachmentInfo {
+        attach_type: AttachmentType::None,
+        edge_name: "none".to_string(),
+        node_id: None,
+        center_offset: 0.0,
+        distance: f64::MAX,
+    }
+}
+
+/// Classify how a point attaches to a node bounds (legacy simple version)
+fn classify_attachment(point: (f64, f64), bounds: &NodeBounds) -> (AttachmentType, f64) {
+    let info = classify_attachment_detailed(point, bounds);
+    (info.attach_type, info.distance)
+}
+
+/// Parse transform="translate(x, y)" or "translate(x,y)"
+fn parse_translate(transform: &str) -> Option<(f64, f64)> {
+    // Look for translate(x, y) pattern
+    if let Some(start) = transform.find("translate(") {
+        let rest = &transform[start + 10..];
+        if let Some(end) = rest.find(')') {
+            let coords = &rest[..end];
+            // Split by comma or space
+            let parts: Vec<&str> = coords.split([',', ' ']).collect();
+            if parts.len() >= 2 {
+                let x = parts[0].trim().parse::<f64>().ok()?;
+                let y = parts[1].trim().parse::<f64>().ok()?;
+                return Some((x, y));
+            }
+        }
+    }
+    None
+}
+
+/// Parse rectangular path dimensions from mermaid's path d attribute
+/// e.g., "M-93.828125 -85.5 L93.828125 -85.5 L93.828125 85.5 L-93.828125 85.5"
+/// Returns (half_width, half_height)
+fn parse_rect_path_dimensions(d: &str) -> Option<(f64, f64)> {
+    // Mermaid paths start with M followed by negative half-width and half-height
+    // e.g., M-93.828125 -85.5 means center is at (0,0), box is from -93.8 to +93.8
+    let parts: Vec<&str> = d.split_whitespace().collect();
+    if parts.is_empty() {
+        return None;
     }
 
-    (AttachmentType::None, f64::MAX)
+    // Parse first M command to get the top-left corner (negative values)
+    let first = parts.first()?;
+    if let Some(coords) = first.strip_prefix('M') {
+        // Handle "M-93.828125" followed by "-85.5" or "M-93,-85"
+        let x = if coords.is_empty() {
+            parts.get(1)?.parse::<f64>().ok()?
+        } else {
+            coords.parse::<f64>().ok()?
+        };
+
+        // Get y value (might be second element or after comma)
+        let y = if coords.is_empty() || !coords.contains(',') {
+            let y_str = if coords.is_empty() {
+                parts.get(2)?
+            } else {
+                parts.get(1)?
+            };
+            y_str.parse::<f64>().ok()?
+        } else {
+            let comma_idx = coords.find(',')?;
+            coords[comma_idx + 1..].parse::<f64>().ok()?
+        };
+
+        // Return absolute values as half-dimensions
+        return Some((x.abs(), y.abs()));
+    }
+
+    None
 }
 
 /// Parse start and end points from an SVG path d attribute
 fn parse_path_endpoints(d: &str) -> Option<((f64, f64), (f64, f64))> {
-    let parts: Vec<&str> = d.split_whitespace().collect();
+    // First, split the path into commands by inserting spaces before command letters
+    // This handles compact mermaid paths like "M122,179L122,280C..."
+    let normalized = normalize_path_commands(d);
+    let parts: Vec<&str> = normalized.split_whitespace().collect();
     if parts.is_empty() {
         return None;
     }
@@ -811,6 +1044,45 @@ fn parse_path_endpoints(d: &str) -> Option<((f64, f64), (f64, f64))> {
         (Some(s), Some(e)) => Some((s, e)),
         _ => None,
     }
+}
+
+/// Normalize SVG path commands by inserting spaces before command letters.
+/// This handles compact mermaid paths like "M122,179L122,280C..." by converting to
+/// "M122,179 L122,280 C..."
+fn normalize_path_commands(d: &str) -> String {
+    let mut result = String::with_capacity(d.len() * 2);
+
+    for c in d.chars() {
+        // Insert space before command letters (except for first character and after another space)
+        if matches!(
+            c,
+            'M' | 'L'
+                | 'C'
+                | 'Q'
+                | 'A'
+                | 'H'
+                | 'V'
+                | 'Z'
+                | 'm'
+                | 'l'
+                | 'c'
+                | 'q'
+                | 'a'
+                | 'h'
+                | 'v'
+                | 'z'
+        ) {
+            // Add space before command letter if not at start and previous char isn't space
+            if !result.is_empty() && !result.ends_with(' ') {
+                result.push(' ');
+            }
+            result.push(c);
+        } else {
+            result.push(c);
+        }
+    }
+
+    result
 }
 
 fn parse_coord_pair(parts: &[&str], i: &mut usize) -> Option<(f64, f64)> {
@@ -1131,5 +1403,149 @@ mod tests {
 
         assert_ne!(s1.width, s2.width);
         assert_ne!(s1.height, s2.height);
+    }
+
+    #[test]
+    fn test_mermaid_er_data_edge_detection() {
+        // Simplified mermaid ER diagram SVG with data-edge attribute
+        let svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600">
+            <g class="edgePaths">
+                <path d="M122,179 L122,280"
+                      class="edge-thickness-normal edge-pattern-solid relationshipLine"
+                      data-edge="true"
+                      marker-start="url(#er-onlyOneStart)"
+                      marker-end="url(#er-zeroOrMoreEnd)"/>
+                <path d="M122,451 L237,564"
+                      class="edge-thickness-normal edge-pattern-solid relationshipLine"
+                      data-edge="true"/>
+                <path d="M463,451 L348,564"
+                      class="edge-thickness-normal edge-pattern-solid relationshipLine"
+                      data-edge="true"/>
+            </g>
+            <g class="nodes">
+                <g class="node default" id="entity-CUSTOMER-0" transform="translate(122, 93.5)">
+                    <path d="M-94 -85.5 L94 -85.5 L94 85.5 L-94 85.5"/>
+                </g>
+                <g class="node default" id="entity-ORDER-1" transform="translate(122, 365.5)">
+                    <path d="M-114 -85.5 L114 -85.5 L114 85.5 L-114 85.5"/>
+                </g>
+            </g>
+        </svg>"#;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+
+        // Should detect 3 edges via data-edge attribute
+        assert_eq!(
+            structure.edge_count, 3,
+            "Expected 3 edges from data-edge attribute, got {}",
+            structure.edge_count
+        );
+
+        // Should detect nodes
+        assert!(
+            structure.node_count >= 2,
+            "Expected at least 2 nodes, got {}",
+            structure.node_count
+        );
+
+        // Should have edge geometry details
+        assert_eq!(
+            structure.edge_geometry.edge_endpoints.len(),
+            3,
+            "Expected 3 edge endpoints"
+        );
+    }
+
+    #[test]
+    fn test_mermaid_minified_data_edge_detection() {
+        // Minified mermaid SVG (all on one line) - this is what we get from mermaid.js
+        let svg = r#"<svg id="my-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600"><g><g class="edgePaths"><path d="M122,179L122,280" class="edge-thickness-normal edge-pattern-solid relationshipLine" data-edge="true" marker-start="url(#er-onlyOneStart)" marker-end="url(#er-zeroOrMoreEnd)"/><path d="M122,451L237,564" class="edge-thickness-normal edge-pattern-solid relationshipLine" data-edge="true"/><path d="M463,451L348,564" class="edge-thickness-normal edge-pattern-solid relationshipLine" data-edge="true"/></g></g></svg>"#;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+
+        // Should detect 3 edges via data-edge attribute
+        assert_eq!(
+            structure.edge_count, 3,
+            "Expected 3 edges from minified SVG data-edge attribute, got {}",
+            structure.edge_count
+        );
+    }
+
+    #[test]
+    fn test_real_mermaid_er_reference_svg() {
+        // Read the actual mermaid reference SVG file if it exists
+        let path = "docs/images/er.svg";
+        if !std::path::Path::new(path).exists() {
+            eprintln!("Skipping test: {} not found", path);
+            return;
+        }
+
+        let svg = std::fs::read_to_string(path).unwrap();
+
+        // First check how many data-edge attributes we can find in the raw string
+        let data_edge_count = svg.matches("data-edge").count();
+        eprintln!("Raw data-edge count in file: {}", data_edge_count);
+
+        let structure = SvgStructure::from_svg(&svg).unwrap();
+
+        eprintln!("edge_count: {}", structure.edge_count);
+        eprintln!(
+            "edge_endpoints: {:?}",
+            structure.edge_geometry.edge_endpoints
+        );
+        eprintln!(
+            "edge_details: {:?}",
+            structure.edge_geometry.edge_details.len()
+        );
+
+        // Should detect edges if data-edge is present
+        if data_edge_count > 0 {
+            assert!(
+                structure.edge_count > 0,
+                "Expected edges to be detected, got edge_count={}",
+                structure.edge_count
+            );
+        }
+    }
+
+    #[test]
+    fn test_mermaid_reference_from_eval_report() {
+        // Try to find and read a mermaid reference SVG from the eval-report directory
+        // This tests the actual mermaid-rendered SVG, not the selkie output
+        let pattern = "eval-report/selkie-eval-*/er/er_reference.svg";
+        let paths: Vec<_> = glob::glob(pattern)
+            .expect("Failed to read glob pattern")
+            .filter_map(|r| r.ok())
+            .collect();
+
+        if paths.is_empty() {
+            eprintln!("Skipping test: no eval-report reference SVG found");
+            return;
+        }
+
+        let path = &paths[0];
+        eprintln!("Testing mermaid reference: {}", path.display());
+
+        let svg = std::fs::read_to_string(path).unwrap();
+
+        // Count raw data-edge occurrences in the file
+        let data_edge_count = svg.matches("data-edge=\"true\"").count();
+        eprintln!("Raw data-edge=\"true\" count: {}", data_edge_count);
+
+        // Parse the structure
+        let structure = SvgStructure::from_svg(&svg).unwrap();
+
+        eprintln!("Parsed edge_count: {}", structure.edge_count);
+        eprintln!(
+            "Edge endpoints: {}",
+            structure.edge_geometry.edge_endpoints.len()
+        );
+
+        // Mermaid ER diagrams should have edges detected via data-edge attribute
+        assert_eq!(
+            structure.edge_count, data_edge_count,
+            "Edge count ({}) should match data-edge count ({})",
+            structure.edge_count, data_edge_count
+        );
     }
 }

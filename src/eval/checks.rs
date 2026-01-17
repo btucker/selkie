@@ -384,20 +384,155 @@ fn check_edge_attachments(
     let ref_geo = &reference.edge_geometry;
 
     // Only compare if both have edges
-    if selkie_geo.edge_endpoints.is_empty() || ref_geo.edge_endpoints.is_empty() {
+    if selkie_geo.edge_details.is_empty() && ref_geo.edge_details.is_empty() {
         return;
     }
 
+    // Build a summary of edge attachments for clear comparison
+    let mut selkie_summary = Vec::new();
+    let mut ref_summary = Vec::new();
+
+    for (i, edge) in selkie_geo.edge_details.iter().enumerate() {
+        let start_desc = if edge.start_center_offset.abs() < 5.0 {
+            format!("{} (centered)", edge.start_edge)
+        } else {
+            format!(
+                "{} (offset {:.0}px)",
+                edge.start_edge, edge.start_center_offset
+            )
+        };
+        let end_desc = if edge.end_center_offset.abs() < 5.0 {
+            format!("{} (centered)", edge.end_edge)
+        } else {
+            format!("{} (offset {:.0}px)", edge.end_edge, edge.end_center_offset)
+        };
+
+        selkie_summary.push(format!(
+            "Edge {}: {} → {}",
+            i + 1,
+            edge.start_node
+                .as_ref()
+                .map(|n| format!("{}.{}", n, start_desc))
+                .unwrap_or_else(|| format!("({:.0},{:.0})", edge.start.0, edge.start.1)),
+            edge.end_node
+                .as_ref()
+                .map(|n| format!("{}.{}", n, end_desc))
+                .unwrap_or_else(|| format!("({:.0},{:.0})", edge.end.0, edge.end.1)),
+        ));
+    }
+
+    for (i, edge) in ref_geo.edge_details.iter().enumerate() {
+        let start_desc = if edge.start_center_offset.abs() < 5.0 {
+            format!("{} (centered)", edge.start_edge)
+        } else {
+            format!(
+                "{} (offset {:.0}px)",
+                edge.start_edge, edge.start_center_offset
+            )
+        };
+        let end_desc = if edge.end_center_offset.abs() < 5.0 {
+            format!("{} (centered)", edge.end_edge)
+        } else {
+            format!("{} (offset {:.0}px)", edge.end_edge, edge.end_center_offset)
+        };
+
+        ref_summary.push(format!(
+            "Edge {}: {} → {}",
+            i + 1,
+            edge.start_node
+                .as_ref()
+                .map(|n| format!("{}.{}", n, start_desc))
+                .unwrap_or_else(|| format!("({:.0},{:.0})", edge.start.0, edge.start.1)),
+            edge.end_node
+                .as_ref()
+                .map(|n| format!("{}.{}", n, end_desc))
+                .unwrap_or_else(|| format!("({:.0},{:.0})", edge.end.0, edge.end.1)),
+        ));
+    }
+
+    // Analyze edge differences for clear AI feedback
+    let has_edges = !selkie_geo.edge_endpoints.is_empty() || !ref_geo.edge_endpoints.is_empty();
+
+    if has_edges {
+        // Check for edge count mismatch
+        let selkie_count = selkie_geo.edge_endpoints.len();
+        let ref_count = ref_geo.edge_endpoints.len();
+
+        if selkie_count != ref_count {
+            issues.push(
+                Issue::warning(
+                    "edge_count",
+                    format!(
+                        "Edge count differs: expected {}, got {}",
+                        ref_count, selkie_count
+                    ),
+                )
+                .with_values(ref_count.to_string(), selkie_count.to_string()),
+            );
+        }
+
+        // Build concise edge comparison
+        let min_count = selkie_count.min(ref_count);
+        let mut edge_diffs = Vec::new();
+
+        for i in 0..min_count {
+            let (sx1, sy1, sx2, sy2) = selkie_geo.edge_endpoints[i];
+            let (rx1, ry1, rx2, ry2) = ref_geo.edge_endpoints[i];
+
+            // Check if edge paths differ significantly (>10px)
+            let start_diff = ((sx1 - rx1).powi(2) + (sy1 - ry1).powi(2)).sqrt();
+            let end_diff = ((sx2 - rx2).powi(2) + (sy2 - ry2).powi(2)).sqrt();
+
+            if start_diff > 10.0 || end_diff > 10.0 {
+                // Classify the edge direction
+                let selkie_dir = classify_edge_direction((sx1, sy1), (sx2, sy2));
+                let ref_dir = classify_edge_direction((rx1, ry1), (rx2, ry2));
+
+                edge_diffs.push(format!(
+                    "Edge {}: selkie={} ref={} (start diff={:.0}px, end diff={:.0}px)",
+                    i + 1,
+                    selkie_dir,
+                    ref_dir,
+                    start_diff,
+                    end_diff
+                ));
+            }
+        }
+
+        if !edge_diffs.is_empty() {
+            let message = format!("EDGE POSITION DIFFERENCES:\n  {}", edge_diffs.join("\n  "));
+            issues.push(Issue::warning("edge_positions", message));
+        }
+    }
+
+    // Compare edges if we have detailed info
+    if !selkie_summary.is_empty() || !ref_summary.is_empty() {
+        // Output detailed edge attachment info for AI analysis
+        if !selkie_summary.is_empty() || !ref_summary.is_empty() {
+            let message = format!(
+                "EDGE ATTACHMENTS:\n  Reference:\n    {}\n  Selkie:\n    {}",
+                if ref_summary.is_empty() {
+                    "(none)".to_string()
+                } else {
+                    ref_summary.join("\n    ")
+                },
+                if selkie_summary.is_empty() {
+                    "(none)".to_string()
+                } else {
+                    selkie_summary.join("\n    ")
+                }
+            );
+            issues.push(Issue::info("edge_details", message));
+        }
+    }
+
+    // Also check overall pattern
     let selkie_total = selkie_geo.vertical_attachments + selkie_geo.horizontal_attachments;
     let ref_total = ref_geo.vertical_attachments + ref_geo.horizontal_attachments;
 
-    // Check if attachment pattern is significantly different
     if selkie_total > 0 && ref_total > 0 {
         let selkie_vert_ratio = selkie_geo.vertical_attachments as f64 / selkie_total as f64;
         let ref_vert_ratio = ref_geo.vertical_attachments as f64 / ref_total as f64;
-
-        // Warn if the ratio of vertical to horizontal differs significantly
-        // e.g., reference has mostly horizontal (sides) but selkie has mostly vertical (top/bottom)
         let ratio_diff = (selkie_vert_ratio - ref_vert_ratio).abs();
 
         if ratio_diff > 0.3 {
@@ -419,7 +554,7 @@ fn check_edge_attachments(
             if selkie_pattern != ref_pattern {
                 issues.push(
                     Issue::warning(
-                        "edge_attachment",
+                        "edge_attachment_pattern",
                         format!(
                             "Edge attachment pattern differs: reference is {}, selkie is {}",
                             ref_pattern, selkie_pattern
@@ -438,6 +573,22 @@ fn check_edge_attachments(
                 );
             }
         }
+    }
+}
+
+/// Classify edge direction based on start and end points
+fn classify_edge_direction(start: (f64, f64), end: (f64, f64)) -> &'static str {
+    let dx = (end.0 - start.0).abs();
+    let dy = (end.1 - start.1).abs();
+
+    if dx < 10.0 && dy > 10.0 {
+        "vertical"
+    } else if dy < 10.0 && dx > 10.0 {
+        "horizontal"
+    } else if dx > 10.0 && dy > 10.0 {
+        "diagonal"
+    } else {
+        "point"
     }
 }
 
