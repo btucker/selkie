@@ -41,17 +41,21 @@ bd sync               # Sync with git
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
 
-## IMPORTANT Development Rules (focus on one diagram type)
+## IMPORTANT Development Rules
+
+### The Five Rules
 
 Rule 1: If the user ever points out a bug that was not caught by eval, before you fix it, first make updates to eval such that it detects the bug.
 
-Rule 2: Always follow TDD
+Rule 2: Always follow the instructions from eval output
 
-Rule 3: Always review the relevant implementation code from the reference-implementations before starting work.
+Rule 3: Always follow TDD
 
-Rule 4: Always prefer the implementation approach of the reference-implementations.
+Rule 4: Always review the relevant implementation code from the reference-implementations before starting work.
 
-### Always follow this process
+Rule 5: Always prefer the implementation approach of the reference-implementations.
+
+### The process that MUST be followed
 
 1. Use `cargo run --bin selkie -- eval --type <diagram_type>` evaluate where our implementation is relative to the reference.
 2. Follow all instructions from its output & confirm our changes are increasing scores
