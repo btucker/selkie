@@ -103,7 +103,6 @@ fn intersect_rect(
     rect_h: f64,
     point_x: f64,
     point_y: f64,
-    marker_offset: f64,
 ) -> (f64, f64, AttachmentSide) {
     let cx = rect_x + rect_w / 2.0;
     let cy = rect_y + rect_h / 2.0;
@@ -115,7 +114,7 @@ fn intersect_rect(
 
     // Avoid division by zero for points at the center
     if dx.abs() < 0.001 && dy.abs() < 0.001 {
-        return (cx, rect_y - marker_offset, AttachmentSide::Top);
+        return (cx, rect_y, AttachmentSide::Top);
     }
 
     // Determine which side the line crosses using mermaid's algorithm
@@ -134,13 +133,8 @@ fn intersect_rect(
         } else {
             AttachmentSide::Top
         };
-        // Apply marker offset perpendicular to the side
-        let offset_y = if dy > 0.0 {
-            marker_offset
-        } else {
-            -marker_offset
-        };
-        (cx + sx, cy + sy + offset_y, side)
+        // Return exact intersection at entity boundary
+        (cx + sx, cy + sy, side)
     } else {
         // Intersection is at left or right
         let sign_x = if dx > 0.0 { 1.0 } else { -1.0 };
@@ -155,13 +149,8 @@ fn intersect_rect(
         } else {
             AttachmentSide::Left
         };
-        // Apply marker offset perpendicular to the side
-        let offset_x = if dx > 0.0 {
-            marker_offset
-        } else {
-            -marker_offset
-        };
-        (cx + sx + offset_x, cy + sy, side)
+        // Return exact intersection at entity boundary
+        (cx + sx, cy + sy, side)
     }
 }
 
@@ -177,7 +166,6 @@ fn adjust_bend_points_for_intersection(
     entity_b_name: &str,
     entity_positions: &HashMap<String, (f64, f64)>,
     entity_dimensions: &HashMap<String, EntityDimensions>,
-    marker_offset: f64,
 ) -> Vec<Point> {
     if bend_points.len() < 2 {
         return bend_points.to_vec();
@@ -204,7 +192,6 @@ fn adjust_bend_points_for_intersection(
             a_dims.height,
             approach_point.x,
             approach_point.y,
-            marker_offset,
         );
         adjusted[0] = Point { x: ix, y: iy };
     }
@@ -229,7 +216,6 @@ fn adjust_bend_points_for_intersection(
             b_dims.height,
             approach_point.x,
             approach_point.y,
-            marker_offset,
         );
         adjusted[last_idx] = Point { x: ix, y: iy };
     }
@@ -689,7 +675,6 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
                         b_name,
                         &entity_positions,
                         &entity_dimensions,
-                        marker_offset,
                     )
                 } else {
                     bend_points.clone()
