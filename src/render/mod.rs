@@ -12,6 +12,7 @@ mod pie;
 mod sequence;
 mod state;
 pub mod svg;
+mod xychart;
 
 use crate::diagrams::{detect_init, detect_type, parse, remove_directives, Diagram};
 use crate::error::{MermaidError, Result};
@@ -85,6 +86,7 @@ pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<St
             let mut db_clone = db.clone();
             gantt::render_gantt(&mut db_clone, config)
         }
+        Diagram::XyChart(db) => xychart::render_xychart(db, config),
         _ => Err(MermaidError::RenderError(format!(
             "Diagram type {:?} not yet supported for rendering",
             diagram_type_name(diagram)

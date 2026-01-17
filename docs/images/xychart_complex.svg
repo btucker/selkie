@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="500" viewBox="0 0 700 500" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.xychart-background {
+  fill: #ffffff;
+}
+
+.xychart-title {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.xychart-axis {
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.xychart-axis-title {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.xychart-axis-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.xychart-tick {
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.xychart-bar {
+  stroke-width: 0;
+}
+
+.xychart-line {
+  fill: none;
+  stroke-width: 2px;
+}
+
+.xychart-point {
+  stroke-width: 1px;
+}
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <rect x="0" y="0" width="700" height="500" class="xychart-background" fill="#ffffff"/>
+    <text x="350" y="50" class="xychart-title" fill="#333333" dominant-baseline="hanging" font-weight="bold" font-size="16" text-anchor="middle">Quarterly Sales by Region</text>
+    <path d="M 90 90 L 650 90" class="xychart-axis" stroke-width="1" fill="none" stroke="#333333"/>
+    <text x="370" y="65" class="xychart-axis-title" fill="#333333" font-size="12" text-anchor="middle" transform="rotate(0 370 65)" dominant-baseline="middle">Sales (millions)</text>
+    <path d="M 90 90 L 90 85" class="xychart-tick" stroke-width="1" stroke="#333333" fill="none"/>
+    <text x="90" y="80" class="xychart-axis-label" text-anchor="middle" font-size="10" dominant-baseline="auto" fill="#333333">0</text>
+    <path d="M 202 90 L 202 85" class="xychart-tick" stroke="#333333" fill="none" stroke-width="1"/>
+    <text x="202" y="80" class="xychart-axis-label" text-anchor="middle" font-size="10" dominant-baseline="auto" fill="#333333">10</text>
+    <path d="M 314 90 L 314 85" class="xychart-tick" stroke-width="1" fill="none" stroke="#333333"/>
+    <text x="314" y="80" class="xychart-axis-label" dominant-baseline="auto" text-anchor="middle" font-size="10" fill="#333333">20</text>
+    <path d="M 426 90 L 426 85" class="xychart-tick" stroke-width="1" fill="none" stroke="#333333"/>
+    <text x="426" y="80" class="xychart-axis-label" text-anchor="middle" dominant-baseline="auto" fill="#333333" font-size="10">30</text>
+    <path d="M 538 90 L 538 85" class="xychart-tick" stroke="#333333" stroke-width="1" fill="none"/>
+    <text x="538" y="80" class="xychart-axis-label" fill="#333333" dominant-baseline="auto" text-anchor="middle" font-size="10">40</text>
+    <path d="M 650 90 L 650 85" class="xychart-tick" stroke-width="1" fill="none" stroke="#333333"/>
+    <text x="650" y="80" class="xychart-axis-label" text-anchor="middle" fill="#333333" font-size="10" dominant-baseline="auto">50</text>
+    <path d="M 90 90 L 90 410" class="xychart-axis" stroke-width="1" fill="none" stroke="#333333"/>
+    <text x="65" y="250" class="xychart-axis-title" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#333333" transform="rotate(-90 65 250)">Region</text>
+    <path d="M 90 122 L 85 122" class="xychart-tick" fill="none" stroke-width="1" stroke="#333333"/>
+    <text x="80" y="122" class="xychart-axis-label" text-anchor="end" dominant-baseline="middle" font-size="10" fill="#333333">North</text>
+    <path d="M 90 186 L 85 186" class="xychart-tick" fill="none" stroke="#333333" stroke-width="1"/>
+    <text x="80" y="186" class="xychart-axis-label" font-size="10" text-anchor="end" dominant-baseline="middle" fill="#333333">South</text>
+    <path d="M 90 250 L 85 250" class="xychart-tick" fill="none" stroke="#333333" stroke-width="1"/>
+    <text x="80" y="250" class="xychart-axis-label" dominant-baseline="middle" text-anchor="end" font-size="10" fill="#333333">East</text>
+    <path d="M 90 314 L 85 314" class="xychart-tick" stroke="#333333" stroke-width="1" fill="none"/>
+    <text x="80" y="314" class="xychart-axis-label" fill="#333333" dominant-baseline="middle" font-size="10" text-anchor="end">West</text>
+    <path d="M 90 378 L 85 378" class="xychart-tick" stroke-width="1" fill="none" stroke="#333333"/>
+    <text x="80" y="378" class="xychart-axis-label" dominant-baseline="middle" text-anchor="end" font-size="10" fill="#333333">Central</text>
+    <rect x="90" y="96.4" width="280" height="51.2" class="xychart-bar" fill="#4C78A8"/>
+    <rect x="90" y="160.4" width="336" height="51.2" class="xychart-bar" fill="#4C78A8"/>
+    <rect x="90" y="224.4" width="224" height="51.2" class="xychart-bar" fill="#4C78A8"/>
+    <rect x="90" y="288.4" width="392" height="51.2" class="xychart-bar" fill="#4C78A8"/>
+    <rect x="90" y="352.4" width="168" height="51.2" class="xychart-bar" fill="#4C78A8"/>
+    <path d="M 370 90 L 426 170 L 314 250 L 482 330 L 258 410" class="xychart-line" fill="none" stroke="#F58518" stroke-width="2"/>
+    <circle cx="370" cy="90" r="4" class="xychart-point" stroke="#F58518" fill="#F58518"/>
+    <circle cx="426" cy="170" r="4" class="xychart-point" stroke="#F58518" fill="#F58518"/>
+    <circle cx="314" cy="250" r="4" class="xychart-point" stroke="#F58518" fill="#F58518"/>
+    <circle cx="482" cy="330" r="4" class="xychart-point" fill="#F58518" stroke="#F58518"/>
+    <circle cx="258" cy="410" r="4" class="xychart-point" stroke="#F58518" fill="#F58518"/>
+    <rect x="90" y="96.4" width="313.6" height="51.2" class="xychart-bar" fill="#E45756"/>
+    <rect x="90" y="160.4" width="280" height="51.2" class="xychart-bar" fill="#E45756"/>
+    <rect x="90" y="224.4" width="246.4" height="51.2" class="xychart-bar" fill="#E45756"/>
+    <rect x="90" y="288.4" width="448" height="51.2" class="xychart-bar" fill="#E45756"/>
+    <rect x="90" y="352.4" width="201.6" height="51.2" class="xychart-bar" fill="#E45756"/>
+    <path d="M 403.6 90 L 370 170 L 336.4 250 L 538 330 L 291.6 410" class="xychart-line" stroke-width="2" stroke="#72B7B2" fill="none"/>
+    <circle cx="403.6" cy="90" r="4" class="xychart-point" fill="#72B7B2" stroke="#72B7B2"/>
+    <circle cx="370" cy="170" r="4" class="xychart-point" stroke="#72B7B2" fill="#72B7B2"/>
+    <circle cx="336.4" cy="250" r="4" class="xychart-point" stroke="#72B7B2" fill="#72B7B2"/>
+    <circle cx="538" cy="330" r="4" class="xychart-point" fill="#72B7B2" stroke="#72B7B2"/>
+    <circle cx="291.6" cy="410" r="4" class="xychart-point" fill="#72B7B2" stroke="#72B7B2"/>
+  </g>
+</svg>
