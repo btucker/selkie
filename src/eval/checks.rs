@@ -522,37 +522,76 @@ fn check_edge_attachments(
 
     let mut side_mismatches = Vec::new();
     for i in 0..edge_count {
-        // Get selkie attachment side (from edge_details or inferred from endpoints)
+        // Get selkie START attachment side (from edge_details or inferred from endpoints)
+        let selkie_start_side = if i < selkie_details.len() {
+            normalize_edge_side(&selkie_details[i].start_edge)
+        } else if i < selkie_endpoints.len() {
+            let (sx, sy, ex, ey) = selkie_endpoints[i];
+            infer_start_attachment_side((sx, sy), (ex, ey))
+        } else {
+            "unknown".to_string()
+        };
+
+        // Get reference START attachment side (from edge_details or inferred from endpoints)
+        // Use initial direction (second point) for accurate inference on curved paths
+        let ref_initial_dirs = &ref_geo.edge_initial_directions;
+        let ref_start_side = if i < ref_details.len() && ref_details[i].start_edge != "none" {
+            normalize_edge_side(&ref_details[i].start_edge)
+        } else if i < ref_endpoints.len() {
+            let (sx, sy, ex, ey) = ref_endpoints[i];
+            let second_point = ref_initial_dirs.get(i).copied().flatten();
+            infer_start_attachment_with_direction((sx, sy), second_point, (ex, ey))
+        } else {
+            "unknown".to_string()
+        };
+
+        // Get selkie END attachment side (from edge_details or inferred from endpoints)
         let selkie_end_side = if i < selkie_details.len() {
             normalize_edge_side(&selkie_details[i].end_edge)
         } else if i < selkie_endpoints.len() {
             let (sx, sy, ex, ey) = selkie_endpoints[i];
-            infer_attachment_side_from_coords((sx, sy), (ex, ey))
+            infer_end_attachment_side((sx, sy), (ex, ey))
         } else {
             "unknown".to_string()
         };
 
-        // Get reference attachment side (from edge_details or inferred from endpoints)
+        // Get reference END attachment side (from edge_details or inferred from endpoints)
         let ref_end_side = if i < ref_details.len() && ref_details[i].end_edge != "none" {
             normalize_edge_side(&ref_details[i].end_edge)
         } else if i < ref_endpoints.len() {
             let (sx, sy, ex, ey) = ref_endpoints[i];
-            infer_attachment_side_from_coords((sx, sy), (ex, ey))
+            infer_end_attachment_side((sx, sy), (ex, ey))
         } else {
             "unknown".to_string()
         };
 
-        // Check if attachment sides are categorically different
+        // Check if START attachment sides are categorically different
         // top/bottom are "vertical", left/right are "horizontal"
-        let selkie_is_vertical = matches!(selkie_end_side.as_str(), "top" | "bottom");
-        let ref_is_vertical = matches!(ref_end_side.as_str(), "top" | "bottom");
+        let selkie_start_is_vertical = matches!(selkie_start_side.as_str(), "top" | "bottom");
+        let ref_start_is_vertical = matches!(ref_start_side.as_str(), "top" | "bottom");
+
+        if selkie_start_side != "unknown"
+            && ref_start_side != "unknown"
+            && selkie_start_is_vertical != ref_start_is_vertical
+        {
+            side_mismatches.push(format!(
+                "Edge {} start: leaves from {} in selkie but {} in reference",
+                i + 1,
+                selkie_start_side,
+                ref_start_side
+            ));
+        }
+
+        // Check if END attachment sides are categorically different
+        let selkie_end_is_vertical = matches!(selkie_end_side.as_str(), "top" | "bottom");
+        let ref_end_is_vertical = matches!(ref_end_side.as_str(), "top" | "bottom");
 
         if selkie_end_side != "unknown"
             && ref_end_side != "unknown"
-            && selkie_is_vertical != ref_is_vertical
+            && selkie_end_is_vertical != ref_end_is_vertical
         {
             side_mismatches.push(format!(
-                "Edge {}: attaches to {} in selkie but {} in reference",
+                "Edge {} end: attaches to {} in selkie but {} in reference",
                 i + 1,
                 selkie_end_side,
                 ref_end_side
@@ -670,10 +709,10 @@ fn normalize_edge_side(side: &str) -> String {
     }
 }
 
-/// Infer attachment side from edge endpoint coordinates
+/// Infer END attachment side from edge endpoint coordinates
 /// This is used when node_bounds aren't available (e.g., for reference SVGs)
 /// Returns the likely attachment side based on the edge direction at the endpoint
-fn infer_attachment_side_from_coords(start: (f64, f64), end: (f64, f64)) -> String {
+fn infer_end_attachment_side(start: (f64, f64), end: (f64, f64)) -> String {
     let dx = end.0 - start.0;
     let dy = end.1 - start.1;
 
@@ -713,12 +752,130 @@ fn infer_attachment_side_from_coords(start: (f64, f64), end: (f64, f64)) -> Stri
     }
 }
 
+/// Infer START attachment side from edge endpoint coordinates
+/// This is the opposite of infer_end_attachment_side - determines which side
+/// the edge leaves FROM based on its direction
+fn infer_start_attachment_side(start: (f64, f64), end: (f64, f64)) -> String {
+    infer_attachment_direction(start, end)
+}
+
+/// Infer the attachment side based on direction from point A to point B.
+/// For start attachment: A=start, B=second_point or end
+/// For end attachment: A=second_last_point or start, B=end
+fn infer_attachment_direction(from: (f64, f64), to: (f64, f64)) -> String {
+    let dx = to.0 - from.0;
+    let dy = to.1 - from.1;
+
+    let dx_abs = dx.abs();
+    let dy_abs = dy.abs();
+
+    if dy_abs > dx_abs * 1.5 {
+        // Mostly vertical
+        if dy > 0.0 {
+            "bottom".to_string() // going down, leaving from bottom
+        } else {
+            "top".to_string() // going up, leaving from top
+        }
+    } else if dx_abs > dy_abs * 1.5 {
+        // Mostly horizontal
+        if dx > 0.0 {
+            "right".to_string() // going right, leaving from right side
+        } else {
+            "left".to_string() // going left, leaving from left side
+        }
+    } else {
+        // Diagonal - use the larger component
+        if dy_abs > dx_abs {
+            if dy > 0.0 {
+                "bottom".to_string()
+            } else {
+                "top".to_string()
+            }
+        } else if dx > 0.0 {
+            "right".to_string()
+        } else {
+            "left".to_string()
+        }
+    }
+}
+
+/// Infer start attachment side using the initial direction (second point) if available.
+/// This is crucial for curved paths where the overall direction differs from the initial tangent.
+fn infer_start_attachment_with_direction(
+    start: (f64, f64),
+    second_point: Option<(f64, f64)>,
+    end: (f64, f64),
+) -> String {
+    // If we have a second point (initial direction), use it for accurate inference
+    if let Some(sp) = second_point {
+        infer_attachment_direction(start, sp)
+    } else {
+        // Fall back to using overall direction
+        infer_attachment_direction(start, end)
+    }
+}
+
 /// Check font styles (size, weight) - WARNING if significantly different
 fn check_font_styles(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
     let selkie_fonts = &selkie.font_analysis;
     let ref_fonts = &reference.font_analysis;
 
-    // Build maps of context -> sizes for comparison
+    // Helper to parse font size string to numeric value
+    fn parse_font_size(s: &str) -> Option<f64> {
+        s.trim_end_matches("px").parse().ok()
+    }
+
+    // Collect all font sizes as numeric values
+    let selkie_all_sizes: Vec<f64> = selkie_fonts
+        .font_sizes
+        .iter()
+        .filter_map(|fs| parse_font_size(&fs.value))
+        .collect();
+
+    let ref_all_sizes: Vec<f64> = ref_fonts
+        .font_sizes
+        .iter()
+        .filter_map(|fs| parse_font_size(&fs.value))
+        .collect();
+
+    // Compare max font sizes (typically entity names / headers)
+    if !selkie_all_sizes.is_empty() && !ref_all_sizes.is_empty() {
+        let selkie_max = selkie_all_sizes.iter().cloned().fold(0.0, f64::max);
+        let ref_max = ref_all_sizes.iter().cloned().fold(0.0, f64::max);
+
+        // More than 2px difference in max font size is significant
+        if (ref_max - selkie_max).abs() > 2.0 {
+            issues.push(
+                Issue::warning(
+                    "font_size",
+                    format!(
+                        "Max font size differs: reference uses {}px, selkie uses {}px ({}px smaller)",
+                        ref_max, selkie_max, ref_max - selkie_max
+                    ),
+                )
+                .with_values(format!("{}px", ref_max), format!("{}px", selkie_max)),
+            );
+        }
+
+        // Compare min font sizes (typically attribute text)
+        let selkie_min = selkie_all_sizes.iter().cloned().fold(f64::MAX, f64::min);
+        let ref_min = ref_all_sizes.iter().cloned().fold(f64::MAX, f64::min);
+
+        if (ref_min - selkie_min).abs() > 2.0 {
+            issues.push(
+                Issue::warning(
+                    "font_size",
+                    format!(
+                        "Min font size differs: reference uses {}px, selkie uses {}px ({}px smaller)",
+                        ref_min, selkie_min, ref_min - selkie_min
+                    ),
+                )
+                .with_values(format!("{}px", ref_min), format!("{}px", selkie_min)),
+            );
+        }
+    }
+
+    // Build maps of context -> sizes for detailed comparison
     let selkie_sizes: std::collections::HashMap<String, Vec<String>> = selkie_fonts
         .font_sizes
         .iter()
@@ -739,16 +896,16 @@ fn check_font_styles(selkie: &SvgStructure, reference: &SvgStructure, issues: &m
             acc
         });
 
-    // Check for missing font sizes
+    // Check for context-specific font size mismatches
     for (context, ref_values) in &ref_sizes {
         if let Some(selkie_values) = selkie_sizes.get(context) {
             // Check if any values differ significantly
             for ref_val in ref_values {
-                let ref_num: Option<f64> = ref_val.trim_end_matches("px").parse().ok();
+                let ref_num: Option<f64> = parse_font_size(ref_val);
                 let mut found_match = false;
 
                 for selkie_val in selkie_values {
-                    let selkie_num: Option<f64> = selkie_val.trim_end_matches("px").parse().ok();
+                    let selkie_num: Option<f64> = parse_font_size(selkie_val);
 
                     if let (Some(r), Some(s)) = (ref_num, selkie_num) {
                         // Allow 2px tolerance

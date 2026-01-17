@@ -82,6 +82,9 @@ pub struct StrokeAnalysis {
 pub struct EdgeGeometry {
     /// Edge endpoints: list of (start_x, start_y, end_x, end_y)
     pub edge_endpoints: Vec<(f64, f64, f64, f64)>,
+    /// Initial direction points for each edge (the second point in the path)
+    /// Used to determine the initial tangent direction for curved paths
+    pub edge_initial_directions: Vec<Option<(f64, f64)>>,
     /// Node bounding boxes: list of (x, y, width, height, id/class)
     pub node_bounds: Vec<NodeBounds>,
     /// Edges that attach to top/bottom of nodes (vertical attachment)
@@ -744,10 +747,12 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                 || class.contains("transition")
             {
                 if let Some(d) = node.attribute("d") {
-                    if let Some((start, end)) = parse_path_endpoints(d) {
+                    // Use parse_path_with_directions to capture initial direction for curved paths
+                    if let Some((start, second_point, end)) = parse_path_with_directions(d) {
                         geometry
                             .edge_endpoints
                             .push((start.0, start.1, end.0, end.1));
+                        geometry.edge_initial_directions.push(second_point);
 
                         // Find best matching nodes for start and end
                         let mut best_start: Option<AttachmentInfo> = None;
@@ -980,10 +985,12 @@ fn parse_rect_path_dimensions(d: &str) -> Option<(f64, f64)> {
     None
 }
 
-/// Parse start and end points from an SVG path d attribute
-fn parse_path_endpoints(d: &str) -> Option<((f64, f64), (f64, f64))> {
-    // First, split the path into commands by inserting spaces before command letters
-    // This handles compact mermaid paths like "M122,179L122,280C..."
+/// Parse path with initial direction: returns (start, second_point, end)
+/// The second_point is used to determine the initial tangent direction of curved paths.
+/// For paths like "M122,451 L122,459 C...", the second point is (122,459) which shows
+/// the edge starts going DOWN even if the overall direction is diagonal.
+#[allow(clippy::type_complexity)]
+fn parse_path_with_directions(d: &str) -> Option<((f64, f64), Option<(f64, f64)>, (f64, f64))> {
     let normalized = normalize_path_commands(d);
     let parts: Vec<&str> = normalized.split_whitespace().collect();
     if parts.is_empty() {
@@ -991,7 +998,9 @@ fn parse_path_endpoints(d: &str) -> Option<((f64, f64), (f64, f64))> {
     }
 
     let mut start: Option<(f64, f64)> = None;
+    let mut second_point: Option<(f64, f64)> = None;
     let mut end: Option<(f64, f64)> = None;
+    let mut point_count = 0;
     let mut i = 0;
 
     while i < parts.len() {
@@ -1003,11 +1012,11 @@ fn parse_path_endpoints(d: &str) -> Option<((f64, f64), (f64, f64))> {
                 i += 1;
                 parse_coord_pair(&parts, &mut i)?
             } else {
-                // M followed directly by coords like "M10,20"
                 parse_inline_coords(&part[1..])?
             };
             if start.is_none() {
                 start = Some((x, y));
+                point_count = 1;
             }
             end = Some((x, y));
         }
@@ -1019,32 +1028,49 @@ fn parse_path_endpoints(d: &str) -> Option<((f64, f64), (f64, f64))> {
             } else {
                 parse_inline_coords(&part[1..])?
             };
+            point_count += 1;
+            if point_count == 2 && second_point.is_none() {
+                second_point = Some((x, y));
+            }
             end = Some((x, y));
         }
         // Handle C (curveto) command - takes 3 coordinate pairs
         else if part == "C" || part.starts_with('C') {
             if part == "C" {
                 i += 1;
-                // Skip first two control points
-                parse_coord_pair(&parts, &mut i)?;
+                // First control point - this is the initial direction for a curve
+                let (cx1, cy1) = parse_coord_pair(&parts, &mut i)?;
+                if point_count == 1 && second_point.is_none() {
+                    // Use first control point as direction indicator
+                    second_point = Some((cx1, cy1));
+                }
+                // Skip second control point
                 parse_coord_pair(&parts, &mut i)?;
                 // Third point is the endpoint
                 let (x, y) = parse_coord_pair(&parts, &mut i)?;
+                point_count += 1;
                 end = Some((x, y));
             } else {
-                // Inline coords after C
                 let coords_str = &part[1..];
                 let coords: Vec<f64> = coords_str
                     .split([',', ' '])
                     .filter_map(|s| s.parse().ok())
                     .collect();
                 if coords.len() >= 6 {
+                    if point_count == 1 && second_point.is_none() {
+                        second_point = Some((coords[0], coords[1]));
+                    }
+                    point_count += 1;
                     end = Some((coords[4], coords[5]));
                 }
             }
         }
         // Handle numbers that might be continuation of previous command
         else if let Some((x, y)) = parse_inline_coords(part) {
+            point_count += 1;
+            if point_count == 2 && second_point.is_none() {
+                second_point = Some((x, y));
+            }
             end = Some((x, y));
         }
 
@@ -1052,7 +1078,7 @@ fn parse_path_endpoints(d: &str) -> Option<((f64, f64), (f64, f64))> {
     }
 
     match (start, end) {
-        (Some(s), Some(e)) => Some((s, e)),
+        (Some(s), Some(e)) => Some((s, second_point, e)),
         _ => None,
     }
 }
@@ -1260,6 +1286,21 @@ fn extract_css_font_styles(
                                 let class_name = class_name.split_whitespace().next().unwrap_or("");
                                 css_fonts.insert(
                                     class_name.to_string(),
+                                    (font_size.clone(), font_weight.clone()),
+                                );
+                            }
+                            // Also handle ID selectors (e.g., "#my-svg" -> "root")
+                            // These are typically used for default/inherited font sizes
+                            else if sel.starts_with('#') {
+                                css_fonts.insert(
+                                    "root".to_string(),
+                                    (font_size.clone(), font_weight.clone()),
+                                );
+                            }
+                            // Handle element selectors (e.g., "svg" -> "root")
+                            else if sel == "svg" || sel.ends_with(" svg") {
+                                css_fonts.insert(
+                                    "root".to_string(),
                                     (font_size.clone(), font_weight.clone()),
                                 );
                             }
