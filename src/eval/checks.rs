@@ -46,6 +46,7 @@ pub fn check_structure(
     check_z_order(selkie, reference, &mut issues);
     check_stroke_widths(selkie, reference, &mut issues);
     check_edge_attachments(selkie, reference, &mut issues);
+    check_font_styles(selkie, reference, &mut issues);
 
     // INFO checks - acceptable variations
     check_extra_labels(selkie, reference, &mut issues);
@@ -440,6 +441,135 @@ fn check_edge_attachments(
     }
 }
 
+/// Check font styles (size, weight) - WARNING if significantly different
+fn check_font_styles(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
+    let selkie_fonts = &selkie.font_analysis;
+    let ref_fonts = &reference.font_analysis;
+
+    // Build maps of context -> sizes for comparison
+    let selkie_sizes: std::collections::HashMap<String, Vec<String>> = selkie_fonts
+        .font_sizes
+        .iter()
+        .fold(std::collections::HashMap::new(), |mut acc, fs| {
+            acc.entry(fs.context.clone())
+                .or_default()
+                .push(fs.value.clone());
+            acc
+        });
+
+    let ref_sizes: std::collections::HashMap<String, Vec<String>> = ref_fonts
+        .font_sizes
+        .iter()
+        .fold(std::collections::HashMap::new(), |mut acc, fs| {
+            acc.entry(fs.context.clone())
+                .or_default()
+                .push(fs.value.clone());
+            acc
+        });
+
+    // Check for missing font sizes
+    for (context, ref_values) in &ref_sizes {
+        if let Some(selkie_values) = selkie_sizes.get(context) {
+            // Check if any values differ significantly
+            for ref_val in ref_values {
+                let ref_num: Option<f64> = ref_val.trim_end_matches("px").parse().ok();
+                let mut found_match = false;
+
+                for selkie_val in selkie_values {
+                    let selkie_num: Option<f64> = selkie_val.trim_end_matches("px").parse().ok();
+
+                    if let (Some(r), Some(s)) = (ref_num, selkie_num) {
+                        // Allow 2px tolerance
+                        if (r - s).abs() <= 2.0 {
+                            found_match = true;
+                            break;
+                        }
+                    } else if ref_val == selkie_val {
+                        found_match = true;
+                        break;
+                    }
+                }
+
+                if !found_match && ref_num.is_some() {
+                    issues.push(
+                        Issue::warning(
+                            "font_size",
+                            format!(
+                                "Font size mismatch for '{}': expected {}, got {:?}",
+                                context, ref_val, selkie_values
+                            ),
+                        )
+                        .with_values(ref_val.clone(), selkie_values.join(", ")),
+                    );
+                    break; // Only report once per context
+                }
+            }
+        }
+    }
+
+    // Build maps of context -> weights for comparison
+    let selkie_weights: std::collections::HashMap<String, Vec<String>> = selkie_fonts
+        .font_weights
+        .iter()
+        .fold(std::collections::HashMap::new(), |mut acc, fs| {
+            acc.entry(fs.context.clone())
+                .or_default()
+                .push(fs.value.clone());
+            acc
+        });
+
+    let ref_weights: std::collections::HashMap<String, Vec<String>> = ref_fonts
+        .font_weights
+        .iter()
+        .fold(std::collections::HashMap::new(), |mut acc, fs| {
+            acc.entry(fs.context.clone())
+                .or_default()
+                .push(fs.value.clone());
+            acc
+        });
+
+    // Check for missing font weights
+    for (context, ref_values) in &ref_weights {
+        if let Some(selkie_values) = selkie_weights.get(context) {
+            for ref_val in ref_values {
+                if !selkie_values.contains(ref_val) {
+                    // Normalize weight comparisons (e.g., "bold" = "700")
+                    let ref_normalized = normalize_font_weight(ref_val);
+                    let selkie_normalized: Vec<String> = selkie_values
+                        .iter()
+                        .map(|v| normalize_font_weight(v))
+                        .collect();
+
+                    if !selkie_normalized.contains(&ref_normalized) {
+                        issues.push(
+                            Issue::warning(
+                                "font_weight",
+                                format!(
+                                    "Font weight mismatch for '{}': expected {}, got {:?}",
+                                    context, ref_val, selkie_values
+                                ),
+                            )
+                            .with_values(ref_val.clone(), selkie_values.join(", ")),
+                        );
+                        break; // Only report once per context
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Normalize font weight values (e.g., "bold" -> "700")
+fn normalize_font_weight(weight: &str) -> String {
+    match weight.trim().to_lowercase().as_str() {
+        "normal" => "400".to_string(),
+        "bold" => "700".to_string(),
+        "lighter" => "lighter".to_string(),
+        "bolder" => "bolder".to_string(),
+        other => other.to_string(),
+    }
+}
+
 /// Calculate structural similarity score (0-1)
 pub fn calculate_similarity(selkie: &SvgStructure, reference: &SvgStructure) -> f64 {
     let mut score_parts: Vec<f64> = Vec::new();
@@ -493,7 +623,7 @@ mod tests {
     use crate::render::svg::structure::{ShapeCounts, ZOrderAnalysis};
 
     fn make_structure(nodes: usize, edges: usize, labels: Vec<&str>) -> SvgStructure {
-        use crate::render::svg::structure::{EdgeGeometry, StrokeAnalysis};
+        use crate::render::svg::structure::{EdgeGeometry, FontAnalysis, StrokeAnalysis};
         SvgStructure {
             width: 400.0,
             height: 300.0,
@@ -507,6 +637,7 @@ mod tests {
             z_order: ZOrderAnalysis::default(),
             stroke_analysis: StrokeAnalysis::default(),
             edge_geometry: EdgeGeometry::default(),
+            font_analysis: FontAnalysis::default(),
         }
     }
 

@@ -32,6 +32,8 @@ pub struct SvgStructure {
     pub stroke_analysis: StrokeAnalysis,
     /// Edge geometry analysis: tracks edge endpoint positions
     pub edge_geometry: EdgeGeometry,
+    /// Font analysis: tracks font-size and font-weight on text elements
+    pub font_analysis: FontAnalysis,
 }
 
 /// Analysis of SVG element rendering order (z-order)
@@ -98,6 +100,26 @@ pub struct NodeBounds {
     pub id: String,
 }
 
+/// Analysis of font styles used in text elements
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct FontAnalysis {
+    /// Font sizes found (class/context -> size)
+    pub font_sizes: Vec<FontStyle>,
+    /// Font weights found (class/context -> weight)
+    pub font_weights: Vec<FontStyle>,
+    /// Count of text elements analyzed
+    pub text_count: usize,
+}
+
+/// A font style value with its context
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct FontStyle {
+    /// CSS class or context where this style was found
+    pub context: String,
+    /// The value (e.g., "14" for font-size, "bold" for font-weight)
+    pub value: String,
+}
+
 impl SvgStructure {
     /// Parse an SVG string and extract its structure
     pub fn from_svg(svg: &str) -> Result<Self, String> {
@@ -137,6 +159,9 @@ impl SvgStructure {
         // Analyze edge geometry
         let edge_geometry = analyze_edge_geometry(&doc);
 
+        // Analyze font styles
+        let font_analysis = analyze_fonts(&doc);
+
         Ok(SvgStructure {
             width,
             height,
@@ -150,6 +175,7 @@ impl SvgStructure {
             z_order,
             stroke_analysis,
             edge_geometry,
+            font_analysis,
         })
     }
 }
@@ -817,6 +843,148 @@ fn parse_inline_coords(s: &str) -> Option<(f64, f64)> {
         return Some((x, y));
     }
     None
+}
+
+/// Analyze font styles (size, weight) on text elements
+fn analyze_fonts(doc: &roxmltree::Document) -> FontAnalysis {
+    let mut analysis = FontAnalysis::default();
+
+    // Extract CSS font rules if present (for eval feature)
+    #[cfg(feature = "eval")]
+    let css_fonts = extract_css_font_styles(doc);
+    #[cfg(not(feature = "eval"))]
+    let css_fonts: std::collections::HashMap<String, (Option<String>, Option<String>)> =
+        std::collections::HashMap::new();
+
+    for node in doc.descendants() {
+        if node.tag_name().name() == "text" {
+            analysis.text_count += 1;
+
+            // Get context from class attribute
+            let class = node.attribute("class").unwrap_or("").to_string();
+            let context = if class.is_empty() {
+                "text".to_string()
+            } else {
+                class.clone()
+            };
+
+            // Check inline font-size attribute
+            if let Some(size) = node.attribute("font-size") {
+                analysis.font_sizes.push(FontStyle {
+                    context: context.clone(),
+                    value: size.to_string(),
+                });
+            } else {
+                // Check CSS rules for matching class
+                for css_class in class.split_whitespace() {
+                    if let Some((Some(s), _)) = css_fonts.get(css_class) {
+                        analysis.font_sizes.push(FontStyle {
+                            context: context.clone(),
+                            value: s.clone(),
+                        });
+                        break;
+                    }
+                }
+            }
+
+            // Check inline font-weight attribute
+            if let Some(weight) = node.attribute("font-weight") {
+                analysis.font_weights.push(FontStyle {
+                    context: context.clone(),
+                    value: weight.to_string(),
+                });
+            } else {
+                // Check CSS rules for matching class
+                for css_class in class.split_whitespace() {
+                    if let Some((_, Some(w))) = css_fonts.get(css_class) {
+                        analysis.font_weights.push(FontStyle {
+                            context: context.clone(),
+                            value: w.clone(),
+                        });
+                        break;
+                    }
+                }
+            }
+
+            // Also check inline style attribute
+            if let Some(style) = node.attribute("style") {
+                if let Some(size) = extract_style_property(style, "font-size") {
+                    analysis.font_sizes.push(FontStyle {
+                        context: context.clone(),
+                        value: size,
+                    });
+                }
+                if let Some(weight) = extract_style_property(style, "font-weight") {
+                    analysis.font_weights.push(FontStyle {
+                        context,
+                        value: weight,
+                    });
+                }
+            }
+        }
+    }
+
+    analysis
+}
+
+/// Extract a property value from an inline style string
+fn extract_style_property(style: &str, property: &str) -> Option<String> {
+    for part in style.split(';') {
+        let trimmed = part.trim();
+        if let Some(value) = trimmed.strip_prefix(property) {
+            if let Some(v) = value.strip_prefix(':') {
+                return Some(v.trim().to_string());
+            }
+        }
+    }
+    None
+}
+
+/// Extract font-size and font-weight from CSS style blocks
+#[cfg(feature = "eval")]
+fn extract_css_font_styles(
+    doc: &roxmltree::Document,
+) -> std::collections::HashMap<String, (Option<String>, Option<String>)> {
+    use simplecss::StyleSheet;
+    let mut css_fonts = std::collections::HashMap::new();
+
+    for node in doc.descendants() {
+        if node.tag_name().name() == "style" {
+            if let Some(css_text) = node.text() {
+                let stylesheet = StyleSheet::parse(css_text);
+                for rule in stylesheet.rules {
+                    let mut font_size: Option<String> = None;
+                    let mut font_weight: Option<String> = None;
+
+                    for decl in &rule.declarations {
+                        if decl.name == "font-size" {
+                            font_size = Some(decl.value.trim().to_string());
+                        } else if decl.name == "font-weight" {
+                            font_weight = Some(decl.value.trim().to_string());
+                        }
+                    }
+
+                    // Associate with each selector in the rule
+                    if font_size.is_some() || font_weight.is_some() {
+                        let selector_str = rule.selector.to_string();
+                        for selector in selector_str.split(',') {
+                            let sel = selector.trim();
+                            // Extract class name from selector (e.g., ".entity-name" -> "entity-name")
+                            if let Some(class_name) = sel.strip_prefix('.') {
+                                let class_name = class_name.split_whitespace().next().unwrap_or("");
+                                css_fonts.insert(
+                                    class_name.to_string(),
+                                    (font_size.clone(), font_weight.clone()),
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    css_fonts
 }
 
 #[cfg(test)]
