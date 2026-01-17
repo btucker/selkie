@@ -6,8 +6,9 @@ use crate::diagrams::er::{Cardinality, Direction, Entity, ErDb, Identification};
 use crate::error::Result;
 use crate::layout::{
     layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
-    LayoutOptions, NodeShape, Padding, SizeEstimator, ToLayoutGraph,
+    LayoutOptions, NodeShape, Padding, Point, SizeEstimator, ToLayoutGraph,
 };
+use crate::render::svg::edges::build_curved_path;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement, Theme};
 
 /// Entity dimensions calculated from content
@@ -423,6 +424,15 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
         }
     }
 
+    // Extract edge bend_points from layout result (dagre-computed paths)
+    // The edge ID format is "relationship-{idx}" as defined in to_layout_graph
+    let mut edge_bend_points: HashMap<String, Vec<Point>> = HashMap::new();
+    for edge in &layout_result.edges {
+        if !edge.bend_points.is_empty() {
+            edge_bend_points.insert(edge.id.clone(), edge.bend_points.clone());
+        }
+    }
+
     // Title offset
     let title_offset = if !db.diagram_title.is_empty() {
         40.0
@@ -512,39 +522,52 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     // Render relationships FIRST so entity boxes paint on top and clip markers
     // (SVG renders later elements on top of earlier ones)
     for (idx, relationship) in relationships.iter().enumerate() {
-        // Look up entity names from IDs
-        let entity_a_name = entity_id_to_name.get(&relationship.entity_a);
-        let entity_b_name = entity_id_to_name.get(&relationship.entity_b);
+        let edge_id = format!("relationship-{}", idx);
 
-        if let (Some(a_name), Some(b_name)) = (entity_a_name, entity_b_name) {
-            // Find the attachment info for this relationship
-            let attachment = edge_attachments.iter().find(|a| a.relationship_idx == idx);
+        // Try to use dagre-computed bend points for the edge path
+        if let Some(bend_points) = edge_bend_points.get(&edge_id) {
+            // Use dagre's edge routing (like mermaid.js)
+            let rel_elem = render_relationship_from_bend_points(
+                bend_points,
+                &relationship.role_a,
+                relationship.rel_spec.card_a,
+                relationship.rel_spec.card_b,
+                relationship.rel_spec.rel_type,
+            );
+            doc.add_element(rel_elem);
+        } else {
+            // Fallback: use manual attachment calculation if dagre didn't provide points
+            let entity_a_name = entity_id_to_name.get(&relationship.entity_a);
+            let entity_b_name = entity_id_to_name.get(&relationship.entity_b);
 
-            if let Some(attachment) = attachment {
-                // Look up the pre-computed distributed positions
-                let start_pos =
-                    distributed_positions.get(&(a_name.clone(), attachment.side_a, idx));
-                let end_pos = distributed_positions.get(&(b_name.clone(), attachment.side_b, idx));
+            if let (Some(a_name), Some(b_name)) = (entity_a_name, entity_b_name) {
+                let attachment = edge_attachments.iter().find(|a| a.relationship_idx == idx);
 
-                if let (Some(start), Some(end)) = (start_pos, end_pos) {
-                    // Determine if this is a side (horizontal) attachment
-                    let is_side_attachment = matches!(
-                        attachment.side_a,
-                        AttachmentSide::Left | AttachmentSide::Right
-                    );
+                if let Some(attachment) = attachment {
+                    let start_pos =
+                        distributed_positions.get(&(a_name.clone(), attachment.side_a, idx));
+                    let end_pos =
+                        distributed_positions.get(&(b_name.clone(), attachment.side_b, idx));
 
-                    let rel_elem = render_relationship_with_positions(
-                        start.x,
-                        start.y,
-                        end.x,
-                        end.y,
-                        is_side_attachment,
-                        &relationship.role_a,
-                        relationship.rel_spec.card_a,
-                        relationship.rel_spec.card_b,
-                        relationship.rel_spec.rel_type,
-                    );
-                    doc.add_element(rel_elem);
+                    if let (Some(start), Some(end)) = (start_pos, end_pos) {
+                        let is_side_attachment = matches!(
+                            attachment.side_a,
+                            AttachmentSide::Left | AttachmentSide::Right
+                        );
+
+                        let rel_elem = render_relationship_with_positions(
+                            start.x,
+                            start.y,
+                            end.x,
+                            end.y,
+                            is_side_attachment,
+                            &relationship.role_a,
+                            relationship.rel_spec.card_a,
+                            relationship.rel_spec.card_b,
+                            relationship.rel_spec.rel_type,
+                        );
+                        doc.add_element(rel_elem);
+                    }
                 }
             }
         }
@@ -777,6 +800,84 @@ fn render_entity(
     SvgElement::Group {
         children,
         attrs: Attrs::new().with_class("entity-node").with_id(&entity.id),
+    }
+}
+
+/// Render a relationship line using dagre-computed bend points
+/// This matches mermaid.js behavior by using the same edge routing from dagre
+fn render_relationship_from_bend_points(
+    bend_points: &[Point],
+    label: &str,
+    card_a: Cardinality,
+    card_b: Cardinality,
+    rel_type: Identification,
+) -> SvgElement {
+    let mut children = Vec::new();
+
+    if bend_points.is_empty() {
+        return SvgElement::Group {
+            children,
+            attrs: Attrs::new().with_class("relationship"),
+        };
+    }
+
+    // Build path using curveBasis interpolation (like mermaid.js uses via d3)
+    let path_d = build_curved_path(bend_points);
+
+    // Get marker IDs for cardinalities
+    // Note: Due to parser semantics, card_b is the left cardinality (for entity_a/start)
+    // and card_a is the right cardinality (for entity_b/end)
+    let marker_start = cardinality_to_marker_id(card_b, false);
+    let marker_end = cardinality_to_marker_id(card_a, true);
+
+    // Build path attributes with markers
+    let mut path_attrs = Attrs::new()
+        .with_class("relationshipLine")
+        .with_attr("marker-start", &format!("url(#{})", marker_start))
+        .with_attr("marker-end", &format!("url(#{})", marker_end));
+
+    // Dotted line for non-identifying relationships
+    if rel_type == Identification::NonIdentifying {
+        path_attrs = path_attrs.with_stroke_dasharray("3");
+    }
+
+    children.push(SvgElement::Path {
+        d: path_d,
+        attrs: path_attrs,
+    });
+
+    // Relationship label (positioned at midpoint of path)
+    if !label.is_empty() {
+        // Calculate label position using geometric midpoint of bend points
+        let label_pos = crate::layout::geometric_midpoint(bend_points);
+        if let Some(mid) = label_pos {
+            // Background for label - uses CSS class for fill color
+            let label_width = (label.len() as f64) * 7.0;
+            children.push(SvgElement::Rect {
+                x: mid.x - label_width / 2.0 - 4.0,
+                y: mid.y - 12.0,
+                width: label_width + 8.0,
+                height: 23.0,
+                rx: Some(0.0),
+                ry: Some(0.0),
+                attrs: Attrs::new().with_class("relationship-label-background"),
+            });
+
+            children.push(SvgElement::Text {
+                x: mid.x,
+                y: mid.y + 4.0,
+                content: label.to_string(),
+                attrs: Attrs::new()
+                    .with_attr("text-anchor", "middle")
+                    .with_class("relationship-label")
+                    .with_attr("font-size", "14"),
+            });
+        }
+    }
+
+    SvgElement::Group {
+        children,
+        attrs: Attrs::new().with_class("relationship"),
     }
 }
 
@@ -1438,6 +1539,9 @@ mod tests {
         //   Edge 2: ORDER -> LINE-ITEM: ends at x=237 on LINE-ITEM top
         //   Edge 3: PRODUCT -> LINE-ITEM: ends at x=348 on LINE-ITEM top
         // The two edges don't share the same endpoint x coordinate.
+        //
+        // With dagre edge routing, this distribution is handled automatically by
+        // the layout algorithm computing edge paths.
 
         let input = r#"erDiagram
     CUSTOMER ||--o{ ORDER : places
@@ -1465,17 +1569,17 @@ mod tests {
 
         // Parse the SVG structure to extract edge endpoints
         let structure = SvgStructure::from_svg(&svg).unwrap();
-        let edge_details = &structure.edge_geometry.edge_details;
+        let edge_endpoints = &structure.edge_geometry.edge_endpoints;
 
         // Get edges that connect to LINE-ITEM (the entity at the bottom)
         // These should have different endpoint x coordinates if properly distributed
         // LINE-ITEM is at the bottom of the diagram, so we look for edges
-        // whose endpoints are in the lower Y region
-        let line_item_edges: Vec<_> = edge_details
+        // whose endpoints are in the lower Y region (end_y > 400)
+        let line_item_edges: Vec<_> = edge_endpoints
             .iter()
             .filter(|e| {
                 // Filter for edges whose end points are at high Y (near LINE-ITEM)
-                e.end.1 > 400.0 // Approximate Y threshold for LINE-ITEM top
+                e.3 > 400.0 // e.3 is end_y
             })
             .collect();
 
@@ -1485,15 +1589,15 @@ mod tests {
             "Should have at least 2 edges connecting to LINE-ITEM. \
              Found {} total edges, {} matching filter. \
              All edges: {:?}",
-            edge_details.len(),
+            edge_endpoints.len(),
             line_item_edges.len(),
-            edge_details
+            edge_endpoints
         );
 
         // The endpoint X coordinates should NOT be the same
         // (they should be distributed across LINE-ITEM's top edge)
-        let end_x1 = line_item_edges[0].end.0;
-        let end_x2 = line_item_edges[1].end.0;
+        let end_x1 = line_item_edges[0].2; // e.2 is end_x
+        let end_x2 = line_item_edges[1].2;
         let x_diff = (end_x1 - end_x2).abs();
 
         assert!(

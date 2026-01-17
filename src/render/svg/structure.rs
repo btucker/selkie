@@ -1098,12 +1098,13 @@ fn parse_coord_pair(parts: &[&str], i: &mut usize) -> Option<(f64, f64)> {
     }
 
     // Try separate x and y values
-    let x: f64 = part.parse().ok()?;
+    // Strip leading/trailing commas that may appear in paths like "C x y, x y, x y"
+    let x: f64 = part.trim_matches(',').parse().ok()?;
     *i += 1;
     if *i >= parts.len() {
         return None;
     }
-    let y: f64 = parts[*i].trim_start_matches(',').parse().ok()?;
+    let y: f64 = parts[*i].trim_matches(',').parse().ok()?;
     Some((x, y))
 }
 
