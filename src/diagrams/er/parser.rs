@@ -1027,4 +1027,250 @@ mod tests {
         let result = parse(input);
         assert!(result.is_ok());
     }
+
+    // =========================================================================
+    // Cypress test ports from mermaid.js erDiagram.spec.js
+    // =========================================================================
+
+    #[test]
+    fn test_cypress_multiple_relationships_same_entities() {
+        // From: "should render an ER diagram with multiple relationships between the same two entities"
+        let input = r#"erDiagram
+            CUSTOMER ||--|{ ADDRESS : "invoiced at"
+            CUSTOMER ||--|{ ADDRESS : "receives goods at""#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+        let db = result.unwrap();
+        assert_eq!(db.get_relationships().len(), 2);
+    }
+
+    #[test]
+    fn test_cypress_cyclical_relationships() {
+        // From: "should render a cyclical ER diagram"
+        let input = r#"erDiagram
+            A ||--|{ B : likes
+            B ||--|{ C : likes
+            C ||--|{ A : likes"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+        let db = result.unwrap();
+        assert_eq!(db.get_relationships().len(), 3);
+    }
+
+    #[test]
+    fn test_cypress_blank_empty_labels() {
+        // From: "should render an ER diagram with blank or empty labels"
+        let input = r#"erDiagram
+            BOOK }|..|{ AUTHOR : ""
+            BOOK }|..|{ GENRE : " "
+            AUTHOR }|..|{ GENRE : "  ""#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+    }
+
+    #[test]
+    fn test_cypress_entities_no_relationships() {
+        // From: "should render entities that have no relationships"
+        let input = r#"erDiagram
+            DEAD_PARROT
+            HERMIT
+            RECLUSE
+            SOCIALITE }o--o{ SOCIALITE : "interacts with"
+            RECLUSE }o--o{ SOCIALITE : avoids"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+        let db = result.unwrap();
+        // Should have all 4 entities
+        assert_eq!(db.get_entities().len(), 4);
+    }
+
+    #[test]
+    fn test_cypress_varchar_length_in_type() {
+        // From: "should render entities with length in attributes type"
+        let input = r#"erDiagram
+            CLUSTER {
+              varchar(99) name
+              string(255) description
+            }"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+        let db = result.unwrap();
+        let entity = db.get_entities().get("CLUSTER").unwrap();
+        assert_eq!(entity.attributes.len(), 2);
+        assert_eq!(entity.attributes[0].attr_type, "varchar(99)");
+        assert_eq!(entity.attributes[1].attr_type, "string(255)");
+    }
+
+    #[test]
+    fn test_cypress_asterisk_prefix_attributes() {
+        // From: "should render entities with attributes that begin with asterisk"
+        let input = r#"erDiagram
+            BOOK {
+              int         *id
+              string      name
+              varchar(99) summary
+            }
+            BOOK }o..o{ STORE : soldBy
+            STORE {
+              int         *id
+              string      name
+              varchar(50) address
+            }"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+    }
+
+    #[test]
+    fn test_cypress_keys_and_comments() {
+        // From: "should render entities with keys and comments"
+        let input = r#"erDiagram
+          AUTHOR_WITH_LONG_ENTITY_NAME {
+            string name PK "comment"
+          }
+          AUTHOR_WITH_LONG_ENTITY_NAME }|..|{ BOOK : writes
+          BOOK {
+              string description
+              float price "price comment"
+              string title PK "title comment"
+              string author FK
+            }"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+        let db = result.unwrap();
+        let book = db.get_entities().get("BOOK").unwrap();
+        // Check that title has PK key
+        let title_attr = book.attributes.iter().find(|a| a.name == "title").unwrap();
+        assert!(title_attr
+            .keys
+            .contains(&super::super::types::AttributeKey::PrimaryKey));
+    }
+
+    #[test]
+    #[ignore = "Parser doesn't support unquoted bracket alias syntax p[Person] - only quoted p[\"Person\"]"]
+    fn test_cypress_entity_name_aliases() {
+        // From: "should render entities with entity name aliases"
+        // TODO: Support unquoted bracket alias syntax like mermaid
+        let input = r#"erDiagram
+          p[Person] {
+            varchar(64) firstName
+            varchar(64) lastName
+          }
+          c["Customer Account"] {
+            varchar(128) email
+          }
+          p ||--o| c : has"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+        let db = result.unwrap();
+        // Check alias is parsed
+        let person = db.get_entities().get("p").unwrap();
+        assert_eq!(person.alias, "Person");
+    }
+
+    #[test]
+    fn test_cypress_numeric_entity_names() {
+        // From: "should render ER diagram with numeric entity names"
+        let input = r#"erDiagram
+            1 ||--|| ORDER : places
+            ORDER ||--|{ 2 : contains
+            2 ||--o{ 3.5 : references"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+    }
+
+    #[test]
+    fn test_cypress_decimal_numbers_in_relationships() {
+        // From: "should render ER diagram with decimal numbers in relationships"
+        let input = r#"erDiagram
+            2.5 ||--|| 1.5 : has
+            CUSTOMER ||--o{ 3.14 : references
+            1.0 ||--|{ ORDER : contains"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+    }
+
+    #[test]
+    fn test_cypress_standalone_numeric_entities() {
+        // From: "should render ER diagram with standalone numeric entities"
+        let input = r#"erDiagram
+           PRODUCT ||--o{ ORDER-ITEM : has
+           1.5
+           u
+           1"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+        let db = result.unwrap();
+        // Should have PRODUCT, ORDER-ITEM, 1.5, u, 1 as entities
+        assert!(db.get_entities().contains_key("1.5"));
+        assert!(db.get_entities().contains_key("u"));
+        assert!(db.get_entities().contains_key("1"));
+    }
+
+    #[test]
+    #[ignore = "Parser doesn't support YAML frontmatter (---title:---)"]
+    fn test_cypress_title_frontmatter() {
+        // From: "1433: should render a simple ER diagram with a title"
+        // TODO: Support YAML frontmatter like mermaid
+        let input = r#"---
+title: simple ER diagram
+---
+erDiagram
+CUSTOMER ||--o{ ORDER : places
+ORDER ||--|{ LINE-ITEM : contains"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+        let db = result.unwrap();
+        assert_eq!(db.diagram_title, "simple ER diagram");
+    }
+
+    #[test]
+    fn test_cypress_complex_mixed_entity_names() {
+        // From: "should render complex ER diagram with mixed special entity names"
+        let input = r#"erDiagram
+            CUSTOMER ||--o{ 1 : places
+            1 ||--|{ u : contains
+            1.5
+            u ||--|| 2.5 : processes
+            2.5 {
+              string id
+              float value
+            }
+            u {
+              varchar(50) name
+              int count
+            }"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+    }
+
+    #[test]
+    fn test_cypress_relationship_labels_special_chars() {
+        // From: "should render edge labels correctly"
+        let input = r#"erDiagram
+            CUSTOMER ||--o{ ORDER : places
+            ORDER ||--|{ LINE-ITEM : contains
+            CUSTOMER ||--|{ ADDRESS : "invoiced at"
+            CUSTOMER ||--|{ ADDRESS : "receives goods at"
+            ORDER ||--o{ INVOICE : "liable for""#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+    }
+
+    #[test]
+    #[ignore = "Parser doesn't support verbose cardinality aliases (one or zero to one or more)"]
+    fn test_cypress_cardinality_aliases() {
+        // From: "should render entities with aliases"
+        // TODO: Support verbose cardinality aliases like mermaid
+        let input = r#"erDiagram
+          T1 one or zero to one or more T2 : test
+          T2 one or many optionally to zero or one T3 : test
+          T3 zero or more to zero or many T4 : test
+          T4 many(0) to many(1) T5 : test
+          T5 many optionally to one T6 : test
+          T6 only one optionally to only one T1 : test
+          T4 0+ to 1+ T6 : test
+          T1 1 to 1 T3 : test"#;
+        let result = parse(input);
+        assert!(result.is_ok(), "Failed: {:?}", result.err());
+    }
 }
