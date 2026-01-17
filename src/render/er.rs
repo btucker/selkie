@@ -690,36 +690,41 @@ fn calculate_connection_points(
     // should use bottom-to-top connections even when there's horizontal offset
     let is_side_attachment = dx.abs() > dy.abs();
 
+    // Marker offset - paths should end before the node boundary so that
+    // markers (crow's feet) extend from the path endpoint TO the node.
+    // The largest markers (oneOrMore, zeroOrMore) extend ~18 units past the path endpoint.
+    let marker_offset = 18.0;
+
     // Determine attachment for entity 1 (source)
+    // Path starts OFFSET from node boundary so marker-start extends to touch the node
     let (start_x, start_y) = if is_side_attachment {
-        // Horizontal offset is dominant or significant - use sides
         if dx > 0.0 {
-            (x1 + w1, center1_y) // right edge
+            (x1 + w1 + marker_offset, center1_y) // offset right of right edge
         } else {
-            (x1, center1_y) // left edge
+            (x1 - marker_offset, center1_y) // offset left of left edge
         }
     } else if dy > 0.0 {
-        // Vertical relationship going down - use bottom
-        (center1_x, y1 + h1)
+        // Vertical relationship going down - offset below bottom
+        (center1_x, y1 + h1 + marker_offset)
     } else {
-        // Vertical relationship going up - use top
-        (center1_x, y1)
+        // Vertical relationship going up - offset above top
+        (center1_x, y1 - marker_offset)
     };
 
     // Determine attachment for entity 2 (target)
+    // Path ends OFFSET from node boundary so marker-end extends to touch the node
     let (end_x, end_y) = if is_side_attachment {
-        // Horizontal offset is dominant or significant - use sides
         if dx > 0.0 {
-            (x2, center2_y) // left edge
+            (x2 - marker_offset, center2_y) // offset left of left edge
         } else {
-            (x2 + w2, center2_y) // right edge
+            (x2 + w2 + marker_offset, center2_y) // offset right of right edge
         }
     } else if dy > 0.0 {
-        // Vertical relationship - use top of target
-        (center2_x, y2)
+        // Vertical relationship - offset above top of target
+        (center2_x, y2 - marker_offset)
     } else {
-        // Vertical relationship going up - use bottom
-        (center2_x, y2 + h2)
+        // Vertical relationship going up - offset below bottom
+        (center2_x, y2 + h2 + marker_offset)
     };
 
     (start_x, start_y, end_x, end_y, is_side_attachment)
@@ -1149,9 +1154,10 @@ mod tests {
             y2 + h2 / 2.0
         );
 
-        // Start should be at bottom center of entity 1
+        // Start should be at bottom center of entity 1, offset for marker
+        // Marker offset is 18.0, so path starts below the bottom edge
         let expected_start_x = x1 + w1 / 2.0; // 125.0
-        let expected_start_y = y1 + h1; // 220.0
+        let expected_start_y = y1 + h1 + 18.0; // 238.0 (220 + 18 marker offset)
         assert!(
             (start_x - expected_start_x).abs() < 1.0,
             "Start X should be at center: expected {}, got {}",
@@ -1160,14 +1166,15 @@ mod tests {
         );
         assert!(
             (start_y - expected_start_y).abs() < 1.0,
-            "Start Y should be at bottom edge: expected {}, got {}",
+            "Start Y should be offset below bottom edge: expected {}, got {}",
             expected_start_y,
             start_y
         );
 
-        // End should be at top center of entity 2
+        // End should be at top center of entity 2, offset for marker
+        // Marker offset is 18.0, so path ends above the top edge
         let expected_end_x = x2 + w2 / 2.0; // 250.0
-        let expected_end_y = y2; // 350.0
+        let expected_end_y = y2 - 18.0; // 332.0 (350 - 18 marker offset)
         assert!(
             (end_x - expected_end_x).abs() < 1.0,
             "End X should be at center: expected {}, got {}",
@@ -1176,7 +1183,7 @@ mod tests {
         );
         assert!(
             (end_y - expected_end_y).abs() < 1.0,
-            "End Y should be at top edge: expected {}, got {}",
+            "End Y should be offset above top edge: expected {}, got {}",
             expected_end_y,
             end_y
         );
