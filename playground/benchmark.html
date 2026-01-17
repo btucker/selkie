@@ -211,34 +211,50 @@
             color: var(--text-secondary);
         }
 
-        .size-comparison {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
+        .size-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .size-item {
-            flex: 1;
-            min-width: 200px;
-            background: var(--bg-card);
-            padding: 1rem;
-            border-radius: 6px;
+        .size-table th,
+        .size-table td {
+            padding: 0.75rem 1rem;
+            text-align: right;
         }
 
-        .size-item .label {
+        .size-table th:first-child,
+        .size-table td:first-child {
+            text-align: left;
+        }
+
+        .size-table th {
             font-size: 0.875rem;
             color: var(--text-secondary);
-            margin-bottom: 0.25rem;
+            font-weight: 500;
         }
 
-        .size-item .value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            font-family: 'SF Mono', Monaco, monospace;
+        .size-table .lib-name {
+            font-weight: 500;
         }
 
-        .size-item.selkie .value {
+        .size-table .selkie-name {
             color: var(--accent-green);
+        }
+
+        .size-table .size-value {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 1rem;
+        }
+
+        .size-table .selkie-value {
+            color: var(--accent-green);
+        }
+
+        .size-note {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-align: center;
         }
 
         .links {
@@ -326,16 +342,28 @@
 
         <div id="bundle-size" class="bundle-size hidden">
             <h3>Bundle Size Comparison</h3>
-            <div class="size-comparison">
-                <div class="size-item selkie">
-                    <div class="label">Selkie (WASM + JS)</div>
-                    <div id="selkie-size" class="value">-</div>
-                </div>
-                <div class="size-item">
-                    <div class="label">Mermaid.js</div>
-                    <div id="mermaid-size" class="value">~2.5 MB</div>
-                </div>
-            </div>
+            <table class="size-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Uncompressed</th>
+                        <th>Gzipped</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="lib-name selkie-name">Selkie (WASM + JS)</td>
+                        <td id="selkie-size" class="size-value selkie-value">-</td>
+                        <td id="selkie-size-gzip" class="size-value selkie-value">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lib-name">Mermaid.js</td>
+                        <td id="mermaid-size" class="size-value">-</td>
+                        <td id="mermaid-size-gzip" class="size-value">-</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="size-note">Comparable bundle size, significantly faster rendering.</p>
         </div>
 
         <div class="links">
@@ -454,11 +482,22 @@
         const resultsBody = document.getElementById('results-body');
         const bundleSizeEl = document.getElementById('bundle-size');
         const selkieSizeEl = document.getElementById('selkie-size');
+        const selkieSizeGzipEl = document.getElementById('selkie-size-gzip');
+        const mermaidSizeEl = document.getElementById('mermaid-size');
+        const mermaidSizeGzipEl = document.getElementById('mermaid-size-gzip');
         const warmupInput = document.getElementById('warmup-runs');
         const benchmarkInput = document.getElementById('benchmark-runs');
 
         let selkie = null;
         let selkieBundleSize = 0;
+        let mermaidBundleSize = 0;
+
+        // Mermaid.js sizes (measured from npm package v11, gzip -9)
+        const MERMAID_SIZE_UNCOMPRESSED = 2754895; // 2.62 MB
+        const MERMAID_SIZE_GZIPPED = 789334; // 770 KB
+
+        // Typical WASM gzip compression ratio (WASM compresses very well)
+        const WASM_GZIP_RATIO = 0.23;
 
         function median(values) {
             const sorted = [...values].sort((a, b) => a - b);
@@ -586,8 +625,11 @@
                 resultsBody.appendChild(row);
             }
 
-            // Show bundle size
+            // Show bundle sizes
             selkieSizeEl.textContent = formatSize(selkieBundleSize);
+            selkieSizeGzipEl.textContent = '~' + formatSize(Math.round(selkieBundleSize * WASM_GZIP_RATIO));
+            mermaidSizeEl.textContent = formatSize(MERMAID_SIZE_UNCOMPRESSED);
+            mermaidSizeGzipEl.textContent = formatSize(MERMAID_SIZE_GZIPPED);
 
             progressSection.classList.add('hidden');
             resultsEl.classList.remove('hidden');
