@@ -51,7 +51,14 @@ For client-side rendering, Selkie compiles to WebAssembly. Both run in the same 
 
 _Median of 10 runs after 2 warmup runs. Chromium via Playwright._
 
-**Bundle Size:** ~350 KB gzipped (WASM + JS glue) vs ~2.5 MB for mermaid.min.js
+**Bundle Size:**
+
+| | Uncompressed | Gzipped |
+|---|---|---|
+| Selkie (WASM + JS) | ~5.0 MB | ~1.2 MB |
+| Mermaid.js | ~2.6 MB | ~775 KB |
+
+Selkie's WASM bundle is larger but offers significantly faster render times.
 
 ## Credits
 
