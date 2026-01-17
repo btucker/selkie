@@ -771,4 +771,207 @@ mod tests {
             assert!(db.get_states().contains_key("Shipped"));
         }
     }
+
+    // Tests ported from mermaid Cypress tests (stateDiagram.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_simple_state_diagram() {
+            // From Cypress: should render a simple state diagrams
+            let input = r#"stateDiagram
+    [*] --> State1
+    State1 --> [*]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert!(db.get_states().contains_key("State1"));
+        }
+
+        #[test]
+        fn test_cypress_long_descriptions() {
+            // From Cypress: should render a long descriptions instead of id when available
+            let input = r#"stateDiagram
+      [*] --> S1
+      state "Some long name" as S1"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_long_descriptions_with_additional() {
+            // From Cypress: should render a long descriptions with additional descriptions
+            let input = r#"stateDiagram
+      [*] --> S1
+      state "Some long name" as S1: The description"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_transition_descriptions_newlines() {
+            // From Cypress: should render a transition descriptions with new lines
+            let input = r#"stateDiagram
+      [*] --> S1
+      S1 --> S2: long line using<br/>should work
+      S1 --> S3: long line using <br>should work
+      S1 --> S4: long line using \nshould work"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_state_with_note() {
+            // From Cypress: should render a state with a note
+            let input = r#"stateDiagram
+    State1: The state with a note
+    note right of State1
+      Important information! You can write
+      notes.
+    end note"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_note_left_side() {
+            // From Cypress: should render a state with on the left side when so specified
+            let input = r#"stateDiagram
+    State1: The state with a note with minus - and plus + in it
+    note left of State1
+      Important information! You can write
+      notes with . and  in them.
+    end note"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_multi_description() {
+            // From Cypress: should render a states with descriptions including multi-line descriptions
+            let input = r#"stateDiagram
+    State1: This a single line description
+    State2: This a multi line description
+    State2: here comes the multi part
+    [*] --> State1
+    State1 --> State2
+    State2 --> [*]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_multiple_transitions() {
+            // From Cypress: multiple transitions from state
+            let input = r#"stateDiagram
+    [*] --> State1
+    State1 --> State2
+    State1 --> State3
+    State1 --> [*]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_composite_state() {
+            // From Cypress: should render a composite state
+            let input = r#"stateDiagram
+    [*] --> First
+    First --> Second
+    First --> Third
+
+    state First {
+        [*] --> 1st
+        1st --> [*]
+    }"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_parallel_states() {
+            // From Cypress: should render a state with parallel states
+            let input = r#"stateDiagram
+    state Active {
+        [*] --> NumLock
+        --
+        [*] --> CapsLock
+        --
+        [*] --> ScrollLock
+    }"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_fork_join() {
+            // From Cypress: should render a state with forks and joins
+            let input = r#"stateDiagram-v2
+    state fork_state <<fork>>
+      [*] --> fork_state
+      fork_state --> State2
+      fork_state --> State3
+
+      state join_state <<join>>
+      State2 --> join_state
+      State3 --> join_state
+      join_state --> State4
+      State4 --> [*]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_choice() {
+            // From Cypress: should render a state with choice
+            let input = r#"stateDiagram-v2
+    state if_state <<choice>>
+    [*] --> IsPositive
+    IsPositive --> if_state
+    if_state --> False: if n < 0
+    if_state --> True : if n >= 0"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_direction_lr() {
+            // From Cypress: should render a state diagram with direction LR
+            let input = r#"stateDiagram
+    direction LR
+    [*] --> A
+    A --> B
+    B --> C"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_direction(), Direction::LeftToRight);
+        }
+
+        #[test]
+        fn test_cypress_classDef_and_class() {
+            // From Cypress: should support classDef and class statements
+            let input = r#"stateDiagram-v2
+    classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
+    [*] --> A
+    A --> B: goB
+    class A badBadEvent"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_v2_syntax() {
+            // From Cypress: stateDiagram-v2 syntax
+            let input = r#"stateDiagram-v2
+    [*] --> Still
+    Still --> [*]
+    Still --> Moving
+    Moving --> Still
+    Moving --> Crash
+    Crash --> [*]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

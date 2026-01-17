@@ -254,3 +254,76 @@ fn parse_node(content: &str) -> Result<MindmapNode> {
         ..Default::default()
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Tests ported from mermaid Cypress tests (mindmap-tidy-tree.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_simple_mindmap_without_children() {
+            // From Cypress 1-tidy-tree: should render a simple mindmap without children
+            let input = r#"mindmap
+      root((mindmap))
+        A
+        B"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_simple_mindmap() {
+            // From Cypress 2-tidy-tree: should render a simple mindmap
+            let input = r#"mindmap
+      root((mindmap is a long thing))
+        A
+        B
+        C
+        D"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_mindmap_different_shapes() {
+            // From Cypress 3-tidy-tree: should render a mindmap with different shapes
+            let input = r#"mindmap
+      root((mindmap))
+        Origins
+          Long history
+          Popularisation
+            British popular psychology author Tony Buzan
+        Research
+          On effectiveness and features
+          On Automatic creation
+            Uses
+                Creative techniques
+                Strategic planning
+                Argument mapping
+        Tools"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_mindmap_with_children() {
+            // From Cypress 4-tidy-tree: should render a mindmap with children
+            let input = r#"mindmap
+      ((This is a mindmap))
+        child1
+         grandchild 1
+         grandchild 2
+        child2
+         grandchild 3
+         grandchild 4
+        child3
+         grandchild 5
+         grandchild 6"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
+}

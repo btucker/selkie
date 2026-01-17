@@ -477,4 +477,86 @@ mod tests {
             assert_eq!(points[3].text, "Incorta");
         }
     }
+
+    // Tests ported from mermaid Cypress tests (quadrantChart.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_minimal() {
+            // From Cypress: should render if only chart type is provided
+            let input = "quadrantChart";
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_complete() {
+            // From Cypress: should render a complete quadrant chart
+            let input = r#"quadrantChart
+    title Reach and engagement of campaigns
+    x-axis Low Reach --> High Reach
+    y-axis Low Engagement --> High Engagement
+    quadrant-1 We should expand
+    quadrant-2 Need to promote
+    quadrant-3 Re-evaluate
+    quadrant-4 May be improved
+    Campaign A: [0.3, 0.6]
+    Campaign B: [0.45, 0.23]
+    Campaign C: [0.57, 0.69]
+    Campaign D: [0.78, 0.34]
+    Campaign E: [0.40, 0.34]
+    Campaign F: [0.35, 0.78]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_points().len(), 6);
+        }
+
+        #[test]
+        fn test_cypress_without_points() {
+            // From Cypress: should render without points
+            let input = r#"quadrantChart
+    title Reach and engagement of campaigns
+    x-axis Low Reach --> High Reach
+    y-axis Low Engagement --> High Engagement
+    quadrant-1 We should expand
+    quadrant-2 Need to promote
+    quadrant-3 Re-evaluate
+    quadrant-4 May be improved"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_without_title() {
+            // From Cypress: should render without title
+            let input = r#"quadrantChart
+    x-axis Low Reach --> High Reach
+    y-axis Low Engagement --> High Engagement
+    quadrant-1 We should expand
+    quadrant-2 Need to promote
+    quadrant-3 Re-evaluate
+    quadrant-4 May be improved"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_styled_points() {
+            // From Cypress: should render with styled points
+            let input = r#"quadrantChart
+    title Campaign performance
+    x-axis Low Reach --> High Reach
+    y-axis Low Engagement --> High Engagement
+    quadrant-1 We should expand
+    quadrant-2 Need to promote
+    quadrant-3 Re-evaluate
+    quadrant-4 May be improved
+    Campaign A:::group1: [0.3, 0.6]
+    Campaign B:::group2: [0.45, 0.23]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

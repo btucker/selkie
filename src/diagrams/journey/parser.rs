@@ -329,4 +329,86 @@ R task: 5:"#;
             assert!(actors.contains(&"Cat".to_string()));
         }
     }
+
+    // Tests ported from mermaid Cypress tests (journey.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_simple_test() {
+            // From Cypress: Simple test
+            let input = r#"journey
+title Adding journey diagram functionality to mermaid
+section Order from website"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_user_journey_chart() {
+            // From Cypress: should render a user journey chart
+            let input = r#"journey
+    title My working day
+    section Go to work
+      Make tea: 5: Me
+      Go upstairs: 3: Me
+      Do work: 1: Me, Cat
+    section Go home
+      Go downstairs: 5: Me
+      Sit down: 3: Me"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.title, "My working day");
+            assert!(!db.get_tasks().is_empty());
+        }
+
+        #[test]
+        fn test_cypress_e_commerce() {
+            // From Cypress: E-Commerce journey
+            let input = r#"journey
+title E-Commerce
+section Order from website
+  Add to cart: 5: Me
+section Checkout from website
+  Add payment details: 5: Me"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.title, "E-Commerce");
+        }
+
+        #[test]
+        fn test_cypress_multiple_actors() {
+            // From Cypress: multiple actors
+            let input = r#"journey
+title Web hook life cycle
+section Darkoob
+  Make preBuilt:5: Darkoob user
+  register slug : 5: Darkoob admin
+  Map slug to a Prebuilt Job:5: Darkoob user
+section External Service
+  set Darkoob slug as hook for an Event : 5 : admin
+  listen to the events : 5 :  External Service
+  call darkoob endpoint : 5 : External Service"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            let actors = db.get_actors();
+            assert!(actors.len() >= 3);
+        }
+
+        #[test]
+        fn test_cypress_no_score() {
+            // From Cypress: tasks without scores
+            let input = r#"journey
+        title User Journey Example
+        section Onboarding
+            Sign Up: 5:
+            Browse Features: 3:
+            Use Core Functionality: 4:"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

@@ -1215,4 +1215,204 @@ destroy Alice",
             assert_eq!(db.get_messages()[0].message, "Hello #lt;World#gt;");
         }
     }
+
+    // Tests ported from mermaid Cypress tests (sequencediagram.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_simple_sequence_diagram() {
+            // From Cypress: should render a simple sequence diagram
+            let input = r#"sequenceDiagram
+        participant Alice
+        participant Bob
+        participant John as John<br/>Second Line
+        Alice ->> Bob: Hello Bob, how are you?
+        Bob-->>John: How about you John?
+        Bob--x Alice: I am good thanks!
+        Bob-x John: I am good thanks!
+        Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
+        Bob-->Alice: Checking with John..."#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_actors().len(), 3);
+            assert!(db.get_messages().len() >= 5);
+        }
+
+        #[test]
+        fn test_cypress_sequence_with_boxes() {
+            // From Cypress: should render a sequence diagram with boxes
+            let input = r#"sequenceDiagram
+      box LightGrey Alice and Bob
+      participant Alice
+      participant Bob
+      end
+      participant John as John<br/>Second Line
+      Alice ->> Bob: Hello Bob, how are you?
+      Bob-->>John: How about you John?"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_actors().len(), 3);
+            assert!(!db.get_boxes().is_empty(), "Should have at least one box");
+        }
+
+        #[test]
+        fn test_cypress_bidirectional_arrows() {
+            // From Cypress: should render bidirectional arrows
+            let input = r#"sequenceDiagram
+      Alice<<->>John: Hello John, how are you?
+      Alice<<-->>John: Hi Alice, I can hear you!
+      John<<->>Alice: This also works the other way
+      John<<-->>Alice: Yes
+      Alice->John: Test
+      John->>Alice: Still works"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_messages().len(), 6);
+        }
+
+        #[test]
+        fn test_cypress_different_line_breaks() {
+            // From Cypress: should handle different line breaks
+            let input = r#"sequenceDiagram
+      participant 1 as multiline<br>using #lt;br#gt;
+      participant 2 as multiline<br/>using #lt;br/#gt;
+      participant 3 as multiline<br />using #lt;br /#gt;
+      1->>2: multiline<br>using #lt;br#gt;"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_actors().len(), 3);
+        }
+
+        #[test]
+        fn test_cypress_alt_else_blocks() {
+            // From Cypress: alt/else blocks
+            let input = r#"sequenceDiagram
+      Alice->>Bob: Hello
+      alt either this
+        Alice->>John: Yes
+        else or this
+        Alice->>John: No
+        else or this will happen
+        Alice->John: Maybe
+      end"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_par_blocks() {
+            // From Cypress: par blocks
+            let input = r#"sequenceDiagram
+      par this happens in parallel
+      Alice -->> Bob: Parallel message 1
+      and
+      Alice -->> John: Parallel message 2
+      end"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_loops() {
+            // From Cypress: loops
+            let input = r#"sequenceDiagram
+        Alice->>Bob: Extremely utterly long line
+        loop Loopy
+            Bob->>Alice: Pasten
+        end"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_actor_creation_destruction() {
+            // From Cypress: actor creation and destruction
+            let input = r#"sequenceDiagram
+      Alice ->> Bob: Hello Bob, how are you ?
+      Bob ->> Alice: Fine, thank you. And you?
+      create participant Polo
+      Alice ->> Polo: Hi Polo!
+      create actor Ola1 as Ola
+      Polo ->> Ola1: Hiii
+      Ola1 ->> Alice: Hi too
+      destroy Ola1
+      Alice --x Ola1: Bye!"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert!(db.is_created("Polo"));
+            assert!(db.is_created("Ola1"));
+            assert!(db.is_destroyed("Ola1"));
+        }
+
+        #[test]
+        fn test_cypress_notes() {
+            // From Cypress: notes with proper sequence format
+            let input = r#"sequenceDiagram
+      participant Alice
+      participant Bob
+      Note right of Alice: This is a note"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_critical_region() {
+            // From Cypress: critical region
+            let input = r#"sequenceDiagram
+    critical Establish a connection to the DB
+        Service-->DB: connect
+    option Network timeout
+        Service-->Service: Log error
+    option Credentials rejected
+        Service-->Service: Log different error
+    end"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_break_block() {
+            // From Cypress: break block
+            let input = r#"sequenceDiagram
+    Consumer-->API: Book Something
+    break when the booking process fails
+        API-->Consumer: show failure
+    end"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_activation() {
+            // From Cypress: activation
+            let input = r#"sequenceDiagram
+        Alice->>+John: Hello John, how are you?
+        Alice->>+John: John, can you hear me?
+        John-->>-Alice: Hi Alice, I can hear you!
+        John-->>-Alice: I feel great!"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            // Check activations
+            assert!(db.get_messages().iter().any(|m| m.activate));
+        }
+
+        #[test]
+        fn test_cypress_links() {
+            // From Cypress: links
+            let input = r#"sequenceDiagram
+    participant A as Alice
+    participant J as John
+    link A: Dashboard @ https://dashboard.contoso.com/alice
+    link J: Dashboard @ https://dashboard.contoso.com/john"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

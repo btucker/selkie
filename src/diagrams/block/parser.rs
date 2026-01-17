@@ -597,4 +597,89 @@ mod tests {
             assert_eq!(two.width_in_columns, Some(2));
         }
     }
+
+    // Tests ported from mermaid Cypress tests (block.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_bl1_block_widths() {
+            // From Cypress BL1: should calculate the block widths
+            let input = r#"block-beta
+  columns 2
+  block
+    id2["I am a wide one"]
+    id1
+  end
+  id["Next row"]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_bl2_columns_in_subblocks() {
+            // From Cypress BL2: should handle columns statement in sub-blocks
+            let input = r#"block
+  id1["Hello"]
+  block
+    columns 3
+    id2["to"]
+    id3["the"]
+    id4["World"]
+    id5["World"]
+  end"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        #[ignore = "TODO: ID format with dots (id2.1) not supported"]
+        fn test_cypress_bl3_align_widths() {
+            // From Cypress BL3: should align block widths and handle columns statement in sub-blocks
+            let input = r#"block
+  block
+    columns 1
+    id1
+    id2
+    id2.1
+  end
+  id3
+  id4"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        #[ignore = "TODO: ID format with dots (id2.1) not supported"]
+        fn test_cypress_bl4_deeper_subblocks() {
+            // From Cypress BL4: should align block widths and handle columns statements in deeper sub-blocks
+            let input = r#"block
+  columns 1
+  block
+    columns 1
+    block
+      columns 3
+      id1
+      id2
+      id2.1(("XYZ"))
+    end
+    id48
+  end
+  id3"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_bl6_arrows_space() {
+            // From Cypress BL6: should handle block arrows and space statements
+            let input = r#"block
+    columns 3
+    space:3
+    ida idb idc
+    id1  id2"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

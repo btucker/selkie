@@ -720,4 +720,110 @@ Person(default, "default", "default")"#;
             assert_eq!(elements[0].alias, "default");
         }
     }
+
+    // Tests ported from mermaid Cypress tests (c4.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        #[ignore = "TODO: accTitle/accDescr accessibility directives not supported"]
+        fn test_cypress_c4_context() {
+            // From Cypress C4.1: should render a simple C4Context diagram
+            let input = r#"C4Context
+      accTitle: C4 context demo
+      accDescr: Many large C4 diagrams
+
+      title System Context diagram for Internet Banking System
+
+      Enterprise_Boundary(b0, "BankBoundary0") {
+          Person(customerA, "Banking Customer A", "A customer of the bank, with personal bank accounts.")
+
+          System(SystemAA, "Internet Banking System", "Allows customers to view information about their bank accounts, and make payments.")
+
+          Enterprise_Boundary(b1, "BankBoundary") {
+            System_Ext(SystemC, "E-mail system", "The internal Microsoft Exchange e-mail system.")
+          }
+        }
+
+      BiRel(customerA, SystemAA, "Uses")
+      Rel(SystemAA, SystemC, "Sends e-mails", "SMTP")"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_c4_container() {
+            // From Cypress C4.2: should render a simple C4Container diagram
+            let input = r#"C4Container
+      title Container diagram for Internet Banking System
+
+      System_Ext(email_system, "E-Mail System", "The internal Microsoft Exchange system", $tags="v1.0")
+      Person(customer, Customer, "A customer of the bank, with personal bank accounts", $tags="v1.0")
+
+      Container_Boundary(c1, "Internet Banking") {
+          Container(spa, "Single-Page App", "JavaScript, Angular", "Provides all the Internet banking functionality to customers via their web browser")
+      }
+
+      Rel(customer, spa, "Uses", "HTTPS")
+      Rel(email_system, customer, "Sends e-mails to")"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_c4_component() {
+            // From Cypress C4.3: should render a simple C4Component diagram
+            let input = r#"C4Component
+      title Component diagram for Internet Banking System - API Application
+
+      Container(spa, "Single Page Application", "javascript and angular", "Provides all the internet banking functionality to customers via their web browser.")
+
+      Container_Boundary(api, "API Application") {
+        Component(sign, "Sign In Controller", "MVC Rest Controller", "Allows users to sign in to the internet banking system")
+      }
+
+      Rel_Back(spa, sign, "Uses", "JSON/HTTPS")"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_c4_dynamic() {
+            // From Cypress C4.4: should render a simple C4Dynamic diagram
+            let input = r#"C4Dynamic
+      title Dynamic diagram for Internet Banking System - API Application
+
+      ContainerDb(c4, "Database", "Relational Database Schema", "Stores user registration information, hashed authentication credentials, access logs, etc.")
+      Container(c1, "Single-Page Application", "JavaScript and Angular", "Provides all of the Internet banking functionality to customers via their web browser.")
+      Container_Boundary(b, "API Application") {
+        Component(c3, "Security Component", "Spring Bean", "Provides functionality Related to signing in, changing passwords, etc.")
+        Component(c2, "Sign In Controller", "Spring MVC Rest Controller", "Allows users to sign in to the Internet Banking System.")
+      }
+      Rel(c1, c2, "Submits credentials to", "JSON/HTTPS")
+      Rel(c2, c3, "Calls isAuthenticated() on")
+      Rel(c3, c4, "select * from users where username = ?", "JDBC")"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        #[ignore = "TODO: Deployment_Node syntax not supported"]
+        fn test_cypress_c4_deployment() {
+            // From Cypress C4.5: should render a simple C4Deployment diagram
+            let input = r#"C4Deployment
+      title Deployment Diagram for Internet Banking System - Live
+
+      Deployment_Node(mob, "Customer's mobile device", "Apple IOS or Android"){
+        Container(mobile, "Mobile App", "Xamarin", "Provides a limited subset of the Internet Banking functionality to customers via their mobile device.")
+      }
+
+      Deployment_Node(comp, "Customer's computer", "Microsoft Windows or Apple macOS"){
+        Deployment_Node(browser, "Web Browser", "Google Chrome, Mozilla Firefox or Microsoft Edge"){
+          Container(spa, "Single-Page Application", "JavaScript and Angular", "Provides all of the Internet Banking functionality to customers via their web browser.")
+        }
+      }"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

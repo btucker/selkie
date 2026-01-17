@@ -559,4 +559,104 @@ mod tests {
             assert_eq!(plots.len(), 4);
         }
     }
+
+    // Tests ported from mermaid Cypress tests (xyChart.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_simplest_beta() {
+            // From Cypress: should render the simplest possible xy-beta chart
+            let input = r#"xychart-beta
+        line [10, 30, 20]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_simplest() {
+            // From Cypress: should render the simplest possible xy chart
+            let input = r#"xychart
+        line [10, 30, 20]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_complete_chart() {
+            // From Cypress: Should render a complete chart
+            let input = r#"xychart
+        title "Sales Revenue"
+        x-axis Months [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+        y-axis "Revenue (in $)" 4000 --> 11000
+        bar [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]
+        line [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_plots().len(), 2);
+        }
+
+        #[test]
+        fn test_cypress_without_title() {
+            // From Cypress: Should render a chart without title
+            let input = r#"xychart
+        x-axis Months [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+        y-axis "Revenue (in $)" 4000 --> 11000
+        bar [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]
+        line [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_y_axis_no_title() {
+            // From Cypress: y-axis title not required
+            let input = r#"xychart
+        x-axis Months [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+        y-axis 4000 --> 11000
+        bar [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]
+        line [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_x_axis_no_title() {
+            // From Cypress: x axis title not required
+            let input = r#"xychart
+        x-axis [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+        bar [5000, 6000, 7500, 8200, 9500, 10500, 14000, 3200, 9200, 9900, 3400, 6000]
+        line [2000, 7000, 6500, 9200, 9500, 7500, 11000, 10200, 3200, 8500, 7000, 8800]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_multiple_plots() {
+            // From Cypress: Multiple plots can be rendered
+            let input = r#"xychart
+        line [23, 46, 77, 34]
+        line [45, 32, 33, 12]
+        bar [87, 54, 99, 85]
+        line [78, 88, 22, 4]
+        line [22, 29, 75, 33]
+        bar [52, 96, 35, 10]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_plots().len(), 6);
+        }
+
+        #[test]
+        #[ignore = "TODO: Leading decimal point (.6) without 0 not supported"]
+        fn test_cypress_decimals_negatives() {
+            // From Cypress: Decimals and negative numbers are supported
+            let input = r#"xychart
+        y-axis -2.4 --> 3.5
+        line [+1.3, .6, 2.4, -.34]"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

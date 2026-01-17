@@ -611,4 +611,163 @@ mod tests {
             assert!(db.get_branches().contains_key("feature"));
         }
     }
+
+    // Tests ported from mermaid Cypress tests (gitGraph.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_simple_commits() {
+            // From Cypress test 1: simple gitgraph with commit on main branch
+            let input = r#"gitGraph
+       commit id: "1"
+       commit id: "2"
+       commit id: "3""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_commits().len(), 3);
+        }
+
+        #[test]
+        fn test_cypress_commit_types() {
+            // From Cypress test 3: different commitTypes on main branch
+            let input = r#"gitGraph
+       commit id: "Normal Commit"
+       commit id: "Reverse Commit" type: REVERSE
+       commit id: "Highlight Commit" type: HIGHLIGHT"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_tags() {
+            // From Cypress test 4: tags commitTypes on main branch
+            let input = r#"gitGraph
+       commit id: "Normal Commit with tag" tag: "v1.0.0"
+       commit id: "Reverse Commit with tag" type: REVERSE tag: "RC_1"
+       commit id: "Highlight Commit" type: HIGHLIGHT  tag: "8.8.4""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_two_branches() {
+            // From Cypress test 5: simple gitgraph with two branches
+            let input = r#"gitGraph
+       commit id: "1"
+       commit id: "2"
+       branch develop
+       checkout develop
+       commit id: "3"
+       commit id: "4"
+       checkout main
+       commit id: "5"
+       commit id: "6""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert!(db.get_branches().contains_key("develop"));
+        }
+
+        #[test]
+        fn test_cypress_merge_commit() {
+            // From Cypress test 6: gitgraph with merge commit
+            let input = r#"gitGraph
+       commit id: "1"
+       commit id: "2"
+       branch develop
+       checkout develop
+       commit id: "3"
+       commit id: "4"
+       checkout main
+       merge develop
+       commit id: "5"
+       commit id: "6""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_tagged_merge() {
+            // From Cypress test 7: gitgraph with three branches and tagged merge commit
+            let input = r#"gitGraph
+       commit id: "1"
+       commit id: "2"
+       branch nice_feature
+       checkout nice_feature
+       commit id: "3"
+       checkout main
+       commit id: "4"
+       checkout nice_feature
+       branch very_nice_feature
+       checkout very_nice_feature
+       commit id: "5"
+       checkout main
+       commit id: "6"
+       checkout nice_feature
+       commit id: "7"
+       checkout main
+       merge nice_feature id: "12345" tag: "my merge commit""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_many_branches() {
+            // From Cypress test 8: gitgraph with more than 8 branches
+            let input = r#"gitGraph
+    checkout main
+    branch branch1
+    branch branch2
+    branch branch3
+    branch branch4
+    branch branch5
+    branch branch6
+    branch branch7
+    branch branch8
+    branch branch9
+    checkout branch1
+    commit id: "1""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert!(db.get_branches().len() >= 9);
+        }
+
+        #[test]
+        fn test_cypress_cherry_pick() {
+            // From Cypress: cherry-pick
+            let input = r#"gitGraph
+       commit id: "ZERO"
+       branch develop
+       commit id:"A"
+       checkout main
+       commit id:"ONE"
+       checkout develop
+       commit id:"B"
+       checkout main
+       cherry-pick id:"A""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_parallel_commits() {
+            // From Cypress: parallel commits
+            let input = r#"gitGraph
+       commit
+       branch branch1
+       branch branch2
+       checkout branch1
+       commit
+       checkout branch2
+       commit
+       checkout main
+       merge branch1
+       merge branch2"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

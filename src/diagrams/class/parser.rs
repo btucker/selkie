@@ -1846,4 +1846,204 @@ click Class1 call functionCall()",
             assert!(class.have_callback);
         }
     }
+
+    // Tests ported from mermaid Cypress tests (classDiagram.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_simple_class_diagram() {
+            // From Cypress test 1: should render a simple class diagram
+            let input = r#"classDiagram
+      Class01 <|-- AveryLongClass : Cool
+      Class03 *-- Class04
+      Class05 o-- Class06
+      Class07 .. Class08
+      Class09 --> C2 : Where am i?
+      Class09 --* C3
+      Class09 --|> Class07
+      Class12 <|.. Class08
+      Class11 ..>Class12
+      Class07 : equals()
+      Class07 : Object[] elementData
+      Class01 : size()
+      Class01 : int chimp
+      Class01 : int gorilla
+      Class01 : -int privateChimp
+      Class01 : +int publicGorilla
+      Class01 : #int protectedMarmoset
+      Class08 <--> C2: Cool label"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert!(db.get_class("Class01").is_some());
+            assert!(db.get_class("AveryLongClass").is_some());
+            assert!(!db.relations.is_empty());
+        }
+
+        #[test]
+        fn test_cypress_cardinality() {
+            // From Cypress test 2: should render class diagrams with cardinality
+            let input = r#"classDiagram
+      Class01 "1" <|--|> "*" AveryLongClass : Cool
+      Class03 "1" *-- "*" Class04
+      Class05 "1" o-- "many" Class06"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_visibilities() {
+            // From Cypress test 3: should render different visibilities
+            let input = r#"classDiagram
+      Class01 <|-- AveryLongClass : Cool
+      Class01 : -privateMethod()
+      Class01 : +publicMethod()
+      Class01 : #protectedMethod()
+      Class01 : -int privateChimp
+      Class01 : +int publicGorilla
+      Class01 : #int protectedMarmoset"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            let class = db.get_class("Class01").unwrap();
+            assert!(class.methods.len() >= 3);
+            assert!(class.members.len() >= 3);
+        }
+
+        #[test]
+        fn test_cypress_abstract_method() {
+            // From Cypress test 5: should render abstract method
+            let input = r#"classDiagram
+      Class01 <|-- AveryLongClass : Cool
+      Class01 : someMethod()*"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_static_method() {
+            // From Cypress test 6: should render static method
+            let input = r#"classDiagram
+      Class01 <|-- AveryLongClass : Cool
+      Class01 : someMethod()$"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_generic_class() {
+            // From Cypress test 7: should render Generic class
+            let input = r#"classDiagram
+    class Class01~T~
+      Class01 : size()
+      Class01 : int chimp
+      Class01 : int gorilla
+      class Class10~T~ {
+        int id
+        test()
+      }"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            // Check generic is captured
+            let class = db.get_class("Class01").unwrap();
+            assert!(!class.type_param.is_empty() || class.id.contains("~"));
+        }
+
+        #[test]
+        fn test_cypress_generic_relations() {
+            // From Cypress test 8: Generic class and relations
+            let input = r#"classDiagram
+    Class01~T~ <|-- AveryLongClass : Cool
+    Class03~T~ *-- Class04~T~"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_link() {
+            // From Cypress test 9: clickable link
+            let input = r#"classDiagram
+    class Class01~T~
+      link Class01 "google.com" "A Tooltip""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_notes() {
+            // From Cypress test 11: notes
+            let input = r#"classDiagram
+      Class01 <|-- AveryLongClass : Cool
+      note "This is a note""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_note_for_class() {
+            // From Cypress test 12: note for class
+            let input = r#"classDiagram
+      class Class01
+      note for Class01 "This is a note for Class01""#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_namespace() {
+            // From Cypress test 13: namespace
+            let input = r#"classDiagram
+      namespace Namespace1 {
+        class Class1
+        class Class2
+      }"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_direction() {
+            // From Cypress test 15: direction
+            let input = r#"classDiagram
+      direction RL
+      class Student {
+        -idCard : IdCard
+      }"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        #[ignore = "TODO: Add lollipop interface notation ()-- support"]
+        fn test_cypress_lollipop() {
+            // From Cypress test: lollipop interface notation
+            let input = r#"classDiagram
+      Bar ()-- Foo"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_style() {
+            // From Cypress: style application
+            let input = r#"classDiagram
+      class Class1
+      style Class1 fill:#f9f,stroke:#333,stroke-width:4px"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_class_css_class() {
+            // From Cypress: CSS class assignment
+            let input = r#"classDiagram
+      class Class1
+      class Class2
+      cssClass "Class1,Class2" myStyle"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

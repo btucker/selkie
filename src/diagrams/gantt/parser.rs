@@ -553,4 +553,123 @@ mod tests {
             assert_eq!(db.get_tasks().len(), 5);
         }
     }
+
+    // Tests ported from mermaid Cypress tests (gantt.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        fn test_cypress_basic_gantt() {
+            // From Cypress: should render a gantt chart
+            let input = r#"gantt
+      dateFormat  YYYY-MM-DD
+      axisFormat  %d/%m
+      title Adding GANTT diagram to mermaid
+      excludes weekdays 2014-01-10
+
+      section A section
+      Completed task            :done,    des1, 2014-01-06,2014-01-08
+      Active task               :active,  des2, 2014-01-09, 3d
+      Future task               :         des3, after des2, 5d
+      Future task2               :         des4, after des3, 5d"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let mut db = result.unwrap();
+            assert!(!db.get_tasks().is_empty());
+        }
+
+        #[test]
+        fn test_cypress_multiline_section_titles() {
+            // From Cypress: Handle multiline section titles with different line breaks
+            let input = r#"gantt
+      dateFormat  YYYY-MM-DD
+      axisFormat  %d/%m
+      title       GANTT diagram with multiline section titles
+
+      section A section<br>multiline
+      Completed task            : done,    des1, 2014-01-06,2014-01-08
+
+      section Critical tasks<br/>multiline
+      Completed task : crit, done, 2014-01-06, 24h"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_multiple_dependencies() {
+            // From Cypress: Multiple dependencies syntax
+            let input = r#"gantt
+      dateFormat  YYYY-MM-DD
+      axisFormat  %d/%m
+      title Adding GANTT diagram to mermaid
+
+      apple :a, 2017-07-20, 1w
+      banana :crit, b, 2017-07-23, 1d
+      cherry :active, c, after b a, 1d"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_excludes() {
+            // From Cypress: excludes specification
+            let input = r#"gantt
+      dateFormat  YYYY-MM-DD
+      excludes weekends
+      title Projects Timeline
+
+      section asdf
+          specs :done, ps, 2019-05-10, 50d"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_tick_interval() {
+            // From Cypress: tickInterval with week unit
+            let input = r#"gantt
+    tickInterval 1week
+    dateFormat  YYYY-MM-DD
+    section Section
+    A task : a1, 2024-01-01, 30d"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_milestones() {
+            // From Cypress: milestones
+            let input = r#"gantt
+      dateFormat  YYYY-MM-DD
+      section Release
+      Release : milestone, m1, 2024-01-15, 0d"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_today_marker() {
+            // From Cypress: todayMarker setting
+            let input = r#"gantt
+      dateFormat  YYYY-MM-DD
+      todayMarker off
+      section Tasks
+      Task1 : t1, 2024-01-01, 5d"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+
+        #[test]
+        fn test_cypress_click_callback() {
+            // From Cypress: click callback
+            let input = r#"gantt
+        dateFormat  YYYY-MM-DD
+        section Clickable
+        Completed task  :done, cl1, 2014-01-06,2014-01-08
+        Active task     :active, cl2, 2014-01-09, 3d
+        click cl1 call callback()"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+        }
+    }
 }

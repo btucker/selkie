@@ -986,4 +986,58 @@ element constructor {
             assert_eq!(db.get_elements().len(), 1);
         }
     }
+
+    // Tests ported from mermaid Cypress tests (requirement.spec.js)
+    mod cypress_tests {
+        use super::*;
+
+        #[test]
+        #[ignore = "TODO: Reverse relationship syntax (<-) not supported"]
+        fn test_cypress_sample() {
+            // From Cypress: sample
+            let input = r#"requirementDiagram
+
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    functionalRequirement test_req2 {
+    id: 1.1
+    text: the second test text.
+    risk: low
+    verifymethod: inspection
+    }
+
+    performanceRequirement test_req3 {
+    id: 1.2
+    text: the third test text.
+    risk: medium
+    verifymethod: demonstration
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    element test_entity2 {
+    type: word doc
+    docRef: reqs/test_entity
+    }
+
+
+    test_entity - satisfies -> test_req2
+    test_req - traces -> test_req2
+    test_req - contains -> test_req3
+    test_req <- copies - test_entity2"#;
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            assert_eq!(db.get_requirements().len(), 3);
+            assert_eq!(db.get_elements().len(), 2);
+            assert!(!db.get_relationships().is_empty());
+        }
+    }
 }
