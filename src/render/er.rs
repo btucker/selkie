@@ -749,7 +749,7 @@ fn generate_er_css(theme: &Theme) -> String {
 }}
 
 .marker {{
-  fill: {line_color};
+  fill: none;
   stroke: {line_color};
   stroke-width: 1;
 }}
