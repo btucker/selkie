@@ -88,6 +88,155 @@ fn determine_attachment_sides(
     }
 }
 
+/// Calculate the intersection point where a line from an external point to the center
+/// of a rectangle crosses the rectangle's boundary.
+///
+/// This implements the same algorithm as mermaid.js's intersect-rect.js:
+/// - If |dy| * w > |dx| * h, the line crosses top or bottom
+/// - Otherwise, the line crosses left or right
+///
+/// Returns (intersection_x, intersection_y, attachment_side)
+fn intersect_rect(
+    rect_x: f64,
+    rect_y: f64,
+    rect_w: f64,
+    rect_h: f64,
+    point_x: f64,
+    point_y: f64,
+    marker_offset: f64,
+) -> (f64, f64, AttachmentSide) {
+    let cx = rect_x + rect_w / 2.0;
+    let cy = rect_y + rect_h / 2.0;
+    let w = rect_w / 2.0;
+    let h = rect_h / 2.0;
+
+    let dx = point_x - cx;
+    let dy = point_y - cy;
+
+    // Avoid division by zero for points at the center
+    if dx.abs() < 0.001 && dy.abs() < 0.001 {
+        return (cx, rect_y - marker_offset, AttachmentSide::Top);
+    }
+
+    // Determine which side the line crosses using mermaid's algorithm
+    // The formula compares the slope of the line to the rectangle's aspect ratio
+    if dy.abs() * w > dx.abs() * h {
+        // Intersection is at top or bottom
+        let sign_y = if dy > 0.0 { 1.0 } else { -1.0 };
+        let sy = h * sign_y;
+        let sx = if dy.abs() > 0.001 {
+            (h * dx) / dy.abs()
+        } else {
+            0.0
+        };
+        let side = if dy > 0.0 {
+            AttachmentSide::Bottom
+        } else {
+            AttachmentSide::Top
+        };
+        // Apply marker offset perpendicular to the side
+        let offset_y = if dy > 0.0 {
+            marker_offset
+        } else {
+            -marker_offset
+        };
+        (cx + sx, cy + sy + offset_y, side)
+    } else {
+        // Intersection is at left or right
+        let sign_x = if dx > 0.0 { 1.0 } else { -1.0 };
+        let sx = w * sign_x;
+        let sy = if dx.abs() > 0.001 {
+            (w * dy) / dx.abs()
+        } else {
+            0.0
+        };
+        let side = if dx > 0.0 {
+            AttachmentSide::Right
+        } else {
+            AttachmentSide::Left
+        };
+        // Apply marker offset perpendicular to the side
+        let offset_x = if dx > 0.0 {
+            marker_offset
+        } else {
+            -marker_offset
+        };
+        (cx + sx + offset_x, cy + sy, side)
+    }
+}
+
+/// Adjust dagre bend_points to properly intersect entity boundaries
+///
+/// Dagre computes edge paths between node centers, but we need the edges to
+/// attach to the correct sides of entity boxes based on approach angle.
+/// This function uses the intersect_rect algorithm to calculate proper
+/// intersection points for the first and last bend points.
+fn adjust_bend_points_for_intersection(
+    bend_points: &[Point],
+    entity_a_name: &str,
+    entity_b_name: &str,
+    entity_positions: &HashMap<String, (f64, f64)>,
+    entity_dimensions: &HashMap<String, EntityDimensions>,
+    marker_offset: f64,
+) -> Vec<Point> {
+    if bend_points.len() < 2 {
+        return bend_points.to_vec();
+    }
+
+    let mut adjusted = bend_points.to_vec();
+
+    // Get entity A (source) info
+    if let (Some(&(ax, ay)), Some(a_dims)) = (
+        entity_positions.get(entity_a_name),
+        entity_dimensions.get(entity_a_name),
+    ) {
+        // Use the second bend point to determine approach direction
+        let approach_point = if bend_points.len() > 1 {
+            &bend_points[1]
+        } else {
+            &bend_points[0]
+        };
+
+        let (ix, iy, _side) = intersect_rect(
+            ax,
+            ay,
+            a_dims.width,
+            a_dims.height,
+            approach_point.x,
+            approach_point.y,
+            marker_offset,
+        );
+        adjusted[0] = Point { x: ix, y: iy };
+    }
+
+    // Get entity B (target) info
+    if let (Some(&(bx, by)), Some(b_dims)) = (
+        entity_positions.get(entity_b_name),
+        entity_dimensions.get(entity_b_name),
+    ) {
+        let last_idx = adjusted.len() - 1;
+        // Use the second-to-last bend point to determine approach direction
+        let approach_point = if bend_points.len() > 1 {
+            &bend_points[bend_points.len() - 2]
+        } else {
+            &bend_points[last_idx]
+        };
+
+        let (ix, iy, _side) = intersect_rect(
+            bx,
+            by,
+            b_dims.width,
+            b_dims.height,
+            approach_point.x,
+            approach_point.y,
+            marker_offset,
+        );
+        adjusted[last_idx] = Point { x: ix, y: iy };
+    }
+
+    adjusted
+}
+
 /// Calculate distributed attachment positions for edges that share the same entity side
 /// Returns a HashMap from (entity_name, side, edge_index) to attachment position
 fn calculate_distributed_attachments(
@@ -524,11 +673,30 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
     for (idx, relationship) in relationships.iter().enumerate() {
         let edge_id = format!("relationship-{}", idx);
 
+        // Get entity information for intersection calculation
+        let entity_a_name = entity_id_to_name.get(&relationship.entity_a);
+        let entity_b_name = entity_id_to_name.get(&relationship.entity_b);
+
         // Try to use dagre-computed bend points for the edge path
         if let Some(bend_points) = edge_bend_points.get(&edge_id) {
-            // Use dagre's edge routing (like mermaid.js)
+            // Adjust bend_points endpoints to properly intersect entity boundaries
+            // using the mermaid.js intersect-rect algorithm
+            let adjusted_points =
+                if let (Some(a_name), Some(b_name)) = (entity_a_name, entity_b_name) {
+                    adjust_bend_points_for_intersection(
+                        bend_points,
+                        a_name,
+                        b_name,
+                        &entity_positions,
+                        &entity_dimensions,
+                        marker_offset,
+                    )
+                } else {
+                    bend_points.clone()
+                };
+
             let rel_elem = render_relationship_from_bend_points(
-                bend_points,
+                &adjusted_points,
                 &relationship.role_a,
                 relationship.rel_spec.card_a,
                 relationship.rel_spec.card_b,
