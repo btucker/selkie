@@ -1574,4 +1574,137 @@ mod tests {
             end_y
         );
     }
+
+    // =========================================================================
+    // Cypress rendering test ports from mermaid.js erDiagram.spec.js
+    // =========================================================================
+
+    #[test]
+    fn test_cypress_render_cyclical_relationships() {
+        // From: "should render a cyclical ER diagram"
+        // Verifies that A→B→C→A cycle renders without errors
+        let input = r#"erDiagram
+            A ||--|{ B : likes
+            B ||--|{ C : likes
+            C ||--|{ A : likes"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // Should have 3 entities
+        let structure = SvgStructure::from_svg(&svg).unwrap();
+        assert_eq!(structure.edge_count, 3, "Should have 3 relationship edges");
+
+        // All 3 entities should be rendered
+        assert!(svg.contains(">A<"), "Should contain entity A");
+        assert!(svg.contains(">B<"), "Should contain entity B");
+        assert!(svg.contains(">C<"), "Should contain entity C");
+    }
+
+    #[test]
+    fn test_cypress_render_entities_no_relationships() {
+        // From: "should render entities that have no relationships"
+        let input = r#"erDiagram
+            DEAD_PARROT
+            HERMIT
+            RECLUSE
+            SOCIALITE }o--o{ SOCIALITE : "interacts with"
+            RECLUSE }o--o{ SOCIALITE : avoids"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // All 4 entities should be rendered even though some have no relationships
+        assert!(
+            svg.contains(">DEAD_PARROT<"),
+            "Should render standalone entity DEAD_PARROT"
+        );
+        assert!(
+            svg.contains(">HERMIT<"),
+            "Should render standalone entity HERMIT"
+        );
+        assert!(svg.contains(">RECLUSE<"), "Should render entity RECLUSE");
+        assert!(
+            svg.contains(">SOCIALITE<"),
+            "Should render entity SOCIALITE"
+        );
+    }
+
+    #[test]
+    fn test_cypress_render_multiple_relationships_same_entities() {
+        // From: "should render an ER diagram with multiple relationships between the same two entities"
+        let input = r#"erDiagram
+            CUSTOMER ||--|{ ADDRESS : "invoiced at"
+            CUSTOMER ||--|{ ADDRESS : "receives goods at""#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // Should have 2 relationship edges
+        let structure = SvgStructure::from_svg(&svg).unwrap();
+        assert_eq!(
+            structure.edge_count, 2,
+            "Should have 2 relationship edges between same entities"
+        );
+
+        // Both labels should appear
+        assert!(
+            svg.contains("invoiced at"),
+            "Should contain first relationship label"
+        );
+        assert!(
+            svg.contains("receives goods at"),
+            "Should contain second relationship label"
+        );
+    }
+
+    #[test]
+    fn test_cypress_render_long_entity_names() {
+        // From: "should render entities and attributes with big and small entity names"
+        let input = r#"erDiagram
+            PRIVATE_FINANCIAL_INSTITUTION {
+              string name
+              int    turnover
+            }
+            PRIVATE_FINANCIAL_INSTITUTION ||..|{ EMPLOYEE : employs
+            EMPLOYEE { bool officer_of_firm }"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // Long entity name should be rendered
+        assert!(
+            svg.contains("PRIVATE_FINANCIAL_INSTITUTION"),
+            "Should render long entity name"
+        );
+
+        // Entity box should be wide enough (check that width is reasonable)
+        let structure = SvgStructure::from_svg(&svg).unwrap();
+        // Width should accommodate long entity names
+        assert!(
+            structure.width > 200.0,
+            "SVG should be wide enough for long names, got {}",
+            structure.width
+        );
+    }
+
+    #[test]
+    fn test_cypress_render_self_referencing_relationship() {
+        // From: "should render an ER diagram with a recursive relationship"
+        let input = r#"erDiagram
+            CUSTOMER ||..o{ CUSTOMER : refers
+            CUSTOMER ||--o{ ORDER : places"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let svg = render_er(&db, &config).unwrap();
+
+        // Should render without error
+        assert!(svg.contains("<svg"), "Should produce valid SVG");
+
+        // Should have the "refers" label for self-reference
+        assert!(
+            svg.contains("refers"),
+            "Should contain self-referencing relationship label"
+        );
+    }
 }
