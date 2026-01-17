@@ -695,9 +695,9 @@ fn calculate_connection_points(
     let (start_x, start_y) = if is_side_attachment {
         // Horizontal offset is dominant or significant - use sides
         if dx > 0.0 {
-            (x1 + w1, center1_y)
+            (x1 + w1, center1_y) // right edge
         } else {
-            (x1, center1_y)
+            (x1, center1_y) // left edge
         }
     } else if dy > 0.0 {
         // Vertical relationship going down - use bottom
@@ -711,9 +711,9 @@ fn calculate_connection_points(
     let (end_x, end_y) = if is_side_attachment {
         // Horizontal offset is dominant or significant - use sides
         if dx > 0.0 {
-            (x2, center2_y)
+            (x2, center2_y) // left edge
         } else {
-            (x2 + w2, center2_y)
+            (x2 + w2, center2_y) // right edge
         }
     } else if dy > 0.0 {
         // Vertical relationship - use top of target
