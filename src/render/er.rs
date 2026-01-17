@@ -684,12 +684,11 @@ fn calculate_connection_points(
     let dx = center2_x - center1_x;
     let dy = center2_y - center1_y;
 
-    // Threshold for considering positions "significantly offset" horizontally
-    // If the x offset is more than 30% of the larger entity width, prefer side attachment
-    let x_threshold = w1.max(w2) * 0.3;
-
     // Determine if this is a side attachment (horizontal approach needed)
-    let is_side_attachment = dx.abs() > dy.abs() || dx.abs() > x_threshold;
+    // Use side attachment only when horizontal offset is dominant over vertical
+    // This matches mermaid's behavior: vertical relationships (like ORDER -> LINE-ITEM)
+    // should use bottom-to-top connections even when there's horizontal offset
+    let is_side_attachment = dx.abs() > dy.abs();
 
     // Determine attachment for entity 1 (source)
     let (start_x, start_y) = if is_side_attachment {
@@ -1114,6 +1113,72 @@ mod tests {
             structure.labels.iter().any(|l| l == "id"),
             "Should have 'id' as a separate label. Got: {:?}",
             structure.labels
+        );
+    }
+
+    #[test]
+    fn test_connection_points_vertical_relationship_with_horizontal_offset() {
+        // When entities are arranged with significant vertical separation,
+        // edges should use vertical attachment (bottom-to-top) even with horizontal offset.
+        // This matches mermaid's behavior for ORDER/PRODUCT -> LINE-ITEM relationships.
+
+        // Entity 1 (ORDER-like): at top-left
+        let x1 = 50.0;
+        let y1 = 100.0;
+        let w1 = 150.0;
+        let h1 = 120.0;
+
+        // Entity 2 (LINE-ITEM-like): at bottom-center, horizontally offset
+        let x2 = 200.0;
+        let y2 = 350.0;
+        let w2 = 100.0;
+        let h2 = 60.0;
+
+        let (start_x, start_y, end_x, end_y, is_side) =
+            calculate_connection_points(x1, y1, h1, w1, x2, y2, h2, w2);
+
+        // Should use vertical attachment (bottom of entity1 to top of entity2)
+        // because vertical separation (250) is greater than horizontal separation (175)
+        assert!(
+            !is_side,
+            "Should use vertical attachment when vertical separation dominates. \
+             Entity1 center: ({}, {}), Entity2 center: ({}, {})",
+            x1 + w1 / 2.0,
+            y1 + h1 / 2.0,
+            x2 + w2 / 2.0,
+            y2 + h2 / 2.0
+        );
+
+        // Start should be at bottom center of entity 1
+        let expected_start_x = x1 + w1 / 2.0; // 125.0
+        let expected_start_y = y1 + h1; // 220.0
+        assert!(
+            (start_x - expected_start_x).abs() < 1.0,
+            "Start X should be at center: expected {}, got {}",
+            expected_start_x,
+            start_x
+        );
+        assert!(
+            (start_y - expected_start_y).abs() < 1.0,
+            "Start Y should be at bottom edge: expected {}, got {}",
+            expected_start_y,
+            start_y
+        );
+
+        // End should be at top center of entity 2
+        let expected_end_x = x2 + w2 / 2.0; // 250.0
+        let expected_end_y = y2; // 350.0
+        assert!(
+            (end_x - expected_end_x).abs() < 1.0,
+            "End X should be at center: expected {}, got {}",
+            expected_end_x,
+            end_x
+        );
+        assert!(
+            (end_y - expected_end_y).abs() < 1.0,
+            "End Y should be at top edge: expected {}, got {}",
+            expected_end_y,
+            end_y
         );
     }
 }
