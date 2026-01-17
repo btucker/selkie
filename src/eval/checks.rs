@@ -6,6 +6,7 @@
 //! - Info: Acceptable variations (styling, minor dimension differences)
 
 use super::Issue;
+use crate::render::svg::structure::{EdgeGeometry, NodeBounds};
 use crate::render::svg::SvgStructure;
 use std::collections::HashSet;
 
@@ -46,6 +47,7 @@ pub fn check_structure(
     check_z_order(selkie, reference, &mut issues);
     check_stroke_widths(selkie, reference, &mut issues);
     check_edge_attachments(selkie, reference, &mut issues);
+    check_edge_node_connectivity(selkie, reference, &mut issues);
     check_font_styles(selkie, reference, &mut issues);
 
     // INFO checks - acceptable variations
@@ -882,6 +884,121 @@ pub fn calculate_similarity(selkie: &SvgStructure, reference: &SvgStructure) -> 
     } else {
         score_parts.iter().sum::<f64>() / score_parts.len() as f64
     }
+}
+
+/// Check if edge endpoints touch node boundaries - ERROR if selkie has disconnected edges
+/// that the reference doesn't have.
+///
+/// This detects a critical rendering bug where crow's feet or edge endpoints
+/// don't connect to their target nodes, making the diagram incorrect.
+fn check_edge_node_connectivity(
+    selkie: &SvgStructure,
+    reference: &SvgStructure,
+    issues: &mut Vec<Issue>,
+) {
+    let selkie_geo = &selkie.edge_geometry;
+    let ref_geo = &reference.edge_geometry;
+
+    // Need edges and nodes in selkie to check connectivity
+    if selkie_geo.edge_endpoints.is_empty() || selkie_geo.node_bounds.is_empty() {
+        return;
+    }
+
+    // Tolerance for "touching" - edges should be within this distance of a node boundary
+    let tolerance = 5.0;
+
+    // Count disconnected edges in selkie
+    let selkie_disconnected = count_disconnected_edges(selkie_geo, tolerance);
+
+    // Count disconnected edges in reference (if data available)
+    let ref_disconnected = if ref_geo.node_bounds.is_empty() {
+        0 // Can't check reference, assume it's fine
+    } else {
+        count_disconnected_edges(ref_geo, tolerance)
+    };
+
+    // Only report if selkie has MORE disconnected edges than reference
+    // (reference may also have some due to SVG structure parsing limitations)
+    if selkie_disconnected > ref_disconnected {
+        let mut messages = Vec::new();
+
+        for (i, &(start_x, start_y, end_x, end_y)) in selkie_geo.edge_endpoints.iter().enumerate() {
+            let start_touches =
+                point_touches_any_node(start_x, start_y, &selkie_geo.node_bounds, tolerance);
+            let end_touches =
+                point_touches_any_node(end_x, end_y, &selkie_geo.node_bounds, tolerance);
+
+            if !start_touches {
+                messages.push(format!(
+                    "Edge {} start ({:.0},{:.0}) doesn't touch any node",
+                    i + 1,
+                    start_x,
+                    start_y
+                ));
+            }
+            if !end_touches {
+                messages.push(format!(
+                    "Edge {} end ({:.0},{:.0}) doesn't touch any node",
+                    i + 1,
+                    end_x,
+                    end_y
+                ));
+            }
+        }
+
+        if !messages.is_empty() {
+            issues.push(Issue::error(
+                "edge_connectivity",
+                format!(
+                    "DISCONNECTED EDGES (endpoints not touching nodes):\n  {}",
+                    messages.join("\n  ")
+                ),
+            ));
+        }
+    }
+}
+
+/// Count how many edge endpoints don't touch any node boundary
+fn count_disconnected_edges(geometry: &EdgeGeometry, tolerance: f64) -> usize {
+    let mut count = 0;
+    for &(start_x, start_y, end_x, end_y) in &geometry.edge_endpoints {
+        if !point_touches_any_node(start_x, start_y, &geometry.node_bounds, tolerance) {
+            count += 1;
+        }
+        if !point_touches_any_node(end_x, end_y, &geometry.node_bounds, tolerance) {
+            count += 1;
+        }
+    }
+    count
+}
+
+/// Check if a point is within tolerance of any node's boundary
+fn point_touches_any_node(x: f64, y: f64, nodes: &[NodeBounds], tolerance: f64) -> bool {
+    for node in nodes {
+        if point_touches_node_boundary(x, y, node, tolerance) {
+            return true;
+        }
+    }
+    false
+}
+
+/// Check if a point is within tolerance of a node's boundary
+fn point_touches_node_boundary(x: f64, y: f64, node: &NodeBounds, tolerance: f64) -> bool {
+    let left = node.x;
+    let right = node.x + node.width;
+    let top = node.y;
+    let bottom = node.y + node.height;
+
+    // Check if point is near any of the four sides
+    let near_left =
+        (x - left).abs() <= tolerance && y >= top - tolerance && y <= bottom + tolerance;
+    let near_right =
+        (x - right).abs() <= tolerance && y >= top - tolerance && y <= bottom + tolerance;
+    let near_top = (y - top).abs() <= tolerance && x >= left - tolerance && x <= right + tolerance;
+    let near_bottom =
+        (y - bottom).abs() <= tolerance && x >= left - tolerance && x <= right + tolerance;
+
+    near_left || near_right || near_top || near_bottom
 }
 
 #[cfg(test)]
