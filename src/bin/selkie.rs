@@ -11,13 +11,17 @@
 
 use std::fs;
 use std::io::{self, Read, Write};
-use std::path::{Path, PathBuf};
+#[cfg(feature = "eval")]
+use std::path::Path;
+use std::path::PathBuf;
 use std::process;
 
 use clap::{Parser, Subcommand, ValueEnum};
 use serde::Deserialize;
+#[cfg(feature = "eval")]
 use uuid::Uuid;
 
+#[cfg(feature = "eval")]
 use selkie::eval::{self, runner::DiagramInput, samples};
 use selkie::render::{RenderConfig, Theme};
 use selkie::{parse, render_with_config};
@@ -70,6 +74,7 @@ enum Commands {
     /// Render a mermaid diagram to SVG/PNG/PDF
     Render(RenderArgs),
     /// Evaluate selkie against mermaid.js reference
+    #[cfg(feature = "eval")]
     Eval(EvalArgs),
 }
 
@@ -132,6 +137,7 @@ struct RenderArgs {
 }
 
 /// Arguments for the eval command
+#[cfg(feature = "eval")]
 #[derive(Parser, Debug)]
 #[command(after_help = "\
 Examples:
@@ -231,6 +237,7 @@ fn main() {
 fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
     match args.command {
         Some(Commands::Render(render_args)) => run_render(render_args),
+        #[cfg(feature = "eval")]
         Some(Commands::Eval(eval_args)) => run_eval(eval_args),
         // Default to render when no subcommand is specified
         None => run_render(args.render),
@@ -449,6 +456,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+#[cfg(feature = "eval")]
 fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     let cache = eval::cache::ReferenceCache::with_defaults();
 
@@ -654,6 +662,7 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /// Load diagrams from a directory of .mmd files
+#[cfg(feature = "eval")]
 fn load_directory(dir: &Path) -> Result<Vec<DiagramInput>, Box<dyn std::error::Error>> {
     let pattern = dir.join("**/*.mmd").to_string_lossy().to_string();
     let mut inputs = Vec::new();
@@ -676,6 +685,7 @@ fn load_directory(dir: &Path) -> Result<Vec<DiagramInput>, Box<dyn std::error::E
 }
 
 /// Load diagrams from JSON file (extract_diagrams output format)
+#[cfg(feature = "eval")]
 fn load_json_diagrams(path: &PathBuf) -> Result<Vec<DiagramInput>, Box<dyn std::error::Error>> {
     #[derive(Deserialize)]
     struct JsonDiagram {
