@@ -565,7 +565,9 @@ fn check_edge_attachments(
             "ATTACHMENT SIDE MISMATCHES (edges connect to wrong entity sides):\n  {}",
             side_mismatches.join("\n  ")
         );
-        issues.push(Issue::warning("edge_attachment_sides", message));
+        // This is an ERROR because attaching to the wrong side is a significant visual bug
+        // (e.g., crow's feet pointing at top instead of left/right)
+        issues.push(Issue::error("edge_attachment_sides", message));
     }
 
     // Compare edges if we have detailed info

@@ -53,6 +53,12 @@ struct AttachmentPosition {
 
 /// Determine which side of an entity box an edge should attach to
 /// Based on relative positions of the two entities
+///
+/// For diagonal edges (significant horizontal AND vertical offset), mermaid uses:
+/// - Source entity: attaches to the side facing the major axis direction (bottom if target is below)
+/// - Target entity: attaches to the side facing WHERE the source is horizontally (left if source is left)
+///
+/// This creates visually pleasing curved edges that approach from the appropriate direction.
 #[allow(clippy::too_many_arguments)]
 fn determine_attachment_sides(
     x1: f64,
@@ -69,97 +75,74 @@ fn determine_attachment_sides(
     let center2_x = x2 + w2 / 2.0;
     let center2_y = y2 + h2 / 2.0;
 
-    let dx = center2_x - center1_x;
-    let dy = center2_y - center1_y;
+    let dx = center2_x - center1_x; // positive = B is right of A
+    let dy = center2_y - center1_y; // positive = B is below A
 
-    // Determine if this is a side (horizontal) or top/bottom (vertical) attachment
-    let is_side_attachment = dx.abs() > dy.abs();
+    // Threshold for "significant" offset (in pixels)
+    // If horizontal offset exceeds this AND we have vertical dominance,
+    // the target should use its horizontal side
+    let diagonal_threshold = 50.0;
 
-    if is_side_attachment {
-        if dx > 0.0 {
-            (AttachmentSide::Right, AttachmentSide::Left)
-        } else {
-            (AttachmentSide::Left, AttachmentSide::Right)
-        }
-    } else if dy > 0.0 {
-        (AttachmentSide::Bottom, AttachmentSide::Top)
-    } else {
-        (AttachmentSide::Top, AttachmentSide::Bottom)
-    }
-}
-
-/// Calculate the intersection point where a line from an external point to the center
-/// of a rectangle crosses the rectangle's boundary.
-///
-/// This implements the same algorithm as mermaid.js's intersect-rect.js:
-/// - If |dy| * w > |dx| * h, the line crosses top or bottom
-/// - Otherwise, the line crosses left or right
-///
-/// Returns (intersection_x, intersection_y, attachment_side)
-fn intersect_rect(
-    rect_x: f64,
-    rect_y: f64,
-    rect_w: f64,
-    rect_h: f64,
-    point_x: f64,
-    point_y: f64,
-) -> (f64, f64, AttachmentSide) {
-    let cx = rect_x + rect_w / 2.0;
-    let cy = rect_y + rect_h / 2.0;
-    let w = rect_w / 2.0;
-    let h = rect_h / 2.0;
-
-    let dx = point_x - cx;
-    let dy = point_y - cy;
-
-    // Avoid division by zero for points at the center
-    if dx.abs() < 0.001 && dy.abs() < 0.001 {
-        return (cx, rect_y, AttachmentSide::Top);
-    }
-
-    // Determine which side the line crosses using mermaid's algorithm
-    // The formula compares the slope of the line to the rectangle's aspect ratio
-    if dy.abs() * w > dx.abs() * h {
-        // Intersection is at top or bottom
-        let sign_y = if dy > 0.0 { 1.0 } else { -1.0 };
-        let sy = h * sign_y;
-        let sx = if dy.abs() > 0.001 {
-            (h * dx) / dy.abs()
-        } else {
-            0.0
-        };
-        let side = if dy > 0.0 {
+    // Source entity (A): use the side facing the major axis direction to B
+    let side_a = if dy.abs() > dx.abs() {
+        if dy > 0.0 {
             AttachmentSide::Bottom
         } else {
             AttachmentSide::Top
-        };
-        // Return exact intersection at entity boundary
-        (cx + sx, cy + sy, side)
+        }
+    } else if dx > 0.0 {
+        AttachmentSide::Right
     } else {
-        // Intersection is at left or right
-        let sign_x = if dx > 0.0 { 1.0 } else { -1.0 };
-        let sx = w * sign_x;
-        let sy = if dx.abs() > 0.001 {
-            (w * dy) / dx.abs()
+        AttachmentSide::Left
+    };
+
+    // Target entity (B): for diagonal edges, use the side facing WHERE A is
+    // This matches mermaid's behavior for ORDER/PRODUCT → LINE-ITEM relationships
+    let side_b = if dy.abs() > dx.abs() {
+        // Vertical dominates
+        if dx.abs() > diagonal_threshold {
+            // Significant horizontal offset - use horizontal side facing source
+            if dx > 0.0 {
+                AttachmentSide::Left // A is to the left, so B uses left side
+            } else {
+                AttachmentSide::Right // A is to the right, so B uses right side
+            }
         } else {
-            0.0
-        };
-        let side = if dx > 0.0 {
-            AttachmentSide::Right
+            // Small horizontal offset - use vertical side (straight line)
+            if dy > 0.0 {
+                AttachmentSide::Top
+            } else {
+                AttachmentSide::Bottom
+            }
+        }
+    } else {
+        // Horizontal dominates
+        if dy.abs() > diagonal_threshold {
+            // Significant vertical offset - use vertical side facing source
+            if dy > 0.0 {
+                AttachmentSide::Top // A is above, so B uses top side
+            } else {
+                AttachmentSide::Bottom // A is below, so B uses bottom side
+            }
         } else {
-            AttachmentSide::Left
-        };
-        // Return exact intersection at entity boundary
-        (cx + sx, cy + sy, side)
-    }
+            // Small vertical offset - use horizontal side (straight line)
+            if dx > 0.0 {
+                AttachmentSide::Left
+            } else {
+                AttachmentSide::Right
+            }
+        }
+    };
+
+    (side_a, side_b)
 }
 
 /// Adjust dagre bend_points to properly intersect entity boundaries
 ///
 /// Dagre computes edge paths between node centers, but we need the edges to
-/// attach to the correct sides of entity boxes based on approach angle.
-/// This function uses the intersect_rect algorithm to calculate proper
-/// intersection points for the first and last bend points.
+/// attach to the correct sides of entity boxes based on relative entity positions.
+/// This determines which side each entity should use based on their layout positions,
+/// then calculates intersection points on those specific sides.
 fn adjust_bend_points_for_intersection(
     bend_points: &[Point],
     entity_a_name: &str,
@@ -171,56 +154,66 @@ fn adjust_bend_points_for_intersection(
         return bend_points.to_vec();
     }
 
+    // Get both entities' positions and dimensions
+    let a_pos = entity_positions.get(entity_a_name);
+    let b_pos = entity_positions.get(entity_b_name);
+    let a_dims = entity_dimensions.get(entity_a_name);
+    let b_dims = entity_dimensions.get(entity_b_name);
+
+    // Need both entities to calculate attachment sides
+    let (Some(&(ax, ay)), Some(&(bx, by)), Some(a_dims), Some(b_dims)) =
+        (a_pos, b_pos, a_dims, b_dims)
+    else {
+        return bend_points.to_vec();
+    };
+
+    // Determine which sides each entity should use based on their relative positions
+    let (side_a, side_b) = determine_attachment_sides(
+        ax,
+        ay,
+        a_dims.width,
+        a_dims.height,
+        bx,
+        by,
+        b_dims.width,
+        b_dims.height,
+    );
+
     let mut adjusted = bend_points.to_vec();
 
-    // Get entity A (source) info
-    if let (Some(&(ax, ay)), Some(a_dims)) = (
-        entity_positions.get(entity_a_name),
-        entity_dimensions.get(entity_a_name),
-    ) {
-        // Use the second bend point to determine approach direction
-        let approach_point = if bend_points.len() > 1 {
-            &bend_points[1]
-        } else {
-            &bend_points[0]
-        };
+    // Calculate intersection point on entity A's determined side
+    let (start_x, start_y) =
+        calculate_side_intersection(ax, ay, a_dims.width, a_dims.height, side_a);
+    adjusted[0] = Point {
+        x: start_x,
+        y: start_y,
+    };
 
-        let (ix, iy, _side) = intersect_rect(
-            ax,
-            ay,
-            a_dims.width,
-            a_dims.height,
-            approach_point.x,
-            approach_point.y,
-        );
-        adjusted[0] = Point { x: ix, y: iy };
-    }
-
-    // Get entity B (target) info
-    if let (Some(&(bx, by)), Some(b_dims)) = (
-        entity_positions.get(entity_b_name),
-        entity_dimensions.get(entity_b_name),
-    ) {
-        let last_idx = adjusted.len() - 1;
-        // Use the second-to-last bend point to determine approach direction
-        let approach_point = if bend_points.len() > 1 {
-            &bend_points[bend_points.len() - 2]
-        } else {
-            &bend_points[last_idx]
-        };
-
-        let (ix, iy, _side) = intersect_rect(
-            bx,
-            by,
-            b_dims.width,
-            b_dims.height,
-            approach_point.x,
-            approach_point.y,
-        );
-        adjusted[last_idx] = Point { x: ix, y: iy };
-    }
+    // Calculate intersection point on entity B's determined side
+    let last_idx = adjusted.len() - 1;
+    let (end_x, end_y) = calculate_side_intersection(bx, by, b_dims.width, b_dims.height, side_b);
+    adjusted[last_idx] = Point { x: end_x, y: end_y };
 
     adjusted
+}
+
+/// Calculate the intersection point on a specific side of an entity box
+fn calculate_side_intersection(
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+    side: AttachmentSide,
+) -> (f64, f64) {
+    let center_x = x + width / 2.0;
+    let center_y = y + height / 2.0;
+
+    match side {
+        AttachmentSide::Top => (center_x, y),
+        AttachmentSide::Bottom => (center_x, y + height),
+        AttachmentSide::Left => (x, center_y),
+        AttachmentSide::Right => (x + width, center_y),
+    }
 }
 
 /// Calculate distributed attachment positions for edges that share the same entity side

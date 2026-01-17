@@ -836,6 +836,7 @@ struct AttachmentInfo {
 }
 
 /// Classify how a point attaches to a node bounds with detailed info
+/// Returns the CLOSEST matching edge within tolerance, not the first match
 fn classify_attachment_detailed(point: (f64, f64), bounds: &NodeBounds) -> AttachmentInfo {
     let (px, py) = point;
     let tolerance = 25.0; // Increased tolerance to account for marker offsets
@@ -856,51 +857,61 @@ fn classify_attachment_detailed(point: (f64, f64), bounds: &NodeBounds) -> Attac
     let within_x = px >= left - tolerance && px <= right + tolerance;
     let within_y = py >= top - tolerance && py <= bottom + tolerance;
 
-    // Find the closest edge
+    // Collect all matching edges within tolerance
+    let mut candidates = Vec::new();
+
     if dist_top < tolerance && within_x {
-        return AttachmentInfo {
+        candidates.push(AttachmentInfo {
             attach_type: AttachmentType::Vertical,
             edge_name: "top".to_string(),
             node_id: Some(bounds.id.clone()),
             center_offset: px - center_x,
             distance: dist_top,
-        };
+        });
     }
     if dist_bottom < tolerance && within_x {
-        return AttachmentInfo {
+        candidates.push(AttachmentInfo {
             attach_type: AttachmentType::Vertical,
             edge_name: "bottom".to_string(),
             node_id: Some(bounds.id.clone()),
             center_offset: px - center_x,
             distance: dist_bottom,
-        };
+        });
     }
     if dist_left < tolerance && within_y {
-        return AttachmentInfo {
+        candidates.push(AttachmentInfo {
             attach_type: AttachmentType::Horizontal,
             edge_name: "left".to_string(),
             node_id: Some(bounds.id.clone()),
             center_offset: py - center_y,
             distance: dist_left,
-        };
+        });
     }
     if dist_right < tolerance && within_y {
-        return AttachmentInfo {
+        candidates.push(AttachmentInfo {
             attach_type: AttachmentType::Horizontal,
             edge_name: "right".to_string(),
             node_id: Some(bounds.id.clone()),
             center_offset: py - center_y,
             distance: dist_right,
-        };
+        });
     }
 
-    AttachmentInfo {
-        attach_type: AttachmentType::None,
-        edge_name: "none".to_string(),
-        node_id: None,
-        center_offset: 0.0,
-        distance: f64::MAX,
-    }
+    // Return the candidate with the smallest distance
+    candidates
+        .into_iter()
+        .min_by(|a, b| {
+            a.distance
+                .partial_cmp(&b.distance)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        })
+        .unwrap_or_else(|| AttachmentInfo {
+            attach_type: AttachmentType::None,
+            edge_name: "none".to_string(),
+            node_id: None,
+            center_offset: 0.0,
+            distance: f64::MAX,
+        })
 }
 
 /// Classify how a point attaches to a node bounds (legacy simple version)
@@ -1094,6 +1105,7 @@ fn parse_coord_pair(parts: &[&str], i: &mut usize) -> Option<(f64, f64)> {
 
     // Try to parse as "x,y" or "x y"
     if let Some((x, y)) = parse_inline_coords(part) {
+        *i += 1; // Advance past this part
         return Some((x, y));
     }
 
@@ -1105,6 +1117,7 @@ fn parse_coord_pair(parts: &[&str], i: &mut usize) -> Option<(f64, f64)> {
         return None;
     }
     let y: f64 = parts[*i].trim_matches(',').parse().ok()?;
+    *i += 1; // Advance past y value
     Some((x, y))
 }
 
@@ -1548,5 +1561,116 @@ mod tests {
             "Edge count ({}) should match data-edge count ({})",
             structure.edge_count, data_edge_count
         );
+    }
+
+    #[test]
+    fn test_selkie_er_svg_edge_attachment_detection() {
+        // Test the actual selkie-generated ER SVG to trace edge attachment detection
+        let pattern = "eval-report/selkie-eval-*/er/er_selkie.svg";
+        let mut paths: Vec<_> = glob::glob(pattern)
+            .expect("Failed to read glob pattern")
+            .filter_map(|r| r.ok())
+            .collect();
+
+        if paths.is_empty() {
+            eprintln!("Skipping test: no selkie SVG found");
+            return;
+        }
+
+        // Sort by modification time to get the most recent
+        paths.sort_by(|a, b| {
+            let a_time = std::fs::metadata(a).and_then(|m| m.modified()).ok();
+            let b_time = std::fs::metadata(b).and_then(|m| m.modified()).ok();
+            b_time.cmp(&a_time) // Reverse order: most recent first
+        });
+        let path = &paths[0]; // Use the most recent
+        eprintln!("Testing selkie SVG: {}", path.display());
+
+        let svg = std::fs::read_to_string(path).unwrap();
+        let structure = SvgStructure::from_svg(&svg).unwrap();
+
+        eprintln!("node_count: {}", structure.node_count);
+        eprintln!("edge_count: {}", structure.edge_count);
+        eprintln!(
+            "node_bounds count: {}",
+            structure.edge_geometry.node_bounds.len()
+        );
+
+        // Print all node bounds
+        for (i, bounds) in structure.edge_geometry.node_bounds.iter().enumerate() {
+            eprintln!(
+                "Node bounds {}: id={} x={:.1} y={:.1} w={:.1} h={:.1}",
+                i, bounds.id, bounds.x, bounds.y, bounds.width, bounds.height
+            );
+        }
+
+        // Print edge details
+        eprintln!(
+            "edge_endpoints count: {}",
+            structure.edge_geometry.edge_endpoints.len()
+        );
+        for (i, (sx, sy, ex, ey)) in structure.edge_geometry.edge_endpoints.iter().enumerate() {
+            eprintln!(
+                "Edge endpoint {}: ({:.1}, {:.1}) → ({:.1}, {:.1})",
+                i, sx, sy, ex, ey
+            );
+        }
+
+        for (i, detail) in structure.edge_geometry.edge_details.iter().enumerate() {
+            eprintln!(
+                "Edge detail {}: start_edge={} end_edge={} start_offset={:.1} end_offset={:.1}",
+                i,
+                detail.start_edge,
+                detail.end_edge,
+                detail.start_center_offset,
+                detail.end_center_offset
+            );
+        }
+
+        // The rendering is correct - let's verify the coordinates
+        // Edge 2 should end at LINE-ITEM's LEFT side (x=175.05)
+        // Edge 3 should end at LINE-ITEM's RIGHT side (x=304.95)
+        if structure.edge_geometry.edge_endpoints.len() >= 3 {
+            let edge2 = &structure.edge_geometry.edge_endpoints[1];
+            let edge3 = &structure.edge_geometry.edge_endpoints[2];
+
+            // Edge 2 endpoint (end_x, end_y)
+            let (_, _, end_x2, end_y2) = edge2;
+            // Edge 3 endpoint (end_x, end_y)
+            let (_, _, end_x3, end_y3) = edge3;
+
+            eprintln!("Edge 2 end: ({:.2}, {:.2})", end_x2, end_y2);
+            eprintln!("Edge 3 end: ({:.2}, {:.2})", end_x3, end_y3);
+
+            // Find LINE-ITEM bounds
+            let line_item_bounds = structure
+                .edge_geometry
+                .node_bounds
+                .iter()
+                .find(|b| b.id.contains("LINE-ITEM") || b.x > 150.0 && b.y > 500.0);
+
+            if let Some(bounds) = line_item_bounds {
+                eprintln!(
+                    "LINE-ITEM bounds: x={:.1} y={:.1} w={:.1} h={:.1}",
+                    bounds.x, bounds.y, bounds.width, bounds.height
+                );
+
+                // Check if edge 2 ends at left side
+                let dist_left = (*end_x2 - bounds.x).abs();
+                let dist_right = (*end_x2 - (bounds.x + bounds.width)).abs();
+                eprintln!(
+                    "Edge 2 distance from left={:.1}, right={:.1}",
+                    dist_left, dist_right
+                );
+
+                // Check if edge 3 ends at right side
+                let dist_left3 = (*end_x3 - bounds.x).abs();
+                let dist_right3 = (*end_x3 - (bounds.x + bounds.width)).abs();
+                eprintln!(
+                    "Edge 3 distance from left={:.1}, right={:.1}",
+                    dist_left3, dist_right3
+                );
+            }
+        }
     }
 }
