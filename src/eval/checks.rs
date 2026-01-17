@@ -505,6 +505,67 @@ fn check_edge_attachments(
         }
     }
 
+    // Check for attachment SIDE mismatches (e.g., selkie attaches to "top" but reference to "left")
+    // This is a critical issue because it means edges are connecting to the wrong sides of entities
+    let selkie_details = &selkie_geo.edge_details;
+    let ref_details = &ref_geo.edge_details;
+    let selkie_endpoints = &selkie_geo.edge_endpoints;
+    let ref_endpoints = &ref_geo.edge_endpoints;
+
+    // Use whichever data source is available
+    let edge_count = selkie_details
+        .len()
+        .min(ref_details.len())
+        .max(selkie_endpoints.len().min(ref_endpoints.len()));
+
+    let mut side_mismatches = Vec::new();
+    for i in 0..edge_count {
+        // Get selkie attachment side (from edge_details or inferred from endpoints)
+        let selkie_end_side = if i < selkie_details.len() {
+            normalize_edge_side(&selkie_details[i].end_edge)
+        } else if i < selkie_endpoints.len() {
+            let (sx, sy, ex, ey) = selkie_endpoints[i];
+            infer_attachment_side_from_coords((sx, sy), (ex, ey))
+        } else {
+            "unknown".to_string()
+        };
+
+        // Get reference attachment side (from edge_details or inferred from endpoints)
+        let ref_end_side = if i < ref_details.len() && ref_details[i].end_edge != "none" {
+            normalize_edge_side(&ref_details[i].end_edge)
+        } else if i < ref_endpoints.len() {
+            let (sx, sy, ex, ey) = ref_endpoints[i];
+            infer_attachment_side_from_coords((sx, sy), (ex, ey))
+        } else {
+            "unknown".to_string()
+        };
+
+        // Check if attachment sides are categorically different
+        // top/bottom are "vertical", left/right are "horizontal"
+        let selkie_is_vertical = matches!(selkie_end_side.as_str(), "top" | "bottom");
+        let ref_is_vertical = matches!(ref_end_side.as_str(), "top" | "bottom");
+
+        if selkie_end_side != "unknown"
+            && ref_end_side != "unknown"
+            && selkie_is_vertical != ref_is_vertical
+        {
+            side_mismatches.push(format!(
+                "Edge {}: attaches to {} in selkie but {} in reference",
+                i + 1,
+                selkie_end_side,
+                ref_end_side
+            ));
+        }
+    }
+
+    if !side_mismatches.is_empty() {
+        let message = format!(
+            "ATTACHMENT SIDE MISMATCHES (edges connect to wrong entity sides):\n  {}",
+            side_mismatches.join("\n  ")
+        );
+        issues.push(Issue::warning("edge_attachment_sides", message));
+    }
+
     // Compare edges if we have detailed info
     if !selkie_summary.is_empty() || !ref_summary.is_empty() {
         // Output detailed edge attachment info for AI analysis
@@ -589,6 +650,62 @@ fn classify_edge_direction(start: (f64, f64), end: (f64, f64)) -> &'static str {
         "diagonal"
     } else {
         "point"
+    }
+}
+
+/// Normalize edge side names for comparison
+/// Handles variations like "none" -> "unknown"
+fn normalize_edge_side(side: &str) -> String {
+    match side.to_lowercase().as_str() {
+        "top" => "top".to_string(),
+        "bottom" => "bottom".to_string(),
+        "left" => "left".to_string(),
+        "right" => "right".to_string(),
+        "none" | "" => "unknown".to_string(),
+        other => other.to_string(),
+    }
+}
+
+/// Infer attachment side from edge endpoint coordinates
+/// This is used when node_bounds aren't available (e.g., for reference SVGs)
+/// Returns the likely attachment side based on the edge direction at the endpoint
+fn infer_attachment_side_from_coords(start: (f64, f64), end: (f64, f64)) -> String {
+    let dx = end.0 - start.0;
+    let dy = end.1 - start.1;
+
+    // Determine the dominant direction at the endpoint
+    // If the edge is mostly vertical, it attaches to top/bottom
+    // If mostly horizontal, it attaches to left/right
+    let dx_abs = dx.abs();
+    let dy_abs = dy.abs();
+
+    if dy_abs > dx_abs * 1.5 {
+        // Mostly vertical - attaching to top or bottom
+        if dy > 0.0 {
+            "top".to_string() // coming from above, attaching to top
+        } else {
+            "bottom".to_string() // coming from below, attaching to bottom
+        }
+    } else if dx_abs > dy_abs * 1.5 {
+        // Mostly horizontal - attaching to left or right
+        if dx > 0.0 {
+            "left".to_string() // coming from left, attaching to left side
+        } else {
+            "right".to_string() // coming from right, attaching to right side
+        }
+    } else {
+        // Diagonal - use the larger component
+        if dy_abs > dx_abs {
+            if dy > 0.0 {
+                "top".to_string()
+            } else {
+                "bottom".to_string()
+            }
+        } else if dx > 0.0 {
+            "left".to_string()
+        } else {
+            "right".to_string()
+        }
     }
 }
 
