@@ -3,6 +3,7 @@
 use std::collections::HashMap;
 
 use crate::common::remove_script;
+pub use crate::diagrams::direction::Direction;
 
 /// State types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -150,37 +151,6 @@ impl StyleClass {
             id,
             styles: Vec::new(),
             text_styles: Vec::new(),
-        }
-    }
-}
-
-/// Direction of the state diagram
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum Direction {
-    #[default]
-    TopToBottom,
-    BottomToTop,
-    LeftToRight,
-    RightToLeft,
-}
-
-impl Direction {
-    #[allow(clippy::should_implement_trait)]
-    pub fn from_str(s: &str) -> Self {
-        match s.to_uppercase().as_str() {
-            "BT" => Self::BottomToTop,
-            "LR" => Self::LeftToRight,
-            "RL" => Self::RightToLeft,
-            _ => Self::TopToBottom,
-        }
-    }
-
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::TopToBottom => "TB",
-            Self::BottomToTop => "BT",
-            Self::LeftToRight => "LR",
-            Self::RightToLeft => "RL",
         }
     }
 }

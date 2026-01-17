@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use crate::diagrams::er::{Cardinality, Direction, Entity, ErDb, Identification};
+use crate::diagrams::er::{Cardinality, Entity, ErDb, Identification};
 use crate::error::Result;
 use crate::layout::{
     layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
@@ -465,12 +465,7 @@ impl ToLayoutGraph for ErDb {
     }
 
     fn preferred_direction(&self) -> LayoutDirection {
-        match self.get_direction() {
-            Direction::TopToBottom => LayoutDirection::TopToBottom,
-            Direction::BottomToTop => LayoutDirection::BottomToTop,
-            Direction::LeftToRight => LayoutDirection::LeftToRight,
-            Direction::RightToLeft => LayoutDirection::RightToLeft,
-        }
+        self.get_direction().into()
     }
 }
 

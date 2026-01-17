@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::str::FromStr;
 
 use crate::common::CommonDb;
+pub use crate::diagrams::direction::Direction;
 
 /// Valid vertex types in flowcharts
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -224,49 +225,6 @@ pub struct FlowData {
     pub edges: Vec<FlowEdge>,
     pub classes: HashMap<String, FlowClass>,
     pub subgraphs: Vec<FlowSubGraph>,
-}
-
-/// Flowchart direction
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum Direction {
-    #[default]
-    TopToBottom,
-    BottomToTop,
-    LeftToRight,
-    RightToLeft,
-}
-
-impl Direction {
-    /// Parse direction from mermaid syntax
-    pub fn parse(s: &str) -> Self {
-        let s = s.trim();
-        if s.contains('<') {
-            Self::RightToLeft
-        } else if s.contains('^') {
-            Self::BottomToTop
-        } else if s.contains('>') {
-            Self::LeftToRight
-        } else if s.contains('v') || s == "TD" || s == "TB" {
-            Self::TopToBottom
-        } else {
-            match s {
-                "RL" => Self::RightToLeft,
-                "BT" => Self::BottomToTop,
-                "LR" => Self::LeftToRight,
-                _ => Self::TopToBottom,
-            }
-        }
-    }
-
-    /// Convert to short string format (TB, BT, LR, RL)
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::TopToBottom => "TB",
-            Self::BottomToTop => "BT",
-            Self::LeftToRight => "LR",
-            Self::RightToLeft => "RL",
-        }
-    }
 }
 
 /// The flowchart database

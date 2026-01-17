@@ -128,12 +128,7 @@ impl ToLayoutGraph for FlowchartDb {
     }
 
     fn preferred_direction(&self) -> LayoutDirection {
-        match Direction::parse(self.get_direction()) {
-            Direction::TopToBottom => LayoutDirection::TopToBottom,
-            Direction::BottomToTop => LayoutDirection::BottomToTop,
-            Direction::LeftToRight => LayoutDirection::LeftToRight,
-            Direction::RightToLeft => LayoutDirection::RightToLeft,
-        }
+        Direction::parse(self.get_direction()).into()
     }
 }
 

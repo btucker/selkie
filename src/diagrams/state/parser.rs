@@ -57,13 +57,7 @@ fn process_statement(
         Rule::direction_stmt => {
             for inner in pair.into_inner() {
                 if inner.as_rule() == Rule::direction {
-                    let dir = match inner.as_str() {
-                        "TB" => Direction::TopToBottom,
-                        "BT" => Direction::BottomToTop,
-                        "LR" => Direction::LeftToRight,
-                        "RL" => Direction::RightToLeft,
-                        _ => Direction::TopToBottom,
-                    };
+                    let dir = Direction::from_str(inner.as_str());
                     db.set_direction(dir);
                 }
             }

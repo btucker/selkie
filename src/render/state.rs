@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use crate::diagrams::state::{Direction, NotePosition, State, StateDb, StateType};
+use crate::diagrams::state::{NotePosition, State, StateDb, StateType};
 use crate::error::Result;
 use crate::layout::Point;
 use crate::layout::{
@@ -461,12 +461,7 @@ impl ToLayoutGraph for StateDb {
     }
 
     fn preferred_direction(&self) -> LayoutDirection {
-        match self.get_direction() {
-            Direction::TopToBottom => LayoutDirection::TopToBottom,
-            Direction::BottomToTop => LayoutDirection::BottomToTop,
-            Direction::LeftToRight => LayoutDirection::LeftToRight,
-            Direction::RightToLeft => LayoutDirection::RightToLeft,
-        }
+        self.get_direction().into()
     }
 }
 

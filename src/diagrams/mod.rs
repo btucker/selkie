@@ -4,6 +4,7 @@ pub mod architecture;
 pub mod block;
 pub mod c4;
 pub mod class;
+pub(crate) mod direction;
 pub mod er;
 pub mod flowchart;
 pub mod gantt;

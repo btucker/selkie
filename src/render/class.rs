@@ -6,6 +6,7 @@
 use std::collections::HashMap;
 
 use crate::diagrams::class::{ClassDb, ClassNode, LineType};
+use crate::diagrams::direction::Direction;
 use crate::error::Result;
 use crate::layout::{
     self, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
@@ -134,12 +135,7 @@ impl ToLayoutGraph for ClassDb {
     }
 
     fn preferred_direction(&self) -> LayoutDirection {
-        match self.direction.to_uppercase().as_str() {
-            "LR" => LayoutDirection::LeftToRight,
-            "RL" => LayoutDirection::RightToLeft,
-            "BT" => LayoutDirection::BottomToTop,
-            _ => LayoutDirection::TopToBottom,
-        }
+        Direction::from_str(&self.direction).into()
     }
 }
 
