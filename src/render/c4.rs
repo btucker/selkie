@@ -1013,8 +1013,8 @@ mod tests {
         // Insert 5 elements - should wrap to new row after 4
         let (x1, y1) = bounds.insert(100.0, 50.0);
         let (x2, _y2) = bounds.insert(100.0, 50.0);
-        let (x3, _y3) = bounds.insert(100.0, 50.0);
-        let (x4, _y4) = bounds.insert(100.0, 50.0);
+        let (_x3, _y3) = bounds.insert(100.0, 50.0);
+        let (_x4, _y4) = bounds.insert(100.0, 50.0);
         let (x5, y5) = bounds.insert(100.0, 50.0);
 
         // First element at start
