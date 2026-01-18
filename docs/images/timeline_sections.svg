@@ -365,94 +365,94 @@ marker path {
                 <path d="M 0,0 V 4 L6,2 Z"></path>
             </marker>
     </defs>
-    <text x="600" y="20" class="titleText" font-size="4ex" font-weight="bold" text-anchor="middle">Timeline of Industrial Revolution</text>
+    <text x="600" y="20" class="titleText" font-weight="bold" text-anchor="middle" font-size="4ex">Timeline of Industrial Revolution</text>
     <g class="timeline-node section-0" transform="translate(100, 50)">
       <path d="M0 63 v-58 q0,-5 5,-5 h540 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="68" x2="550" y2="68" class="node-line-0"/>
-      <text x="275" y="10" alignment-baseline="middle" dominant-baseline="middle" dy="1em" text-anchor="middle">17th-20th century</text>
+      <text x="275" y="10" dominant-baseline="middle" text-anchor="middle" dy="1em" alignment-baseline="middle">17th-20th century</text>
     </g>
     <g class="taskWrapper timeline-node section-0" transform="translate(100, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h180 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="68" x2="190" y2="68" class="node-line-0"/>
-      <text x="95" y="10" text-anchor="middle" alignment-baseline="middle" dy="1em" dominant-baseline="middle">Industry 1.0</text>
+      <text x="95" y="10" dy="1em" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle">Industry 1.0</text>
     </g>
     <g class="lineWrapper">
-      <line x1="195" y1="236" x2="195" y2="491.2" stroke-dasharray="5,5" stroke="black" marker-end="url(#arrowhead)" stroke-width="2"/>
+      <line x1="195" y1="236" x2="195" y2="491.2" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke="black"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(100, 336)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
       <g>
-        <text x="95" y="-7.600000000000001" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Machinery, Water</tspan><tspan x="95" dy="1.1em">power, Steam power</tspan></text>
+        <text x="95" y="10" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle"><tspan x="95" dy="1em">Machinery, Water</tspan><tspan x="95" dy="1.1em">power, Steam power</tspan></text>
       </g>
     </g>
     <g class="taskWrapper timeline-node section-0" transform="translate(300, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h180 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="68" x2="190" y2="68" class="node-line-0"/>
-      <text x="95" y="10" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle">Industry 2.0</text>
+      <text x="95" y="10" dy="1em" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle">Industry 2.0</text>
     </g>
     <g class="lineWrapper">
-      <line x1="395" y1="236" x2="395" y2="491.2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke-width="2" stroke="black"/>
+      <line x1="395" y1="236" x2="395" y2="491.2" marker-end="url(#arrowhead)" stroke-width="2" stroke-dasharray="5,5" stroke="black"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(300, 336)">
       <path d="M0 50.2 v-45.2 q0,-5 5,-5 h180 q5,0 5,5 v50.2 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="55.2" x2="190" y2="55.2" class="node-line-0"/>
       <g>
-        <text x="95" y="-16.400000000000002" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Electricity, Internal</tspan><tspan x="95" dy="1.1em">combustion engine,</tspan><tspan x="95" dy="1.1em">Mass production</tspan></text>
+        <text x="95" y="10" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle"><tspan x="95" dy="1em">Electricity, Internal</tspan><tspan x="95" dy="1.1em">combustion engine,</tspan><tspan x="95" dy="1.1em">Mass production</tspan></text>
       </g>
     </g>
     <g class="taskWrapper timeline-node section-0" transform="translate(500, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h180 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="68" x2="190" y2="68" class="node-line-0"/>
-      <text x="95" y="10" text-anchor="middle" alignment-baseline="middle" dy="1em" dominant-baseline="middle">Industry 3.0</text>
+      <text x="95" y="10" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle">Industry 3.0</text>
     </g>
     <g class="lineWrapper">
-      <line x1="595" y1="236" x2="595" y2="491.2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" stroke-width="2" stroke="black"/>
+      <line x1="595" y1="236" x2="595" y2="491.2" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" stroke="black"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(500, 336)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
       <g>
-        <text x="95" y="-7.600000000000001" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Electronics,</tspan><tspan x="95" dy="1.1em">Computers, Automation</tspan></text>
+        <text x="95" y="10" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle"><tspan x="95" dy="1em">Electronics,</tspan><tspan x="95" dy="1.1em">Computers, Automation</tspan></text>
       </g>
     </g>
     <g class="timeline-node section-1" transform="translate(700, 50)">
       <path d="M0 63 v-58 q0,-5 5,-5 h340 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="68" x2="350" y2="68" class="node-line-1"/>
-      <text x="175" y="10" dominant-baseline="middle" alignment-baseline="middle" text-anchor="middle" dy="1em">21st century</text>
+      <text x="175" y="10" dy="1em" dominant-baseline="middle" alignment-baseline="middle" text-anchor="middle">21st century</text>
     </g>
     <g class="taskWrapper timeline-node section-1" transform="translate(700, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h180 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="68" x2="190" y2="68" class="node-line-1"/>
-      <text x="95" y="10" dominant-baseline="middle" dy="1em" alignment-baseline="middle" text-anchor="middle">Industry 4.0</text>
+      <text x="95" y="10" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em">Industry 4.0</text>
     </g>
     <g class="lineWrapper">
-      <line x1="795" y1="236" x2="795" y2="491.2" stroke="black" stroke-dasharray="5,5" marker-end="url(#arrowhead)" stroke-width="2"/>
+      <line x1="795" y1="236" x2="795" y2="491.2" stroke-width="2" marker-end="url(#arrowhead)" stroke="black" stroke-dasharray="5,5"/>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(700, 336)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
       <g>
-        <text x="95" y="-7.600000000000001" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Internet, Robotics,</tspan><tspan x="95" dy="1.1em">Internet of Things</tspan></text>
+        <text x="95" y="10" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle"><tspan x="95" dy="1em">Internet, Robotics,</tspan><tspan x="95" dy="1.1em">Internet of Things</tspan></text>
       </g>
     </g>
     <g class="taskWrapper timeline-node section-1" transform="translate(900, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h180 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="68" x2="190" y2="68" class="node-line-1"/>
-      <text x="95" y="10" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" dy="1em">Industry 5.0</text>
+      <text x="95" y="10" dy="1em" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle">Industry 5.0</text>
     </g>
     <g class="lineWrapper">
-      <line x1="995" y1="236" x2="995" y2="491.2" stroke-dasharray="5,5" stroke-width="2" stroke="black" marker-end="url(#arrowhead)"/>
+      <line x1="995" y1="236" x2="995" y2="491.2" stroke-width="2" stroke="black" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(900, 336)">
       <path d="M0 50.2 v-45.2 q0,-5 5,-5 h180 q5,0 5,5 v50.2 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="55.2" x2="190" y2="55.2" class="node-line-1"/>
       <g>
-        <text x="95" y="-16.400000000000002" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Artificial</tspan><tspan x="95" dy="1.1em">intelligence, Big</tspan><tspan x="95" dy="1.1em">data, 3D printing</tspan></text>
+        <text x="95" y="10" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle"><tspan x="95" dy="1em">Artificial</tspan><tspan x="95" dy="1.1em">intelligence, Big</tspan><tspan x="95" dy="1.1em">data, 3D printing</tspan></text>
       </g>
     </g>
     <g class="lineWrapper">
-      <line x1="100" y1="286" x2="1300" y2="286" stroke-width="4" marker-end="url(#arrowhead)" stroke="black"/>
+      <line x1="100" y1="286" x2="1300" y2="286" marker-end="url(#arrowhead)" stroke-width="4" stroke="black"/>
     </g>
   </g>
 </svg>

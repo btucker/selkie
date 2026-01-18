@@ -593,8 +593,8 @@ fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
         }
     } else {
         // Multi-line: create tspans
-        let total_height = lines.len() as f64 * FONT_SIZE * 1.1;
-        let start_y = cy - total_height / 2.0;
+        // Reference uses y=padding/2 (10) with dy="1em" to push first line down
+        // Don't try to vertically center - just flow text downward from near top
 
         let mut tspans = Vec::new();
         for (i, line) in lines.iter().enumerate() {
@@ -603,7 +603,7 @@ fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
                     r#"<tspan x="{}" dy="{}">{}</tspan>"#,
                     cx,
                     if i == 0 {
-                        "0em".to_string()
+                        "1em".to_string() // Push first line down by 1em
                     } else {
                         "1.1em".to_string()
                     },
@@ -615,9 +615,9 @@ fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
         SvgElement::Group {
             children: vec![SvgElement::Raw {
                 content: format!(
-                    r#"<text x="{}" y="{}" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em">{}</text>"#,
+                    r#"<text x="{}" y="{}" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle">{}</text>"#,
                     cx,
-                    start_y,
+                    cy, // Use cy directly (10), don't try to center vertically
                     tspans
                         .iter()
                         .map(|t| match t {
