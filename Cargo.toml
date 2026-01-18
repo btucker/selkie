@@ -120,3 +120,10 @@ lto = true            # Link-time optimization
 codegen-units = 1     # Better optimization (slower compile)
 panic = "abort"       # Remove unwinding code
 strip = true          # Strip symbols
+
+# Configure wasm-pack to enable required WASM features
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-O", "--enable-bulk-memory", "--enable-nontrapping-float-to-int"]
+
+[package.metadata.wasm-pack.profile.dev]
+wasm-opt = false

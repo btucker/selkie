@@ -406,6 +406,36 @@ const examples = {
     "Monitoring" : 5
     "Security" : 4
     "Other" : 2`,
+
+    'mindmap-simple': `mindmap
+  root((Central Topic))
+    First Branch
+      Sub-topic A
+      Sub-topic B
+    Second Branch
+      Sub-topic C
+      Sub-topic D
+    Third Branch`,
+
+    'mindmap-complex': `mindmap
+  root((mindmap))
+    Origins
+      Long history
+      ::icon(fa fa-book)
+      Popularisation
+        British popular psychology author Tony Buzan
+    Research
+      On effectiveness
+      On Automatic creation
+        Uses
+          Creative techniques
+          Strategic planning
+          Argument mapping
+    Tools
+      Pen and paper
+      Mermaid
+        cloud)I am a cloud(
+        bang))I am a bang((`,
 };
 
 // State
