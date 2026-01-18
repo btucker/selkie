@@ -304,20 +304,26 @@ fn parse_arrow(arrow: &str) -> (String, EdgeStroke, u32) {
     };
 
     // Calculate length based on repeated characters
+    // Mermaid's algorithm: for open edges (no arrow head), remove last char then subtract 1
+    // For arrows with heads, just subtract 1 from the dash count
+    let is_open_edge = edge_type == "arrow_open";
     let length = match stroke {
         EdgeStroke::Normal | EdgeStroke::Invisible => {
             // Count consecutive dashes or tildes
             let dash_count = arrow.chars().filter(|&c| c == '-' || c == '~').count();
-            // Minimum length is 1, max is 3 for display purposes
-            (dash_count.saturating_sub(1).clamp(1, 3)) as u32
+            // Open edges subtract 2 (like mermaid's slice(-1) then length-1)
+            // Arrow edges subtract 1
+            let subtract = if is_open_edge { 2 } else { 1 };
+            (dash_count.saturating_sub(subtract).max(1).min(10)) as u32
         }
         EdgeStroke::Thick => {
             let eq_count = arrow.chars().filter(|&c| c == '=').count();
-            (eq_count.saturating_sub(1).clamp(1, 3)) as u32
+            let subtract = if is_open_edge { 2 } else { 1 };
+            (eq_count.saturating_sub(subtract).max(1).min(10)) as u32
         }
         EdgeStroke::Dotted => {
             let dot_count = arrow.chars().filter(|&c| c == '.').count();
-            (dot_count.clamp(1, 3)) as u32
+            (dot_count.max(1).min(10)) as u32
         }
     };
 

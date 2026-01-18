@@ -2378,7 +2378,6 @@ A[\LeanLeft\]"#;
             }
 
             #[test]
-            #[ignore = "TODO: Edge length calculation differs from mermaid (we count total, mermaid counts extra)"]
             fn should_handle_normal_edge_length_1() {
                 let input = "graph TD;\nA --- B;";
                 let result = parse(input);
@@ -2388,7 +2387,6 @@ A[\LeanLeft\]"#;
             }
 
             #[test]
-            #[ignore = "TODO: Edge length calculation differs from mermaid (we count total, mermaid counts extra)"]
             fn should_handle_normal_edge_length_2() {
                 let input = "graph TD;\nA ---- B;";
                 let result = parse(input);
@@ -2425,7 +2423,6 @@ A[\LeanLeft\]"#;
             }
 
             #[test]
-            #[ignore = "TODO: Edge length calculation differs from mermaid (we count total, mermaid counts extra)"]
             fn should_handle_thick_edge_length_1() {
                 let input = "graph TD;\nA === B;";
                 let result = parse(input);
