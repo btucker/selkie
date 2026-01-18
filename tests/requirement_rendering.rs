@@ -5,6 +5,7 @@
 //! - cypress/integration/rendering/requirementDiagram-unified.spec.js
 
 use roxmltree::Document;
+use selkie::render::{render_text, render_with_config, RenderConfig, Theme};
 use selkie::{parse, render};
 
 fn render_requirement_svg(input: &str) -> String {
@@ -22,16 +23,6 @@ fn has_class(doc: &Document<'_>, class_name: &str) -> bool {
             .map(|class| class.split_whitespace().any(|c| c == class_name))
             .unwrap_or(false)
     })
-}
-
-fn count_elements_with_class(doc: &Document<'_>, class_name: &str) -> usize {
-    doc.descendants()
-        .filter(|node| {
-            node.attribute("class")
-                .map(|class| class.split_whitespace().any(|c| c == class_name))
-                .unwrap_or(false)
-        })
-        .count()
 }
 
 fn svg_contains_text(svg: &str, text: &str) -> bool {
@@ -829,4 +820,116 @@ verifymethod: test
     assert!(svg_contains_text(&svg, "demonstration_req"), "Should render demonstration requirement");
     assert!(svg_contains_text(&svg, "inspection_req"), "Should render inspection requirement");
     assert!(svg_contains_text(&svg, "test_req"), "Should render test requirement");
+}
+
+// ============================================================================
+// Theme Tests
+// ============================================================================
+
+#[test]
+fn should_render_with_dark_theme() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let diagram = parse(input).expect("Failed to parse requirement diagram");
+    let config = RenderConfig {
+        theme: Theme::dark(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with dark theme");
+
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+    assert!(svg.contains("<style>"), "Should contain embedded styles");
+    // Dark theme uses #1f2020 background
+    assert!(svg.contains("#1f2020"), "Should use dark theme colors");
+}
+
+#[test]
+fn should_render_with_forest_theme() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let diagram = parse(input).expect("Failed to parse requirement diagram");
+    let config = RenderConfig {
+        theme: Theme::forest(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with forest theme");
+
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+    assert!(svg.contains("<style>"), "Should contain embedded styles");
+}
+
+#[test]
+fn should_render_with_neutral_theme() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let diagram = parse(input).expect("Failed to parse requirement diagram");
+    let config = RenderConfig {
+        theme: Theme::neutral(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with neutral theme");
+
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+    assert!(svg.contains("<style>"), "Should contain embedded styles");
+}
+
+#[test]
+fn should_render_with_theme_directive() {
+    let input = r##"%%{init: {"theme": "forest"}}%%
+requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"##;
+
+    let svg = render_text(input).expect("Failed to render with theme directive");
+
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+    // Forest theme uses green colors
+    assert!(svg.contains("#cde498") || svg.contains("#cdffb2") || svg.contains("#008000"),
+        "Should use forest theme colors");
 }

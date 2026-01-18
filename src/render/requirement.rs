@@ -492,67 +492,63 @@ fn render_element_box(
     width: f64,
     height: f64,
 ) -> SvgElement {
-    let mut children = Vec::new();
-
-    // Main box
-    children.push(SvgElement::Rect {
-        x,
-        y,
-        width,
-        height,
-        rx: Some(0.0),
-        ry: Some(0.0),
-        attrs: Attrs::new()
-            .with_stroke_width(2.0)
-            .with_class("element-box"),
-    });
-
-    // Header background
-    children.push(SvgElement::Rect {
-        x,
-        y,
-        width,
-        height: HEADER_HEIGHT,
-        rx: Some(0.0),
-        ry: Some(0.0),
-        attrs: Attrs::new().with_class("element-header"),
-    });
-
-    // Element label (in header)
-    children.push(SvgElement::Text {
-        x: x + width / 2.0,
-        y: y + HEADER_HEIGHT / 2.0 + 5.0,
-        content: "Element".to_string(),
-        attrs: Attrs::new()
-            .with_attr("text-anchor", "middle")
-            .with_class("element-type")
-            .with_attr("font-size", &HEADER_FONT_SIZE.to_string()),
-    });
-
-    // Divider line
-    children.push(SvgElement::Line {
-        x1: x,
-        y1: y + HEADER_HEIGHT,
-        x2: x + width,
-        y2: y + HEADER_HEIGHT,
-        attrs: Attrs::new().with_stroke_width(1.0).with_class("divider"),
-    });
-
     // Content area
     let content_y = y + HEADER_HEIGHT + BOX_PADDING;
     let mut current_y = content_y;
 
-    // Name
-    children.push(SvgElement::Text {
-        x: x + BOX_PADDING,
-        y: current_y + LINE_HEIGHT / 2.0 + 4.0,
-        content: elem.name.clone(),
-        attrs: Attrs::new()
-            .with_attr("text-anchor", "start")
-            .with_class("element-name")
-            .with_attr("font-size", &FONT_SIZE.to_string())
-            .with_attr("font-weight", "bold"),
-    });
+    let mut children = vec![
+        // Main box
+        SvgElement::Rect {
+            x,
+            y,
+            width,
+            height,
+            rx: Some(0.0),
+            ry: Some(0.0),
+            attrs: Attrs::new()
+                .with_stroke_width(2.0)
+                .with_class("element-box"),
+        },
+        // Header background
+        SvgElement::Rect {
+            x,
+            y,
+            width,
+            height: HEADER_HEIGHT,
+            rx: Some(0.0),
+            ry: Some(0.0),
+            attrs: Attrs::new().with_class("element-header"),
+        },
+        // Element label (in header)
+        SvgElement::Text {
+            x: x + width / 2.0,
+            y: y + HEADER_HEIGHT / 2.0 + 5.0,
+            content: "Element".to_string(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("element-type")
+                .with_attr("font-size", &HEADER_FONT_SIZE.to_string()),
+        },
+        // Divider line
+        SvgElement::Line {
+            x1: x,
+            y1: y + HEADER_HEIGHT,
+            x2: x + width,
+            y2: y + HEADER_HEIGHT,
+            attrs: Attrs::new().with_stroke_width(1.0).with_class("divider"),
+        },
+        // Name
+        SvgElement::Text {
+            x: x + BOX_PADDING,
+            y: content_y + LINE_HEIGHT / 2.0 + 4.0,
+            content: elem.name.clone(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "start")
+                .with_class("element-name")
+                .with_attr("font-size", &FONT_SIZE.to_string())
+                .with_attr("font-weight", "bold"),
+        },
+    ];
     current_y += LINE_HEIGHT;
 
     // Type
