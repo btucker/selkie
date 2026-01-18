@@ -350,54 +350,54 @@ marker path {
     <g class="taskWrapper timeline-node section-0" transform="translate(50, 50)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
-      <text x="95" y="25" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" dy="1em">2002</text>
+      <text x="95" y="25" dy="1em" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle">2002</text>
     </g>
     <g class="lineWrapper">
-      <line x1="145" y1="100" x2="145" y2="410" stroke="black" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
+      <line x1="145" y1="100" x2="145" y2="410" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke="black" stroke-width="2"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(50, 200)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
-      <text x="95" y="25" dy="1em" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle">LinkedIn</text>
+      <text x="95" y="25" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle">LinkedIn</text>
     </g>
     <g class="taskWrapper timeline-node section-1" transform="translate(250, 50)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
-      <text x="95" y="25" dy="1em" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle">2004</text>
+      <text x="95" y="25" dominant-baseline="middle" dy="1em" text-anchor="middle" alignment-baseline="middle">2004</text>
     </g>
     <g class="lineWrapper">
-      <line x1="345" y1="100" x2="345" y2="410" stroke-width="2" marker-end="url(#arrowhead)" stroke="black" stroke-dasharray="5,5"/>
+      <line x1="345" y1="100" x2="345" y2="410" stroke-width="2" stroke-dasharray="5,5" stroke="black" marker-end="url(#arrowhead)"/>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(250, 200)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
-      <text x="95" y="25" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em">Facebook</text>
+      <text x="95" y="25" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" dy="1em">Facebook</text>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(250, 260)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
-      <text x="95" y="25" dominant-baseline="middle" alignment-baseline="middle" dy="1em" text-anchor="middle">Google</text>
+      <text x="95" y="25" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em">Google</text>
     </g>
     <g class="taskWrapper timeline-node section-2" transform="translate(450, 50)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-2"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-2"/>
-      <text x="95" y="25" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle">2005</text>
+      <text x="95" y="25" alignment-baseline="middle" text-anchor="middle" dy="1em" dominant-baseline="middle">2005</text>
     </g>
     <g class="lineWrapper">
-      <line x1="545" y1="100" x2="545" y2="410" stroke-width="2" marker-end="url(#arrowhead)" stroke="black" stroke-dasharray="5,5"/>
+      <line x1="545" y1="100" x2="545" y2="410" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" stroke="black"/>
     </g>
     <g class="eventWrapper timeline-node section-2" transform="translate(450, 200)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-2"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-2"/>
-      <text x="95" y="25" dy="1em" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle">YouTube</text>
+      <text x="95" y="25" dominant-baseline="middle" dy="1em" alignment-baseline="middle" text-anchor="middle">YouTube</text>
     </g>
     <g class="taskWrapper timeline-node section-3" transform="translate(650, 50)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-3"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-3"/>
-      <text x="95" y="25" alignment-baseline="middle" text-anchor="middle" dy="1em" dominant-baseline="middle">2006</text>
+      <text x="95" y="25" text-anchor="middle" dy="1em" alignment-baseline="middle" dominant-baseline="middle">2006</text>
     </g>
     <g class="lineWrapper">
-      <line x1="745" y1="100" x2="745" y2="410" stroke="black" stroke-dasharray="5,5" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <line x1="745" y1="100" x2="745" y2="410" stroke-dasharray="5,5" stroke-width="2" stroke="black" marker-end="url(#arrowhead)"/>
     </g>
     <g class="eventWrapper timeline-node section-3" transform="translate(650, 200)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-3"/>
@@ -405,7 +405,7 @@ marker path {
       <text x="95" y="25" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" dy="1em">Twitter</text>
     </g>
     <g class="lineWrapper">
-      <line x1="50" y1="150" x2="950" y2="150" stroke-width="4" stroke="black" marker-end="url(#arrowhead)"/>
+      <line x1="50" y1="150" x2="950" y2="150" stroke="black" stroke-width="4" marker-end="url(#arrowhead)"/>
     </g>
   </g>
 </svg>

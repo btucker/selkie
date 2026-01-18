@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500" viewBox="0 0 1200 500" class="mermaid">
   <style>
 
 .mermaid {
@@ -346,93 +346,94 @@ marker path {
                 <path d="M 0,0 V 4 L6,2 Z"></path>
             </marker>
     </defs>
-    <text x="450" y="20" class="titleText" text-anchor="middle" font-weight="bold" font-size="4ex">England&apos;s History Timeline</text>
+    <text x="550" y="20" class="titleText" font-size="4ex" font-weight="bold" text-anchor="middle">Timeline of Industrial Revolution</text>
     <g class="timeline-node section-0" transform="translate(50, 50)">
-      <path d="M0 45 v-40 q0,-5 5,-5 h340 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
-      <line x1="0" y1="50" x2="350" y2="50" class="node-line-0"/>
-      <text x="175" y="25" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">Stone Age</text>
+      <path d="M0 45 v-40 q0,-5 5,-5 h540 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
+      <line x1="0" y1="50" x2="550" y2="50" class="node-line-0"/>
+      <text x="275" y="25" dominant-baseline="middle" alignment-baseline="middle" dy="1em" text-anchor="middle">17th-20th century</text>
     </g>
     <g class="taskWrapper timeline-node section-0" transform="translate(50, 150)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
-      <text x="95" y="25" dominant-baseline="middle" text-anchor="middle" dy="1em" alignment-baseline="middle">7600 BC</text>
+      <text x="95" y="25" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em">Industry 1.0</text>
     </g>
     <g class="lineWrapper">
-      <line x1="145" y1="200" x2="145" y2="510" stroke="black" marker-end="url(#arrowhead)" stroke-width="2" stroke-dasharray="5,5"/>
+      <line x1="145" y1="200" x2="145" y2="450" stroke="black" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(50, 300)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
       <g>
-        <text x="95" y="6.849999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Britain&apos;s oldest known</tspan><tspan x="95" dy="1.1em">house was built in</tspan><tspan x="95" dy="1.1em">Orkney, Scotland</tspan></text>
+        <text x="95" y="12.899999999999999" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Machinery, Water power,</tspan><tspan x="95" dy="1.1em">Steam power</tspan></text>
       </g>
     </g>
     <g class="taskWrapper timeline-node section-0" transform="translate(250, 150)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
-      <text x="95" y="25" alignment-baseline="middle" dy="1em" dominant-baseline="middle" text-anchor="middle">6000 BC</text>
+      <text x="95" y="25" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle">Industry 2.0</text>
     </g>
     <g class="lineWrapper">
-      <line x1="345" y1="200" x2="345" y2="510" stroke="black" stroke-dasharray="5,5" marker-end="url(#arrowhead)" stroke-width="2"/>
+      <line x1="345" y1="200" x2="345" y2="450" stroke-dasharray="5,5" stroke-width="2" stroke="black" marker-end="url(#arrowhead)"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(250, 300)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
       <g>
-        <text x="95" y="6.849999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Sea levels rise and</tspan><tspan x="95" dy="1.1em">Britain becomes an</tspan><tspan x="95" dy="1.1em">island.</tspan></text>
+        <text x="95" y="6.849999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Electricity, Internal</tspan><tspan x="95" dy="1.1em">combustion engine, Mass</tspan><tspan x="95" dy="1.1em">production</tspan></text>
       </g>
     </g>
-    <g class="timeline-node section-1" transform="translate(450, 50)">
-      <path d="M0 45 v-40 q0,-5 5,-5 h340 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
-      <line x1="0" y1="50" x2="350" y2="50" class="node-line-1"/>
-      <text x="175" y="25" dy="1em" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle">Bronze Age</text>
-    </g>
-    <g class="taskWrapper timeline-node section-1" transform="translate(450, 150)">
-      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
-      <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
-      <text x="95" y="25" dy="1em" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle">2300 BC</text>
+    <g class="taskWrapper timeline-node section-0" transform="translate(450, 150)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
+      <text x="95" y="25" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" dy="1em">Industry 3.0</text>
     </g>
     <g class="lineWrapper">
-      <line x1="545" y1="200" x2="545" y2="510" marker-end="url(#arrowhead)" stroke-width="2" stroke-dasharray="5,5" stroke="black"/>
+      <line x1="545" y1="200" x2="545" y2="450" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke="black" stroke-width="2"/>
     </g>
-    <g class="eventWrapper timeline-node section-1" transform="translate(450, 300)">
-      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
-      <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
+    <g class="eventWrapper timeline-node section-0" transform="translate(450, 300)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
       <g>
-        <text x="95" y="12.899999999999999" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">People arrive from Europe</tspan><tspan x="95" dy="1.1em">and settle in Britain.</tspan></text>
+        <text x="95" y="12.899999999999999" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Electronics, Computers,</tspan><tspan x="95" dy="1.1em">Automation</tspan></text>
       </g>
     </g>
-    <g class="eventWrapper timeline-node section-1" transform="translate(450, 360)">
-      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
-      <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
-      <g>
-        <text x="95" y="6.849999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">New styles of pottery and</tspan><tspan x="95" dy="1.1em">ways of burying the dead</tspan><tspan x="95" dy="1.1em">appear.</tspan></text>
-      </g>
+    <g class="timeline-node section-1" transform="translate(650, 50)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h340 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
+      <line x1="0" y1="50" x2="350" y2="50" class="node-line-1"/>
+      <text x="175" y="25" dominant-baseline="middle" alignment-baseline="middle" text-anchor="middle" dy="1em">21st century</text>
     </g>
     <g class="taskWrapper timeline-node section-1" transform="translate(650, 150)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
-      <text x="95" y="25" dy="1em" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle">2200 BC</text>
+      <text x="95" y="25" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" dy="1em">Industry 4.0</text>
     </g>
     <g class="lineWrapper">
-      <line x1="745" y1="200" x2="745" y2="510" stroke="black" stroke-dasharray="5,5" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <line x1="745" y1="200" x2="745" y2="450" stroke-width="2" stroke-dasharray="5,5" stroke="black" marker-end="url(#arrowhead)"/>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(650, 300)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
       <g>
-        <text x="95" y="6.849999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">The last major building</tspan><tspan x="95" dy="1.1em">works are completed at</tspan><tspan x="95" dy="1.1em">Stonehenge.</tspan></text>
+        <text x="95" y="12.899999999999999" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Internet, Robotics,</tspan><tspan x="95" dy="1.1em">Internet of Things</tspan></text>
       </g>
     </g>
-    <g class="eventWrapper timeline-node section-1" transform="translate(650, 360)">
+    <g class="taskWrapper timeline-node section-1" transform="translate(850, 150)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
+      <text x="95" y="25" dy="1em" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle">Industry 5.0</text>
+    </g>
+    <g class="lineWrapper">
+      <line x1="945" y1="200" x2="945" y2="450" stroke-width="2" stroke="black" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+    </g>
+    <g class="eventWrapper timeline-node section-1" transform="translate(850, 300)">
       <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
       <g>
-        <text x="95" y="12.899999999999999" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">The first metal objects</tspan><tspan x="95" dy="1.1em">are made in Britain.</tspan></text>
+        <text x="95" y="12.899999999999999" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="95" dy="0em">Artificial intelligence,</tspan><tspan x="95" dy="1.1em">Big data, 3D printing</tspan></text>
       </g>
     </g>
     <g class="lineWrapper">
-      <line x1="50" y1="250" x2="950" y2="250" stroke-width="4" marker-end="url(#arrowhead)" stroke="black"/>
+      <line x1="50" y1="250" x2="1150" y2="250" stroke="black" marker-end="url(#arrowhead)" stroke-width="4"/>
     </g>
   </g>
 </svg>
