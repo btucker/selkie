@@ -19,7 +19,7 @@ const NODE_PADDING: f64 = 20.0;
 const COLUMN_WIDTH: f64 = 200.0;
 const SECTION_HEIGHT: f64 = 68.0; // ~68px in reference
 const TASK_HEIGHT: f64 = 68.0; // ~68px in reference
-const EVENT_HEIGHT: f64 = 65.0; // ~65px minimum in reference
+const EVENT_HEIGHT: f64 = 50.0; // ~45-50px minimum in reference
 const EVENT_SPACING: f64 = 10.0;
 const SECTION_GAP: f64 = 50.0;
 const TASK_GAP: f64 = 100.0;
@@ -165,8 +165,8 @@ fn calculate_layout(
     };
 
     // Total height includes title, sections, tasks, events, and timeline line
-    // Add extra margin to match reference which has ~340px below the timeline line
-    let total_height = depth_y + max_event_line_length + 280.0;
+    // Add extra margin for bottom spacing
+    let total_height = depth_y + max_event_line_length + 250.0;
 
     TimelineLayout {
         total_width,
