@@ -57,19 +57,20 @@ block_stmt = {
 
 block_id = @{
     // Must not be "end" keyword
-    !^"end" ~ (ASCII_ALPHANUMERIC | "_" | "-")+
+    !^"end" ~ (ASCII_ALPHANUMERIC | "_" | "-" | ".")+
 }
 
 shape_with_label = {
-    // Square bracket shapes
-    square_shape
-    | round_shape
-    | stadium_shape
-    | subroutine_shape
-    | cylinder_shape
-    | circle_shape
-    | diamond_shape
-    | hexagon_shape
+    // Order matters - try more specific/longer patterns first
+    double_circle_shape    // (((...)))
+    | circle_shape         // ((...))
+    | stadium_shape        // ([...])
+    | subroutine_shape     // [[...]]
+    | cylinder_shape       // [(...))]
+    | hexagon_shape        // {{...}}
+    | square_shape         // [...]
+    | round_shape          // (...)
+    | diamond_shape        // {...}
     | parallelogram_shape
     | block_arrow_shape
 }

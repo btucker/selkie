@@ -140,6 +140,10 @@ pub struct C4Relationship {
 pub struct C4Db {
     /// Diagram title
     title: Option<String>,
+    /// Accessibility title
+    acc_title: Option<String>,
+    /// Accessibility description
+    acc_description: Option<String>,
     /// All elements (persons, systems, containers, components)
     elements: Vec<C4Element>,
     /// All boundaries
@@ -169,6 +173,26 @@ impl C4Db {
     /// Get the diagram title
     pub fn get_title(&self) -> Option<&str> {
         self.title.as_deref()
+    }
+
+    /// Set the accessibility title
+    pub fn set_acc_title(&mut self, title: &str) {
+        self.acc_title = Some(title.trim().to_string());
+    }
+
+    /// Get the accessibility title
+    pub fn get_acc_title(&self) -> Option<&str> {
+        self.acc_title.as_deref()
+    }
+
+    /// Set the accessibility description
+    pub fn set_acc_description(&mut self, description: &str) {
+        self.acc_description = Some(description.trim().to_string());
+    }
+
+    /// Get the accessibility description
+    pub fn get_acc_description(&self) -> Option<&str> {
+        self.acc_description.as_deref()
     }
 
     /// Add a person element

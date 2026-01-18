@@ -633,7 +633,6 @@ mod tests {
         }
 
         #[test]
-        #[ignore = "TODO: ID format with dots (id2.1) not supported"]
         fn test_cypress_bl3_align_widths() {
             // From Cypress BL3: should align block widths and handle columns statement in sub-blocks
             let input = r#"block
@@ -650,7 +649,6 @@ mod tests {
         }
 
         #[test]
-        #[ignore = "TODO: ID format with dots (id2.1) not supported"]
         fn test_cypress_bl4_deeper_subblocks() {
             // From Cypress BL4: should align block widths and handle columns statements in deeper sub-blocks
             let input = r#"block

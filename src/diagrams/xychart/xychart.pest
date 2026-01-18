@@ -138,9 +138,10 @@ bar_stmt = {
 // Primitives
 // ==================
 
-// Number: integer or decimal (at least one digit before or after decimal)
+// Number: integer or decimal (supports leading decimal like .6)
 number = @{
-    ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)?
+    ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT*)?
+    | "." ~ ASCII_DIGIT+
 }
 
 quoted_string = @{

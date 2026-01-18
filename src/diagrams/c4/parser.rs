@@ -52,6 +52,27 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
         Rule::comment_stmt => {
             // Ignore comments
         }
+        Rule::acc_title_stmt => {
+            for inner in pair.into_inner() {
+                if inner.as_rule() == Rule::line_content {
+                    db.set_acc_title(inner.as_str());
+                }
+            }
+        }
+        Rule::acc_descr_stmt | Rule::acc_descr_single | Rule::acc_descr_multi => {
+            for inner in pair.into_inner() {
+                match inner.as_rule() {
+                    Rule::line_content | Rule::multiline_content => {
+                        db.set_acc_description(inner.as_str());
+                    }
+                    Rule::acc_descr_single | Rule::acc_descr_multi => {
+                        // Recurse into nested statement
+                        process_statement(db, inner)?;
+                    }
+                    _ => {}
+                }
+            }
+        }
         Rule::title_stmt => {
             for inner in pair.into_inner() {
                 if inner.as_rule() == Rule::title_text {
@@ -761,7 +782,6 @@ Person(default, "default", "default")"#;
         use super::*;
 
         #[test]
-        #[ignore = "TODO: accTitle/accDescr accessibility directives not supported"]
         fn test_cypress_c4_context() {
             // From Cypress C4.1: should render a simple C4Context diagram
             let input = r#"C4Context

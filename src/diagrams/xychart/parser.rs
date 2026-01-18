@@ -649,7 +649,6 @@ mod tests {
         }
 
         #[test]
-        #[ignore = "TODO: Leading decimal point (.6) without 0 not supported"]
         fn test_cypress_decimals_negatives() {
             // From Cypress: Decimals and negative numbers are supported
             let input = r#"xychart
