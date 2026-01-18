@@ -510,9 +510,6 @@ mod tests {
             detect_diagram_type("architecture-beta\n  service db(database)[DB]"),
             "architecture"
         );
-        assert_eq!(
-            detect_diagram_type("sankey-beta\n  a,b,10"),
-            "sankey"
-        );
+        assert_eq!(detect_diagram_type("sankey-beta\n  a,b,10"), "sankey");
     }
 }

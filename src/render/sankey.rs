@@ -42,8 +42,8 @@ struct LayoutLink {
     source_y1: f64,
     target_y0: f64, // End y position at target
     target_y1: f64,
-    source_x: f64,  // x position at source (right edge of node)
-    target_x: f64,  // x position at target (left edge of node)
+    source_x: f64, // x position at source (right edge of node)
+    target_x: f64, // x position at target (left edge of node)
 }
 
 /// Render a sankey diagram to SVG
@@ -364,17 +364,11 @@ fn create_gradient_defs(
         let gradient_id = format!("linearGradient-{}", i + 1);
 
         let stop1 = SvgElement::Raw {
-            content: format!(
-                "<stop offset=\"0%\" stop-color=\"{}\"/>",
-                source_color
-            ),
+            content: format!("<stop offset=\"0%\" stop-color=\"{}\"/>", source_color),
         };
 
         let stop2 = SvgElement::Raw {
-            content: format!(
-                "<stop offset=\"100%\" stop-color=\"{}\"/>",
-                target_color
-            ),
+            content: format!("<stop offset=\"100%\" stop-color=\"{}\"/>", target_color),
         };
 
         let gradient = SvgElement::Raw {
