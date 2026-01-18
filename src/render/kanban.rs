@@ -97,9 +97,9 @@ fn calculate_layout(db: &KanbanDb) -> KanbanLayout {
         }
 
         // Minimum section height or content height plus padding
-        let height =
-            (section_content_height + 3.0 * PADDING).max(MIN_SECTION_HEIGHT) + max_label_height
-                - 25.0;
+        let height = (section_content_height + 3.0 * PADDING).max(MIN_SECTION_HEIGHT)
+            + max_label_height
+            - 25.0;
         section_heights.push(height);
         item_positions.push(positions);
     }
@@ -272,8 +272,13 @@ fn render_items(db: &KanbanDb, layout: &KanbanLayout, _config: &RenderConfig) ->
 
         for (item_idx, item) in items.iter().enumerate() {
             if let Some((y, height)) = positions.get(item_idx) {
-                let item_elem =
-                    render_item(item, section_x + PADDING, *y, SECTION_WIDTH - 2.0 * PADDING, *height);
+                let item_elem = render_item(
+                    item,
+                    section_x + PADDING,
+                    *y,
+                    SECTION_WIDTH - 2.0 * PADDING,
+                    *height,
+                );
                 children.push(item_elem);
             }
         }

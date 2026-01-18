@@ -110,7 +110,10 @@ fn kanban_multiple_sections() {
     let doc = parse_svg(&svg);
     // Should have two sections
     let section_count = count_elements_with_class(&doc, "section");
-    assert!(section_count >= 2, "Should have at least 2 section elements");
+    assert!(
+        section_count >= 2,
+        "Should have at least 2 section elements"
+    );
 }
 
 #[test]
@@ -225,14 +228,8 @@ fn kanban_full_metadata() {
     assert_valid_svg(&svg);
 
     // Should contain all metadata
-    assert!(
-        svg_contains_text(&svg, "MC-2037"),
-        "Should contain ticket"
-    );
-    assert!(
-        svg_contains_text(&svg, "knsv"),
-        "Should contain assigned"
-    );
+    assert!(svg_contains_text(&svg, "MC-2037"), "Should contain ticket");
+    assert!(svg_contains_text(&svg, "knsv"), "Should contain assigned");
 
     let doc = parse_svg(&svg);
     assert!(
@@ -310,16 +307,7 @@ fn kanban_section_colors() {
 
     let doc = parse_svg(&svg);
     // Check for section color classes
-    assert!(
-        has_class(&doc, "section-1"),
-        "Should have section-1 class"
-    );
-    assert!(
-        has_class(&doc, "section-2"),
-        "Should have section-2 class"
-    );
-    assert!(
-        has_class(&doc, "section-3"),
-        "Should have section-3 class"
-    );
+    assert!(has_class(&doc, "section-1"), "Should have section-1 class");
+    assert!(has_class(&doc, "section-2"), "Should have section-2 class");
+    assert!(has_class(&doc, "section-3"), "Should have section-3 class");
 }
