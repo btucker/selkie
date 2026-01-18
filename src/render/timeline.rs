@@ -606,22 +606,57 @@ fn escape_xml(s: &str) -> String {
         .replace('\'', "&apos;")
 }
 
-/// Generate timeline-specific CSS
+/// Determine if a color is dark (for choosing contrasting text color)
+fn is_dark_color(color: &str) -> bool {
+    // Parse hex color
+    let color = color.trim_start_matches('#');
+    if color.len() < 6 {
+        return false;
+    }
+
+    let r = u8::from_str_radix(&color[0..2], 16).unwrap_or(128);
+    let g = u8::from_str_radix(&color[2..4], 16).unwrap_or(128);
+    let b = u8::from_str_radix(&color[4..6], 16).unwrap_or(128);
+
+    // Calculate relative luminance
+    let luminance = (0.299 * r as f64 + 0.587 * g as f64 + 0.114 * b as f64) / 255.0;
+    luminance < 0.5
+}
+
+/// Darken a hex color by a percentage
+fn darken_color(color: &str, amount: f64) -> String {
+    let color = color.trim_start_matches('#');
+    if color.len() < 6 {
+        return format!("#{}", color);
+    }
+
+    let r = u8::from_str_radix(&color[0..2], 16).unwrap_or(128);
+    let g = u8::from_str_radix(&color[2..4], 16).unwrap_or(128);
+    let b = u8::from_str_radix(&color[4..6], 16).unwrap_or(128);
+
+    let factor = 1.0 - amount;
+    let r = ((r as f64) * factor) as u8;
+    let g = ((g as f64) * factor) as u8;
+    let b = ((b as f64) * factor) as u8;
+
+    format!("#{:02x}{:02x}{:02x}", r, g, b)
+}
+
+/// Generate timeline-specific CSS using theme colors
 fn generate_timeline_css(theme: &crate::render::svg::Theme) -> String {
-    let colors = [
-        ("#f9f", "#333"),  // section 0: pink
-        ("#bbf", "#333"),  // section 1: light blue
-        ("#bfb", "#333"),  // section 2: light green
-        ("#fbf", "#333"),  // section 3: light purple
-        ("#ff9", "#333"),  // section 4: yellow
-        ("#9ff", "#333"),  // section 5: cyan
-        ("#f99", "#333"),  // section 6: salmon
-        ("#9f9", "#333"),  // section 7: light green 2
-        ("#99f", "#333"),  // section 8: light blue 2
-        ("#fc9", "#333"),  // section 9: orange
-        ("#c9f", "#333"),  // section 10: lavender
-        ("#9fc", "#333"),  // section 11: aqua
+    // Use theme's pie_colors as cScale colors for timeline
+    // Fall back to default colors if not enough pie_colors
+    let default_colors = vec![
+        "#f9f".to_string(), "#bbf".to_string(), "#bfb".to_string(), "#fbf".to_string(),
+        "#ff9".to_string(), "#9ff".to_string(), "#f99".to_string(), "#9f9".to_string(),
+        "#99f".to_string(), "#fc9".to_string(), "#c9f".to_string(), "#9fc".to_string(),
     ];
+
+    let colors: Vec<&str> = if theme.pie_colors.len() >= 10 {
+        theme.pie_colors.iter().map(|s| s.as_str()).collect()
+    } else {
+        default_colors.iter().map(|s| s.as_str()).collect()
+    };
 
     let mut css = format!(
         r#"
@@ -637,40 +672,52 @@ fn generate_timeline_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .timeline-node text {{
-  fill: #333;
+  fill: {text_color};
   font-size: {font_size}px;
 }}
 
 .lineWrapper line {{
-  stroke: black;
+  stroke: {line_color};
 }}
 "#,
         text_color = theme.primary_text_color,
         font_family = theme.font_family,
         font_size = FONT_SIZE as i32,
+        line_color = theme.line_color,
     );
 
-    // Generate section-specific styles
-    for (i, (bg_color, _text_color)) in colors.iter().enumerate() {
+    // Generate section-specific styles using theme colors
+    for i in 0..MAX_SECTIONS {
+        let bg_color = colors.get(i % colors.len()).unwrap_or(&"#f9f");
+        let text_color = if is_dark_color(bg_color) { "#fff" } else { "#333" };
+        let line_color = darken_color(bg_color, 0.2);
+
         css.push_str(&format!(
             r#"
 .section-{i} {{
   fill: {bg};
 }}
 
+.section-{i} text {{
+  fill: {text_color};
+}}
+
 .node-section-{i} {{
   fill: {bg};
-  stroke: #333;
+  stroke: {stroke};
   stroke-width: 1px;
 }}
 
 .node-line-{i} {{
-  stroke: {bg};
+  stroke: {line};
   stroke-width: 3px;
 }}
 "#,
             i = i,
             bg = bg_color,
+            text_color = text_color,
+            stroke = theme.primary_border_color,
+            line = line_color,
         ));
     }
 
@@ -733,5 +780,63 @@ mod tests {
         // Text may be wrapped across tspans, so check for parts
         assert!(svg.contains("17th-20th") || svg.contains("century"));
         assert!(svg.contains("21st century") || svg.contains("21st"));
+    }
+
+    #[test]
+    fn test_render_timeline_with_dark_theme() {
+        use crate::render::svg::Theme;
+
+        let mut db = TimelineDb::new();
+        db.set_title("Dark Theme Timeline");
+        db.add_task("2020: Event 1", &[]);
+        db.add_task("2021: Event 2", &[]);
+
+        let config = RenderConfig {
+            theme: Theme::dark(),
+            ..RenderConfig::default()
+        };
+        let result = render_timeline(&db, &config);
+        assert!(result.is_ok());
+        let svg = result.unwrap();
+        // Dark theme should have dark text color
+        assert!(svg.contains("#ccc") || svg.contains("ccc"));
+    }
+
+    #[test]
+    fn test_render_timeline_with_forest_theme() {
+        use crate::render::svg::Theme;
+
+        let mut db = TimelineDb::new();
+        db.set_title("Forest Theme Timeline");
+        db.add_section("Nature");
+        db.add_task("Spring: Bloom", &[]);
+
+        let config = RenderConfig {
+            theme: Theme::forest(),
+            ..RenderConfig::default()
+        };
+        let result = render_timeline(&db, &config);
+        assert!(result.is_ok());
+        let svg = result.unwrap();
+        // Forest theme uses green colors
+        assert!(svg.contains("cde498") || svg.contains("#cde498"));
+    }
+
+    #[test]
+    fn test_is_dark_color() {
+        assert!(super::is_dark_color("#000000"));
+        assert!(super::is_dark_color("#333333"));
+        assert!(!super::is_dark_color("#ffffff"));
+        assert!(!super::is_dark_color("#f9f"));
+        assert!(!super::is_dark_color("#ECECFF"));
+    }
+
+    #[test]
+    fn test_darken_color() {
+        let darkened = super::darken_color("#ffffff", 0.2);
+        assert_eq!(darkened, "#cccccc");
+
+        let darkened = super::darken_color("#ff0000", 0.5);
+        assert_eq!(darkened, "#7f0000");
     }
 }
