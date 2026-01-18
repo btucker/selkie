@@ -9,17 +9,18 @@ use crate::diagrams::c4::{C4Boundary, C4Db, C4Element, C4Relationship, C4ShapeTy
 use crate::error::Result;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
-// C4 element dimensions (approximating mermaid.js)
-const ELEMENT_WIDTH: f64 = 200.0;
-const ELEMENT_HEIGHT: f64 = 120.0;
-const PERSON_HEIGHT: f64 = 140.0;
-const ELEMENT_SPACING: f64 = 40.0;
-const BOUNDARY_PADDING: f64 = 30.0;
-const TITLE_HEIGHT: f64 = 40.0;
+// C4 layout configuration (matching mermaid.js defaults)
+const SHAPES_PER_ROW: usize = 4;
+const ELEMENT_WIDTH: f64 = 216.0;
+const ELEMENT_HEIGHT: f64 = 150.0;
+const PERSON_HEIGHT: f64 = 180.0;
+const ELEMENT_MARGIN: f64 = 20.0;
+const DIAGRAM_MARGIN: f64 = 20.0;
+const BOUNDARY_PADDING: f64 = 20.0;
 
 // C4 colors (mermaid.js defaults)
 const COLOR_PERSON: &str = "#08427b";
-const COLOR_PERSON_EXT: &str = "#999999";
+const COLOR_PERSON_EXT: &str = "#62717c";
 const COLOR_SYSTEM: &str = "#1168bd";
 const COLOR_SYSTEM_EXT: &str = "#999999";
 const COLOR_CONTAINER: &str = "#438dd5";
@@ -35,12 +36,12 @@ const COLOR_REL: &str = "#666666";
 pub fn render_c4(db: &C4Db, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
-    // Calculate layout
+    // Calculate layout using grid-based algorithm
     let layout = calculate_layout(db);
 
     // Set document size based on layout bounds
-    let (width, height) = calculate_bounds(&layout);
-    doc.set_size(width + ELEMENT_SPACING * 2.0, height + TITLE_HEIGHT + ELEMENT_SPACING * 2.0);
+    let padding = DIAGRAM_MARGIN * 2.0;
+    doc.set_size(layout.total_width + padding, layout.total_height + padding);
 
     // Add theme styles
     if config.embed_css {
@@ -50,9 +51,9 @@ pub fn render_c4(db: &C4Db, config: &RenderConfig) -> Result<String> {
     // Add marker definitions for arrows
     doc.add_defs(create_c4_markers());
 
-    // Render boundaries (background)
-    for boundary in db.get_boundaries() {
-        if let Some(bounds) = layout.boundary_bounds.get(&boundary.alias) {
+    // Render boundaries first (background)
+    for (alias, bounds) in &layout.boundary_bounds {
+        if let Some(boundary) = db.get_boundaries().iter().find(|b| &b.alias == alias) {
             let element = render_boundary(boundary, bounds);
             doc.add_element(element);
         }
@@ -97,9 +98,80 @@ struct BoundaryBounds {
 struct Layout {
     element_positions: Vec<(C4Element, Position)>,
     boundary_bounds: HashMap<String, BoundaryBounds>,
+    total_width: f64,
+    total_height: f64,
 }
 
-/// Calculate the layout for all elements
+/// Bounds tracker for layout algorithm (matches mermaid.js Bounds class)
+#[derive(Debug, Clone, Default)]
+struct Bounds {
+    start_x: f64,
+    stop_x: f64,
+    start_y: f64,
+    stop_y: f64,
+    // For tracking current row
+    next_x: f64,
+    next_y: f64,
+    row_count: usize,
+    row_max_height: f64,
+}
+
+impl Bounds {
+    fn new(x: f64, y: f64) -> Self {
+        Self {
+            start_x: x,
+            stop_x: x,
+            start_y: y,
+            stop_y: y,
+            next_x: x,
+            next_y: y,
+            row_count: 0,
+            row_max_height: 0.0,
+        }
+    }
+
+    /// Insert an element into the bounds, using grid layout
+    fn insert(&mut self, width: f64, height: f64) -> (f64, f64) {
+        self.row_count += 1;
+
+        // Check if we need to start a new row
+        if self.row_count > SHAPES_PER_ROW {
+            self.next_x = self.start_x;
+            self.next_y = self.stop_y + ELEMENT_MARGIN;
+            self.row_count = 1;
+            self.row_max_height = 0.0;
+        }
+
+        let x = self.next_x;
+        let y = self.next_y;
+
+        // Update bounds
+        self.next_x = x + width + ELEMENT_MARGIN;
+        self.stop_x = self.stop_x.max(x + width);
+        self.row_max_height = self.row_max_height.max(height);
+        self.stop_y = self.stop_y.max(y + self.row_max_height);
+
+        (x, y)
+    }
+
+    /// Get the width of the bounded area
+    fn width(&self) -> f64 {
+        self.stop_x - self.start_x
+    }
+
+    /// Get the height of the bounded area
+    fn height(&self) -> f64 {
+        self.stop_y - self.start_y
+    }
+
+    /// Add margin after all elements
+    fn add_margin(&mut self, margin: f64) {
+        self.stop_x += margin;
+        self.stop_y += margin;
+    }
+}
+
+/// Calculate the layout for all elements using grid-based algorithm
 fn calculate_layout(db: &C4Db) -> Layout {
     let mut element_positions: Vec<(C4Element, Position)> = Vec::new();
     let mut boundary_bounds: HashMap<String, BoundaryBounds> = HashMap::new();
@@ -111,161 +183,140 @@ fn calculate_layout(db: &C4Db) -> Layout {
         elements_by_boundary.entry(parent).or_default().push(element);
     }
 
-    // Track boundary nesting
-    let mut boundary_parents: HashMap<String, String> = HashMap::new();
-    for boundary in db.get_boundaries() {
-        if !boundary.parent_boundary.is_empty() {
-            boundary_parents.insert(boundary.alias.clone(), boundary.parent_boundary.clone());
-        }
-    }
+    // Create root bounds
+    let mut root_bounds = Bounds::new(DIAGRAM_MARGIN, DIAGRAM_MARGIN);
 
-    // Calculate positions - simple vertical stacking layout
-    let mut current_y = TITLE_HEIGHT + ELEMENT_SPACING;
-    let start_x = ELEMENT_SPACING;
-
-    // First, process root elements (no boundary)
+    // Process root-level elements (those with no parent boundary)
     if let Some(root_elements) = elements_by_boundary.get("") {
-        let mut x = start_x;
         for element in root_elements {
             let height = element_height(&element.shape_type);
+            let (x, y) = root_bounds.insert(ELEMENT_WIDTH, height);
             element_positions.push((
                 (*element).clone(),
                 Position {
                     x,
-                    y: current_y,
+                    y,
                     width: ELEMENT_WIDTH,
                     height,
                 },
             ));
-            x += ELEMENT_WIDTH + ELEMENT_SPACING;
         }
         if !root_elements.is_empty() {
-            current_y += PERSON_HEIGHT + ELEMENT_SPACING;
+            root_bounds.add_margin(ELEMENT_MARGIN);
         }
     }
 
-    // Process each boundary
-    for boundary in db.get_boundaries() {
-        let boundary_start_y = current_y;
-        let boundary_start_x = start_x;
+    // Process boundaries recursively
+    let root_boundaries: Vec<_> = db
+        .get_boundaries()
+        .iter()
+        .filter(|b| b.parent_boundary.is_empty())
+        .collect();
 
-        // Get elements in this boundary
-        let boundary_elements = elements_by_boundary.get(&boundary.alias).cloned().unwrap_or_default();
-
-        // Get nested boundaries
-        let nested: Vec<_> = db.get_boundaries().iter()
-            .filter(|b| b.parent_boundary == boundary.alias)
-            .collect();
-
-        // Calculate boundary content
-        let mut max_x = boundary_start_x + BOUNDARY_PADDING;
-        let mut inner_y = boundary_start_y + TITLE_HEIGHT;
-
-        // Layout elements in this boundary
-        let mut x = boundary_start_x + BOUNDARY_PADDING;
-        for element in &boundary_elements {
-            let height = element_height(&element.shape_type);
-            element_positions.push((
-                (*element).clone(),
-                Position {
-                    x,
-                    y: inner_y,
-                    width: ELEMENT_WIDTH,
-                    height,
-                },
-            ));
-            x += ELEMENT_WIDTH + ELEMENT_SPACING;
-            max_x = max_x.max(x);
-        }
-
-        if !boundary_elements.is_empty() {
-            inner_y += PERSON_HEIGHT + ELEMENT_SPACING;
-        }
-
-        // Process nested boundaries
-        for nested_boundary in &nested {
-            let nested_elements = elements_by_boundary.get(&nested_boundary.alias).cloned().unwrap_or_default();
-
-            let nested_start_y = inner_y;
-            let nested_start_x = boundary_start_x + BOUNDARY_PADDING;
-
-            let mut nested_x = nested_start_x + BOUNDARY_PADDING;
-            let mut nested_inner_y = nested_start_y + TITLE_HEIGHT;
-
-            for element in &nested_elements {
-                let height = element_height(&element.shape_type);
-                element_positions.push((
-                    (*element).clone(),
-                    Position {
-                        x: nested_x,
-                        y: nested_inner_y,
-                        width: ELEMENT_WIDTH,
-                        height,
-                    },
-                ));
-                nested_x += ELEMENT_WIDTH + ELEMENT_SPACING;
-                max_x = max_x.max(nested_x + BOUNDARY_PADDING);
-            }
-
-            if !nested_elements.is_empty() {
-                nested_inner_y += PERSON_HEIGHT + ELEMENT_SPACING;
-            }
-
-            // Store nested boundary bounds
-            let nested_width = (nested_x - nested_start_x).max(ELEMENT_WIDTH + BOUNDARY_PADDING * 2.0);
-            let nested_height = nested_inner_y - nested_start_y + BOUNDARY_PADDING;
-
-            boundary_bounds.insert(nested_boundary.alias.clone(), BoundaryBounds {
-                x: nested_start_x,
-                y: nested_start_y,
-                width: nested_width,
-                height: nested_height,
-                label: nested_boundary.label.clone(),
-            });
-
-            inner_y = nested_start_y + nested_height + ELEMENT_SPACING;
-        }
-
-        // Store boundary bounds
-        let width = (max_x - boundary_start_x).max(ELEMENT_WIDTH + BOUNDARY_PADDING * 2.0);
-        let height = inner_y - boundary_start_y + BOUNDARY_PADDING;
-
-        boundary_bounds.insert(boundary.alias.clone(), BoundaryBounds {
-            x: boundary_start_x,
-            y: boundary_start_y,
-            width,
-            height,
-            label: boundary.label.clone(),
-        });
-
-        current_y = boundary_start_y + height + ELEMENT_SPACING;
+    for boundary in root_boundaries {
+        process_boundary(
+            boundary,
+            db,
+            &elements_by_boundary,
+            &mut root_bounds,
+            &mut element_positions,
+            &mut boundary_bounds,
+        );
     }
 
     Layout {
         element_positions,
         boundary_bounds,
+        total_width: root_bounds.stop_x,
+        total_height: root_bounds.stop_y,
     }
+}
+
+/// Process a boundary and its contents recursively
+fn process_boundary(
+    boundary: &C4Boundary,
+    db: &C4Db,
+    elements_by_boundary: &HashMap<String, Vec<&C4Element>>,
+    parent_bounds: &mut Bounds,
+    element_positions: &mut Vec<(C4Element, Position)>,
+    boundary_bounds: &mut HashMap<String, BoundaryBounds>,
+) {
+    // Start position for this boundary
+    let boundary_x = parent_bounds.next_x;
+    let boundary_y = if parent_bounds.row_count > 0 {
+        parent_bounds.stop_y + ELEMENT_MARGIN
+    } else {
+        parent_bounds.next_y
+    };
+
+    // Create bounds for content inside this boundary
+    let mut content_bounds = Bounds::new(
+        boundary_x + BOUNDARY_PADDING,
+        boundary_y + BOUNDARY_PADDING + 30.0, // Extra space for label
+    );
+
+    // Process elements in this boundary
+    if let Some(elements) = elements_by_boundary.get(&boundary.alias) {
+        for element in elements {
+            let height = element_height(&element.shape_type);
+            let (x, y) = content_bounds.insert(ELEMENT_WIDTH, height);
+            element_positions.push((
+                (*element).clone(),
+                Position {
+                    x,
+                    y,
+                    width: ELEMENT_WIDTH,
+                    height,
+                },
+            ));
+        }
+    }
+
+    // Process nested boundaries
+    let nested_boundaries: Vec<_> = db
+        .get_boundaries()
+        .iter()
+        .filter(|b| b.parent_boundary == boundary.alias)
+        .collect();
+
+    for nested in nested_boundaries {
+        process_boundary(
+            nested,
+            db,
+            elements_by_boundary,
+            &mut content_bounds,
+            element_positions,
+            boundary_bounds,
+        );
+    }
+
+    // Calculate boundary dimensions
+    let content_width = content_bounds.width().max(ELEMENT_WIDTH);
+    let content_height = content_bounds.height().max(ELEMENT_HEIGHT / 2.0);
+
+    let boundary_width = content_width + BOUNDARY_PADDING * 2.0;
+    let boundary_height = content_height + BOUNDARY_PADDING * 2.0 + 30.0; // Label space
+
+    // Store boundary bounds
+    boundary_bounds.insert(
+        boundary.alias.clone(),
+        BoundaryBounds {
+            x: boundary_x,
+            y: boundary_y,
+            width: boundary_width,
+            height: boundary_height,
+            label: boundary.label.clone(),
+        },
+    );
+
+    // Update parent bounds
+    parent_bounds.stop_x = parent_bounds.stop_x.max(boundary_x + boundary_width);
+    parent_bounds.stop_y = parent_bounds.stop_y.max(boundary_y + boundary_height);
+    parent_bounds.next_y = parent_bounds.stop_y + ELEMENT_MARGIN;
+    parent_bounds.row_count = 0; // Reset row for next boundary
 }
 
 /// Calculate the overall bounds of the diagram
-fn calculate_bounds(layout: &Layout) -> (f64, f64) {
-    let mut max_x: f64 = 400.0;
-    let mut max_y: f64 = 300.0;
-
-    for (_, pos) in &layout.element_positions {
-        max_x = max_x.max(pos.x + pos.width);
-        max_y = max_y.max(pos.y + pos.height);
-    }
-
-    for bounds in layout.boundary_bounds.values() {
-        max_x = max_x.max(bounds.x + bounds.width);
-        max_y = max_y.max(bounds.y + bounds.height);
-    }
-
-    (max_x, max_y)
-}
-
-/// Get element height based on shape type
 fn element_height(shape_type: &C4ShapeType) -> f64 {
     match shape_type {
         C4ShapeType::Person | C4ShapeType::PersonExt => PERSON_HEIGHT,
@@ -284,40 +335,46 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
             // Person shape: circle head + body rectangle
             let head_r = 25.0;
             let head_cx = position.x + position.width / 2.0;
-            let head_cy = position.y + head_r + 5.0;
+            let head_cy = position.y + head_r + 10.0;
 
             children.push(SvgElement::Circle {
                 cx: head_cx,
                 cy: head_cy,
                 r: head_r,
-                attrs: Attrs::new().with_fill(bg_color).with_class("c4-person-head"),
+                attrs: Attrs::new()
+                    .with_fill(bg_color)
+                    .with_class("c4-person-head"),
             });
 
             let body_y = head_cy + head_r + 5.0;
-            let body_height = position.height - (body_y - position.y);
+            let body_height = position.height - (body_y - position.y) - 10.0;
             children.push(SvgElement::Rect {
                 x: position.x,
                 y: body_y,
                 width: position.width,
-                height: body_height,
+                height: body_height.max(60.0),
                 rx: Some(5.0),
                 ry: Some(5.0),
-                attrs: Attrs::new().with_fill(bg_color).with_class("c4-person-body"),
+                attrs: Attrs::new()
+                    .with_fill(bg_color)
+                    .with_class("c4-person-body"),
             });
         }
-        C4ShapeType::SystemDb | C4ShapeType::SystemDbExt |
-        C4ShapeType::ContainerDb | C4ShapeType::ContainerDbExt |
-        C4ShapeType::ComponentDb | C4ShapeType::ComponentDbExt => {
-            // Database shape: cylinder
-            let rx = position.width / 2.0;
-            let ry = 15.0;
+        C4ShapeType::SystemDb
+        | C4ShapeType::SystemDbExt
+        | C4ShapeType::ContainerDb
+        | C4ShapeType::ContainerDbExt
+        | C4ShapeType::ComponentDb
+        | C4ShapeType::ComponentDbExt => {
+            // Database shape: cylinder (ellipse top + rect body + ellipse bottom)
+            let ry = 12.0;
             let cx = position.x + position.width / 2.0;
 
             // Top ellipse
             children.push(SvgElement::Ellipse {
                 cx,
                 cy: position.y + ry,
-                rx,
+                rx: position.width / 2.0,
                 ry,
                 attrs: Attrs::new().with_fill(bg_color).with_class("c4-db-top"),
             });
@@ -333,32 +390,31 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
                 attrs: Attrs::new().with_fill(bg_color).with_class("c4-db-body"),
             });
 
-            // Bottom ellipse (just the visible part)
-            let path = format!(
-                "M {} {} A {} {} 0 0 0 {} {} L {} {} A {} {} 0 0 0 {} {} Z",
-                position.x, position.y + position.height - ry,
-                rx, ry,
-                position.x + position.width, position.y + position.height - ry,
-                position.x + position.width, position.y + position.height - ry,
-                rx, ry,
-                position.x, position.y + position.height - ry
-            );
-            children.push(SvgElement::Path {
-                d: path,
-                attrs: Attrs::new().with_fill(bg_color).with_class("c4-db-bottom"),
+            // Bottom ellipse
+            children.push(SvgElement::Ellipse {
+                cx,
+                cy: position.y + position.height - ry,
+                rx: position.width / 2.0,
+                ry,
+                attrs: Attrs::new()
+                    .with_fill(bg_color)
+                    .with_class("c4-db-bottom"),
             });
         }
-        C4ShapeType::SystemQueue | C4ShapeType::SystemQueueExt |
-        C4ShapeType::ContainerQueue | C4ShapeType::ContainerQueueExt |
-        C4ShapeType::ComponentQueue | C4ShapeType::ComponentQueueExt => {
+        C4ShapeType::SystemQueue
+        | C4ShapeType::SystemQueueExt
+        | C4ShapeType::ContainerQueue
+        | C4ShapeType::ContainerQueueExt
+        | C4ShapeType::ComponentQueue
+        | C4ShapeType::ComponentQueueExt => {
             // Queue shape: rectangle with rounded ends (like a pipe)
             children.push(SvgElement::Rect {
                 x: position.x,
                 y: position.y,
                 width: position.width,
                 height: position.height,
-                rx: Some(position.height / 2.0),
-                ry: Some(position.height / 2.0),
+                rx: Some(position.height / 3.0),
+                ry: Some(position.height / 3.0),
                 attrs: Attrs::new().with_fill(bg_color).with_class("c4-queue"),
             });
         }
@@ -376,11 +432,20 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
         }
     }
 
-    // Add text labels
-    let text_y = position.y + 35.0;
+    // Calculate text starting position
     let text_x = position.x + position.width / 2.0;
+    let mut text_y = match element.shape_type {
+        C4ShapeType::Person | C4ShapeType::PersonExt => position.y + 80.0,
+        C4ShapeType::SystemDb
+        | C4ShapeType::ContainerDb
+        | C4ShapeType::ComponentDb
+        | C4ShapeType::SystemDbExt
+        | C4ShapeType::ContainerDbExt
+        | C4ShapeType::ComponentDbExt => position.y + 35.0,
+        _ => position.y + 25.0,
+    };
 
-    // Element name
+    // Element label (name)
     children.push(SvgElement::Text {
         x: text_x,
         y: text_y,
@@ -392,42 +457,40 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
             .with_attr("font-size", "14")
             .with_class("c4-label"),
     });
+    text_y += 18.0;
 
     // Technology (if present)
     if !element.technology.is_empty() {
         children.push(SvgElement::Text {
             x: text_x,
-            y: text_y + 18.0,
+            y: text_y,
             content: format!("[{}]", element.technology),
             attrs: Attrs::new()
                 .with_fill(text_color)
                 .with_attr("text-anchor", "middle")
                 .with_attr("font-size", "11")
+                .with_attr("font-style", "italic")
                 .with_class("c4-technology"),
         });
+        text_y += 16.0;
     }
 
-    // Description
+    // Description (wrapped)
     if !element.description.is_empty() {
-        let desc_y = if element.technology.is_empty() {
-            text_y + 25.0
-        } else {
-            text_y + 40.0
-        };
-
-        // Wrap long descriptions
-        let wrapped = wrap_text(&element.description, 30);
-        for (i, line) in wrapped.iter().enumerate() {
+        text_y += 8.0;
+        let wrapped = wrap_text(&element.description, 28);
+        for line in wrapped {
             children.push(SvgElement::Text {
                 x: text_x,
-                y: desc_y + (i as f64 * 14.0),
-                content: line.clone(),
+                y: text_y,
+                content: line,
                 attrs: Attrs::new()
                     .with_fill(text_color)
                     .with_attr("text-anchor", "middle")
                     .with_attr("font-size", "11")
                     .with_class("c4-description"),
             });
+            text_y += 14.0;
         }
     }
 
@@ -441,35 +504,34 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
 
 /// Render a boundary
 fn render_boundary(boundary: &C4Boundary, bounds: &BoundaryBounds) -> SvgElement {
-    let mut children = Vec::new();
-
-    // Boundary rectangle with dashed border
-    children.push(SvgElement::Rect {
-        x: bounds.x,
-        y: bounds.y,
-        width: bounds.width,
-        height: bounds.height,
-        rx: Some(5.0),
-        ry: Some(5.0),
-        attrs: Attrs::new()
-            .with_fill("none")
-            .with_stroke(COLOR_BOUNDARY)
-            .with_stroke_width(2.0)
-            .with_attr("stroke-dasharray", "10,5")
-            .with_class("c4-boundary"),
-    });
-
-    // Boundary label
-    children.push(SvgElement::Text {
-        x: bounds.x + 10.0,
-        y: bounds.y + 20.0,
-        content: bounds.label.clone(),
-        attrs: Attrs::new()
-            .with_fill(COLOR_BOUNDARY)
-            .with_attr("font-weight", "bold")
-            .with_attr("font-size", "14")
-            .with_class("c4-boundary-label"),
-    });
+    let children = vec![
+        // Boundary rectangle with dashed border
+        SvgElement::Rect {
+            x: bounds.x,
+            y: bounds.y,
+            width: bounds.width,
+            height: bounds.height,
+            rx: Some(2.5),
+            ry: Some(2.5),
+            attrs: Attrs::new()
+                .with_fill("none")
+                .with_stroke(COLOR_BOUNDARY)
+                .with_stroke_width(1.0)
+                .with_attr("stroke-dasharray", "7,7")
+                .with_class("c4-boundary"),
+        },
+        // Boundary label
+        SvgElement::Text {
+            x: bounds.x + 10.0,
+            y: bounds.y + 20.0,
+            content: bounds.label.clone(),
+            attrs: Attrs::new()
+                .with_fill(COLOR_BOUNDARY)
+                .with_attr("font-weight", "bold")
+                .with_attr("font-size", "14")
+                .with_class("c4-boundary-label"),
+        },
+    ];
 
     SvgElement::Group {
         children,
@@ -482,55 +544,42 @@ fn render_boundary(boundary: &C4Boundary, bounds: &BoundaryBounds) -> SvgElement
 /// Render a relationship
 fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgElement> {
     // Find source and target positions
-    let source_pos = layout.element_positions.iter()
+    let source_pos = layout
+        .element_positions
+        .iter()
         .find(|(e, _)| e.alias == rel.from)
         .map(|(_, p)| p)?;
 
-    let target_pos = layout.element_positions.iter()
+    let target_pos = layout
+        .element_positions
+        .iter()
         .find(|(e, _)| e.alias == rel.to)
         .map(|(_, p)| p)?;
 
     let mut children = Vec::new();
 
-    // Calculate connection points (center of each element)
-    let start_x = source_pos.x + source_pos.width / 2.0;
-    let start_y = source_pos.y + source_pos.height;
-    let end_x = target_pos.x + target_pos.width / 2.0;
-    let end_y = target_pos.y;
-
-    // If elements are side by side, connect horizontally
-    let (sx, sy, ex, ey) = if (source_pos.y - target_pos.y).abs() < source_pos.height {
-        // Horizontal connection
-        let sy = source_pos.y + source_pos.height / 2.0;
-        let ey = target_pos.y + target_pos.height / 2.0;
-        if source_pos.x < target_pos.x {
-            (source_pos.x + source_pos.width, sy, target_pos.x, ey)
-        } else {
-            (source_pos.x, sy, target_pos.x + target_pos.width, ey)
-        }
-    } else {
-        (start_x, start_y, end_x, end_y)
-    };
+    // Calculate intersection points (where line meets element edge)
+    let (start, end) = calculate_intersection_points(source_pos, target_pos);
 
     // Draw the line
-    let path = format!("M {} {} L {} {}", sx, sy, ex, ey);
+    let path = format!("M {} {} L {} {}", start.0, start.1, end.0, end.1);
     children.push(SvgElement::Path {
         d: path,
         attrs: Attrs::new()
             .with_fill("none")
             .with_stroke(COLOR_REL)
-            .with_stroke_width(1.5)
+            .with_stroke_width(1.0)
             .with_attr("marker-end", "url(#c4-arrow)")
             .with_class("c4-relationship"),
     });
 
     // Add label at midpoint
     if !rel.label.is_empty() {
-        let mid_x = (sx + ex) / 2.0;
-        let mid_y = (sy + ey) / 2.0;
+        let mid_x = (start.0 + end.0) / 2.0;
+        let mid_y = (start.1 + end.1) / 2.0;
 
         // Background for label
-        let label_width = rel.label.len() as f64 * 7.0 + 10.0;
+        let label_width = (rel.label.len() as f64 * 7.0 + 10.0).min(150.0);
         children.push(SvgElement::Rect {
             x: mid_x - label_width / 2.0,
             y: mid_y - 10.0,
@@ -541,7 +590,7 @@ fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgEleme
             attrs: Attrs::new()
                 .with_fill("#ffffff")
                 .with_stroke(COLOR_REL)
-                .with_stroke_width(1.0)
+                .with_stroke_width(0.5)
                 .with_class("c4-rel-label-bg"),
         });
 
@@ -559,8 +608,8 @@ fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgEleme
 
     // Add technology label if present
     if !rel.technology.is_empty() {
-        let mid_x = (sx + ex) / 2.0;
-        let mid_y = (sy + ey) / 2.0 + 15.0;
+        let mid_x = (start.0 + end.0) / 2.0;
+        let mid_y = (start.1 + end.1) / 2.0 + 15.0;
 
         children.push(SvgElement::Text {
             x: mid_x,
@@ -570,6 +619,7 @@ fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgEleme
                 .with_fill(COLOR_REL)
                 .with_attr("text-anchor", "middle")
                 .with_attr("font-size", "10")
+                .with_attr("font-style", "italic")
                 .with_class("c4-rel-technology"),
         });
     }
@@ -578,6 +628,71 @@ fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgEleme
         children,
         attrs: Attrs::new().with_class("c4-relationship-group"),
     })
+}
+
+/// Calculate intersection points between element centers and their edges
+fn calculate_intersection_points(from: &Position, to: &Position) -> ((f64, f64), (f64, f64)) {
+    // Calculate centers
+    let from_cx = from.x + from.width / 2.0;
+    let from_cy = from.y + from.height / 2.0;
+    let to_cx = to.x + to.width / 2.0;
+    let to_cy = to.y + to.height / 2.0;
+
+    // Direction from source to target
+    let dx = to_cx - from_cx;
+    let dy = to_cy - from_cy;
+
+    // Calculate start point (edge of source element)
+    let start = get_rect_intersection(from, from_cx, from_cy, dx, dy);
+
+    // Calculate end point (edge of target element) - reverse direction
+    let end = get_rect_intersection(to, to_cx, to_cy, -dx, -dy);
+
+    (start, end)
+}
+
+/// Get intersection point of a line from center going in direction (dx, dy) with rectangle edge
+fn get_rect_intersection(pos: &Position, cx: f64, cy: f64, dx: f64, dy: f64) -> (f64, f64) {
+    if dx.abs() < 0.001 && dy.abs() < 0.001 {
+        return (cx, cy);
+    }
+
+    // Calculate intersection with each edge
+    let half_w = pos.width / 2.0;
+    let half_h = pos.height / 2.0;
+
+    // Horizontal edges (top/bottom)
+    if dy.abs() > 0.001 {
+        let t_top = -half_h / dy;
+        let t_bottom = half_h / dy;
+        let t = if dy > 0.0 { t_bottom } else { t_top };
+
+        if t > 0.0 {
+            let ix = cx + dx * t;
+            if ix >= pos.x && ix <= pos.x + pos.width {
+                let iy = if dy > 0.0 { pos.y + pos.height } else { pos.y };
+                return (ix, iy);
+            }
+        }
+    }
+
+    // Vertical edges (left/right)
+    if dx.abs() > 0.001 {
+        let t_left = -half_w / dx;
+        let t_right = half_w / dx;
+        let t = if dx > 0.0 { t_right } else { t_left };
+
+        if t > 0.0 {
+            let iy = cy + dy * t;
+            if iy >= pos.y && iy <= pos.y + pos.height {
+                let ix = if dx > 0.0 { pos.x + pos.width } else { pos.x };
+                return (ix, iy);
+            }
+        }
+    }
+
+    // Fallback to center
+    (cx, cy)
 }
 
 /// Get colors for an element type
@@ -594,15 +709,15 @@ fn element_colors(shape_type: &C4ShapeType) -> (&'static str, &'static str) {
         C4ShapeType::Container | C4ShapeType::ContainerDb | C4ShapeType::ContainerQueue => {
             (COLOR_CONTAINER, COLOR_TEXT_LIGHT)
         }
-        C4ShapeType::ContainerExt | C4ShapeType::ContainerDbExt | C4ShapeType::ContainerQueueExt => {
-            (COLOR_CONTAINER_EXT, COLOR_TEXT_LIGHT)
-        }
+        C4ShapeType::ContainerExt
+        | C4ShapeType::ContainerDbExt
+        | C4ShapeType::ContainerQueueExt => (COLOR_CONTAINER_EXT, COLOR_TEXT_LIGHT),
         C4ShapeType::Component | C4ShapeType::ComponentDb | C4ShapeType::ComponentQueue => {
             (COLOR_COMPONENT, COLOR_TEXT_DARK)
         }
-        C4ShapeType::ComponentExt | C4ShapeType::ComponentDbExt | C4ShapeType::ComponentQueueExt => {
-            (COLOR_COMPONENT_EXT, COLOR_TEXT_DARK)
-        }
+        C4ShapeType::ComponentExt
+        | C4ShapeType::ComponentDbExt
+        | C4ShapeType::ComponentQueueExt => (COLOR_COMPONENT_EXT, COLOR_TEXT_DARK),
     }
 }
 
@@ -614,7 +729,7 @@ fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
     for word in text.split_whitespace() {
         if current_line.is_empty() {
             current_line = word.to_string();
-        } else if current_line.len() + word.len() + 1 <= max_chars {
+        } else if current_line.len() + word.len() < max_chars {
             current_line.push(' ');
             current_line.push_str(word);
         } else {
@@ -643,7 +758,8 @@ fn create_c4_markers() -> Vec<SvgElement> {
     vec![SvgElement::Raw {
         content: r##"<marker id="c4-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
     <path d="M 0 0 L 10 5 L 0 10 z" fill="#666666"/>
-</marker>"##.to_string(),
+</marker>"##
+            .to_string(),
     }]
 }
 
@@ -665,7 +781,7 @@ fn generate_c4_css(config: &RenderConfig) -> String {
   stroke-width: 1px;
 }}
 
-.c4-db-top, .c4-db-body {{
+.c4-db-top, .c4-db-body, .c4-db-bottom {{
   stroke: rgba(0,0,0,0.3);
   stroke-width: 1px;
 }}
@@ -724,5 +840,28 @@ mod tests {
         let (bg, text) = element_colors(&C4ShapeType::Component);
         assert_eq!(bg, COLOR_COMPONENT);
         assert_eq!(text, COLOR_TEXT_DARK);
+    }
+
+    #[test]
+    fn test_bounds_grid_layout() {
+        let mut bounds = Bounds::new(10.0, 10.0);
+
+        // Insert 5 elements - should wrap to new row after 4
+        let (x1, y1) = bounds.insert(100.0, 50.0);
+        let (x2, _y2) = bounds.insert(100.0, 50.0);
+        let (x3, _y3) = bounds.insert(100.0, 50.0);
+        let (x4, _y4) = bounds.insert(100.0, 50.0);
+        let (x5, y5) = bounds.insert(100.0, 50.0);
+
+        // First element at start
+        assert_eq!(x1, 10.0);
+        assert_eq!(y1, 10.0);
+
+        // Second element next to first
+        assert!(x2 > x1);
+
+        // Fifth element should wrap to new row
+        assert_eq!(x5, 10.0);
+        assert!(y5 > y1);
     }
 }

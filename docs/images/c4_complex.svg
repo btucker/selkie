@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1110" height="630" viewBox="0 0 1110 630" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1496" height="500" viewBox="0 0 1496 500" class="mermaid">
   <style>
 
 .c4-element-group {
@@ -16,7 +16,7 @@
   stroke-width: 1px;
 }
 
-.c4-db-top, .c4-db-body {
+.c4-db-top, .c4-db-body, .c4-db-bottom {
   stroke: rgba(0,0,0,0.3);
   stroke-width: 1px;
 }
@@ -66,78 +66,79 @@
 
     </g>
     <g class="c4-boundary-group" id="c1">
-      <rect x="40" y="260" width="990" height="250" rx="5" ry="5" class="c4-boundary" fill="none" stroke-width="2" stroke="#444444" stroke-dasharray="10,5"/>
-      <text x="50" y="280" class="c4-boundary-label" font-weight="bold" fill="#444444" font-size="14">Internet Banking</text>
+      <rect x="492" y="240" width="964" height="220" rx="2.5" ry="2.5" class="c4-boundary" stroke="#444444" stroke-width="1" fill="none" stroke-dasharray="7,7"/>
+      <text x="502" y="260" class="c4-boundary-label" fill="#444444" font-weight="bold" font-size="14">Internet Banking</text>
     </g>
     <g class="c4-element-group" id="email_system">
-      <rect x="40" y="80" width="200" height="120" rx="5" ry="5" class="c4-element" fill="#999999"/>
-      <text x="140" y="115" class="c4-label" font-size="14" text-anchor="middle" fill="#ffffff" font-weight="bold">E-Mail System</text>
-      <text x="140" y="140" class="c4-description" font-size="11" text-anchor="middle" fill="#ffffff">The internal Microsoft</text>
-      <text x="140" y="154" class="c4-description" fill="#ffffff" text-anchor="middle" font-size="11">Exchange system</text>
+      <rect x="20" y="20" width="216" height="150" rx="5" ry="5" class="c4-element" fill="#999999"/>
+      <text x="128" y="45" class="c4-label" font-weight="bold" fill="#ffffff" font-size="14" text-anchor="middle">E-Mail System</text>
+      <text x="128" y="71" class="c4-description" fill="#ffffff" text-anchor="middle" font-size="11">The internal Microsoft</text>
+      <text x="128" y="85" class="c4-description" font-size="11" text-anchor="middle" fill="#ffffff">Exchange system</text>
     </g>
     <g class="c4-element-group" id="customer">
-      <circle cx="380" cy="110" r="25" class="c4-person-head" fill="#08427b"/>
-      <rect x="280" y="140" width="200" height="80" rx="5" ry="5" class="c4-person-body" fill="#08427b"/>
-      <text x="380" y="115" class="c4-label" font-weight="bold" fill="#ffffff" text-anchor="middle" font-size="14">Customer</text>
-      <text x="380" y="140" class="c4-description" fill="#ffffff" text-anchor="middle" font-size="11">A customer of the bank, with</text>
-      <text x="380" y="154" class="c4-description" fill="#ffffff" font-size="11" text-anchor="middle">personal bank accounts</text>
+      <circle cx="364" cy="55" r="25" class="c4-person-head" fill="#08427b"/>
+      <rect x="256" y="85" width="216" height="105" rx="5" ry="5" class="c4-person-body" fill="#08427b"/>
+      <text x="364" y="100" class="c4-label" font-weight="bold" text-anchor="middle" font-size="14" fill="#ffffff">Customer</text>
+      <text x="364" y="126" class="c4-description" font-size="11" fill="#ffffff" text-anchor="middle">A customer of the bank, with</text>
+      <text x="364" y="140" class="c4-description" text-anchor="middle" font-size="11" fill="#ffffff">personal bank accounts</text>
     </g>
     <g class="c4-element-group" id="spa">
-      <rect x="70" y="300" width="200" height="120" rx="5" ry="5" class="c4-element" fill="#438dd5"/>
-      <text x="170" y="335" class="c4-label" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">Single-Page App</text>
-      <text x="170" y="353" class="c4-technology" font-size="11" text-anchor="middle" fill="#ffffff">[JavaScript, Angular]</text>
-      <text x="170" y="375" class="c4-description" fill="#ffffff" font-size="11" text-anchor="middle">Provides all the Internet</text>
-      <text x="170" y="389" class="c4-description" text-anchor="middle" font-size="11" fill="#ffffff">banking functionality</text>
+      <rect x="512" y="290" width="216" height="150" rx="5" ry="5" class="c4-element" fill="#438dd5"/>
+      <text x="620" y="315" class="c4-label" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">Single-Page App</text>
+      <text x="620" y="333" class="c4-technology" fill="#ffffff" font-style="italic" text-anchor="middle" font-size="11">[JavaScript, Angular]</text>
+      <text x="620" y="357" class="c4-description" text-anchor="middle" fill="#ffffff" font-size="11">Provides all the Internet</text>
+      <text x="620" y="371" class="c4-description" text-anchor="middle" font-size="11" fill="#ffffff">banking functionality</text>
     </g>
     <g class="c4-element-group" id="api">
-      <rect x="310" y="300" width="200" height="120" rx="5" ry="5" class="c4-element" fill="#438dd5"/>
-      <text x="410" y="335" class="c4-label" fill="#ffffff" text-anchor="middle" font-size="14" font-weight="bold">API Application</text>
-      <text x="410" y="353" class="c4-technology" text-anchor="middle" fill="#ffffff" font-size="11">[Java, Spring MVC]</text>
-      <text x="410" y="375" class="c4-description" font-size="11" fill="#ffffff" text-anchor="middle">Provides banking functionality</text>
-      <text x="410" y="389" class="c4-description" font-size="11" fill="#ffffff" text-anchor="middle">via JSON/HTTPS API</text>
+      <rect x="748" y="290" width="216" height="150" rx="5" ry="5" class="c4-element" fill="#438dd5"/>
+      <text x="856" y="315" class="c4-label" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">API Application</text>
+      <text x="856" y="333" class="c4-technology" fill="#ffffff" font-size="11" text-anchor="middle" font-style="italic">[Java, Spring MVC]</text>
+      <text x="856" y="357" class="c4-description" text-anchor="middle" font-size="11" fill="#ffffff">Provides banking</text>
+      <text x="856" y="371" class="c4-description" fill="#ffffff" text-anchor="middle" font-size="11">functionality via JSON/HTTPS</text>
+      <text x="856" y="385" class="c4-description" fill="#ffffff" font-size="11" text-anchor="middle">API</text>
     </g>
     <g class="c4-element-group" id="db">
-      <ellipse cx="650" cy="315" rx="100" ry="15" class="c4-db-top" fill="#438dd5"/>
-      <rect x="550" y="315" width="200" height="90" class="c4-db-body" fill="#438dd5"/>
-      <path d="M 550 405 A 100 15 0 0 0 750 405 L 750 405 A 100 15 0 0 0 550 405 Z" class="c4-db-bottom" fill="#438dd5"/>
-      <text x="650" y="335" class="c4-label" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Database</text>
-      <text x="650" y="353" class="c4-technology" font-size="11" text-anchor="middle" fill="#ffffff">[Oracle]</text>
-      <text x="650" y="375" class="c4-description" font-size="11" text-anchor="middle" fill="#ffffff">Stores user data, accounts,</text>
-      <text x="650" y="389" class="c4-description" fill="#ffffff" font-size="11" text-anchor="middle">transactions</text>
+      <ellipse cx="1092" cy="302" rx="108" ry="12" class="c4-db-top" fill="#438dd5"/>
+      <rect x="984" y="302" width="216" height="126" class="c4-db-body" fill="#438dd5"/>
+      <ellipse cx="1092" cy="428" rx="108" ry="12" class="c4-db-bottom" fill="#438dd5"/>
+      <text x="1092" y="325" class="c4-label" text-anchor="middle" font-weight="bold" font-size="14" fill="#ffffff">Database</text>
+      <text x="1092" y="343" class="c4-technology" text-anchor="middle" font-style="italic" fill="#ffffff" font-size="11">[Oracle]</text>
+      <text x="1092" y="367" class="c4-description" font-size="11" fill="#ffffff" text-anchor="middle">Stores user data, accounts,</text>
+      <text x="1092" y="381" class="c4-description" fill="#ffffff" font-size="11" text-anchor="middle">transactions</text>
     </g>
     <g class="c4-element-group" id="queue">
-      <rect x="790" y="300" width="200" height="120" rx="60" ry="60" class="c4-queue" fill="#438dd5"/>
-      <text x="890" y="335" class="c4-label" text-anchor="middle" font-weight="bold" fill="#ffffff" font-size="14">Message Broker</text>
-      <text x="890" y="353" class="c4-technology" text-anchor="middle" fill="#ffffff" font-size="11">[RabbitMQ]</text>
-      <text x="890" y="375" class="c4-description" font-size="11" text-anchor="middle" fill="#ffffff">Handles async messaging</text>
+      <rect x="1220" y="290" width="216" height="150" rx="50" ry="50" class="c4-queue" fill="#438dd5"/>
+      <text x="1328" y="315" class="c4-label" font-size="14" font-weight="bold" text-anchor="middle" fill="#ffffff">Message Broker</text>
+      <text x="1328" y="333" class="c4-technology" font-size="11" text-anchor="middle" font-style="italic" fill="#ffffff">[RabbitMQ]</text>
+      <text x="1328" y="357" class="c4-description" text-anchor="middle" fill="#ffffff" font-size="11">Handles async messaging</text>
     </g>
     <g class="c4-relationship-group">
-      <path d="M 380 220 L 170 300" class="c4-relationship" stroke="#666666" fill="none" stroke-width="1.5" marker-end="url(#c4-arrow)"/>
-      <rect x="256" y="250" width="38" height="20" rx="3" ry="3" class="c4-rel-label-bg" fill="#ffffff" stroke-width="1" stroke="#666666"/>
-      <text x="275" y="264" class="c4-rel-label" fill="#666666" text-anchor="middle" font-size="11">Uses</text>
-      <text x="275" y="275" class="c4-rel-technology" text-anchor="middle" fill="#666666" font-size="10">[HTTPS]</text>
+      <path d="M 454.3529411764706 200 L 544.7058823529412 290" class="c4-relationship" marker-end="url(#c4-arrow)" stroke-width="1" stroke="#666666" fill="none"/>
+      <rect x="480.5294117647059" y="235" width="38" height="20" rx="3" ry="3" class="c4-rel-label-bg" stroke="#666666" stroke-width="0.5" fill="#ffffff"/>
+      <text x="499.5294117647059" y="249" class="c4-rel-label" fill="#666666" text-anchor="middle" font-size="11">Uses</text>
+      <text x="499.5294117647059" y="260" class="c4-rel-technology" font-size="10" fill="#666666" font-style="italic" text-anchor="middle">[HTTPS]</text>
     </g>
     <g class="c4-relationship-group">
-      <path d="M 270 360 L 310 360" class="c4-relationship" marker-end="url(#c4-arrow)" stroke-width="1.5" stroke="#666666" fill="none"/>
-      <rect x="222" y="350" width="136" height="20" rx="3" ry="3" class="c4-rel-label-bg" stroke="#666666" stroke-width="1" fill="#ffffff"/>
-      <text x="290" y="364" class="c4-rel-label" font-size="11" fill="#666666" text-anchor="middle">Makes API calls to</text>
-      <text x="290" y="375" class="c4-rel-technology" text-anchor="middle" fill="#666666" font-size="10">[JSON/HTTPS]</text>
+      <path d="M 728 365 L 748 365" class="c4-relationship" stroke-width="1" stroke="#666666" marker-end="url(#c4-arrow)" fill="none"/>
+      <rect x="670" y="355" width="136" height="20" rx="3" ry="3" class="c4-rel-label-bg" stroke-width="0.5" fill="#ffffff" stroke="#666666"/>
+      <text x="738" y="369" class="c4-rel-label" font-size="11" fill="#666666" text-anchor="middle">Makes API calls to</text>
+      <text x="738" y="380" class="c4-rel-technology" fill="#666666" text-anchor="middle" font-style="italic" font-size="10">[JSON/HTTPS]</text>
     </g>
     <g class="c4-relationship-group">
-      <path d="M 510 360 L 550 360" class="c4-relationship" stroke-width="1.5" stroke="#666666" fill="none" marker-end="url(#c4-arrow)"/>
-      <rect x="441" y="350" width="178" height="20" rx="3" ry="3" class="c4-rel-label-bg" stroke-width="1" fill="#ffffff" stroke="#666666"/>
-      <text x="530" y="364" class="c4-rel-label" font-size="11" fill="#666666" text-anchor="middle">Reads from and writes to</text>
-      <text x="530" y="375" class="c4-rel-technology" fill="#666666" text-anchor="middle" font-size="10">[JDBC]</text>
+      <path d="M 964 365 L 984 365" class="c4-relationship" stroke="#666666" fill="none" stroke-width="1" marker-end="url(#c4-arrow)"/>
+      <rect x="899" y="355" width="150" height="20" rx="3" ry="3" class="c4-rel-label-bg" stroke-width="0.5" stroke="#666666" fill="#ffffff"/>
+      <text x="974" y="369" class="c4-rel-label" text-anchor="middle" font-size="11" fill="#666666">Reads from and writes to</text>
+      <text x="974" y="380" class="c4-rel-technology" font-style="italic" font-size="10" fill="#666666" text-anchor="middle">[JDBC]</text>
     </g>
     <g class="c4-relationship-group">
-      <path d="M 510 360 L 790 360" class="c4-relationship" fill="none" stroke="#666666" marker-end="url(#c4-arrow)" stroke-width="1.5"/>
-      <rect x="585.5" y="350" width="129" height="20" rx="3" ry="3" class="c4-rel-label-bg" stroke-width="1" fill="#ffffff" stroke="#666666"/>
-      <text x="650" y="364" class="c4-rel-label" fill="#666666" text-anchor="middle" font-size="11">Sends messages to</text>
+      <path d="M 964 365 L 1220 365" class="c4-relationship" stroke-width="1" stroke="#666666" marker-end="url(#c4-arrow)" fill="none"/>
+      <rect x="1027.5" y="355" width="129" height="20" rx="3" ry="3" class="c4-rel-label-bg" stroke="#666666" stroke-width="0.5" fill="#ffffff"/>
+      <text x="1092" y="369" class="c4-rel-label" font-size="11" fill="#666666" text-anchor="middle">Sends messages to</text>
     </g>
     <g class="c4-relationship-group">
-      <path d="M 240 140 L 280 150" class="c4-relationship" stroke="#666666" fill="none" marker-end="url(#c4-arrow)" stroke-width="1.5"/>
-      <rect x="199" y="135" width="122" height="20" rx="3" ry="3" class="c4-rel-label-bg" stroke="#666666" stroke-width="1" fill="#ffffff"/>
-      <text x="260" y="149" class="c4-rel-label" text-anchor="middle" font-size="11" fill="#666666">Sends e-mails to</text>
+      <path d="M 236 101.86440677966101 L 256 103.13559322033899" class="c4-relationship" stroke="#666666" stroke-width="1" marker-end="url(#c4-arrow)" fill="none"/>
+      <rect x="185" y="92.5" width="122" height="20" rx="3" ry="3" class="c4-rel-label-bg" fill="#ffffff" stroke="#666666" stroke-width="0.5"/>
+      <text x="246" y="106.5" class="c4-rel-label" fill="#666666" text-anchor="middle" font-size="11">Sends e-mails to</text>
     </g>
   </g>
 </svg>
