@@ -18,12 +18,6 @@ const NODE_PADDING: f64 = 10.0;
 const LABEL_PADDING: f64 = 6.0;
 const FONT_SIZE: f64 = 14.0;
 
-/// D3 Tableau 10 color scheme (matching mermaid.js)
-const TABLEAU_10: &[&str] = &[
-    "#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#af7aa1", "#ff9da7",
-    "#9c755f", "#bab0ab",
-];
-
 /// Computed node position and dimensions
 #[derive(Debug, Clone)]
 #[allow(dead_code)] // Some fields reserved for future enhancements (e.g., showValues)
@@ -72,23 +66,23 @@ pub fn render_sankey(db: &SankeyDb, config: &RenderConfig) -> Result<String> {
     // Add theme styles
     if config.embed_css {
         doc.add_style(&config.theme.generate_css());
-        doc.add_style(&generate_sankey_css());
+        doc.add_style(&generate_sankey_css(&config.theme));
     }
 
     // Add gradient definitions for links
-    let defs = create_gradient_defs(&layout_nodes, &layout_links);
+    let defs = create_gradient_defs(&layout_nodes, &layout_links, config);
     doc.add_defs(vec![defs]);
 
     // Render links first (behind nodes)
-    let links_group = render_links(&layout_links);
+    let links_group = render_links(&layout_links, config);
     doc.add_element(links_group);
 
     // Render nodes
-    let nodes_group = render_nodes(&layout_nodes);
+    let nodes_group = render_nodes(&layout_nodes, config);
     doc.add_element(nodes_group);
 
     // Render labels
-    let labels_group = render_labels(&layout_nodes, DEFAULT_WIDTH);
+    let labels_group = render_labels(&layout_nodes, DEFAULT_WIDTH, config);
     doc.add_element(labels_group);
 
     Ok(doc.to_string())
@@ -342,11 +336,16 @@ fn compute_link_positions(
 }
 
 /// Create gradient definitions for links
-fn create_gradient_defs(nodes: &[LayoutNode], links: &[LayoutLink]) -> SvgElement {
+fn create_gradient_defs(
+    nodes: &[LayoutNode],
+    links: &[LayoutLink],
+    config: &RenderConfig,
+) -> SvgElement {
+    let colors = &config.theme.sankey_node_colors;
     let node_colors: HashMap<_, _> = nodes
         .iter()
         .enumerate()
-        .map(|(i, n)| (n.id.clone(), TABLEAU_10[i % TABLEAU_10.len()]))
+        .map(|(i, n)| (n.id.clone(), colors[i % colors.len()].as_str()))
         .collect();
 
     let mut children = Vec::new();
@@ -355,11 +354,11 @@ fn create_gradient_defs(nodes: &[LayoutNode], links: &[LayoutLink]) -> SvgElemen
         let source_color = node_colors
             .get(&link.source_id)
             .copied()
-            .unwrap_or(TABLEAU_10[0]);
+            .unwrap_or(colors[0].as_str());
         let target_color = node_colors
             .get(&link.target_id)
             .copied()
-            .unwrap_or(TABLEAU_10[1]);
+            .unwrap_or(colors[1 % colors.len()].as_str());
 
         // Create linear gradient
         let gradient_id = format!("linearGradient-{}", i + 1);
@@ -396,7 +395,7 @@ fn create_gradient_defs(nodes: &[LayoutNode], links: &[LayoutLink]) -> SvgElemen
 }
 
 /// Render all links
-fn render_links(links: &[LayoutLink]) -> SvgElement {
+fn render_links(links: &[LayoutLink], config: &RenderConfig) -> SvgElement {
     let mut children = Vec::new();
 
     for (i, link) in links.iter().enumerate() {
@@ -440,7 +439,7 @@ fn render_links(links: &[LayoutLink]) -> SvgElement {
             d,
             attrs: Attrs::new()
                 .with_fill(&gradient_id)
-                .with_attr("fill-opacity", "0.5")
+                .with_attr("fill-opacity", &config.theme.sankey_link_opacity)
                 .with_class("sankey-link"),
         };
 
@@ -462,11 +461,12 @@ fn render_links(links: &[LayoutLink]) -> SvgElement {
 }
 
 /// Render all nodes
-fn render_nodes(nodes: &[LayoutNode]) -> SvgElement {
+fn render_nodes(nodes: &[LayoutNode], config: &RenderConfig) -> SvgElement {
     let mut children = Vec::new();
+    let colors = &config.theme.sankey_node_colors;
 
     for (i, node) in nodes.iter().enumerate() {
-        let color = TABLEAU_10[i % TABLEAU_10.len()];
+        let color = &colors[i % colors.len()];
 
         let rect = SvgElement::Rect {
             x: node.x0,
@@ -498,7 +498,7 @@ fn render_nodes(nodes: &[LayoutNode]) -> SvgElement {
 }
 
 /// Render node labels
-fn render_labels(nodes: &[LayoutNode], width: f64) -> SvgElement {
+fn render_labels(nodes: &[LayoutNode], width: f64, config: &RenderConfig) -> SvgElement {
     let mut children = Vec::new();
 
     for node in nodes {
@@ -522,6 +522,7 @@ fn render_labels(nodes: &[LayoutNode], width: f64) -> SvgElement {
                 .with_attr("text-anchor", text_anchor)
                 .with_attr("dominant-baseline", "middle")
                 .with_attr("font-size", &format!("{}", FONT_SIZE))
+                .with_fill(&config.theme.sankey_label_color)
                 .with_class("sankey-label"),
         };
 
@@ -537,26 +538,30 @@ fn render_labels(nodes: &[LayoutNode], width: f64) -> SvgElement {
 }
 
 /// Generate CSS for sankey diagrams
-fn generate_sankey_css() -> String {
-    r#"
-.sankey-node {
+fn generate_sankey_css(theme: &crate::render::svg::Theme) -> String {
+    format!(
+        r#"
+.sankey-node {{
   stroke: none;
-}
+}}
 
-.sankey-link {
-  fill-opacity: 0.5;
-}
+.sankey-link {{
+  fill-opacity: {link_opacity};
+}}
 
-.sankey-label {
-  fill: #333;
-  font-family: "trebuchet ms", verdana, arial, sans-serif;
-}
+.sankey-label {{
+  fill: {label_color};
+  font-family: {font_family};
+}}
 
-.link {
+.link {{
   mix-blend-mode: multiply;
-}
-"#
-    .to_string()
+}}
+"#,
+        link_opacity = theme.sankey_link_opacity,
+        label_color = theme.sankey_label_color,
+        font_family = theme.font_family,
+    )
 }
 
 #[cfg(test)]

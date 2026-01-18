@@ -88,8 +88,8 @@ marker path {
 }
 
 .sankey-label {
-  fill: #333;
-  font-family: "trebuchet ms", verdana, arial, sans-serif;
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
 }
 
 .link {
@@ -121,24 +121,24 @@ marker path {
         <path d="M10,0 C152.5,0 152.5,0 295,0 L295,400 C152.5,400 152.5,400 10,400 Z" class="sankey-link" fill="url(#linearGradient-1)" fill-opacity="0.5"/>
       </g>
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M305,0 C447.5,0 447.5,0 590,0 L590,400 C447.5,400 447.5,400 305,400 Z" class="sankey-link" fill="url(#linearGradient-2)" fill-opacity="0.5"/>
+        <path d="M305,0 C447.5,0 447.5,0 590,0 L590,400 C447.5,400 447.5,400 305,400 Z" class="sankey-link" fill-opacity="0.5" fill="url(#linearGradient-2)"/>
       </g>
     </g>
     <g class="nodes">
-      <g class="node" transform="translate(0,0)" id="node-1" y="0" x="0">
+      <g class="node" transform="translate(0,0)" x="0" y="0" id="node-1">
         <rect x="0" y="0" width="10" height="400" class="sankey-node" fill="#4e79a7"/>
       </g>
-      <g class="node" transform="translate(295,0)" x="295" id="node-2" y="0">
+      <g class="node" x="295" id="node-2" y="0" transform="translate(295,0)">
         <rect x="295" y="0" width="10" height="400" class="sankey-node" fill="#f28e2c"/>
       </g>
-      <g class="node" id="node-3" y="0" x="590" transform="translate(590,0)">
+      <g class="node" transform="translate(590,0)" y="0" x="590" id="node-3">
         <rect x="590" y="0" width="10" height="400" class="sankey-node" fill="#e15759"/>
       </g>
     </g>
     <g class="node-labels" font-size="14">
-      <text x="16" y="200" class="sankey-label" font-size="14" dominant-baseline="middle" text-anchor="start">a</text>
-      <text x="289" y="200" class="sankey-label" text-anchor="end" dominant-baseline="middle" font-size="14">b</text>
-      <text x="584" y="200" class="sankey-label" font-size="14" dominant-baseline="middle" text-anchor="end">c</text>
+      <text x="16" y="200" class="sankey-label" font-size="14" dominant-baseline="middle" text-anchor="start" fill="#333333">a</text>
+      <text x="289" y="200" class="sankey-label" text-anchor="end" font-size="14" dominant-baseline="middle" fill="#333333">b</text>
+      <text x="584" y="200" class="sankey-label" font-size="14" fill="#333333" text-anchor="end" dominant-baseline="middle">c</text>
     </g>
   </g>
 </svg>
