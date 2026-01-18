@@ -2,6 +2,32 @@
 
 use super::color::{adjust, Color};
 
+/// Compute journey fillType colors dynamically from theme base colors.
+/// This matches mermaid.js theme-default.js journey color calculation.
+/// fillType0 = primaryColor
+/// fillType1 = secondaryColor
+/// fillType2 = adjust(primaryColor, { h: 64 })
+/// fillType3 = adjust(secondaryColor, { h: 64 })
+/// fillType4 = adjust(primaryColor, { h: -64 })
+/// fillType5 = adjust(secondaryColor, { h: -64 })
+/// fillType6 = adjust(primaryColor, { h: 128 })
+/// fillType7 = adjust(secondaryColor, { h: 128 })
+fn compute_journey_fill_types(primary: &str, secondary: &str) -> Vec<String> {
+    let primary_color = Color::from_hex(primary).unwrap_or_else(|| Color::rgb(236, 236, 255));
+    let secondary_color = Color::from_hex(secondary).unwrap_or_else(|| Color::rgb(255, 255, 222));
+
+    vec![
+        primary_color.to_hex(),                             // fillType0 = primaryColor
+        secondary_color.to_hex(),                           // fillType1 = secondaryColor
+        adjust(&primary_color, 64.0, 0.0, 0.0).to_hex(),    // fillType2 = adjust(primary, h: 64)
+        adjust(&secondary_color, 64.0, 0.0, 0.0).to_hex(),  // fillType3 = adjust(secondary, h: 64)
+        adjust(&primary_color, -64.0, 0.0, 0.0).to_hex(),   // fillType4 = adjust(primary, h: -64)
+        adjust(&secondary_color, -64.0, 0.0, 0.0).to_hex(), // fillType5 = adjust(secondary, h: -64)
+        adjust(&primary_color, 128.0, 0.0, 0.0).to_hex(),   // fillType6 = adjust(primary, h: 128)
+        adjust(&secondary_color, 128.0, 0.0, 0.0).to_hex(), // fillType7 = adjust(secondary, h: 128)
+    ]
+}
+
 /// Compute pie chart colors dynamically from theme base colors.
 /// This matches mermaid.js theme-default.js pie color calculation.
 fn compute_pie_colors(primary: &str, secondary: &str, tertiary: &str) -> Vec<String> {
@@ -10,16 +36,16 @@ fn compute_pie_colors(primary: &str, secondary: &str, tertiary: &str) -> Vec<Str
     let tertiary_color = Color::from_hex(tertiary).unwrap_or_else(|| Color::rgb(250, 250, 250));
 
     vec![
-        primary_color.to_hsl_string(),                          // pie1 = primaryColor
-        secondary_color.to_hsl_string(),                        // pie2 = secondaryColor
+        primary_color.to_hsl_string(),   // pie1 = primaryColor
+        secondary_color.to_hsl_string(), // pie2 = secondaryColor
         adjust(&tertiary_color, 0.0, 0.0, -40.0).to_hsl_string(), // pie3 = adjust(tertiaryColor, { l: -40 })
-        adjust(&primary_color, 0.0, 0.0, -10.0).to_hsl_string(),  // pie4 = adjust(primaryColor, { l: -10 })
+        adjust(&primary_color, 0.0, 0.0, -10.0).to_hsl_string(), // pie4 = adjust(primaryColor, { l: -10 })
         adjust(&secondary_color, 0.0, 0.0, -30.0).to_hsl_string(), // pie5 = adjust(secondaryColor, { l: -30 })
-        adjust(&tertiary_color, 0.0, 0.0, -20.0).to_hsl_string(),  // pie6 = adjust(tertiaryColor, { l: -20 })
-        adjust(&primary_color, 60.0, 0.0, -20.0).to_hsl_string(),  // pie7 = adjust(primaryColor, { h: +60, l: -20 })
+        adjust(&tertiary_color, 0.0, 0.0, -20.0).to_hsl_string(), // pie6 = adjust(tertiaryColor, { l: -20 })
+        adjust(&primary_color, 60.0, 0.0, -20.0).to_hsl_string(), // pie7 = adjust(primaryColor, { h: +60, l: -20 })
         adjust(&primary_color, -60.0, 0.0, -40.0).to_hsl_string(), // pie8 = adjust(primaryColor, { h: -60, l: -40 })
         adjust(&primary_color, 120.0, 0.0, -40.0).to_hsl_string(), // pie9 = adjust(primaryColor, { h: 120, l: -40 })
-        adjust(&primary_color, 60.0, 0.0, -40.0).to_hsl_string(),  // pie10 = adjust(primaryColor, { h: +60, l: -40 })
+        adjust(&primary_color, 60.0, 0.0, -40.0).to_hsl_string(), // pie10 = adjust(primaryColor, { h: +60, l: -40 })
         adjust(&primary_color, -90.0, 0.0, -40.0).to_hsl_string(), // pie11 = adjust(primaryColor, { h: -90, l: -40 })
         adjust(&primary_color, 120.0, 0.0, -30.0).to_hsl_string(), // pie12 = adjust(primaryColor, { h: 120, l: -30 })
     ]
@@ -165,6 +191,20 @@ pub struct Theme {
     pub quadrant_x_axis_text_fill: String,
     /// Y-axis text color
     pub quadrant_y_axis_text_fill: String,
+
+    // === Journey diagram colors ===
+    /// Journey fillType colors (0-7) for CSS classes
+    /// Computed from primary/secondary colors with hue adjustments
+    pub journey_fill_types: Vec<String>,
+    /// Journey sectionFills colors for inline fill attributes
+    /// These are the dark colors used directly on rect elements
+    pub journey_section_fills: Vec<String>,
+    /// Journey face color (default: #FFF8DC cornsilk)
+    pub journey_face_color: String,
+    /// Journey text color for legend
+    pub journey_text_color: String,
+    /// Journey actor colors (matching mermaid.js actorColours)
+    pub journey_actor_colors: Vec<String>,
 }
 
 impl Default for Theme {
@@ -250,6 +290,28 @@ impl Default for Theme {
             quadrant_point_text_fill: "#333333".to_string(),
             quadrant_x_axis_text_fill: "#333333".to_string(),
             quadrant_y_axis_text_fill: "#333333".to_string(),
+            // Journey diagram - default theme (computed from primary/secondary colors)
+            journey_fill_types: compute_journey_fill_types("#ECECFF", "#ffffde"),
+            // sectionFills - dark colors used for inline fill attributes (mermaid.js defaults)
+            journey_section_fills: vec![
+                "#191970".to_string(), // Midnight Blue
+                "#8B008B".to_string(), // Dark Magenta
+                "#4B0082".to_string(), // Indigo
+                "#2F4F4F".to_string(), // Dark Slate Gray
+                "#800000".to_string(), // Maroon
+                "#8B4513".to_string(), // Saddle Brown
+                "#00008B".to_string(), // Dark Blue
+            ],
+            journey_face_color: "#FFF8DC".to_string(), // cornsilk - mermaid.js default
+            journey_text_color: "#333".to_string(),
+            journey_actor_colors: vec![
+                "#8FBC8F".to_string(), // Dark Sea Green
+                "#7CFC00".to_string(), // Lawn Green
+                "#00FFFF".to_string(), // Cyan
+                "#20B2AA".to_string(), // Light Sea Green
+                "#B0E0E6".to_string(), // Powder Blue
+                "#FFFFE0".to_string(), // Light Yellow
+            ],
         }
     }
 }
@@ -337,6 +399,27 @@ impl Theme {
             quadrant_point_text_fill: "#ccc".to_string(),
             quadrant_x_axis_text_fill: "#ccc".to_string(),
             quadrant_y_axis_text_fill: "#ccc".to_string(),
+            // Journey diagram - dark theme (computed from dark theme colors)
+            journey_fill_types: compute_journey_fill_types("#1f2020", "#8a8a8a"),
+            journey_section_fills: vec![
+                "#191970".to_string(),
+                "#8B008B".to_string(),
+                "#4B0082".to_string(),
+                "#2F4F4F".to_string(),
+                "#800000".to_string(),
+                "#8B4513".to_string(),
+                "#00008B".to_string(),
+            ],
+            journey_face_color: "#FFF8DC".to_string(), // cornsilk - mermaid.js default
+            journey_text_color: "#ccc".to_string(),
+            journey_actor_colors: vec![
+                "#8FBC8F".to_string(),
+                "#7CFC00".to_string(),
+                "#00FFFF".to_string(),
+                "#20B2AA".to_string(),
+                "#B0E0E6".to_string(),
+                "#FFFFE0".to_string(),
+            ],
         }
     }
 
@@ -422,6 +505,27 @@ impl Theme {
             quadrant_point_text_fill: "#333333".to_string(),
             quadrant_x_axis_text_fill: "#333333".to_string(),
             quadrant_y_axis_text_fill: "#333333".to_string(),
+            // Journey diagram - neutral theme (computed from neutral colors)
+            journey_fill_types: compute_journey_fill_types("#f0f0f0", "#e0e0e0"),
+            journey_section_fills: vec![
+                "#191970".to_string(),
+                "#8B008B".to_string(),
+                "#4B0082".to_string(),
+                "#2F4F4F".to_string(),
+                "#800000".to_string(),
+                "#8B4513".to_string(),
+                "#00008B".to_string(),
+            ],
+            journey_face_color: "#FFF8DC".to_string(),
+            journey_text_color: "#333".to_string(),
+            journey_actor_colors: vec![
+                "#8FBC8F".to_string(),
+                "#7CFC00".to_string(),
+                "#00FFFF".to_string(),
+                "#20B2AA".to_string(),
+                "#B0E0E6".to_string(),
+                "#FFFFE0".to_string(),
+            ],
         }
     }
 
@@ -508,6 +612,27 @@ impl Theme {
             quadrant_point_text_fill: "#333333".to_string(),
             quadrant_x_axis_text_fill: "#333333".to_string(),
             quadrant_y_axis_text_fill: "#333333".to_string(),
+            // Journey diagram - forest theme (computed from forest colors)
+            journey_fill_types: compute_journey_fill_types("#cde498", "#cdffb2"),
+            journey_section_fills: vec![
+                "#191970".to_string(),
+                "#8B008B".to_string(),
+                "#4B0082".to_string(),
+                "#2F4F4F".to_string(),
+                "#800000".to_string(),
+                "#8B4513".to_string(),
+                "#00008B".to_string(),
+            ],
+            journey_face_color: "#FFF8DC".to_string(),
+            journey_text_color: "#333".to_string(),
+            journey_actor_colors: vec![
+                "#8FBC8F".to_string(),
+                "#7CFC00".to_string(),
+                "#00FFFF".to_string(),
+                "#20B2AA".to_string(),
+                "#B0E0E6".to_string(),
+                "#FFFFE0".to_string(),
+            ],
         }
     }
 
@@ -607,6 +732,27 @@ impl Theme {
             quadrant_point_text_fill: "#333333".to_string(),
             quadrant_x_axis_text_fill: "#333333".to_string(),
             quadrant_y_axis_text_fill: "#333333".to_string(),
+            // Journey diagram - base theme (computed from base colors)
+            journey_fill_types: compute_journey_fill_types("#fff4dd", "#dde4ff"),
+            journey_section_fills: vec![
+                "#191970".to_string(),
+                "#8B008B".to_string(),
+                "#4B0082".to_string(),
+                "#2F4F4F".to_string(),
+                "#800000".to_string(),
+                "#8B4513".to_string(),
+                "#00008B".to_string(),
+            ],
+            journey_face_color: "#FFF8DC".to_string(),
+            journey_text_color: "#333".to_string(),
+            journey_actor_colors: vec![
+                "#8FBC8F".to_string(),
+                "#7CFC00".to_string(),
+                "#00FFFF".to_string(),
+                "#20B2AA".to_string(),
+                "#B0E0E6".to_string(),
+                "#FFFFE0".to_string(),
+            ],
         }
     }
 
@@ -874,6 +1020,32 @@ marker path {{
             quadrant_point_text_fill: primary_text.to_hex(),
             quadrant_x_axis_text_fill: primary_text.to_hex(),
             quadrant_y_axis_text_fill: primary_text.to_hex(),
+
+            // Journey diagram colors (derived from primary/secondary)
+            journey_fill_types: compute_journey_fill_types(primary, secondary),
+            journey_section_fills: vec![
+                "#191970".to_string(),
+                "#8B008B".to_string(),
+                "#4B0082".to_string(),
+                "#2F4F4F".to_string(),
+                "#800000".to_string(),
+                "#8B4513".to_string(),
+                "#00008B".to_string(),
+            ],
+            journey_face_color: "#FFF8DC".to_string(),
+            journey_text_color: if dark_mode {
+                "#ccc".to_string()
+            } else {
+                "#333".to_string()
+            },
+            journey_actor_colors: vec![
+                "#8FBC8F".to_string(),
+                "#7CFC00".to_string(),
+                "#00FFFF".to_string(),
+                "#20B2AA".to_string(),
+                "#B0E0E6".to_string(),
+                "#FFFFE0".to_string(),
+            ],
         }
     }
 

@@ -178,7 +178,12 @@ pub fn render_treemap(db: &TreemapDb, config: &RenderConfig) -> Result<String> {
 
     // Add hidden grand total (matching mermaid.js for label detection)
     // This is a hidden element used by the eval system to verify total values
-    let grand_total: f64 = ctx.positioned.iter().filter(|r| r.is_leaf).map(|r| r.value.unwrap_or(0.0)).sum();
+    let grand_total: f64 = ctx
+        .positioned
+        .iter()
+        .filter(|r| r.is_leaf)
+        .map(|r| r.value.unwrap_or(0.0))
+        .sum();
     container_children.push(SvgElement::Text {
         x: width - 10.0,
         y: title_height + 12.5,

@@ -1323,7 +1323,9 @@ fn analyze_colors(doc: &roxmltree::Document) -> ColorAnalysis {
     let mut stroke_count = 0;
 
     // Elements that typically have meaningful fill/stroke colors
-    let shape_tags = ["rect", "circle", "ellipse", "polygon", "path", "line", "polyline"];
+    let shape_tags = [
+        "rect", "circle", "ellipse", "polygon", "path", "line", "polyline",
+    ];
 
     for node in doc.descendants() {
         let tag = node.tag_name().name();

@@ -30,18 +30,9 @@ const FACE_RADIUS: f64 = 15.0;
 /// Task font size (matching mermaid.js default from config.schema.yaml)
 const TASK_FONT_SIZE: f64 = 14.0;
 
-/// Actor colors (matching mermaid.js defaults)
-const ACTOR_COLORS: &[&str] = &[
-    "#8FBC8F", "#7CFC00", "#00FFFF", "#20B2AA", "#B0E0E6", "#FFFFE0",
-];
-
-/// Section fill colors (matching mermaid.js defaults)
-const SECTION_FILLS: &[&str] = &[
-    "#191970", "#8B008B", "#4B0082", "#2F4F4F", "#800000", "#8B4513", "#00008B",
-];
-
-/// Section text colors (matching mermaid.js defaults)
-const SECTION_COLORS: &[&str] = &["#fff"];
+// Note: Actor colors, section fill colors, and text colors are now
+// derived from the theme in RenderConfig. See theme.journey_section_fills,
+// theme.journey_actor_colors, and theme.journey_text_color.
 
 /// Render a journey diagram to SVG
 pub fn render_journey(db: &JourneyDb, config: &RenderConfig) -> Result<String> {
@@ -69,12 +60,13 @@ pub fn render_journey(db: &JourneyDb, config: &RenderConfig) -> Result<String> {
     // Add arrow marker definition
     doc.add_defs(vec![create_arrow_defs()]);
 
-    // Build actor color map
+    // Build actor color map from theme
+    let theme_actor_colors = &config.theme.journey_actor_colors;
     let actor_colors: std::collections::HashMap<String, (String, usize)> = actors
         .iter()
         .enumerate()
         .map(|(i, actor)| {
-            let color = ACTOR_COLORS[i % ACTOR_COLORS.len()].to_string();
+            let color = theme_actor_colors[i % theme_actor_colors.len()].clone();
             (actor.clone(), (color, i))
         })
         .collect();
@@ -83,12 +75,12 @@ pub fn render_journey(db: &JourneyDb, config: &RenderConfig) -> Result<String> {
     let title_offset = if has_title { TITLE_HEIGHT } else { 0.0 };
 
     // Render actor legend first (matching mermaid.js render order)
-    let legend = render_actor_legend(&actors, &actor_colors, title_offset);
+    let legend = render_actor_legend(&actors, &actor_colors, title_offset, config);
     doc.add_node(legend);
 
     // Render sections and tasks
     let (sections_element, tasks_element) =
-        render_sections_and_tasks(db, left_margin, title_offset, &actor_colors);
+        render_sections_and_tasks(db, left_margin, title_offset, &actor_colors, config);
     doc.add_node(sections_element);
     doc.add_node(tasks_element);
 
@@ -122,9 +114,16 @@ fn render_actor_legend(
     actors: &[String],
     actor_colors: &std::collections::HashMap<String, (String, usize)>,
     title_offset: f64,
+    config: &RenderConfig,
 ) -> SvgElement {
     let mut children = Vec::new();
     let start_y = 60.0 + title_offset;
+    let default_color = config
+        .theme
+        .journey_actor_colors
+        .first()
+        .map(|s| s.as_str())
+        .unwrap_or("#8FBC8F");
 
     for (i, actor) in actors.iter().enumerate() {
         let y_pos = start_y + (i as f64) * 25.0;
@@ -133,7 +132,7 @@ fn render_actor_legend(
         let (color, pos) = actor_colors
             .get(actor)
             .map(|(c, p)| (c.as_str(), *p))
-            .unwrap_or((ACTOR_COLORS[0], 0));
+            .unwrap_or((default_color, 0));
 
         // Draw colored circle
         let circle = SvgElement::Circle {
@@ -153,7 +152,7 @@ fn render_actor_legend(
             content: actor.clone(),
             attrs: Attrs::new()
                 .with_class("legend")
-                .with_fill("#666")
+                .with_fill(&config.theme.journey_text_color)
                 .with_attr("text-anchor", "start"),
         };
 
@@ -192,6 +191,7 @@ fn render_sections_and_tasks(
     left_margin: f64,
     title_offset: f64,
     actor_colors: &std::collections::HashMap<String, (String, usize)>,
+    config: &RenderConfig,
 ) -> (SvgElement, SvgElement) {
     let tasks = db.get_tasks();
     let sections = db.get_sections();
@@ -200,13 +200,22 @@ fn render_sections_and_tasks(
 
     let section_y = 50.0 + title_offset;
     let task_y = TASK_VERTICAL_OFFSET + title_offset;
+    // Use section_fills for inline fill attributes (dark colors matching mermaid.js)
+    let section_fills = &config.theme.journey_section_fills;
 
     // If there are no tasks but there are sections, render the sections
     if tasks.is_empty() {
         for (section_idx, section_name) in sections.iter().enumerate() {
             let section_x = (section_idx as f64) * (WIDTH + DIAGRAM_MARGIN_X) + left_margin;
 
-            let section = render_section(section_name, section_x, section_y, WIDTH, section_idx);
+            let section = render_section(
+                section_name,
+                section_x,
+                section_y,
+                WIDTH,
+                section_idx,
+                section_fills,
+            );
             section_elements.push(section);
         }
     } else {
@@ -235,6 +244,7 @@ fn render_sections_and_tasks(
                     section_y,
                     section_width,
                     section_number,
+                    section_fills,
                 );
                 section_elements.push(section);
 
@@ -244,9 +254,9 @@ fn render_sections_and_tasks(
 
             // Render task
             let task_x = (i as f64) * (WIDTH + DIAGRAM_MARGIN_X) + left_margin;
-            let section_num = (section_number - 1) % SECTION_FILLS.len();
+            let section_num = (section_number - 1) % section_fills.len();
 
-            let task_elem = render_task(task, task_x, task_y, section_num, actor_colors, i);
+            let task_elem = render_task(task, task_x, task_y, section_num, actor_colors, i, config);
             task_elements.push(task_elem);
         }
     }
@@ -264,11 +274,21 @@ fn render_sections_and_tasks(
 }
 
 /// Render a section header
-fn render_section(text: &str, x: f64, y: f64, width: f64, section_num: usize) -> SvgElement {
+fn render_section(
+    text: &str,
+    x: f64,
+    y: f64,
+    width: f64,
+    section_num: usize,
+    section_fills: &[String],
+) -> SvgElement {
     let mut children = Vec::new();
-    let section_idx = section_num % SECTION_FILLS.len();
-    let fill = SECTION_FILLS[section_idx];
-    let color = SECTION_COLORS[0];
+    let section_idx = section_num % section_fills.len();
+    let fill = &section_fills[section_idx];
+    // Text color - computed dynamically based on fill brightness
+    let fill_color = crate::render::svg::Color::parse(fill)
+        .unwrap_or_else(|| crate::render::svg::Color::rgb(236, 236, 255));
+    let text_color = if fill_color.is_dark() { "#fff" } else { "#333" };
 
     // Section background rectangle
     let rect = SvgElement::Rect {
@@ -284,14 +304,14 @@ fn render_section(text: &str, x: f64, y: f64, width: f64, section_num: usize) ->
     };
     children.push(rect);
 
-    // Section label - centered text
+    // Section label - centered text (no section-type class to avoid CSS fill override)
     let label = SvgElement::Text {
         x: x + width / 2.0,
         y: y + HEIGHT / 2.0 + 5.0,
         content: text.to_string(),
         attrs: Attrs::new()
-            .with_class(&format!("journey-section section-type-{}", section_idx))
-            .with_fill(color)
+            .with_class("journey-section")
+            .with_fill(text_color)
             .with_attr("text-anchor", "middle")
             .with_attr("dominant-baseline", "middle"),
     };
@@ -311,10 +331,15 @@ fn render_task(
     section_num: usize,
     actor_colors: &std::collections::HashMap<String, (String, usize)>,
     task_index: usize,
+    config: &RenderConfig,
 ) -> SvgElement {
     let mut children = Vec::new();
-    let fill = SECTION_FILLS[section_num % SECTION_FILLS.len()];
-    let color = SECTION_COLORS[0];
+    let section_fills = &config.theme.journey_section_fills;
+    let fill = &section_fills[section_num % section_fills.len()];
+    // Text color - computed dynamically based on fill brightness
+    let fill_color = crate::render::svg::Color::parse(fill)
+        .unwrap_or_else(|| crate::render::svg::Color::rgb(236, 236, 255));
+    let text_color = if fill_color.is_dark() { "#fff" } else { "#333" };
 
     // Task vertical line (dashed) - from task to face area
     let center_x = x + WIDTH / 2.0;
@@ -335,7 +360,12 @@ fn render_task(
 
     // Face element based on score - positioned at 300 + (5 - score) * 30
     let face_y = FACE_BASE_Y + ((5 - task.score) as f64) * FACE_SCORE_MULTIPLIER;
-    let face = render_face(center_x, face_y, task.score);
+    let face = render_face(
+        center_x,
+        face_y,
+        task.score,
+        &config.theme.journey_face_color,
+    );
     children.push(face);
 
     // Task background rectangle
@@ -381,7 +411,7 @@ fn render_task(
     }
 
     // Task label using tspan for proper text rendering
-    let task_label = render_task_label(&task.task, x, y, WIDTH, HEIGHT, color);
+    let task_label = render_task_label(&task.task, x, y, WIDTH, HEIGHT, text_color);
     children.push(task_label);
 
     SvgElement::Group {
@@ -446,7 +476,7 @@ fn render_task_label(
 }
 
 /// Render a face emoji based on score
-fn render_face(cx: f64, cy: f64, score: i32) -> SvgElement {
+fn render_face(cx: f64, cy: f64, score: i32, face_color: &str) -> SvgElement {
     let mut children = Vec::new();
 
     // Face circle
@@ -456,6 +486,7 @@ fn render_face(cx: f64, cy: f64, score: i32) -> SvgElement {
         r: FACE_RADIUS,
         attrs: Attrs::new()
             .with_class("face")
+            .with_fill(face_color)
             .with_stroke_width(2.0)
             .with_attr("overflow", "visible"),
     };
@@ -577,8 +608,9 @@ fn generate_journey_css(config: &RenderConfig) -> String {
 
     let mut section_css = String::new();
 
-    // Generate section type styles
-    for (i, &fill) in SECTION_FILLS.iter().enumerate() {
+    // Generate section type CSS styles using fillType colors (light theme colors)
+    // Note: These get overridden by inline fill attributes, but we match mermaid.js CSS
+    for (i, fill) in theme.journey_fill_types.iter().enumerate() {
         section_css.push_str(&format!(
             r#"
 .section-type-{i} {{
@@ -593,9 +625,9 @@ fn generate_journey_css(config: &RenderConfig) -> String {
         ));
     }
 
-    // Generate actor styles
+    // Generate actor styles from theme actor colors
     let mut actor_css = String::new();
-    for (i, &color) in ACTOR_COLORS.iter().enumerate() {
+    for (i, color) in theme.journey_actor_colors.iter().enumerate() {
         actor_css.push_str(&format!(
             r#"
 .actor-{i} {{
@@ -626,13 +658,14 @@ fn generate_journey_css(config: &RenderConfig) -> String {
   stroke-dasharray: 4 2;
 }}
 .face {{
-  fill: white;
-  stroke: #666;
+  fill: {face_color};
+  stroke: #999;
 }}
 .mouth {{
   stroke: #666;
 }}
 .legend {{
+  fill: {legend_color};
   font-family: {font_family};
   font-size: 14px;
 }}
@@ -647,6 +680,8 @@ fn generate_journey_css(config: &RenderConfig) -> String {
 "#,
         font_family = theme.font_family,
         title_color = theme.primary_text_color,
+        face_color = theme.journey_face_color,
+        legend_color = theme.journey_text_color,
         section_css = section_css,
         actor_css = actor_css
     )
