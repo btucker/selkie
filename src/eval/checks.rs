@@ -57,7 +57,45 @@ pub fn check_structure(
     check_markers(selkie, reference, &mut issues);
     check_colors(selkie, reference, &mut issues);
 
+    // ERROR checks - text visibility issues (CSS fill override)
+    check_text_visibility(selkie, &mut issues);
+
     issues
+}
+
+/// Check for text visibility issues where CSS fill rules override inline fill attributes
+/// This causes text to have unexpected colors that may be invisible against backgrounds
+fn check_text_visibility(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
+    let visibility_issues = &selkie.color_analysis.text_visibility_issues;
+
+    if !visibility_issues.is_empty() {
+        let mut messages = Vec::new();
+
+        for issue in visibility_issues {
+            let bg_info = if let Some(ref bg) = issue.background_fill {
+                format!(" (background: {})", bg)
+            } else {
+                String::new()
+            };
+
+            messages.push(format!(
+                "Text '{}' has class '{}' with CSS fill '{}' overriding inline fill '{}'{}",
+                issue.text,
+                issue.css_class,
+                issue.css_fill,
+                issue.inline_fill.as_deref().unwrap_or("none"),
+                bg_info
+            ));
+        }
+
+        issues.push(Issue::error(
+            "text_visibility",
+            format!(
+                "TEXT VISIBILITY ISSUE: CSS fill rules override inline text colors, potentially making text invisible:\n  {}",
+                messages.join("\n  ")
+            ),
+        ));
+    }
 }
 
 /// Check node count - ERROR if mismatch
@@ -1391,7 +1429,9 @@ mod tests {
     use crate::render::svg::structure::{ShapeCounts, ZOrderAnalysis};
 
     fn make_structure(nodes: usize, edges: usize, labels: Vec<&str>) -> SvgStructure {
-        use crate::render::svg::structure::{EdgeGeometry, FontAnalysis, StrokeAnalysis};
+        use crate::render::svg::structure::{
+            ColorAnalysis, EdgeGeometry, FontAnalysis, StrokeAnalysis,
+        };
         SvgStructure {
             width: 400.0,
             height: 300.0,
@@ -1406,6 +1446,7 @@ mod tests {
             stroke_analysis: StrokeAnalysis::default(),
             edge_geometry: EdgeGeometry::default(),
             font_analysis: FontAnalysis::default(),
+            color_analysis: ColorAnalysis::default(),
         }
     }
 

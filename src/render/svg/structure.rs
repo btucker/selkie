@@ -90,6 +90,23 @@ pub struct ColorAnalysis {
     pub fill_count: usize,
     /// Count of elements with stroke
     pub stroke_count: usize,
+    /// Text elements with potential visibility issues (CSS fill override)
+    pub text_visibility_issues: Vec<TextVisibilityIssue>,
+}
+
+/// A text element with potential visibility issues
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct TextVisibilityIssue {
+    /// The text content
+    pub text: String,
+    /// The CSS class that defines fill
+    pub css_class: String,
+    /// The fill color from CSS
+    pub css_fill: String,
+    /// The inline fill attribute (if any)
+    pub inline_fill: Option<String>,
+    /// The background fill color (from parent or sibling rect)
+    pub background_fill: Option<String>,
 }
 
 /// Analysis of edge/path geometry
@@ -1381,12 +1398,149 @@ fn analyze_colors(doc: &roxmltree::Document) -> ColorAnalysis {
     fill_vec.sort();
     stroke_vec.sort();
 
+    // Detect text visibility issues (CSS fill override)
+    let text_visibility_issues = detect_text_visibility_issues(doc);
+
     ColorAnalysis {
         fill_colors: fill_vec,
         stroke_colors: stroke_vec,
         fill_count,
         stroke_count,
+        text_visibility_issues,
     }
+}
+
+/// Detect text elements where CSS fill rules may override inline fill attributes
+/// This can cause text to become invisible or hard to read against its background
+fn detect_text_visibility_issues(doc: &roxmltree::Document) -> Vec<TextVisibilityIssue> {
+    use std::collections::HashMap;
+
+    let mut issues = Vec::new();
+
+    // Step 1: Parse CSS from <style> elements to build class -> fill map
+    let mut css_fill_rules: HashMap<String, String> = HashMap::new();
+
+    for node in doc.descendants() {
+        if node.tag_name().name() == "style" {
+            if let Some(css_text) = node.text() {
+                // Parse simple CSS rules like ".class-name { fill: #color; }"
+                for rule in css_text.split('}') {
+                    let rule = rule.trim();
+                    if rule.is_empty() {
+                        continue;
+                    }
+
+                    // Split into selector and properties
+                    if let Some(brace_pos) = rule.find('{') {
+                        let selector = rule[..brace_pos].trim();
+                        let properties = rule[brace_pos + 1..].trim();
+
+                        // Extract fill property if present
+                        for prop in properties.split(';') {
+                            let prop = prop.trim();
+                            if let Some(fill_value) = prop.strip_prefix("fill:") {
+                                let fill_value = fill_value.trim().to_lowercase();
+
+                                // Handle multiple selectors (e.g., ".class1, .class2")
+                                for sel in selector.split(',') {
+                                    let sel = sel.trim();
+                                    // Extract class name from selector (e.g., ".section-type-0" -> "section-type-0")
+                                    if let Some(class_name) = sel.strip_prefix('.') {
+                                        // Handle compound selectors by taking the last class
+                                        let class_name = class_name
+                                            .split_whitespace()
+                                            .next()
+                                            .unwrap_or(class_name);
+                                        css_fill_rules
+                                            .insert(class_name.to_string(), fill_value.clone());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Step 2: Find text elements with classes that have CSS fill rules
+    for node in doc.descendants() {
+        if node.tag_name().name() != "text" {
+            continue;
+        }
+
+        let class_attr = node.attribute("class").unwrap_or("");
+        let inline_fill = node.attribute("fill").map(String::from);
+        let text_content = get_text_content(&node);
+
+        // Check each class on the text element
+        for class_name in class_attr.split_whitespace() {
+            if let Some(css_fill) = css_fill_rules.get(class_name) {
+                // This text has a class with a CSS fill rule
+                // Check if the inline fill differs from CSS (potential override issue)
+                if let Some(ref inline) = inline_fill {
+                    let inline_normalized = normalize_color(inline);
+                    if inline_normalized != *css_fill {
+                        // CSS fill differs from inline fill - this is a potential issue
+                        // because CSS class rules override SVG presentation attributes
+
+                        // Try to find background color from sibling rect
+                        let background_fill = find_sibling_rect_fill(&node);
+
+                        issues.push(TextVisibilityIssue {
+                            text: text_content.clone(),
+                            css_class: class_name.to_string(),
+                            css_fill: css_fill.clone(),
+                            inline_fill: Some(inline_normalized),
+                            background_fill,
+                        });
+                        break; // Only report once per text element
+                    }
+                }
+            }
+        }
+    }
+
+    issues
+}
+
+/// Find the fill color of a sibling rect element (likely the background)
+fn find_sibling_rect_fill(text_node: &roxmltree::Node) -> Option<String> {
+    // Look for a sibling rect in the same parent group
+    if let Some(parent) = text_node.parent() {
+        for sibling in parent.children() {
+            if sibling.tag_name().name() == "rect" {
+                if let Some(fill) = sibling.attribute("fill") {
+                    return Some(normalize_color(fill));
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Get text content from a text element (including tspan children)
+fn get_text_content(node: &roxmltree::Node) -> String {
+    let mut content = String::new();
+
+    // Get direct text content
+    if let Some(text) = node.text() {
+        content.push_str(text);
+    }
+
+    // Get text from tspan children
+    for child in node.children() {
+        if child.tag_name().name() == "tspan" {
+            if let Some(text) = child.text() {
+                if !content.is_empty() {
+                    content.push(' ');
+                }
+                content.push_str(text);
+            }
+        }
+    }
+
+    content.trim().to_string()
 }
 
 /// Normalize a color string for comparison
