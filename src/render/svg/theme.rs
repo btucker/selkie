@@ -106,6 +106,40 @@ pub struct Theme {
     pub sankey_link_opacity: String,
     /// Sankey label text color
     pub sankey_label_color: String,
+
+    // === Quadrant chart colors ===
+    /// Quadrant 1 (top-right) background color
+    pub quadrant1_fill: String,
+    /// Quadrant 2 (top-left) background color
+    pub quadrant2_fill: String,
+    /// Quadrant 3 (bottom-left) background color
+    pub quadrant3_fill: String,
+    /// Quadrant 4 (bottom-right) background color
+    pub quadrant4_fill: String,
+    /// Quadrant internal border color
+    pub quadrant_internal_border_stroke: String,
+    /// Quadrant external border color
+    pub quadrant_external_border_stroke: String,
+    /// Quadrant title text color
+    pub quadrant_title_fill: String,
+    /// Quadrant label text color (fallback)
+    pub quadrant_text_fill: String,
+    /// Quadrant 1 text fill color
+    pub quadrant1_text_fill: String,
+    /// Quadrant 2 text fill color
+    pub quadrant2_text_fill: String,
+    /// Quadrant 3 text fill color
+    pub quadrant3_text_fill: String,
+    /// Quadrant 4 text fill color
+    pub quadrant4_text_fill: String,
+    /// Default point fill color
+    pub quadrant_point_fill: String,
+    /// Point label text color
+    pub quadrant_point_text_fill: String,
+    /// X-axis text color
+    pub quadrant_x_axis_text_fill: String,
+    /// Y-axis text color
+    pub quadrant_y_axis_text_fill: String,
 }
 
 impl Default for Theme {
@@ -185,6 +219,23 @@ impl Default for Theme {
             ],
             sankey_link_opacity: "0.5".to_string(),
             sankey_label_color: "#333333".to_string(),
+            // Quadrant chart - default theme (mermaid.js defaults derived from primaryColor #ECECFF)
+            quadrant1_fill: "#ECECFF".to_string(),
+            quadrant2_fill: "#f1f1ff".to_string(),
+            quadrant3_fill: "#f6f6ff".to_string(),
+            quadrant4_fill: "#fbfbff".to_string(),
+            quadrant_internal_border_stroke: "#c7c7f1".to_string(),
+            quadrant_external_border_stroke: "#c7c7f1".to_string(),
+            quadrant_title_fill: "#333333".to_string(),
+            quadrant_text_fill: "#333333".to_string(),
+            quadrant1_text_fill: "#343434".to_string(),
+            quadrant2_text_fill: "#2f2f2f".to_string(),
+            quadrant3_text_fill: "#2a2a2a".to_string(),
+            quadrant4_text_fill: "#252525".to_string(),
+            quadrant_point_fill: "#9370DB".to_string(),
+            quadrant_point_text_fill: "#333333".to_string(),
+            quadrant_x_axis_text_fill: "#333333".to_string(),
+            quadrant_y_axis_text_fill: "#333333".to_string(),
         }
     }
 }
@@ -266,6 +317,23 @@ impl Theme {
             ],
             sankey_link_opacity: "0.5".to_string(),
             sankey_label_color: "#ccc".to_string(),
+            // Quadrant chart - dark theme
+            quadrant1_fill: "#2a2a2a".to_string(),
+            quadrant2_fill: "#3a3a3a".to_string(),
+            quadrant3_fill: "#3a3a3a".to_string(),
+            quadrant4_fill: "#2a2a2a".to_string(),
+            quadrant_internal_border_stroke: "#81B1DB".to_string(),
+            quadrant_external_border_stroke: "#81B1DB".to_string(),
+            quadrant_title_fill: "#ccc".to_string(),
+            quadrant_text_fill: "#ccc".to_string(),
+            quadrant1_text_fill: "#ccc".to_string(),
+            quadrant2_text_fill: "#ccc".to_string(),
+            quadrant3_text_fill: "#ccc".to_string(),
+            quadrant4_text_fill: "#ccc".to_string(),
+            quadrant_point_fill: "#81B1DB".to_string(),
+            quadrant_point_text_fill: "#ccc".to_string(),
+            quadrant_x_axis_text_fill: "#ccc".to_string(),
+            quadrant_y_axis_text_fill: "#ccc".to_string(),
         }
     }
 
@@ -345,6 +413,23 @@ impl Theme {
             ],
             sankey_link_opacity: "0.5".to_string(),
             sankey_label_color: "#333333".to_string(),
+            // Quadrant chart - neutral theme (grayscale)
+            quadrant1_fill: "#f0f0f0".to_string(),
+            quadrant2_fill: "#e0e0e0".to_string(),
+            quadrant3_fill: "#e0e0e0".to_string(),
+            quadrant4_fill: "#f0f0f0".to_string(),
+            quadrant_internal_border_stroke: "#666666".to_string(),
+            quadrant_external_border_stroke: "#666666".to_string(),
+            quadrant_title_fill: "#333333".to_string(),
+            quadrant_text_fill: "#333333".to_string(),
+            quadrant1_text_fill: "#333333".to_string(),
+            quadrant2_text_fill: "#333333".to_string(),
+            quadrant3_text_fill: "#333333".to_string(),
+            quadrant4_text_fill: "#333333".to_string(),
+            quadrant_point_fill: "#666666".to_string(),
+            quadrant_point_text_fill: "#333333".to_string(),
+            quadrant_x_axis_text_fill: "#333333".to_string(),
+            quadrant_y_axis_text_fill: "#333333".to_string(),
         }
     }
 
@@ -425,6 +510,23 @@ impl Theme {
             ],
             sankey_link_opacity: "0.5".to_string(),
             sankey_label_color: "#333333".to_string(),
+            // Quadrant chart - forest theme (green palette)
+            quadrant1_fill: "#cde498".to_string(),
+            quadrant2_fill: "#cdffb2".to_string(),
+            quadrant3_fill: "#cdffb2".to_string(),
+            quadrant4_fill: "#cde498".to_string(),
+            quadrant_internal_border_stroke: "#13540c".to_string(),
+            quadrant_external_border_stroke: "#13540c".to_string(),
+            quadrant_title_fill: "#333333".to_string(),
+            quadrant_text_fill: "#333333".to_string(),
+            quadrant1_text_fill: "#333333".to_string(),
+            quadrant2_text_fill: "#333333".to_string(),
+            quadrant3_text_fill: "#333333".to_string(),
+            quadrant4_text_fill: "#333333".to_string(),
+            quadrant_point_fill: "#13540c".to_string(),
+            quadrant_point_text_fill: "#333333".to_string(),
+            quadrant_x_axis_text_fill: "#333333".to_string(),
+            quadrant_y_axis_text_fill: "#333333".to_string(),
         }
     }
 
@@ -507,6 +609,23 @@ impl Theme {
             ],
             sankey_link_opacity: "0.5".to_string(),
             sankey_label_color: "#333333".to_string(),
+            // Quadrant chart - base theme (warm pastels)
+            quadrant1_fill: "#fff4dd".to_string(),
+            quadrant2_fill: "#dde4ff".to_string(),
+            quadrant3_fill: "#dde4ff".to_string(),
+            quadrant4_fill: "#fff4dd".to_string(),
+            quadrant_internal_border_stroke: "#9370DB".to_string(),
+            quadrant_external_border_stroke: "#9370DB".to_string(),
+            quadrant_title_fill: "#333333".to_string(),
+            quadrant_text_fill: "#333333".to_string(),
+            quadrant1_text_fill: "#333333".to_string(),
+            quadrant2_text_fill: "#333333".to_string(),
+            quadrant3_text_fill: "#333333".to_string(),
+            quadrant4_text_fill: "#333333".to_string(),
+            quadrant_point_fill: "#9370DB".to_string(),
+            quadrant_point_text_fill: "#333333".to_string(),
+            quadrant_x_axis_text_fill: "#333333".to_string(),
+            quadrant_y_axis_text_fill: "#333333".to_string(),
         }
     }
 
@@ -756,6 +875,24 @@ marker path {{
             },
             sankey_link_opacity: "0.5".to_string(),
             sankey_label_color: primary_text.to_hex(),
+
+            // Quadrant chart colors (derived)
+            quadrant1_fill: color::lighten(&primary_color, 20.0).to_hex(),
+            quadrant2_fill: color::lighten(&secondary_color, 10.0).to_hex(),
+            quadrant3_fill: color::lighten(&secondary_color, 10.0).to_hex(),
+            quadrant4_fill: color::lighten(&primary_color, 20.0).to_hex(),
+            quadrant_internal_border_stroke: primary_border.to_hex(),
+            quadrant_external_border_stroke: primary_border.to_hex(),
+            quadrant_title_fill: primary_text.to_hex(),
+            quadrant_text_fill: primary_text.to_hex(),
+            quadrant1_text_fill: primary_text.to_hex(),
+            quadrant2_text_fill: primary_text.to_hex(),
+            quadrant3_text_fill: primary_text.to_hex(),
+            quadrant4_text_fill: primary_text.to_hex(),
+            quadrant_point_fill: primary_border.to_hex(),
+            quadrant_point_text_fill: primary_text.to_hex(),
+            quadrant_x_axis_text_fill: primary_text.to_hex(),
+            quadrant_y_axis_text_fill: primary_text.to_hex(),
         }
     }
 
@@ -1003,6 +1140,72 @@ marker path {{
                 false
             }
 
+            // Quadrant chart colors
+            "quadrant1Fill" => {
+                self.quadrant1_fill = value.to_string();
+                true
+            }
+            "quadrant2Fill" => {
+                self.quadrant2_fill = value.to_string();
+                true
+            }
+            "quadrant3Fill" => {
+                self.quadrant3_fill = value.to_string();
+                true
+            }
+            "quadrant4Fill" => {
+                self.quadrant4_fill = value.to_string();
+                true
+            }
+            "quadrantInternalBorderStroke" => {
+                self.quadrant_internal_border_stroke = value.to_string();
+                true
+            }
+            "quadrantExternalBorderStroke" => {
+                self.quadrant_external_border_stroke = value.to_string();
+                true
+            }
+            "quadrantTitleFill" => {
+                self.quadrant_title_fill = value.to_string();
+                true
+            }
+            "quadrantTextFill" => {
+                self.quadrant_text_fill = value.to_string();
+                true
+            }
+            "quadrant1TextFill" => {
+                self.quadrant1_text_fill = value.to_string();
+                true
+            }
+            "quadrant2TextFill" => {
+                self.quadrant2_text_fill = value.to_string();
+                true
+            }
+            "quadrant3TextFill" => {
+                self.quadrant3_text_fill = value.to_string();
+                true
+            }
+            "quadrant4TextFill" => {
+                self.quadrant4_text_fill = value.to_string();
+                true
+            }
+            "quadrantPointFill" => {
+                self.quadrant_point_fill = value.to_string();
+                true
+            }
+            "quadrantPointTextFill" => {
+                self.quadrant_point_text_fill = value.to_string();
+                true
+            }
+            "quadrantXAxisTextFill" => {
+                self.quadrant_x_axis_text_fill = value.to_string();
+                true
+            }
+            "quadrantYAxisTextFill" => {
+                self.quadrant_y_axis_text_fill = value.to_string();
+                true
+            }
+
             _ => false,
         }
     }
@@ -1028,6 +1231,23 @@ marker path {{
             "pieStrokeColor" => Some(&self.pie_stroke_color),
             "actorBkg" => Some(&self.actor_bkg),
             "taskBkgColor" => Some(&self.task_bkg_color),
+            // Quadrant chart colors
+            "quadrant1Fill" => Some(&self.quadrant1_fill),
+            "quadrant2Fill" => Some(&self.quadrant2_fill),
+            "quadrant3Fill" => Some(&self.quadrant3_fill),
+            "quadrant4Fill" => Some(&self.quadrant4_fill),
+            "quadrantInternalBorderStroke" => Some(&self.quadrant_internal_border_stroke),
+            "quadrantExternalBorderStroke" => Some(&self.quadrant_external_border_stroke),
+            "quadrantTitleFill" => Some(&self.quadrant_title_fill),
+            "quadrantTextFill" => Some(&self.quadrant_text_fill),
+            "quadrant1TextFill" => Some(&self.quadrant1_text_fill),
+            "quadrant2TextFill" => Some(&self.quadrant2_text_fill),
+            "quadrant3TextFill" => Some(&self.quadrant3_text_fill),
+            "quadrant4TextFill" => Some(&self.quadrant4_text_fill),
+            "quadrantPointFill" => Some(&self.quadrant_point_fill),
+            "quadrantPointTextFill" => Some(&self.quadrant_point_text_fill),
+            "quadrantXAxisTextFill" => Some(&self.quadrant_x_axis_text_fill),
+            "quadrantYAxisTextFill" => Some(&self.quadrant_y_axis_text_fill),
             _ => None,
         }
     }
