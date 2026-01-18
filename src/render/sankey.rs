@@ -17,7 +17,8 @@ use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 const DEFAULT_WIDTH: f64 = 600.0;
 const DEFAULT_HEIGHT: f64 = 400.0;
 const NODE_WIDTH: f64 = 10.0;
-const NODE_PADDING: f64 = 10.0;
+/// Node padding: 10 base + 15 for showValues (mermaid default)
+const NODE_PADDING: f64 = 25.0;
 const LABEL_PADDING: f64 = 6.0;
 const FONT_SIZE: f64 = 14.0;
 
@@ -148,6 +149,7 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
 
     // Step 6: Calculate ky (scale factor) based on the most constrained column
     // This ensures consistent scaling across all columns
+    // Nodes should fill available space (matching mermaid.js d3-sankey behavior)
     let mut ky = f64::MAX;
     for col_nodes in &nodes_by_column {
         if col_nodes.is_empty() {
@@ -164,13 +166,9 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
         }
     }
 
-    // Cap ky to prevent nodes from being too large in simple diagrams
-    // Max node height should be around 1/3 of the diagram height
-    let max_ky = height / 3.0 / node_values.values().copied().fold(0.0, f64::max).max(1.0);
+    // Fallback if no valid ky was computed
     if ky == f64::MAX {
-        ky = max_ky;
-    } else {
-        ky = ky.min(max_ky);
+        ky = 1.0;
     }
 
     // Step 7: Compute y positions within each column
@@ -483,8 +481,8 @@ fn render_nodes(nodes: &[LayoutNode], config: &RenderConfig) -> SvgElement {
     }
 }
 
-/// Render node labels
-fn render_labels(nodes: &[LayoutNode], width: f64, config: &RenderConfig) -> SvgElement {
+/// Render node labels with values (showValues=true is mermaid default)
+fn render_labels(nodes: &[LayoutNode], width: f64, _config: &RenderConfig) -> SvgElement {
     let mut children = Vec::new();
 
     for node in nodes {
@@ -500,17 +498,17 @@ fn render_labels(nodes: &[LayoutNode], width: f64, config: &RenderConfig) -> Svg
 
         let label_y = (node.y0 + node.y1) / 2.0;
 
-        // Use dy="0.35em" for vertical centering (matches mermaid.js approach)
-        let label = SvgElement::Text {
-            x: label_x,
-            y: label_y,
-            content: node.id.clone(),
-            attrs: Attrs::new()
-                .with_attr("text-anchor", text_anchor)
-                .with_attr("dy", "0.35em")
-                .with_attr("font-size", &format!("{}", FONT_SIZE))
-                .with_fill(&config.theme.sankey_label_color)
-                .with_class("sankey-label"),
+        // Format value: round to 2 decimal places, remove trailing zeros
+        let value_str = format_value(node.value);
+
+        // Label content: "node_id\nvalue" (matches mermaid showValues=true)
+        // Use raw SVG with actual newline (matching mermaid.js output)
+        // dy="0em" when showing values (multiline text)
+        let label = SvgElement::Raw {
+            content: format!(
+                "<text x=\"{}\" y=\"{}\" dy=\"0em\" text-anchor=\"{}\">{}\n{}</text>",
+                label_x, label_y, text_anchor, node.id, value_str
+            ),
         };
 
         children.push(label);
@@ -521,6 +519,19 @@ fn render_labels(nodes: &[LayoutNode], width: f64, config: &RenderConfig) -> Svg
         attrs: Attrs::new()
             .with_class("node-labels")
             .with_attr("font-size", &format!("{}", FONT_SIZE)),
+    }
+}
+
+/// Format a value for display: round to 2 decimal places, remove trailing zeros
+fn format_value(value: f64) -> String {
+    let rounded = (value * 100.0).round() / 100.0;
+    if rounded == rounded.trunc() {
+        // Integer value
+        format!("{}", rounded as i64)
+    } else {
+        // Decimal value - remove trailing zeros
+        let s = format!("{:.2}", rounded);
+        s.trim_end_matches('0').trim_end_matches('.').to_string()
     }
 }
 
@@ -625,24 +636,36 @@ mod tests {
     }
 
     #[test]
-    fn test_node_heights_proportional() {
-        // Test that node heights are proportional to flow, not filling entire height
+    fn test_node_heights_fill_available_space() {
+        // Test that nodes fill available space (matching mermaid.js d3-sankey behavior)
         let mut db = SankeyDb::new();
         db.add_link("A", "B", 10.0);
 
         let (layout_nodes, _) = compute_layout(&db, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
-        // Nodes should NOT fill the entire 400px height
-        // With max_ky capping, nodes should be at most ~1/3 of height
-        for node in &layout_nodes {
-            let node_height = node.y1 - node.y0;
-            assert!(
-                node_height < DEFAULT_HEIGHT * 0.5,
-                "Node height {} should be less than half of SVG height {}",
-                node_height,
-                DEFAULT_HEIGHT
-            );
-        }
+        // With single column per side, nodes should fill the height
+        // Both nodes have the same value (10), so they should have equal height
+        assert_eq!(layout_nodes.len(), 2);
+        let node_a = &layout_nodes[0];
+        let node_b = &layout_nodes[1];
+
+        // Both nodes should have the same height (full available space)
+        let height_a = node_a.y1 - node_a.y0;
+        let height_b = node_b.y1 - node_b.y0;
+        assert!(
+            (height_a - height_b).abs() < 1.0,
+            "Node heights should be equal: A={}, B={}",
+            height_a,
+            height_b
+        );
+
+        // Nodes should fill available height (400px)
+        assert!(
+            height_a > DEFAULT_HEIGHT * 0.9,
+            "Node should fill available height: {} > {}",
+            height_a,
+            DEFAULT_HEIGHT * 0.9
+        );
     }
 
     #[test]
