@@ -238,11 +238,7 @@ fn count_layout_rows(node_bounds: &[NodeBounds]) -> usize {
 }
 
 /// Check layout pattern - ERROR if significantly different row/column arrangement
-fn check_layout_pattern(
-    selkie: &SvgStructure,
-    reference: &SvgStructure,
-    issues: &mut Vec<Issue>,
-) {
+fn check_layout_pattern(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
     let selkie_bounds = &selkie.edge_geometry.node_bounds;
     let ref_bounds = &reference.edge_geometry.node_bounds;
 
@@ -286,7 +282,10 @@ fn check_layout_pattern(
                     ref_rows, selkie_rows
                 ),
             )
-            .with_values(format!("{} rows", ref_rows), format!("{} rows", selkie_rows)),
+            .with_values(
+                format!("{} rows", ref_rows),
+                format!("{} rows", selkie_rows),
+            ),
         );
     }
 }
