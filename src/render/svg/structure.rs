@@ -1290,15 +1290,10 @@ fn extract_css_font_styles(
                                 );
                             }
                             // Also handle ID selectors (e.g., "#my-svg" -> "root")
+                            // and element selectors (e.g., "svg" -> "root")
                             // These are typically used for default/inherited font sizes
-                            else if sel.starts_with('#') {
-                                css_fonts.insert(
-                                    "root".to_string(),
-                                    (font_size.clone(), font_weight.clone()),
-                                );
-                            }
-                            // Handle element selectors (e.g., "svg" -> "root")
-                            else if sel == "svg" || sel.ends_with(" svg") {
+                            else if sel.starts_with('#') || sel == "svg" || sel.ends_with(" svg")
+                            {
                                 css_fonts.insert(
                                     "root".to_string(),
                                     (font_size.clone(), font_weight.clone()),
