@@ -593,7 +593,7 @@ fn render_title(title: &str, width: f64) -> SvgElement {
         attrs: Attrs::new()
             .with_fill(COLOR_TEXT_DARK)
             .with_attr("text-anchor", "middle")
-            .with_attr("font-size", "20")
+            .with_attr("font-size", "16")
             .with_attr("font-weight", "bold")
             .with_class("c4-title"),
     }
