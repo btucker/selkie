@@ -3,6 +3,7 @@
 //! This module provides SVG rendering for positioned diagram elements.
 
 mod architecture;
+mod block;
 mod class;
 mod er;
 mod flowchart;
@@ -80,6 +81,7 @@ pub fn render_text(text: &str) -> Result<String> {
 pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<String> {
     match diagram {
         Diagram::Architecture(db) => render_architecture(db, config),
+        Diagram::Block(db) => block::render_block(db, config),
         Diagram::Flowchart(db) => render_flowchart(db, config),
         Diagram::Git(db) => git::render_git(db, config),
         Diagram::Pie(db) => pie::render_pie(db, config),
