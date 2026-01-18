@@ -780,6 +780,7 @@ fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
 }
 
 /// Generate CSS for requirement diagrams
+/// Colors match mermaid.js default theme for requirement diagrams
 fn generate_requirement_css(theme: &Theme) -> String {
     format!(
         r#"
@@ -789,7 +790,7 @@ fn generate_requirement_css(theme: &Theme) -> String {
 }}
 
 .requirement-header {{
-  fill: {secondary_color};
+  fill: {primary_color};
   stroke: {border_color};
 }}
 
@@ -807,12 +808,12 @@ fn generate_requirement_css(theme: &Theme) -> String {
 }}
 
 .element-box {{
-  fill: {tertiary_color};
+  fill: {primary_color};
   stroke: {border_color};
 }}
 
 .element-header {{
-  fill: {note_bg_color};
+  fill: {primary_color};
   stroke: {border_color};
 }}
 
@@ -855,13 +856,10 @@ fn generate_requirement_css(theme: &Theme) -> String {
 }}
 "#,
         primary_color = theme.primary_color,
-        secondary_color = theme.secondary_color,
-        tertiary_color = theme.tertiary_color,
         border_color = theme.primary_border_color,
         text_color = theme.primary_text_color,
         line_color = theme.line_color,
         background = theme.background,
-        note_bg_color = theme.note_bkg_color,
     )
 }
 
