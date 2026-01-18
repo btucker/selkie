@@ -63,9 +63,13 @@ pub fn render_radar(db: &RadarDb, config: &RenderConfig) -> Result<String> {
     let title = db.get_title();
 
     // Calculate min/max values
-    let max_value: f64 = options
-        .max
-        .unwrap_or_else(|| curves.iter().flat_map(|c| c.entries.iter()).copied().fold(0.0, f64::max));
+    let max_value: f64 = options.max.unwrap_or_else(|| {
+        curves
+            .iter()
+            .flat_map(|c| c.entries.iter())
+            .copied()
+            .fold(0.0, f64::max)
+    });
     let min_value: f64 = options.min;
 
     // Create main group centered on chart
@@ -96,12 +100,7 @@ pub fn render_radar(db: &RadarDb, config: &RenderConfig) -> Result<String> {
 
     // Draw legend if enabled
     if options.show_legend {
-        draw_legend(
-            &mut main_group_children,
-            curves,
-            chart_width,
-            chart_height,
-        );
+        draw_legend(&mut main_group_children, curves, chart_width, chart_height);
     }
 
     // Draw title
@@ -123,7 +122,10 @@ pub fn render_radar(db: &RadarDb, config: &RenderConfig) -> Result<String> {
     // Wrap in centered group
     let main_group = SvgElement::Group {
         children: main_group_children,
-        attrs: Attrs::new().with_attr("transform", &format!("translate({}, {})", center_x, center_y)),
+        attrs: Attrs::new().with_attr(
+            "transform",
+            &format!("translate({}, {})", center_x, center_y),
+        ),
     };
     doc.add_element(main_group);
 

@@ -51,14 +51,8 @@ fn test_cypress_multiple_curves() {
 
     assert_valid_svg(&svg);
     // Should have two curves
-    assert!(
-        svg.contains("radarCurve-0"),
-        "Should contain first curve"
-    );
-    assert!(
-        svg.contains("radarCurve-1"),
-        "Should contain second curve"
-    );
+    assert!(svg.contains("radarCurve-0"), "Should contain first curve");
+    assert!(svg.contains("radarCurve-1"), "Should contain second curve");
 }
 
 #[test]
@@ -87,10 +81,7 @@ fn test_cypress_complex_radar() {
     let svg = render(&diagram).expect("Failed to render complex radar");
 
     assert_valid_svg(&svg);
-    assert!(
-        svg.contains("My favorite ninjas"),
-        "Should contain title"
-    );
+    assert!(svg.contains("My favorite ninjas"), "Should contain title");
     // Should have polygon graticule
     assert!(
         svg.contains("<polygon") && svg.contains("radarGraticule"),
@@ -260,8 +251,14 @@ fn test_radar_axes_labels() {
     let svg = render(&diagram).expect("Failed to render radar");
 
     assert_valid_svg(&svg);
-    assert!(svg.contains("Top Speed"), "Should contain 'Top Speed' label");
-    assert!(svg.contains("Max Power"), "Should contain 'Max Power' label");
+    assert!(
+        svg.contains("Top Speed"),
+        "Should contain 'Top Speed' label"
+    );
+    assert!(
+        svg.contains("Max Power"),
+        "Should contain 'Max Power' label"
+    );
     assert!(svg.contains("Agility"), "Should contain 'Agility' label");
 }
 
@@ -292,8 +289,14 @@ fn test_radar_curve_labels() {
 
     assert_valid_svg(&svg);
     // Legend should show curve labels
-    assert!(svg.contains("Curve One"), "Should contain 'Curve One' label");
-    assert!(svg.contains("Curve Two"), "Should contain 'Curve Two' label");
+    assert!(
+        svg.contains("Curve One"),
+        "Should contain 'Curve One' label"
+    );
+    assert!(
+        svg.contains("Curve Two"),
+        "Should contain 'Curve Two' label"
+    );
 }
 
 #[test]
