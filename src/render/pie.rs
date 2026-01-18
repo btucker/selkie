@@ -84,20 +84,7 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
     let legend_item_height = 22.0;
     let legend_box_size = 18.0; // mermaid.js uses 18x18
 
-    // Render title
-    if let Some(title) = db.get_diagram_title() {
-        let title_elem = SvgElement::Text {
-            x: cx,
-            y: 25.0,
-            content: title.to_string(),
-            attrs: Attrs::new()
-                .with_attr("text-anchor", "middle")
-                .with_class("pie-title")
-                .with_attr("font-size", "20")
-                .with_attr("font-weight", "bold"),
-        };
-        doc.add_element(title_elem);
-    }
+    // === PHASE 1: Render all shapes first (for correct z-order) ===
 
     // Render outer circle (pieOuterCircle) - frames the pie chart
     // mermaid.js uses radius + 1 for the outer circle
@@ -112,6 +99,9 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
             .with_class("pieOuterCircle"),
     };
     doc.add_element(outer_circle);
+
+    // Collect percentage labels while rendering slices (to render text after all shapes)
+    let mut percentage_labels: Vec<(f64, f64, String)> = Vec::new();
 
     // Render each slice (sorted by value descending)
     for (label, value) in sorted_for_rendering.iter() {
@@ -156,38 +146,64 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
         };
         doc.add_element(slice);
 
-        // Add percentage label inside slice
+        // Collect percentage label data (to render after all shapes)
         // Use 2% threshold to show labels for small slices like mermaid.js
         if percentage >= 0.02 {
             let mid_angle = start_angle + angle / 2.0;
             let label_radius = radius * 0.75; // Position inside slice (mermaid.js uses ~0.75)
             let label_x = cx + label_radius * mid_angle.cos();
             let label_y = pie_cy + label_radius * mid_angle.sin();
-
-            let pct_label = SvgElement::Text {
-                x: label_x,
-                y: label_y,
-                content: format!("{}%", (percentage * 100.0).round() as i32),
-                attrs: Attrs::new()
-                    .with_attr("text-anchor", "middle")
-                    .with_attr("dominant-baseline", "middle")
-                    .with_class("slice")
-                    .with_attr("font-size", "17"),
-            };
-            doc.add_element(pct_label);
+            percentage_labels.push((
+                label_x,
+                label_y,
+                format!("{}%", (percentage * 100.0).round() as i32),
+            ));
         }
 
         start_angle = end_angle;
     }
 
+    // === PHASE 2: Render all text elements (after shapes for correct z-order) ===
+
+    // Render title
+    if let Some(title) = db.get_diagram_title() {
+        let title_elem = SvgElement::Text {
+            x: cx,
+            y: 25.0,
+            content: title.to_string(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("pie-title")
+                .with_attr("font-size", "20")
+                .with_attr("font-weight", "bold"),
+        };
+        doc.add_element(title_elem);
+    }
+
+    // Render percentage labels
+    for (label_x, label_y, content) in percentage_labels {
+        let pct_label = SvgElement::Text {
+            x: label_x,
+            y: label_y,
+            content,
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_attr("dominant-baseline", "middle")
+                .with_class("slice")
+                .with_attr("font-size", "17"),
+        };
+        doc.add_element(pct_label);
+    }
+
     // Build legend items in ORIGINAL input order (not sorted)
-    let legend_items: Vec<(String, String, f64)> = sections_vec
+    // Include the raw value for showData display
+    let legend_items: Vec<(String, String, f64, f64)> = sections_vec
         .iter()
         .enumerate()
         .map(|(i, (label, value))| {
             let color = colors[i % colors.len()];
             let percentage = *value / total;
-            (color.to_string(), label.clone(), percentage)
+            (color.to_string(), label.clone(), percentage, *value)
         })
         .collect();
 
@@ -198,6 +214,7 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
         legend_y,
         legend_item_height,
         legend_box_size,
+        db.get_show_data(),
     );
     doc.add_element(legend_group);
 
@@ -205,16 +222,19 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
 }
 
 /// Render a legend for the pie chart
+/// Note: Legend shapes (rects) are rendered before text to ensure correct z-order
 fn render_legend(
-    items: &[(String, String, f64)], // (color, label, percentage)
+    items: &[(String, String, f64, f64)], // (color, label, percentage, value)
     x: f64,
     y: f64,
     item_height: f64,
     box_size: f64,
+    show_data: bool,
 ) -> SvgElement {
     let mut children = Vec::new();
 
-    for (i, (color, label, _percentage)) in items.iter().enumerate() {
+    // First pass: render all colored boxes (shapes before text for z-order)
+    for (i, (color, _, _, _)) in items.iter().enumerate() {
         let item_y = y + (i as f64) * item_height;
 
         // Colored box with matching stroke (mermaid.js style)
@@ -230,13 +250,29 @@ fn render_legend(
                 .with_stroke(color)
                 .with_class("legend"),
         });
+    }
 
-        // Label text only (no percentage - mermaid.js style)
+    // Second pass: render all text labels
+    for (i, (_, label, _percentage, value)) in items.iter().enumerate() {
+        let item_y = y + (i as f64) * item_height;
+
+        // Label text - include value in brackets when showData is set (mermaid.js style)
         // mermaid.js uses x="22" relative to rect x (i.e., box_size + 4)
+        let display_label = if show_data {
+            // Format value: use integer if whole number, otherwise keep decimal
+            let value_str = if value.fract() == 0.0 {
+                format!("{}", *value as i64)
+            } else {
+                format!("{}", value)
+            };
+            format!("{} [{}]", label, value_str)
+        } else {
+            label.clone()
+        };
         children.push(SvgElement::Text {
             x: x + box_size + 4.0,
             y: item_y + 14.0, // mermaid.js uses y="14" relative to rect
-            content: label.clone(),
+            content: display_label,
             attrs: Attrs::new()
                 .with_class("legend")
                 .with_attr("font-size", "17"),

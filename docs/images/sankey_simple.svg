@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.sankey-node {
+  stroke: none;
+}
+
+.sankey-link {
+  stroke-opacity: 0.5;
+}
+
+.sankey-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.link {
+  mix-blend-mode: multiply;
+}
+
+  </style>
+  <defs>
+    <linearGradient id="linearGradient-1" gradientUnits="userSpaceOnUse" x1="10" x2="590"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="nodes">
+      <g class="node" y="0" x="0" id="node-1" transform="translate(0,0)">
+        <rect x="0" y="0" width="10" height="400" class="sankey-node" fill="#4e79a7"/>
+      </g>
+      <g class="node" transform="translate(590,0)" x="590" id="node-2" y="0">
+        <rect x="0" y="0" width="10" height="400" class="sankey-node" fill="#f28e2c"/>
+      </g>
+    </g>
+    <g class="node-labels" font-size="14">
+      <text x="16" y="200" dy="0em" text-anchor="start">sourceNode
+10</text>
+      <text x="584" y="200" dy="0em" text-anchor="end">targetNode
+10</text>
+    </g>
+    <g class="links" stroke-opacity="0.5" fill="none">
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,200 C300,200 300,200 590,200" stroke="url(#linearGradient-1)" stroke-width="400"/>
+      </g>
+    </g>
+  </g>
+</svg>

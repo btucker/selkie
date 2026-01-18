@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.sankey-node {
+  stroke: none;
+}
+
+.sankey-link {
+  stroke-opacity: 0.5;
+}
+
+.sankey-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.link {
+  mix-blend-mode: multiply;
+}
+
+  </style>
+  <defs>
+    <linearGradient id="linearGradient-1" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+    <linearGradient id="linearGradient-2" gradientUnits="userSpaceOnUse" x1="94.28571428571429" x2="168.57142857142858"><stop offset="0%" stop-color="#f28e2c"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-3" gradientUnits="userSpaceOnUse" x1="94.28571428571429" x2="590"><stop offset="0%" stop-color="#f28e2c"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-4" gradientUnits="userSpaceOnUse" x1="94.28571428571429" x2="168.57142857142858"><stop offset="0%" stop-color="#f28e2c"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-5" gradientUnits="userSpaceOnUse" x1="94.28571428571429" x2="168.57142857142858"><stop offset="0%" stop-color="#f28e2c"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
+    <linearGradient id="linearGradient-6" gradientUnits="userSpaceOnUse" x1="10" x2="168.57142857142858"><stop offset="0%" stop-color="#af7aa1"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-7" gradientUnits="userSpaceOnUse" x1="10" x2="168.57142857142858"><stop offset="0%" stop-color="#ff9da7"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-8" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#9c755f"/><stop offset="100%" stop-color="#bab0ab"/></linearGradient>
+    <linearGradient id="linearGradient-9" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#bab0ab"/></linearGradient>
+    <linearGradient id="linearGradient-10" gradientUnits="userSpaceOnUse" x1="94.28571428571429" x2="168.57142857142858"><stop offset="0%" stop-color="#bab0ab"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-11" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#f28e2c"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-12" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#f28e2c"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-13" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#f28e2c"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-14" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#af7aa1"/></linearGradient>
+    <linearGradient id="linearGradient-15" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-16" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="421.42857142857144"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#ff9da7"/></linearGradient>
+    <linearGradient id="linearGradient-17" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-18" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#9c755f"/></linearGradient>
+    <linearGradient id="linearGradient-19" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#bab0ab"/></linearGradient>
+    <linearGradient id="linearGradient-20" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-21" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-22" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#4e79a7"/></linearGradient>
+    <linearGradient id="linearGradient-23" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+    <linearGradient id="linearGradient-24" gradientUnits="userSpaceOnUse" x1="347.14285714285717" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-25" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#76b7b2"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-26" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-27" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-28" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-29" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="252.8571428571429"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#af7aa1"/></linearGradient>
+    <linearGradient id="linearGradient-30" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#bab0ab"/></linearGradient>
+    <linearGradient id="linearGradient-31" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-32" gradientUnits="userSpaceOnUse" x1="10" x2="337.14285714285717"><stop offset="0%" stop-color="#ff9da7"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
+    <linearGradient id="linearGradient-33" gradientUnits="userSpaceOnUse" x1="431.42857142857144" x2="505.7142857142858"><stop offset="0%" stop-color="#ff9da7"/><stop offset="100%" stop-color="#9c755f"/></linearGradient>
+    <linearGradient id="linearGradient-34" gradientUnits="userSpaceOnUse" x1="431.42857142857144" x2="590"><stop offset="0%" stop-color="#ff9da7"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-35" gradientUnits="userSpaceOnUse" x1="515.7142857142858" x2="590"><stop offset="0%" stop-color="#9c755f"/><stop offset="100%" stop-color="#9c755f"/></linearGradient>
+    <linearGradient id="linearGradient-36" gradientUnits="userSpaceOnUse" x1="10" x2="337.14285714285717"><stop offset="0%" stop-color="#bab0ab"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
+    <linearGradient id="linearGradient-37" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#e15759"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-38" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#e15759"/><stop offset="100%" stop-color="#4e79a7"/></linearGradient>
+    <linearGradient id="linearGradient-39" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#e15759"/><stop offset="100%" stop-color="#9c755f"/></linearGradient>
+    <linearGradient id="linearGradient-40" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#e15759"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+    <linearGradient id="linearGradient-41" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#e15759"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-42" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#e15759"/><stop offset="100%" stop-color="#bab0ab"/></linearGradient>
+    <linearGradient id="linearGradient-43" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#e15759"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-44" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#e15759"/><stop offset="100%" stop-color="#4e79a7"/></linearGradient>
+    <linearGradient id="linearGradient-45" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#59a14f"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+    <linearGradient id="linearGradient-46" gradientUnits="userSpaceOnUse" x1="94.28571428571429" x2="168.57142857142858"><stop offset="0%" stop-color="#59a14f"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
+    <linearGradient id="linearGradient-47" gradientUnits="userSpaceOnUse" x1="10" x2="252.8571428571429"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#af7aa1"/></linearGradient>
+    <linearGradient id="linearGradient-48" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#af7aa1"/><stop offset="100%" stop-color="#ff9da7"/></linearGradient>
+    <linearGradient id="linearGradient-49" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#9c755f"/><stop offset="100%" stop-color="#ff9da7"/></linearGradient>
+    <linearGradient id="linearGradient-50" gradientUnits="userSpaceOnUse" x1="94.28571428571429" x2="168.57142857142858"><stop offset="0%" stop-color="#ff9da7"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-51" gradientUnits="userSpaceOnUse" x1="10" x2="168.57142857142858"><stop offset="0%" stop-color="#bab0ab"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-52" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#bab0ab"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+    <linearGradient id="linearGradient-53" gradientUnits="userSpaceOnUse" x1="10" x2="590"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-54" gradientUnits="userSpaceOnUse" x1="10" x2="590"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-55" gradientUnits="userSpaceOnUse" x1="94.28571428571429" x2="337.14285714285717"><stop offset="0%" stop-color="#f28e2c"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
+    <linearGradient id="linearGradient-56" gradientUnits="userSpaceOnUse" x1="94.28571428571429" x2="590"><stop offset="0%" stop-color="#e15759"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-57" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#76b7b2"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-58" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#76b7b2"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+    <linearGradient id="linearGradient-59" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#59a14f"/><stop offset="100%" stop-color="#bab0ab"/></linearGradient>
+    <linearGradient id="linearGradient-60" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="252.8571428571429"><stop offset="0%" stop-color="#59a14f"/><stop offset="100%" stop-color="#af7aa1"/></linearGradient>
+    <linearGradient id="linearGradient-61" gradientUnits="userSpaceOnUse" x1="178.57142857142858" x2="590"><stop offset="0%" stop-color="#59a14f"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-62" gradientUnits="userSpaceOnUse" x1="262.8571428571429" x2="337.14285714285717"><stop offset="0%" stop-color="#af7aa1"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
+    <linearGradient id="linearGradient-63" gradientUnits="userSpaceOnUse" x1="262.8571428571429" x2="590"><stop offset="0%" stop-color="#af7aa1"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-64" gradientUnits="userSpaceOnUse" x1="262.8571428571429" x2="337.14285714285717"><stop offset="0%" stop-color="#af7aa1"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+    <linearGradient id="linearGradient-65" gradientUnits="userSpaceOnUse" x1="10" x2="337.14285714285717"><stop offset="0%" stop-color="#59a14f"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
+    <linearGradient id="linearGradient-66" gradientUnits="userSpaceOnUse" x1="10" x2="84.28571428571429"><stop offset="0%" stop-color="#edc949"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+    <linearGradient id="linearGradient-67" gradientUnits="userSpaceOnUse" x1="10" x2="337.14285714285717"><stop offset="0%" stop-color="#af7aa1"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
+    <linearGradient id="linearGradient-68" gradientUnits="userSpaceOnUse" x1="10" x2="337.14285714285717"><stop offset="0%" stop-color="#ff9da7"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="nodes">
+      <g class="node" transform="translate(0,35.00000000000003)" x="0" id="node-1" y="35.00000000000003">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#4e79a7"/>
+      </g>
+      <g class="node" id="node-7" y="0" x="0" transform="translate(0,0)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#af7aa1"/>
+      </g>
+      <g class="node" y="61" transform="translate(0,61)" x="0" id="node-8">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#ff9da7"/>
+      </g>
+      <g class="node" y="0" transform="translate(0,0)" id="node-9" x="0">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#9c755f"/>
+      </g>
+      <g class="node" id="node-11" transform="translate(0,0)" x="0" y="0">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#4e79a7"/>
+      </g>
+      <g class="node" x="0" transform="translate(0,0)" y="0" id="node-24">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#76b7b2"/>
+      </g>
+      <g class="node" transform="translate(0,9.000000000000028)" id="node-26" y="9.000000000000028" x="0">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#edc949"/>
+      </g>
+      <g class="node" y="87" id="node-28" transform="translate(0,87)" x="0">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#ff9da7"/>
+      </g>
+      <g class="node" y="113" id="node-30" x="0" transform="translate(0,113)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#bab0ab"/>
+      </g>
+      <g class="node" transform="translate(0,217)" y="217" x="0" id="node-35">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#59a14f"/>
+      </g>
+      <g class="node" id="node-36" x="0" y="139" transform="translate(0,139)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#edc949"/>
+      </g>
+      <g class="node" x="0" id="node-37" transform="translate(0,165)" y="165">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#af7aa1"/>
+      </g>
+      <g class="node" transform="translate(0,191)" y="191" id="node-39" x="0">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#9c755f"/>
+      </g>
+      <g class="node" transform="translate(0,243)" x="0" id="node-40" y="243">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#bab0ab"/>
+      </g>
+      <g class="node" transform="translate(0,347)" id="node-41" x="0" y="347">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#4e79a7"/>
+      </g>
+      <g class="node" transform="translate(0,295)" id="node-44" x="0" y="295">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#76b7b2"/>
+      </g>
+      <g class="node" y="269" id="node-45" x="0" transform="translate(0,269)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#59a14f"/>
+      </g>
+      <g class="node" x="0" id="node-46" y="399" transform="translate(0,399)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#edc949"/>
+      </g>
+      <g class="node" y="321" transform="translate(0,321)" id="node-47" x="0">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#af7aa1"/>
+      </g>
+      <g class="node" y="373" x="0" id="node-48" transform="translate(0,373)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#ff9da7"/>
+      </g>
+      <g class="node" x="84.28571428571429" id="node-2" transform="translate(84.28571428571429,340.11202370043213)" y="340.11202370043213">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#f28e2c"/>
+      </g>
+      <g class="node" id="node-10" y="190.79729237491694" transform="translate(84.28571428571429,190.79729237491694)" x="84.28571428571429">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#bab0ab"/>
+      </g>
+      <g class="node" y="144.3334217169975" id="node-25" transform="translate(84.28571428571429,144.3334217169975)" x="84.28571428571429">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#59a14f"/>
+      </g>
+      <g class="node" transform="translate(84.28571428571429,222.3334217169975)" x="84.28571428571429" id="node-38" y="222.3334217169975">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#ff9da7"/>
+      </g>
+      <g class="node" transform="translate(84.28571428571429,311.54467675309184)" id="node-42" y="311.54467675309184" x="84.28571428571429">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#f28e2c"/>
+      </g>
+      <g class="node" id="node-43" y="386" x="84.28571428571429" transform="translate(84.28571428571429,386)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#e15759"/>
+      </g>
+      <g class="node" x="168.57142857142858" transform="translate(168.57142857142858,201.66684343399498)" id="node-3" y="201.66684343399498">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#e15759"/>
+      </g>
+      <g class="node" y="320.59458474983387" transform="translate(168.57142857142858,320.59458474983387)" id="node-5" x="168.57142857142858">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#59a14f"/>
+      </g>
+      <g class="node" id="node-6" x="168.57142857142858" y="175.66684343399498" transform="translate(168.57142857142858,175.66684343399498)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#edc949"/>
+      </g>
+      <g class="node" x="252.8571428571429" y="245.05598415110927" id="node-27" transform="translate(252.8571428571429,245.05598415110927)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#af7aa1"/>
+      </g>
+      <g class="node" transform="translate(337.14285714285717,313.6075786607503)" x="337.14285714285717" id="node-12" y="313.6075786607503">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#f28e2c"/>
+      </g>
+      <g class="node" transform="translate(337.14285714285717,276.0893535061836)" id="node-16" y="276.0893535061836" x="337.14285714285717">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#edc949"/>
+      </g>
+      <g class="node" transform="translate(421.42857142857144,231.76250967242714)" id="node-18" x="421.42857142857144" y="231.76250967242714">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#ff9da7"/>
+      </g>
+      <g class="node" id="node-29" transform="translate(505.7142857142858,173.5)" x="505.7142857142858" y="173.5">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#9c755f"/>
+      </g>
+      <g class="node" x="590" transform="translate(590,191)" id="node-4" y="191">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#76b7b2"/>
+      </g>
+      <g class="node" id="node-13" x="590" y="217" transform="translate(590,217)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#e15759"/>
+      </g>
+      <g class="node" id="node-14" x="590" y="373" transform="translate(590,373)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#76b7b2"/>
+      </g>
+      <g class="node" y="399" id="node-15" transform="translate(590,399)" x="590">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#59a14f"/>
+      </g>
+      <g class="node" transform="translate(590,243)" y="243" x="590" id="node-17">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#af7aa1"/>
+      </g>
+      <g class="node" id="node-19" y="61" x="590" transform="translate(590,61)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#9c755f"/>
+      </g>
+      <g class="node" id="node-20" y="269" transform="translate(590,269)" x="590">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#bab0ab"/>
+      </g>
+      <g class="node" id="node-21" transform="translate(590,295)" y="295" x="590">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#4e79a7"/>
+      </g>
+      <g class="node" x="590" y="321" id="node-22" transform="translate(590,321)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#f28e2c"/>
+      </g>
+      <g class="node" transform="translate(590,347)" y="347" x="590" id="node-23">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#e15759"/>
+      </g>
+      <g class="node" id="node-31" x="590" y="87" transform="translate(590,87)">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#4e79a7"/>
+      </g>
+      <g class="node" id="node-32" transform="translate(590,113)" x="590" y="113">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#f28e2c"/>
+      </g>
+      <g class="node" x="590" transform="translate(590,139)" id="node-33" y="139">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#e15759"/>
+      </g>
+      <g class="node" id="node-34" y="165" transform="translate(590,165)" x="590">
+        <rect x="0" y="0" width="10" height="1" class="sankey-node" fill="#76b7b2"/>
+      </g>
+    </g>
+    <g class="node-labels" font-size="14">
+      <text x="16" y="35.50000000000003" dy="0em" text-anchor="start">Agricultural &apos;waste&apos;
+124.73</text>
+      <text x="16" y="0.5" dy="0em" text-anchor="start">Biofuel imports
+35</text>
+      <text x="16" y="61.5" dy="0em" text-anchor="start">Biomass imports
+35</text>
+      <text x="16" y="0.5" dy="0em" text-anchor="start">Coal imports
+11.61</text>
+      <text x="16" y="0.5" dy="0em" text-anchor="start">Coal reserves
+63.97</text>
+      <text x="16" y="0.5" dy="0em" text-anchor="start">Gas imports
+40.72</text>
+      <text x="16" y="9.500000000000028" dy="0em" text-anchor="start">Gas reserves
+82.23</text>
+      <text x="16" y="87.5" dy="0em" text-anchor="start">Geothermal
+7.01</text>
+      <text x="16" y="113.5" dy="0em" text-anchor="start">Hydro
+7</text>
+      <text x="16" y="217.5" dy="0em" text-anchor="start">Marine algae
+4.38</text>
+      <text x="16" y="139.5" dy="0em" text-anchor="start">Nuclear
+839.98</text>
+      <text x="16" y="165.5" dy="0em" text-anchor="start">Oil imports
+504.29</text>
+      <text x="16" y="191.5" dy="0em" text-anchor="start">Oil reserves
+107.7</text>
+      <text x="16" y="243.5" dy="0em" text-anchor="start">Other waste
+134.4</text>
+      <text x="16" y="347.5" dy="0em" text-anchor="start">Pumped heat
+263.7</text>
+      <text x="16" y="295.5" dy="0em" text-anchor="start">Solar
+79.16</text>
+      <text x="16" y="269.5" dy="0em" text-anchor="start">Tidal
+9.45</text>
+      <text x="16" y="399.5" dy="0em" text-anchor="start">UK land based bioenergy
+182.01</text>
+      <text x="16" y="321.5" dy="0em" text-anchor="start">Wave
+19.01</text>
+      <text x="16" y="373.5" dy="0em" text-anchor="start">Wind
+289.37</text>
+      <text x="100.28571428571429" y="340.61202370043213" dy="0em" text-anchor="start">Bio-conversion
+388.93</text>
+      <text x="100.28571428571429" y="191.29729237491694" dy="0em" text-anchor="start">Coal
+75.57</text>
+      <text x="100.28571428571429" y="144.8334217169975" dy="0em" text-anchor="start">Ngas
+122.95</text>
+      <text x="100.28571428571429" y="222.8334217169975" dy="0em" text-anchor="start">Oil
+611.99</text>
+      <text x="100.28571428571429" y="312.04467675309184" dy="0em" text-anchor="start">Solar PV
+59.9</text>
+      <text x="100.28571428571429" y="386.5" dy="0em" text-anchor="start">Solar Thermal
+19.26</text>
+      <text x="184.57142857142858" y="202.16684343399498" dy="0em" text-anchor="start">Liquid
+647.59</text>
+      <text x="184.57142857142858" y="321.09458474983387" dy="0em" text-anchor="start">Solid
+447.48</text>
+      <text x="184.57142857142858" y="176.16684343399498" dy="0em" text-anchor="start">Gas
+204.1</text>
+      <text x="268.8571428571429" y="245.55598415110927" dy="0em" text-anchor="start">Thermal generation
+1391.99</text>
+      <text x="331.14285714285717" y="314.1075786607503" dy="0em" text-anchor="end">District heating
+79.33</text>
+      <text x="331.14285714285717" y="276.5893535061836" dy="0em" text-anchor="end">Electricity grid
+918.61</text>
+      <text x="415.42857142857144" y="232.26250967242714" dy="0em" text-anchor="end">H2 conversion
+27.14</text>
+      <text x="499.7142857142858" y="174" dy="0em" text-anchor="end">H2
+20.9</text>
+      <text x="584" y="191.5" dy="0em" text-anchor="end">Losses
+878.33</text>
+      <text x="584" y="217.5" dy="0em" text-anchor="end">Industry
+568.93</text>
+      <text x="584" y="373.5" dy="0em" text-anchor="end">Heating and cooling - commercial
+134.16</text>
+      <text x="584" y="399.5" dy="0em" text-anchor="end">Heating and cooling - homes
+372.2</text>
+      <text x="584" y="243.5" dy="0em" text-anchor="end">Over generation / exports
+104.45</text>
+      <text x="584" y="61.5" dy="0em" text-anchor="end">Road transport
+194.53</text>
+      <text x="584" y="269.5" dy="0em" text-anchor="end">Agriculture
+11.03</text>
+      <text x="584" y="295.5" dy="0em" text-anchor="end">Rail transport
+12.28</text>
+      <text x="584" y="321.5" dy="0em" text-anchor="end">Lighting &amp; appliances - commercial
+90.01</text>
+      <text x="584" y="347.5" dy="0em" text-anchor="end">Lighting &amp; appliances - homes
+93.49</text>
+      <text x="584" y="87.5" dy="0em" text-anchor="end">International shipping
+128.69</text>
+      <text x="584" y="113.5" dy="0em" text-anchor="end">Domestic aviation
+14.46</text>
+      <text x="584" y="139.5" dy="0em" text-anchor="end">International aviation
+206.27</text>
+      <text x="584" y="165.5" dy="0em" text-anchor="end">National navigation
+33.22</text>
+    </g>
+    <g class="links" stroke-opacity="0.5" fill="none">
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,35.50000000000003 C47.142857142857146,35.50000000000003 47.142857142857146,340.61202370043213 84.28571428571429,340.61202370043213" stroke="url(#linearGradient-1)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M94.28571428571429,340.61202370043213 C131.42857142857144,340.61202370043213 131.42857142857144,202.16684343399498 168.57142857142858,202.16684343399498" stroke="url(#linearGradient-2)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M94.28571428571429,341.61202370043213 C342.14285714285717,341.61202370043213 342.14285714285717,191.5 590,191.5" stroke="url(#linearGradient-3)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M94.28571428571429,342.61202370043213 C131.42857142857144,342.61202370043213 131.42857142857144,321.09458474983387 168.57142857142858,321.09458474983387" stroke="url(#linearGradient-4)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M94.28571428571429,343.61202370043213 C131.42857142857144,343.61202370043213 131.42857142857144,176.16684343399498 168.57142857142858,176.16684343399498" stroke-width="1" stroke="url(#linearGradient-5)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,0.5 C89.28571428571429,0.5 89.28571428571429,203.16684343399498 168.57142857142858,203.16684343399498" stroke="url(#linearGradient-6)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,61.5 C89.28571428571429,61.5 89.28571428571429,322.09458474983387 168.57142857142858,322.09458474983387" stroke="url(#linearGradient-7)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,0.5 C47.142857142857146,0.5 47.142857142857146,191.29729237491694 84.28571428571429,191.29729237491694" stroke-width="1" stroke="url(#linearGradient-8)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,0.5 C47.142857142857146,0.5 47.142857142857146,192.29729237491694 84.28571428571429,192.29729237491694" stroke-width="1" stroke="url(#linearGradient-9)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M94.28571428571429,191.29729237491694 C131.42857142857144,191.29729237491694 131.42857142857144,323.09458474983387 168.57142857142858,323.09458474983387" stroke="url(#linearGradient-10)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,314.1075786607503 C468.57142857142856,314.1075786607503 468.57142857142856,217.5 590,217.5" stroke="url(#linearGradient-11)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,315.1075786607503 C468.57142857142856,315.1075786607503 468.57142857142856,373.5 590,373.5" stroke="url(#linearGradient-12)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,316.1075786607503 C468.57142857142856,316.1075786607503 468.57142857142856,399.5 590,399.5" stroke="url(#linearGradient-13)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,276.5893535061836 C468.57142857142856,276.5893535061836 468.57142857142856,243.5 590,243.5" stroke-width="1" stroke="url(#linearGradient-14)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,277.5893535061836 C468.57142857142856,277.5893535061836 468.57142857142856,400.5 590,400.5" stroke-width="1" stroke="url(#linearGradient-15)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,278.5893535061836 C384.28571428571433,278.5893535061836 384.28571428571433,232.26250967242714 421.42857142857144,232.26250967242714" stroke="url(#linearGradient-16)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,279.5893535061836 C468.57142857142856,279.5893535061836 468.57142857142856,218.5 590,218.5" stroke="url(#linearGradient-17)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,280.5893535061836 C468.57142857142856,280.5893535061836 468.57142857142856,61.5 590,61.5" stroke-width="1" stroke="url(#linearGradient-18)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,281.5893535061836 C468.57142857142856,281.5893535061836 468.57142857142856,269.5 590,269.5" stroke-width="1" stroke="url(#linearGradient-19)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,282.5893535061836 C468.57142857142856,282.5893535061836 468.57142857142856,374.5 590,374.5" stroke-width="1" stroke="url(#linearGradient-20)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,283.5893535061836 C468.57142857142856,283.5893535061836 468.57142857142856,192.5 590,192.5" stroke-width="1" stroke="url(#linearGradient-21)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,284.5893535061836 C468.57142857142856,284.5893535061836 468.57142857142856,295.5 590,295.5" stroke-width="1" stroke="url(#linearGradient-22)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,285.5893535061836 C468.57142857142856,285.5893535061836 468.57142857142856,321.5 590,321.5" stroke-width="1" stroke="url(#linearGradient-23)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M347.14285714285717,286.5893535061836 C468.57142857142856,286.5893535061836 468.57142857142856,347.5 590,347.5" stroke-width="1" stroke="url(#linearGradient-24)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,0.5 C47.142857142857146,0.5 47.142857142857146,144.8334217169975 84.28571428571429,144.8334217169975" stroke="url(#linearGradient-25)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,9.500000000000028 C47.142857142857146,9.500000000000028 47.142857142857146,145.8334217169975 84.28571428571429,145.8334217169975" stroke="url(#linearGradient-26)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,176.16684343399498 C384.2857142857143,176.16684343399498 384.2857142857143,375.5 590,375.5" stroke="url(#linearGradient-27)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,177.16684343399498 C384.2857142857143,177.16684343399498 384.2857142857143,193.5 590,193.5" stroke="url(#linearGradient-28)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,178.16684343399498 C215.71428571428572,178.16684343399498 215.71428571428572,245.55598415110927 252.8571428571429,245.55598415110927" stroke="url(#linearGradient-29)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,179.16684343399498 C384.2857142857143,179.16684343399498 384.2857142857143,270.5 590,270.5" stroke="url(#linearGradient-30)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,180.16684343399498 C384.2857142857143,180.16684343399498 384.2857142857143,219.5 590,219.5" stroke-width="1" stroke="url(#linearGradient-31)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,87.5 C173.57142857142858,87.5 173.57142857142858,276.5893535061836 337.14285714285717,276.5893535061836" stroke-width="1" stroke="url(#linearGradient-32)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M431.42857142857144,232.26250967242714 C468.5714285714286,232.26250967242714 468.5714285714286,174 505.7142857142858,174" stroke-width="1" stroke="url(#linearGradient-33)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M431.42857142857144,233.26250967242714 C510.7142857142857,233.26250967242714 510.7142857142857,194.5 590,194.5" stroke="url(#linearGradient-34)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M515.7142857142858,174 C552.8571428571429,174 552.8571428571429,62.5 590,62.5" stroke="url(#linearGradient-35)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,113.5 C173.57142857142858,113.5 173.57142857142858,277.5893535061836 337.14285714285717,277.5893535061836" stroke="url(#linearGradient-36)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,202.16684343399498 C384.2857142857143,202.16684343399498 384.2857142857143,220.5 590,220.5" stroke="url(#linearGradient-37)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,203.16684343399498 C384.2857142857143,203.16684343399498 384.2857142857143,87.5 590,87.5" stroke="url(#linearGradient-38)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,204.16684343399498 C384.2857142857143,204.16684343399498 384.2857142857143,63.5 590,63.5" stroke-width="1" stroke="url(#linearGradient-39)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,205.16684343399498 C384.2857142857143,205.16684343399498 384.2857142857143,113.5 590,113.5" stroke="url(#linearGradient-40)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,206.16684343399498 C384.2857142857143,206.16684343399498 384.2857142857143,139.5 590,139.5" stroke-width="1" stroke="url(#linearGradient-41)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,207.16684343399498 C384.2857142857143,207.16684343399498 384.2857142857143,271.5 590,271.5" stroke="url(#linearGradient-42)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,208.16684343399498 C384.2857142857143,208.16684343399498 384.2857142857143,165.5 590,165.5" stroke-width="1" stroke="url(#linearGradient-43)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,209.16684343399498 C384.2857142857143,209.16684343399498 384.2857142857143,296.5 590,296.5" stroke-width="1" stroke="url(#linearGradient-44)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,217.5 C47.142857142857146,217.5 47.142857142857146,341.61202370043213 84.28571428571429,341.61202370043213" stroke-width="1" stroke="url(#linearGradient-45)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M94.28571428571429,144.8334217169975 C131.42857142857144,144.8334217169975 131.42857142857144,177.16684343399498 168.57142857142858,177.16684343399498" stroke="url(#linearGradient-46)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,139.5 C131.42857142857144,139.5 131.42857142857144,246.55598415110927 252.8571428571429,246.55598415110927" stroke-width="1" stroke="url(#linearGradient-47)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,165.5 C47.142857142857146,165.5 47.142857142857146,222.8334217169975 84.28571428571429,222.8334217169975" stroke="url(#linearGradient-48)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,191.5 C47.142857142857146,191.5 47.142857142857146,223.8334217169975 84.28571428571429,223.8334217169975" stroke-width="1" stroke="url(#linearGradient-49)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M94.28571428571429,222.8334217169975 C131.42857142857144,222.8334217169975 131.42857142857144,204.16684343399498 168.57142857142858,204.16684343399498" stroke="url(#linearGradient-50)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,243.5 C89.28571428571429,243.5 89.28571428571429,324.09458474983387 168.57142857142858,324.09458474983387" stroke="url(#linearGradient-51)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,244.5 C47.142857142857146,244.5 47.142857142857146,342.61202370043213 84.28571428571429,342.61202370043213" stroke-width="1" stroke="url(#linearGradient-52)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,347.5 C300,347.5 300,401.5 590,401.5" stroke-width="1" stroke="url(#linearGradient-53)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,348.5 C300,348.5 300,376.5 590,376.5" stroke="url(#linearGradient-54)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M94.28571428571429,312.04467675309184 C215.71428571428572,312.04467675309184 215.71428571428572,278.5893535061836 337.14285714285717,278.5893535061836" stroke-width="1" stroke="url(#linearGradient-55)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M94.28571428571429,386.5 C342.14285714285717,386.5 342.14285714285717,402.5 590,402.5" stroke="url(#linearGradient-56)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,295.5 C47.142857142857146,295.5 47.142857142857146,386.5 84.28571428571429,386.5" stroke="url(#linearGradient-57)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,296.5 C47.142857142857146,296.5 47.142857142857146,312.04467675309184 84.28571428571429,312.04467675309184" stroke-width="1" stroke="url(#linearGradient-58)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,321.09458474983387 C384.2857142857143,321.09458474983387 384.2857142857143,272.5 590,272.5" stroke-width="1" stroke="url(#linearGradient-59)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,322.09458474983387 C215.71428571428572,322.09458474983387 215.71428571428572,247.55598415110927 252.8571428571429,247.55598415110927" stroke="url(#linearGradient-60)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M178.57142857142858,323.09458474983387 C384.2857142857143,323.09458474983387 384.2857142857143,221.5 590,221.5" stroke="url(#linearGradient-61)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M262.8571428571429,245.55598415110927 C300,245.55598415110927 300,279.5893535061836 337.14285714285717,279.5893535061836" stroke="url(#linearGradient-62)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M262.8571428571429,246.55598415110927 C426.42857142857144,246.55598415110927 426.42857142857144,195.5 590,195.5" stroke-width="1" stroke="url(#linearGradient-63)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M262.8571428571429,247.55598415110927 C300,247.55598415110927 300,314.1075786607503 337.14285714285717,314.1075786607503" stroke="url(#linearGradient-64)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,269.5 C173.57142857142858,269.5 173.57142857142858,280.5893535061836 337.14285714285717,280.5893535061836" stroke="url(#linearGradient-65)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,399.5 C47.142857142857146,399.5 47.142857142857146,343.61202370043213 84.28571428571429,343.61202370043213" stroke="url(#linearGradient-66)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,321.5 C173.57142857142858,321.5 173.57142857142858,281.5893535061836 337.14285714285717,281.5893535061836" stroke="url(#linearGradient-67)" stroke-width="1"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,373.5 C173.57142857142858,373.5 173.57142857142858,282.5893535061836 337.14285714285717,282.5893535061836" stroke-width="1" stroke="url(#linearGradient-68)"/>
+      </g>
+    </g>
+  </g>
+</svg>
