@@ -12,6 +12,7 @@ mod git;
 mod mindmap;
 mod packet;
 mod pie;
+mod quadrant;
 mod radar;
 mod requirement;
 mod sequence;
@@ -98,6 +99,7 @@ pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<St
         Diagram::Radar(db) => radar::render_radar(db, config),
         Diagram::Packet(db) => packet::render_packet(db, config),
         Diagram::XyChart(db) => xychart::render_xychart(db, config),
+        Diagram::Quadrant(db) => quadrant::render_quadrant(db, config),
         Diagram::Treemap(db) => treemap::render_treemap(db, config),
         _ => Err(MermaidError::RenderError(format!(
             "Diagram type {:?} not yet supported for rendering",
