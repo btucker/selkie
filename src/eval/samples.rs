@@ -365,6 +365,55 @@ pub fn embedded_samples() -> Vec<Sample> {
         end
     end"#,
         },
+        // Sankey diagrams
+        Sample {
+            name: "sankey_simple",
+            diagram_type: "sankey",
+            source: r#"sankey-beta
+
+sourceNode,targetNode,10"#,
+        },
+        Sample {
+            name: "sankey_chain",
+            diagram_type: "sankey",
+            source: r#"sankey-beta
+
+a,b,8
+b,c,8
+c,d,8"#,
+        },
+        Sample {
+            name: "sankey_branching",
+            diagram_type: "sankey",
+            source: r#"sankey-beta
+
+a,b,8
+b,c,8
+c,d,8
+d,e,8
+
+x,c,4
+c,y,4"#,
+        },
+        Sample {
+            name: "sankey_energy",
+            diagram_type: "sankey",
+            source: r#"sankey-beta
+
+Bio-conversion,Liquid,0.597
+Bio-conversion,Losses,26.862
+Bio-conversion,Solid,280.322
+Bio-conversion,Gas,81.144"#,
+        },
+        Sample {
+            name: "sankey_quoted",
+            diagram_type: "sankey",
+            source: r#"sankey-beta
+
+"Biofuel imports",Liquid,35
+"Heating and cooling",Residential,79.329
+"District heating","Heating and cooling, commercial",22.505"#,
+        },
     ]
 }
 
@@ -397,6 +446,8 @@ fn detect_diagram_type(source: &str) -> String {
         "journey".to_string()
     } else if first_line.starts_with("architecture") {
         "architecture".to_string()
+    } else if first_line.starts_with("sankey") {
+        "sankey".to_string()
     } else {
         "unknown".to_string()
     }
@@ -458,6 +509,10 @@ mod tests {
         assert_eq!(
             detect_diagram_type("architecture-beta\n  service db(database)[DB]"),
             "architecture"
+        );
+        assert_eq!(
+            detect_diagram_type("sankey-beta\n  a,b,10"),
+            "sankey"
         );
     }
 }
