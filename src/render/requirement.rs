@@ -22,8 +22,10 @@ struct BoxDimensions {
     height: f64,
 }
 
-/// Default box dimensions
-const DEFAULT_BOX_WIDTH: f64 = 200.0;
+/// Default box dimensions - sized to match mermaid reference
+/// Mermaid requirement boxes are ~160px wide, elements are ~140px
+const DEFAULT_REQ_BOX_WIDTH: f64 = 160.0;
+const DEFAULT_ELEM_BOX_WIDTH: f64 = 140.0;
 const DEFAULT_BOX_HEIGHT: f64 = 120.0;
 const BOX_PADDING: f64 = 10.0;
 const LINE_HEIGHT: f64 = 18.0;
@@ -61,7 +63,7 @@ fn calculate_requirement_dimensions(req: &Requirement) -> BoxDimensions {
         .max(risk_width)
         .max(verify_width);
 
-    let width = (content_width + BOX_PADDING * 4.0).max(DEFAULT_BOX_WIDTH);
+    let width = (content_width + BOX_PADDING * 4.0).max(DEFAULT_REQ_BOX_WIDTH);
 
     // Calculate height based on content
     let mut line_count = 1; // Type header
@@ -100,7 +102,7 @@ fn calculate_element_dimensions(elem: &Element) -> BoxDimensions {
     };
 
     let content_width = name_width.max(type_width).max(docref_width);
-    let width = (content_width + BOX_PADDING * 4.0).max(DEFAULT_BOX_WIDTH);
+    let width = (content_width + BOX_PADDING * 4.0).max(DEFAULT_ELEM_BOX_WIDTH);
 
     let mut line_count = 1; // Element header
     if !elem.element_type.is_empty() {
@@ -175,9 +177,9 @@ impl ToLayoutGraph for RequirementDb {
 
         graph.options = LayoutOptions {
             direction,
-            node_spacing: 50.0,
-            layer_spacing: 80.0,
-            padding: Padding::uniform(20.0),
+            node_spacing: 30.0,  // Reduced from 50 to match tighter mermaid layout
+            layer_spacing: 60.0, // Reduced from 80 to match tighter mermaid layout
+            padding: Padding::uniform(10.0), // Reduced from 20 to match mermaid
             ..Default::default()
         };
 
@@ -321,7 +323,7 @@ pub fn render_requirement(db: &RequirementDb, config: &RenderConfig) -> Result<S
     for (name, req) in requirements {
         if let Some(&(x, y)) = node_positions.get(name) {
             let dims = node_dimensions.get(name).cloned().unwrap_or(BoxDimensions {
-                width: DEFAULT_BOX_WIDTH,
+                width: DEFAULT_REQ_BOX_WIDTH,
                 height: DEFAULT_BOX_HEIGHT,
             });
             let req_elem = render_requirement_box(req, x, y, dims.width, dims.height);
@@ -333,7 +335,7 @@ pub fn render_requirement(db: &RequirementDb, config: &RenderConfig) -> Result<S
     for (name, elem) in elements {
         if let Some(&(x, y)) = node_positions.get(name) {
             let dims = node_dimensions.get(name).cloned().unwrap_or(BoxDimensions {
-                width: DEFAULT_BOX_WIDTH,
+                width: DEFAULT_ELEM_BOX_WIDTH,
                 height: 80.0,
             });
             let elem_elem = render_element_box(elem, x, y, dims.width, dims.height);
