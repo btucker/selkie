@@ -5,6 +5,7 @@
 
 use crate::diagrams::block::{Block, BlockDb, BlockType};
 use crate::error::Result;
+use crate::render::svg::markers::create_arrow_markers;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 use std::collections::HashMap;
 
@@ -118,6 +119,9 @@ pub fn render_block(db: &BlockDb, config: &RenderConfig) -> Result<String> {
         doc.add_style(&generate_block_css(config, classes));
     }
 
+    // Add arrow marker definitions for edges
+    doc.add_defs(create_arrow_markers(&config.theme));
+
     // Render edges first (behind blocks)
     if !edges.is_empty() {
         let block_map: HashMap<&str, &PositionedBlock> = positioned_blocks
@@ -212,7 +216,10 @@ fn layout_blocks(
             continue;
         }
 
-        let (width, height) = sizes.get(id).cloned().unwrap_or((MIN_BLOCK_WIDTH, MIN_BLOCK_HEIGHT));
+        let (width, height) = sizes
+            .get(id)
+            .cloned()
+            .unwrap_or((MIN_BLOCK_WIDTH, MIN_BLOCK_HEIGHT));
         let span = block.width_in_columns.unwrap_or(1);
 
         // Check if we need to wrap to next row
@@ -431,10 +438,7 @@ fn render_block_node(block: &PositionedBlock, _config: &RenderConfig) -> SvgElem
         attrs: Attrs::new()
             .with_class(&class_list.join(" "))
             .with_id(&format!("block-{}", block.id))
-            .with_attr(
-                "transform",
-                &format!("translate({}, {})", block.x, block.y),
-            ),
+            .with_attr("transform", &format!("translate({}, {})", block.x, block.y)),
     }
 }
 
@@ -485,9 +489,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
                 cx: w / 2.0,
                 cy: h / 2.0,
                 r: inner_radius,
-                attrs: Attrs::new()
-                    .with_class("node-bkg-inner")
-                    .with_fill("none"),
+                attrs: Attrs::new().with_class("node-bkg-inner").with_fill("none"),
             };
             SvgElement::Group {
                 children: vec![outer, inner],
@@ -507,7 +509,18 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             let m = h / 4.0;
             let points = format!(
                 "{},{} {},{} {},{} {},{} {},{} {},{}",
-                m, 0.0, w - m, 0.0, w, h / 2.0, w - m, h, m, h, 0.0, h / 2.0
+                m,
+                0.0,
+                w - m,
+                0.0,
+                w,
+                h / 2.0,
+                w - m,
+                h,
+                m,
+                h,
+                0.0,
+                h / 2.0
             );
             SvgElement::PolygonStr {
                 points,
@@ -556,8 +569,24 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             let path = format!(
                 "M 0 {} A {} {} 0 1 0 {} {} V {} A {} {} 0 1 0 0 {} V {} Z \
                  M 0 {} A {} {} 0 1 1 {} {} A {} {} 0 1 1 0 {}",
-                ry, w / 2.0, ry, w, ry, h - ry, w / 2.0, ry, h - ry, ry, ry, w / 2.0, ry, w, ry,
-                w / 2.0, ry, ry
+                ry,
+                w / 2.0,
+                ry,
+                w,
+                ry,
+                h - ry,
+                w / 2.0,
+                ry,
+                h - ry,
+                ry,
+                ry,
+                w / 2.0,
+                ry,
+                w,
+                ry,
+                w / 2.0,
+                ry,
+                ry
             );
             SvgElement::Path {
                 d: path,
@@ -568,7 +597,14 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             let skew = 10.0;
             let points = format!(
                 "{},{} {},{} {},{} {},{}",
-                skew, 0.0, w, 0.0, w - skew, h, 0.0, h
+                skew,
+                0.0,
+                w,
+                0.0,
+                w - skew,
+                h,
+                0.0,
+                h
             );
             SvgElement::PolygonStr {
                 points,
@@ -579,7 +615,14 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             let skew = 10.0;
             let points = format!(
                 "{},{} {},{} {},{} {},{}",
-                0.0, 0.0, w - skew, 0.0, w, h, skew, h
+                0.0,
+                0.0,
+                w - skew,
+                0.0,
+                w,
+                h,
+                skew,
+                h
             );
             SvgElement::PolygonStr {
                 points,
@@ -660,7 +703,7 @@ fn generate_block_css(
 .node-bkg {{
   fill: {node_fill};
   stroke: {node_border};
-  stroke-width: 1px;
+  stroke-width: 2px;
 }}
 .node-bkg-inner {{
   stroke: {node_border};
@@ -668,10 +711,22 @@ fn generate_block_css(
 }}
 .block-edge {{
   stroke: {line_color};
+  stroke-width: 2px;
+  fill: none;
 }}
 .edge-label {{
   font-family: {font_family};
   fill: {text_color};
+  font-size: 12px;
+}}
+.block-edges marker {{
+  fill: {line_color};
+}}
+.block-composite {{
+  fill: {secondary_color};
+  stroke: {node_border};
+  stroke-width: 1px;
+  stroke-dasharray: 5,5;
 }}
 {custom_css}
 "#,
@@ -680,6 +735,7 @@ fn generate_block_css(
         node_fill = theme.primary_color,
         node_border = theme.primary_border_color,
         line_color = theme.line_color,
+        secondary_color = theme.secondary_color,
         custom_css = custom_css
     )
 }

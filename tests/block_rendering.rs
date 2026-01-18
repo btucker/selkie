@@ -337,7 +337,10 @@ fn test_bl18_block_types_square_rounded_circle() {
 
     assert_valid_svg(&svg);
     // Verify different shapes exist
-    assert!(svg.contains("rect") || svg.contains("path"), "Should contain rect or path elements for blocks");
+    assert!(
+        svg.contains("rect") || svg.contains("path"),
+        "Should contain rect or path elements for blocks"
+    );
 }
 
 #[test]
