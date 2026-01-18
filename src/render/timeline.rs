@@ -26,6 +26,9 @@ const TASK_GAP: f64 = 100.0;
 const FONT_SIZE: f64 = 16.0; // Match mermaid.js default
 const TITLE_FONT_SIZE: f64 = 24.0;
 const MAX_SECTIONS: usize = 12;
+// Character width factor for text wrapping estimation
+// Browser-measured text is narrower than simple estimates; 0.42 matches mermaid.js behavior
+const CHAR_WIDTH_FACTOR: f64 = 0.42;
 
 /// Render a timeline diagram to SVG
 pub fn render_timeline(db: &TimelineDb, config: &RenderConfig) -> Result<String> {
@@ -184,7 +187,7 @@ fn estimate_node_height(text: &str, width: f64) -> f64 {
 
     for line in lines {
         // Estimate characters per line
-        let chars_per_line = (width / (FONT_SIZE * 0.5)).floor() as usize;
+        let chars_per_line = (width / (FONT_SIZE * CHAR_WIDTH_FACTOR)).floor() as usize;
         let line_count = if chars_per_line > 0 {
             (line.len() / chars_per_line).max(1)
         } else {
@@ -555,7 +558,7 @@ fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
     }
 
     // Estimate characters per line
-    let chars_per_line = (max_width / (FONT_SIZE * 0.5)).floor() as usize;
+    let chars_per_line = (max_width / (FONT_SIZE * CHAR_WIDTH_FACTOR)).floor() as usize;
 
     // Build lines
     let mut lines: Vec<String> = Vec::new();
