@@ -27,8 +27,8 @@ const FACE_BASE_Y: f64 = 300.0;
 const FACE_SCORE_MULTIPLIER: f64 = 30.0;
 /// Face radius
 const FACE_RADIUS: f64 = 15.0;
-/// Task font size
-const TASK_FONT_SIZE: f64 = 12.0;
+/// Task font size (matching mermaid.js default from config.schema.yaml)
+const TASK_FONT_SIZE: f64 = 14.0;
 
 /// Actor colors (matching mermaid.js defaults)
 const ACTOR_COLORS: &[&str] = &[
@@ -51,11 +51,11 @@ pub fn render_journey(db: &JourneyDb, config: &RenderConfig) -> Result<String> {
     let actors = db.get_actors();
     let has_title = !db.title.is_empty();
 
-    // Calculate dimensions
+    // Calculate dimensions (matching mermaid.js width calculation)
     let num_tasks = tasks.len().max(1);
     let left_margin = LEFT_MARGIN;
-    let task_total_width =
-        (num_tasks as f64) * WIDTH + ((num_tasks.saturating_sub(1)) as f64) * DIAGRAM_MARGIN_X;
+    // Use full taskMargin spacing for each task, plus margins on both ends
+    let task_total_width = (num_tasks as f64) * (WIDTH + DIAGRAM_MARGIN_X);
     let width = left_margin + task_total_width + DIAGRAM_MARGIN_X * 2.0;
     let height = FACE_BASE_Y + 5.0 * FACE_SCORE_MULTIPLIER + DIAGRAM_MARGIN_Y * 2.0 + 50.0;
 
@@ -82,13 +82,7 @@ pub fn render_journey(db: &JourneyDb, config: &RenderConfig) -> Result<String> {
     // Calculate title offset
     let title_offset = if has_title { TITLE_HEIGHT } else { 0.0 };
 
-    // Render title if present
-    if has_title {
-        let title_element = render_title(&db.title, left_margin, config);
-        doc.add_node(title_element);
-    }
-
-    // Render actor legend
+    // Render actor legend first (matching mermaid.js render order)
     let legend = render_actor_legend(&actors, &actor_colors, title_offset);
     doc.add_node(legend);
 
@@ -97,6 +91,12 @@ pub fn render_journey(db: &JourneyDb, config: &RenderConfig) -> Result<String> {
         render_sections_and_tasks(db, left_margin, title_offset, &actor_colors);
     doc.add_node(sections_element);
     doc.add_node(tasks_element);
+
+    // Render title AFTER tasks (matching mermaid.js z-order where title appears last)
+    if has_title {
+        let title_element = render_title(&db.title, left_margin, config);
+        doc.add_node(title_element);
+    }
 
     // Render activity line (arrow at the bottom)
     let line_y = HEIGHT * 4.0 + title_offset; // One section head + one task + margins
@@ -117,6 +117,7 @@ fn create_arrow_defs() -> SvgElement {
 }
 
 /// Render the actor legend on the left side
+/// Each actor's circle+text is wrapped in its own group to maintain proper z-order
 fn render_actor_legend(
     actors: &[String],
     actor_colors: &std::collections::HashMap<String, (String, usize)>,
@@ -144,7 +145,6 @@ fn render_actor_legend(
                 .with_fill(color)
                 .with_stroke("#000"),
         };
-        children.push(circle);
 
         // Draw actor name with legend class (for CSS targeting)
         let text = SvgElement::Text {
@@ -156,7 +156,14 @@ fn render_actor_legend(
                 .with_fill("#666")
                 .with_attr("text-anchor", "start"),
         };
-        children.push(text);
+
+        // Wrap each actor in its own group so text comes after its own circle
+        // This prevents z-order detection issues where text appears before next actor's circle
+        let actor_group = SvgElement::Group {
+            children: vec![circle, text],
+            attrs: Attrs::new().with_class(&format!("actor-legend-{}", pos)),
+        };
+        children.push(actor_group);
     }
 
     SvgElement::Group {
@@ -165,7 +172,7 @@ fn render_actor_legend(
     }
 }
 
-/// Render the diagram title
+/// Render the diagram title (matching mermaid.js with font-size: 4ex)
 fn render_title(title: &str, left_margin: f64, config: &RenderConfig) -> SvgElement {
     SvgElement::Text {
         x: left_margin,
@@ -174,7 +181,7 @@ fn render_title(title: &str, left_margin: f64, config: &RenderConfig) -> SvgElem
         attrs: Attrs::new()
             .with_class("journey-title")
             .with_fill(&config.theme.primary_text_color)
-            .with_attr("font-size", "24px")
+            .with_attr("font-size", "4ex")
             .with_attr("font-weight", "bold"),
     }
 }
@@ -480,6 +487,8 @@ fn render_face(cx: f64, cy: f64, score: i32) -> SvgElement {
 
     // Mouth based on score
     // Using d3.arc equivalent: innerRadius/outerRadius with start/end angles
+    // Note: Reference mermaid.js doesn't set explicit stroke-width on mouth paths
+    // (they use CSS styling), so we don't set stroke-width on arc paths here
     let mouth = if score > 3 {
         // Happy face - smile arc (startAngle: PI/2, endAngle: 3*PI/2)
         // This creates a downward arc (smile)
@@ -500,7 +509,6 @@ fn render_face(cx: f64, cy: f64, score: i32) -> SvgElement {
             attrs: Attrs::new()
                 .with_class("mouth")
                 .with_stroke("#666")
-                .with_stroke_width(2.0)
                 .with_fill("none"),
         }
     } else if score < 3 {
@@ -522,11 +530,10 @@ fn render_face(cx: f64, cy: f64, score: i32) -> SvgElement {
             attrs: Attrs::new()
                 .with_class("mouth")
                 .with_stroke("#666")
-                .with_stroke_width(2.0)
                 .with_fill("none"),
         }
     } else {
-        // Neutral face - straight line
+        // Neutral face - straight line (reference uses stroke-width: 1px)
         SvgElement::Line {
             x1: cx - 5.0,
             y1: cy + 7.0,
