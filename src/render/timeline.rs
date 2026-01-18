@@ -11,18 +11,18 @@ use crate::error::Result;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
 // Mermaid-compatible layout constants
-const LEFT_MARGIN: f64 = 50.0;
+const LEFT_MARGIN: f64 = 100.0; // Match reference (starts content at x=200 from viewBox x=100)
 const TOP_MARGIN: f64 = 50.0;
-const NODE_WIDTH: f64 = 150.0;
+const NODE_WIDTH: f64 = 180.0; // Match reference (h180 in path)
 const NODE_PADDING: f64 = 20.0;
 const COLUMN_WIDTH: f64 = 200.0;
-const SECTION_HEIGHT: f64 = 50.0;
-const TASK_HEIGHT: f64 = 50.0;
-const EVENT_HEIGHT: f64 = 50.0;
+const SECTION_HEIGHT: f64 = 68.0; // ~68px in reference
+const TASK_HEIGHT: f64 = 68.0; // ~68px in reference
+const EVENT_HEIGHT: f64 = 65.0; // ~65px minimum in reference
 const EVENT_SPACING: f64 = 10.0;
 const SECTION_GAP: f64 = 50.0;
 const TASK_GAP: f64 = 100.0;
-const FONT_SIZE: f64 = 11.0;
+const FONT_SIZE: f64 = 16.0; // Match mermaid.js default
 const TITLE_FONT_SIZE: f64 = 24.0;
 const MAX_SECTIONS: usize = 12;
 
@@ -148,7 +148,8 @@ fn calculate_layout(
 
     // Calculate total number of columns (tasks across all sections)
     let total_columns = tasks.len().max(1);
-    let total_width = LEFT_MARGIN + (total_columns as f64) * COLUMN_WIDTH + LEFT_MARGIN * 3.0;
+    // Width: left margin + columns + right margin for timeline arrow
+    let total_width = LEFT_MARGIN + (total_columns as f64) * COLUMN_WIDTH + LEFT_MARGIN * 2.0;
 
     // Calculate depth_y (position of timeline line)
     let section_begin_y = TOP_MARGIN;
@@ -159,7 +160,8 @@ fn calculate_layout(
     };
 
     // Total height includes title, sections, tasks, events, and timeline line
-    let total_height = depth_y + max_event_line_length + 200.0;
+    // Add extra margin to match reference which has ~340px below the timeline line
+    let total_height = depth_y + max_event_line_length + 280.0;
 
     TimelineLayout {
         total_width,
@@ -180,7 +182,7 @@ fn estimate_node_height(text: &str, width: f64) -> f64 {
 
     for line in lines {
         // Estimate characters per line
-        let chars_per_line = (width / (FONT_SIZE * 0.6)).floor() as usize;
+        let chars_per_line = (width / (FONT_SIZE * 0.5)).floor() as usize;
         let line_count = if chars_per_line > 0 {
             (line.len() / chars_per_line).max(1)
         } else {
@@ -551,7 +553,7 @@ fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
     }
 
     // Estimate characters per line
-    let chars_per_line = (max_width / (FONT_SIZE * 0.6)).floor() as usize;
+    let chars_per_line = (max_width / (FONT_SIZE * 0.5)).floor() as usize;
 
     // Build lines
     let mut lines: Vec<String> = Vec::new();
