@@ -191,6 +191,7 @@ fn layout_blocks(
     let mut y = 0.0;
     let mut col = 0;
     let mut row_height = 0.0_f64;
+    let mut current_x = 0.0; // Track actual x position based on block widths
 
     // Collect all blocks and sort by ID for consistent ordering
     let mut block_list: Vec<_> = blocks.iter().collect();
@@ -201,9 +202,11 @@ fn layout_blocks(
         if block.block_type == BlockType::Space {
             let span = block.width_in_columns.unwrap_or(1);
             for _ in 0..span {
+                current_x += MIN_BLOCK_WIDTH + BLOCK_SPACING;
                 col += 1;
                 if col >= columns {
                     col = 0;
+                    current_x = 0.0;
                     y += row_height + BLOCK_SPACING;
                     row_height = 0.0;
                 }
@@ -225,12 +228,10 @@ fn layout_blocks(
         // Check if we need to wrap to next row
         if col + span > columns && col > 0 {
             col = 0;
+            current_x = 0.0;
             y += row_height + BLOCK_SPACING;
             row_height = 0.0;
         }
-
-        // Calculate x position based on column
-        let x = (col as f64) * (MIN_BLOCK_WIDTH + BLOCK_SPACING);
 
         // Adjust width for column span
         let block_width = if span > 1 {
@@ -243,7 +244,7 @@ fn layout_blocks(
             id: id.clone(),
             label: block.label.clone().unwrap_or_else(|| id.clone()),
             block_type: block.block_type.clone(),
-            x,
+            x: current_x,
             y,
             width: block_width,
             height,
@@ -252,12 +253,15 @@ fn layout_blocks(
             classes: block.classes.clone(),
         });
 
+        // Advance x position by actual block width
+        current_x += block_width + BLOCK_SPACING;
         row_height = row_height.max(height);
         col += span;
 
         // Wrap to next row if needed
         if col >= columns {
             col = 0;
+            current_x = 0.0;
             y += row_height + BLOCK_SPACING;
             row_height = 0.0;
         }
