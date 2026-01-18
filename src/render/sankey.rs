@@ -412,14 +412,13 @@ fn render_links(links: &[LayoutLink], config: &RenderConfig) -> SvgElement {
 
         let gradient_id = format!("url(#linearGradient-{})", i + 1);
 
+        // Path element matches mermaid.js reference - no class, no redundant attrs
+        // Parent groups handle fill="none" and stroke-opacity
         let link_path = SvgElement::Path {
             d,
             attrs: Attrs::new()
-                .with_fill("none")
                 .with_stroke(&gradient_id)
-                .with_stroke_width(link.width)
-                .with_attr("stroke-opacity", &config.theme.sankey_link_opacity)
-                .with_class("sankey-link"),
+                .with_stroke_width(link.width),
         };
 
         // Wrap in group for the link
