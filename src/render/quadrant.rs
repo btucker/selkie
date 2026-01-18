@@ -210,6 +210,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         chart_top,
         chart_width,
         chart_height,
+        has_points,
     );
 
     // Render data points
@@ -323,6 +324,10 @@ fn render_quadrant_labels(
 }
 
 /// Render axis labels on the edges
+/// X-axis position depends on whether points exist:
+/// - No points: x-axis at top (default per mermaid.js)
+/// - With points: x-axis at bottom
+#[allow(clippy::too_many_arguments)]
 fn render_axis_labels(
     doc: &mut SvgDocument,
     db: &QuadrantDb,
@@ -331,12 +336,22 @@ fn render_axis_labels(
     chart_top: f64,
     chart_width: f64,
     chart_height: f64,
+    has_points: bool,
 ) {
-    // X-axis left label (below left of chart)
+    // X-axis Y position depends on whether there are points
+    let x_axis_y = if has_points {
+        // With points: x-axis at bottom
+        chart_top + chart_height + AXIS_LABEL_PADDING / 2.0 + 5.0
+    } else {
+        // No points: x-axis at top (just below title area)
+        chart_top - AXIS_LABEL_PADDING / 2.0 - 5.0
+    };
+
+    // X-axis left label
     if !db.x_axis_left.is_empty() {
         doc.add_element(SvgElement::Text {
             x: chart_left,
-            y: chart_top + chart_height + AXIS_LABEL_PADDING / 2.0 + 5.0,
+            y: x_axis_y,
             content: db.x_axis_left.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
@@ -347,11 +362,11 @@ fn render_axis_labels(
         });
     }
 
-    // X-axis right label (below right of chart)
+    // X-axis right label
     if !db.x_axis_right.is_empty() {
         doc.add_element(SvgElement::Text {
             x: chart_left + chart_width,
-            y: chart_top + chart_height + AXIS_LABEL_PADDING / 2.0 + 5.0,
+            y: x_axis_y,
             content: db.x_axis_right.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "end")
