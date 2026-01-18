@@ -231,7 +231,7 @@ fn render_with_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Timelin
         render_section_node(
             doc,
             section,
-            section_number,
+            section_number as i32,
             master_x,
             layout.section_begin_y,
             section_width,
@@ -243,7 +243,7 @@ fn render_with_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Timelin
         render_tasks(
             doc,
             &section_tasks,
-            section_number,
+            section_number as i32,
             master_x,
             master_y,
             layout,
@@ -270,13 +270,13 @@ fn render_without_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Time
 fn render_section_node(
     doc: &mut SvgDocument,
     text: &str,
-    section_num: usize,
+    section_num: i32,
     x: f64,
     y: f64,
     width: f64,
     height: f64,
 ) {
-    let section_class = format!("timeline-node section-{}", section_num % MAX_SECTIONS);
+    let section_class = format!("timeline-node section-{}", section_num);
 
     // Background path with rounded top
     let rd = 5.0;
@@ -295,7 +295,7 @@ fn render_section_node(
         d: path_d,
         attrs: Attrs::new().with_class(&format!(
             "node-bkg node-section-{}",
-            section_num % MAX_SECTIONS
+            section_num
         )),
     });
 
@@ -305,7 +305,7 @@ fn render_section_node(
         y1: height,
         x2: width,
         y2: height,
-        attrs: Attrs::new().with_class(&format!("node-line-{}", section_num % MAX_SECTIONS)),
+        attrs: Attrs::new().with_class(&format!("node-line-{}", section_num)),
     });
 
     // Text (centered)
@@ -325,7 +325,7 @@ fn render_section_node(
 fn render_tasks(
     doc: &mut SvgDocument,
     tasks: &[&TimelineTask],
-    section_color: usize,
+    section_color: i32,
     start_x: f64,
     start_y: f64,
     layout: &TimelineLayout,
@@ -339,6 +339,7 @@ fn render_tasks(
 }
 
 /// Render tasks with multicolor (no sections)
+/// Uses section indices starting from -1 to match mermaid.js behavior
 fn render_tasks_multicolor(
     doc: &mut SvgDocument,
     tasks: &[&TimelineTask],
@@ -349,7 +350,9 @@ fn render_tasks_multicolor(
     let mut master_x = start_x;
 
     for (idx, task) in tasks.iter().enumerate() {
-        render_task_node(doc, task, idx, master_x, start_y, layout);
+        // Start from -1 to match mermaid.js (section--1, section-0, section-1, ...)
+        let section_idx = idx as i32 - 1;
+        render_task_node(doc, task, section_idx, master_x, start_y, layout);
         master_x += COLUMN_WIDTH;
     }
 }
@@ -358,12 +361,13 @@ fn render_tasks_multicolor(
 fn render_task_node(
     doc: &mut SvgDocument,
     task: &TimelineTask,
-    section_color: usize,
+    section_color: i32,
     x: f64,
     y: f64,
     layout: &TimelineLayout,
 ) {
-    let node_class = format!("timeline-node section-{}", section_color % MAX_SECTIONS);
+    // Format section class (negative indices like -1 become "section--1")
+    let node_class = format!("timeline-node section-{}", section_color);
     let width = NODE_WIDTH + NODE_PADDING * 2.0;
     let height = layout.max_task_height;
 
@@ -384,7 +388,7 @@ fn render_task_node(
         d: path_d,
         attrs: Attrs::new().with_class(&format!(
             "node-bkg node-section-{}",
-            section_color % MAX_SECTIONS
+            section_color
         )),
     });
 
@@ -394,7 +398,7 @@ fn render_task_node(
         y1: height,
         x2: width,
         y2: height,
-        attrs: Attrs::new().with_class(&format!("node-line-{}", section_color % MAX_SECTIONS)),
+        attrs: Attrs::new().with_class(&format!("node-line-{}", section_color)),
     });
 
     // Text
@@ -419,7 +423,7 @@ fn render_task_node(
 fn render_events(
     doc: &mut SvgDocument,
     task: &TimelineTask,
-    section_color: usize,
+    section_color: i32,
     task_x: f64,
     task_bottom_y: f64,
     layout: &TimelineLayout,
@@ -467,13 +471,13 @@ fn render_events(
 fn render_event_node(
     doc: &mut SvgDocument,
     text: &str,
-    section_color: usize,
+    section_color: i32,
     x: f64,
     y: f64,
     width: f64,
     height: f64,
 ) {
-    let node_class = format!("timeline-node section-{}", section_color % MAX_SECTIONS);
+    let node_class = format!("timeline-node section-{}", section_color);
 
     // Event box background
     let rd = 5.0;
@@ -492,7 +496,7 @@ fn render_event_node(
         d: path_d,
         attrs: Attrs::new().with_class(&format!(
             "node-bkg node-section-{}",
-            section_color % MAX_SECTIONS
+            section_color
         )),
     });
 
@@ -502,7 +506,7 @@ fn render_event_node(
         y1: height,
         x2: width,
         y2: height,
-        attrs: Attrs::new().with_class(&format!("node-line-{}", section_color % MAX_SECTIONS)),
+        attrs: Attrs::new().with_class(&format!("node-line-{}", section_color)),
     });
 
     // Text
@@ -641,66 +645,29 @@ fn escape_xml(s: &str) -> String {
         .replace('\'', "&apos;")
 }
 
-/// Determine if a color is dark (for choosing contrasting text color)
-fn is_dark_color(color: &str) -> bool {
-    // Parse hex color
-    let color = color.trim_start_matches('#');
-    if color.len() < 6 {
-        return false;
-    }
-
-    let r = u8::from_str_radix(&color[0..2], 16).unwrap_or(128);
-    let g = u8::from_str_radix(&color[2..4], 16).unwrap_or(128);
-    let b = u8::from_str_radix(&color[4..6], 16).unwrap_or(128);
-
-    // Calculate relative luminance
-    let luminance = (0.299 * r as f64 + 0.587 * g as f64 + 0.114 * b as f64) / 255.0;
-    luminance < 0.5
-}
-
-/// Darken a hex color by a percentage
-fn darken_color(color: &str, amount: f64) -> String {
-    let color = color.trim_start_matches('#');
-    if color.len() < 6 {
-        return format!("#{}", color);
-    }
-
-    let r = u8::from_str_radix(&color[0..2], 16).unwrap_or(128);
-    let g = u8::from_str_radix(&color[2..4], 16).unwrap_or(128);
-    let b = u8::from_str_radix(&color[4..6], 16).unwrap_or(128);
-
-    let factor = 1.0 - amount;
-    let r = ((r as f64) * factor) as u8;
-    let g = ((g as f64) * factor) as u8;
-    let b = ((b as f64) * factor) as u8;
-
-    format!("#{:02x}{:02x}{:02x}", r, g, b)
-}
-
-/// Generate timeline-specific CSS using theme colors
+/// Generate timeline-specific CSS using mermaid.js-compatible HSL colors
 fn generate_timeline_css(theme: &crate::render::svg::Theme) -> String {
-    // Use theme's pie_colors as cScale colors for timeline
-    // Fall back to default colors if not enough pie_colors
-    let default_colors = vec![
-        "#f9f".to_string(),
-        "#bbf".to_string(),
-        "#bfb".to_string(),
-        "#fbf".to_string(),
-        "#ff9".to_string(),
-        "#9ff".to_string(),
-        "#f99".to_string(),
-        "#9f9".to_string(),
-        "#99f".to_string(),
-        "#fc9".to_string(),
-        "#c9f".to_string(),
-        "#9fc".to_string(),
+    // Mermaid.js timeline uses specific HSL colors for each section
+    // The hue values and lightness follow a specific pattern from the reference
+    let timeline_colors: Vec<(f64, f64, f64)> = vec![
+        // (hue, saturation, lightness)
+        (60.0, 100.0, 73.53),   // section-0: yellow (slightly different lightness)
+        (80.0, 100.0, 76.27),   // section-1: yellow-green
+        (270.0, 100.0, 76.27),  // section-2: purple
+        (300.0, 100.0, 76.27),  // section-3: magenta
+        (330.0, 100.0, 76.27),  // section-4: pink
+        (0.0, 100.0, 76.27),    // section-5: red
+        (30.0, 100.0, 76.27),   // section-6: orange
+        (90.0, 100.0, 76.27),   // section-7: green
+        (150.0, 100.0, 76.27),  // section-8: cyan-green
+        (180.0, 100.0, 76.27),  // section-9: cyan
+        (210.0, 100.0, 76.27),  // section-10: light blue
+        (240.0, 100.0, 76.27),  // section-11: blue (wraps to -1 pattern)
     ];
 
-    let colors: Vec<&str> = if theme.pie_colors.len() >= 10 {
-        theme.pie_colors.iter().map(|s| s.as_str()).collect()
-    } else {
-        default_colors.iter().map(|s| s.as_str()).collect()
-    };
+    // Section -1 uses blue/violet (hsl(240, 100%, 76.27%))
+    // This is used for sectionless timelines where each task is its own section
+    let section_minus1 = (240.0, 100.0, 76.27);
 
     let mut css = format!(
         r#"
@@ -723,27 +690,58 @@ fn generate_timeline_css(theme: &crate::render::svg::Theme) -> String {
 .lineWrapper line {{
   stroke: {line_color};
 }}
+
+.section--1 {{
+  fill: hsl({h_m1}, {s_m1}%, {l_m1}%);
+}}
+
+.section--1 text {{
+  fill: #ffffff;
+}}
+
+.node-section--1 {{
+  fill: hsl({h_m1}, {s_m1}%, {l_m1}%);
+  stroke: {stroke};
+  stroke-width: 1px;
+}}
+
+.node-line--1 {{
+  stroke: hsl({inv_h_m1}, {s_m1}%, {inv_l_m1}%);
+  stroke-width: 3px;
+}}
 "#,
         text_color = theme.primary_text_color,
         font_family = theme.font_family,
         font_size = FONT_SIZE as i32,
         line_color = theme.line_color,
+        h_m1 = section_minus1.0,
+        s_m1 = section_minus1.1,
+        l_m1 = section_minus1.2,
+        stroke = theme.primary_border_color,
+        inv_h_m1 = (section_minus1.0 + 180.0) % 360.0,
+        inv_l_m1 = (section_minus1.2 + 10.0_f64).min(90.0),
     );
 
-    // Generate section-specific styles using theme colors
+    // Generate section-specific styles using HSL colors
     for i in 0..MAX_SECTIONS {
-        let bg_color = colors.get(i % colors.len()).unwrap_or(&"#f9f");
-        let text_color = if is_dark_color(bg_color) {
-            "#fff"
+        let (h, s, l) = if i < timeline_colors.len() {
+            timeline_colors[i]
         } else {
-            "#333"
+            // Wrap around for sections beyond our defined list
+            timeline_colors[i % timeline_colors.len()]
         };
-        let line_color = darken_color(bg_color, 0.2);
+
+        // Determine text color based on lightness
+        let text_color = if l > 60.0 { "black" } else { "#ffffff" };
+
+        // Calculate line/border color (inverted hue, higher lightness)
+        let inv_h = (h + 180.0) % 360.0;
+        let inv_l = (l + 10.0).min(90.0);
 
         css.push_str(&format!(
             r#"
 .section-{i} {{
-  fill: {bg};
+  fill: hsl({h}, {s}%, {l}%);
 }}
 
 .section-{i} text {{
@@ -751,21 +749,24 @@ fn generate_timeline_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .node-section-{i} {{
-  fill: {bg};
+  fill: hsl({h}, {s}%, {l}%);
   stroke: {stroke};
   stroke-width: 1px;
 }}
 
 .node-line-{i} {{
-  stroke: {line};
+  stroke: hsl({inv_h}, {s}%, {inv_l}%);
   stroke-width: 3px;
 }}
 "#,
             i = i,
-            bg = bg_color,
+            h = h,
+            s = s,
+            l = l,
             text_color = text_color,
             stroke = theme.primary_border_color,
-            line = line_color,
+            inv_h = inv_h,
+            inv_l = inv_l,
         ));
     }
 
@@ -870,21 +871,4 @@ mod tests {
         assert!(svg.contains("cde498") || svg.contains("#cde498"));
     }
 
-    #[test]
-    fn test_is_dark_color() {
-        assert!(super::is_dark_color("#000000"));
-        assert!(super::is_dark_color("#333333"));
-        assert!(!super::is_dark_color("#ffffff"));
-        assert!(!super::is_dark_color("#f9f"));
-        assert!(!super::is_dark_color("#ECECFF"));
-    }
-
-    #[test]
-    fn test_darken_color() {
-        let darkened = super::darken_color("#ffffff", 0.2);
-        assert_eq!(darkened, "#cccccc");
-
-        let darkened = super::darken_color("#ff0000", 0.5);
-        assert_eq!(darkened, "#7f0000");
-    }
 }

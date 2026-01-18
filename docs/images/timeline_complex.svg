@@ -99,231 +99,250 @@ marker path {
   stroke: #333333;
 }
 
+.section--1 {
+  fill: hsl(240, 100%, 76.27%);
+}
+
+.section--1 text {
+  fill: #ffffff;
+}
+
+.node-section--1 {
+  fill: hsl(240, 100%, 76.27%);
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node-line--1 {
+  stroke: hsl(60, 100%, 86.27%);
+  stroke-width: 3px;
+}
+
 .section-0 {
-  fill: #ECECFF;
+  fill: hsl(60, 100%, 73.53%);
 }
 
 .section-0 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-0 {
-  fill: #ECECFF;
+  fill: hsl(60, 100%, 73.53%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-0 {
-  stroke: #bcbccc;
+  stroke: hsl(240, 100%, 83.53%);
   stroke-width: 3px;
 }
 
 .section-1 {
-  fill: #ffffde;
+  fill: hsl(80, 100%, 76.27%);
 }
 
 .section-1 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-1 {
-  fill: #ffffde;
+  fill: hsl(80, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-1 {
-  stroke: #ccccb1;
+  stroke: hsl(260, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-2 {
-  fill: #b9b9ff;
+  fill: hsl(270, 100%, 76.27%);
 }
 
 .section-2 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-2 {
-  fill: #b9b9ff;
+  fill: hsl(270, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-2 {
-  stroke: #9494cc;
+  stroke: hsl(90, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-3 {
-  fill: #b5ff20;
+  fill: hsl(300, 100%, 76.27%);
 }
 
 .section-3 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-3 {
-  fill: #b5ff20;
+  fill: hsl(300, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-3 {
-  stroke: #90cc19;
+  stroke: hsl(120, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-4 {
-  fill: #d4ffb2;
+  fill: hsl(330, 100%, 76.27%);
 }
 
 .section-4 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-4 {
-  fill: #d4ffb2;
+  fill: hsl(330, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-4 {
-  stroke: #a9cc8e;
+  stroke: hsl(150, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-5 {
-  fill: #ffb3e6;
+  fill: hsl(0, 100%, 76.27%);
 }
 
 .section-5 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-5 {
-  fill: #ffb3e6;
+  fill: hsl(0, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-5 {
-  stroke: #cc8fb8;
+  stroke: hsl(180, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-6 {
-  fill: #ffd700;
+  fill: hsl(30, 100%, 76.27%);
 }
 
 .section-6 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-6 {
-  fill: #ffd700;
+  fill: hsl(30, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-6 {
-  stroke: #ccac00;
+  stroke: hsl(210, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-7 {
-  fill: #c4c4ff;
+  fill: hsl(90, 100%, 76.27%);
 }
 
 .section-7 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-7 {
-  fill: #c4c4ff;
+  fill: hsl(90, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-7 {
-  stroke: #9c9ccc;
+  stroke: hsl(270, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-8 {
-  fill: #ffe6cc;
+  fill: hsl(150, 100%, 76.27%);
 }
 
 .section-8 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-8 {
-  fill: #ffe6cc;
+  fill: hsl(150, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-8 {
-  stroke: #ccb8a3;
+  stroke: hsl(330, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-9 {
-  fill: #ccffcc;
+  fill: hsl(180, 100%, 76.27%);
 }
 
 .section-9 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-9 {
-  fill: #ccffcc;
+  fill: hsl(180, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-9 {
-  stroke: #a3cca3;
+  stroke: hsl(0, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-10 {
-  fill: #ECECFF;
+  fill: hsl(210, 100%, 76.27%);
 }
 
 .section-10 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-10 {
-  fill: #ECECFF;
+  fill: hsl(210, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-10 {
-  stroke: #bcbccc;
+  stroke: hsl(30, 100%, 86.27%);
   stroke-width: 3px;
 }
 
 .section-11 {
-  fill: #ffffde;
+  fill: hsl(240, 100%, 76.27%);
 }
 
 .section-11 text {
-  fill: #333;
+  fill: black;
 }
 
 .node-section-11 {
-  fill: #ffffde;
+  fill: hsl(240, 100%, 76.27%);
   stroke: #9370DB;
   stroke-width: 1px;
 }
 
 .node-line-11 {
-  stroke: #ccccb1;
+  stroke: hsl(60, 100%, 86.27%);
   stroke-width: 3px;
 }
 
@@ -346,11 +365,11 @@ marker path {
                 <path d="M 0,0 V 4 L6,2 Z"></path>
             </marker>
     </defs>
-    <text x="500" y="20" class="titleText" font-weight="bold" font-size="4ex" text-anchor="middle">England&apos;s History Timeline</text>
+    <text x="500" y="20" class="titleText" font-size="4ex" font-weight="bold" text-anchor="middle">England&apos;s History Timeline</text>
     <g class="timeline-node section-0" transform="translate(100, 50)">
       <path d="M0 63 v-58 q0,-5 5,-5 h340 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="68" x2="350" y2="68" class="node-line-0"/>
-      <text x="175" y="34" dominant-baseline="middle" dy="1em" text-anchor="middle" alignment-baseline="middle">Stone Age</text>
+      <text x="175" y="34" dominant-baseline="middle" text-anchor="middle" dy="1em" alignment-baseline="middle">Stone Age</text>
     </g>
     <g class="taskWrapper timeline-node section-0" transform="translate(100, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h210 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
@@ -358,7 +377,7 @@ marker path {
       <text x="110" y="34" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" dy="1em">7600 BC</text>
     </g>
     <g class="lineWrapper">
-      <line x1="210" y1="236" x2="210" y2="556.4" stroke="black" marker-end="url(#arrowhead)" stroke-width="2" stroke-dasharray="5,5"/>
+      <line x1="210" y1="236" x2="210" y2="556.4" stroke-dasharray="5,5" marker-end="url(#arrowhead)" stroke="black" stroke-width="2"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(100, 336)">
       <path d="M0 50.2 v-45.2 q0,-5 5,-5 h210 q5,0 5,5 v50.2 H0 Z" class="node-bkg node-section-0"/>
@@ -370,10 +389,10 @@ marker path {
     <g class="taskWrapper timeline-node section-0" transform="translate(300, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h210 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="68" x2="220" y2="68" class="node-line-0"/>
-      <text x="110" y="34" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">6000 BC</text>
+      <text x="110" y="34" dominant-baseline="middle" alignment-baseline="middle" text-anchor="middle" dy="1em">6000 BC</text>
     </g>
     <g class="lineWrapper">
-      <line x1="410" y1="236" x2="410" y2="556.4" stroke="black" marker-end="url(#arrowhead)" stroke-width="2" stroke-dasharray="5,5"/>
+      <line x1="410" y1="236" x2="410" y2="556.4" stroke-dasharray="5,5" marker-end="url(#arrowhead)" stroke="black" stroke-width="2"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(300, 336)">
       <path d="M0 50.2 v-45.2 q0,-5 5,-5 h210 q5,0 5,5 v50.2 H0 Z" class="node-bkg node-section-0"/>
@@ -385,15 +404,15 @@ marker path {
     <g class="timeline-node section-1" transform="translate(500, 50)">
       <path d="M0 63 v-58 q0,-5 5,-5 h340 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="68" x2="350" y2="68" class="node-line-1"/>
-      <text x="175" y="34" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle">Bronze Age</text>
+      <text x="175" y="34" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">Bronze Age</text>
     </g>
     <g class="taskWrapper timeline-node section-1" transform="translate(500, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h210 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="68" x2="220" y2="68" class="node-line-1"/>
-      <text x="110" y="34" alignment-baseline="middle" dy="1em" dominant-baseline="middle" text-anchor="middle">2300 BC</text>
+      <text x="110" y="34" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">2300 BC</text>
     </g>
     <g class="lineWrapper">
-      <line x1="610" y1="236" x2="610" y2="556.4" stroke-width="2" stroke-dasharray="5,5" stroke="black" marker-end="url(#arrowhead)"/>
+      <line x1="610" y1="236" x2="610" y2="556.4" stroke="black" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke-width="2"/>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(500, 336)">
       <path d="M0 50.2 v-45.2 q0,-5 5,-5 h210 q5,0 5,5 v50.2 H0 Z" class="node-bkg node-section-1"/>
@@ -412,10 +431,10 @@ marker path {
     <g class="taskWrapper timeline-node section-1" transform="translate(700, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h210 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="68" x2="220" y2="68" class="node-line-1"/>
-      <text x="110" y="34" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" dy="1em">2200 BC</text>
+      <text x="110" y="34" dy="1em" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle">2200 BC</text>
     </g>
     <g class="lineWrapper">
-      <line x1="810" y1="236" x2="810" y2="556.4" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke="black"/>
+      <line x1="810" y1="236" x2="810" y2="556.4" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke-width="2" stroke="black"/>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(700, 336)">
       <path d="M0 50.2 v-45.2 q0,-5 5,-5 h210 q5,0 5,5 v50.2 H0 Z" class="node-bkg node-section-1"/>
@@ -432,7 +451,7 @@ marker path {
       </g>
     </g>
     <g class="lineWrapper">
-      <line x1="100" y1="286" x2="1100" y2="286" stroke="black" marker-end="url(#arrowhead)" stroke-width="4"/>
+      <line x1="100" y1="286" x2="1100" y2="286" stroke-width="4" stroke="black" marker-end="url(#arrowhead)"/>
     </g>
   </g>
 </svg>
