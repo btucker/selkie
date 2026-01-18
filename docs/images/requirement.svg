@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="712" height="669" viewBox="0 0 712 669" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.requirement-box {
+  fill: #ECECFF;
+  stroke: #9370DB;
+}
+
+.requirement-header {
+  fill: #ffffde;
+  stroke: #9370DB;
+}
+
+.requirement-type {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.requirement-name {
+  fill: #333333;
+}
+
+.requirement-attr {
+  fill: #333333;
+}
+
+.element-box {
+  fill: #fafafa;
+  stroke: #9370DB;
+}
+
+.element-header {
+  fill: #FFFFCC;
+  stroke: #9370DB;
+}
+
+.element-type {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.element-name {
+  fill: #333333;
+}
+
+.element-attr {
+  fill: #333333;
+}
+
+.divider {
+  stroke: #9370DB;
+}
+
+.relationship-line {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1.5;
+}
+
+.relationship-label {
+  fill: #333333;
+}
+
+.relationship-label-bg {
+  fill: #ffffff;
+  stroke: #9370DB;
+  stroke-width: 0.5;
+}
+
+.marker {
+  fill: #333333;
+  stroke: none;
+}
+
+  </style>
+  <defs>
+    <marker id="requirement-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" class="marker"/>
+    </marker>
+    <marker id="requirement-contains" viewBox="0 0 20 20" refX="18" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M0,10 L10,0 L20,10 L10,20 z" class="marker"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="relationship">
+      <path d="M 512.00 307.00 C 512.00 332.67, 512.00 358.33, 465.73 384.94 C 419.47 411.54, 326.93 439.08, 234.40 466.62" class="relationship-line" marker-end="url(#requirement-arrow)"/>
+      <rect x="374.6004050199891" y="404.3272604107175" width="71" height="20" rx="3" ry="3" class="relationship-label-bg"/>
+      <text x="410.1004050199891" y="418.3272604107175" class="relationship-label" text-anchor="middle" font-size="11">satisfies</text>
+    </g>
+    <g class="relationship">
+      <path d="M 78.14 334.00 C 68.49 350.67, 58.85 367.33, 58.85 384.00 C 58.85 400.67, 68.49 417.33, 78.14 434.00" class="relationship-line" marker-end="url(#requirement-arrow)"/>
+      <rect x="24.19999999999999" y="374" width="50" height="20" rx="3" ry="3" class="relationship-label-bg"/>
+      <text x="49.19999999999999" y="388" class="relationship-label" text-anchor="middle" font-size="11">traces</text>
+    </g>
+    <g class="relationship">
+      <path d="M 217.20 321.72 C 254.80 342.48, 292.40 363.24, 316.02 381.95 C 339.65 400.67, 349.29 417.33, 358.94 434.00" class="relationship-line" marker-end="url(#requirement-arrow)"/>
+      <rect x="266.8861117605289" y="356.8201040031116" width="64" height="20" rx="3" ry="3" class="relationship-label-bg"/>
+      <text x="298.8861117605289" y="370.8201040031116" class="relationship-label" text-anchor="middle" font-size="11">contains</text>
+    </g>
+    <g class="relationship">
+      <path d="M 117.20 99.00 C 117.20 115.67, 117.20 132.33, 117.20 149.00 C 117.20 165.67, 117.20 182.33, 117.20 199.00" class="relationship-line" marker-end="url(#requirement-arrow)"/>
+      <rect x="85.19999999999999" y="139" width="64" height="20" rx="3" ry="3" class="relationship-label-bg"/>
+      <text x="117.19999999999999" y="153" class="relationship-label" font-size="11" text-anchor="middle">verifies</text>
+    </g>
+    <g class="requirement-node" id="test_req">
+      <rect x="17.19999999999999" y="199" width="200" height="135" rx="0" ry="0" class="requirement-box" stroke-width="2"/>
+      <rect x="17.19999999999999" y="199" width="200" height="25" rx="0" ry="0" class="requirement-header"/>
+      <text x="117.19999999999999" y="216.5" class="requirement-type" font-size="14" text-anchor="middle">Requirement</text>
+      <line x1="17.19999999999999" y1="224" x2="217.2" y2="224" class="divider" stroke-width="1"/>
+      <text x="27.19999999999999" y="247" class="requirement-name" text-anchor="start" font-weight="bold" font-size="12">test_req</text>
+      <text x="27.19999999999999" y="265" class="requirement-attr" text-anchor="start" font-size="12">Id: 1</text>
+      <text x="27.19999999999999" y="283" class="requirement-attr" font-size="12" text-anchor="start">Text: the test text.</text>
+      <text x="27.19999999999999" y="301" class="requirement-attr" text-anchor="start" font-size="12">Risk: High</text>
+      <text x="27.19999999999999" y="319" class="requirement-attr" text-anchor="start" font-size="12">Verify: Test</text>
+    </g>
+    <g class="requirement-node" id="test_req2">
+      <rect x="0" y="434" width="234.39999999999998" height="135" rx="0" ry="0" class="requirement-box" stroke-width="2"/>
+      <rect x="0" y="434" width="234.39999999999998" height="25" rx="0" ry="0" class="requirement-header"/>
+      <text x="117.19999999999999" y="451.5" class="requirement-type" text-anchor="middle" font-size="14">Functional Requirement</text>
+      <line x1="0" y1="459" x2="234.39999999999998" y2="459" class="divider" stroke-width="1"/>
+      <text x="10" y="482" class="requirement-name" text-anchor="start" font-size="12" font-weight="bold">test_req2</text>
+      <text x="10" y="500" class="requirement-attr" text-anchor="start" font-size="12">Id: 1.1</text>
+      <text x="10" y="518" class="requirement-attr" font-size="12" text-anchor="start">Text: the second test text.</text>
+      <text x="10" y="536" class="requirement-attr" font-size="12" text-anchor="start">Risk: Low</text>
+      <text x="10" y="554" class="requirement-attr" text-anchor="start" font-size="12">Verify: Inspection</text>
+    </g>
+    <g class="requirement-node" id="test_req3">
+      <rect x="284.4" y="434" width="227.2" height="135" rx="0" ry="0" class="requirement-box" stroke-width="2"/>
+      <rect x="284.4" y="434" width="227.2" height="25" rx="0" ry="0" class="requirement-header"/>
+      <text x="398" y="451.5" class="requirement-type" font-size="14" text-anchor="middle">Performance Requirement</text>
+      <line x1="284.4" y1="459" x2="511.59999999999997" y2="459" class="divider" stroke-width="1"/>
+      <text x="294.4" y="482" class="requirement-name" font-size="12" text-anchor="start" font-weight="bold">test_req3</text>
+      <text x="294.4" y="500" class="requirement-attr" text-anchor="start" font-size="12">Id: 1.2</text>
+      <text x="294.4" y="518" class="requirement-attr" text-anchor="start" font-size="12">Text: the third test text.</text>
+      <text x="294.4" y="536" class="requirement-attr" text-anchor="start" font-size="12">Risk: Medium</text>
+      <text x="294.4" y="554" class="requirement-attr" text-anchor="start" font-size="12">Verify: Demonstration</text>
+    </g>
+    <g class="element-node" id="test_entity2">
+      <rect x="17.19999999999999" y="0" width="200" height="99" rx="0" ry="0" class="element-box" stroke-width="2"/>
+      <rect x="17.19999999999999" y="0" width="200" height="25" rx="0" ry="0" class="element-header"/>
+      <text x="117.19999999999999" y="17.5" class="element-type" font-size="14" text-anchor="middle">Element</text>
+      <line x1="17.19999999999999" y1="25" x2="217.2" y2="25" class="divider" stroke-width="1"/>
+      <text x="27.19999999999999" y="48" class="element-name" text-anchor="start" font-size="12" font-weight="bold">test_entity2</text>
+      <text x="27.19999999999999" y="66" class="element-attr" font-size="12" text-anchor="start">Type: word doc</text>
+      <text x="27.19999999999999" y="84" class="element-attr" font-size="12" text-anchor="start">Doc: reqs/test_entity</text>
+    </g>
+    <g class="element-node" id="test_entity">
+      <rect x="411.99999999999994" y="226" width="200" height="81" rx="0" ry="0" class="element-box" stroke-width="2"/>
+      <rect x="411.99999999999994" y="226" width="200" height="25" rx="0" ry="0" class="element-header"/>
+      <text x="511.99999999999994" y="243.5" class="element-type" text-anchor="middle" font-size="14">Element</text>
+      <line x1="411.99999999999994" y1="251" x2="612" y2="251" class="divider" stroke-width="1"/>
+      <text x="421.99999999999994" y="274" class="element-name" font-size="12" font-weight="bold" text-anchor="start">test_entity</text>
+      <text x="421.99999999999994" y="292" class="element-attr" text-anchor="start" font-size="12">Type: simulation</text>
+    </g>
+  </g>
+</svg>
