@@ -217,8 +217,7 @@ fn layout_blocks(
         .map(|(id, b)| (id.as_str(), b))
         .collect();
 
-    let mut positioned =
-        layout_block_list(&root_blocks, &effective_sizes, columns, 0.0, 0.0);
+    let mut positioned = layout_block_list(&root_blocks, &effective_sizes, columns, 0.0, 0.0);
 
     // Collect composite info for child positioning
     let composite_info: Vec<_> = positioned
@@ -271,7 +270,10 @@ fn calculate_composite_size(
                 total_width += MIN_BLOCK_WIDTH + BLOCK_SPACING;
                 continue;
             }
-            let (w, h) = sizes.get(*id).cloned().unwrap_or((MIN_BLOCK_WIDTH, MIN_BLOCK_HEIGHT));
+            let (w, h) = sizes
+                .get(*id)
+                .cloned()
+                .unwrap_or((MIN_BLOCK_WIDTH, MIN_BLOCK_HEIGHT));
             total_width += w + BLOCK_SPACING;
             max_height = max_height.max(h);
         }
@@ -282,10 +284,7 @@ fn calculate_composite_size(
         total_width -= BLOCK_SPACING;
     }
 
-    (
-        total_width + padding * 2.0,
-        max_height + padding * 2.0,
-    )
+    (total_width + padding * 2.0, max_height + padding * 2.0)
 }
 
 /// Layout a list of blocks in a grid starting at given offset
