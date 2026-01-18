@@ -16,6 +16,7 @@ mod radar;
 mod sequence;
 mod state;
 pub mod svg;
+mod treemap;
 mod xychart;
 
 use crate::diagrams::{detect_init, detect_type, parse, remove_directives, Diagram};
@@ -95,6 +96,7 @@ pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<St
         Diagram::Radar(db) => radar::render_radar(db, config),
         Diagram::Packet(db) => packet::render_packet(db, config),
         Diagram::XyChart(db) => xychart::render_xychart(db, config),
+        Diagram::Treemap(db) => treemap::render_treemap(db, config),
         _ => Err(MermaidError::RenderError(format!(
             "Diagram type {:?} not yet supported for rendering",
             diagram_type_name(diagram)

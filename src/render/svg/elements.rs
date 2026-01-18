@@ -37,6 +37,15 @@ impl Attrs {
         self
     }
 
+    /// Conditionally add a style attribute
+    pub fn with_style_if(self, condition: bool, style: &str) -> Self {
+        if condition {
+            self.with_style(style)
+        } else {
+            self
+        }
+    }
+
     pub fn with_transform(mut self, transform: &str) -> Self {
         self.attrs
             .insert("transform".to_string(), transform.to_string());
