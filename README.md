@@ -91,15 +91,7 @@ Selkie supports parsing and rendering for all major Mermaid diagram types.
 | **Block** | <img src="docs/images/block_complex.svg" alt="Block Diagram" width="200"> |
 | **Packet** | <img src="docs/images/packet_complex.svg" alt="Packet Diagram" width="500"> |
 | **Treemap** | <img src="docs/images/treemap.svg" alt="Treemap" width="400"> |
-
-<details>
-<summary><strong>Parser Only</strong> (rendering in progress)</summary>
-
-| Type | Description |
-|------|-------------|
-| Kanban | Kanban boards |
-
-</details>
+| **Kanban** | <img src="docs/images/kanban.svg" alt="Kanban Board" width="400"> |
 
 ## Installation
 

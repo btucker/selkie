@@ -871,6 +871,29 @@ Rel(email_system, customer, "Sends e-mails to")`,
 classDef engineering fill:#6b9bc3,stroke:#333;
 classDef marketing fill:#c36b9b,stroke:#333;
 classDef sales fill:#c3a66b,stroke:#333;`,
+
+    // Kanban diagrams
+    'kanban-simple': `kanban
+  id1[Todo]
+    docs[Create Documentation]
+    blog[Create Blog about the new diagram]
+  id2[In Progress]
+    id6[Create renderer for all cases]`,
+
+    'kanban-complex': `kanban
+  id1[Todo]
+    docs[Create Documentation]
+    blog[Create Blog about the new diagram]
+  id2[In Progress]
+    id3[Create renderer for all cases]@{ priority: 'High' }
+  id4[Review]
+    id5[Code review]@{ ticket: 'PROJ-123', assigned: 'alice' }
+  id6[Testing]
+    id7[Unit tests]@{ priority: 'Medium', ticket: 'PROJ-124' }
+  id8[Blocked]
+    id9[Waiting on API]@{ priority: 'Very High', assigned: 'bob' }
+  id10[Done]
+    id11[Initial setup]@{ priority: 'Low', ticket: 'PROJ-100', assigned: 'charlie' }`,
 };
 
 // State
