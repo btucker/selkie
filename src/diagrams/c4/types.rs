@@ -138,6 +138,8 @@ pub struct C4Relationship {
 /// The C4 diagram database
 #[derive(Debug, Clone, Default)]
 pub struct C4Db {
+    /// Diagram title
+    title: Option<String>,
     /// All elements (persons, systems, containers, components)
     elements: Vec<C4Element>,
     /// All boundaries
@@ -157,6 +159,16 @@ impl C4Db {
     /// Clear all data
     pub fn clear(&mut self) {
         *self = Self::default();
+    }
+
+    /// Set the diagram title
+    pub fn set_title(&mut self, title: &str) {
+        self.title = Some(title.to_string());
+    }
+
+    /// Get the diagram title
+    pub fn get_title(&self) -> Option<&str> {
+        self.title.as_deref()
     }
 
     /// Add a person element
@@ -307,8 +319,20 @@ impl C4Db {
 
     /// Add a relationship
     pub fn add_relationship(&mut self, from: &str, to: &str, label: &str, technology: &str) {
+        self.add_relationship_with_type("Rel", from, to, label, technology);
+    }
+
+    /// Add a relationship with a specific type (Rel, BiRel, Rel_Back, etc.)
+    pub fn add_relationship_with_type(
+        &mut self,
+        rel_type: &str,
+        from: &str,
+        to: &str,
+        label: &str,
+        technology: &str,
+    ) {
         let rel = C4Relationship {
-            rel_type: "Rel".to_string(),
+            rel_type: rel_type.to_string(),
             from: from.to_string(),
             to: to.to_string(),
             label: label.to_string(),

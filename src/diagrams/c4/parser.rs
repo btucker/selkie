@@ -55,7 +55,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
         Rule::title_stmt => {
             for inner in pair.into_inner() {
                 if inner.as_rule() == Rule::title_text {
-                    // Title could be stored in db if needed
+                    db.set_title(inner.as_str().trim());
                 }
             }
         }
@@ -311,11 +311,46 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
         Rule::container_boundary_block => {
             process_boundary(db, pair, "container")?;
         }
+        Rule::deployment_node_block => {
+            process_boundary(db, pair, "deployment")?;
+        }
+        Rule::deployment_node_l_block => {
+            process_boundary(db, pair, "deployment_l")?;
+        }
+        Rule::deployment_node_r_block => {
+            process_boundary(db, pair, "deployment_r")?;
+        }
         // Relationships
-        Rule::rel_stmt | Rule::birel_stmt | Rule::rel_direction_stmt => {
+        Rule::rel_stmt => {
             let attrs = extract_all_attributes(pair);
             if attrs.len() >= 2 {
-                db.add_relationship(
+                db.add_relationship_with_type(
+                    "Rel",
+                    &attrs.first().cloned().unwrap_or_default(),
+                    &attrs.get(1).cloned().unwrap_or_default(),
+                    &attrs.get(2).cloned().unwrap_or_default(),
+                    &attrs.get(3).cloned().unwrap_or_default(),
+                );
+            }
+        }
+        Rule::birel_stmt => {
+            let attrs = extract_all_attributes(pair);
+            if attrs.len() >= 2 {
+                db.add_relationship_with_type(
+                    "BiRel",
+                    &attrs.first().cloned().unwrap_or_default(),
+                    &attrs.get(1).cloned().unwrap_or_default(),
+                    &attrs.get(2).cloned().unwrap_or_default(),
+                    &attrs.get(3).cloned().unwrap_or_default(),
+                );
+            }
+        }
+        Rule::rel_direction_stmt => {
+            let attrs = extract_all_attributes(pair);
+            if attrs.len() >= 2 {
+                // For directional rels, just use "Rel" type for now
+                db.add_relationship_with_type(
+                    "Rel",
                     &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),
@@ -807,7 +842,6 @@ Person(default, "default", "default")"#;
         }
 
         #[test]
-        #[ignore = "TODO: Deployment_Node syntax not supported"]
         fn test_cypress_c4_deployment() {
             // From Cypress C4.5: should render a simple C4Deployment diagram
             let input = r#"C4Deployment

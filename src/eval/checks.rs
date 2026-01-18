@@ -52,6 +52,13 @@ pub fn check_structure(
     check_edge_node_connectivity(selkie, reference, &mut issues);
     check_font_styles(selkie, reference, &mut issues);
 
+    // Selkie-only checks (don't compare to reference, check for rendering issues)
+    check_text_overflow(selkie, &mut issues);
+    check_element_spacing(selkie, &mut issues);
+
+    // Comparative text placement checks
+    check_text_placement(selkie, reference, &mut issues);
+
     // INFO checks - acceptable variations
     check_extra_labels(selkie, reference, &mut issues);
     check_markers(selkie, reference, &mut issues);
@@ -59,6 +66,9 @@ pub fn check_structure(
 
     // ERROR checks - text visibility issues (CSS fill override)
     check_text_visibility(selkie, &mut issues);
+
+    // WARNING checks - text fill color mismatches
+    check_text_fill_colors(selkie, reference, &mut issues);
 
     issues
 }
@@ -96,6 +106,69 @@ fn check_text_visibility(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
             ),
         ));
     }
+}
+
+/// Check for text fill color mismatches between selkie and reference
+/// Reference may use CSS/foreignObject for text colors, selkie uses inline fill
+fn check_text_fill_colors(
+    selkie: &SvgStructure,
+    reference: &SvgStructure,
+    issues: &mut Vec<Issue>,
+) {
+    // Extract text fill colors from raw SVG
+    let selkie_text_fills = extract_text_fill_colors(&selkie.raw_svg);
+    let ref_text_fills = extract_text_fill_colors(&reference.raw_svg);
+
+    // Check if selkie has fill colors on text that reference doesn't
+    let selkie_set: std::collections::HashSet<_> = selkie_text_fills.iter().collect();
+    let ref_set: std::collections::HashSet<_> = ref_text_fills.iter().collect();
+
+    let extra_fills: Vec<_> = selkie_set.difference(&ref_set).cloned().collect();
+
+    if !extra_fills.is_empty() {
+        // Check if we're using white text where reference might use dark text
+        let has_white_text = extra_fills.iter().any(|c| {
+            let c = c.to_lowercase();
+            c == "#fff" || c == "#ffffff" || c == "white"
+        });
+
+        if has_white_text {
+            issues.push(Issue::warning(
+                "text_fill_mismatch",
+                format!(
+                    "Text fill color mismatch: selkie uses {:?} but reference text has no inline fill (uses CSS/foreignObject). Reference text color is typically #333 (dark) via CSS .label class.",
+                    extra_fills
+                ),
+            ));
+        }
+    }
+}
+
+/// Extract fill colors from text elements in raw SVG
+fn extract_text_fill_colors(svg: &str) -> Vec<String> {
+    let mut fills = Vec::new();
+
+    // Simple extraction for text element fills
+    // Look for <text ... fill="..." ...>
+    for part in svg.split("<text") {
+        if let Some(tag_end) = part.find('>') {
+            let tag_content = &part[..tag_end];
+            // Extract fill attribute
+            if let Some(fill_start) = tag_content.find("fill=\"") {
+                let after_fill = &tag_content[fill_start + 6..];
+                if let Some(fill_end) = after_fill.find('"') {
+                    let fill_value = &after_fill[..fill_end];
+                    if !fill_value.is_empty() && fill_value != "none" {
+                        fills.push(fill_value.to_lowercase());
+                    }
+                }
+            }
+        }
+    }
+
+    fills.sort();
+    fills.dedup();
+    fills
 }
 
 /// Check node count - ERROR if mismatch
@@ -1420,6 +1493,429 @@ fn point_touches_node_boundary(x: f64, y: f64, node: &NodeBounds, tolerance: f64
         (y - bottom).abs() <= tolerance && x >= left - tolerance && x <= right + tolerance;
 
     near_left || near_right || near_top || near_bottom
+}
+
+/// Check for text that overflows/escapes its containing node
+/// This detects a common rendering issue where text is too long for its box
+fn check_text_overflow(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
+    let node_bounds = &selkie.edge_geometry.node_bounds;
+
+    if node_bounds.is_empty() {
+        return;
+    }
+
+    let mut overflow_issues = Vec::new();
+    let tolerance = 5.0; // Allow small tolerance
+
+    // Parse SVG directly to check text bounds accurately
+    if let Ok(doc) = roxmltree::Document::parse(&selkie.raw_svg) {
+        for text_node in doc.descendants().filter(|n| n.tag_name().name() == "text") {
+            // Get text y coordinate
+            let text_y = text_node
+                .attribute("y")
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(0.0);
+
+            // Count tspans and check for dy attributes
+            let tspans: Vec<_> = text_node
+                .descendants()
+                .filter(|n| n.tag_name().name() == "tspan")
+                .collect();
+
+            if tspans.is_empty() {
+                continue; // Skip single-line text without tspans
+            }
+
+            // Calculate total dy offset for multi-line text
+            let font_size = 16.0; // Default font size
+            let mut total_dy = 0.0;
+            for tspan in &tspans {
+                if let Some(dy) = tspan.attribute("dy") {
+                    // Parse dy value (e.g., "1em", "1.1em")
+                    let dy_value = if dy.ends_with("em") {
+                        dy.trim_end_matches("em").parse::<f64>().unwrap_or(0.0) * font_size
+                    } else {
+                        dy.parse::<f64>().unwrap_or(0.0)
+                    };
+                    total_dy += dy_value;
+                }
+            }
+
+            // Calculate actual text bottom (y + all dy offsets + descender space)
+            let text_bottom = text_y + total_dy + font_size * 0.2;
+
+            // Get parent group transform to find absolute position
+            let mut group_y = 0.0;
+            let mut current = text_node.parent();
+            while let Some(parent) = current {
+                if let Some(transform) = parent.attribute("transform") {
+                    if let Some(ty) = parse_translate_y(transform) {
+                        group_y += ty;
+                    }
+                }
+                current = parent.parent();
+            }
+
+            let absolute_text_bottom = group_y + text_bottom;
+
+            // Find containing node by checking if it contains the text's position
+            let text_x = text_node
+                .attribute("x")
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(0.0);
+            let mut group_x = 0.0;
+            let mut current2 = text_node.parent();
+            while let Some(parent) = current2 {
+                if let Some(transform) = parent.attribute("transform") {
+                    if let Some(tx) = parse_translate_x(transform) {
+                        group_x += tx;
+                    }
+                }
+                current2 = parent.parent();
+            }
+            let absolute_text_x = group_x + text_x;
+
+            // Find the containing node
+            let containing_node = node_bounds.iter().find(|n| {
+                absolute_text_x >= n.x - tolerance
+                    && absolute_text_x <= n.x + n.width + tolerance
+                    && group_y + text_y >= n.y - tolerance
+                    && group_y + text_y <= n.y + n.height + tolerance
+            });
+
+            if let Some(node) = containing_node {
+                let node_bottom = node.y + node.height;
+                let overflow_bottom = absolute_text_bottom - node_bottom;
+
+                if overflow_bottom > tolerance {
+                    // Get text content for preview
+                    let text_content: String = text_node
+                        .descendants()
+                        .filter_map(|n| n.text())
+                        .collect::<Vec<_>>()
+                        .join(" ");
+                    let text_preview = if text_content.len() > 30 {
+                        format!("{}...", &text_content[..30])
+                    } else {
+                        text_content
+                    };
+
+                    overflow_issues.push(format!(
+                        "Text \"{}\" overflows bottom by {:.0}px (node height: {:.0}, text needs: {:.0})",
+                        text_preview,
+                        overflow_bottom,
+                        node.height,
+                        absolute_text_bottom - node.y
+                    ));
+                }
+            }
+        }
+    }
+
+    if !overflow_issues.is_empty() {
+        issues.push(Issue::warning(
+            "text_overflow",
+            format!(
+                "TEXT OVERFLOW DETECTED ({} issues):\n  {}",
+                overflow_issues.len(),
+                overflow_issues.join("\n  ")
+            ),
+        ));
+    }
+}
+
+/// Parse x-coordinate from translate transform
+fn parse_translate_x(transform: &str) -> Option<f64> {
+    if let Some(start) = transform.find("translate(") {
+        let rest = &transform[start + 10..];
+        if let Some(end) = rest.find(')') {
+            let coords = &rest[..end];
+            let parts: Vec<&str> = coords.split([',', ' ']).filter(|s| !s.is_empty()).collect();
+            if !parts.is_empty() {
+                return parts[0].trim().parse::<f64>().ok();
+            }
+        }
+    }
+    None
+}
+
+/// Parse y-coordinate from translate transform
+fn parse_translate_y(transform: &str) -> Option<f64> {
+    if let Some(start) = transform.find("translate(") {
+        let rest = &transform[start + 10..];
+        if let Some(end) = rest.find(')') {
+            let coords = &rest[..end];
+            let parts: Vec<&str> = coords.split([',', ' ']).filter(|s| !s.is_empty()).collect();
+            if parts.len() >= 2 {
+                return parts[1].trim().parse::<f64>().ok();
+            }
+        }
+    }
+    None
+}
+
+/// Check for element spacing issues (overlapping or too close)
+fn check_element_spacing(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
+    let node_bounds = &selkie.edge_geometry.node_bounds;
+
+    if node_bounds.len() < 2 {
+        return;
+    }
+
+    let mut spacing_issues = Vec::new();
+    let min_spacing = 5.0; // Minimum expected spacing between elements
+
+    // Check for overlapping nodes
+    for i in 0..node_bounds.len() {
+        for j in (i + 1)..node_bounds.len() {
+            let a = &node_bounds[i];
+            let b = &node_bounds[j];
+
+            // Check for overlap
+            let overlap_x = (a.x < b.x + b.width) && (a.x + a.width > b.x);
+            let overlap_y = (a.y < b.y + b.height) && (a.y + a.height > b.y);
+
+            if overlap_x && overlap_y {
+                // Calculate overlap amount
+                let overlap_width = (a.x + a.width).min(b.x + b.width) - a.x.max(b.x);
+                let overlap_height = (a.y + a.height).min(b.y + b.height) - a.y.max(b.y);
+
+                // Only report significant overlaps (not just touching)
+                if overlap_width > min_spacing && overlap_height > min_spacing {
+                    spacing_issues.push(format!(
+                        "Nodes \"{}\" and \"{}\" overlap by {:.0}x{:.0}px",
+                        if a.id.is_empty() {
+                            format!("({:.0},{:.0})", a.x, a.y)
+                        } else {
+                            a.id.clone()
+                        },
+                        if b.id.is_empty() {
+                            format!("({:.0},{:.0})", b.x, b.y)
+                        } else {
+                            b.id.clone()
+                        },
+                        overlap_width,
+                        overlap_height
+                    ));
+                }
+            }
+        }
+    }
+
+    // Check for very close but not overlapping elements (potential spacing inconsistency)
+    let mut close_pairs = 0;
+    for i in 0..node_bounds.len() {
+        for j in (i + 1)..node_bounds.len() {
+            let a = &node_bounds[i];
+            let b = &node_bounds[j];
+
+            // Calculate minimum distance between nodes
+            let dx = if a.x + a.width < b.x {
+                b.x - (a.x + a.width)
+            } else if b.x + b.width < a.x {
+                a.x - (b.x + b.width)
+            } else {
+                0.0 // Overlapping in x
+            };
+
+            let dy = if a.y + a.height < b.y {
+                b.y - (a.y + a.height)
+            } else if b.y + b.height < a.y {
+                a.y - (b.y + b.height)
+            } else {
+                0.0 // Overlapping in y
+            };
+
+            let distance = (dx * dx + dy * dy).sqrt();
+
+            // Elements very close but not overlapping (possible spacing issue)
+            if distance > 0.0 && distance < min_spacing {
+                close_pairs += 1;
+            }
+        }
+    }
+
+    if close_pairs > 3 {
+        spacing_issues.push(format!(
+            "{} pairs of elements are very close together (< {}px apart)",
+            close_pairs, min_spacing
+        ));
+    }
+
+    if !spacing_issues.is_empty() {
+        issues.push(Issue::warning(
+            "element_spacing",
+            format!(
+                "SPACING ISSUES DETECTED ({} issues):\n  {}",
+                spacing_issues.len(),
+                spacing_issues.join("\n  ")
+            ),
+        ));
+    }
+}
+
+/// Check text placement within nodes by comparing vertical centering
+/// This detects issues where text is not properly centered/positioned within containing nodes
+fn check_text_placement(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
+    let selkie_text = &selkie.edge_geometry.text_bounds;
+    let selkie_nodes = &selkie.edge_geometry.node_bounds;
+    let ref_text = &reference.edge_geometry.text_bounds;
+    let ref_nodes = &reference.edge_geometry.node_bounds;
+
+    // Skip if not enough data to compare
+    if selkie_text.is_empty() || ref_text.is_empty() {
+        return;
+    }
+
+    // Calculate average vertical offset (text_y relative to containing node top) for both
+    let selkie_offsets = calculate_text_vertical_offsets(selkie_text, selkie_nodes);
+    let ref_offsets = calculate_text_vertical_offsets(ref_text, ref_nodes);
+
+    if selkie_offsets.is_empty() || ref_offsets.is_empty() {
+        return;
+    }
+
+    // Calculate average relative vertical position (0 = top, 0.5 = center, 1 = bottom)
+    let selkie_avg_rel: f64 =
+        selkie_offsets.iter().map(|(_, rel, _)| rel).sum::<f64>() / selkie_offsets.len() as f64;
+    let ref_avg_rel: f64 =
+        ref_offsets.iter().map(|(_, rel, _)| rel).sum::<f64>() / ref_offsets.len() as f64;
+
+    // Difference in relative position - significant if > 0.15 (15% of node height)
+    let rel_diff = (selkie_avg_rel - ref_avg_rel).abs();
+
+    if rel_diff > 0.15 {
+        let selkie_pos = if selkie_avg_rel < 0.35 {
+            "near top"
+        } else if selkie_avg_rel > 0.65 {
+            "near bottom"
+        } else {
+            "centered"
+        };
+        let ref_pos = if ref_avg_rel < 0.35 {
+            "near top"
+        } else if ref_avg_rel > 0.65 {
+            "near bottom"
+        } else {
+            "centered"
+        };
+
+        issues.push(
+            Issue::warning(
+                "text_placement",
+                format!(
+                    "Text vertical placement differs: selkie positions text {} ({:.0}% from top), \
+                     reference positions text {} ({:.0}% from top). Difference: {:.0}%",
+                    selkie_pos,
+                    selkie_avg_rel * 100.0,
+                    ref_pos,
+                    ref_avg_rel * 100.0,
+                    rel_diff * 100.0
+                ),
+            )
+            .with_values(
+                format!("{:.0}% from top", ref_avg_rel * 100.0),
+                format!("{:.0}% from top", selkie_avg_rel * 100.0),
+            ),
+        );
+    }
+
+    // Also check for specific text elements with significant placement differences
+    let mut placement_mismatches = Vec::new();
+
+    for (selkie_offset, selkie_rel, selkie_label) in &selkie_offsets {
+        // Find matching text in reference by label content
+        let matching_ref = ref_offsets.iter().find(|(_, _, ref_label)| {
+            // Match by first word or full content
+            let selkie_first = selkie_label.split_whitespace().next().unwrap_or("");
+            let ref_first = ref_label.split_whitespace().next().unwrap_or("");
+            selkie_first == ref_first || selkie_label == ref_label
+        });
+
+        if let Some((ref_offset, ref_rel, _)) = matching_ref {
+            let offset_diff = (selkie_offset - ref_offset).abs();
+            let rel_diff = (selkie_rel - ref_rel).abs();
+
+            // Report if absolute offset differs by > 10px OR relative position by > 20%
+            if offset_diff > 10.0 || rel_diff > 0.2 {
+                // Truncate label for display
+                let label_preview = if selkie_label.len() > 20 {
+                    format!("{}...", &selkie_label[..20])
+                } else {
+                    selkie_label.clone()
+                };
+
+                placement_mismatches.push(format!(
+                    "\"{}\" at y-offset {:.0}px ({:.0}%) vs reference {:.0}px ({:.0}%)",
+                    label_preview,
+                    selkie_offset,
+                    selkie_rel * 100.0,
+                    ref_offset,
+                    ref_rel * 100.0
+                ));
+            }
+        }
+    }
+
+    if !placement_mismatches.is_empty() {
+        issues.push(Issue::warning(
+            "text_placement_details",
+            format!(
+                "TEXT PLACEMENT MISMATCHES ({} issues):\n  {}",
+                placement_mismatches.len(),
+                placement_mismatches.join("\n  ")
+            ),
+        ));
+    }
+}
+
+/// Calculate vertical offsets for text elements relative to their containing nodes
+/// Returns Vec of (absolute_offset_from_top, relative_position_0_to_1, label_text)
+fn calculate_text_vertical_offsets(
+    text_bounds: &[crate::render::svg::structure::TextBounds],
+    node_bounds: &[NodeBounds],
+) -> Vec<(f64, f64, String)> {
+    let mut offsets = Vec::new();
+
+    for text in text_bounds {
+        // Find containing node - first by parent ID, then by geometric containment
+        let mut containing_node = None;
+
+        // Try parent ID match first
+        if let Some(ref parent_id) = text.parent_node_id {
+            containing_node = node_bounds.iter().find(|n| n.id == *parent_id);
+        }
+
+        // Fall back to geometric containment if parent ID match failed or wasn't available
+        if containing_node.is_none() {
+            containing_node = node_bounds.iter().find(|n| {
+                let x_in = text.x >= n.x - 10.0 && text.x <= n.x + n.width + 10.0;
+                let y_in = text.y >= n.y - 10.0 && text.y <= n.y + n.height + 10.0;
+                x_in && y_in
+            });
+        }
+
+        if let Some(node) = containing_node {
+            // Calculate text vertical center relative to node
+            let text_center_y = text.y + text.height / 2.0;
+            let node_top = node.y;
+            let node_height = node.height;
+
+            // Absolute offset from top of node
+            let offset = text_center_y - node_top;
+
+            // Relative position (0 = top, 0.5 = center, 1 = bottom)
+            let relative = if node_height > 0.0 {
+                offset / node_height
+            } else {
+                0.5
+            };
+
+            offsets.push((offset, relative, text.text.clone()));
+        }
+    }
+
+    offsets
 }
 
 #[cfg(test)]

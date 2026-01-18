@@ -53,6 +53,9 @@ statement = {
     | enterprise_boundary_block
     | system_boundary_block
     | container_boundary_block
+    | deployment_node_block
+    | deployment_node_l_block
+    | deployment_node_r_block
     | rel_stmt
     | birel_stmt
     | rel_direction_stmt
@@ -198,6 +201,18 @@ system_boundary_block = {
 
 container_boundary_block = {
     ^"Container_Boundary" ~ "(" ~ attributes ~ ")" ~ "{" ~ (NEWLINE | statement)* ~ "}"
+}
+
+deployment_node_block = {
+    (^"Deployment_Node" | ^"Node") ~ "(" ~ attributes ~ ")" ~ "{" ~ (NEWLINE | statement)* ~ "}"
+}
+
+deployment_node_l_block = {
+    ^"Node_L" ~ "(" ~ attributes ~ ")" ~ "{" ~ (NEWLINE | statement)* ~ "}"
+}
+
+deployment_node_r_block = {
+    ^"Node_R" ~ "(" ~ attributes ~ ")" ~ "{" ~ (NEWLINE | statement)* ~ "}"
 }
 
 // ==================

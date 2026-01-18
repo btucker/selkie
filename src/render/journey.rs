@@ -285,10 +285,6 @@ fn render_section(
     let mut children = Vec::new();
     let section_idx = section_num % section_fills.len();
     let fill = &section_fills[section_idx];
-    // Text color - computed dynamically based on fill brightness
-    let fill_color = crate::render::svg::Color::parse(fill)
-        .unwrap_or_else(|| crate::render::svg::Color::rgb(236, 236, 255));
-    let text_color = if fill_color.is_dark() { "#fff" } else { "#333" };
 
     // Section background rectangle
     let rect = SvgElement::Rect {
@@ -304,14 +300,14 @@ fn render_section(
     };
     children.push(rect);
 
-    // Section label - centered text (no section-type class to avoid CSS fill override)
+    // Section label - centered text with label class (matching mermaid.js)
+    // Text color comes from CSS .label { fill: #333; } like the reference
     let label = SvgElement::Text {
         x: x + width / 2.0,
         y: y + HEIGHT / 2.0 + 5.0,
         content: text.to_string(),
         attrs: Attrs::new()
-            .with_class("journey-section")
-            .with_fill(text_color)
+            .with_class("label")
             .with_attr("text-anchor", "middle")
             .with_attr("dominant-baseline", "middle"),
     };
@@ -336,10 +332,6 @@ fn render_task(
     let mut children = Vec::new();
     let section_fills = &config.theme.journey_section_fills;
     let fill = &section_fills[section_num % section_fills.len()];
-    // Text color - computed dynamically based on fill brightness
-    let fill_color = crate::render::svg::Color::parse(fill)
-        .unwrap_or_else(|| crate::render::svg::Color::rgb(236, 236, 255));
-    let text_color = if fill_color.is_dark() { "#fff" } else { "#333" };
 
     // Task vertical line (dashed) - from task to face area
     let center_x = x + WIDTH / 2.0;
@@ -410,8 +402,8 @@ fn render_task(
         }
     }
 
-    // Task label using tspan for proper text rendering
-    let task_label = render_task_label(&task.task, x, y, WIDTH, HEIGHT, text_color);
+    // Task label using class="label" for CSS-based text color
+    let task_label = render_task_label(&task.task, x, y, WIDTH, HEIGHT);
     children.push(task_label);
 
     SvgElement::Group {
@@ -423,33 +415,26 @@ fn render_task(
 }
 
 /// Render task label with proper text positioning
-fn render_task_label(
-    content: &str,
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
-    color: &str,
-) -> SvgElement {
+/// Uses class="label" for CSS-based fill color (matching mermaid.js)
+fn render_task_label(content: &str, x: f64, y: f64, width: f64, height: f64) -> SvgElement {
     // Split on <br> tags for multiline support
     let lines: Vec<&str> = content.split("<br>").collect();
     let line_count = lines.len();
 
     if line_count == 1 {
-        // Single line - simple text element
+        // Single line - simple text element with label class for CSS fill
         SvgElement::Text {
             x: x + width / 2.0,
             y: y + height / 2.0 + 5.0,
             content: content.to_string(),
             attrs: Attrs::new()
-                .with_class("task")
-                .with_fill(color)
+                .with_class("label")
                 .with_attr("text-anchor", "middle")
                 .with_attr("dominant-baseline", "middle")
                 .with_attr("font-size", &format!("{}px", TASK_FONT_SIZE)),
         }
     } else {
-        // Multiple lines using tspan
+        // Multiple lines using tspan - use label class for CSS fill
         let mut tspans = String::new();
         for (i, line) in lines.iter().enumerate() {
             let dy =
@@ -464,10 +449,9 @@ fn render_task_label(
 
         SvgElement::Raw {
             content: format!(
-                r#"<text x="{}" y="{}" fill="{}" text-anchor="middle" dominant-baseline="central" alignment-baseline="central" class="task" font-size="{}px">{}</text>"#,
+                r#"<text x="{}" y="{}" text-anchor="middle" dominant-baseline="central" alignment-baseline="central" class="label" font-size="{}px">{}</text>"#,
                 x + width / 2.0,
                 y + height / 2.0,
-                color,
                 TASK_FONT_SIZE,
                 tspans
             ),
@@ -671,6 +655,8 @@ fn generate_journey_css(config: &RenderConfig) -> String {
 }}
 .label {{
   font-family: {font_family};
+  color: #333;
+  fill: #333;
 }}
 .activity-line {{
   fill: none;

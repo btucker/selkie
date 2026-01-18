@@ -57,7 +57,7 @@ Rule 5: Always prefer the implementation approach of the reference-implementatio
 
 ### The process that MUST be followed
 
-1. Use `cargo run --bin selkie -- eval --type <diagram_type>` evaluate where our implementation is relative to the reference.
+1. Use `cargo run --features eval --bin selkie -- eval --type <diagram_type>` evaluate where our implementation is relative to the reference.
 2. Follow all instructions from its output & confirm our changes are increasing scores
 3. Log new issues to log in bd & resolve completed ones
 4. When you resolve a rendering issue, update the svg in docs/images
