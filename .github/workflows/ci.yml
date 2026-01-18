@@ -1,4 +1,5 @@
 name: CI
+# Caching enabled for faster builds
 
 on:
   push:
