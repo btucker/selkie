@@ -69,7 +69,7 @@ fn process_statement(
         }
         Rule::block_stmt => {
             let (id, label, block_type, width) = extract_block_info(pair)?;
-            db.add_block(&id, label.as_deref(), block_type);
+            db.add_block_with_parent(&id, label.as_deref(), block_type, parent_id);
             if let Some(w) = width {
                 db.set_width(&id, w);
             }
@@ -77,13 +77,13 @@ fn process_statement(
         Rule::space_stmt => {
             // Generate unique ID for space
             let id = db.generate_space_id();
-            db.add_block(&id, None, BlockType::Space);
+            db.add_block_with_parent(&id, None, BlockType::Space, parent_id);
         }
         Rule::composite_block => {
             process_composite(db, pair, parent_id)?;
         }
         Rule::edge_stmt => {
-            process_edge(db, pair)?;
+            process_edge(db, pair, parent_id)?;
         }
         Rule::class_def_stmt => {
             process_class_def(db, pair)?;
@@ -231,7 +231,7 @@ fn extract_label(pair: pest::iterators::Pair<Rule>) -> String {
 fn process_composite(
     db: &mut BlockDb,
     pair: pest::iterators::Pair<Rule>,
-    _parent_id: Option<&str>,
+    parent_id: Option<&str>,
 ) -> Result<(), String> {
     let mut composite_id = db.generate_composite_id();
     let mut label = String::new();
@@ -253,9 +253,14 @@ fn process_composite(
                 }
             }
             Rule::statement => {
-                // First add the composite block
+                // First add the composite block with its parent
                 if !db.get_blocks().contains_key(&composite_id) {
-                    db.add_block(&composite_id, Some(&label), BlockType::Composite);
+                    db.add_block_with_parent(
+                        &composite_id,
+                        Some(&label),
+                        BlockType::Composite,
+                        parent_id,
+                    );
                 }
                 // Then process statements within it
                 process_statement(db, inner, Some(&composite_id))?;
@@ -266,13 +271,17 @@ fn process_composite(
 
     // Ensure composite is added even if empty
     if !db.get_blocks().contains_key(&composite_id) {
-        db.add_block(&composite_id, Some(&label), BlockType::Composite);
+        db.add_block_with_parent(&composite_id, Some(&label), BlockType::Composite, parent_id);
     }
 
     Ok(())
 }
 
-fn process_edge(db: &mut BlockDb, pair: pest::iterators::Pair<Rule>) -> Result<(), String> {
+fn process_edge(
+    db: &mut BlockDb,
+    pair: pest::iterators::Pair<Rule>,
+    parent_id: Option<&str>,
+) -> Result<(), String> {
     let mut blocks: Vec<(String, Option<String>, BlockType, Option<usize>)> = Vec::new();
     let mut edge_label: Option<String> = None;
 
@@ -301,15 +310,15 @@ fn process_edge(db: &mut BlockDb, pair: pest::iterators::Pair<Rule>) -> Result<(
         let (id1, label1, type1, width1) = &blocks[0];
         let (id2, label2, type2, width2) = &blocks[1];
 
-        // Add blocks if they don't exist
+        // Add blocks if they don't exist (with parent if specified)
         if !db.get_blocks().contains_key(id1) {
-            db.add_block(id1, label1.as_deref(), type1.clone());
+            db.add_block_with_parent(id1, label1.as_deref(), type1.clone(), parent_id);
             if let Some(w) = width1 {
                 db.set_width(id1, *w);
             }
         }
         if !db.get_blocks().contains_key(id2) {
-            db.add_block(id2, label2.as_deref(), type2.clone());
+            db.add_block_with_parent(id2, label2.as_deref(), type2.clone(), parent_id);
             if let Some(w) = width2 {
                 db.set_width(id2, *w);
             }

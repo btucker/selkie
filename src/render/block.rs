@@ -192,7 +192,7 @@ fn layout_blocks(
     let mut col = 0;
     let mut row_height = 0.0_f64;
 
-    // Collect blocks and sort by ID for consistent ordering
+    // Collect all blocks and sort by ID for consistent ordering
     let mut block_list: Vec<_> = blocks.iter().collect();
     block_list.sort_by(|a, b| a.0.cmp(b.0));
 
@@ -443,10 +443,34 @@ fn render_block_node(block: &PositionedBlock, _config: &RenderConfig) -> SvgElem
     }
 }
 
+/// Build inline style string from block styles
+fn build_inline_style(styles: &[String]) -> Option<String> {
+    if styles.is_empty() {
+        return None;
+    }
+    // Join styles with semicolons
+    let style_str = styles.join(";");
+    if style_str.is_empty() {
+        None
+    } else {
+        Some(style_str)
+    }
+}
+
 /// Render block shape based on type
 fn render_block_shape(block: &PositionedBlock) -> SvgElement {
     let w = block.width;
     let h = block.height;
+    let inline_style = build_inline_style(&block.styles);
+
+    // Helper to create attrs with optional inline style
+    let make_attrs = |class: &str| {
+        let mut attrs = Attrs::new().with_class(class);
+        if let Some(ref style) = inline_style {
+            attrs = attrs.with_attr("style", style);
+        }
+        attrs
+    };
 
     match block.block_type {
         BlockType::Square => SvgElement::Rect {
@@ -456,7 +480,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             height: h,
             rx: None,
             ry: None,
-            attrs: Attrs::new().with_class("node-bkg"),
+            attrs: make_attrs("node-bkg"),
         },
         BlockType::Round => SvgElement::Rect {
             x: 0.0,
@@ -465,7 +489,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             height: h,
             rx: Some(BLOCK_PADDING),
             ry: Some(BLOCK_PADDING),
-            attrs: Attrs::new().with_class("node-bkg"),
+            attrs: make_attrs("node-bkg"),
         },
         BlockType::Circle => {
             let radius = w.min(h) / 2.0;
@@ -473,7 +497,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
                 cx: w / 2.0,
                 cy: h / 2.0,
                 r: radius,
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             }
         }
         BlockType::DoubleCircle => {
@@ -484,7 +508,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
                 cx: w / 2.0,
                 cy: h / 2.0,
                 r: outer_radius,
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             };
             let inner = SvgElement::Circle {
                 cx: w / 2.0,
@@ -503,7 +527,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             let points = format!("{},{} {},{} {},{} {},{}", cx, 0.0, w, cy, cx, h, 0.0, cy);
             SvgElement::PolygonStr {
                 points,
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             }
         }
         BlockType::Hexagon => {
@@ -525,7 +549,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             );
             SvgElement::PolygonStr {
                 points,
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             }
         }
         BlockType::Stadium => {
@@ -537,7 +561,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
                 height: h,
                 rx: Some(r),
                 ry: Some(r),
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             }
         }
         BlockType::Subroutine => {
@@ -549,7 +573,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
                 height: h,
                 rx: None,
                 ry: None,
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             };
             let inner = SvgElement::Rect {
                 x: 5.0,
@@ -591,7 +615,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             );
             SvgElement::Path {
                 d: path,
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             }
         }
         BlockType::LeanRight | BlockType::Trapezoid => {
@@ -609,7 +633,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             );
             SvgElement::PolygonStr {
                 points,
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             }
         }
         BlockType::LeanLeft | BlockType::InvTrapezoid => {
@@ -627,7 +651,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             );
             SvgElement::PolygonStr {
                 points,
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             }
         }
         BlockType::BlockArrow => {
@@ -647,7 +671,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
             );
             SvgElement::Path {
                 d: path,
-                attrs: Attrs::new().with_class("node-bkg"),
+                attrs: make_attrs("node-bkg"),
             }
         }
         BlockType::Composite => {
@@ -659,7 +683,7 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
                 height: h,
                 rx: None,
                 ry: None,
-                attrs: Attrs::new().with_class("block-composite"),
+                attrs: make_attrs("block-composite"),
             }
         }
         BlockType::Space | BlockType::Edge => {

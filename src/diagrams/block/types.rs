@@ -140,8 +140,14 @@ impl BlockDb {
         *self = Self::new();
     }
 
-    /// Add a block
-    pub fn add_block(&mut self, id: &str, label: Option<&str>, block_type: BlockType) {
+    /// Add a block with optional parent
+    pub fn add_block_with_parent(
+        &mut self,
+        id: &str,
+        label: Option<&str>,
+        block_type: BlockType,
+        parent_id: Option<&str>,
+    ) {
         // Protect against prototype pollution
         if id == "__proto__" || id == "constructor" {
             return;
@@ -150,9 +156,18 @@ impl BlockDb {
         let mut block = Block::new(id.to_string());
         block.label = label.map(|s| s.to_string());
         block.block_type = block_type;
+        block.parent_id = parent_id.map(|s| s.to_string());
 
         self.blocks.insert(id.to_string(), block.clone());
-        self.root_block.children.push(block);
+        // Only add to root children if no parent (top-level block)
+        if parent_id.is_none() {
+            self.root_block.children.push(block);
+        }
+    }
+
+    /// Add a block (legacy method, adds to root)
+    pub fn add_block(&mut self, id: &str, label: Option<&str>, block_type: BlockType) {
+        self.add_block_with_parent(id, label, block_type, None);
     }
 
     /// Add an edge
