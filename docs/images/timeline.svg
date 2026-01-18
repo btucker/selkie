@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="460" viewBox="0 0 1000 460" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.titleText {
+  text-anchor: middle;
+  font-size: 24px;
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.timeline-node {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.timeline-node text {
+  fill: #333;
+  font-size: 11px;
+}
+
+.lineWrapper line {
+  stroke: black;
+}
+
+.section-0 {
+  fill: #f9f;
+}
+
+.node-section-0 {
+  fill: #f9f;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-0 {
+  stroke: #f9f;
+  stroke-width: 3px;
+}
+
+.section-1 {
+  fill: #bbf;
+}
+
+.node-section-1 {
+  fill: #bbf;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-1 {
+  stroke: #bbf;
+  stroke-width: 3px;
+}
+
+.section-2 {
+  fill: #bfb;
+}
+
+.node-section-2 {
+  fill: #bfb;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-2 {
+  stroke: #bfb;
+  stroke-width: 3px;
+}
+
+.section-3 {
+  fill: #fbf;
+}
+
+.node-section-3 {
+  fill: #fbf;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-3 {
+  stroke: #fbf;
+  stroke-width: 3px;
+}
+
+.section-4 {
+  fill: #ff9;
+}
+
+.node-section-4 {
+  fill: #ff9;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-4 {
+  stroke: #ff9;
+  stroke-width: 3px;
+}
+
+.section-5 {
+  fill: #9ff;
+}
+
+.node-section-5 {
+  fill: #9ff;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-5 {
+  stroke: #9ff;
+  stroke-width: 3px;
+}
+
+.section-6 {
+  fill: #f99;
+}
+
+.node-section-6 {
+  fill: #f99;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-6 {
+  stroke: #f99;
+  stroke-width: 3px;
+}
+
+.section-7 {
+  fill: #9f9;
+}
+
+.node-section-7 {
+  fill: #9f9;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-7 {
+  stroke: #9f9;
+  stroke-width: 3px;
+}
+
+.section-8 {
+  fill: #99f;
+}
+
+.node-section-8 {
+  fill: #99f;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-8 {
+  stroke: #99f;
+  stroke-width: 3px;
+}
+
+.section-9 {
+  fill: #fc9;
+}
+
+.node-section-9 {
+  fill: #fc9;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-9 {
+  stroke: #fc9;
+  stroke-width: 3px;
+}
+
+.section-10 {
+  fill: #c9f;
+}
+
+.node-section-10 {
+  fill: #c9f;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-10 {
+  stroke: #c9f;
+  stroke-width: 3px;
+}
+
+.section-11 {
+  fill: #9fc;
+}
+
+.node-section-11 {
+  fill: #9fc;
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.node-line-11 {
+  stroke: #9fc;
+  stroke-width: 3px;
+}
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <defs>
+      <marker id="arrowhead" refX="5" refY="2" markerWidth="6" markerHeight="4" orient="auto">
+                <path d="M 0,0 V 4 L6,2 Z"></path>
+            </marker>
+    </defs>
+    <text x="450" y="20" class="titleText" text-anchor="middle" font-weight="bold" font-size="4ex">History of Social Media Platform</text>
+    <g class="taskWrapper timeline-node section-0" transform="translate(50, 50)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
+      <text x="95" y="25" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em">2002</text>
+    </g>
+    <g class="lineWrapper">
+      <line x1="145" y1="100" x2="145" y2="410" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke-width="2" stroke="black"/>
+    </g>
+    <g class="eventWrapper timeline-node section-0" transform="translate(50, 200)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-0"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-0"/>
+      <text x="95" y="25" alignment-baseline="middle" dy="1em" dominant-baseline="middle" text-anchor="middle">LinkedIn</text>
+    </g>
+    <g class="taskWrapper timeline-node section-1" transform="translate(250, 50)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
+      <text x="95" y="25" dy="1em" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle">2004</text>
+    </g>
+    <g class="lineWrapper">
+      <line x1="345" y1="100" x2="345" y2="410" marker-end="url(#arrowhead)" stroke-width="2" stroke="black" stroke-dasharray="5,5"/>
+    </g>
+    <g class="eventWrapper timeline-node section-1" transform="translate(250, 200)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
+      <text x="95" y="25" dy="1em" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle">Facebook</text>
+    </g>
+    <g class="eventWrapper timeline-node section-1" transform="translate(250, 260)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-1"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-1"/>
+      <text x="95" y="25" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">Google</text>
+    </g>
+    <g class="taskWrapper timeline-node section-2" transform="translate(450, 50)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-2"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-2"/>
+      <text x="95" y="25" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em">2005</text>
+    </g>
+    <g class="lineWrapper">
+      <line x1="545" y1="100" x2="545" y2="410" stroke="black" stroke-dasharray="5,5" stroke-width="2" marker-end="url(#arrowhead)"/>
+    </g>
+    <g class="eventWrapper timeline-node section-2" transform="translate(450, 200)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-2"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-2"/>
+      <text x="95" y="25" dy="1em" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle">YouTube</text>
+    </g>
+    <g class="taskWrapper timeline-node section-3" transform="translate(650, 50)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-3"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-3"/>
+      <text x="95" y="25" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle">2006</text>
+    </g>
+    <g class="lineWrapper">
+      <line x1="745" y1="100" x2="745" y2="410" stroke-dasharray="5,5" stroke-width="2" stroke="black" marker-end="url(#arrowhead)"/>
+    </g>
+    <g class="eventWrapper timeline-node section-3" transform="translate(650, 200)">
+      <path d="M0 45 v-40 q0,-5 5,-5 h180 q5,0 5,5 v45 H0 Z" class="node-bkg node-section-3"/>
+      <line x1="0" y1="50" x2="190" y2="50" class="node-line-3"/>
+      <text x="95" y="25" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em">Twitter</text>
+    </g>
+    <g class="lineWrapper">
+      <line x1="50" y1="150" x2="950" y2="150" stroke-width="4" stroke="black" marker-end="url(#arrowhead)"/>
+    </g>
+  </g>
+</svg>
