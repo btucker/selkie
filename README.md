@@ -1,4 +1,6 @@
-<img src="docs/images/selkie-logo.png" width="250" align="right">
+<div align="center">
+  <img src="docs/images/selkie-logo.png" width="250">
+</div>
 
 # Selkie
 
