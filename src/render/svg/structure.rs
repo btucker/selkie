@@ -674,13 +674,22 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
             }
         }
 
-        // Also check for mermaid.js node containers (<g class="node" transform="translate(x,y)">)
-        // These contain child <path> elements that define the box bounds relative to center
+        // Also check for node containers (<g class="node" transform="translate(x,y)">)
+        // These contain child <path> or <rect> elements that define the box bounds
+        // Handles: ER diagrams (entity-*), block diagrams (block-*), mermaid.js nodes (id-*)
         if node.tag_name().name() == "g" {
             let class = node.attribute("class").unwrap_or("");
             let id = node.attribute("id").unwrap_or("");
 
-            if class.contains("node") && id.contains("entity") {
+            // Match nodes from various diagram types
+            let is_node_group = class.contains("node")
+                && (id.contains("entity")
+                    || id.starts_with("block-")
+                    || id.starts_with("id-")
+                    || id.starts_with("id")
+                    || id.starts_with("node-"));
+
+            if is_node_group {
                 // Parse transform="translate(x, y)"
                 if let Some(transform) = node.attribute("transform") {
                     if let Some((cx, cy)) = parse_translate(transform) {
@@ -1010,7 +1019,14 @@ fn parse_path_with_directions(d: &str) -> Option<((f64, f64), Option<(f64, f64)>
         if part == "M" || part.starts_with('M') {
             let (x, y) = if part == "M" {
                 i += 1;
-                parse_coord_pair(&parts, &mut i)?
+                let coords = parse_coord_pair(&parts, &mut i)?;
+                // parse_coord_pair already advanced i, so continue to skip the i += 1 at end
+                if start.is_none() {
+                    start = Some(coords);
+                    point_count = 1;
+                }
+                end = Some(coords);
+                continue;
             } else {
                 parse_inline_coords(&part[1..])?
             };
@@ -1024,7 +1040,13 @@ fn parse_path_with_directions(d: &str) -> Option<((f64, f64), Option<(f64, f64)>
         else if part == "L" || part.starts_with('L') {
             let (x, y) = if part == "L" {
                 i += 1;
-                parse_coord_pair(&parts, &mut i)?
+                let coords = parse_coord_pair(&parts, &mut i)?;
+                point_count += 1;
+                if point_count == 2 && second_point.is_none() {
+                    second_point = Some(coords);
+                }
+                end = Some(coords);
+                continue;
             } else {
                 parse_inline_coords(&part[1..])?
             };
@@ -1050,6 +1072,7 @@ fn parse_path_with_directions(d: &str) -> Option<((f64, f64), Option<(f64, f64)>
                 let (x, y) = parse_coord_pair(&parts, &mut i)?;
                 point_count += 1;
                 end = Some((x, y));
+                continue;
             } else {
                 let coords_str = &part[1..];
                 let coords: Vec<f64> = coords_str
@@ -1062,6 +1085,36 @@ fn parse_path_with_directions(d: &str) -> Option<((f64, f64), Option<(f64, f64)>
                     }
                     point_count += 1;
                     end = Some((coords[4], coords[5]));
+                }
+            }
+        }
+        // Handle Q (quadratic Bezier) command - takes 2 coordinate pairs (control point + endpoint)
+        else if part == "Q" || part.starts_with('Q') {
+            if part == "Q" {
+                i += 1;
+                // Control point - this is the initial direction for the curve
+                let (cx, cy) = parse_coord_pair(&parts, &mut i)?;
+                if point_count == 1 && second_point.is_none() {
+                    // Use control point as direction indicator
+                    second_point = Some((cx, cy));
+                }
+                // Endpoint
+                let (x, y) = parse_coord_pair(&parts, &mut i)?;
+                point_count += 1;
+                end = Some((x, y));
+                continue;
+            } else {
+                let coords_str = &part[1..];
+                let coords: Vec<f64> = coords_str
+                    .split([',', ' '])
+                    .filter_map(|s| s.parse().ok())
+                    .collect();
+                if coords.len() >= 4 {
+                    if point_count == 1 && second_point.is_none() {
+                        second_point = Some((coords[0], coords[1]));
+                    }
+                    point_count += 1;
+                    end = Some((coords[2], coords[3]));
                 }
             }
         }
@@ -1290,15 +1343,10 @@ fn extract_css_font_styles(
                                 );
                             }
                             // Also handle ID selectors (e.g., "#my-svg" -> "root")
+                            // and element selectors (e.g., "svg" -> "root")
                             // These are typically used for default/inherited font sizes
-                            else if sel.starts_with('#') {
-                                css_fonts.insert(
-                                    "root".to_string(),
-                                    (font_size.clone(), font_weight.clone()),
-                                );
-                            }
-                            // Handle element selectors (e.g., "svg" -> "root")
-                            else if sel == "svg" || sel.ends_with(" svg") {
+                            else if sel.starts_with('#') || sel == "svg" || sel.ends_with(" svg")
+                            {
                                 css_fonts.insert(
                                     "root".to_string(),
                                     (font_size.clone(), font_weight.clone()),

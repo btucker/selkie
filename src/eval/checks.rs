@@ -43,6 +43,8 @@ pub fn check_structure(
 
     // WARNING checks - significant differences
     check_dimensions(selkie, reference, config, &mut issues);
+    check_layout_pattern(selkie, reference, &mut issues);
+    check_node_containment(selkie, reference, &mut issues);
     check_shape_counts(selkie, reference, &mut issues);
     check_z_order(selkie, reference, &mut issues);
     check_stroke_widths(selkie, reference, &mut issues);
@@ -208,6 +210,170 @@ fn check_dimensions(
                 selkie.height
             ),
         ));
+    }
+}
+
+/// Count the number of distinct rows in a layout by clustering Y positions
+fn count_layout_rows(node_bounds: &[NodeBounds]) -> usize {
+    if node_bounds.is_empty() {
+        return 0;
+    }
+
+    // Cluster Y positions with a tolerance of 20px
+    let tolerance = 20.0;
+    let mut y_positions: Vec<f64> = node_bounds.iter().map(|b| b.y).collect();
+    y_positions.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+
+    let mut rows = 1;
+    let mut last_y = y_positions[0];
+
+    for &y in &y_positions[1..] {
+        if (y - last_y).abs() > tolerance {
+            rows += 1;
+            last_y = y;
+        }
+    }
+
+    rows
+}
+
+/// Check layout pattern - ERROR if significantly different row/column arrangement
+fn check_layout_pattern(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
+    let selkie_bounds = &selkie.edge_geometry.node_bounds;
+    let ref_bounds = &reference.edge_geometry.node_bounds;
+
+    // Skip if no nodes to compare
+    if selkie_bounds.is_empty() || ref_bounds.is_empty() {
+        return;
+    }
+
+    let selkie_rows = count_layout_rows(selkie_bounds);
+    let ref_rows = count_layout_rows(ref_bounds);
+
+    // If reference has 1 row but selkie has multiple, that's a layout error
+    if ref_rows == 1 && selkie_rows > 1 {
+        issues.push(
+            Issue::error(
+                "layout_pattern",
+                format!(
+                    "Layout differs: reference has {} row (horizontal layout), selkie has {} rows (vertical stacking)",
+                    ref_rows, selkie_rows
+                ),
+            )
+            .with_values(format!("{} rows", ref_rows), format!("{} rows", selkie_rows)),
+        );
+    } else if ref_rows > selkie_rows && selkie_rows == 1 {
+        issues.push(
+            Issue::error(
+                "layout_pattern",
+                format!(
+                    "Layout differs: reference has {} rows (vertical layout), selkie has {} row (horizontal)",
+                    ref_rows, selkie_rows
+                ),
+            )
+            .with_values(format!("{} rows", ref_rows), format!("{} rows", selkie_rows)),
+        );
+    } else if (selkie_rows as i32 - ref_rows as i32).abs() > 1 {
+        issues.push(
+            Issue::warning(
+                "layout_pattern",
+                format!(
+                    "Row count differs: reference has {} rows, selkie has {} rows",
+                    ref_rows, selkie_rows
+                ),
+            )
+            .with_values(
+                format!("{} rows", ref_rows),
+                format!("{} rows", selkie_rows),
+            ),
+        );
+    }
+}
+
+/// Check if a node is a container (composite block, cluster, etc.)
+fn is_container_node(bounds: &NodeBounds) -> bool {
+    let id = bounds.id.to_lowercase();
+    // Selkie patterns
+    id.contains("composite")
+        || id.contains("cluster")
+        || id.contains("container")
+        // Mermaid patterns: auto-generated IDs like "id-w3hwz1x9xf8-1"
+        || (bounds.id.starts_with("id-")
+            && bounds.id.len() > 10
+            && bounds.id.chars().skip(3).take(8).all(|c| c.is_alphanumeric()))
+}
+
+/// Check if node a contains node b geometrically
+fn node_contains(container: &NodeBounds, inner: &NodeBounds) -> bool {
+    // Check if inner is fully within container bounds (with small tolerance)
+    let tolerance = 5.0;
+    inner.x >= container.x - tolerance
+        && inner.y >= container.y - tolerance
+        && inner.x + inner.width <= container.x + container.width + tolerance
+        && inner.y + inner.height <= container.y + container.height + tolerance
+}
+
+/// Count how many nodes are contained within containers
+fn count_contained_nodes(node_bounds: &[NodeBounds]) -> usize {
+    let mut count = 0;
+    for container in node_bounds {
+        if is_container_node(container) {
+            for inner in node_bounds {
+                if inner.id != container.id && node_contains(container, inner) {
+                    count += 1;
+                }
+            }
+        }
+    }
+    count
+}
+
+/// Check node containment - ERROR if nodes should be nested but aren't
+fn check_node_containment(
+    selkie: &SvgStructure,
+    reference: &SvgStructure,
+    issues: &mut Vec<Issue>,
+) {
+    let selkie_bounds = &selkie.edge_geometry.node_bounds;
+    let ref_bounds = &reference.edge_geometry.node_bounds;
+
+    // Skip if no nodes to compare
+    if selkie_bounds.is_empty() || ref_bounds.is_empty() {
+        return;
+    }
+
+    let selkie_contained = count_contained_nodes(selkie_bounds);
+    let ref_contained = count_contained_nodes(ref_bounds);
+
+    // If reference has nested nodes but selkie doesn't, that's an error
+    if ref_contained > 0 && selkie_contained == 0 {
+        issues.push(
+            Issue::error(
+                "node_containment",
+                format!(
+                    "Containment missing: reference has {} nodes nested inside containers, selkie has {}",
+                    ref_contained, selkie_contained
+                ),
+            )
+            .with_values(
+                format!("{} nested nodes", ref_contained),
+                format!("{} nested nodes", selkie_contained),
+            ),
+        );
+    } else if ref_contained > selkie_contained && selkie_contained > 0 {
+        issues.push(
+            Issue::warning(
+                "node_containment",
+                format!(
+                    "Containment differs: reference has {} nested nodes, selkie has {}",
+                    ref_contained, selkie_contained
+                ),
+            )
+            .with_values(
+                format!("{} nested nodes", ref_contained),
+                format!("{} nested nodes", selkie_contained),
+            ),
+        );
     }
 }
 

@@ -26,16 +26,59 @@ jobs:
         with:
           target: wasm32-unknown-unknown
 
+      - name: Cache Cargo registry and target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-deploy-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-deploy-
+            ${{ runner.os }}-cargo-
+
+      - name: Cache wasm-pack
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/wasm-pack
+          key: ${{ runner.os }}-wasm-pack-0.12.1
+
       - name: Install wasm-pack
-        run: cargo install wasm-pack@0.12.1
+        run: |
+          if ! command -v wasm-pack &> /dev/null; then
+            cargo install wasm-pack@0.12.1
+          fi
 
       - name: Build WASM package
         run: |
           wasm-pack build --target web --features wasm
           mv pkg playground/pkg
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache npm global packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-global-mermaid-cli
+          restore-keys: |
+            ${{ runner.os }}-npm-global-
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-chromium
+
       - name: Install Chromium dependencies
         run: npx playwright install-deps chromium
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
 
       - name: Install mermaid-cli
         run: npm install -g @mermaid-js/mermaid-cli
