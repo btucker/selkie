@@ -30,7 +30,10 @@ fn test_minimal_quadrant_chart() {
 
     assert_valid_svg(&svg);
     assert!(svg.contains("Campaign A"), "Should contain point label");
-    assert!(svg.contains("<circle"), "Should render data point as circle");
+    assert!(
+        svg.contains("<circle"),
+        "Should render data point as circle"
+    );
 }
 
 #[test]
@@ -59,8 +62,14 @@ fn test_complete_quadrant_chart() {
         svg.contains("Reach and engagement of campaigns"),
         "Should contain title"
     );
-    assert!(svg.contains("Low Reach"), "Should contain x-axis left label");
-    assert!(svg.contains("High Reach"), "Should contain x-axis right label");
+    assert!(
+        svg.contains("Low Reach"),
+        "Should contain x-axis left label"
+    );
+    assert!(
+        svg.contains("High Reach"),
+        "Should contain x-axis right label"
+    );
     assert!(
         svg.contains("Low Engagement"),
         "Should contain y-axis bottom label"
@@ -77,7 +86,10 @@ fn test_complete_quadrant_chart() {
         svg.contains("Need to promote"),
         "Should contain quadrant-2 label"
     );
-    assert!(svg.contains("Re-evaluate"), "Should contain quadrant-3 label");
+    assert!(
+        svg.contains("Re-evaluate"),
+        "Should contain quadrant-3 label"
+    );
     assert!(
         svg.contains("May be improved"),
         "Should contain quadrant-4 label"
@@ -293,7 +305,10 @@ fn test_quoted_labels() {
         svg.contains("Analytics Platform Evaluation"),
         "Should contain quoted title"
     );
-    assert!(svg.contains("Low Value"), "Should contain quoted axis label");
+    assert!(
+        svg.contains("Low Value"),
+        "Should contain quoted axis label"
+    );
     assert!(
         svg.contains("Premium Solutions"),
         "Should contain quoted quadrant label"
@@ -339,9 +354,18 @@ fn test_gartner_style_chart() {
         "Should contain title"
     );
     assert!(svg.contains("Leaders"), "Should contain quadrant labels");
-    assert!(svg.contains("Microsoft"), "Should contain company data points");
-    assert!(svg.contains("Tableau"), "Should contain company data points");
-    assert!(svg.contains("ThoughtSpot"), "Should contain company data points");
+    assert!(
+        svg.contains("Microsoft"),
+        "Should contain company data points"
+    );
+    assert!(
+        svg.contains("Tableau"),
+        "Should contain company data points"
+    );
+    assert!(
+        svg.contains("ThoughtSpot"),
+        "Should contain company data points"
+    );
 }
 
 // ============================================================================
@@ -374,7 +398,10 @@ fn test_quadrant_with_dark_theme() {
         "Should use dark quadrant fill colors"
     );
     // Dark theme should use light text colors
-    assert!(svg.contains("#ccc"), "Should use light text color for dark theme");
+    assert!(
+        svg.contains("#ccc"),
+        "Should use light text color for dark theme"
+    );
 }
 
 #[test]

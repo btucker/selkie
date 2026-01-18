@@ -193,7 +193,15 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
     );
 
     // Render axis labels
-    render_axis_labels(&mut doc, db, config, chart_left, chart_top, chart_width, chart_height);
+    render_axis_labels(
+        &mut doc,
+        db,
+        config,
+        chart_left,
+        chart_top,
+        chart_width,
+        chart_height,
+    );
 
     // Render data points
     render_points(
@@ -290,7 +298,6 @@ fn render_axis_labels(
     chart_width: f64,
     chart_height: f64,
 ) {
-
     // X-axis left label (below left of chart)
     if !db.x_axis_left.is_empty() {
         doc.add_element(SvgElement::Text {
@@ -384,11 +391,7 @@ fn render_points(
         // Get point styling
         let radius = point.style.radius.unwrap_or(DEFAULT_POINT_RADIUS);
         let default_point_color = &config.theme.quadrant_point_fill;
-        let fill = point
-            .style
-            .color
-            .as_deref()
-            .unwrap_or(default_point_color);
+        let fill = point.style.color.as_deref().unwrap_or(default_point_color);
         let stroke_color = point.style.stroke_color.as_deref();
         let stroke_width = point
             .style
@@ -399,9 +402,7 @@ fn render_points(
             .unwrap_or(0.0);
 
         // Build point attributes
-        let mut point_attrs = Attrs::new()
-            .with_fill(fill)
-            .with_class("quadrant-point");
+        let mut point_attrs = Attrs::new().with_fill(fill).with_class("quadrant-point");
 
         if let Some(sc) = stroke_color {
             point_attrs = point_attrs.with_stroke(sc).with_stroke_width(stroke_width);
