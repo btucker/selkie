@@ -1140,10 +1140,7 @@ fn parse_translate(transform: &str) -> Option<(f64, f64)> {
         if let Some(end) = rest.find(')') {
             let coords = &rest[..end];
             // Split by comma or space, filter empty parts
-            let parts: Vec<&str> = coords
-                .split([',', ' '])
-                .filter(|s| !s.is_empty())
-                .collect();
+            let parts: Vec<&str> = coords.split([',', ' ']).filter(|s| !s.is_empty()).collect();
             if parts.len() >= 2 {
                 let x = parts[0].trim().parse::<f64>().ok()?;
                 let y = parts[1].trim().parse::<f64>().ok()?;

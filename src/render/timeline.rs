@@ -295,10 +295,7 @@ fn render_section_node(
     // Background
     group_children.push(SvgElement::Path {
         d: path_d,
-        attrs: Attrs::new().with_class(&format!(
-            "node-bkg node-section-{}",
-            section_num
-        )),
+        attrs: Attrs::new().with_class(&format!("node-bkg node-section-{}", section_num)),
     });
 
     // Bottom line
@@ -389,10 +386,7 @@ fn render_task_node(
     // Background
     task_children.push(SvgElement::Path {
         d: path_d,
-        attrs: Attrs::new().with_class(&format!(
-            "node-bkg node-section-{}",
-            section_color
-        )),
+        attrs: Attrs::new().with_class(&format!("node-bkg node-section-{}", section_color)),
     });
 
     // Bottom line
@@ -499,10 +493,7 @@ fn render_event_node(
     // Background
     event_children.push(SvgElement::Path {
         d: path_d,
-        attrs: Attrs::new().with_class(&format!(
-            "node-bkg node-section-{}",
-            section_color
-        )),
+        attrs: Attrs::new().with_class(&format!("node-bkg node-section-{}", section_color)),
     });
 
     // Bottom line
@@ -657,18 +648,18 @@ fn generate_timeline_css(theme: &crate::render::svg::Theme) -> String {
     // The hue values and lightness follow a specific pattern from the reference
     let timeline_colors: Vec<(f64, f64, f64)> = vec![
         // (hue, saturation, lightness)
-        (60.0, 100.0, 73.53),   // section-0: yellow (slightly different lightness)
-        (80.0, 100.0, 76.27),   // section-1: yellow-green
-        (270.0, 100.0, 76.27),  // section-2: purple
-        (300.0, 100.0, 76.27),  // section-3: magenta
-        (330.0, 100.0, 76.27),  // section-4: pink
-        (0.0, 100.0, 76.27),    // section-5: red
-        (30.0, 100.0, 76.27),   // section-6: orange
-        (90.0, 100.0, 76.27),   // section-7: green
-        (150.0, 100.0, 76.27),  // section-8: cyan-green
-        (180.0, 100.0, 76.27),  // section-9: cyan
-        (210.0, 100.0, 76.27),  // section-10: light blue
-        (240.0, 100.0, 76.27),  // section-11: blue (wraps to -1 pattern)
+        (60.0, 100.0, 73.53), // section-0: yellow (slightly different lightness)
+        (80.0, 100.0, 76.27), // section-1: yellow-green
+        (270.0, 100.0, 76.27), // section-2: purple
+        (300.0, 100.0, 76.27), // section-3: magenta
+        (330.0, 100.0, 76.27), // section-4: pink
+        (0.0, 100.0, 76.27),  // section-5: red
+        (30.0, 100.0, 76.27), // section-6: orange
+        (90.0, 100.0, 76.27), // section-7: green
+        (150.0, 100.0, 76.27), // section-8: cyan-green
+        (180.0, 100.0, 76.27), // section-9: cyan
+        (210.0, 100.0, 76.27), // section-10: light blue
+        (240.0, 100.0, 76.27), // section-11: blue (wraps to -1 pattern)
     ];
 
     // Section -1 uses blue/violet (hsl(240, 100%, 76.27%))
@@ -876,5 +867,4 @@ mod tests {
         // Forest theme uses green colors
         assert!(svg.contains("cde498") || svg.contains("#cde498"));
     }
-
 }

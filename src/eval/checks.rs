@@ -1520,11 +1520,7 @@ fn check_element_spacing(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
 
 /// Check text placement within nodes by comparing vertical centering
 /// This detects issues where text is not properly centered/positioned within containing nodes
-fn check_text_placement(
-    selkie: &SvgStructure,
-    reference: &SvgStructure,
-    issues: &mut Vec<Issue>,
-) {
+fn check_text_placement(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
     let selkie_text = &selkie.edge_geometry.text_bounds;
     let selkie_nodes = &selkie.edge_geometry.node_bounds;
     let ref_text = &reference.edge_geometry.text_bounds;
@@ -1544,8 +1540,8 @@ fn check_text_placement(
     }
 
     // Calculate average relative vertical position (0 = top, 0.5 = center, 1 = bottom)
-    let selkie_avg_rel: f64 = selkie_offsets.iter().map(|(_, rel, _)| rel).sum::<f64>()
-        / selkie_offsets.len() as f64;
+    let selkie_avg_rel: f64 =
+        selkie_offsets.iter().map(|(_, rel, _)| rel).sum::<f64>() / selkie_offsets.len() as f64;
     let ref_avg_rel: f64 =
         ref_offsets.iter().map(|(_, rel, _)| rel).sum::<f64>() / ref_offsets.len() as f64;
 
