@@ -99,8 +99,7 @@ marker path {
   </style>
   <defs>
     <defs>
-      <linearGradient id="linearGradient-1" gradientUnits="userSpaceOnUse" x1="10" x2="295"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
-      <linearGradient id="linearGradient-2" gradientUnits="userSpaceOnUse" x1="305" x2="590"><stop offset="0%" stop-color="#f28e2c"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+      <linearGradient id="linearGradient-1" gradientUnits="userSpaceOnUse" x1="10" x2="590"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
     </defs>
   </defs>
   <g class="root">
@@ -116,29 +115,22 @@ marker path {
     <g class="nodes">
 
     </g>
-    <g class="links" fill="none" stroke-opacity="0.5">
-      <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,200 C152.5,200 152.5,200 295,200" class="sankey-link" fill="none" stroke-width="133.33333333333334" stroke="url(#linearGradient-1)" stroke-opacity="0.5"/>
-      </g>
-      <g class="link" style="mix-blend-mode: multiply">
-        <path d="M305,200 C447.5,200 447.5,200 590,200" class="sankey-link" fill="none" stroke-width="133.33333333333334" stroke="url(#linearGradient-2)" stroke-opacity="0.5"/>
-      </g>
-    </g>
     <g class="nodes">
-      <g class="node" y="133.33333333333331" id="node-1" transform="translate(0,133.33333333333331)" x="0">
-        <rect x="0" y="133.33333333333331" width="10" height="133.33333333333331" class="sankey-node" fill="#4e79a7"/>
+      <g class="node" id="node-1" x="0" transform="translate(0,133.33333333333331)" y="133.33333333333331">
+        <rect x="0" y="0" width="10" height="133.33333333333331" class="sankey-node" fill="#4e79a7"/>
       </g>
-      <g class="node" transform="translate(295,133.33333333333331)" id="node-2" y="133.33333333333331" x="295">
-        <rect x="295" y="133.33333333333331" width="10" height="133.33333333333331" class="sankey-node" fill="#f28e2c"/>
-      </g>
-      <g class="node" id="node-3" y="133.33333333333331" x="590" transform="translate(590,133.33333333333331)">
-        <rect x="590" y="133.33333333333331" width="10" height="133.33333333333331" class="sankey-node" fill="#e15759"/>
+      <g class="node" id="node-2" transform="translate(590,133.33333333333331)" x="590" y="133.33333333333331">
+        <rect x="0" y="0" width="10" height="133.33333333333331" class="sankey-node" fill="#f28e2c"/>
       </g>
     </g>
     <g class="node-labels" font-size="14">
-      <text x="16" y="199.99999999999997" class="sankey-label" font-size="14" fill="#333333" text-anchor="start" dominant-baseline="middle">a</text>
-      <text x="289" y="199.99999999999997" class="sankey-label" font-size="14" dominant-baseline="middle" text-anchor="end" fill="#333333">b</text>
-      <text x="584" y="199.99999999999997" class="sankey-label" dominant-baseline="middle" font-size="14" fill="#333333" text-anchor="end">c</text>
+      <text x="16" y="199.99999999999997" class="sankey-label" text-anchor="start" font-size="14" fill="#333333" dominant-baseline="middle">sourceNode</text>
+      <text x="584" y="199.99999999999997" class="sankey-label" text-anchor="end" dominant-baseline="middle" font-size="14" fill="#333333">targetNode</text>
+    </g>
+    <g class="links" fill="none" stroke-opacity="0.5">
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,200 C300,200 300,200 590,200" class="sankey-link" fill="none" stroke-opacity="0.5" stroke="url(#linearGradient-1)" stroke-width="133.33333333333334"/>
+      </g>
     </g>
   </g>
 </svg>

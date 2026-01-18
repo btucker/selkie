@@ -7,7 +7,7 @@
 //! 3. Position nodes vertically with padding
 //! 4. Compute link paths as curved bands between nodes
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use crate::diagrams::sankey::SankeyDb;
 use crate::error::Result;
@@ -25,6 +25,7 @@ const FONT_SIZE: f64 = 14.0;
 #[derive(Debug, Clone)]
 struct LayoutNode {
     id: String,
+    index: usize, // Original index in input order (for node-N id)
     #[allow(dead_code)]
     column: usize,
     x0: f64,
@@ -76,17 +77,16 @@ pub fn render_sankey(db: &SankeyDb, config: &RenderConfig) -> Result<String> {
     let defs = create_gradient_defs(&layout_nodes, &layout_links, config);
     doc.add_defs(vec![defs]);
 
-    // Render links first (behind nodes)
-    let links_group = render_links(&layout_links, config);
-    doc.add_element(links_group);
-
-    // Render nodes
+    // Render order matches mermaid.js: nodes, labels, then links on top
+    // Links use mix-blend-mode: multiply so they blend with background
     let nodes_group = render_nodes(&layout_nodes, config);
     doc.add_element(nodes_group);
 
-    // Render labels
     let labels_group = render_labels(&layout_nodes, DEFAULT_WIDTH, config);
     doc.add_element(labels_group);
+
+    let links_group = render_links(&layout_links, config);
+    doc.add_element(links_group);
 
     Ok(doc.to_string())
 }
@@ -131,7 +131,15 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
         0.0
     };
 
-    // Step 5: Group nodes by column
+    // Step 5: Build node index map (for node-N id assignment matching input order)
+    let node_indices: HashMap<String, usize> = graph
+        .nodes
+        .iter()
+        .enumerate()
+        .map(|(i, n)| (n.id.clone(), i))
+        .collect();
+
+    // Step 6: Group nodes by column
     let mut nodes_by_column: Vec<Vec<String>> = vec![Vec::new(); num_columns];
     for node in &graph.nodes {
         let col = node_columns.get(&node.id).copied().unwrap_or(0);
@@ -191,8 +199,12 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
             let y0 = current_y;
             let y1 = y0 + node_height;
 
+            // Get original index from input order
+            let index = node_indices.get(node_id).copied().unwrap_or(0);
+
             layout_nodes.push(LayoutNode {
                 id: node_id.clone(),
+                index,
                 column: col,
                 x0,
                 y0,
@@ -296,12 +308,12 @@ fn compute_link_positions(
     let mut layout_links = Vec::new();
 
     for link in links {
-        let (_source_x0, source_y0, source_x1, source_y1) = node_positions
+        let (_source_x0, source_y0, source_x1, _source_y1) = node_positions
             .get(&link.source)
             .copied()
             .unwrap_or((0.0, 0.0, NODE_WIDTH, 10.0));
 
-        let (target_x0, target_y0, _target_x1, target_y1) = node_positions
+        let (target_x0, target_y0, _target_x1, _target_y1) = node_positions
             .get(&link.target)
             .copied()
             .unwrap_or((0.0, 0.0, NODE_WIDTH, 10.0));
@@ -345,8 +357,7 @@ fn create_gradient_defs(
     let colors = &config.theme.sankey_node_colors;
     let node_colors: HashMap<_, _> = nodes
         .iter()
-        .enumerate()
-        .map(|(i, n)| (n.id.clone(), colors[i % colors.len()].as_str()))
+        .map(|n| (n.id.clone(), colors[n.index % colors.len()].as_str()))
         .collect();
 
     let mut children = Vec::new();
@@ -438,12 +449,13 @@ fn render_nodes(nodes: &[LayoutNode], config: &RenderConfig) -> SvgElement {
     let mut children = Vec::new();
     let colors = &config.theme.sankey_node_colors;
 
-    for (i, node) in nodes.iter().enumerate() {
-        let color = &colors[i % colors.len()];
+    for node in nodes.iter() {
+        let color = &colors[node.index % colors.len()];
 
+        // Rect uses local coordinates (0,0) since group has the transform
         let rect = SvgElement::Rect {
-            x: node.x0,
-            y: node.y0,
+            x: 0.0,
+            y: 0.0,
             width: node.x1 - node.x0,
             height: node.y1 - node.y0,
             rx: None,
@@ -451,11 +463,12 @@ fn render_nodes(nodes: &[LayoutNode], config: &RenderConfig) -> SvgElement {
             attrs: Attrs::new().with_fill(color).with_class("sankey-node"),
         };
 
+        // Group has transform for positioning, x/y are data attributes for tests
         let node_group = SvgElement::Group {
             children: vec![rect],
             attrs: Attrs::new()
                 .with_class("node")
-                .with_id(&format!("node-{}", i + 1))
+                .with_id(&format!("node-{}", node.index + 1))
                 .with_attr("transform", &format!("translate({},{})", node.x0, node.y0))
                 .with_attr("x", &format!("{}", node.x0))
                 .with_attr("y", &format!("{}", node.y0)),
