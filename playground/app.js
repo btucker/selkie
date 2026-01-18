@@ -636,26 +636,29 @@ const examples = {
     // Sankey diagrams
     'sankey-simple': `sankey-beta
 
-Bio-conversion,Liquid,0.597
-Bio-conversion,Losses,26.862
-Bio-conversion,Solid,280.322
-Bio-conversion,Gas,81.144`,
+Revenue,Salaries,40
+Revenue,Operations,25
+Revenue,Marketing,15
+Revenue,R&D,12
+Revenue,Profit,8`,
 
     'sankey-complex': `sankey-beta
 
-Agricultural 'waste',Bio-conversion,124.729
-Bio-conversion,Liquid,0.597
-Bio-conversion,Losses,26.862
-Bio-conversion,Solid,280.322
-Bio-conversion,Gas,81.144
-Biofuel imports,Liquid,35
-Biomass imports,Solid,35
-Coal imports,Coal,11.606
-Coal reserves,Coal,63.965
-Coal,Solid,75.571
-District heating,Industry,10.639
-District heating,Heating and cooling - commercial,22.505
-District heating,Heating and cooling - homes,46.184`,
+Website,Homepage,100
+Homepage,Products,45
+Homepage,Blog,25
+Homepage,Pricing,20
+Homepage,Bounce,10
+Products,Add to Cart,30
+Products,Exit,15
+Blog,Subscribe,10
+Blog,Exit,15
+Pricing,Sign Up,15
+Pricing,Exit,5
+Add to Cart,Checkout,25
+Add to Cart,Abandon,5
+Checkout,Purchase,22
+Checkout,Abandon,3`,
 
     // C4 diagrams
     'c4-simple': `C4Context
