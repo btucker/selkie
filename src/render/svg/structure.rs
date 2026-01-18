@@ -87,6 +87,8 @@ pub struct EdgeGeometry {
     pub edge_initial_directions: Vec<Option<(f64, f64)>>,
     /// Node bounding boxes: list of (x, y, width, height, id/class)
     pub node_bounds: Vec<NodeBounds>,
+    /// Text bounding boxes with their content and parent info
+    pub text_bounds: Vec<TextBounds>,
     /// Edges that attach to top/bottom of nodes (vertical attachment)
     pub vertical_attachments: usize,
     /// Edges that attach to left/right of nodes (horizontal attachment)
@@ -124,6 +126,19 @@ pub struct NodeBounds {
     pub width: f64,
     pub height: f64,
     pub id: String,
+}
+
+/// Bounding box of a text element with its content
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct TextBounds {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+    /// The text content
+    pub text: String,
+    /// Parent node ID if the text is inside a node
+    pub parent_node_id: Option<String>,
 }
 
 /// Analysis of font styles used in text elements
@@ -830,7 +845,142 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
         }
     }
 
+    // Extract text bounds for overflow detection
+    geometry.text_bounds = extract_text_bounds(doc, &geometry.node_bounds);
+
     geometry
+}
+
+/// Extract text element bounding boxes with parent node association
+fn extract_text_bounds(doc: &roxmltree::Document, node_bounds: &[NodeBounds]) -> Vec<TextBounds> {
+    let mut text_bounds = Vec::new();
+
+    for node in doc.descendants() {
+        if node.tag_name().name() == "text" {
+            // Get text content from all tspan children or direct text
+            let text_content: String = node
+                .descendants()
+                .filter_map(|n| n.text())
+                .collect::<Vec<_>>()
+                .join(" ")
+                .trim()
+                .to_string();
+
+            if text_content.is_empty() {
+                continue;
+            }
+
+            // Get position from x/y attributes or parent transform
+            let mut x = node
+                .attribute("x")
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(0.0);
+            let mut y = node
+                .attribute("y")
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(0.0);
+
+            // Check for parent group transform
+            if let Some(parent) = node.parent() {
+                if let Some(transform) = parent.attribute("transform") {
+                    if let Some((tx, ty)) = parse_translate(transform) {
+                        x += tx;
+                        y += ty;
+                    }
+                }
+            }
+
+            // Estimate text width based on content length and font size
+            let font_size = extract_font_size(&node).unwrap_or(16.0);
+            let char_width = font_size * 0.6; // Average character width
+            let estimated_width = text_content.len() as f64 * char_width;
+
+            // Count lines for height estimation (check for tspan elements)
+            let tspan_count = node
+                .descendants()
+                .filter(|n| n.tag_name().name() == "tspan")
+                .count()
+                .max(1);
+            let estimated_height = tspan_count as f64 * font_size * 1.2;
+
+            // Find parent node if text is inside one
+            let parent_node_id = find_parent_node(&node, node_bounds, x, y);
+
+            text_bounds.push(TextBounds {
+                x,
+                y: y - estimated_height, // Adjust for text baseline
+                width: estimated_width,
+                height: estimated_height,
+                text: text_content,
+                parent_node_id,
+            });
+        }
+    }
+
+    text_bounds
+}
+
+/// Extract font-size from a text element
+fn extract_font_size(node: &roxmltree::Node) -> Option<f64> {
+    // Check inline style
+    if let Some(style) = node.attribute("style") {
+        for part in style.split(';') {
+            let kv: Vec<&str> = part.split(':').map(|s| s.trim()).collect();
+            if kv.len() == 2 && kv[0] == "font-size" {
+                return kv[1].trim_end_matches("px").parse().ok();
+            }
+        }
+    }
+
+    // Check font-size attribute
+    node.attribute("font-size")
+        .and_then(|s| s.trim_end_matches("px").parse().ok())
+}
+
+/// Find if a text element is inside a node bounds
+fn find_parent_node(
+    text_node: &roxmltree::Node,
+    node_bounds: &[NodeBounds],
+    text_x: f64,
+    text_y: f64,
+) -> Option<String> {
+    // First check parent groups for node-like classes
+    let mut current = text_node.parent();
+    while let Some(parent) = current {
+        if let Some(class) = parent.attribute("class") {
+            if class.contains("node")
+                || class.contains("section")
+                || class.contains("task")
+                || class.contains("event")
+            {
+                if let Some(id) = parent.attribute("id") {
+                    return Some(id.to_string());
+                }
+                // Use class as fallback ID
+                return Some(
+                    class
+                        .split_whitespace()
+                        .next()
+                        .unwrap_or("unknown")
+                        .to_string(),
+                );
+            }
+        }
+        current = parent.parent();
+    }
+
+    // Fallback: find geometrically containing node
+    for bounds in node_bounds {
+        if text_x >= bounds.x
+            && text_x <= bounds.x + bounds.width
+            && text_y >= bounds.y
+            && text_y <= bounds.y + bounds.height
+        {
+            return Some(bounds.id.clone());
+        }
+    }
+
+    None
 }
 
 #[derive(Debug, PartialEq)]

@@ -52,6 +52,10 @@ pub fn check_structure(
     check_edge_node_connectivity(selkie, reference, &mut issues);
     check_font_styles(selkie, reference, &mut issues);
 
+    // Selkie-only checks (don't compare to reference, check for rendering issues)
+    check_text_overflow(selkie, &mut issues);
+    check_element_spacing(selkie, &mut issues);
+
     // INFO checks - acceptable variations
     check_extra_labels(selkie, reference, &mut issues);
     check_markers(selkie, reference, &mut issues);
@@ -1324,6 +1328,191 @@ fn point_touches_node_boundary(x: f64, y: f64, node: &NodeBounds, tolerance: f64
         (y - bottom).abs() <= tolerance && x >= left - tolerance && x <= right + tolerance;
 
     near_left || near_right || near_top || near_bottom
+}
+
+/// Check for text that overflows/escapes its containing node
+/// This detects a common rendering issue where text is too long for its box
+fn check_text_overflow(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
+    let text_bounds = &selkie.edge_geometry.text_bounds;
+    let node_bounds = &selkie.edge_geometry.node_bounds;
+
+    if text_bounds.is_empty() || node_bounds.is_empty() {
+        return;
+    }
+
+    let mut overflow_issues = Vec::new();
+    let tolerance = 10.0; // Allow some small overflow
+
+    for text in text_bounds {
+        // Find the containing node for this text
+        let containing_node = if let Some(ref parent_id) = text.parent_node_id {
+            node_bounds.iter().find(|n| n.id == *parent_id)
+        } else {
+            // Try to find a node that contains this text geometrically
+            node_bounds.iter().find(|n| {
+                text.x >= n.x - tolerance
+                    && text.y >= n.y - tolerance
+                    && text.x <= n.x + n.width + tolerance
+                    && text.y <= n.y + n.height + tolerance
+            })
+        };
+
+        if let Some(node) = containing_node {
+            // Check if text extends beyond node bounds
+            let text_right = text.x + text.width;
+            let text_bottom = text.y + text.height;
+            let node_right = node.x + node.width;
+            let node_bottom = node.y + node.height;
+
+            let overflow_right = text_right - node_right;
+            let overflow_bottom = text_bottom - node_bottom;
+            let overflow_left = node.x - text.x;
+            let overflow_top = node.y - text.y;
+
+            // Truncate text for display (first 30 chars)
+            let text_preview = if text.text.len() > 30 {
+                format!("{}...", &text.text[..30])
+            } else {
+                text.text.clone()
+            };
+
+            if overflow_right > tolerance {
+                overflow_issues.push(format!(
+                    "Text \"{}\" overflows right by {:.0}px (node: {})",
+                    text_preview, overflow_right, node.id
+                ));
+            }
+            if overflow_bottom > tolerance {
+                overflow_issues.push(format!(
+                    "Text \"{}\" overflows bottom by {:.0}px (node: {})",
+                    text_preview, overflow_bottom, node.id
+                ));
+            }
+            if overflow_left > tolerance {
+                overflow_issues.push(format!(
+                    "Text \"{}\" overflows left by {:.0}px (node: {})",
+                    text_preview, overflow_left, node.id
+                ));
+            }
+            if overflow_top > tolerance {
+                overflow_issues.push(format!(
+                    "Text \"{}\" overflows top by {:.0}px (node: {})",
+                    text_preview, overflow_top, node.id
+                ));
+            }
+        }
+    }
+
+    if !overflow_issues.is_empty() {
+        issues.push(Issue::warning(
+            "text_overflow",
+            format!(
+                "TEXT OVERFLOW DETECTED ({} issues):\n  {}",
+                overflow_issues.len(),
+                overflow_issues.join("\n  ")
+            ),
+        ));
+    }
+}
+
+/// Check for element spacing issues (overlapping or too close)
+fn check_element_spacing(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
+    let node_bounds = &selkie.edge_geometry.node_bounds;
+
+    if node_bounds.len() < 2 {
+        return;
+    }
+
+    let mut spacing_issues = Vec::new();
+    let min_spacing = 5.0; // Minimum expected spacing between elements
+
+    // Check for overlapping nodes
+    for i in 0..node_bounds.len() {
+        for j in (i + 1)..node_bounds.len() {
+            let a = &node_bounds[i];
+            let b = &node_bounds[j];
+
+            // Check for overlap
+            let overlap_x = (a.x < b.x + b.width) && (a.x + a.width > b.x);
+            let overlap_y = (a.y < b.y + b.height) && (a.y + a.height > b.y);
+
+            if overlap_x && overlap_y {
+                // Calculate overlap amount
+                let overlap_width = (a.x + a.width).min(b.x + b.width) - a.x.max(b.x);
+                let overlap_height = (a.y + a.height).min(b.y + b.height) - a.y.max(b.y);
+
+                // Only report significant overlaps (not just touching)
+                if overlap_width > min_spacing && overlap_height > min_spacing {
+                    spacing_issues.push(format!(
+                        "Nodes \"{}\" and \"{}\" overlap by {:.0}x{:.0}px",
+                        if a.id.is_empty() {
+                            format!("({:.0},{:.0})", a.x, a.y)
+                        } else {
+                            a.id.clone()
+                        },
+                        if b.id.is_empty() {
+                            format!("({:.0},{:.0})", b.x, b.y)
+                        } else {
+                            b.id.clone()
+                        },
+                        overlap_width,
+                        overlap_height
+                    ));
+                }
+            }
+        }
+    }
+
+    // Check for very close but not overlapping elements (potential spacing inconsistency)
+    let mut close_pairs = 0;
+    for i in 0..node_bounds.len() {
+        for j in (i + 1)..node_bounds.len() {
+            let a = &node_bounds[i];
+            let b = &node_bounds[j];
+
+            // Calculate minimum distance between nodes
+            let dx = if a.x + a.width < b.x {
+                b.x - (a.x + a.width)
+            } else if b.x + b.width < a.x {
+                a.x - (b.x + b.width)
+            } else {
+                0.0 // Overlapping in x
+            };
+
+            let dy = if a.y + a.height < b.y {
+                b.y - (a.y + a.height)
+            } else if b.y + b.height < a.y {
+                a.y - (b.y + b.height)
+            } else {
+                0.0 // Overlapping in y
+            };
+
+            let distance = (dx * dx + dy * dy).sqrt();
+
+            // Elements very close but not overlapping (possible spacing issue)
+            if distance > 0.0 && distance < min_spacing {
+                close_pairs += 1;
+            }
+        }
+    }
+
+    if close_pairs > 3 {
+        spacing_issues.push(format!(
+            "{} pairs of elements are very close together (< {}px apart)",
+            close_pairs, min_spacing
+        ));
+    }
+
+    if !spacing_issues.is_empty() {
+        issues.push(Issue::warning(
+            "element_spacing",
+            format!(
+                "SPACING ISSUES DETECTED ({} issues):\n  {}",
+                spacing_issues.len(),
+                spacing_issues.join("\n  ")
+            ),
+        ));
+    }
 }
 
 #[cfg(test)]
