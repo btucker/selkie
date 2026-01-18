@@ -51,6 +51,11 @@ pub fn render_c4(db: &C4Db, config: &RenderConfig) -> Result<String> {
     // Add marker definitions for arrows
     doc.add_defs(create_c4_markers());
 
+    // Render title if present
+    if let Some(title) = db.get_title() {
+        doc.add_element(render_title(title, layout.total_width + padding));
+    }
+
     // Render boundaries first (background)
     for (alias, bounds) in &layout.boundary_bounds {
         if let Some(boundary) = db.get_boundaries().iter().find(|b| &b.alias == alias) {
@@ -529,7 +534,7 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
     // Description (wrapped)
     if !element.description.is_empty() {
         text_y += 6.0;
-        let wrapped = wrap_text(&element.description, 28);
+        let wrapped = wrap_text(&element.description, 55);
         for line in wrapped {
             children.push(SvgElement::Text {
                 x: text_x,
@@ -579,6 +584,21 @@ fn shape_type_label(shape_type: &C4ShapeType) -> &'static str {
     }
 }
 
+/// Render the diagram title
+fn render_title(title: &str, width: f64) -> SvgElement {
+    SvgElement::Text {
+        x: width / 2.0,
+        y: 25.0,
+        content: title.to_string(),
+        attrs: Attrs::new()
+            .with_fill(COLOR_TEXT_DARK)
+            .with_attr("text-anchor", "middle")
+            .with_attr("font-size", "20")
+            .with_attr("font-weight", "bold")
+            .with_class("c4-title"),
+    }
+}
+
 /// Render a boundary
 fn render_boundary(boundary: &C4Boundary, bounds: &BoundaryBounds) -> SvgElement {
     // Deployment nodes use solid borders, other boundaries use dashed
@@ -594,7 +614,7 @@ fn render_boundary(boundary: &C4Boundary, bounds: &BoundaryBounds) -> SvgElement
         rect_attrs = rect_attrs.with_attr("stroke-dasharray", "7,7");
     }
 
-    let children = vec![
+    let mut children = vec![
         // Boundary rectangle
         SvgElement::Rect {
             x: bounds.x,
@@ -617,6 +637,20 @@ fn render_boundary(boundary: &C4Boundary, bounds: &BoundaryBounds) -> SvgElement
                 .with_class("c4-boundary-label"),
         },
     ];
+
+    // Add boundary type label if not deployment
+    if !boundary.boundary_type.is_empty() && !is_deployment {
+        let type_label = format!("[{}]", boundary.boundary_type.to_uppercase());
+        children.push(SvgElement::Text {
+            x: bounds.x + 10.0,
+            y: bounds.y + 35.0,
+            content: type_label,
+            attrs: Attrs::new()
+                .with_fill(COLOR_BOUNDARY)
+                .with_attr("font-size", "12")
+                .with_class("c4-boundary-type"),
+        });
+    }
 
     SvgElement::Group {
         children,

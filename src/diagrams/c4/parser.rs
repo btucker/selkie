@@ -55,7 +55,7 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
         Rule::title_stmt => {
             for inner in pair.into_inner() {
                 if inner.as_rule() == Rule::title_text {
-                    // Title could be stored in db if needed
+                    db.set_title(inner.as_str().trim());
                 }
             }
         }

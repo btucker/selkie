@@ -138,6 +138,8 @@ pub struct C4Relationship {
 /// The C4 diagram database
 #[derive(Debug, Clone, Default)]
 pub struct C4Db {
+    /// Diagram title
+    title: Option<String>,
     /// All elements (persons, systems, containers, components)
     elements: Vec<C4Element>,
     /// All boundaries
@@ -157,6 +159,16 @@ impl C4Db {
     /// Clear all data
     pub fn clear(&mut self) {
         *self = Self::default();
+    }
+
+    /// Set the diagram title
+    pub fn set_title(&mut self, title: &str) {
+        self.title = Some(title.to_string());
+    }
+
+    /// Get the diagram title
+    pub fn get_title(&self) -> Option<&str> {
+        self.title.as_deref()
     }
 
     /// Add a person element
