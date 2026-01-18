@@ -23,6 +23,11 @@ const QUADRANT_LABEL_FONT_SIZE: f64 = 16.0;
 const AXIS_LABEL_FONT_SIZE: f64 = 16.0;
 const POINT_LABEL_FONT_SIZE: f64 = 12.0;
 
+/// Padding for quadrant text when points exist (text moves to top)
+const QUADRANT_TEXT_TOP_PADDING: f64 = 5.0;
+/// Padding between point and its label
+const POINT_TEXT_PADDING: f64 = 5.0;
+
 /// Render a quadrant chart to SVG
 pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
@@ -181,6 +186,9 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
             .with_class("quadrant-outer-border"),
     });
 
+    // Check if there are any points (affects quadrant label positioning)
+    let has_points = !db.get_points().is_empty();
+
     // Render quadrant labels
     render_quadrant_labels(
         &mut doc,
@@ -190,6 +198,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         chart_top,
         quadrant_width,
         quadrant_height,
+        has_points,
     );
 
     // Render axis labels
@@ -217,7 +226,10 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
     Ok(doc.to_string())
 }
 
-/// Render quadrant labels in the center of each quadrant
+/// Render quadrant labels
+/// If points exist, labels are placed at the top of each quadrant.
+/// If no points, labels are centered in each quadrant.
+#[allow(clippy::too_many_arguments)]
 fn render_quadrant_labels(
     doc: &mut SvgDocument,
     db: &QuadrantDb,
@@ -226,19 +238,41 @@ fn render_quadrant_labels(
     chart_top: f64,
     quadrant_width: f64,
     quadrant_height: f64,
+    has_points: bool,
 ) {
+    // Determine Y position and dominant-baseline based on whether there are points
+    let (q1_y, q2_y, q3_y, q4_y, dominant_baseline) = if has_points {
+        // When points exist, place labels at top of each quadrant
+        (
+            chart_top + QUADRANT_TEXT_TOP_PADDING,
+            chart_top + QUADRANT_TEXT_TOP_PADDING,
+            chart_top + quadrant_height + QUADRANT_TEXT_TOP_PADDING,
+            chart_top + quadrant_height + QUADRANT_TEXT_TOP_PADDING,
+            "hanging",
+        )
+    } else {
+        // When no points, center labels in each quadrant
+        (
+            chart_top + quadrant_height / 2.0,
+            chart_top + quadrant_height / 2.0,
+            chart_top + quadrant_height + quadrant_height / 2.0,
+            chart_top + quadrant_height + quadrant_height / 2.0,
+            "middle",
+        )
+    };
+
     // Quadrant 1 (top-right)
     if !db.quadrant1.is_empty() {
         doc.add_element(SvgElement::Text {
             x: chart_left + quadrant_width + quadrant_width / 2.0,
-            y: chart_top + quadrant_height / 2.0,
+            y: q1_y,
             content: db.quadrant1.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("dominant-baseline", dominant_baseline)
                 .with_class("quadrant-label")
                 .with_attr("font-size", &format!("{}", QUADRANT_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.quadrant_text_fill),
+                .with_fill(&config.theme.quadrant1_text_fill),
         });
     }
 
@@ -246,14 +280,14 @@ fn render_quadrant_labels(
     if !db.quadrant2.is_empty() {
         doc.add_element(SvgElement::Text {
             x: chart_left + quadrant_width / 2.0,
-            y: chart_top + quadrant_height / 2.0,
+            y: q2_y,
             content: db.quadrant2.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("dominant-baseline", dominant_baseline)
                 .with_class("quadrant-label")
                 .with_attr("font-size", &format!("{}", QUADRANT_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.quadrant_text_fill),
+                .with_fill(&config.theme.quadrant2_text_fill),
         });
     }
 
@@ -261,14 +295,14 @@ fn render_quadrant_labels(
     if !db.quadrant3.is_empty() {
         doc.add_element(SvgElement::Text {
             x: chart_left + quadrant_width / 2.0,
-            y: chart_top + quadrant_height + quadrant_height / 2.0,
+            y: q3_y,
             content: db.quadrant3.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("dominant-baseline", dominant_baseline)
                 .with_class("quadrant-label")
                 .with_attr("font-size", &format!("{}", QUADRANT_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.quadrant_text_fill),
+                .with_fill(&config.theme.quadrant3_text_fill),
         });
     }
 
@@ -276,14 +310,14 @@ fn render_quadrant_labels(
     if !db.quadrant4.is_empty() {
         doc.add_element(SvgElement::Text {
             x: chart_left + quadrant_width + quadrant_width / 2.0,
-            y: chart_top + quadrant_height + quadrant_height / 2.0,
+            y: q4_y,
             content: db.quadrant4.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("dominant-baseline", dominant_baseline)
                 .with_class("quadrant-label")
                 .with_attr("font-size", &format!("{}", QUADRANT_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.quadrant_text_fill),
+                .with_fill(&config.theme.quadrant4_text_fill),
         });
     }
 }
@@ -416,15 +450,15 @@ fn render_points(
             attrs: point_attrs,
         });
 
-        // Render point label
+        // Render point label (below the point per mermaid.js reference)
         if !point.text.is_empty() {
             doc.add_element(SvgElement::Text {
                 x: px,
-                y: py - radius - 5.0, // Position above the point
+                y: py + POINT_TEXT_PADDING, // Position below the point
                 content: point.text.clone(),
                 attrs: Attrs::new()
                     .with_attr("text-anchor", "middle")
-                    .with_attr("dominant-baseline", "auto")
+                    .with_attr("dominant-baseline", "hanging")
                     .with_class("quadrant-point-label")
                     .with_attr("font-size", &format!("{}", POINT_LABEL_FONT_SIZE))
                     .with_fill(&config.theme.quadrant_point_text_fill),

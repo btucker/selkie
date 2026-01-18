@@ -114,8 +114,16 @@ pub struct Theme {
     pub quadrant_external_border_stroke: String,
     /// Quadrant title text color
     pub quadrant_title_fill: String,
-    /// Quadrant label text color
+    /// Quadrant label text color (fallback)
     pub quadrant_text_fill: String,
+    /// Quadrant 1 text fill color
+    pub quadrant1_text_fill: String,
+    /// Quadrant 2 text fill color
+    pub quadrant2_text_fill: String,
+    /// Quadrant 3 text fill color
+    pub quadrant3_text_fill: String,
+    /// Quadrant 4 text fill color
+    pub quadrant4_text_fill: String,
     /// Default point fill color
     pub quadrant_point_fill: String,
     /// Point label text color
@@ -197,6 +205,10 @@ impl Default for Theme {
             quadrant_external_border_stroke: "#9370DB".to_string(),
             quadrant_title_fill: "#333333".to_string(),
             quadrant_text_fill: "#333333".to_string(),
+            quadrant1_text_fill: "#333333".to_string(),
+            quadrant2_text_fill: "#333333".to_string(),
+            quadrant3_text_fill: "#333333".to_string(),
+            quadrant4_text_fill: "#333333".to_string(),
             quadrant_point_fill: "#4682B4".to_string(),
             quadrant_point_text_fill: "#333333".to_string(),
             quadrant_x_axis_text_fill: "#333333".to_string(),
@@ -276,6 +288,10 @@ impl Theme {
             quadrant_external_border_stroke: "#81B1DB".to_string(),
             quadrant_title_fill: "#ccc".to_string(),
             quadrant_text_fill: "#ccc".to_string(),
+            quadrant1_text_fill: "#ccc".to_string(),
+            quadrant2_text_fill: "#ccc".to_string(),
+            quadrant3_text_fill: "#ccc".to_string(),
+            quadrant4_text_fill: "#ccc".to_string(),
             quadrant_point_fill: "#81B1DB".to_string(),
             quadrant_point_text_fill: "#ccc".to_string(),
             quadrant_x_axis_text_fill: "#ccc".to_string(),
@@ -353,6 +369,10 @@ impl Theme {
             quadrant_external_border_stroke: "#666666".to_string(),
             quadrant_title_fill: "#333333".to_string(),
             quadrant_text_fill: "#333333".to_string(),
+            quadrant1_text_fill: "#333333".to_string(),
+            quadrant2_text_fill: "#333333".to_string(),
+            quadrant3_text_fill: "#333333".to_string(),
+            quadrant4_text_fill: "#333333".to_string(),
             quadrant_point_fill: "#666666".to_string(),
             quadrant_point_text_fill: "#333333".to_string(),
             quadrant_x_axis_text_fill: "#333333".to_string(),
@@ -431,6 +451,10 @@ impl Theme {
             quadrant_external_border_stroke: "#13540c".to_string(),
             quadrant_title_fill: "#333333".to_string(),
             quadrant_text_fill: "#333333".to_string(),
+            quadrant1_text_fill: "#333333".to_string(),
+            quadrant2_text_fill: "#333333".to_string(),
+            quadrant3_text_fill: "#333333".to_string(),
+            quadrant4_text_fill: "#333333".to_string(),
             quadrant_point_fill: "#13540c".to_string(),
             quadrant_point_text_fill: "#333333".to_string(),
             quadrant_x_axis_text_fill: "#333333".to_string(),
@@ -511,6 +535,10 @@ impl Theme {
             quadrant_external_border_stroke: "#9370DB".to_string(),
             quadrant_title_fill: "#333333".to_string(),
             quadrant_text_fill: "#333333".to_string(),
+            quadrant1_text_fill: "#333333".to_string(),
+            quadrant2_text_fill: "#333333".to_string(),
+            quadrant3_text_fill: "#333333".to_string(),
+            quadrant4_text_fill: "#333333".to_string(),
             quadrant_point_fill: "#9370DB".to_string(),
             quadrant_point_text_fill: "#333333".to_string(),
             quadrant_x_axis_text_fill: "#333333".to_string(),
@@ -743,6 +771,10 @@ marker path {{
             quadrant_external_border_stroke: primary_border.to_hex(),
             quadrant_title_fill: primary_text.to_hex(),
             quadrant_text_fill: primary_text.to_hex(),
+            quadrant1_text_fill: primary_text.to_hex(),
+            quadrant2_text_fill: primary_text.to_hex(),
+            quadrant3_text_fill: primary_text.to_hex(),
+            quadrant4_text_fill: primary_text.to_hex(),
             quadrant_point_fill: primary_border.to_hex(),
             quadrant_point_text_fill: primary_text.to_hex(),
             quadrant_x_axis_text_fill: primary_text.to_hex(),
@@ -1027,6 +1059,22 @@ marker path {{
                 self.quadrant_text_fill = value.to_string();
                 true
             }
+            "quadrant1TextFill" => {
+                self.quadrant1_text_fill = value.to_string();
+                true
+            }
+            "quadrant2TextFill" => {
+                self.quadrant2_text_fill = value.to_string();
+                true
+            }
+            "quadrant3TextFill" => {
+                self.quadrant3_text_fill = value.to_string();
+                true
+            }
+            "quadrant4TextFill" => {
+                self.quadrant4_text_fill = value.to_string();
+                true
+            }
             "quadrantPointFill" => {
                 self.quadrant_point_fill = value.to_string();
                 true
@@ -1078,6 +1126,10 @@ marker path {{
             "quadrantExternalBorderStroke" => Some(&self.quadrant_external_border_stroke),
             "quadrantTitleFill" => Some(&self.quadrant_title_fill),
             "quadrantTextFill" => Some(&self.quadrant_text_fill),
+            "quadrant1TextFill" => Some(&self.quadrant1_text_fill),
+            "quadrant2TextFill" => Some(&self.quadrant2_text_fill),
+            "quadrant3TextFill" => Some(&self.quadrant3_text_fill),
+            "quadrant4TextFill" => Some(&self.quadrant4_text_fill),
             "quadrantPointFill" => Some(&self.quadrant_point_fill),
             "quadrantPointTextFill" => Some(&self.quadrant_point_text_fill),
             "quadrantXAxisTextFill" => Some(&self.quadrant_x_axis_text_fill),
