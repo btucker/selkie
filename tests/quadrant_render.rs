@@ -2,7 +2,8 @@
 //!
 //! Test cases ported from Mermaid.js Cypress tests (quadrantChart.spec.ts)
 
-use selkie::{parse, render};
+use selkie::render::{RenderConfig, Theme};
+use selkie::{parse, render, render_with_config};
 
 /// Helper to check basic SVG structure
 fn assert_valid_svg(svg: &str) {
@@ -341,4 +342,105 @@ fn test_gartner_style_chart() {
     assert!(svg.contains("Microsoft"), "Should contain company data points");
     assert!(svg.contains("Tableau"), "Should contain company data points");
     assert!(svg.contains("ThoughtSpot"), "Should contain company data points");
+}
+
+// ============================================================================
+// Theme Tests
+// ============================================================================
+
+#[test]
+fn test_quadrant_with_dark_theme() {
+    let input = r#"quadrantChart
+        title Dark Theme Test
+        x-axis Low --> High
+        y-axis Low --> High
+        quadrant-1 Q1
+        quadrant-2 Q2
+        quadrant-3 Q3
+        quadrant-4 Q4
+        Point A: [0.5, 0.5]"#;
+
+    let diagram = parse(input).expect("Failed to parse");
+    let config = RenderConfig {
+        theme: Theme::dark(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with dark theme");
+
+    assert_valid_svg(&svg);
+    // Dark theme should use dark quadrant colors
+    assert!(
+        svg.contains("#2a2a2a") || svg.contains("#3a3a3a"),
+        "Should use dark quadrant fill colors"
+    );
+    // Dark theme should use light text colors
+    assert!(svg.contains("#ccc"), "Should use light text color for dark theme");
+}
+
+#[test]
+fn test_quadrant_with_forest_theme() {
+    let input = r#"quadrantChart
+        title Forest Theme Test
+        x-axis Low --> High
+        y-axis Low --> High
+        quadrant-1 Q1
+        Point A: [0.75, 0.75]"#;
+
+    let diagram = parse(input).expect("Failed to parse");
+    let config = RenderConfig {
+        theme: Theme::forest(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with forest theme");
+
+    assert_valid_svg(&svg);
+    // Forest theme should use green-ish colors
+    assert!(
+        svg.contains("#cde498") || svg.contains("#cdffb2"),
+        "Should use forest green quadrant fill colors"
+    );
+}
+
+#[test]
+fn test_quadrant_with_neutral_theme() {
+    let input = r#"quadrantChart
+        title Neutral Theme Test
+        quadrant-1 Q1
+        Point A: [0.5, 0.5]"#;
+
+    let diagram = parse(input).expect("Failed to parse");
+    let config = RenderConfig {
+        theme: Theme::neutral(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with neutral theme");
+
+    assert_valid_svg(&svg);
+    // Neutral theme should use grayscale colors
+    assert!(
+        svg.contains("#f0f0f0") || svg.contains("#e0e0e0"),
+        "Should use neutral grayscale quadrant fill colors"
+    );
+}
+
+#[test]
+fn test_quadrant_with_base_theme() {
+    let input = r#"quadrantChart
+        title Base Theme Test
+        quadrant-1 Q1
+        Point A: [0.5, 0.5]"#;
+
+    let diagram = parse(input).expect("Failed to parse");
+    let config = RenderConfig {
+        theme: Theme::base(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with base theme");
+
+    assert_valid_svg(&svg);
+    // Base theme should use warm pastel colors
+    assert!(
+        svg.contains("#fff4dd") || svg.contains("#dde4ff"),
+        "Should use base theme warm pastel quadrant fill colors"
+    );
 }

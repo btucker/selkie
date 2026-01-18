@@ -23,20 +23,6 @@ const QUADRANT_LABEL_FONT_SIZE: f64 = 16.0;
 const AXIS_LABEL_FONT_SIZE: f64 = 16.0;
 const POINT_LABEL_FONT_SIZE: f64 = 12.0;
 
-/// Quadrant fill colors (mermaid.js default theme)
-const QUADRANT_COLORS: &[&str] = &[
-    "#f0f0f0", // quadrant 1 (top-right)
-    "#e0e0e0", // quadrant 2 (top-left)
-    "#e0e0e0", // quadrant 3 (bottom-left)
-    "#f0f0f0", // quadrant 4 (bottom-right)
-];
-
-/// Border color for quadrant lines
-const BORDER_COLOR: &str = "#9370DB";
-
-/// Default point fill color
-const DEFAULT_POINT_COLOR: &str = "#4682B4";
-
 /// Render a quadrant chart to SVG
 pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
@@ -97,7 +83,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
                 .with_class("quadrant-title")
                 .with_attr("font-size", &format!("{}", TITLE_FONT_SIZE))
                 .with_attr("font-weight", "bold")
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.quadrant_title_fill),
         };
         doc.add_element(title_elem);
     }
@@ -112,7 +98,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         rx: None,
         ry: None,
         attrs: Attrs::new()
-            .with_fill(QUADRANT_COLORS[1])
+            .with_fill(&config.theme.quadrant2_fill)
             .with_class("quadrant quadrant-2"),
     });
 
@@ -125,7 +111,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         rx: None,
         ry: None,
         attrs: Attrs::new()
-            .with_fill(QUADRANT_COLORS[0])
+            .with_fill(&config.theme.quadrant1_fill)
             .with_class("quadrant quadrant-1"),
     });
 
@@ -138,7 +124,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         rx: None,
         ry: None,
         attrs: Attrs::new()
-            .with_fill(QUADRANT_COLORS[2])
+            .with_fill(&config.theme.quadrant3_fill)
             .with_class("quadrant quadrant-3"),
     });
 
@@ -151,7 +137,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         rx: None,
         ry: None,
         attrs: Attrs::new()
-            .with_fill(QUADRANT_COLORS[3])
+            .with_fill(&config.theme.quadrant4_fill)
             .with_class("quadrant quadrant-4"),
     });
 
@@ -163,7 +149,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         x2: chart_left + quadrant_width,
         y2: chart_bottom,
         attrs: Attrs::new()
-            .with_stroke(BORDER_COLOR)
+            .with_stroke(&config.theme.quadrant_internal_border_stroke)
             .with_stroke_width(1.0)
             .with_class("quadrant-border"),
     });
@@ -175,7 +161,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         x2: chart_right,
         y2: chart_top + quadrant_height,
         attrs: Attrs::new()
-            .with_stroke(BORDER_COLOR)
+            .with_stroke(&config.theme.quadrant_internal_border_stroke)
             .with_stroke_width(1.0)
             .with_class("quadrant-border"),
     });
@@ -190,7 +176,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         ry: None,
         attrs: Attrs::new()
             .with_fill("none")
-            .with_stroke(BORDER_COLOR)
+            .with_stroke(&config.theme.quadrant_external_border_stroke)
             .with_stroke_width(2.0)
             .with_class("quadrant-outer-border"),
     });
@@ -244,7 +230,7 @@ fn render_quadrant_labels(
                 .with_attr("dominant-baseline", "middle")
                 .with_class("quadrant-label")
                 .with_attr("font-size", &format!("{}", QUADRANT_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.quadrant_text_fill),
         });
     }
 
@@ -259,7 +245,7 @@ fn render_quadrant_labels(
                 .with_attr("dominant-baseline", "middle")
                 .with_class("quadrant-label")
                 .with_attr("font-size", &format!("{}", QUADRANT_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.quadrant_text_fill),
         });
     }
 
@@ -274,7 +260,7 @@ fn render_quadrant_labels(
                 .with_attr("dominant-baseline", "middle")
                 .with_class("quadrant-label")
                 .with_attr("font-size", &format!("{}", QUADRANT_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.quadrant_text_fill),
         });
     }
 
@@ -289,7 +275,7 @@ fn render_quadrant_labels(
                 .with_attr("dominant-baseline", "middle")
                 .with_class("quadrant-label")
                 .with_attr("font-size", &format!("{}", QUADRANT_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.quadrant_text_fill),
         });
     }
 }
@@ -316,7 +302,7 @@ fn render_axis_labels(
                 .with_attr("dominant-baseline", "middle")
                 .with_class("axis-label x-axis-left")
                 .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.quadrant_x_axis_text_fill),
         });
     }
 
@@ -331,7 +317,7 @@ fn render_axis_labels(
                 .with_attr("dominant-baseline", "middle")
                 .with_class("axis-label x-axis-right")
                 .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.quadrant_x_axis_text_fill),
         });
     }
 
@@ -354,7 +340,7 @@ fn render_axis_labels(
                 )
                 .with_class("axis-label y-axis-bottom")
                 .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.quadrant_y_axis_text_fill),
         });
     }
 
@@ -373,7 +359,7 @@ fn render_axis_labels(
                 )
                 .with_class("axis-label y-axis-top")
                 .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.quadrant_y_axis_text_fill),
         });
     }
 }
@@ -397,11 +383,12 @@ fn render_points(
 
         // Get point styling
         let radius = point.style.radius.unwrap_or(DEFAULT_POINT_RADIUS);
+        let default_point_color = &config.theme.quadrant_point_fill;
         let fill = point
             .style
             .color
             .as_deref()
-            .unwrap_or(DEFAULT_POINT_COLOR);
+            .unwrap_or(default_point_color);
         let stroke_color = point.style.stroke_color.as_deref();
         let stroke_width = point
             .style
@@ -439,7 +426,7 @@ fn render_points(
                     .with_attr("dominant-baseline", "auto")
                     .with_class("quadrant-point-label")
                     .with_attr("font-size", &format!("{}", POINT_LABEL_FONT_SIZE))
-                    .with_fill(&config.theme.primary_text_color),
+                    .with_fill(&config.theme.quadrant_point_text_fill),
             });
         }
     }
@@ -454,7 +441,7 @@ fn generate_quadrant_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .quadrant-title {{
-  fill: {text_color};
+  fill: {title_fill};
   font-family: {font_family};
 }}
 
@@ -463,23 +450,23 @@ fn generate_quadrant_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .quadrant-border {{
-  stroke: {border_color};
+  stroke: {internal_border};
   stroke-width: 1px;
 }}
 
 .quadrant-outer-border {{
   fill: none;
-  stroke: {border_color};
+  stroke: {external_border};
   stroke-width: 2px;
 }}
 
 .quadrant-label {{
-  fill: {text_color};
+  fill: {text_fill};
   font-family: {font_family};
 }}
 
 .axis-label {{
-  fill: {text_color};
+  fill: {x_axis_text};
   font-family: {font_family};
 }}
 
@@ -488,13 +475,17 @@ fn generate_quadrant_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .quadrant-point-label {{
-  fill: {text_color};
+  fill: {point_text_fill};
   font-family: {font_family};
 }}
 "#,
         background = theme.background,
-        text_color = theme.primary_text_color,
-        border_color = theme.primary_border_color,
+        title_fill = theme.quadrant_title_fill,
+        text_fill = theme.quadrant_text_fill,
+        internal_border = theme.quadrant_internal_border_stroke,
+        external_border = theme.quadrant_external_border_stroke,
+        x_axis_text = theme.quadrant_x_axis_text_fill,
+        point_text_fill = theme.quadrant_point_text_fill,
         font_family = theme.font_family,
     )
 }
