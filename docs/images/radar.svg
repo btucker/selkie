@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.radarGraticule {
+    fill: none;
+    stroke: #999999;
+    stroke-width: 1px;
+    stroke-opacity: 0.3;
+}
+
+.radarAxisLine {
+    stroke: #333333;
+    stroke-width: 1px;
+}
+
+.radarAxisLabel {
+    font-family: trebuchet ms, verdana, arial, sans-serif;
+    font-size: 12px;
+    fill: #333333;
+}
+
+.radarTitle {
+    font-family: trebuchet ms, verdana, arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    fill: #333333;
+}
+
+.radarLegendText {
+    font-family: trebuchet ms, verdana, arial, sans-serif;
+    font-size: 12px;
+    fill: #333333;
+}
+
+[class^="radarCurve-"] {
+    fill-opacity: 0.3;
+    stroke-width: 2px;
+}
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g transform="translate(250, 250)">
+      <circle cx="0" cy="0" r="40" class="radarGraticule" stroke-width="1" fill="none" stroke="#999999" stroke-opacity="0.3"/>
+      <circle cx="0" cy="0" r="80" class="radarGraticule" stroke-width="1" stroke-opacity="0.3" fill="none" stroke="#999999"/>
+      <circle cx="0" cy="0" r="120" class="radarGraticule" stroke="#999999" fill="none" stroke-opacity="0.3" stroke-width="1"/>
+      <circle cx="0" cy="0" r="160" class="radarGraticule" stroke-opacity="0.3" stroke="#999999" fill="none" stroke-width="1"/>
+      <circle cx="0" cy="0" r="200" class="radarGraticule" stroke="#999999" stroke-width="1" stroke-opacity="0.3" fill="none"/>
+      <line x1="0" y1="0" x2="0.000000000000010409497792752502" y2="-170" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
+      <text x="0.000000000000013471114790620887" y="-220.00000000000003" class="radarAxisLabel" text-anchor="middle" fill="#333333" dominant-baseline="middle" font-size="12">Speed</text>
+      <line x1="0" y1="0" x2="161.6796077701761" y2="-52.53288904374106" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
+      <text x="209.2324335849338" y="-67.98373876248844" class="radarAxisLabel" text-anchor="middle" font-size="12" dominant-baseline="middle" fill="#333333">Power</text>
+      <line x1="0" y1="0" x2="99.92349288972044" y2="137.53288904374108" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
+      <text x="129.3127555043441" y="177.98373876248846" class="radarAxisLabel" font-size="12" fill="#333333" text-anchor="middle" dominant-baseline="middle">Agility</text>
+      <line x1="0" y1="0" x2="-99.92349288972042" y2="137.53288904374108" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
+      <text x="-129.3127555043441" y="177.98373876248846" class="radarAxisLabel" fill="#333333" dominant-baseline="middle" text-anchor="middle" font-size="12">Stamina</text>
+      <line x1="0" y1="0" x2="-161.67960777017612" y2="-52.53288904374104" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
+      <text x="-209.23243358493383" y="-67.98373876248841" class="radarAxisLabel" font-size="12" text-anchor="middle" fill="#333333" dominant-baseline="middle">Intelligence</text>
+      <path d="M0.00000000000000734788079488412,-120 C50.824460230813024,-120 132.53701518065594,-96.50388671211483 152.16904260722455,-49.442719099991585 C171.80107003379317,-2.381551487868336 150.82209154452858,142.73799774044159 117.55705045849463,161.80339887498948 C84.29200937246068,180.86880000953738 -1.9785626414227266,99.99946125181764 -47.02282018339784,64.7213595499958 C-92.06707772537295,29.443257848173957 -160.02185357785203,-18.594252055142267 -152.16904260722458,-49.442719099991564 C-144.31623163659714,-80.29118614484086 -50.82446023081301,-120 0.00000000000000734788079488412,-120 Z" class="radarCurve-0" stroke="#4C78A8" fill="#4C78A8" fill-opacity="0.3" stroke-width="2"/>
+      <path d="M0.000000000000009797174393178826,-160 C31.765287644258144,-157.93576647757536 64.30530484767112,-67.65406011726975 76.08452130361228,-24.721359549995793 C87.86373775955343,18.211341017278162 102.87237275936863,65.93240466802116 70.53423027509677,97.0820393249937 C38.196087790824926,128.23167398196625 -86.71866141599855,184.20880000953738 -117.5570504584946,161.80339887498948 C-148.39543950099065,139.39799774044158 -133.75880938198705,16.659128287129576 -114.12678195541844,-37.08203932499367 C-94.49475452884984,-90.82320693711692 -31.765287644258123,-162.06423352242464 0.000000000000009797174393178826,-160 Z" class="radarCurve-1" stroke-width="2" fill="#F58518" fill-opacity="0.3" stroke="#F58518"/>
+      <rect x="187.5" y="-187.5" width="12" height="12" class="radarLegendBox-0" fill="#4C78A8"/>
+      <text x="203.5" y="-187.5" class="radarLegendText" font-size="12" dominant-baseline="hanging">Player 1</text>
+      <rect x="187.5" y="-167.5" width="12" height="12" class="radarLegendBox-1" fill="#F58518"/>
+      <text x="203.5" y="-167.5" class="radarLegendText" dominant-baseline="hanging" font-size="12">Player 2</text>
+      <text x="0" y="-230" class="radarTitle" font-weight="bold" text-anchor="middle" fill="#333333" font-size="16">Skill Comparison</text>
+    </g>
+  </g>
+</svg>
