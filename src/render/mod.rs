@@ -9,6 +9,7 @@ mod flowchart;
 mod gantt;
 mod git;
 mod mindmap;
+mod packet;
 mod pie;
 mod radar;
 mod sequence;
@@ -90,6 +91,7 @@ pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<St
         }
         Diagram::Mindmap(db) => mindmap::render_mindmap(db, config),
         Diagram::Radar(db) => radar::render_radar(db, config),
+        Diagram::Packet(db) => packet::render_packet(db, config),
         Diagram::XyChart(db) => xychart::render_xychart(db, config),
         _ => Err(MermaidError::RenderError(format!(
             "Diagram type {:?} not yet supported for rendering",
