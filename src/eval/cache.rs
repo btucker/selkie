@@ -2,14 +2,13 @@
 //!
 //! Caches mermaid.js rendered SVGs by diagram content hash to avoid
 //! re-rendering the same diagram multiple times.
-//!
-//! Uses mermaid.ink API for reference rendering (no local browser required).
 
-use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
 use std::collections::hash_map::DefaultHasher;
 use std::fs;
 use std::hash::{Hash, Hasher};
+use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 
 /// Cache for reference SVG and PNG outputs
 pub struct ReferenceCache {
@@ -88,14 +87,14 @@ impl ReferenceCache {
     /// Get or render a reference SVG
     ///
     /// If cached, returns the cached version.
-    /// Otherwise, renders with mermaid.ink and caches the result.
+    /// Otherwise, renders with mermaid.js and caches the result.
     pub fn get_or_render(&self, diagram: &str) -> Result<String, String> {
         // Check cache first
         if let Some(svg) = self.get(diagram) {
             return Ok(svg);
         }
 
-        // Render with mermaid.ink API
+        // Render with mermaid.js
         let svg = self.render_with_mermaid(diagram)?;
 
         // Cache the result (ignore errors, caching is optional)
@@ -105,7 +104,7 @@ impl ReferenceCache {
     }
 
     /// Render multiple diagrams at once, using cache where available.
-    /// Uses mermaid.ink API for uncached diagrams.
+    /// Uses mmdc batch mode (markdown input) for efficiency.
     /// Returns a vector of Result<svg, error> in the same order as input.
     pub fn render_batch(&self, diagrams: &[&str]) -> Vec<Result<String, String>> {
         // Check which diagrams need rendering
@@ -124,16 +123,10 @@ impl ReferenceCache {
                 .collect();
         }
 
-        eprint!(
-            "Rendering {} reference SVGs with mermaid.ink...",
-            uncached.len()
-        );
+        eprint!("Rendering {} reference SVGs with mmdc...", uncached.len());
 
-        // Render uncached diagrams using mermaid.ink API
-        let batch_results: Vec<Result<String, String>> = uncached
-            .iter()
-            .map(|(_, diagram)| self.render_with_mermaid_ink(diagram))
-            .collect();
+        // Render uncached diagrams in batch using markdown mode
+        let batch_results = self.render_batch_with_mmdc(&uncached);
 
         eprintln!(" done");
 
@@ -162,37 +155,130 @@ impl ReferenceCache {
             .collect()
     }
 
-    /// Render a diagram using mermaid.ink API
-    fn render_with_mermaid_ink(&self, diagram: &str) -> Result<String, String> {
-        // Base64 encode the diagram
-        let encoded = BASE64.encode(diagram.as_bytes());
+    /// Render multiple diagrams in a single mmdc invocation using markdown batch mode
+    fn render_batch_with_mmdc(&self, diagrams: &[(usize, &str)]) -> Vec<Result<String, String>> {
+        // Create temp directory for mmdc output
+        let temp_dir = match tempfile::tempdir() {
+            Ok(dir) => dir,
+            Err(e) => {
+                return diagrams
+                    .iter()
+                    .map(|_| Err(format!("Failed to create temp dir: {}", e)))
+                    .collect();
+            }
+        };
 
-        // Build the URL
-        let url = format!("https://mermaid.ink/svg/{}", encoded);
-
-        // Make the HTTP request and read response body
-        let svg = ureq::get(&url)
-            .timeout(std::time::Duration::from_secs(30))
-            .call()
-            .map_err(|e| format!("mermaid.ink request failed: {}", e))?
-            .into_string()
-            .map_err(|e| format!("Failed to read mermaid.ink response: {}", e))?;
-
-        if svg.trim().is_empty() {
-            return Err("mermaid.ink returned empty response".to_string());
+        // Create markdown file with all diagrams as fenced code blocks
+        let md_path = temp_dir.path().join("batch.md");
+        let mut md_content = String::new();
+        for (i, (_, diagram)) in diagrams.iter().enumerate() {
+            md_content.push_str(&format!(
+                "## Diagram {}\n\n```mermaid\n{}\n```\n\n",
+                i, diagram
+            ));
         }
 
-        // Check if the response is actually an SVG
-        if !svg.contains("<svg") {
-            return Err(format!("mermaid.ink returned non-SVG response: {}", svg));
+        if let Err(e) = fs::write(&md_path, &md_content) {
+            return diagrams
+                .iter()
+                .map(|_| Err(format!("Failed to write markdown: {}", e)))
+                .collect();
+        }
+
+        // Run mmdc with markdown input
+        let output_md = temp_dir.path().join("output.md");
+        let artefacts_dir = temp_dir.path().join("svgs");
+
+        let output = Command::new("mmdc")
+            .args([
+                "-i",
+                md_path.to_str().unwrap(),
+                "-o",
+                output_md.to_str().unwrap(),
+                "-a",
+                artefacts_dir.to_str().unwrap(),
+                "-q",
+            ])
+            .stderr(Stdio::piped())
+            .output();
+
+        let output = match output {
+            Ok(o) => o,
+            Err(e) => {
+                return diagrams
+                    .iter()
+                    .map(|_| Err(format!("Failed to run mmdc: {}", e)))
+                    .collect();
+            }
+        };
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return diagrams
+                .iter()
+                .map(|_| Err(format!("mmdc failed: {}", stderr)))
+                .collect();
+        }
+
+        // Read generated SVGs (mmdc names them output-1.svg, output-2.svg, etc.)
+        diagrams
+            .iter()
+            .enumerate()
+            .map(|(i, _)| {
+                let svg_path = artefacts_dir.join(format!("output-{}.svg", i + 1));
+                fs::read_to_string(&svg_path)
+                    .map_err(|e| format!("Failed to read SVG {}: {}", svg_path.display(), e))
+            })
+            .collect()
+    }
+
+    /// Render a diagram using mmdc (mermaid CLI)
+    pub fn render_with_mermaid(&self, diagram: &str) -> Result<String, String> {
+        // Check if mmdc is available
+        let mmdc_check = Command::new("which")
+            .arg("mmdc")
+            .output()
+            .map_err(|e| format!("Failed to check for mmdc: {}", e))?;
+
+        if !mmdc_check.status.success() {
+            return Err(
+                "mmdc (mermaid CLI) is not installed. Install it with: npm install -g @mermaid-js/mermaid-cli"
+                    .to_string(),
+            );
+        }
+
+        // Run mmdc with stdin input and stdout output
+        let mut child = Command::new("mmdc")
+            .args(["-i", "-", "-o", "-", "-q"])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .map_err(|e| format!("Failed to spawn mmdc: {}", e))?;
+
+        // Write diagram to stdin
+        if let Some(mut stdin) = child.stdin.take() {
+            stdin
+                .write_all(diagram.as_bytes())
+                .map_err(|e| format!("Failed to write to mmdc stdin: {}", e))?;
+        }
+
+        let output = child
+            .wait_with_output()
+            .map_err(|e| format!("Failed to get mmdc output: {}", e))?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("mmdc render failed: {}", stderr));
+        }
+
+        let svg = String::from_utf8_lossy(&output.stdout).to_string();
+
+        if svg.trim().is_empty() {
+            return Err("mmdc returned empty output".to_string());
         }
 
         Ok(svg)
-    }
-
-    /// Render a diagram using mermaid.ink API (public interface)
-    pub fn render_with_mermaid(&self, diagram: &str) -> Result<String, String> {
-        self.render_with_mermaid_ink(diagram)
     }
 
     // ==================== PNG Cache Methods ====================
