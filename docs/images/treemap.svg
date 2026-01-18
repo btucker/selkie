@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" class="mermaid">
+  <style>
+
+.treemapContainer {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+.treemapTitle {
+  font-size: 14px;
+  font-weight: bold;
+  fill: #333333;
+}
+.treemapSection {
+  stroke-width: 2px;
+}
+.treemapSectionHeader {
+  fill: none;
+}
+.treemapSectionLabel {
+  font-weight: bold;
+}
+.treemapSectionValue {
+  font-style: italic;
+}
+.treemapLeaf {
+  stroke-width: 3px;
+}
+.treemapLabel {
+  font-size: 14px;
+}
+.treemapValue {
+  font-size: 10px;
+}
+
+.section-0 .treemapSection {
+  fill: #ECECFF;
+  stroke: #ECECFF;
+}
+.section-0 .treemapLeaf {
+  fill: #ECECFF;
+  stroke: #ECECFF;
+}
+.section-0 .treemapLabel,
+.section-0 .treemapValue,
+.section-0 .treemapSectionLabel,
+.section-0 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-1 .treemapSection {
+  fill: #ffffde;
+  stroke: #ffffde;
+}
+.section-1 .treemapLeaf {
+  fill: #ffffde;
+  stroke: #ffffde;
+}
+.section-1 .treemapLabel,
+.section-1 .treemapValue,
+.section-1 .treemapSectionLabel,
+.section-1 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-2 .treemapSection {
+  fill: #b9b9ff;
+  stroke: #b9b9ff;
+}
+.section-2 .treemapLeaf {
+  fill: #b9b9ff;
+  stroke: #b9b9ff;
+}
+.section-2 .treemapLabel,
+.section-2 .treemapValue,
+.section-2 .treemapSectionLabel,
+.section-2 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-3 .treemapSection {
+  fill: #b5ff20;
+  stroke: #b5ff20;
+}
+.section-3 .treemapLeaf {
+  fill: #b5ff20;
+  stroke: #b5ff20;
+}
+.section-3 .treemapLabel,
+.section-3 .treemapValue,
+.section-3 .treemapSectionLabel,
+.section-3 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-4 .treemapSection {
+  fill: #d4ffb2;
+  stroke: #d4ffb2;
+}
+.section-4 .treemapLeaf {
+  fill: #d4ffb2;
+  stroke: #d4ffb2;
+}
+.section-4 .treemapLabel,
+.section-4 .treemapValue,
+.section-4 .treemapSectionLabel,
+.section-4 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-5 .treemapSection {
+  fill: #ffb3e6;
+  stroke: #ffb3e6;
+}
+.section-5 .treemapLeaf {
+  fill: #ffb3e6;
+  stroke: #ffb3e6;
+}
+.section-5 .treemapLabel,
+.section-5 .treemapValue,
+.section-5 .treemapSectionLabel,
+.section-5 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-6 .treemapSection {
+  fill: #ffd700;
+  stroke: #ffd700;
+}
+.section-6 .treemapLeaf {
+  fill: #ffd700;
+  stroke: #ffd700;
+}
+.section-6 .treemapLabel,
+.section-6 .treemapValue,
+.section-6 .treemapSectionLabel,
+.section-6 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-7 .treemapSection {
+  fill: #c4c4ff;
+  stroke: #c4c4ff;
+}
+.section-7 .treemapLeaf {
+  fill: #c4c4ff;
+  stroke: #c4c4ff;
+}
+.section-7 .treemapLabel,
+.section-7 .treemapValue,
+.section-7 .treemapSectionLabel,
+.section-7 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-8 .treemapSection {
+  fill: #ffe6cc;
+  stroke: #ffe6cc;
+}
+.section-8 .treemapLeaf {
+  fill: #ffe6cc;
+  stroke: #ffe6cc;
+}
+.section-8 .treemapLabel,
+.section-8 .treemapValue,
+.section-8 .treemapSectionLabel,
+.section-8 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-9 .treemapSection {
+  fill: #ccffcc;
+  stroke: #ccffcc;
+}
+.section-9 .treemapLeaf {
+  fill: #ccffcc;
+  stroke: #ccffcc;
+}
+.section-9 .treemapLabel,
+.section-9 .treemapValue,
+.section-9 .treemapSectionLabel,
+.section-9 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-10 .treemapSection {
+  fill: #ECECFF;
+  stroke: #ECECFF;
+}
+.section-10 .treemapLeaf {
+  fill: #ECECFF;
+  stroke: #ECECFF;
+}
+.section-10 .treemapLabel,
+.section-10 .treemapValue,
+.section-10 .treemapSectionLabel,
+.section-10 .treemapSectionValue {
+  fill: #333333;
+}
+
+.section-11 .treemapSection {
+  fill: #ECECFF;
+  stroke: #ECECFF;
+}
+.section-11 .treemapLeaf {
+  fill: #ECECFF;
+  stroke: #ECECFF;
+}
+.section-11 .treemapLabel,
+.section-11 .treemapValue,
+.section-11 .treemapSectionLabel,
+.section-11 .treemapSectionValue {
+  fill: #333333;
+}
+
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+      <g class="treemapContainer">
+        <g class="treemapSections">
+          <g class="treemapSection section-0">
+            <rect x="0" y="0" width="548.5714285714286" height="500" class="treemapSection section-0" fill-opacity="0.6" stroke-opacity="0.4" stroke-width="2"/>
+            <rect x="0" y="0" width="548.5714285714286" height="25" class="treemapSectionHeader" fill="none" stroke-width="0"/>
+            <text x="6" y="12.5" class="treemapSectionLabel section-0" dominant-baseline="middle" font-weight="bold" font-size="12px">Category B</text>
+            <text x="538.5714285714286" y="12.5" class="treemapSectionValue section-0" font-size="10px" font-style="italic" dominant-baseline="middle" text-anchor="end">40</text>
+          </g>
+          <g class="treemapSection section-1">
+            <rect x="548.5714285714286" y="0" width="411.42857142857144" height="500" class="treemapSection section-1" fill-opacity="0.6" stroke-opacity="0.4" stroke-width="2"/>
+            <rect x="548.5714285714286" y="0" width="411.42857142857144" height="25" class="treemapSectionHeader" fill="none" stroke-width="0"/>
+            <text x="554.5714285714286" y="12.5" class="treemapSectionLabel section-1" font-size="12px" font-weight="bold" dominant-baseline="middle">Category A</text>
+            <text x="950" y="12.5" class="treemapSectionValue section-1" font-style="italic" font-size="10px" text-anchor="end" dominant-baseline="middle">30</text>
+          </g>
+        </g>
+        <g class="treemapLeaves">
+          <g class="treemapNode treemapLeafGroup section-0">
+            <rect x="10" y="35" width="330.35714285714283" height="455" class="treemapLeaf section-0" fill-opacity="0.3" stroke-width="3"/>
+            <text x="175.17857142857142" y="257.5" class="treemapLabel section-0" font-size="14px" text-anchor="middle" dominant-baseline="middle">Item B2</text>
+            <text x="175.17857142857142" y="271.5" class="treemapValue section-0" text-anchor="middle" font-size="10px" dominant-baseline="hanging">25</text>
+          </g>
+          <g class="treemapNode treemapLeafGroup section-0">
+            <rect x="340.35714285714283" y="35" width="198.21428571428572" height="455" class="treemapLeaf section-0" stroke-width="3" fill-opacity="0.3"/>
+            <text x="439.46428571428567" y="257.5" class="treemapLabel section-0" text-anchor="middle" font-size="14px" dominant-baseline="middle">Item B1</text>
+            <text x="439.46428571428567" y="271.5" class="treemapValue section-0" text-anchor="middle" dominant-baseline="hanging" font-size="10px">15</text>
+          </g>
+          <g class="treemapNode treemapLeafGroup section-1">
+            <rect x="558.5714285714286" y="35" width="260.95238095238096" height="455" class="treemapLeaf section-1" fill-opacity="0.3" stroke-width="3"/>
+            <text x="689.047619047619" y="257.5" class="treemapLabel section-1" text-anchor="middle" dominant-baseline="middle" font-size="14px">Item A2</text>
+            <text x="689.047619047619" y="271.5" class="treemapValue section-1" font-size="10px" dominant-baseline="hanging" text-anchor="middle">20</text>
+          </g>
+          <g class="treemapNode treemapLeafGroup section-1">
+            <rect x="819.5238095238095" y="35" width="130.4761904761905" height="455" class="treemapLeaf section-1" fill-opacity="0.3" stroke-width="3"/>
+            <text x="884.7619047619048" y="257.5" class="treemapLabel section-1" font-size="14px" dominant-baseline="middle" text-anchor="middle">Item A1</text>
+            <text x="884.7619047619048" y="271.5" class="treemapValue section-1" dominant-baseline="hanging" font-size="10px" text-anchor="middle">10</text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
