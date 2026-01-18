@@ -139,11 +139,6 @@ impl Bounds {
         }
     }
 
-    fn with_width_limit(mut self, limit: f64) -> Self {
-        self.width_limit = limit;
-        self
-    }
-
     /// Insert an element into the bounds, using grid layout
     fn insert(&mut self, width: f64, height: f64) -> (f64, f64) {
         self.row_count += 1;
