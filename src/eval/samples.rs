@@ -404,6 +404,8 @@ fn detect_diagram_type(source: &str) -> String {
         || first_line.starts_with("c4deployment")
     {
         "c4".to_string()
+    } else if first_line.starts_with("quadrantchart") {
+        "quadrant".to_string()
     } else if first_line.starts_with("treemap") {
         "treemap".to_string()
     } else if first_line.starts_with("xychart") {

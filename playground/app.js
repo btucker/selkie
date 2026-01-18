@@ -436,6 +436,39 @@ const examples = {
       Mermaid
         cloud)I am a cloud(
         bang))I am a bang((`,
+
+    'quadrant-simple': `quadrantChart
+    title Reach and Engagement
+    x-axis Low Reach --> High Reach
+    y-axis Low Engagement --> High Engagement
+    quadrant-1 We should expand
+    quadrant-2 Need to promote
+    quadrant-3 Re-evaluate
+    quadrant-4 May be improved
+    Campaign A: [0.3, 0.6]
+    Campaign B: [0.45, 0.23]
+    Campaign C: [0.57, 0.69]
+    Campaign D: [0.78, 0.34]`,
+
+    'quadrant-complex': `quadrantChart
+    title Analytics and Business Intelligence Platforms
+    x-axis Completeness of Vision --> High Vision
+    y-axis Ability to Execute --> High Execution
+    quadrant-1 Leaders
+    quadrant-2 Challengers
+    quadrant-3 Niche Players
+    quadrant-4 Visionaries
+    Microsoft: [0.75, 0.75] radius: 10
+    Salesforce: [0.55, 0.60] radius: 8
+    SAP: [0.70, 0.65]
+    IBM: [0.51, 0.40]
+    Oracle: [0.65, 0.55]
+    Qlik: [0.60, 0.45]
+    Tableau: [0.68, 0.72]
+    SAS: [0.45, 0.58]
+    MicroStrategy: [0.50, 0.50]
+    Amazon: [0.80, 0.68] color: #ff9900
+    Google: [0.72, 0.60] color: #4285f4`,
 };
 
 // State
