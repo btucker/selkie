@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/images/selkie-logo.png" width="250">
+  <img src="docs/images/selkie-logo.png" width="200">
 </div>
 
 # Selkie
