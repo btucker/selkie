@@ -1,8 +1,11 @@
 //! Sankey diagram renderer
 //!
 //! Renders Sankey diagrams showing flow between nodes with weighted connections.
-//! The layout algorithm assigns nodes to columns based on their position in the
-//! flow graph, then calculates vertical positions based on flow values.
+//! The layout algorithm follows d3-sankey's approach:
+//! 1. Assign nodes to columns based on link depth
+//! 2. Calculate node heights proportional to their flow values
+//! 3. Position nodes vertically with padding
+//! 4. Compute link paths as curved bands between nodes
 
 use std::collections::{HashMap, HashSet};
 
@@ -20,30 +23,30 @@ const FONT_SIZE: f64 = 14.0;
 
 /// Computed node position and dimensions
 #[derive(Debug, Clone)]
-#[allow(dead_code)] // Some fields reserved for future enhancements (e.g., showValues)
 struct LayoutNode {
     id: String,
+    #[allow(dead_code)]
     column: usize,
     x0: f64,
     y0: f64,
     x1: f64,
     y1: f64,
-    value: f64, // Total flow through this node
+    #[allow(dead_code)]
+    value: f64,
 }
 
-/// Computed link position
+/// Computed link with path info
 #[derive(Debug, Clone)]
-#[allow(dead_code)] // Value field reserved for future tooltip/label features
 struct LayoutLink {
     source_id: String,
     target_id: String,
+    #[allow(dead_code)]
     value: f64,
-    source_y0: f64, // Start y position at source
-    source_y1: f64,
-    target_y0: f64, // End y position at target
-    target_y1: f64,
-    source_x: f64, // x position at source (right edge of node)
-    target_x: f64, // x position at target (left edge of node)
+    width: f64,    // Stroke width for the link
+    source_y: f64, // Center Y at source
+    target_y: f64, // Center Y at target
+    source_x: f64, // X position at source (right edge of node)
+    target_x: f64, // X position at target (left edge of node)
 }
 
 /// Render a sankey diagram to SVG
@@ -88,7 +91,7 @@ pub fn render_sankey(db: &SankeyDb, config: &RenderConfig) -> Result<String> {
     Ok(doc.to_string())
 }
 
-/// Compute the sankey layout - assigns positions to all nodes and links
+/// Compute the sankey layout following d3-sankey algorithm
 fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, Vec<LayoutLink>) {
     let graph = db.get_graph();
 
@@ -128,42 +131,62 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
         0.0
     };
 
-    // Step 5: Group nodes by column and compute y positions
+    // Step 5: Group nodes by column
     let mut nodes_by_column: Vec<Vec<String>> = vec![Vec::new(); num_columns];
     for node in &graph.nodes {
         let col = node_columns.get(&node.id).copied().unwrap_or(0);
         nodes_by_column[col].push(node.id.clone());
     }
 
-    // Compute y positions within each column
+    // Step 6: Calculate ky (scale factor) based on the most constrained column
+    // This ensures consistent scaling across all columns
+    let mut ky = f64::MAX;
+    for col_nodes in &nodes_by_column {
+        if col_nodes.is_empty() {
+            continue;
+        }
+        let total_value: f64 = col_nodes
+            .iter()
+            .map(|id| node_values.get(id).copied().unwrap_or(0.0))
+            .sum();
+        let padding_total = NODE_PADDING * (col_nodes.len().saturating_sub(1)) as f64;
+        let available = height - padding_total;
+        if total_value > 0.0 {
+            ky = ky.min(available / total_value);
+        }
+    }
+
+    // Cap ky to prevent nodes from being too large in simple diagrams
+    // Max node height should be around 1/3 of the diagram height
+    let max_ky = height / 3.0 / node_values.values().copied().fold(0.0, f64::max).max(1.0);
+    if ky == f64::MAX {
+        ky = max_ky;
+    } else {
+        ky = ky.min(max_ky);
+    }
+
+    // Step 7: Compute y positions within each column
     let mut layout_nodes: Vec<LayoutNode> = Vec::new();
-    let mut node_positions: HashMap<String, (f64, f64, f64, f64)> = HashMap::new(); // id -> (x0, y0, x1, y1)
+    let mut node_positions: HashMap<String, (f64, f64, f64, f64)> = HashMap::new();
 
     for (col, col_nodes) in nodes_by_column.iter().enumerate() {
         let x0 = col as f64 * column_width;
         let x1 = x0 + NODE_WIDTH;
 
-        // Calculate total value in this column for scaling
-        let total_value: f64 = col_nodes
+        // Calculate total height needed for this column
+        let total_height: f64 = col_nodes
             .iter()
-            .map(|id| node_values.get(id).copied().unwrap_or(0.0))
+            .map(|id| node_values.get(id).copied().unwrap_or(0.0) * ky)
             .sum();
-
-        // Available height minus padding between nodes
         let padding_total = NODE_PADDING * (col_nodes.len().saturating_sub(1)) as f64;
-        let available_height = height - padding_total;
 
-        // Position nodes vertically
-        let mut current_y = 0.0;
+        // Center the column vertically
+        let start_y = (height - total_height - padding_total) / 2.0;
+        let mut current_y = start_y.max(0.0);
 
         for node_id in col_nodes {
             let value = node_values.get(node_id).copied().unwrap_or(0.0);
-            let node_height = if total_value > 0.0 {
-                (value / total_value) * available_height
-            } else {
-                available_height / col_nodes.len() as f64
-            }
-            .max(1.0); // Minimum height of 1
+            let node_height = (value * ky).max(1.0);
 
             let y0 = current_y;
             let y1 = y0 + node_height;
@@ -183,8 +206,8 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
         }
     }
 
-    // Step 6: Compute link positions
-    let layout_links = compute_link_positions(&graph.links, &node_positions, &node_values);
+    // Step 8: Compute link positions (as strokes with width)
+    let layout_links = compute_link_positions(&graph.links, &node_positions, ky);
 
     (layout_nodes, layout_links)
 }
@@ -204,19 +227,15 @@ fn compute_node_columns(
         .map(|n| n.id.clone())
         .collect();
 
-    // BFS from sources
+    // BFS from sources to find longest path to each node
     let mut queue: Vec<(String, usize)> = source_nodes.iter().map(|id| (id.clone(), 0)).collect();
-    let mut visited: HashSet<String> = HashSet::new();
 
     while let Some((node_id, col)) = queue.pop() {
-        // Update column to max seen
+        // Update column to max seen (longest path)
         let current_col = columns.entry(node_id.clone()).or_insert(0);
-        *current_col = (*current_col).max(col);
-
-        if visited.contains(&node_id) {
-            continue;
+        if col > *current_col {
+            *current_col = col;
         }
-        visited.insert(node_id.clone());
 
         // Process outgoing edges
         if let Some(edges) = outgoing.get(&node_id) {
@@ -246,7 +265,7 @@ fn compute_node_values(
         values.insert(node.id.clone(), 0.0);
     }
 
-    // Sum incoming and outgoing values, take max
+    // Sum incoming and outgoing values, take max (d3-sankey approach)
     let mut incoming_values: HashMap<String, f64> = HashMap::new();
     let mut outgoing_values: HashMap<String, f64> = HashMap::new();
 
@@ -264,11 +283,11 @@ fn compute_node_values(
     values
 }
 
-/// Compute link positions based on node positions
+/// Compute link positions - links are drawn as strokes with width
 fn compute_link_positions(
     links: &[crate::diagrams::sankey::GraphLink],
     node_positions: &HashMap<String, (f64, f64, f64, f64)>,
-    node_values: &HashMap<String, f64>,
+    ky: f64,
 ) -> Vec<LayoutLink> {
     // Track current y offset at each node for stacking links
     let mut source_offsets: HashMap<String, f64> = HashMap::new();
@@ -287,46 +306,28 @@ fn compute_link_positions(
             .copied()
             .unwrap_or((0.0, 0.0, NODE_WIDTH, 10.0));
 
-        let source_value = node_values.get(&link.source).copied().unwrap_or(1.0);
-        let target_value = node_values.get(&link.target).copied().unwrap_or(1.0);
-
-        // Calculate link height at source and target based on proportion
-        let source_height = source_y1 - source_y0;
-        let target_height = target_y1 - target_y0;
-
-        let link_height_at_source = if source_value > 0.0 {
-            (link.value / source_value) * source_height
-        } else {
-            source_height
-        };
-
-        let link_height_at_target = if target_value > 0.0 {
-            (link.value / target_value) * target_height
-        } else {
-            target_height
-        };
+        // Link width is proportional to value
+        let link_width = (link.value * ky).max(1.0);
 
         // Get current offset at source and target
         let source_offset = source_offsets.entry(link.source.clone()).or_insert(0.0);
         let target_offset = target_offsets.entry(link.target.clone()).or_insert(0.0);
 
-        let link_source_y0 = source_y0 + *source_offset;
-        let link_source_y1 = link_source_y0 + link_height_at_source;
-        let link_target_y0 = target_y0 + *target_offset;
-        let link_target_y1 = link_target_y0 + link_height_at_target;
+        // Center Y positions for the link at source and target
+        let source_y = source_y0 + *source_offset + link_width / 2.0;
+        let target_y = target_y0 + *target_offset + link_width / 2.0;
 
         // Update offsets for next link
-        *source_offset += link_height_at_source;
-        *target_offset += link_height_at_target;
+        *source_offset += link_width;
+        *target_offset += link_width;
 
         layout_links.push(LayoutLink {
             source_id: link.source.clone(),
             target_id: link.target.clone(),
             value: link.value,
-            source_y0: link_source_y0,
-            source_y1: link_source_y1,
-            target_y0: link_target_y0,
-            target_y1: link_target_y1,
+            width: link_width,
+            source_y,
+            target_y,
             source_x: source_x1, // Right edge of source node
             target_x: target_x0, // Left edge of target node
         });
@@ -363,22 +364,13 @@ fn create_gradient_defs(
         // Create linear gradient
         let gradient_id = format!("linearGradient-{}", i + 1);
 
-        let stop1 = SvgElement::Raw {
-            content: format!("<stop offset=\"0%\" stop-color=\"{}\"/>", source_color),
-        };
-
-        let stop2 = SvgElement::Raw {
-            content: format!("<stop offset=\"100%\" stop-color=\"{}\"/>", target_color),
-        };
-
         let gradient = SvgElement::Raw {
             content: format!(
-                "<linearGradient id=\"{}\" gradientUnits=\"userSpaceOnUse\" x1=\"{}\" x2=\"{}\">{}{}</linearGradient>",
-                gradient_id,
-                link.source_x,
-                link.target_x,
-                stop1.to_svg(0),
-                stop2.to_svg(0)
+                "<linearGradient id=\"{}\" gradientUnits=\"userSpaceOnUse\" x1=\"{}\" x2=\"{}\">\
+                 <stop offset=\"0%\" stop-color=\"{}\"/>\
+                 <stop offset=\"100%\" stop-color=\"{}\"/>\
+                 </linearGradient>",
+                gradient_id, link.source_x, link.target_x, source_color, target_color
             ),
         };
 
@@ -388,43 +380,25 @@ fn create_gradient_defs(
     SvgElement::Defs { children }
 }
 
-/// Render all links
+/// Render all links as strokes (matching mermaid.js d3SankeyLinkHorizontal)
 fn render_links(links: &[LayoutLink], config: &RenderConfig) -> SvgElement {
     let mut children = Vec::new();
 
     for (i, link) in links.iter().enumerate() {
-        // Create a smooth horizontal link path using cubic Bezier curves
-        // d3-sankey uses a specific curve that we approximate
-        // Control points at horizontal midpoint
+        // d3SankeyLinkHorizontal generates a cubic bezier curve
+        // M source_x,source_y C mid_x,source_y mid_x,target_y target_x,target_y
         let mid_x = (link.source_x + link.target_x) / 2.0;
 
-        // Path for the link (as a filled shape)
         let d = format!(
-            "M{},{} C{},{} {},{} {},{} L{},{} C{},{} {},{} {},{} Z",
-            // Start at top of source
+            "M{},{} C{},{} {},{} {},{}",
             link.source_x,
-            link.source_y0,
-            // Control point 1 (horizontal middle, source y)
+            link.source_y,
             mid_x,
-            link.source_y0,
-            // Control point 2 (horizontal middle, target y)
+            link.source_y,
             mid_x,
-            link.target_y0,
-            // End at top of target
+            link.target_y,
             link.target_x,
-            link.target_y0,
-            // Line to bottom of target
-            link.target_x,
-            link.target_y1,
-            // Control point 3 (horizontal middle, target y)
-            mid_x,
-            link.target_y1,
-            // Control point 4 (horizontal middle, source y)
-            mid_x,
-            link.source_y1,
-            // End at bottom of source
-            link.source_x,
-            link.source_y1,
+            link.target_y,
         );
 
         let gradient_id = format!("url(#linearGradient-{})", i + 1);
@@ -432,8 +406,10 @@ fn render_links(links: &[LayoutLink], config: &RenderConfig) -> SvgElement {
         let link_path = SvgElement::Path {
             d,
             attrs: Attrs::new()
-                .with_fill(&gradient_id)
-                .with_attr("fill-opacity", &config.theme.sankey_link_opacity)
+                .with_fill("none")
+                .with_stroke(&gradient_id)
+                .with_stroke_width(link.width)
+                .with_attr("stroke-opacity", &config.theme.sankey_link_opacity)
                 .with_class("sankey-link"),
         };
 
@@ -450,7 +426,10 @@ fn render_links(links: &[LayoutLink], config: &RenderConfig) -> SvgElement {
 
     SvgElement::Group {
         children,
-        attrs: Attrs::new().with_class("links"),
+        attrs: Attrs::new()
+            .with_class("links")
+            .with_fill("none")
+            .with_attr("stroke-opacity", &config.theme.sankey_link_opacity),
     }
 }
 
@@ -540,7 +519,7 @@ fn generate_sankey_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .sankey-link {{
-  fill-opacity: {link_opacity};
+  stroke-opacity: {link_opacity};
 }}
 
 .sankey-label {{
@@ -599,7 +578,6 @@ mod tests {
         assert!(result.is_ok());
         let svg = result.unwrap();
         assert!(svg.contains("<svg"));
-        // Should have gradient definitions
         assert!(svg.contains("linearGradient"));
     }
 
@@ -630,5 +608,41 @@ mod tests {
         assert_eq!(columns.get("A"), Some(&0));
         assert_eq!(columns.get("B"), Some(&1));
         assert_eq!(columns.get("C"), Some(&2));
+    }
+
+    #[test]
+    fn test_node_heights_proportional() {
+        // Test that node heights are proportional to flow, not filling entire height
+        let mut db = SankeyDb::new();
+        db.add_link("A", "B", 10.0);
+
+        let (layout_nodes, _) = compute_layout(&db, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
+        // Nodes should NOT fill the entire 400px height
+        // With max_ky capping, nodes should be at most ~1/3 of height
+        for node in &layout_nodes {
+            let node_height = node.y1 - node.y0;
+            assert!(
+                node_height < DEFAULT_HEIGHT * 0.5,
+                "Node height {} should be less than half of SVG height {}",
+                node_height,
+                DEFAULT_HEIGHT
+            );
+        }
+    }
+
+    #[test]
+    fn test_links_are_strokes() {
+        // Test that links use stroke, not fill
+        let mut db = SankeyDb::new();
+        db.add_link("A", "B", 10.0);
+
+        let config = RenderConfig::default();
+        let result = render_sankey(&db, &config).unwrap();
+
+        // Links should have stroke-width attribute
+        assert!(result.contains("stroke-width="));
+        // Links should have fill="none"
+        assert!(result.contains("fill=\"none\""));
     }
 }
