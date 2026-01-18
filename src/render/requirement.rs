@@ -352,7 +352,11 @@ fn render_requirement_box(
     width: f64,
     height: f64,
 ) -> SvgElement {
+    // IMPORTANT: Render all shapes first, then all text elements
+    // This ensures proper z-order (text appears on top of shapes)
     let mut children = Vec::new();
+
+    // === SHAPES FIRST ===
 
     // Main box
     children.push(SvgElement::Rect {
@@ -378,6 +382,17 @@ fn render_requirement_box(
         attrs: Attrs::new().with_class("requirement-header"),
     });
 
+    // Divider line
+    children.push(SvgElement::Line {
+        x1: x,
+        y1: y + HEADER_HEIGHT,
+        x2: x + width,
+        y2: y + HEADER_HEIGHT,
+        attrs: Attrs::new().with_stroke_width(1.0).with_class("divider"),
+    });
+
+    // === TEXT ELEMENTS AFTER SHAPES ===
+
     // Type label (in header)
     let type_text = format_requirement_type(&req.req_type);
     children.push(SvgElement::Text {
@@ -388,15 +403,6 @@ fn render_requirement_box(
             .with_attr("text-anchor", "middle")
             .with_class("requirement-type")
             .with_attr("font-size", &HEADER_FONT_SIZE.to_string()),
-    });
-
-    // Divider line
-    children.push(SvgElement::Line {
-        x1: x,
-        y1: y + HEADER_HEIGHT,
-        x2: x + width,
-        y2: y + HEADER_HEIGHT,
-        attrs: Attrs::new().with_stroke_width(1.0).with_class("divider"),
     });
 
     // Content area
@@ -486,11 +492,14 @@ fn render_requirement_box(
 
 /// Render an element box
 fn render_element_box(elem: &Element, x: f64, y: f64, width: f64, height: f64) -> SvgElement {
+    // IMPORTANT: Render all shapes first, then all text elements
+    // This ensures proper z-order (text appears on top of shapes)
     // Content area
     let content_y = y + HEADER_HEIGHT + BOX_PADDING;
-    let mut current_y = content_y;
+    let mut current_y = content_y + LINE_HEIGHT;
 
     let mut children = vec![
+        // === SHAPES FIRST ===
         // Main box
         SvgElement::Rect {
             x,
@@ -513,6 +522,15 @@ fn render_element_box(elem: &Element, x: f64, y: f64, width: f64, height: f64) -
             ry: Some(0.0),
             attrs: Attrs::new().with_class("element-header"),
         },
+        // Divider line
+        SvgElement::Line {
+            x1: x,
+            y1: y + HEADER_HEIGHT,
+            x2: x + width,
+            y2: y + HEADER_HEIGHT,
+            attrs: Attrs::new().with_stroke_width(1.0).with_class("divider"),
+        },
+        // === TEXT ELEMENTS AFTER SHAPES ===
         // Element label (in header)
         SvgElement::Text {
             x: x + width / 2.0,
@@ -522,14 +540,6 @@ fn render_element_box(elem: &Element, x: f64, y: f64, width: f64, height: f64) -
                 .with_attr("text-anchor", "middle")
                 .with_class("element-type")
                 .with_attr("font-size", &HEADER_FONT_SIZE.to_string()),
-        },
-        // Divider line
-        SvgElement::Line {
-            x1: x,
-            y1: y + HEADER_HEIGHT,
-            x2: x + width,
-            y2: y + HEADER_HEIGHT,
-            attrs: Attrs::new().with_stroke_width(1.0).with_class("divider"),
         },
         // Name
         SvgElement::Text {
@@ -543,7 +553,6 @@ fn render_element_box(elem: &Element, x: f64, y: f64, width: f64, height: f64) -
                 .with_attr("font-weight", "bold"),
         },
     ];
-    current_y += LINE_HEIGHT;
 
     // Type (strip surrounding quotes if present)
     if !elem.element_type.is_empty() {
