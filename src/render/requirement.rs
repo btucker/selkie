@@ -40,7 +40,7 @@ fn calculate_requirement_dimensions(req: &Requirement) -> BoxDimensions {
     let name_width = req.name.len() as f64 * header_char_width;
     let type_width = format_requirement_type(&req.req_type).len() as f64 * char_width;
     let id_width = if !req.requirement_id.is_empty() {
-        format!("Id: {}", req.requirement_id).len() as f64 * char_width
+        format!("ID: {}", req.requirement_id).len() as f64 * char_width
     } else {
         0.0
     };
@@ -52,7 +52,7 @@ fn calculate_requirement_dimensions(req: &Requirement) -> BoxDimensions {
         0.0
     };
     let risk_width = format!("Risk: {:?}", req.risk).len() as f64 * char_width;
-    let verify_width = format!("Verify: {:?}", req.verify_method).len() as f64 * char_width;
+    let verify_width = format!("Verification: {:?}", req.verify_method).len() as f64 * char_width;
 
     let content_width = name_width
         .max(type_width)
@@ -94,7 +94,7 @@ fn calculate_element_dimensions(elem: &Element) -> BoxDimensions {
         0.0
     };
     let docref_width = if !elem.doc_ref.is_empty() {
-        format!("Doc: {}", elem.doc_ref).len() as f64 * char_width
+        format!("Doc Ref: {}", elem.doc_ref).len() as f64 * char_width
     } else {
         0.0
     };
@@ -115,28 +115,28 @@ fn calculate_element_dimensions(elem: &Element) -> BoxDimensions {
     BoxDimensions { width, height }
 }
 
-/// Format requirement type for display
+/// Format requirement type for display (with guillemets to match mermaid)
 fn format_requirement_type(req_type: &RequirementType) -> &'static str {
     match req_type {
-        RequirementType::Requirement => "Requirement",
-        RequirementType::FunctionalRequirement => "Functional Requirement",
-        RequirementType::InterfaceRequirement => "Interface Requirement",
-        RequirementType::PerformanceRequirement => "Performance Requirement",
-        RequirementType::PhysicalRequirement => "Physical Requirement",
-        RequirementType::DesignConstraint => "Design Constraint",
+        RequirementType::Requirement => "<<Requirement>>",
+        RequirementType::FunctionalRequirement => "<<Functional Requirement>>",
+        RequirementType::InterfaceRequirement => "<<Interface Requirement>>",
+        RequirementType::PerformanceRequirement => "<<Performance Requirement>>",
+        RequirementType::PhysicalRequirement => "<<Physical Requirement>>",
+        RequirementType::DesignConstraint => "<<Design Constraint>>",
     }
 }
 
-/// Format relationship type for display
+/// Format relationship type for display (with guillemets to match mermaid)
 fn format_relationship_type(rel_type: &RelationshipType) -> &'static str {
     match rel_type {
-        RelationshipType::Contains => "contains",
-        RelationshipType::Copies => "copies",
-        RelationshipType::Derives => "derives",
-        RelationshipType::Satisfies => "satisfies",
-        RelationshipType::Verifies => "verifies",
-        RelationshipType::Refines => "refines",
-        RelationshipType::Traces => "traces",
+        RelationshipType::Contains => "<<contains>>",
+        RelationshipType::Copies => "<<copies>>",
+        RelationshipType::Derives => "<<derives>>",
+        RelationshipType::Satisfies => "<<satisfies>>",
+        RelationshipType::Verifies => "<<verifies>>",
+        RelationshipType::Refines => "<<refines>>",
+        RelationshipType::Traces => "<<traces>>",
     }
 }
 
@@ -421,7 +421,7 @@ fn render_requirement_box(
         children.push(SvgElement::Text {
             x: x + BOX_PADDING,
             y: current_y + LINE_HEIGHT / 2.0 + 4.0,
-            content: format!("Id: {}", req.requirement_id),
+            content: format!("ID: {}", req.requirement_id),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
                 .with_class("requirement-attr")
@@ -469,7 +469,7 @@ fn render_requirement_box(
     children.push(SvgElement::Text {
         x: x + BOX_PADDING,
         y: current_y + LINE_HEIGHT / 2.0 + 4.0,
-        content: format!("Verify: {}", format_verify_method(&req.verify_method)),
+        content: format!("Verification: {}", format_verify_method(&req.verify_method)),
         attrs: Attrs::new()
             .with_attr("text-anchor", "start")
             .with_class("requirement-attr")
@@ -517,7 +517,7 @@ fn render_element_box(elem: &Element, x: f64, y: f64, width: f64, height: f64) -
         SvgElement::Text {
             x: x + width / 2.0,
             y: y + HEADER_HEIGHT / 2.0 + 5.0,
-            content: "Element".to_string(),
+            content: "<<Element>>".to_string(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
                 .with_class("element-type")
@@ -545,12 +545,13 @@ fn render_element_box(elem: &Element, x: f64, y: f64, width: f64, height: f64) -
     ];
     current_y += LINE_HEIGHT;
 
-    // Type
+    // Type (strip surrounding quotes if present)
     if !elem.element_type.is_empty() {
+        let type_text = elem.element_type.trim_matches('"');
         children.push(SvgElement::Text {
             x: x + BOX_PADDING,
             y: current_y + LINE_HEIGHT / 2.0 + 4.0,
-            content: format!("Type: {}", elem.element_type),
+            content: format!("Type: {}", type_text),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
                 .with_class("element-attr")
@@ -564,7 +565,7 @@ fn render_element_box(elem: &Element, x: f64, y: f64, width: f64, height: f64) -
         children.push(SvgElement::Text {
             x: x + BOX_PADDING,
             y: current_y + LINE_HEIGHT / 2.0 + 4.0,
-            content: format!("Doc: {}", elem.doc_ref),
+            content: format!("Doc Ref: {}", elem.doc_ref),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
                 .with_class("element-attr")
