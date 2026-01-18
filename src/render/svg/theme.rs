@@ -99,6 +99,14 @@ pub struct Theme {
     /// Today line color
     pub today_line_color: String,
 
+    // === Sankey diagram colors ===
+    /// Sankey node color palette (10 colors matching d3 Tableau 10)
+    pub sankey_node_colors: Vec<String>,
+    /// Sankey link fill opacity
+    pub sankey_link_opacity: String,
+    /// Sankey label text color
+    pub sankey_label_color: String,
+
     // === Quadrant chart colors ===
     /// Quadrant 1 (top-right) background color
     pub quadrant1_fill: String,
@@ -196,6 +204,21 @@ impl Default for Theme {
             crit_border_color: "#ff8888".to_string(),
             grid_color: "#d3d3d3".to_string(),
             today_line_color: "#ff0000".to_string(),
+            // Sankey diagram - default theme (D3 Tableau 10 color scheme)
+            sankey_node_colors: vec![
+                "#4e79a7".to_string(), // blue
+                "#f28e2c".to_string(), // orange
+                "#e15759".to_string(), // red
+                "#76b7b2".to_string(), // teal
+                "#59a14f".to_string(), // green
+                "#edc949".to_string(), // yellow
+                "#af7aa1".to_string(), // purple
+                "#ff9da7".to_string(), // pink
+                "#9c755f".to_string(), // brown
+                "#bab0ab".to_string(), // gray
+            ],
+            sankey_link_opacity: "0.5".to_string(),
+            sankey_label_color: "#333333".to_string(),
             // Quadrant chart - default theme (mermaid.js defaults derived from primaryColor #ECECFF)
             quadrant1_fill: "#ECECFF".to_string(),
             quadrant2_fill: "#f1f1ff".to_string(),
@@ -279,6 +302,21 @@ impl Theme {
             crit_border_color: "#ff6666".to_string(),
             grid_color: "#444444".to_string(),
             today_line_color: "#ff6666".to_string(),
+            // Sankey diagram - dark theme (muted colors for dark background)
+            sankey_node_colors: vec![
+                "#5c8eb8".to_string(), // muted blue
+                "#d9a066".to_string(), // muted orange
+                "#c86b6d".to_string(), // muted red
+                "#6aa8a3".to_string(), // muted teal
+                "#5a9c52".to_string(), // muted green
+                "#d4bc5a".to_string(), // muted yellow
+                "#9d7090".to_string(), // muted purple
+                "#e08e96".to_string(), // muted pink
+                "#8d6b54".to_string(), // muted brown
+                "#9e958f".to_string(), // muted gray
+            ],
+            sankey_link_opacity: "0.5".to_string(),
+            sankey_label_color: "#ccc".to_string(),
             // Quadrant chart - dark theme
             quadrant1_fill: "#2a2a2a".to_string(),
             quadrant2_fill: "#3a3a3a".to_string(),
@@ -360,6 +398,21 @@ impl Theme {
             crit_border_color: "#404040".to_string(),
             grid_color: "#cccccc".to_string(),
             today_line_color: "#333333".to_string(),
+            // Sankey diagram - neutral theme (grayscale)
+            sankey_node_colors: vec![
+                "#808080".to_string(), // gray 1
+                "#606060".to_string(), // gray 2
+                "#a0a0a0".to_string(), // gray 3
+                "#505050".to_string(), // gray 4
+                "#909090".to_string(), // gray 5
+                "#707070".to_string(), // gray 6
+                "#b0b0b0".to_string(), // gray 7
+                "#404040".to_string(), // gray 8
+                "#c0c0c0".to_string(), // gray 9
+                "#303030".to_string(), // gray 10
+            ],
+            sankey_link_opacity: "0.5".to_string(),
+            sankey_label_color: "#333333".to_string(),
             // Quadrant chart - neutral theme (grayscale)
             quadrant1_fill: "#f0f0f0".to_string(),
             quadrant2_fill: "#e0e0e0".to_string(),
@@ -442,6 +495,21 @@ impl Theme {
             crit_border_color: "#ff8888".to_string(),
             grid_color: "#6eaa49".to_string(),
             today_line_color: "#ff0000".to_string(),
+            // Sankey diagram - forest theme (green palette)
+            sankey_node_colors: vec![
+                "#6eaa49".to_string(), // medium green
+                "#487e3a".to_string(), // dark green
+                "#cde498".to_string(), // light green
+                "#13540c".to_string(), // very dark green
+                "#98d439".to_string(), // lime
+                "#4caf50".to_string(), // material green
+                "#8bc34a".to_string(), // light green
+                "#009688".to_string(), // teal
+                "#00695c".to_string(), // dark teal
+                "#2e7d32".to_string(), // forest green
+            ],
+            sankey_link_opacity: "0.5".to_string(),
+            sankey_label_color: "#333333".to_string(),
             // Quadrant chart - forest theme (green palette)
             quadrant1_fill: "#cde498".to_string(),
             quadrant2_fill: "#cdffb2".to_string(),
@@ -526,6 +594,21 @@ impl Theme {
             crit_border_color: "#ff8888".to_string(),
             grid_color: "#cccccc".to_string(),
             today_line_color: "#9370DB".to_string(),
+            // Sankey diagram - base theme (warm neutral palette)
+            sankey_node_colors: vec![
+                "#4e79a7".to_string(), // blue
+                "#f28e2c".to_string(), // orange
+                "#e15759".to_string(), // red
+                "#76b7b2".to_string(), // teal
+                "#59a14f".to_string(), // green
+                "#edc949".to_string(), // yellow
+                "#af7aa1".to_string(), // purple
+                "#ff9da7".to_string(), // pink
+                "#9c755f".to_string(), // brown
+                "#bab0ab".to_string(), // gray
+            ],
+            sankey_link_opacity: "0.5".to_string(),
+            sankey_label_color: "#333333".to_string(),
             // Quadrant chart - base theme (warm pastels)
             quadrant1_fill: "#fff4dd".to_string(),
             quadrant2_fill: "#dde4ff".to_string(),
@@ -761,6 +844,37 @@ marker path {{
             crit_border_color: "#ff8888".to_string(),
             grid_color: grid_color.to_hex(),
             today_line_color: "#ff0000".to_string(),
+
+            // Sankey diagram colors (derived from primary colors + D3 Tableau 10)
+            sankey_node_colors: if dark_mode {
+                vec![
+                    "#5c8eb8".to_string(),
+                    "#d9a066".to_string(),
+                    "#c86b6d".to_string(),
+                    "#6aa8a3".to_string(),
+                    "#5a9c52".to_string(),
+                    "#d4bc5a".to_string(),
+                    "#9d7090".to_string(),
+                    "#e08e96".to_string(),
+                    "#8d6b54".to_string(),
+                    "#9e958f".to_string(),
+                ]
+            } else {
+                vec![
+                    "#4e79a7".to_string(),
+                    "#f28e2c".to_string(),
+                    "#e15759".to_string(),
+                    "#76b7b2".to_string(),
+                    "#59a14f".to_string(),
+                    "#edc949".to_string(),
+                    "#af7aa1".to_string(),
+                    "#ff9da7".to_string(),
+                    "#9c755f".to_string(),
+                    "#bab0ab".to_string(),
+                ]
+            },
+            sankey_link_opacity: "0.5".to_string(),
+            sankey_label_color: primary_text.to_hex(),
 
             // Quadrant chart colors (derived)
             quadrant1_fill: color::lighten(&primary_color, 20.0).to_hex(),

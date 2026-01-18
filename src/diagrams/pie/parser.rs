@@ -24,6 +24,10 @@ static ACC_DESCR_MULTILINE_START_RE: LazyLock<Regex> =
 
 static COMMENT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*%%").unwrap());
 
+// Title on separate line (without quotes, after pie header)
+static TITLE_LINE_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)^\s*title\s+(.+)$").unwrap());
+
 /// Parse a pie chart diagram
 pub fn parse(input: &str) -> Result<PieDb> {
     let mut db = PieDb::new();
@@ -106,6 +110,13 @@ pub fn parse_into(input: &str, db: &mut PieDb) -> Result<()> {
         // Check for multiline accDescr start
         if ACC_DESCR_MULTILINE_START_RE.is_match(line) {
             in_multiline_descr = true;
+            i += 1;
+            continue;
+        }
+
+        // Check for separate-line title (mermaid.js supports "title X" on its own line)
+        if let Some(caps) = TITLE_LINE_RE.captures(line) {
+            db.set_diagram_title(caps.get(1).unwrap().as_str().trim());
             i += 1;
             continue;
         }

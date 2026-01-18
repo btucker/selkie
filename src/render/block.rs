@@ -724,7 +724,7 @@ fn generate_block_css(
 }}
 .block-edge {{
   stroke: {line_color};
-  stroke-width: 2px;
+  stroke-width: 1px;
   fill: none;
 }}
 .edge-label {{
