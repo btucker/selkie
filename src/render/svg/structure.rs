@@ -691,40 +691,84 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
 
         // Also check for node containers (<g class="node" transform="translate(x,y)">)
         // These contain child <path> or <rect> elements that define the box bounds
-        // Handles: ER diagrams (entity-*), block diagrams (block-*), mermaid.js nodes (id-*)
+        // Handles: ER diagrams (entity-*), block diagrams (block-*), mermaid.js nodes (id-*),
+        // and timeline diagrams (taskWrapper, eventWrapper, timeline-node)
         if node.tag_name().name() == "g" {
             let class = node.attribute("class").unwrap_or("");
             let id = node.attribute("id").unwrap_or("");
 
-            // Match nodes from various diagram types
-            let is_node_group = class.contains("node")
-                && (id.contains("entity")
-                    || id.starts_with("block-")
-                    || id.starts_with("id-")
-                    || id.starts_with("id")
-                    || id.starts_with("node-"));
+            // Match nodes from various diagram types including timeline
+            let is_timeline_node = class.contains("taskWrapper")
+                || class.contains("eventWrapper")
+                || class.contains("timeline-node");
+
+            let is_node_group = is_timeline_node
+                || (class.contains("node")
+                    && (id.contains("entity")
+                        || id.starts_with("block-")
+                        || id.starts_with("id-")
+                        || id.starts_with("id")
+                        || id.starts_with("node-")));
 
             if is_node_group {
                 // Parse transform="translate(x, y)"
                 if let Some(transform) = node.attribute("transform") {
                     if let Some((cx, cy)) = parse_translate(transform) {
-                        // Find first child path to get bounds
-                        for child in node.children() {
-                            if child.tag_name().name() == "path" {
-                                if let Some(d) = child.attribute("d") {
-                                    if let Some((half_w, half_h)) = parse_rect_path_dimensions(d) {
+                        let mut found_bounds = false;
+
+                        // Find path element in children or grandchildren (timeline nodes nest paths deeper)
+                        let path_candidates: Vec<_> = node
+                            .descendants()
+                            .filter(|n| n.tag_name().name() == "path")
+                            .filter(|n| {
+                                // For timeline, look for node-bkg paths
+                                let path_class = n.attribute("class").unwrap_or("");
+                                path_class.contains("node-bkg") || !is_timeline_node
+                            })
+                            .collect();
+
+                        for path_node in path_candidates {
+                            if let Some(d) = path_node.attribute("d") {
+                                // Try mermaid-style rect path first
+                                if let Some((half_w, half_h)) = parse_rect_path_dimensions(d) {
+                                    geometry.node_bounds.push(NodeBounds {
+                                        x: cx - half_w,
+                                        y: cy - half_h,
+                                        width: half_w * 2.0,
+                                        height: half_h * 2.0,
+                                        id: id.to_string(),
+                                    });
+                                    found_bounds = true;
+                                    break;
+                                }
+                                // For timeline nodes, try timeline path parser
+                                // Timeline paths are in local coords (0,0 = transform origin)
+                                if is_timeline_node {
+                                    if let Some((w, h)) = parse_timeline_path_dimensions(d) {
                                         geometry.node_bounds.push(NodeBounds {
-                                            x: cx - half_w,
-                                            y: cy - half_h,
-                                            width: half_w * 2.0,
-                                            height: half_h * 2.0,
-                                            id: id.to_string(),
+                                            x: cx,
+                                            y: cy,
+                                            width: w,
+                                            height: h,
+                                            id: if id.is_empty() {
+                                                class.to_string()
+                                            } else {
+                                                id.to_string()
+                                            },
                                         });
+                                        found_bounds = true;
                                         break;
                                     }
                                 }
                             }
-                            // Also check for rect child (LINE-ITEM uses this)
+                        }
+
+                        if found_bounds {
+                            continue;
+                        }
+
+                        // Also check for rect child (LINE-ITEM uses this)
+                        for child in node.children() {
                             if child.tag_name().name() == "rect" {
                                 let rx = child
                                     .attribute("x")
@@ -870,7 +914,7 @@ fn extract_text_bounds(doc: &roxmltree::Document, node_bounds: &[NodeBounds]) ->
                 continue;
             }
 
-            // Get position from x/y attributes or parent transform
+            // Get position from x/y attributes
             let mut x = node
                 .attribute("x")
                 .and_then(|s| s.parse::<f64>().ok())
@@ -880,14 +924,16 @@ fn extract_text_bounds(doc: &roxmltree::Document, node_bounds: &[NodeBounds]) ->
                 .and_then(|s| s.parse::<f64>().ok())
                 .unwrap_or(0.0);
 
-            // Check for parent group transform
-            if let Some(parent) = node.parent() {
+            // Accumulate transforms from all ancestor groups
+            let mut current = node.parent();
+            while let Some(parent) = current {
                 if let Some(transform) = parent.attribute("transform") {
                     if let Some((tx, ty)) = parse_translate(transform) {
                         x += tx;
                         y += ty;
                     }
                 }
+                current = parent.parent();
             }
 
             // Estimate text width based on content length and font size
@@ -1091,8 +1137,11 @@ fn parse_translate(transform: &str) -> Option<(f64, f64)> {
         let rest = &transform[start + 10..];
         if let Some(end) = rest.find(')') {
             let coords = &rest[..end];
-            // Split by comma or space
-            let parts: Vec<&str> = coords.split([',', ' ']).collect();
+            // Split by comma or space, filter empty parts
+            let parts: Vec<&str> = coords
+                .split([',', ' '])
+                .filter(|s| !s.is_empty())
+                .collect();
             if parts.len() >= 2 {
                 let x = parts[0].trim().parse::<f64>().ok()?;
                 let y = parts[1].trim().parse::<f64>().ok()?;
@@ -1137,11 +1186,152 @@ fn parse_rect_path_dimensions(d: &str) -> Option<(f64, f64)> {
             coords[comma_idx + 1..].parse::<f64>().ok()?
         };
 
-        // Return absolute values as half-dimensions
-        return Some((x.abs(), y.abs()));
+        // Only valid if both coordinates are negative (mermaid rect style)
+        // This distinguishes from timeline paths that start at M0 Y
+        if x < 0.0 && y < 0.0 {
+            // Return absolute values as half-dimensions
+            return Some((x.abs(), y.abs()));
+        }
     }
 
     None
+}
+
+/// Parse timeline path dimensions from paths like "M0 63 v-58 q0,-5 5,-5 h210 q5,0 5,5 v63 H0 Z"
+/// Returns (width, height) based on the path's bounding box
+fn parse_timeline_path_dimensions(d: &str) -> Option<(f64, f64)> {
+    // Timeline paths start at M0 Y and use relative commands (v, h, q)
+    // We need to find the maximum extents
+    let normalized = normalize_path_commands(d);
+    let parts: Vec<&str> = normalized.split_whitespace().collect();
+
+    let mut x: f64 = 0.0;
+    let mut y: f64 = 0.0;
+    let mut min_x: f64 = 0.0;
+    let mut max_x: f64 = 0.0;
+    let mut min_y: f64 = 0.0;
+    let mut max_y: f64 = 0.0;
+    let mut i = 0;
+
+    while i < parts.len() {
+        let part = parts[i];
+
+        if part == "M" || part.starts_with('M') {
+            // Move to absolute position
+            let (mx, my) = if part == "M" {
+                i += 1;
+                let mx_str = parts.get(i)?;
+                i += 1;
+                let my_str = parts.get(i)?;
+                (mx_str.parse::<f64>().ok()?, my_str.parse::<f64>().ok()?)
+            } else if let Some((px, py)) = parse_inline_coords(&part[1..]) {
+                // Handle M-x,-y or Mx,y format
+                (px, py)
+            } else {
+                // Handle Mx y format (x is inline, y is next part)
+                let mx = part[1..].parse::<f64>().ok()?;
+                i += 1;
+                let my = parts.get(i)?.parse::<f64>().ok()?;
+                (mx, my)
+            };
+            x = mx;
+            y = my;
+            min_x = min_x.min(x);
+            max_x = max_x.max(x);
+            min_y = min_y.min(y);
+            max_y = max_y.max(y);
+        } else if part == "v" || part.starts_with('v') {
+            // Relative vertical line
+            let dy = if part == "v" {
+                i += 1;
+                parts.get(i)?.parse::<f64>().ok()?
+            } else {
+                part[1..].parse::<f64>().ok()?
+            };
+            y += dy;
+            min_y = min_y.min(y);
+            max_y = max_y.max(y);
+        } else if part == "V" || part.starts_with('V') {
+            // Absolute vertical line
+            let new_y = if part == "V" {
+                i += 1;
+                parts.get(i)?.parse::<f64>().ok()?
+            } else {
+                part[1..].parse::<f64>().ok()?
+            };
+            y = new_y;
+            min_y = min_y.min(y);
+            max_y = max_y.max(y);
+        } else if part == "h" || part.starts_with('h') {
+            // Relative horizontal line
+            let dx = if part == "h" {
+                i += 1;
+                parts.get(i)?.parse::<f64>().ok()?
+            } else {
+                part[1..].parse::<f64>().ok()?
+            };
+            x += dx;
+            min_x = min_x.min(x);
+            max_x = max_x.max(x);
+        } else if part == "H" || part.starts_with('H') {
+            // Absolute horizontal line
+            let new_x = if part == "H" {
+                i += 1;
+                parts.get(i)?.parse::<f64>().ok()?
+            } else {
+                part[1..].parse::<f64>().ok()?
+            };
+            x = new_x;
+            min_x = min_x.min(x);
+            max_x = max_x.max(x);
+        } else if part == "q" || part.starts_with('q') {
+            // Relative quadratic curve - skip control point, move to endpoint
+            // Format: q cx,cy ex,ey OR q cx cy ex ey
+            if part == "q" {
+                // Skip 4 values (control x, y, end x, y)
+                i += 1; // cx
+                i += 1; // cy
+                i += 1; // ex
+                if let Some(ey_str) = parts.get(i) {
+                    // Get the endpoint relative offsets
+                    let ex_str = parts.get(i - 1)?;
+                    let ex = ex_str.trim_matches(',').parse::<f64>().ok()?;
+                    let ey = ey_str.trim_matches(',').parse::<f64>().ok()?;
+                    x += ex;
+                    y += ey;
+                    min_x = min_x.min(x);
+                    max_x = max_x.max(x);
+                    min_y = min_y.min(y);
+                    max_y = max_y.max(y);
+                }
+            } else {
+                // Inline control point like q0,-5 followed by endpoint 5,-5
+                // The control point is in this part, endpoint is in next part
+                i += 1;
+                if let Some(endpoint_str) = parts.get(i) {
+                    if let Some((ex, ey)) = parse_inline_coords(endpoint_str) {
+                        x += ex;
+                        y += ey;
+                        min_x = min_x.min(x);
+                        max_x = max_x.max(x);
+                        min_y = min_y.min(y);
+                        max_y = max_y.max(y);
+                    }
+                }
+            }
+        }
+
+        i += 1;
+    }
+
+    let width = max_x - min_x;
+    let height = max_y - min_y;
+
+    if width > 0.0 && height > 0.0 {
+        Some((width, height))
+    } else {
+        None
+    }
 }
 
 /// Parse path with initial direction: returns (start, second_point, end)

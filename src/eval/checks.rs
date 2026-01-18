@@ -56,6 +56,9 @@ pub fn check_structure(
     check_text_overflow(selkie, &mut issues);
     check_element_spacing(selkie, &mut issues);
 
+    // Comparative text placement checks
+    check_text_placement(selkie, reference, &mut issues);
+
     // INFO checks - acceptable variations
     check_extra_labels(selkie, reference, &mut issues);
     check_markers(selkie, reference, &mut issues);
@@ -1513,6 +1516,174 @@ fn check_element_spacing(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
             ),
         ));
     }
+}
+
+/// Check text placement within nodes by comparing vertical centering
+/// This detects issues where text is not properly centered/positioned within containing nodes
+fn check_text_placement(
+    selkie: &SvgStructure,
+    reference: &SvgStructure,
+    issues: &mut Vec<Issue>,
+) {
+    let selkie_text = &selkie.edge_geometry.text_bounds;
+    let selkie_nodes = &selkie.edge_geometry.node_bounds;
+    let ref_text = &reference.edge_geometry.text_bounds;
+    let ref_nodes = &reference.edge_geometry.node_bounds;
+
+    // Skip if not enough data to compare
+    if selkie_text.is_empty() || ref_text.is_empty() {
+        return;
+    }
+
+    // Calculate average vertical offset (text_y relative to containing node top) for both
+    let selkie_offsets = calculate_text_vertical_offsets(selkie_text, selkie_nodes);
+    let ref_offsets = calculate_text_vertical_offsets(ref_text, ref_nodes);
+
+    if selkie_offsets.is_empty() || ref_offsets.is_empty() {
+        return;
+    }
+
+    // Calculate average relative vertical position (0 = top, 0.5 = center, 1 = bottom)
+    let selkie_avg_rel: f64 = selkie_offsets.iter().map(|(_, rel, _)| rel).sum::<f64>()
+        / selkie_offsets.len() as f64;
+    let ref_avg_rel: f64 =
+        ref_offsets.iter().map(|(_, rel, _)| rel).sum::<f64>() / ref_offsets.len() as f64;
+
+    // Difference in relative position - significant if > 0.15 (15% of node height)
+    let rel_diff = (selkie_avg_rel - ref_avg_rel).abs();
+
+    if rel_diff > 0.15 {
+        let selkie_pos = if selkie_avg_rel < 0.35 {
+            "near top"
+        } else if selkie_avg_rel > 0.65 {
+            "near bottom"
+        } else {
+            "centered"
+        };
+        let ref_pos = if ref_avg_rel < 0.35 {
+            "near top"
+        } else if ref_avg_rel > 0.65 {
+            "near bottom"
+        } else {
+            "centered"
+        };
+
+        issues.push(
+            Issue::warning(
+                "text_placement",
+                format!(
+                    "Text vertical placement differs: selkie positions text {} ({:.0}% from top), \
+                     reference positions text {} ({:.0}% from top). Difference: {:.0}%",
+                    selkie_pos,
+                    selkie_avg_rel * 100.0,
+                    ref_pos,
+                    ref_avg_rel * 100.0,
+                    rel_diff * 100.0
+                ),
+            )
+            .with_values(
+                format!("{:.0}% from top", ref_avg_rel * 100.0),
+                format!("{:.0}% from top", selkie_avg_rel * 100.0),
+            ),
+        );
+    }
+
+    // Also check for specific text elements with significant placement differences
+    let mut placement_mismatches = Vec::new();
+
+    for (selkie_offset, selkie_rel, selkie_label) in &selkie_offsets {
+        // Find matching text in reference by label content
+        let matching_ref = ref_offsets.iter().find(|(_, _, ref_label)| {
+            // Match by first word or full content
+            let selkie_first = selkie_label.split_whitespace().next().unwrap_or("");
+            let ref_first = ref_label.split_whitespace().next().unwrap_or("");
+            selkie_first == ref_first || selkie_label == ref_label
+        });
+
+        if let Some((ref_offset, ref_rel, _)) = matching_ref {
+            let offset_diff = (selkie_offset - ref_offset).abs();
+            let rel_diff = (selkie_rel - ref_rel).abs();
+
+            // Report if absolute offset differs by > 10px OR relative position by > 20%
+            if offset_diff > 10.0 || rel_diff > 0.2 {
+                // Truncate label for display
+                let label_preview = if selkie_label.len() > 20 {
+                    format!("{}...", &selkie_label[..20])
+                } else {
+                    selkie_label.clone()
+                };
+
+                placement_mismatches.push(format!(
+                    "\"{}\" at y-offset {:.0}px ({:.0}%) vs reference {:.0}px ({:.0}%)",
+                    label_preview,
+                    selkie_offset,
+                    selkie_rel * 100.0,
+                    ref_offset,
+                    ref_rel * 100.0
+                ));
+            }
+        }
+    }
+
+    if !placement_mismatches.is_empty() {
+        issues.push(Issue::warning(
+            "text_placement_details",
+            format!(
+                "TEXT PLACEMENT MISMATCHES ({} issues):\n  {}",
+                placement_mismatches.len(),
+                placement_mismatches.join("\n  ")
+            ),
+        ));
+    }
+}
+
+/// Calculate vertical offsets for text elements relative to their containing nodes
+/// Returns Vec of (absolute_offset_from_top, relative_position_0_to_1, label_text)
+fn calculate_text_vertical_offsets(
+    text_bounds: &[crate::render::svg::structure::TextBounds],
+    node_bounds: &[NodeBounds],
+) -> Vec<(f64, f64, String)> {
+    let mut offsets = Vec::new();
+
+    for text in text_bounds {
+        // Find containing node - first by parent ID, then by geometric containment
+        let mut containing_node = None;
+
+        // Try parent ID match first
+        if let Some(ref parent_id) = text.parent_node_id {
+            containing_node = node_bounds.iter().find(|n| n.id == *parent_id);
+        }
+
+        // Fall back to geometric containment if parent ID match failed or wasn't available
+        if containing_node.is_none() {
+            containing_node = node_bounds.iter().find(|n| {
+                let x_in = text.x >= n.x - 10.0 && text.x <= n.x + n.width + 10.0;
+                let y_in = text.y >= n.y - 10.0 && text.y <= n.y + n.height + 10.0;
+                x_in && y_in
+            });
+        }
+
+        if let Some(node) = containing_node {
+            // Calculate text vertical center relative to node
+            let text_center_y = text.y + text.height / 2.0;
+            let node_top = node.y;
+            let node_height = node.height;
+
+            // Absolute offset from top of node
+            let offset = text_center_y - node_top;
+
+            // Relative position (0 = top, 0.5 = center, 1 = bottom)
+            let relative = if node_height > 0.0 {
+                offset / node_height
+            } else {
+                0.5
+            };
+
+            offsets.push((offset, relative, text.text.clone()));
+        }
+    }
+
+    offsets
 }
 
 #[cfg(test)]

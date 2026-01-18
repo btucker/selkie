@@ -308,8 +308,9 @@ fn render_section_node(
         attrs: Attrs::new().with_class(&format!("node-line-{}", section_num)),
     });
 
-    // Text (centered)
-    let text_elem = wrap_text(text, width / 2.0, height / 2.0, width - NODE_PADDING * 2.0);
+    // Text - positioned near top to match mermaid.js (translate(_, 10))
+    let text_y = 10.0; // Match mermaid's translate(_, 10) for text group position
+    let text_elem = wrap_text(text, width / 2.0, text_y, width - NODE_PADDING * 2.0);
     group_children.push(text_elem);
 
     let group = SvgElement::Group {
@@ -401,8 +402,10 @@ fn render_task_node(
         attrs: Attrs::new().with_class(&format!("node-line-{}", section_color)),
     });
 
-    // Text
-    let text_elem = wrap_text(&task.task, width / 2.0, height / 2.0, TEXT_WRAP_WIDTH);
+    // Text - positioned near top to match mermaid.js (translate(_, 10))
+    // Reference uses y=10 from node top, not centered
+    let text_y = 10.0; // Match mermaid's translate(_, 10) for text group position
+    let text_elem = wrap_text(&task.task, width / 2.0, text_y, TEXT_WRAP_WIDTH);
     task_children.push(text_elem);
 
     let task_group = SvgElement::Group {
@@ -509,8 +512,9 @@ fn render_event_node(
         attrs: Attrs::new().with_class(&format!("node-line-{}", section_color)),
     });
 
-    // Text
-    let text_elem = wrap_text(text, width / 2.0, height / 2.0, TEXT_WRAP_WIDTH);
+    // Text - positioned near top to match mermaid.js (translate(_, 10))
+    let text_y = 10.0; // Match mermaid's translate(_, 10) for text group position
+    let text_elem = wrap_text(text, width / 2.0, text_y, TEXT_WRAP_WIDTH);
     event_children.push(text_elem);
 
     let event_group = SvgElement::Group {
