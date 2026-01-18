@@ -63,7 +63,7 @@ fn calculate_requirement_dimensions(req: &Requirement) -> BoxDimensions {
         .max(risk_width)
         .max(verify_width);
 
-    let width = (content_width + BOX_PADDING * 4.0).max(DEFAULT_REQ_BOX_WIDTH);
+    let width = (content_width + BOX_PADDING * 2.0).max(DEFAULT_REQ_BOX_WIDTH);
 
     // Calculate height based on content
     let mut line_count = 1; // Type header
@@ -102,7 +102,7 @@ fn calculate_element_dimensions(elem: &Element) -> BoxDimensions {
     };
 
     let content_width = name_width.max(type_width).max(docref_width);
-    let width = (content_width + BOX_PADDING * 4.0).max(DEFAULT_ELEM_BOX_WIDTH);
+    let width = (content_width + BOX_PADDING * 2.0).max(DEFAULT_ELEM_BOX_WIDTH);
 
     let mut line_count = 1; // Element header
     if !elem.element_type.is_empty() {
@@ -177,9 +177,9 @@ impl ToLayoutGraph for RequirementDb {
 
         graph.options = LayoutOptions {
             direction,
-            node_spacing: 30.0,  // Reduced from 50 to match tighter mermaid layout
-            layer_spacing: 60.0, // Reduced from 80 to match tighter mermaid layout
-            padding: Padding::uniform(10.0), // Reduced from 20 to match mermaid
+            node_spacing: 20.0,             // Match mermaid's tighter layout
+            layer_spacing: 50.0,            // Match mermaid's default rankSpacing
+            padding: Padding::uniform(8.0), // Match mermaid's padding
             ..Default::default()
         };
 
