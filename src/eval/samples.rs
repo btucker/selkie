@@ -401,6 +401,10 @@ fn detect_diagram_type(source: &str) -> String {
         "treemap".to_string()
     } else if first_line.starts_with("xychart") {
         "xychart".to_string()
+    } else if first_line.starts_with("radar") {
+        "radar".to_string()
+    } else if first_line.starts_with("packet") {
+        "packet".to_string()
     } else if first_line.starts_with("block-beta") || first_line.starts_with("block") {
         "block".to_string()
     } else {
