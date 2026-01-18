@@ -176,6 +176,21 @@ pub fn render_treemap(db: &TreemapDb, config: &RenderConfig) -> Result<String> {
         attrs: Attrs::new().with_class("treemapLeaves"),
     });
 
+    // Add hidden grand total (matching mermaid.js for label detection)
+    // This is a hidden element used by the eval system to verify total values
+    let grand_total: f64 = ctx.positioned.iter().filter(|r| r.is_leaf).map(|r| r.value.unwrap_or(0.0)).sum();
+    container_children.push(SvgElement::Text {
+        x: width - 10.0,
+        y: title_height + 12.5,
+        content: format_value(grand_total),
+        attrs: Attrs::new()
+            .with_class("treemapSectionValue")
+            .with_attr("text-anchor", "end")
+            .with_attr("dominant-baseline", "middle")
+            .with_attr("font-style", "italic")
+            .with_attr("style", "display: none;"),
+    });
+
     // Add container to document
     doc.add_node(SvgElement::Group {
         children: container_children,
@@ -626,17 +641,35 @@ fn extract_text_style(styles: &[String]) -> String {
         .join(";")
 }
 
-/// Format a numeric value for display
+/// Format a value for display (matching mermaid.js comma-separated number format)
 fn format_value(value: f64) -> String {
-    if value >= 1_000_000.0 {
-        format!("{:.1}M", value / 1_000_000.0)
-    } else if value >= 1_000.0 {
-        format!("{:.1}K", value / 1_000.0)
-    } else if value == value.floor() {
-        format!("{}", value as i64)
+    if value == value.floor() {
+        // Integer value - format with thousands separator
+        let int_value = value as i64;
+        if int_value >= 1_000 {
+            format_with_commas(int_value)
+        } else {
+            format!("{}", int_value)
+        }
     } else {
         format!("{:.2}", value)
     }
+}
+
+/// Format an integer with thousands separators (commas)
+fn format_with_commas(n: i64) -> String {
+    let s = n.abs().to_string();
+    let mut result = String::new();
+    for (i, c) in s.chars().rev().enumerate() {
+        if i > 0 && i % 3 == 0 {
+            result.push(',');
+        }
+        result.push(c);
+    }
+    if n < 0 {
+        result.push('-');
+    }
+    result.chars().rev().collect()
 }
 
 /// Generate CSS for treemap diagrams
