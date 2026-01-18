@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="706" viewBox="0 0 1100 706" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="713.8" viewBox="0 0 1200 713.8" class="mermaid">
   <style>
 
 .mermaid {
@@ -346,67 +346,67 @@ marker path {
                 <path d="M 0,0 V 4 L6,2 Z"></path>
             </marker>
     </defs>
-    <text x="450" y="20" class="titleText" text-anchor="middle" font-size="4ex" font-weight="bold">England&apos;s History Timeline</text>
+    <text x="500" y="20" class="titleText" font-size="4ex" font-weight="bold" text-anchor="middle">England&apos;s History Timeline</text>
     <g class="timeline-node section-0" transform="translate(100, 50)">
       <path d="M0 63 v-58 q0,-5 5,-5 h340 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="68" x2="350" y2="68" class="node-line-0"/>
-      <text x="175" y="34" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" dy="1em">Stone Age</text>
+      <text x="175" y="34" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em">Stone Age</text>
     </g>
     <g class="taskWrapper timeline-node section-0" transform="translate(100, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h210 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="68" x2="220" y2="68" class="node-line-0"/>
-      <text x="110" y="34" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">7600 BC</text>
+      <text x="110" y="34" dy="1em" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle">7600 BC</text>
     </g>
     <g class="lineWrapper">
-      <line x1="210" y1="236" x2="210" y2="576" stroke-dasharray="5,5" stroke-width="2" stroke="black" marker-end="url(#arrowhead)"/>
+      <line x1="210" y1="236" x2="210" y2="583.8" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke="black"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(100, 336)">
-      <path d="M0 60 v-55 q0,-5 5,-5 h210 q5,0 5,5 v60 H0 Z" class="node-bkg node-section-0"/>
-      <line x1="0" y1="65" x2="220" y2="65" class="node-line-0"/>
+      <path d="M0 67.80000000000001 v-62.80000000000001 q0,-5 5,-5 h210 q5,0 5,5 v67.80000000000001 H0 Z" class="node-bkg node-section-0"/>
+      <line x1="0" y1="72.80000000000001" x2="220" y2="72.80000000000001" class="node-line-0"/>
       <g>
-        <text x="110" y="6.099999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">Britain&apos;s oldest known</tspan><tspan x="110" dy="1.1em">house was built in</tspan><tspan x="110" dy="1.1em">Orkney, Scotland</tspan></text>
+        <text x="110" y="1.2000000000000028" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">Britain&apos;s oldest</tspan><tspan x="110" dy="1.1em">known house was</tspan><tspan x="110" dy="1.1em">built in Orkney,</tspan><tspan x="110" dy="1.1em">Scotland</tspan></text>
       </g>
     </g>
     <g class="taskWrapper timeline-node section-0" transform="translate(300, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h210 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="68" x2="220" y2="68" class="node-line-0"/>
-      <text x="110" y="34" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">6000 BC</text>
+      <text x="110" y="34" dominant-baseline="middle" text-anchor="middle" dy="1em" alignment-baseline="middle">6000 BC</text>
     </g>
     <g class="lineWrapper">
-      <line x1="410" y1="236" x2="410" y2="576" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke-width="2" stroke="black"/>
+      <line x1="410" y1="236" x2="410" y2="583.8" stroke="black" stroke-dasharray="5,5" marker-end="url(#arrowhead)" stroke-width="2"/>
     </g>
     <g class="eventWrapper timeline-node section-0" transform="translate(300, 336)">
       <path d="M0 60 v-55 q0,-5 5,-5 h210 q5,0 5,5 v60 H0 Z" class="node-bkg node-section-0"/>
       <line x1="0" y1="65" x2="220" y2="65" class="node-line-0"/>
       <g>
-        <text x="110" y="6.099999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">Sea levels rise and</tspan><tspan x="110" dy="1.1em">Britain becomes an</tspan><tspan x="110" dy="1.1em">island.</tspan></text>
+        <text x="110" y="6.099999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">Sea levels rise</tspan><tspan x="110" dy="1.1em">and Britain</tspan><tspan x="110" dy="1.1em">becomes an island.</tspan></text>
       </g>
     </g>
     <g class="timeline-node section-1" transform="translate(500, 50)">
       <path d="M0 63 v-58 q0,-5 5,-5 h340 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="68" x2="350" y2="68" class="node-line-1"/>
-      <text x="175" y="34" dominant-baseline="middle" text-anchor="middle" dy="1em" alignment-baseline="middle">Bronze Age</text>
+      <text x="175" y="34" dominant-baseline="middle" dy="1em" alignment-baseline="middle" text-anchor="middle">Bronze Age</text>
     </g>
     <g class="taskWrapper timeline-node section-1" transform="translate(500, 168)">
       <path d="M0 63 v-58 q0,-5 5,-5 h210 q5,0 5,5 v63 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="68" x2="220" y2="68" class="node-line-1"/>
-      <text x="110" y="34" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em">2300 BC</text>
+      <text x="110" y="34" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" dy="1em">2300 BC</text>
     </g>
     <g class="lineWrapper">
-      <line x1="610" y1="236" x2="610" y2="576" stroke-width="2" stroke="black" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+      <line x1="610" y1="236" x2="610" y2="583.8" marker-end="url(#arrowhead)" stroke-dasharray="5,5" stroke-width="2" stroke="black"/>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(500, 336)">
       <path d="M0 60 v-55 q0,-5 5,-5 h210 q5,0 5,5 v60 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="65" x2="220" y2="65" class="node-line-1"/>
       <g>
-        <text x="110" y="14.899999999999999" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">People arrive from Europe</tspan><tspan x="110" dy="1.1em">and settle in Britain.</tspan></text>
+        <text x="110" y="6.099999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">People arrive from</tspan><tspan x="110" dy="1.1em">Europe and settle</tspan><tspan x="110" dy="1.1em">in Britain.</tspan></text>
       </g>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(500, 411)">
-      <path d="M0 60 v-55 q0,-5 5,-5 h210 q5,0 5,5 v60 H0 Z" class="node-bkg node-section-1"/>
-      <line x1="0" y1="65" x2="220" y2="65" class="node-line-1"/>
+      <path d="M0 67.80000000000001 v-62.80000000000001 q0,-5 5,-5 h210 q5,0 5,5 v67.80000000000001 H0 Z" class="node-bkg node-section-1"/>
+      <line x1="0" y1="72.80000000000001" x2="220" y2="72.80000000000001" class="node-line-1"/>
       <g>
-        <text x="110" y="6.099999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">New styles of pottery and</tspan><tspan x="110" dy="1.1em">ways of burying the dead</tspan><tspan x="110" dy="1.1em">appear.</tspan></text>
+        <text x="110" y="1.2000000000000028" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">New styles of</tspan><tspan x="110" dy="1.1em">pottery and ways</tspan><tspan x="110" dy="1.1em">of burying the</tspan><tspan x="110" dy="1.1em">dead appear.</tspan></text>
       </g>
     </g>
     <g class="taskWrapper timeline-node section-1" transform="translate(700, 168)">
@@ -415,24 +415,24 @@ marker path {
       <text x="110" y="34" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle">2200 BC</text>
     </g>
     <g class="lineWrapper">
-      <line x1="810" y1="236" x2="810" y2="576" stroke="black" stroke-dasharray="5,5" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <line x1="810" y1="236" x2="810" y2="583.8" stroke="black" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
     </g>
     <g class="eventWrapper timeline-node section-1" transform="translate(700, 336)">
-      <path d="M0 60 v-55 q0,-5 5,-5 h210 q5,0 5,5 v60 H0 Z" class="node-bkg node-section-1"/>
-      <line x1="0" y1="65" x2="220" y2="65" class="node-line-1"/>
+      <path d="M0 67.80000000000001 v-62.80000000000001 q0,-5 5,-5 h210 q5,0 5,5 v67.80000000000001 H0 Z" class="node-bkg node-section-1"/>
+      <line x1="0" y1="72.80000000000001" x2="220" y2="72.80000000000001" class="node-line-1"/>
       <g>
-        <text x="110" y="6.099999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">The last major building</tspan><tspan x="110" dy="1.1em">works are completed at</tspan><tspan x="110" dy="1.1em">Stonehenge.</tspan></text>
+        <text x="110" y="1.2000000000000028" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">The last major</tspan><tspan x="110" dy="1.1em">building works are</tspan><tspan x="110" dy="1.1em">completed at</tspan><tspan x="110" dy="1.1em">Stonehenge.</tspan></text>
       </g>
     </g>
-    <g class="eventWrapper timeline-node section-1" transform="translate(700, 411)">
+    <g class="eventWrapper timeline-node section-1" transform="translate(700, 418.8)">
       <path d="M0 60 v-55 q0,-5 5,-5 h210 q5,0 5,5 v60 H0 Z" class="node-bkg node-section-1"/>
       <line x1="0" y1="65" x2="220" y2="65" class="node-line-1"/>
       <g>
-        <text x="110" y="14.899999999999999" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">The first metal objects</tspan><tspan x="110" dy="1.1em">are made in Britain.</tspan></text>
+        <text x="110" y="6.099999999999998" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em"><tspan x="110" dy="0em">The first metal</tspan><tspan x="110" dy="1.1em">objects are made</tspan><tspan x="110" dy="1.1em">in Britain.</tspan></text>
       </g>
     </g>
     <g class="lineWrapper">
-      <line x1="100" y1="286" x2="1000" y2="286" marker-end="url(#arrowhead)" stroke="black" stroke-width="4"/>
+      <line x1="100" y1="286" x2="1100" y2="286" stroke-width="4" marker-end="url(#arrowhead)" stroke="black"/>
     </g>
   </g>
 </svg>

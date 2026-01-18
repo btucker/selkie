@@ -14,6 +14,7 @@ use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 const LEFT_MARGIN: f64 = 100.0; // Match reference (starts content at x=200 from viewBox x=100)
 const TOP_MARGIN: f64 = 50.0;
 const NODE_WIDTH: f64 = 180.0; // Match reference (h180 in path)
+const TEXT_WRAP_WIDTH: f64 = 150.0; // Reference uses width: 150 for text wrapping
 const NODE_PADDING: f64 = 20.0;
 const COLUMN_WIDTH: f64 = 200.0;
 const SECTION_HEIGHT: f64 = 68.0; // ~68px in reference
@@ -116,7 +117,7 @@ fn calculate_layout(
     let max_section_height: f64 = if has_sections {
         let mut max_height: f64 = 0.0;
         for section in sections {
-            let height = estimate_node_height(section, NODE_WIDTH);
+            let height = estimate_node_height(section, TEXT_WRAP_WIDTH);
             max_height = max_height.max(height);
         }
         max_height.max(SECTION_HEIGHT)
@@ -130,14 +131,14 @@ fn calculate_layout(
     let mut max_event_line_length: f64 = 0.0;
 
     for task in tasks {
-        let height = estimate_node_height(&task.task, NODE_WIDTH);
+        let height = estimate_node_height(&task.task, TEXT_WRAP_WIDTH);
         max_task_height = max_task_height.max(height);
         _max_event_count = _max_event_count.max(task.events.len());
 
         // Calculate event line length for this task
         let mut event_line_length: f64 = 0.0;
         for event in &task.events {
-            event_line_length += estimate_node_height(event, NODE_WIDTH);
+            event_line_length += estimate_node_height(event, TEXT_WRAP_WIDTH);
         }
         if !task.events.is_empty() {
             event_line_length += (task.events.len() - 1) as f64 * EVENT_SPACING;
@@ -149,7 +150,8 @@ fn calculate_layout(
     // Calculate total number of columns (tasks across all sections)
     let total_columns = tasks.len().max(1);
     // Width: left margin + columns + right margin for timeline arrow
-    let total_width = LEFT_MARGIN + (total_columns as f64) * COLUMN_WIDTH + LEFT_MARGIN * 2.0;
+    // Reference uses ~150px left margin and ~340px right margin for the arrow
+    let total_width = LEFT_MARGIN + (total_columns as f64) * COLUMN_WIDTH + LEFT_MARGIN * 3.0;
 
     // Calculate depth_y (position of timeline line)
     let section_begin_y = TOP_MARGIN;
@@ -393,7 +395,7 @@ fn render_task_node(
     });
 
     // Text
-    let text_elem = wrap_text(&task.task, width / 2.0, height / 2.0, NODE_WIDTH);
+    let text_elem = wrap_text(&task.task, width / 2.0, height / 2.0, TEXT_WRAP_WIDTH);
     task_children.push(text_elem);
 
     let task_group = SvgElement::Group {
@@ -444,7 +446,7 @@ fn render_events(
     // Render each event
     let mut event_y = task_bottom_y + TASK_GAP;
     for event in &task.events {
-        let event_height = estimate_node_height(event, NODE_WIDTH);
+        let event_height = estimate_node_height(event, TEXT_WRAP_WIDTH);
         render_event_node(
             doc,
             event,
@@ -501,7 +503,7 @@ fn render_event_node(
     });
 
     // Text
-    let text_elem = wrap_text(text, width / 2.0, height / 2.0, width - NODE_PADDING);
+    let text_elem = wrap_text(text, width / 2.0, height / 2.0, TEXT_WRAP_WIDTH);
     event_children.push(text_elem);
 
     let event_group = SvgElement::Group {
