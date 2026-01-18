@@ -12,7 +12,10 @@ mod git;
 mod mindmap;
 mod packet;
 mod pie;
+mod quadrant;
 mod radar;
+mod requirement;
+mod sankey;
 mod sequence;
 mod state;
 pub mod svg;
@@ -95,9 +98,12 @@ pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<St
         }
         Diagram::Mindmap(db) => mindmap::render_mindmap(db, config),
         Diagram::Timeline(db) => timeline::render_timeline(db, config),
+        Diagram::Requirement(db) => requirement::render_requirement(db, config),
+        Diagram::Sankey(db) => sankey::render_sankey(db, config),
         Diagram::Radar(db) => radar::render_radar(db, config),
         Diagram::Packet(db) => packet::render_packet(db, config),
         Diagram::XyChart(db) => xychart::render_xychart(db, config),
+        Diagram::Quadrant(db) => quadrant::render_quadrant(db, config),
         Diagram::Treemap(db) => treemap::render_treemap(db, config),
         _ => Err(MermaidError::RenderError(format!(
             "Diagram type {:?} not yet supported for rendering",

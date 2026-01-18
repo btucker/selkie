@@ -1,0 +1,1063 @@
+//! Requirement diagram rendering tests - ported from Cypress tests
+//!
+//! These tests are ported from the mermaid.js Cypress test suite:
+//! - cypress/integration/rendering/requirement.spec.js
+//! - cypress/integration/rendering/requirementDiagram-unified.spec.js
+
+use roxmltree::Document;
+use selkie::render::{render_text, render_with_config, RenderConfig, Theme};
+use selkie::{parse, render};
+
+fn render_requirement_svg(input: &str) -> String {
+    let diagram = parse(input).expect("Failed to parse requirement diagram");
+    render(&diagram).expect("Failed to render requirement diagram")
+}
+
+fn parse_svg(svg: &str) -> Document<'_> {
+    Document::parse(svg).expect("Failed to parse SVG")
+}
+
+fn has_class(doc: &Document<'_>, class_name: &str) -> bool {
+    doc.descendants().any(|node| {
+        node.attribute("class")
+            .map(|class| class.split_whitespace().any(|c| c == class_name))
+            .unwrap_or(false)
+    })
+}
+
+fn svg_contains_text(svg: &str, text: &str) -> bool {
+    svg.contains(text)
+}
+
+// ============================================================================
+// Basic Rendering Tests (from requirementDiagram-unified.spec.js)
+// ============================================================================
+
+#[test]
+fn should_render_a_simple_requirement_diagram() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let svg = render_requirement_svg(input);
+    let doc = parse_svg(&svg);
+
+    // Should have requirement and element nodes
+    assert!(
+        has_class(&doc, "requirement-node") || svg_contains_text(&svg, "test_req"),
+        "Should render requirement node"
+    );
+    assert!(
+        has_class(&doc, "element-node") || svg_contains_text(&svg, "test_entity"),
+        "Should render element node"
+    );
+
+    // Should contain the requirement text
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement name"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element name"
+    );
+}
+
+#[test]
+fn should_render_a_not_so_simple_requirement_diagram() {
+    let input = r#"requirementDiagram
+
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    functionalRequirement test_req2 {
+    id: 1.1
+    text: the second test text.
+    risk: low
+    verifymethod: inspection
+    }
+
+    performanceRequirement test_req3 {
+    id: 1.2
+    text: the third test text.
+    risk: medium
+    verifymethod: demonstration
+    }
+
+    interfaceRequirement test_req4 {
+    id: 1.2.1
+    text: the fourth test text.
+    risk: medium
+    verifymethod: analysis
+    }
+
+    physicalRequirement test_req5 {
+    id: 1.2.2
+    text: the fifth test text.
+    risk: medium
+    verifymethod: analysis
+    }
+
+    designConstraint test_req6 {
+    id: 1.2.3
+    text: the sixth test text.
+    risk: medium
+    verifymethod: analysis
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    element test_entity2 {
+    type: word doc
+    docRef: reqs/test_entity
+    }
+
+    element test_entity3 {
+    type: "test suite"
+    docRef: github.com/all_the_tests
+    }
+
+
+    test_entity - satisfies -> test_req2
+    test_req - traces -> test_req2
+    test_req - contains -> test_req3
+    test_req3 - contains -> test_req4
+    test_req4 - derives -> test_req5
+    test_req5 - refines -> test_req6
+    test_entity3 - verifies -> test_req5"#;
+
+    let svg = render_requirement_svg(input);
+
+    // Should contain all requirement names
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain test_req"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req2"),
+        "Should contain test_req2"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req3"),
+        "Should contain test_req3"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req4"),
+        "Should contain test_req4"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req5"),
+        "Should contain test_req5"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req6"),
+        "Should contain test_req6"
+    );
+
+    // Should contain all element names
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain test_entity"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity2"),
+        "Should contain test_entity2"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity3"),
+        "Should contain test_entity3"
+    );
+}
+
+#[test]
+fn should_render_requirement_diagram_with_empty_information() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    }
+    element test_entity {
+    }"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain empty requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain empty element"
+    );
+}
+
+#[test]
+fn should_render_requirements_and_elements_with_and_without_information() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+        id: 1
+        text: the test text.
+        risk: high
+        verifymethod: test
+    }
+    element test_entity {
+    }"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement with info"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element without info"
+    );
+}
+
+#[test]
+fn should_render_requirements_and_elements_with_long_and_short_text() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+        id: 1
+        text: the test text that is long and takes up a lot of space.
+        risk: high
+        verifymethod: test
+    }
+    element test_entity_name_that_is_extra_long {
+    }"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity_name_that_is_extra_long"),
+        "Should contain element with long name"
+    );
+}
+
+#[test]
+fn should_render_requirements_and_elements_with_quoted_text_for_spaces() {
+    let input = r#"requirementDiagram
+    requirement "test req name with spaces" {
+        id: 1
+        text: the test text that is long and takes up a lot of space.
+        risk: high
+        verifymethod: test
+    }
+    element "test entity name that is extra long with spaces" {
+    }"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "test req name with spaces"),
+        "Should contain requirement with spaces in name"
+    );
+    assert!(
+        svg_contains_text(&svg, "test entity name that is extra long with spaces"),
+        "Should contain element with spaces in name"
+    );
+}
+
+// ============================================================================
+// Direction Tests
+// ============================================================================
+
+#[test]
+fn should_render_requirement_diagram_with_tb_direction() {
+    let input = r#"requirementDiagram
+direction TB
+
+requirement test_req {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+element test_entity {
+type: simulation
+}
+
+test_entity - satisfies -> test_req"#;
+
+    let svg = render_requirement_svg(input);
+    let doc = parse_svg(&svg);
+
+    assert!(
+        doc.root_element().tag_name().name() == "svg",
+        "Should produce valid SVG"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+}
+
+#[test]
+fn should_render_requirement_diagram_with_bt_direction() {
+    let input = r#"requirementDiagram
+direction BT
+
+requirement test_req {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+element test_entity {
+type: simulation
+}
+
+test_entity - satisfies -> test_req"#;
+
+    let svg = render_requirement_svg(input);
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+}
+
+#[test]
+fn should_render_requirement_diagram_with_lr_direction() {
+    let input = r#"requirementDiagram
+direction LR
+
+requirement test_req {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+element test_entity {
+type: simulation
+}
+
+test_entity - satisfies -> test_req"#;
+
+    let svg = render_requirement_svg(input);
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+}
+
+#[test]
+fn should_render_requirement_diagram_with_rl_direction() {
+    let input = r#"requirementDiagram
+direction RL
+
+requirement test_req {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+element test_entity {
+type: simulation
+}
+
+test_entity - satisfies -> test_req"#;
+
+    let svg = render_requirement_svg(input);
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+}
+
+// ============================================================================
+// Styling Tests
+// ============================================================================
+
+#[test]
+fn should_render_requirements_and_elements_with_styles_from_style_statement() {
+    let input = r#"requirementDiagram
+
+requirement test_req {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+element test_entity {
+type: simulation
+}
+
+test_entity - satisfies -> test_req
+
+style test_req,test_entity fill:#f9f,stroke:blue, color:grey, font-weight:bold"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element"
+    );
+}
+
+#[test]
+fn should_render_requirements_and_elements_with_styles_from_class_statement() {
+    let input = r#"requirementDiagram
+
+requirement test_req {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+element test_entity {
+type: simulation
+}
+
+test_entity - satisfies -> test_req
+classDef bold font-weight: bold
+classDef blue stroke:lightblue, color: #0000FF
+class test_entity bold
+class test_req blue, bold"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element"
+    );
+}
+
+#[test]
+fn should_render_requirements_and_elements_with_classes_shorthand_syntax() {
+    let input = r#"requirementDiagram
+
+requirement test_req:::blue {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+element test_entity {
+type: simulation
+}
+
+test_entity - satisfies -> test_req
+classDef bold font-weight: bold
+classDef blue stroke:lightblue, color: #0000FF
+test_entity:::bold"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element"
+    );
+}
+
+#[test]
+fn should_render_requirements_with_default_class_and_other_styles() {
+    let input = r#"requirementDiagram
+
+requirement test_req:::blue {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+element test_entity {
+type: simulation
+}
+
+test_entity - satisfies -> test_req
+classDef blue stroke:lightblue, color:blue
+classDef default fill:pink
+style test_entity color:green"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element"
+    );
+}
+
+// ============================================================================
+// Relationship Type Tests
+// ============================================================================
+
+#[test]
+fn should_render_all_relationship_types() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    functionalRequirement test_req2 {
+    id: 1.1
+    text: the second test text.
+    risk: low
+    verifymethod: inspection
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    element test_entity2 {
+    type: word doc
+    docRef: reqs/test_entity
+    }
+
+    test_entity - satisfies -> test_req2
+    test_req - traces -> test_req2
+    test_req - contains -> test_req2
+    test_entity2 - verifies -> test_req"#;
+
+    let svg = render_requirement_svg(input);
+    let doc = parse_svg(&svg);
+
+    assert!(
+        doc.root_element().tag_name().name() == "svg",
+        "Should produce valid SVG"
+    );
+
+    // Should have relationship edges
+    assert!(
+        svg.contains("path") || svg.contains("line"),
+        "Should have relationship lines"
+    );
+}
+
+// ============================================================================
+// Demo/Sample Tests (from demos/requirements.html)
+// ============================================================================
+
+#[test]
+fn should_render_full_demo_diagram() {
+    let input = r#"requirementDiagram
+
+requirement test_req {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+functionalRequirement test_req2 {
+id: 1.1
+text: the second test text.
+risk: low
+verifymethod: inspection
+}
+
+performanceRequirement test_req3 {
+id: 1.2
+text: the third test text.
+risk: medium
+verifymethod: demonstration
+}
+
+interfaceRequirement test_req4 {
+id: 1.2.1
+text: the fourth test text.
+risk: medium
+verifymethod: analysis
+}
+
+physicalRequirement test_req5 {
+id: 1.2.2
+text: the fifth test text.
+risk: medium
+verifymethod: analysis
+}
+
+designConstraint test_req6 {
+id: 1.2.3
+text: the sixth test text.
+risk: medium
+verifymethod: analysis
+}
+
+element test_entity {
+type: simulation
+}
+
+element test_entity2 {
+type: word doc
+docRef: reqs/test_entity
+}
+
+element test_entity3 {
+type: "test suite"
+docRef: github.com/all_the_tests
+}
+
+test_entity - satisfies -> test_req2
+test_req - traces -> test_req2
+test_req - contains -> test_req3
+test_req3 - contains -> test_req4
+test_req4 - derives -> test_req5
+test_req5 - refines -> test_req6
+test_entity3 - verifies -> test_req5"#;
+
+    let svg = render_requirement_svg(input);
+
+    // Verify all requirement types are rendered
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req2"),
+        "Should contain functionalRequirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req3"),
+        "Should contain performanceRequirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req4"),
+        "Should contain interfaceRequirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req5"),
+        "Should contain physicalRequirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req6"),
+        "Should contain designConstraint"
+    );
+
+    // Verify all elements are rendered
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element 1"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity2"),
+        "Should contain element 2"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity3"),
+        "Should contain element 3"
+    );
+}
+
+#[test]
+fn should_render_demo_with_descriptive_names() {
+    let input = r#"requirementDiagram
+
+requirement "An Example" {
+id: 1
+text: the test text.
+risk: high
+verifymethod: test
+}
+
+functionalRequirement "Random Name" {
+id: 1.1
+text: the second test text.
+risk: low
+verifymethod: inspection
+}
+
+performanceRequirement "Something Else" {
+id: 1.2
+text: the third test text.
+risk: medium
+verifymethod: demonstration
+}
+
+element test_entity {
+type: simulation
+}
+
+test_entity - satisfies -> "Random Name"
+"An Example" - traces -> "Random Name"
+"An Example" - contains -> "Something Else""#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "An Example"),
+        "Should contain 'An Example'"
+    );
+    assert!(
+        svg_contains_text(&svg, "Random Name"),
+        "Should contain 'Random Name'"
+    );
+    assert!(
+        svg_contains_text(&svg, "Something Else"),
+        "Should contain 'Something Else'"
+    );
+}
+
+// ============================================================================
+// Edge Cases
+// ============================================================================
+
+#[test]
+fn should_render_only_requirements_no_relationships() {
+    let input = r#"requirementDiagram
+
+requirement standalone_req {
+id: 1
+text: A standalone requirement.
+risk: low
+verifymethod: test
+}
+
+element standalone_element {
+type: component
+}"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "standalone_req"),
+        "Should render standalone requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "standalone_element"),
+        "Should render standalone element"
+    );
+}
+
+#[test]
+fn should_render_requirement_with_all_attributes() {
+    let input = r#"requirementDiagram
+
+requirement complete_req {
+id: REQ-001
+text: This is a complete requirement with all attributes specified.
+risk: high
+verifymethod: analysis
+}"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "complete_req"),
+        "Should render requirement name"
+    );
+    // The SVG should contain the requirement details
+    assert!(svg.contains("<svg"), "Should be valid SVG");
+}
+
+#[test]
+fn should_render_element_with_docref() {
+    let input = r#"requirementDiagram
+
+element documented_element {
+type: documentation
+docRef: docs/specification.md
+}"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "documented_element"),
+        "Should render element name"
+    );
+}
+
+// ============================================================================
+// Requirement Type Display Tests
+// ============================================================================
+
+#[test]
+fn should_display_requirement_type_labels() {
+    let input = r#"requirementDiagram
+
+requirement basic_req {
+id: 1
+}
+
+functionalRequirement func_req {
+id: 2
+}
+
+interfaceRequirement iface_req {
+id: 3
+}
+
+performanceRequirement perf_req {
+id: 4
+}
+
+physicalRequirement phys_req {
+id: 5
+}
+
+designConstraint design_req {
+id: 6
+}"#;
+
+    let svg = render_requirement_svg(input);
+    let doc = parse_svg(&svg);
+
+    // All requirement types should be rendered
+    assert!(
+        doc.root_element().tag_name().name() == "svg",
+        "Should produce valid SVG"
+    );
+
+    // Check that each requirement is represented
+    assert!(
+        svg_contains_text(&svg, "basic_req"),
+        "Should render basic requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "func_req"),
+        "Should render functional requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "iface_req"),
+        "Should render interface requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "perf_req"),
+        "Should render performance requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "phys_req"),
+        "Should render physical requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "design_req"),
+        "Should render design constraint"
+    );
+}
+
+// ============================================================================
+// Risk Level Display Tests
+// ============================================================================
+
+#[test]
+fn should_handle_all_risk_levels() {
+    let input = r#"requirementDiagram
+
+requirement low_risk {
+id: 1
+risk: low
+}
+
+requirement medium_risk {
+id: 2
+risk: medium
+}
+
+requirement high_risk {
+id: 3
+risk: high
+}"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "low_risk"),
+        "Should render low risk requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "medium_risk"),
+        "Should render medium risk requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "high_risk"),
+        "Should render high risk requirement"
+    );
+}
+
+// ============================================================================
+// Verify Method Display Tests
+// ============================================================================
+
+#[test]
+fn should_handle_all_verify_methods() {
+    let input = r#"requirementDiagram
+
+requirement analysis_req {
+id: 1
+verifymethod: analysis
+}
+
+requirement demonstration_req {
+id: 2
+verifymethod: demonstration
+}
+
+requirement inspection_req {
+id: 3
+verifymethod: inspection
+}
+
+requirement test_req {
+id: 4
+verifymethod: test
+}"#;
+
+    let svg = render_requirement_svg(input);
+
+    assert!(
+        svg_contains_text(&svg, "analysis_req"),
+        "Should render analysis requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "demonstration_req"),
+        "Should render demonstration requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "inspection_req"),
+        "Should render inspection requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should render test requirement"
+    );
+}
+
+// ============================================================================
+// Theme Tests
+// ============================================================================
+
+#[test]
+fn should_render_with_dark_theme() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let diagram = parse(input).expect("Failed to parse requirement diagram");
+    let config = RenderConfig {
+        theme: Theme::dark(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with dark theme");
+
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+    assert!(svg.contains("<style>"), "Should contain embedded styles");
+    // Dark theme uses #1f2020 background
+    assert!(svg.contains("#1f2020"), "Should use dark theme colors");
+}
+
+#[test]
+fn should_render_with_forest_theme() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let diagram = parse(input).expect("Failed to parse requirement diagram");
+    let config = RenderConfig {
+        theme: Theme::forest(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with forest theme");
+
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+    assert!(svg.contains("<style>"), "Should contain embedded styles");
+}
+
+#[test]
+fn should_render_with_neutral_theme() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let diagram = parse(input).expect("Failed to parse requirement diagram");
+    let config = RenderConfig {
+        theme: Theme::neutral(),
+        ..Default::default()
+    };
+    let svg = render_with_config(&diagram, &config).expect("Failed to render with neutral theme");
+
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+    assert!(svg.contains("<style>"), "Should contain embedded styles");
+}
+
+#[test]
+fn should_render_with_theme_directive() {
+    let input = r##"%%{init: {"theme": "forest"}}%%
+requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"##;
+
+    let svg = render_text(input).expect("Failed to render with theme directive");
+
+    assert!(svg.contains("<svg"), "Should produce valid SVG");
+    // Forest theme uses green colors
+    assert!(
+        svg.contains("#cde498") || svg.contains("#cdffb2") || svg.contains("#008000"),
+        "Should use forest theme colors"
+    );
+}
