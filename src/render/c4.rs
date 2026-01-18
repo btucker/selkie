@@ -71,8 +71,8 @@ pub fn render_c4(db: &C4Db, config: &RenderConfig) -> Result<String> {
     }
 
     // Render relationships
-    for relationship in db.get_relationships() {
-        if let Some(element) = render_relationship(relationship, &layout) {
+    for (index, relationship) in db.get_relationships().iter().enumerate() {
+        if let Some(element) = render_relationship(relationship, &layout, index) {
             doc.add_element(element);
         }
     }
@@ -663,7 +663,11 @@ fn render_boundary(boundary: &C4Boundary, bounds: &BoundaryBounds) -> SvgElement
 }
 
 /// Render a relationship
-fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgElement> {
+fn render_relationship(
+    rel: &C4Relationship,
+    layout: &Layout,
+    rel_index: usize,
+) -> Option<SvgElement> {
     // Find source and target positions
     let source_pos = layout
         .element_positions
@@ -682,45 +686,57 @@ fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgEleme
     // Calculate intersection points (where line meets element edge)
     let (start, end) = calculate_intersection_points(source_pos, target_pos);
 
-    // Draw the line
-    let path = format!("M {} {} L {} {}", start.0, start.1, end.0, end.1);
-    let mut line_attrs = Attrs::new()
-        .with_fill("none")
-        .with_stroke(COLOR_REL)
-        .with_stroke_width(1.0)
-        .with_attr("marker-end", "url(#c4-arrow)")
-        .with_class("c4-relationship");
+    // First relationship uses <line>, others use <path> with quadratic Bezier (matching mermaid)
+    if rel_index == 0 {
+        // Use line element for straight connection
+        let mut line_attrs = Attrs::new()
+            .with_stroke(COLOR_REL)
+            .with_stroke_width(1.0)
+            .with_attr("marker-end", "url(#c4-arrow)")
+            .with_class("c4-relationship");
 
-    // BiRel has arrows on both ends
-    if rel.rel_type == "BiRel" {
-        line_attrs = line_attrs.with_attr("marker-start", "url(#c4-arrow)");
+        // BiRel has arrows on both ends
+        if rel.rel_type == "BiRel" {
+            line_attrs = line_attrs.with_attr("marker-start", "url(#c4-arrow-reverse)");
+        }
+
+        children.push(SvgElement::Line {
+            x1: start.0,
+            y1: start.1,
+            x2: end.0,
+            y2: end.1,
+            attrs: line_attrs,
+        });
+    } else {
+        // Use path with quadratic Bezier curve for subsequent relationships
+        let control_x = start.0 + (end.0 - start.0) / 2.0 - (end.0 - start.0) / 4.0;
+        let control_y = start.1 + (end.1 - start.1) / 2.0;
+        let path = format!(
+            "M{},{} Q{},{} {},{}",
+            start.0, start.1, control_x, control_y, end.0, end.1
+        );
+        let mut line_attrs = Attrs::new()
+            .with_fill("none")
+            .with_stroke(COLOR_REL)
+            .with_stroke_width(1.0)
+            .with_attr("marker-end", "url(#c4-arrow)")
+            .with_class("c4-relationship");
+
+        // BiRel has arrows on both ends
+        if rel.rel_type == "BiRel" {
+            line_attrs = line_attrs.with_attr("marker-start", "url(#c4-arrow-reverse)");
+        }
+
+        children.push(SvgElement::Path {
+            d: path,
+            attrs: line_attrs,
+        });
     }
 
-    children.push(SvgElement::Path {
-        d: path,
-        attrs: line_attrs,
-    });
-
-    // Add label at midpoint
+    // Add label at midpoint (without background rect to match mermaid)
     if !rel.label.is_empty() {
         let mid_x = (start.0 + end.0) / 2.0;
         let mid_y = (start.1 + end.1) / 2.0;
-
-        // Background for label
-        let label_width = (rel.label.len() as f64 * 7.0 + 10.0).min(150.0);
-        children.push(SvgElement::Rect {
-            x: mid_x - label_width / 2.0,
-            y: mid_y - 10.0,
-            width: label_width,
-            height: 20.0,
-            rx: Some(3.0),
-            ry: Some(3.0),
-            attrs: Attrs::new()
-                .with_fill("#ffffff")
-                .with_stroke(COLOR_REL)
-                .with_stroke_width(0.5)
-                .with_class("c4-rel-label-bg"),
-        });
 
         children.push(SvgElement::Text {
             x: mid_x,
@@ -729,7 +745,7 @@ fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgEleme
             attrs: Attrs::new()
                 .with_fill(COLOR_REL)
                 .with_attr("text-anchor", "middle")
-                .with_attr("font-size", "11")
+                .with_attr("font-size", "12")
                 .with_class("c4-rel-label"),
         });
     }
@@ -737,7 +753,7 @@ fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgEleme
     // Add technology label if present
     if !rel.technology.is_empty() {
         let mid_x = (start.0 + end.0) / 2.0;
-        let mid_y = (start.1 + end.1) / 2.0 + 15.0;
+        let mid_y = (start.1 + end.1) / 2.0 + 17.0;
 
         children.push(SvgElement::Text {
             x: mid_x,
@@ -746,7 +762,7 @@ fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgEleme
             attrs: Attrs::new()
                 .with_fill(COLOR_REL)
                 .with_attr("text-anchor", "middle")
-                .with_attr("font-size", "10")
+                .with_attr("font-size", "12")
                 .with_attr("font-style", "italic")
                 .with_class("c4-rel-technology"),
         });
@@ -884,12 +900,22 @@ fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
 
 /// Create arrow markers for relationships
 fn create_c4_markers() -> Vec<SvgElement> {
-    vec![SvgElement::Raw {
-        content: r##"<marker id="c4-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    vec![
+        // Forward arrow (arrowhead)
+        SvgElement::Raw {
+            content: r##"<marker id="c4-arrow" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
     <path d="M 0 0 L 10 5 L 0 10 z" fill="#666666"/>
 </marker>"##
-            .to_string(),
-    }]
+                .to_string(),
+        },
+        // Reverse arrow (arrowend) for BiRel
+        SvgElement::Raw {
+            content: r##"<marker id="c4-arrow-reverse" refX="1" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+    <path d="M 10 0 L 0 5 L 10 10 z" fill="#666666"/>
+</marker>"##
+                .to_string(),
+        },
+    ]
 }
 
 /// Generate CSS for C4 diagrams
