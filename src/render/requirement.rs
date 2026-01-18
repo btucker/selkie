@@ -485,13 +485,7 @@ fn render_requirement_box(
 }
 
 /// Render an element box
-fn render_element_box(
-    elem: &Element,
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
-) -> SvgElement {
+fn render_element_box(elem: &Element, x: f64, y: f64, width: f64, height: f64) -> SvgElement {
     // Content area
     let content_y = y + HEADER_HEIGHT + BOX_PADDING;
     let mut current_y = content_y;
@@ -580,9 +574,7 @@ fn render_element_box(
 
     SvgElement::Group {
         children,
-        attrs: Attrs::new()
-            .with_class("element-node")
-            .with_id(&elem.name),
+        attrs: Attrs::new().with_class("element-node").with_id(&elem.name),
     }
 }
 

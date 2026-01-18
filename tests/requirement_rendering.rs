@@ -145,7 +145,10 @@ fn should_render_a_not_so_simple_requirement_diagram() {
     let svg = render_requirement_svg(input);
 
     // Should contain all requirement names
-    assert!(svg_contains_text(&svg, "test_req"), "Should contain test_req");
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain test_req"
+    );
     assert!(
         svg_contains_text(&svg, "test_req2"),
         "Should contain test_req2"
@@ -299,8 +302,14 @@ test_entity - satisfies -> test_req"#;
     let svg = render_requirement_svg(input);
     let doc = parse_svg(&svg);
 
-    assert!(doc.root_element().tag_name().name() == "svg", "Should produce valid SVG");
-    assert!(svg_contains_text(&svg, "test_req"), "Should contain requirement");
+    assert!(
+        doc.root_element().tag_name().name() == "svg",
+        "Should produce valid SVG"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
 }
 
 #[test]
@@ -394,8 +403,14 @@ style test_req,test_entity fill:#f9f,stroke:blue, color:grey, font-weight:bold"#
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "test_req"), "Should contain requirement");
-    assert!(svg_contains_text(&svg, "test_entity"), "Should contain element");
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element"
+    );
 }
 
 #[test]
@@ -421,8 +436,14 @@ class test_req blue, bold"#;
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "test_req"), "Should contain requirement");
-    assert!(svg_contains_text(&svg, "test_entity"), "Should contain element");
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element"
+    );
 }
 
 #[test]
@@ -447,8 +468,14 @@ test_entity:::bold"#;
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "test_req"), "Should contain requirement");
-    assert!(svg_contains_text(&svg, "test_entity"), "Should contain element");
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element"
+    );
 }
 
 #[test]
@@ -473,8 +500,14 @@ style test_entity color:green"#;
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "test_req"), "Should contain requirement");
-    assert!(svg_contains_text(&svg, "test_entity"), "Should contain element");
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element"
+    );
 }
 
 // ============================================================================
@@ -515,7 +548,10 @@ fn should_render_all_relationship_types() {
     let svg = render_requirement_svg(input);
     let doc = parse_svg(&svg);
 
-    assert!(doc.root_element().tag_name().name() == "svg", "Should produce valid SVG");
+    assert!(
+        doc.root_element().tag_name().name() == "svg",
+        "Should produce valid SVG"
+    );
 
     // Should have relationship edges
     assert!(
@@ -599,17 +635,44 @@ test_entity3 - verifies -> test_req5"#;
     let svg = render_requirement_svg(input);
 
     // Verify all requirement types are rendered
-    assert!(svg_contains_text(&svg, "test_req"), "Should contain requirement");
-    assert!(svg_contains_text(&svg, "test_req2"), "Should contain functionalRequirement");
-    assert!(svg_contains_text(&svg, "test_req3"), "Should contain performanceRequirement");
-    assert!(svg_contains_text(&svg, "test_req4"), "Should contain interfaceRequirement");
-    assert!(svg_contains_text(&svg, "test_req5"), "Should contain physicalRequirement");
-    assert!(svg_contains_text(&svg, "test_req6"), "Should contain designConstraint");
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should contain requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req2"),
+        "Should contain functionalRequirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req3"),
+        "Should contain performanceRequirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req4"),
+        "Should contain interfaceRequirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req5"),
+        "Should contain physicalRequirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req6"),
+        "Should contain designConstraint"
+    );
 
     // Verify all elements are rendered
-    assert!(svg_contains_text(&svg, "test_entity"), "Should contain element 1");
-    assert!(svg_contains_text(&svg, "test_entity2"), "Should contain element 2");
-    assert!(svg_contains_text(&svg, "test_entity3"), "Should contain element 3");
+    assert!(
+        svg_contains_text(&svg, "test_entity"),
+        "Should contain element 1"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity2"),
+        "Should contain element 2"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_entity3"),
+        "Should contain element 3"
+    );
 }
 
 #[test]
@@ -647,9 +710,18 @@ test_entity - satisfies -> "Random Name"
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "An Example"), "Should contain 'An Example'");
-    assert!(svg_contains_text(&svg, "Random Name"), "Should contain 'Random Name'");
-    assert!(svg_contains_text(&svg, "Something Else"), "Should contain 'Something Else'");
+    assert!(
+        svg_contains_text(&svg, "An Example"),
+        "Should contain 'An Example'"
+    );
+    assert!(
+        svg_contains_text(&svg, "Random Name"),
+        "Should contain 'Random Name'"
+    );
+    assert!(
+        svg_contains_text(&svg, "Something Else"),
+        "Should contain 'Something Else'"
+    );
 }
 
 // ============================================================================
@@ -673,8 +745,14 @@ type: component
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "standalone_req"), "Should render standalone requirement");
-    assert!(svg_contains_text(&svg, "standalone_element"), "Should render standalone element");
+    assert!(
+        svg_contains_text(&svg, "standalone_req"),
+        "Should render standalone requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "standalone_element"),
+        "Should render standalone element"
+    );
 }
 
 #[test]
@@ -690,7 +768,10 @@ verifymethod: analysis
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "complete_req"), "Should render requirement name");
+    assert!(
+        svg_contains_text(&svg, "complete_req"),
+        "Should render requirement name"
+    );
     // The SVG should contain the requirement details
     assert!(svg.contains("<svg"), "Should be valid SVG");
 }
@@ -706,7 +787,10 @@ docRef: docs/specification.md
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "documented_element"), "Should render element name");
+    assert!(
+        svg_contains_text(&svg, "documented_element"),
+        "Should render element name"
+    );
 }
 
 // ============================================================================
@@ -745,15 +829,36 @@ id: 6
     let doc = parse_svg(&svg);
 
     // All requirement types should be rendered
-    assert!(doc.root_element().tag_name().name() == "svg", "Should produce valid SVG");
+    assert!(
+        doc.root_element().tag_name().name() == "svg",
+        "Should produce valid SVG"
+    );
 
     // Check that each requirement is represented
-    assert!(svg_contains_text(&svg, "basic_req"), "Should render basic requirement");
-    assert!(svg_contains_text(&svg, "func_req"), "Should render functional requirement");
-    assert!(svg_contains_text(&svg, "iface_req"), "Should render interface requirement");
-    assert!(svg_contains_text(&svg, "perf_req"), "Should render performance requirement");
-    assert!(svg_contains_text(&svg, "phys_req"), "Should render physical requirement");
-    assert!(svg_contains_text(&svg, "design_req"), "Should render design constraint");
+    assert!(
+        svg_contains_text(&svg, "basic_req"),
+        "Should render basic requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "func_req"),
+        "Should render functional requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "iface_req"),
+        "Should render interface requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "perf_req"),
+        "Should render performance requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "phys_req"),
+        "Should render physical requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "design_req"),
+        "Should render design constraint"
+    );
 }
 
 // ============================================================================
@@ -781,9 +886,18 @@ risk: high
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "low_risk"), "Should render low risk requirement");
-    assert!(svg_contains_text(&svg, "medium_risk"), "Should render medium risk requirement");
-    assert!(svg_contains_text(&svg, "high_risk"), "Should render high risk requirement");
+    assert!(
+        svg_contains_text(&svg, "low_risk"),
+        "Should render low risk requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "medium_risk"),
+        "Should render medium risk requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "high_risk"),
+        "Should render high risk requirement"
+    );
 }
 
 // ============================================================================
@@ -816,10 +930,22 @@ verifymethod: test
 
     let svg = render_requirement_svg(input);
 
-    assert!(svg_contains_text(&svg, "analysis_req"), "Should render analysis requirement");
-    assert!(svg_contains_text(&svg, "demonstration_req"), "Should render demonstration requirement");
-    assert!(svg_contains_text(&svg, "inspection_req"), "Should render inspection requirement");
-    assert!(svg_contains_text(&svg, "test_req"), "Should render test requirement");
+    assert!(
+        svg_contains_text(&svg, "analysis_req"),
+        "Should render analysis requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "demonstration_req"),
+        "Should render demonstration requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "inspection_req"),
+        "Should render inspection requirement"
+    );
+    assert!(
+        svg_contains_text(&svg, "test_req"),
+        "Should render test requirement"
+    );
 }
 
 // ============================================================================
@@ -930,6 +1056,8 @@ requirementDiagram
 
     assert!(svg.contains("<svg"), "Should produce valid SVG");
     // Forest theme uses green colors
-    assert!(svg.contains("#cde498") || svg.contains("#cdffb2") || svg.contains("#008000"),
-        "Should use forest theme colors");
+    assert!(
+        svg.contains("#cde498") || svg.contains("#cdffb2") || svg.contains("#008000"),
+        "Should use forest theme colors"
+    );
 }
