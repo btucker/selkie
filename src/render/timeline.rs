@@ -99,15 +99,19 @@ pub fn render_timeline(db: &TimelineDb, config: &RenderConfig) -> Result<String>
 struct TimelineLayout {
     total_width: f64,
     total_height: f64,
-    depth_y: f64,             // Y position of the timeline line
-    section_begin_y: f64,     // Y position where sections start
-    max_section_height: f64,  // Maximum height of section boxes
-    max_task_height: f64,     // Maximum height of task boxes
+    depth_y: f64,               // Y position of the timeline line
+    section_begin_y: f64,       // Y position where sections start
+    max_section_height: f64,    // Maximum height of section boxes
+    max_task_height: f64,       // Maximum height of task boxes
     max_event_line_length: f64, // Maximum total height of events for any task
 }
 
 /// Calculate layout dimensions
-fn calculate_layout(tasks: &[TimelineTask], sections: &[String], has_sections: bool) -> TimelineLayout {
+fn calculate_layout(
+    tasks: &[TimelineTask],
+    sections: &[String],
+    has_sections: bool,
+) -> TimelineLayout {
     // Calculate maximum section height based on text wrapping
     let max_section_height: f64 = if has_sections {
         let mut max_height: f64 = 0.0;
@@ -210,10 +214,8 @@ fn render_with_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Timelin
 
     for (section_number, section) in sections.iter().enumerate() {
         // Filter tasks for this section
-        let section_tasks: Vec<&TimelineTask> = tasks
-            .iter()
-            .filter(|t| t.section == *section)
-            .collect();
+        let section_tasks: Vec<&TimelineTask> =
+            tasks.iter().filter(|t| t.section == *section).collect();
 
         let task_count = section_tasks.len().max(1);
         let section_width = (task_count as f64) * COLUMN_WIDTH - SECTION_GAP;
@@ -284,7 +286,10 @@ fn render_section_node(
     // Background
     group_children.push(SvgElement::Path {
         d: path_d,
-        attrs: Attrs::new().with_class(&format!("node-bkg node-section-{}", section_num % MAX_SECTIONS)),
+        attrs: Attrs::new().with_class(&format!(
+            "node-bkg node-section-{}",
+            section_num % MAX_SECTIONS
+        )),
     });
 
     // Bottom line
@@ -370,7 +375,10 @@ fn render_task_node(
     // Background
     task_children.push(SvgElement::Path {
         d: path_d,
-        attrs: Attrs::new().with_class(&format!("node-bkg node-section-{}", section_color % MAX_SECTIONS)),
+        attrs: Attrs::new().with_class(&format!(
+            "node-bkg node-section-{}",
+            section_color % MAX_SECTIONS
+        )),
     });
 
     // Bottom line
@@ -435,7 +443,15 @@ fn render_events(
     let mut event_y = task_bottom_y + TASK_GAP;
     for event in &task.events {
         let event_height = estimate_node_height(event, NODE_WIDTH);
-        render_event_node(doc, event, section_color, task_x, event_y, width, event_height);
+        render_event_node(
+            doc,
+            event,
+            section_color,
+            task_x,
+            event_y,
+            width,
+            event_height,
+        );
         event_y += event_height + EVENT_SPACING;
     }
 }
@@ -467,7 +483,10 @@ fn render_event_node(
     // Background
     event_children.push(SvgElement::Path {
         d: path_d,
-        attrs: Attrs::new().with_class(&format!("node-bkg node-section-{}", section_color % MAX_SECTIONS)),
+        attrs: Attrs::new().with_class(&format!(
+            "node-bkg node-section-{}",
+            section_color % MAX_SECTIONS
+        )),
     });
 
     // Bottom line
@@ -513,7 +532,10 @@ fn render_timeline_line(doc: &mut SvgDocument, layout: &TimelineLayout) {
 /// Create wrapped text element
 fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
     // Split text on <br> and whitespace
-    let text = text.replace("<br>", "\n").replace("<br/>", "\n").replace("<br />", "\n");
+    let text = text
+        .replace("<br>", "\n")
+        .replace("<br/>", "\n")
+        .replace("<br />", "\n");
     let words: Vec<&str> = text.split_whitespace().collect();
 
     if words.is_empty() {
@@ -572,7 +594,11 @@ fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
                 content: format!(
                     r#"<tspan x="{}" dy="{}">{}</tspan>"#,
                     cx,
-                    if i == 0 { "0em".to_string() } else { "1.1em".to_string() },
+                    if i == 0 {
+                        "0em".to_string()
+                    } else {
+                        "1.1em".to_string()
+                    },
                     escape_xml(line)
                 ),
             });
@@ -584,10 +610,14 @@ fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
                     r#"<text x="{}" y="{}" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em">{}</text>"#,
                     cx,
                     start_y,
-                    tspans.iter().map(|t| match t {
-                        SvgElement::Raw { content } => content.clone(),
-                        _ => String::new(),
-                    }).collect::<Vec<_>>().join("")
+                    tspans
+                        .iter()
+                        .map(|t| match t {
+                            SvgElement::Raw { content } => content.clone(),
+                            _ => String::new(),
+                        })
+                        .collect::<Vec<_>>()
+                        .join("")
                 ),
             }],
             attrs: Attrs::new(),
@@ -645,9 +675,18 @@ fn generate_timeline_css(theme: &crate::render::svg::Theme) -> String {
     // Use theme's pie_colors as cScale colors for timeline
     // Fall back to default colors if not enough pie_colors
     let default_colors = vec![
-        "#f9f".to_string(), "#bbf".to_string(), "#bfb".to_string(), "#fbf".to_string(),
-        "#ff9".to_string(), "#9ff".to_string(), "#f99".to_string(), "#9f9".to_string(),
-        "#99f".to_string(), "#fc9".to_string(), "#c9f".to_string(), "#9fc".to_string(),
+        "#f9f".to_string(),
+        "#bbf".to_string(),
+        "#bfb".to_string(),
+        "#fbf".to_string(),
+        "#ff9".to_string(),
+        "#9ff".to_string(),
+        "#f99".to_string(),
+        "#9f9".to_string(),
+        "#99f".to_string(),
+        "#fc9".to_string(),
+        "#c9f".to_string(),
+        "#9fc".to_string(),
     ];
 
     let colors: Vec<&str> = if theme.pie_colors.len() >= 10 {
@@ -687,7 +726,11 @@ fn generate_timeline_css(theme: &crate::render::svg::Theme) -> String {
     // Generate section-specific styles using theme colors
     for i in 0..MAX_SECTIONS {
         let bg_color = colors.get(i % colors.len()).unwrap_or(&"#f9f");
-        let text_color = if is_dark_color(bg_color) { "#fff" } else { "#333" };
+        let text_color = if is_dark_color(bg_color) {
+            "#fff"
+        } else {
+            "#333"
+        };
         let line_color = darken_color(bg_color, 0.2);
 
         css.push_str(&format!(
