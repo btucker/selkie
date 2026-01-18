@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="204" height="472" viewBox="-30 -30 204 472" class="mermaid">
+  <style>
+
+.block-node {
+  cursor: pointer;
+}
+.block-label {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  fill: #333333;
+}
+.node-bkg {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 2px;
+}
+.node-bkg-inner {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+.block-edge {
+  stroke: #333333;
+  stroke-width: 2px;
+  fill: none;
+}
+.edge-label {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  fill: #333333;
+  font-size: 12px;
+}
+.block-edges marker {
+  fill: #333333;
+}
+.block-composite {
+  fill: #ffffde;
+  stroke: #9370DB;
+  stroke-width: 1px;
+  stroke-dasharray: 5,5;
+}
+.blue .node-bkg { fill:#66f;stroke:#333;stroke-width:2px }
+
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+      <g class="block-edges">
+        <path d="M 40 372 Q 54 206 68 40" class="block-edge" marker-end="url(#arrowhead)" fill="none" stroke-width="2"/>
+        <path d="M 72 100 Q 67.2 110 62.400000000000006 120" class="block-edge" marker-end="url(#arrowhead)" fill="none" stroke-width="2"/>
+        <path d="M 52 232 Q 52 242 52 252" class="block-edge" marker-end="url(#arrowhead)" fill="none" stroke-width="2"/>
+        <text x="52" y="232" class="edge-label" text-anchor="middle" dominant-baseline="middle" font-size="12px">labeled</text>
+      </g>
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+      <g class="block-nodes">
+        <g class="block-node block-square blue" id="block-A" transform="translate(0, 0)">
+          <rect x="0" y="0" width="136" height="40" class="node-bkg"/>
+          <text x="68" y="20" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Square Block</text>
+        </g>
+        <g class="block-node block-round" id="block-B" transform="translate(0, 60)">
+          <rect x="0" y="0" width="144" height="40" rx="10" ry="10" class="node-bkg"/>
+          <text x="72" y="20" class="block-label" font-size="14px" dominant-baseline="middle" text-anchor="middle">Rounded Block</text>
+        </g>
+        <g class="block-node block-diamond" id="block-C" transform="translate(0, 120)">
+          <path d="M 62.400000000000006 0 L 124.80000000000001 26 L 62.400000000000006 52 L 0 26 Z" class="node-bkg"/>
+          <text x="62.400000000000006" y="26" class="block-label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Diamond</text>
+        </g>
+        <g class="block-node block-square" id="block-D" transform="translate(0, 192)">
+          <rect x="0" y="0" width="104" height="40" class="node-bkg"/>
+          <text x="52" y="20" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Nested 1</text>
+        </g>
+        <g class="block-node block-square" id="block-E" transform="translate(0, 252)">
+          <rect x="0" y="0" width="104" height="40" class="node-bkg"/>
+          <text x="52" y="20" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Nested 2</text>
+        </g>
+        <g class="block-node block-stadium" id="block-F" transform="translate(0, 312)">
+          <rect x="0" y="0" width="96" height="40" rx="20" ry="20" class="node-bkg"/>
+          <text x="48" y="20" class="block-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Stadium</text>
+        </g>
+        <g class="block-node block-square" transform="translate(0, 372)" id="block-G">
+          <rect x="0" y="0" width="80" height="40" class="node-bkg"/>
+          <text x="40" y="20" class="block-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">G</text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
