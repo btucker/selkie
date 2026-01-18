@@ -65,6 +65,30 @@ struct TreemapRect {
     styles: Vec<String>,
 }
 
+/// Layout context for treemap positioning
+struct LayoutContext<'a> {
+    db: &'a TreemapDb,
+    positioned: Vec<TreemapRect>,
+}
+
+impl<'a> LayoutContext<'a> {
+    fn new(db: &'a TreemapDb) -> Self {
+        Self {
+            db,
+            positioned: Vec::new(),
+        }
+    }
+}
+
+/// Bounding box for layout calculations
+#[derive(Debug, Clone, Copy)]
+struct Bounds {
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+}
+
 /// Render a treemap diagram to SVG
 pub fn render_treemap(db: &TreemapDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
@@ -117,32 +141,26 @@ pub fn render_treemap(db: &TreemapDb, config: &RenderConfig) -> Result<String> {
     };
 
     // Calculate total value and position nodes
-    let total_value = calculate_total_value(&virtual_root);
-    let mut positioned: Vec<TreemapRect> = Vec::new();
+    let mut ctx = LayoutContext::new(db);
 
     // Layout the treemap
-    layout_treemap(
-        &virtual_root,
-        0.0,
-        title_height,
+    let bounds = Bounds {
+        x: 0.0,
+        y: title_height,
         width,
         height,
-        0,
-        0,
-        total_value,
-        db,
-        &mut positioned,
-    );
+    };
+    layout_treemap(&virtual_root, bounds, 0, 0, &mut ctx);
 
     // Render sections (branch nodes with children)
     let mut section_elements = Vec::new();
-    for rect in positioned.iter().filter(|r| !r.is_leaf && r.depth > 0) {
+    for rect in ctx.positioned.iter().filter(|r| !r.is_leaf && r.depth > 0) {
         section_elements.push(render_section(rect, config));
     }
 
     // Render leaf nodes
     let mut leaf_elements = Vec::new();
-    for rect in positioned.iter().filter(|r| r.is_leaf) {
+    for rect in ctx.positioned.iter().filter(|r| r.is_leaf) {
         leaf_elements.push(render_leaf(rect, config));
     }
 
@@ -181,15 +199,10 @@ fn calculate_total_value(node: &TreemapNode) -> f64 {
 /// Layout treemap nodes recursively using squarified algorithm
 fn layout_treemap(
     node: &TreemapNode,
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
+    bounds: Bounds,
     depth: usize,
     section: usize,
-    _parent_total: f64,
-    db: &TreemapDb,
-    positioned: &mut Vec<TreemapRect>,
+    ctx: &mut LayoutContext,
 ) {
     let is_leaf = node.value.is_some();
     let total_value = calculate_total_value(node);
@@ -198,19 +211,19 @@ fn layout_treemap(
     let styles = node
         .class_selector
         .as_ref()
-        .map(|class| db.get_styles_for_class(class))
+        .map(|class| ctx.db.get_styles_for_class(class))
         .unwrap_or_default();
 
     // Add this node to positioned list (except virtual root)
     if depth > 0 || !node.name.is_empty() {
-        positioned.push(TreemapRect {
+        ctx.positioned.push(TreemapRect {
             name: node.name.clone(),
             value: node.value,
             total_value,
-            x,
-            y,
-            width,
-            height,
+            x: bounds.x,
+            y: bounds.y,
+            width: bounds.width,
+            height: bounds.height,
             depth,
             section,
             is_leaf,
@@ -226,15 +239,15 @@ fn layout_treemap(
 
     // Calculate available space for children
     // Sections have a header that takes up space
-    let (child_x, child_y, child_width, child_height) = if depth > 0 {
-        (
-            x + SECTION_PADDING,
-            y + SECTION_HEADER_HEIGHT + SECTION_PADDING,
-            width - 2.0 * SECTION_PADDING,
-            height - SECTION_HEADER_HEIGHT - 2.0 * SECTION_PADDING,
-        )
+    let child_bounds = if depth > 0 {
+        Bounds {
+            x: bounds.x + SECTION_PADDING,
+            y: bounds.y + SECTION_HEADER_HEIGHT + SECTION_PADDING,
+            width: bounds.width - 2.0 * SECTION_PADDING,
+            height: bounds.height - SECTION_HEADER_HEIGHT - 2.0 * SECTION_PADDING,
+        }
     } else {
-        (x, y, width, height)
+        bounds
     };
 
     // Sort children by value (largest first for better layout)
@@ -249,13 +262,12 @@ fn layout_treemap(
     let child_values: Vec<f64> = children.iter().map(|c| calculate_total_value(c)).collect();
     let children_total: f64 = child_values.iter().sum();
 
-    if children_total <= 0.0 || child_width <= 0.0 || child_height <= 0.0 {
+    if children_total <= 0.0 || child_bounds.width <= 0.0 || child_bounds.height <= 0.0 {
         return;
     }
 
     // Apply squarified treemap layout
-    let rects =
-        squarify_layout(&child_values, child_x, child_y, child_width, child_height, children_total);
+    let rects = squarify_layout(&child_values, child_bounds, children_total);
 
     // Recursively layout children
     for (i, (child, rect)) in children.iter().zip(rects.iter()).enumerate() {
@@ -268,116 +280,105 @@ fn layout_treemap(
             section
         };
 
-        layout_treemap(
-            child,
-            rect.0,
-            rect.1,
-            rect.2,
-            rect.3,
-            depth + 1,
-            child_section,
-            children_total,
-            db,
-            positioned,
-        );
+        layout_treemap(child, *rect, depth + 1, child_section, ctx);
     }
 }
 
 /// Squarified treemap layout algorithm
-/// Returns a list of (x, y, width, height) for each value
-fn squarify_layout(
-    values: &[f64],
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
-    total: f64,
-) -> Vec<(f64, f64, f64, f64)> {
+/// Returns a list of Bounds for each value
+fn squarify_layout(values: &[f64], bounds: Bounds, total: f64) -> Vec<Bounds> {
     if values.is_empty() || total <= 0.0 {
         return vec![];
     }
 
     if values.len() == 1 {
-        return vec![(x, y, width, height)];
+        return vec![bounds];
     }
 
     // Normalize values to fit the available area
-    let area = width * height;
+    let area = bounds.width * bounds.height;
     let normalized: Vec<f64> = values.iter().map(|v| (v / total) * area).collect();
 
     // Use slice-and-dice for simplicity (alternating horizontal/vertical)
-    squarify_recursive(&normalized, x, y, width, height, true)
+    squarify_recursive(&normalized, bounds, true)
 }
 
 /// Recursive squarified layout
-fn squarify_recursive(
-    areas: &[f64],
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
-    horizontal: bool,
-) -> Vec<(f64, f64, f64, f64)> {
+fn squarify_recursive(areas: &[f64], bounds: Bounds, horizontal: bool) -> Vec<Bounds> {
     if areas.is_empty() {
         return vec![];
     }
 
     if areas.len() == 1 {
-        return vec![(x, y, width, height)];
+        return vec![bounds];
     }
 
     let total: f64 = areas.iter().sum();
     if total <= 0.0 {
-        return areas.iter().map(|_| (x, y, 0.0, 0.0)).collect();
+        return areas
+            .iter()
+            .map(|_| Bounds {
+                x: bounds.x,
+                y: bounds.y,
+                width: 0.0,
+                height: 0.0,
+            })
+            .collect();
     }
 
     // Find the best split point for squarified layout
-    let (left_areas, right_areas, split_ratio) = find_best_split(areas, width, height);
+    let (left_areas, right_areas, split_ratio) = find_best_split(areas);
 
     let mut result = Vec::with_capacity(areas.len());
 
     if horizontal {
         // Split horizontally (left and right)
-        let split_x = x + width * split_ratio;
-        let left_width = width * split_ratio;
-        let right_width = width * (1.0 - split_ratio);
+        let left_width = bounds.width * split_ratio;
+        let right_width = bounds.width * (1.0 - split_ratio);
 
         result.extend(squarify_recursive(
             &left_areas,
-            x,
-            y,
-            left_width,
-            height,
+            Bounds {
+                x: bounds.x,
+                y: bounds.y,
+                width: left_width,
+                height: bounds.height,
+            },
             !horizontal,
         ));
         result.extend(squarify_recursive(
             &right_areas,
-            split_x,
-            y,
-            right_width,
-            height,
+            Bounds {
+                x: bounds.x + left_width,
+                y: bounds.y,
+                width: right_width,
+                height: bounds.height,
+            },
             !horizontal,
         ));
     } else {
         // Split vertically (top and bottom)
-        let split_y = y + height * split_ratio;
-        let top_height = height * split_ratio;
-        let bottom_height = height * (1.0 - split_ratio);
+        let top_height = bounds.height * split_ratio;
+        let bottom_height = bounds.height * (1.0 - split_ratio);
 
         result.extend(squarify_recursive(
             &left_areas,
-            x,
-            y,
-            width,
-            top_height,
+            Bounds {
+                x: bounds.x,
+                y: bounds.y,
+                width: bounds.width,
+                height: top_height,
+            },
             !horizontal,
         ));
         result.extend(squarify_recursive(
             &right_areas,
-            x,
-            split_y,
-            width,
-            bottom_height,
+            Bounds {
+                x: bounds.x,
+                y: bounds.y + top_height,
+                width: bounds.width,
+                height: bottom_height,
+            },
             !horizontal,
         ));
     }
@@ -386,7 +387,7 @@ fn squarify_recursive(
 }
 
 /// Find the best split point to minimize aspect ratio variance
-fn find_best_split(areas: &[f64], _width: f64, _height: f64) -> (Vec<f64>, Vec<f64>, f64) {
+fn find_best_split(areas: &[f64]) -> (Vec<f64>, Vec<f64>, f64) {
     let total: f64 = areas.iter().sum();
 
     if areas.len() <= 1 {
