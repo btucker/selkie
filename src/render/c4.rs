@@ -581,8 +581,21 @@ fn shape_type_label(shape_type: &C4ShapeType) -> &'static str {
 
 /// Render a boundary
 fn render_boundary(boundary: &C4Boundary, bounds: &BoundaryBounds) -> SvgElement {
+    // Deployment nodes use solid borders, other boundaries use dashed
+    let is_deployment = boundary.boundary_type.starts_with("deployment");
+
+    let mut rect_attrs = Attrs::new()
+        .with_fill("none")
+        .with_stroke(COLOR_BOUNDARY)
+        .with_stroke_width(1.0)
+        .with_class("c4-boundary");
+
+    if !is_deployment {
+        rect_attrs = rect_attrs.with_attr("stroke-dasharray", "7,7");
+    }
+
     let children = vec![
-        // Boundary rectangle with dashed border
+        // Boundary rectangle
         SvgElement::Rect {
             x: bounds.x,
             y: bounds.y,
@@ -590,12 +603,7 @@ fn render_boundary(boundary: &C4Boundary, bounds: &BoundaryBounds) -> SvgElement
             height: bounds.height,
             rx: Some(2.5),
             ry: Some(2.5),
-            attrs: Attrs::new()
-                .with_fill("none")
-                .with_stroke(COLOR_BOUNDARY)
-                .with_stroke_width(1.0)
-                .with_attr("stroke-dasharray", "7,7")
-                .with_class("c4-boundary"),
+            attrs: rect_attrs,
         },
         // Boundary label
         SvgElement::Text {

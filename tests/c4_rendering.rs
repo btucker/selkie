@@ -19,7 +19,8 @@ fn render_c4_svg(input: &str) -> Result<String, String> {
 }
 
 fn svg_contains_text(svg: &str, text: &str) -> bool {
-    svg.contains(text)
+    // Check for raw text or HTML entity encoded version
+    svg.contains(text) || svg.contains(&text.replace('\'', "&apos;"))
 }
 
 fn count_text_elements(svg: &str, text: &str) -> usize {
@@ -263,7 +264,6 @@ fn c4_4_should_render_simple_c4_dynamic_diagram() {
 // ============================================================================
 
 #[test]
-#[ignore = "TODO: Deployment_Node syntax not yet supported in parser"]
 fn c4_5_should_render_simple_c4_deployment_diagram() {
     let input = r#"C4Deployment
       title Deployment Diagram for Internet Banking System - Live

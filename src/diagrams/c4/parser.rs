@@ -311,6 +311,15 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
         Rule::container_boundary_block => {
             process_boundary(db, pair, "container")?;
         }
+        Rule::deployment_node_block => {
+            process_boundary(db, pair, "deployment")?;
+        }
+        Rule::deployment_node_l_block => {
+            process_boundary(db, pair, "deployment_l")?;
+        }
+        Rule::deployment_node_r_block => {
+            process_boundary(db, pair, "deployment_r")?;
+        }
         // Relationships
         Rule::rel_stmt | Rule::birel_stmt | Rule::rel_direction_stmt => {
             let attrs = extract_all_attributes(pair);
@@ -807,7 +816,6 @@ Person(default, "default", "default")"#;
         }
 
         #[test]
-        #[ignore = "TODO: Deployment_Node syntax not supported"]
         fn test_cypress_c4_deployment() {
             // From Cypress C4.5: should render a simple C4Deployment diagram
             let input = r#"C4Deployment
