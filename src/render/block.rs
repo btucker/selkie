@@ -46,9 +46,11 @@ struct PositionedBlock {
     width: f64,
     /// Height
     height: f64,
-    /// Column span
+    /// Column span (reserved for future use)
+    #[allow(dead_code)]
     column_span: usize,
-    /// Custom styles
+    /// Custom styles (reserved for future use)
+    #[allow(dead_code)]
     styles: Vec<String>,
     /// CSS classes
     classes: Vec<String>,
@@ -57,9 +59,11 @@ struct PositionedBlock {
 /// Edge between blocks
 #[derive(Debug, Clone)]
 struct PositionedEdge {
-    /// Start block ID
+    /// Start block ID (reserved for future use)
+    #[allow(dead_code)]
     start: String,
-    /// End block ID
+    /// End block ID (reserved for future use)
+    #[allow(dead_code)]
     end: String,
     /// Edge label
     label: Option<String>,
@@ -111,7 +115,7 @@ pub fn render_block(db: &BlockDb, config: &RenderConfig) -> Result<String> {
 
     // Add CSS styles
     if config.embed_css {
-        doc.add_style(&generate_block_css(config, &classes));
+        doc.add_style(&generate_block_css(config, classes));
     }
 
     // Render edges first (behind blocks)
