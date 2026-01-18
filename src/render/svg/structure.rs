@@ -674,13 +674,22 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
             }
         }
 
-        // Also check for mermaid.js node containers (<g class="node" transform="translate(x,y)">)
-        // These contain child <path> elements that define the box bounds relative to center
+        // Also check for node containers (<g class="node" transform="translate(x,y)">)
+        // These contain child <path> or <rect> elements that define the box bounds
+        // Handles: ER diagrams (entity-*), block diagrams (block-*), mermaid.js nodes (id-*)
         if node.tag_name().name() == "g" {
             let class = node.attribute("class").unwrap_or("");
             let id = node.attribute("id").unwrap_or("");
 
-            if class.contains("node") && id.contains("entity") {
+            // Match nodes from various diagram types
+            let is_node_group = class.contains("node")
+                && (id.contains("entity")
+                    || id.starts_with("block-")
+                    || id.starts_with("id-")
+                    || id.starts_with("id")
+                    || id.starts_with("node-"));
+
+            if is_node_group {
                 // Parse transform="translate(x, y)"
                 if let Some(transform) = node.attribute("transform") {
                     if let Some((cx, cy)) = parse_translate(transform) {
