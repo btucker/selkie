@@ -115,30 +115,30 @@ marker path {
 
     </g>
     <g class="nodes">
-      <g class="node" y="12.5" x="0" id="node-1" transform="translate(0,12.5)">
+      <g class="node" transform="translate(0,3.350044368937205)" y="3.350044368937205" id="node-1" x="0">
         <rect x="0" y="0" width="10" height="375" class="sankey-node" fill="#4e79a7"/>
       </g>
-      <g class="node" x="590" id="node-2" y="0" transform="translate(590,0)">
+      <g class="node" transform="translate(590,0)" x="590" id="node-2" y="0">
         <rect x="0" y="0" width="10" height="274.49866893188425" class="sankey-node" fill="#f28e2c"/>
       </g>
-      <g class="node" id="node-3" x="590" y="299.49866893188425" transform="translate(590,299.49866893188425)">
+      <g class="node" x="590" y="299.4986689318842" id="node-3" transform="translate(590,299.4986689318842)">
         <rect x="0" y="0" width="10" height="100.5013310681158" class="sankey-node" fill="#e15759"/>
       </g>
     </g>
     <g class="node-labels" font-size="14">
-      <text x="16" y="200" dy="0em" text-anchor="start">Pumped heat
+      <text x="16" y="190.85004436893723" dy="0em" text-anchor="start">Pumped heat
 263.7</text>
       <text x="584" y="137.24933446594213" dy="0em" text-anchor="end">Heating and cooling, &quot;homes&quot;
 193.03</text>
-      <text x="584" y="349.7493344659422" dy="0em" text-anchor="end">Heating and cooling, &quot;commercial&quot;
+      <text x="584" y="349.74933446594207" dy="0em" text-anchor="end">Heating and cooling, &quot;commercial&quot;
 70.67</text>
     </g>
-    <g class="links" stroke-opacity="0.5" fill="none">
+    <g class="links" fill="none" stroke-opacity="0.5">
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,149.74933446594213 C300,149.74933446594213 300,137.24933446594213 590,137.24933446594213" stroke="url(#linearGradient-1)" stroke-width="274.49866893188425"/>
+        <path d="M10,140.59937883487933 C300,140.59937883487933 300,137.24933446594213 590,137.24933446594213" stroke-width="274.49866893188425" stroke="url(#linearGradient-1)"/>
       </g>
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,337.2493344659422 C300,337.2493344659422 300,349.7493344659422 590,349.7493344659422" stroke-width="100.5013310681158" stroke="url(#linearGradient-2)"/>
+        <path d="M10,328.0993788348794 C300,328.0993788348794 300,349.74933446594207 590,349.74933446594207" stroke="url(#linearGradient-2)" stroke-width="100.5013310681158"/>
       </g>
     </g>
   </g>

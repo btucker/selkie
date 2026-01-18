@@ -180,7 +180,90 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
         ky = 1.0;
     }
 
-    // Step 7: Compute y positions within each column
+    // Step 7: Compute initial y positions within each column
+    // d3-sankey initializes nodes at y=0 and uses relaxation to spread them
+    let mut node_y_positions: HashMap<String, f64> = HashMap::new();
+    let mut node_heights: HashMap<String, f64> = HashMap::new();
+
+    for col_nodes in &nodes_by_column {
+        let mut current_y = 0.0;
+
+        for node_id in col_nodes {
+            let value = node_values.get(node_id).copied().unwrap_or(0.0);
+            let node_height = (value * ky).max(1.0);
+
+            node_y_positions.insert(node_id.clone(), current_y);
+            node_heights.insert(node_id.clone(), node_height);
+            current_y += node_height + NODE_PADDING;
+        }
+    }
+
+    // Step 8: Apply relaxation to minimize link displacement
+    // First forward pass: align nodes with their sources
+    for col_nodes in nodes_by_column.iter().skip(1) {
+        for node_id in col_nodes {
+            let node_height = node_heights.get(node_id).copied().unwrap_or(0.0);
+
+            // Find the source with the largest flow
+            if let Some(edges) = incoming.get(node_id) {
+                if let Some((primary_source, _)) = edges
+                    .iter()
+                    .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal))
+                {
+                    let source_y = node_y_positions.get(primary_source).copied().unwrap_or(0.0);
+                    let source_h = node_heights.get(primary_source).copied().unwrap_or(0.0);
+
+                    // Align center of this node with center of primary source
+                    let source_center = source_y + source_h / 2.0;
+                    let target_y = source_center - node_height / 2.0;
+                    let new_y = target_y.max(0.0).min(height - node_height);
+                    node_y_positions.insert(node_id.clone(), new_y);
+                }
+            }
+        }
+
+        resolve_collisions(col_nodes, &mut node_y_positions, &node_heights, height);
+    }
+
+    // Backward pass: align nodes with their targets
+    for col in (0..num_columns - 1).rev() {
+        let col_nodes = &nodes_by_column[col];
+
+        for node_id in col_nodes {
+            let node_height = node_heights.get(node_id).copied().unwrap_or(0.0);
+            let current_y = node_y_positions.get(node_id).copied().unwrap_or(0.0);
+
+            // Find weighted center of all targets
+            if let Some(edges) = outgoing.get(node_id) {
+                let mut total_weight = 0.0;
+                let mut weighted_sum = 0.0;
+
+                for (target_id, value) in edges {
+                    let target_y = node_y_positions.get(target_id).copied().unwrap_or(0.0);
+                    let target_h = node_heights.get(target_id).copied().unwrap_or(0.0);
+                    let target_center = target_y + target_h / 2.0;
+                    total_weight += value;
+                    weighted_sum += target_center * value;
+                }
+
+                if total_weight > 0.0 {
+                    let avg_target_center = weighted_sum / total_weight;
+                    let my_center = current_y + node_height / 2.0;
+
+                    // Move halfway toward the target center (relaxation)
+                    let new_center = my_center + (avg_target_center - my_center) * 0.5;
+                    let new_y = (new_center - node_height / 2.0)
+                        .max(0.0)
+                        .min(height - node_height);
+                    node_y_positions.insert(node_id.clone(), new_y);
+                }
+            }
+        }
+
+        resolve_collisions(col_nodes, &mut node_y_positions, &node_heights, height);
+    }
+
+    // Step 9: Build final layout nodes
     let mut layout_nodes: Vec<LayoutNode> = Vec::new();
     let mut node_positions: HashMap<String, (f64, f64, f64, f64)> = HashMap::new();
 
@@ -188,25 +271,11 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
         let x0 = col as f64 * column_width;
         let x1 = x0 + NODE_WIDTH;
 
-        // Calculate total height needed for this column
-        let total_height: f64 = col_nodes
-            .iter()
-            .map(|id| node_values.get(id).copied().unwrap_or(0.0) * ky)
-            .sum();
-        let padding_total = NODE_PADDING * (col_nodes.len().saturating_sub(1)) as f64;
-
-        // Center the column vertically
-        let start_y = (height - total_height - padding_total) / 2.0;
-        let mut current_y = start_y.max(0.0);
-
         for node_id in col_nodes {
-            let value = node_values.get(node_id).copied().unwrap_or(0.0);
-            let node_height = (value * ky).max(1.0);
-
-            let y0 = current_y;
+            let y0 = node_y_positions.get(node_id).copied().unwrap_or(0.0);
+            let node_height = node_heights.get(node_id).copied().unwrap_or(0.0);
             let y1 = y0 + node_height;
-
-            // Get original index from input order
+            let value = node_values.get(node_id).copied().unwrap_or(0.0);
             let index = node_indices.get(node_id).copied().unwrap_or(0);
 
             layout_nodes.push(LayoutNode {
@@ -221,17 +290,18 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
             });
 
             node_positions.insert(node_id.clone(), (x0, y0, x1, y1));
-            current_y = y1 + NODE_PADDING;
         }
     }
 
-    // Step 8: Compute link positions (as strokes with width)
+    // Step 10: Compute link positions (as strokes with width)
     let layout_links = compute_link_positions(&graph.links, &node_positions, ky);
 
     (layout_nodes, layout_links)
 }
 
 /// Compute node columns using topological sort from sources
+/// Implements d3-sankey "justify" alignment: sink nodes (no outgoing edges)
+/// are pushed to the rightmost column.
 fn compute_node_columns(
     nodes: &[crate::diagrams::sankey::GraphNode],
     outgoing: &HashMap<String, Vec<(String, f64)>>,
@@ -269,7 +339,70 @@ fn compute_node_columns(
         columns.entry(node.id.clone()).or_insert(0);
     }
 
+    // Apply "justify" alignment: push sink nodes (no outgoing edges) to rightmost column
+    // This matches d3-sankey's sankeyJustify behavior
+    let max_column = columns.values().copied().max().unwrap_or(0);
+    for node in nodes {
+        let has_outgoing = outgoing
+            .get(&node.id)
+            .map(|edges| !edges.is_empty())
+            .unwrap_or(false);
+        if !has_outgoing {
+            // Sink node: push to rightmost column
+            columns.insert(node.id.clone(), max_column);
+        }
+    }
+
     columns
+}
+
+/// Resolve vertical collisions within a column by pushing overlapping nodes apart
+fn resolve_collisions(
+    col_nodes: &[String],
+    node_y_positions: &mut HashMap<String, f64>,
+    node_heights: &HashMap<String, f64>,
+    height: f64,
+) {
+    if col_nodes.is_empty() {
+        return;
+    }
+
+    // Sort nodes by y position
+    let mut sorted_nodes: Vec<_> = col_nodes.iter().collect();
+    sorted_nodes.sort_by(|a, b| {
+        let ya = node_y_positions.get(*a).copied().unwrap_or(0.0);
+        let yb = node_y_positions.get(*b).copied().unwrap_or(0.0);
+        ya.partial_cmp(&yb).unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    // Push nodes down to resolve overlaps
+    let mut y = 0.0;
+    for node_id in &sorted_nodes {
+        let current_y = node_y_positions.get(*node_id).copied().unwrap_or(0.0);
+        let node_height = node_heights.get(*node_id).copied().unwrap_or(0.0);
+
+        if current_y < y {
+            node_y_positions.insert((*node_id).clone(), y);
+        } else {
+            y = current_y;
+        }
+        y += node_height + NODE_PADDING;
+    }
+
+    // If we exceeded the height, push nodes back up
+    let last_node = sorted_nodes.last().unwrap();
+    let last_y = node_y_positions.get(*last_node).copied().unwrap_or(0.0);
+    let last_height = node_heights.get(*last_node).copied().unwrap_or(0.0);
+
+    let overflow = last_y + last_height - height;
+    if overflow > 0.0 {
+        // Push all nodes up proportionally
+        for node_id in sorted_nodes.iter().rev() {
+            let current_y = node_y_positions.get(*node_id).copied().unwrap_or(0.0);
+            let new_y = (current_y - overflow).max(0.0);
+            node_y_positions.insert((*node_id).clone(), new_y);
+        }
+    }
 }
 
 /// Compute total flow through each node
