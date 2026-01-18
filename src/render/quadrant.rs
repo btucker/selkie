@@ -323,10 +323,12 @@ fn render_quadrant_labels(
     }
 }
 
-/// Render axis labels on the edges
+/// Render axis labels on the edges.
 /// X-axis position depends on whether points exist:
 /// - No points: x-axis at top (default per mermaid.js)
 /// - With points: x-axis at bottom
+///
+/// When both labels exist for an axis, they are centered in each half.
 #[allow(clippy::too_many_arguments)]
 fn render_axis_labels(
     doc: &mut SvgDocument,
@@ -338,6 +340,13 @@ fn render_axis_labels(
     chart_height: f64,
     has_points: bool,
 ) {
+    let half_width = chart_width / 2.0;
+    let half_height = chart_height / 2.0;
+
+    // Check if both labels exist for each axis (affects positioning)
+    let draw_x_labels_in_middle = !db.x_axis_right.is_empty();
+    let draw_y_labels_in_middle = !db.y_axis_top.is_empty();
+
     // X-axis Y position depends on whether there are points
     let x_axis_y = if has_points {
         // With points: x-axis at bottom
@@ -349,12 +358,19 @@ fn render_axis_labels(
 
     // X-axis left label
     if !db.x_axis_left.is_empty() {
+        let (x_pos, text_anchor) = if draw_x_labels_in_middle {
+            // Center in left half when both labels exist
+            (chart_left + half_width / 2.0, "middle")
+        } else {
+            // Align to left edge when only left label exists
+            (chart_left, "start")
+        };
         doc.add_element(SvgElement::Text {
-            x: chart_left,
+            x: x_pos,
             y: x_axis_y,
             content: db.x_axis_left.clone(),
             attrs: Attrs::new()
-                .with_attr("text-anchor", "start")
+                .with_attr("text-anchor", text_anchor)
                 .with_attr("dominant-baseline", "middle")
                 .with_class("axis-label x-axis-left")
                 .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
@@ -364,12 +380,19 @@ fn render_axis_labels(
 
     // X-axis right label
     if !db.x_axis_right.is_empty() {
+        let (x_pos, text_anchor) = if draw_x_labels_in_middle {
+            // Center in right half when both labels exist
+            (chart_left + half_width + half_width / 2.0, "middle")
+        } else {
+            // Align to right edge when only right label exists
+            (chart_left + chart_width, "end")
+        };
         doc.add_element(SvgElement::Text {
-            x: chart_left + chart_width,
+            x: x_pos,
             y: x_axis_y,
             content: db.x_axis_right.clone(),
             attrs: Attrs::new()
-                .with_attr("text-anchor", "end")
+                .with_attr("text-anchor", text_anchor)
                 .with_attr("dominant-baseline", "middle")
                 .with_class("axis-label x-axis-right")
                 .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
@@ -379,20 +402,28 @@ fn render_axis_labels(
 
     // Y-axis bottom label (left side, at bottom)
     if !db.y_axis_bottom.is_empty() {
+        let y_pos = if draw_y_labels_in_middle {
+            // Center in bottom half when both labels exist
+            chart_top + half_height + half_height / 2.0
+        } else {
+            // At bottom edge when only bottom label exists
+            chart_top + chart_height
+        };
+        let text_anchor = if draw_y_labels_in_middle {
+            "middle"
+        } else {
+            "end"
+        };
         doc.add_element(SvgElement::Text {
             x: chart_left - 10.0,
-            y: chart_top + chart_height,
+            y: y_pos,
             content: db.y_axis_bottom.clone(),
             attrs: Attrs::new()
-                .with_attr("text-anchor", "end")
+                .with_attr("text-anchor", text_anchor)
                 .with_attr("dominant-baseline", "middle")
                 .with_attr(
                     "transform",
-                    &format!(
-                        "rotate(-90, {}, {})",
-                        chart_left - 10.0,
-                        chart_top + chart_height
-                    ),
+                    &format!("rotate(-90, {}, {})", chart_left - 10.0, y_pos),
                 )
                 .with_class("axis-label y-axis-bottom")
                 .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
@@ -402,16 +433,28 @@ fn render_axis_labels(
 
     // Y-axis top label (left side, at top)
     if !db.y_axis_top.is_empty() {
+        let y_pos = if draw_y_labels_in_middle {
+            // Center in top half when both labels exist
+            chart_top + half_height / 2.0
+        } else {
+            // At top edge when only top label exists
+            chart_top
+        };
+        let text_anchor = if draw_y_labels_in_middle {
+            "middle"
+        } else {
+            "start"
+        };
         doc.add_element(SvgElement::Text {
             x: chart_left - 10.0,
-            y: chart_top,
+            y: y_pos,
             content: db.y_axis_top.clone(),
             attrs: Attrs::new()
-                .with_attr("text-anchor", "start")
+                .with_attr("text-anchor", text_anchor)
                 .with_attr("dominant-baseline", "middle")
                 .with_attr(
                     "transform",
-                    &format!("rotate(-90, {}, {})", chart_left - 10.0, chart_top),
+                    &format!("rotate(-90, {}, {})", chart_left - 10.0, y_pos),
                 )
                 .with_class("axis-label y-axis-top")
                 .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
