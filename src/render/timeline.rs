@@ -13,10 +13,10 @@ use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 // Mermaid-compatible layout constants
 const LEFT_MARGIN: f64 = 100.0; // Match reference (starts content at x=200 from viewBox x=100)
 const TOP_MARGIN: f64 = 50.0;
-const NODE_WIDTH: f64 = 180.0; // Match reference (h180 in path)
+const NODE_WIDTH: f64 = 150.0; // Reference uses width: 150 for node content (total = 150 + 2*padding = 190)
 const TEXT_WRAP_WIDTH: f64 = 150.0; // Reference uses width: 150 for text wrapping
 const NODE_PADDING: f64 = 20.0;
-const COLUMN_WIDTH: f64 = 200.0;
+const COLUMN_WIDTH: f64 = 200.0; // Reference uses masterX += 200 spacing between task centers
 const SECTION_HEIGHT: f64 = 68.0; // ~68px in reference
 const TASK_HEIGHT: f64 = 68.0; // ~68px in reference
 const EVENT_HEIGHT: f64 = 50.0; // ~45-50px minimum in reference
@@ -27,7 +27,9 @@ const FONT_SIZE: f64 = 16.0; // Match mermaid.js default
 const TITLE_FONT_SIZE: f64 = 24.0;
 const MAX_SECTIONS: usize = 12;
 // Character width factor for text wrapping estimation
-// Browser-measured text is narrower than simple estimates; 0.42 matches mermaid.js behavior
+// Higher values = wider characters = earlier line wrapping
+// Reference uses getComputedTextLength() for actual measurement; we estimate
+// Value of 0.42 gives ~22 chars per line at 150px width
 const CHAR_WIDTH_FACTOR: f64 = 0.42;
 
 /// Render a timeline diagram to SVG
