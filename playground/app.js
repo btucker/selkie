@@ -529,6 +529,345 @@ const examples = {
     MicroStrategy: [0.50, 0.50]
     Amazon: [0.80, 0.68] color: #ff9900
     Google: [0.72, 0.60] color: #4285f4`,
+
+    // Architecture diagrams
+    'architecture-simple': `architecture-beta
+    group api(cloud)[API]
+
+    service db(database)[Database] in api
+    service disk1(disk)[Storage] in api
+    service server(server)[Server] in api
+    service gateway(internet)[Gateway]
+
+    db:L -- R:server
+    disk1:T -- B:server
+    gateway:R --> L:server`,
+
+    'architecture-complex': `architecture-beta
+    title Complex Architecture
+
+    group edge(cloud)[Edge]
+    group platform(server)[Platform]
+    group data(database)[Data]
+    group observability(disk)[Observability] in platform
+
+    service gateway(internet)[Gateway] in edge
+    service web(internet)[Web App] in edge
+    service api(server)[API] in edge
+    service auth(server)[Auth] in edge
+
+    service core(server)[Core] in platform
+    service cache(disk)[Cache] in platform
+    service queue(server)[Queue] in platform
+    junction hub in platform
+
+    service db(database)[Main DB] in data
+    service search(disk)[Search] in data
+
+    service metrics(disk)[Metrics] in observability
+    service logs(disk)[Logs] in observability
+
+    gateway:R --> L:web
+    web:R --> L:api
+    api:R -- L:auth
+    api{group}:B -[jwt]- T:core{group}
+    core:L -- R:queue
+    core:R -- L:cache
+    core:B -- T:hub
+    hub:R -- L:metrics
+    metrics:R -- L:logs
+    core{group}:R -[sql]- L:db{group}
+    db:B -- T:search
+    cache{group}:B -[replicate]- R:db{group}`,
+
+    // Git Graph diagrams
+    'git-simple': `gitGraph
+    commit id:"A"
+    commit id:"B"
+    branch feature
+    checkout feature
+    commit id:"C"
+    checkout main
+    commit id:"D"
+    merge feature`,
+
+    'git-complex': `gitGraph
+    commit id:"A"
+    commit id:"B"
+    branch feature
+    checkout feature
+    commit id:"C"
+    commit id:"D"
+    checkout main
+    commit id:"E"
+    merge feature
+    branch hotfix
+    checkout hotfix
+    commit id:"F"
+    checkout main
+    merge hotfix
+    commit id:"G"
+    branch release
+    checkout release
+    commit id:"H"
+    commit id:"I"
+    checkout main
+    merge release`,
+
+    // Timeline diagrams
+    'timeline-simple': `timeline
+    title History of Social Media Platform
+    2002 : LinkedIn
+    2004 : Facebook : Google
+    2005 : YouTube
+    2006 : Twitter`,
+
+    'timeline-complex': `timeline
+    title England's History Timeline
+    section Stone Age
+      7600 BC : Britain's oldest known house was built in Orkney, Scotland
+      6000 BC : Sea levels rise and Britain becomes an island.
+    section Bronze Age
+      2300 BC : People arrive from Europe and settle in Britain.
+              : New styles of pottery and ways of burying the dead appear.
+      2200 BC : The last major building works are completed at Stonehenge.
+              : The first metal objects are made in Britain.`,
+
+    // Sankey diagrams
+    'sankey-simple': `sankey-beta
+
+Bio-conversion,Liquid,0.597
+Bio-conversion,Losses,26.862
+Bio-conversion,Solid,280.322
+Bio-conversion,Gas,81.144`,
+
+    'sankey-complex': `sankey-beta
+
+Agricultural 'waste',Bio-conversion,124.729
+Bio-conversion,Liquid,0.597
+Bio-conversion,Losses,26.862
+Bio-conversion,Solid,280.322
+Bio-conversion,Gas,81.144
+Biofuel imports,Liquid,35
+Biomass imports,Solid,35
+Coal imports,Coal,11.606
+Coal reserves,Coal,63.965
+Coal,Solid,75.571
+District heating,Industry,10.639
+District heating,Heating and cooling - commercial,22.505
+District heating,Heating and cooling - homes,46.184`,
+
+    // C4 diagrams
+    'c4-simple': `C4Context
+title System Context diagram for Internet Banking System
+
+Enterprise_Boundary(b0, "BankBoundary") {
+    Person(customer, "Banking Customer", "A customer of the bank")
+    System(banking, "Internet Banking System", "Allows customers to view accounts")
+}
+
+System_Ext(email, "E-mail System", "External e-mail system")
+
+Rel(customer, banking, "Uses")
+Rel(banking, email, "Sends e-mails", "SMTP")`,
+
+    'c4-complex': `C4Container
+title Container diagram for Internet Banking System
+
+System_Ext(email_system, "E-Mail System", "The internal Microsoft Exchange system")
+Person(customer, "Customer", "A customer of the bank, with personal bank accounts")
+
+Container_Boundary(c1, "Internet Banking") {
+    Container(spa, "Single-Page App", "JavaScript, Angular", "Provides all the Internet banking functionality")
+    Container(api, "API Application", "Java, Spring MVC", "Provides banking functionality via JSON/HTTPS API")
+    ContainerDb(db, "Database", "Oracle", "Stores user data, accounts, transactions")
+    ContainerQueue(queue, "Message Broker", "RabbitMQ", "Handles async messaging")
+}
+
+Rel(customer, spa, "Uses", "HTTPS")
+Rel(spa, api, "Makes API calls to", "JSON/HTTPS")
+Rel(api, db, "Reads from and writes to", "JDBC")
+Rel(api, queue, "Sends messages to")
+Rel(email_system, customer, "Sends e-mails to")`,
+
+    // Journey diagrams
+    'journey-simple': `journey
+    title My working day
+    section Go to work
+      Make tea: 5: Me
+      Go upstairs: 3: Me
+      Do work: 1: Me, Cat
+    section Go home
+      Go downstairs: 5: Me
+      Sit down: 3: Me`,
+
+    'journey-complex': `journey
+    title E-Commerce User Journey
+    section Discovery
+      Visit homepage: 5: Customer
+      Search for product: 4: Customer
+      Browse categories: 3: Customer
+    section Selection
+      View product details: 5: Customer
+      Read reviews: 4: Customer
+      Compare prices: 3: Customer
+      Add to cart: 5: Customer
+    section Checkout
+      Review cart: 4: Customer
+      Enter shipping info: 3: Customer, System
+      Select payment method: 4: Customer
+      Complete purchase: 5: Customer, System
+    section Post-Purchase
+      Receive confirmation: 5: System
+      Track shipment: 4: Customer
+      Receive delivery: 5: Customer`,
+
+    // XY Chart diagrams
+    'xychart-simple': `xychart-beta
+    title "Monthly Sales"
+    x-axis [Jan, Feb, Mar, Apr, May, Jun]
+    y-axis "Sales (units)" 0 --> 100
+    bar [20, 35, 45, 62, 78, 91]
+    line [15, 30, 40, 55, 70, 85]`,
+
+    'xychart-complex': `xychart-beta
+    title "Website Analytics"
+    x-axis [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
+    y-axis "Visitors (thousands)" 0 --> 50
+    bar [12, 18, 25, 22, 30, 45, 42]
+    line [10, 15, 20, 18, 25, 40, 38]
+    line [8, 12, 18, 15, 22, 35, 30]`,
+
+    // Radar diagrams
+    'radar-simple': `radar-beta
+    title Skills Assessment
+    axis Coding, Testing, Design
+    axis Review["Code Review"], Docs["Documentation"]
+
+    curve TeamA["Team Alpha"]{
+        Coding 4, Testing 3,
+        Design 3, Review 4,
+        Docs 2
+    }
+    curve TeamB["Team Beta"]{3, 4, 4, 3, 5}
+
+    showLegend true
+    ticks 5
+    max 5
+    graticule polygon`,
+
+    'radar-complex': `radar-beta
+    title Programming Language Comparison
+    axis Performance, Ecosystem, Safety
+    axis Learning["Learning Curve"], Tooling, Community
+
+    curve rust["Rust"]{
+        Performance 5, Ecosystem 4,
+        Safety 5, Learning 2,
+        Tooling 5, Community 4
+    }
+    curve python["Python"]{
+        Performance 2, Ecosystem 5,
+        Safety 3, Learning 5,
+        Tooling 4, Community 5
+    }
+    curve go["Go"]{
+        Performance 4, Ecosystem 4,
+        Safety 4, Learning 4,
+        Tooling 5, Community 4
+    }
+    curve cpp["C++"]{5, 5, 2, 1, 3, 4}
+
+    showLegend true
+    ticks 5
+    max 5
+    min 0
+    graticule circle`,
+
+    // Block diagrams
+    'block-simple': `block-beta
+  columns 2
+  block
+    id2["I am a wide one"]
+    id1
+  end
+  id["Next row"]`,
+
+    'block-complex': `block-beta
+  columns 3
+  A["Square Block"]
+  B("Rounded Block")
+  C{"Diamond"}
+
+  block:container
+    columns 2
+    D["Nested 1"]
+    E["Nested 2"]
+  end
+  space
+  F(["Stadium"])
+
+  G --> A
+  B --> C
+  D -- "labeled" --> E
+
+  classDef blue fill:#66f,stroke:#333,stroke-width:2px;
+  class A blue
+  style B fill:#f9F,stroke:#333,stroke-width:4px`,
+
+    // Packet diagrams
+    'packet-simple': `packet
+    title Simple Packet
+    0-7: "Header"
+    8-15: "Length"
+    16-31: "Data"`,
+
+    'packet-complex': `packet
+    title TCP Packet Structure
+    0-15: "Source Port"
+    16-31: "Destination Port"
+    32-63: "Sequence Number"
+    64-95: "Acknowledgment Number"
+    96-99: "Data Offset"
+    100-105: "Reserved"
+    106: "URG"
+    107: "ACK"
+    108: "PSH"
+    109: "RST"
+    110: "SYN"
+    111: "FIN"
+    112-127: "Window"
+    128-143: "Checksum"
+    144-159: "Urgent Pointer"
+    160-191: "(Options and Padding)"
+    192-255: "Data"`,
+
+    // Treemap diagrams
+    'treemap-simple': `treemap-beta
+"Category A"
+    "Item A1": 10
+    "Item A2": 20
+"Category B"
+    "Item B1": 15
+    "Item B2": 25`,
+
+    'treemap-complex': `treemap-beta
+"Company Budget"
+    "Engineering":::engineering
+        "Frontend": 300000
+        "Backend": 400000
+        "DevOps": 200000
+    "Marketing":::marketing
+        "Digital": 250000
+        "Print": 100000
+        "Events": 150000
+    "Sales":::sales
+        "Direct": 500000
+        "Channel": 300000
+
+classDef engineering fill:#6b9bc3,stroke:#333;
+classDef marketing fill:#c36b9b,stroke:#333;
+classDef sales fill:#c3a66b,stroke:#333;`,
 };
 
 // State
