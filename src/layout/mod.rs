@@ -977,7 +977,7 @@ mod tests {
         use crate::layout::dagre::rank;
         let mut dg = to_dagre_graph(&graph);
         let config = to_dagre_config(&graph.options);
-        rank::assign_ranks(&mut dg, config.ranker.clone());
+        rank::assign_ranks(&mut dg, config.ranker);
 
         let layering = init_order(&dg);
         eprintln!("init_order layer 2: {:?}", layering.get(2));

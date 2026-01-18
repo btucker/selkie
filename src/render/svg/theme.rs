@@ -1669,18 +1669,23 @@ mod tests {
         use crate::diagrams::DiagramConfig;
 
         // Test dark theme selection
-        let mut config = DiagramConfig::default();
-        config.theme = Some("dark".to_string());
+        let config = DiagramConfig {
+            theme: Some("dark".to_string()),
+            ..Default::default()
+        };
         let theme = Theme::from_directive(&config);
         assert_eq!(theme.background, "#1f2020"); // dark background
 
         // Test forest theme selection
-        config.theme = Some("forest".to_string());
+        let config = DiagramConfig {
+            theme: Some("forest".to_string()),
+            ..Default::default()
+        };
         let theme = Theme::from_directive(&config);
         assert_eq!(theme.line_color, "#008000"); // forest green
 
         // Test default theme (no theme specified)
-        config.theme = None;
+        let config = DiagramConfig::default();
         let theme = Theme::from_directive(&config);
         assert_eq!(theme.primary_color, "#ECECFF"); // default light purple
     }
@@ -1688,15 +1693,17 @@ mod tests {
     #[test]
     fn test_from_directive_applies_overrides() {
         use crate::diagrams::DiagramConfig;
+        use std::collections::HashMap;
 
-        let mut config = DiagramConfig::default();
-        config.theme = Some("default".to_string());
-        config
-            .theme_variables
-            .insert("primaryColor".to_string(), "#ff0000".to_string());
-        config
-            .theme_variables
-            .insert("lineColor".to_string(), "#00ff00".to_string());
+        let mut theme_variables = HashMap::new();
+        theme_variables.insert("primaryColor".to_string(), "#ff0000".to_string());
+        theme_variables.insert("lineColor".to_string(), "#00ff00".to_string());
+
+        let config = DiagramConfig {
+            theme: Some("default".to_string()),
+            theme_variables,
+            ..Default::default()
+        };
 
         let theme = Theme::from_directive(&config);
 
@@ -1711,8 +1718,10 @@ mod tests {
     fn test_from_directive_unknown_theme_falls_back() {
         use crate::diagrams::DiagramConfig;
 
-        let mut config = DiagramConfig::default();
-        config.theme = Some("nonexistent_theme".to_string());
+        let config = DiagramConfig {
+            theme: Some("nonexistent_theme".to_string()),
+            ..Default::default()
+        };
 
         let theme = Theme::from_directive(&config);
         // Should fall back to default theme

@@ -314,16 +314,16 @@ fn parse_arrow(arrow: &str) -> (String, EdgeStroke, u32) {
             // Open edges subtract 2 (like mermaid's slice(-1) then length-1)
             // Arrow edges subtract 1
             let subtract = if is_open_edge { 2 } else { 1 };
-            (dash_count.saturating_sub(subtract).max(1).min(10)) as u32
+            dash_count.saturating_sub(subtract).clamp(1, 10) as u32
         }
         EdgeStroke::Thick => {
             let eq_count = arrow.chars().filter(|&c| c == '=').count();
             let subtract = if is_open_edge { 2 } else { 1 };
-            (eq_count.saturating_sub(subtract).max(1).min(10)) as u32
+            eq_count.saturating_sub(subtract).clamp(1, 10) as u32
         }
         EdgeStroke::Dotted => {
             let dot_count = arrow.chars().filter(|&c| c == '.').count();
-            (dot_count.max(1).min(10)) as u32
+            dot_count.clamp(1, 10) as u32
         }
     };
 

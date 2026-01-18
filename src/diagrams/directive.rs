@@ -340,7 +340,7 @@ flowchart TD
 
         let config = detect_init(text).expect("Should parse directive");
         // XSS value should be filtered out
-        assert!(config.theme_variables.get("primaryColor").is_none());
+        assert!(!config.theme_variables.contains_key("primaryColor"));
     }
 
     #[test]
@@ -349,7 +349,7 @@ flowchart TD
 
         let config = detect_init(text).expect("Should parse directive");
         // Prototype pollution keys should be filtered out
-        assert!(config.extra.get("__proto__").is_none());
+        assert!(!config.extra.contains_key("__proto__"));
     }
 
     #[test]
