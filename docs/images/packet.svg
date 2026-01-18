@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1026" height="80" viewBox="0 0 1026 80" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.packetByte {
+    font-size: 10px;
+}
+.packetByte.start {
+    fill: black;
+}
+.packetByte.end {
+    fill: black;
+}
+.packetLabel {
+    fill: black;
+    font-size: 12px;
+}
+.packetTitle {
+    fill: black;
+    font-size: 14px;
+}
+.packetBlock {
+    stroke: black;
+    stroke-width: 1;
+    fill: #efefef;
+}
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <rect x="1" y="8" width="254" height="32" class="packetBlock"/>
+    <text x="128" y="24" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Header</text>
+    <text x="1" y="6" class="packetByte start" text-anchor="start" dominant-baseline="auto">0</text>
+    <text x="255" y="6" class="packetByte end" dominant-baseline="auto" text-anchor="end">7</text>
+    <rect x="257" y="8" width="254" height="32" class="packetBlock"/>
+    <text x="384" y="24" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Length</text>
+    <text x="257" y="6" class="packetByte start" text-anchor="start" dominant-baseline="auto">8</text>
+    <text x="511" y="6" class="packetByte end" dominant-baseline="auto" text-anchor="end">15</text>
+    <rect x="513" y="8" width="510" height="32" class="packetBlock"/>
+    <text x="768" y="24" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Data</text>
+    <text x="513" y="6" class="packetByte start" text-anchor="start" dominant-baseline="auto">16</text>
+    <text x="1023" y="6" class="packetByte end" text-anchor="end" dominant-baseline="auto">31</text>
+    <text x="513" y="60" class="packetTitle" dominant-baseline="middle" text-anchor="middle">Simple Packet</text>
+  </g>
+</svg>
