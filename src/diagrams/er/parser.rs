@@ -39,6 +39,9 @@ pub fn parse_into(input: &str, db: &mut ErDb) -> Result<()> {
 
 fn process_rule(pair: pest::iterators::Pair<Rule>, db: &mut ErDb) -> Result<()> {
     match pair.as_rule() {
+        Rule::frontmatter => {
+            process_frontmatter(pair, db)?;
+        }
         Rule::document => {
             for inner in pair.into_inner() {
                 process_rule(inner, db)?;
@@ -115,6 +118,27 @@ fn process_acc_descr(pair: pest::iterators::Pair<Rule>, db: &mut ErDb) -> Result
     Ok(())
 }
 
+fn process_frontmatter(pair: pest::iterators::Pair<Rule>, db: &mut ErDb) -> Result<()> {
+    for inner in pair.into_inner() {
+        if inner.as_rule() == Rule::frontmatter_content {
+            for line in inner.into_inner() {
+                if line.as_rule() == Rule::frontmatter_line {
+                    for item in line.into_inner() {
+                        if item.as_rule() == Rule::title_line {
+                            for val in item.into_inner() {
+                                if val.as_rule() == Rule::frontmatter_value {
+                                    db.diagram_title = val.as_str().trim().to_string();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
 fn process_entity_stmt(pair: pest::iterators::Pair<Rule>, db: &mut ErDb) -> Result<()> {
     let mut entity_name = String::new();
     let mut alias = None;
@@ -127,15 +151,21 @@ fn process_entity_stmt(pair: pest::iterators::Pair<Rule>, db: &mut ErDb) -> Resu
             }
             Rule::alias_def => {
                 for a in inner.into_inner() {
-                    if a.as_rule() == Rule::alias_quoted {
-                        // Strip quotes from alias
-                        let raw = a.as_str();
-                        alias = Some(
-                            raw.strip_prefix('"')
-                                .and_then(|s| s.strip_suffix('"'))
-                                .unwrap_or(raw)
-                                .to_string(),
-                        );
+                    match a.as_rule() {
+                        Rule::alias_quoted => {
+                            // Strip quotes from alias
+                            let raw = a.as_str();
+                            alias = Some(
+                                raw.strip_prefix('"')
+                                    .and_then(|s| s.strip_suffix('"'))
+                                    .unwrap_or(raw)
+                                    .to_string(),
+                            );
+                        }
+                        Rule::alias_unquoted => {
+                            alias = Some(a.as_str().to_string());
+                        }
+                        _ => {}
                     }
                 }
             }
@@ -169,15 +199,21 @@ fn process_entity_with_attrs(pair: pest::iterators::Pair<Rule>, db: &mut ErDb) -
             }
             Rule::alias_def => {
                 for a in inner.into_inner() {
-                    if a.as_rule() == Rule::alias_quoted {
-                        // Strip quotes from alias
-                        let raw = a.as_str();
-                        alias = Some(
-                            raw.strip_prefix('"')
-                                .and_then(|s| s.strip_suffix('"'))
-                                .unwrap_or(raw)
-                                .to_string(),
-                        );
+                    match a.as_rule() {
+                        Rule::alias_quoted => {
+                            // Strip quotes from alias
+                            let raw = a.as_str();
+                            alias = Some(
+                                raw.strip_prefix('"')
+                                    .and_then(|s| s.strip_suffix('"'))
+                                    .unwrap_or(raw)
+                                    .to_string(),
+                            );
+                        }
+                        Rule::alias_unquoted => {
+                            alias = Some(a.as_str().to_string());
+                        }
+                        _ => {}
                     }
                 }
             }
@@ -1146,7 +1182,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "Parser doesn't support unquoted bracket alias syntax p[Person] - only quoted p[\"Person\"]"]
     fn test_cypress_entity_name_aliases() {
         // From: "should render entities with entity name aliases"
         // TODO: Support unquoted bracket alias syntax like mermaid
@@ -1207,7 +1242,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "Parser doesn't support YAML frontmatter (---title:---)"]
     fn test_cypress_title_frontmatter() {
         // From: "1433: should render a simple ER diagram with a title"
         // TODO: Support YAML frontmatter like mermaid
@@ -1257,7 +1291,6 @@ ORDER ||--|{ LINE-ITEM : contains"#;
     }
 
     #[test]
-    #[ignore = "Parser doesn't support verbose cardinality aliases (one or zero to one or more)"]
     fn test_cypress_cardinality_aliases() {
         // From: "should render entities with aliases"
         // TODO: Support verbose cardinality aliases like mermaid

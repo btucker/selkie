@@ -5,7 +5,32 @@
 // Top-level structure
 // ==================
 
-diagram = { SOI ~ keyword_er_diagram ~ document ~ EOI }
+diagram = { SOI ~ frontmatter? ~ keyword_er_diagram ~ document ~ EOI }
+
+// YAML-style frontmatter (optional)
+frontmatter = {
+    "---" ~ NEWLINE ~ frontmatter_content ~ "---" ~ NEWLINE?
+}
+
+frontmatter_content = {
+    (frontmatter_line ~ NEWLINE)*
+}
+
+frontmatter_line = {
+    title_line | generic_frontmatter_line
+}
+
+title_line = {
+    "title" ~ ":" ~ frontmatter_value
+}
+
+generic_frontmatter_line = @{
+    (!("---" | NEWLINE) ~ ANY)*
+}
+
+frontmatter_value = @{
+    (!NEWLINE ~ ANY)*
+}
 
 keyword_er_diagram = _{ "erDiagram" }
 
@@ -84,9 +109,10 @@ simple_entity_name = @{
     | ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)?
 }
 
-alias_def = { "[" ~ alias_quoted ~ "]" }
+alias_def = { "[" ~ (alias_quoted | alias_unquoted) ~ "]" }
 alias_quoted = @{ "\"" ~ alias_inner ~ "\"" }
 alias_inner = @{ (!"\"" ~ ANY)* }
+alias_unquoted = @{ (!"]" ~ !"\"" ~ ANY)+ }
 
 class_shorthand = { ":::" ~ id_list }
 
@@ -143,12 +169,15 @@ rel_spec = {
     cardinality_left ~ rel_type ~ cardinality_right
 }
 
+// Order matters - try longer/more specific patterns first
 cardinality_left = {
-    only_one_left | zero_or_one_left | zero_or_more_left | one_or_more_left | md_parent
+    zero_or_one_left | one_or_more_left | zero_or_more_left | only_one_left | md_parent
 }
 
+// Order matters - try longer/more specific patterns first
+// one_or_more before zero_or_more so many(1) matches before many
 cardinality_right = {
-    only_one_right | zero_or_one_right | zero_or_more_right | one_or_more_right
+    zero_or_one_right | one_or_more_right | zero_or_more_right | only_one_right
 }
 
 // Cardinality symbols (left side - reading left to right)
@@ -158,11 +187,11 @@ zero_or_more_left = { "}o" | ^"zero or more" | ^"zero or many" | ^"many(0)" | ^"
 one_or_more_left = { "}|" | ^"one or more" | ^"one or many" | ^"many(1)" | "1+" }
 md_parent = { "u" }
 
-// Cardinality symbols (right side)
-only_one_right = { "||" | ^"one" | "1" }
+// Cardinality symbols (right side) - longer patterns first
+only_one_right = { "||" | ^"only one" | ^"one" | "1" }
 zero_or_one_right = { "o|" | ^"zero or one" | ^"one or zero" }
-zero_or_more_right = { "o{" | ^"zero or more" | ^"zero or many" | ^"many" }
-one_or_more_right = { "|{" | ^"one or more" | ^"one or many" }
+zero_or_more_right = { "o{" | ^"zero or more" | ^"zero or many" | ^"many(0)" | "0+" | ^"many" }
+one_or_more_right = { "|{" | ^"one or more" | ^"one or many" | ^"many(1)" | "1+" }
 
 // Relationship types
 rel_type = {

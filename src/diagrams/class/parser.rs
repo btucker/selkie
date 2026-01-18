@@ -2016,7 +2016,6 @@ click Class1 call functionCall()",
         }
 
         #[test]
-        #[ignore = "TODO: Add lollipop interface notation ()-- support"]
         fn test_cypress_lollipop() {
             // From Cypress test: lollipop interface notation
             let input = r#"classDiagram

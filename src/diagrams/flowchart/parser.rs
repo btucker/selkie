@@ -971,7 +971,6 @@ end"#;
         }
 
         #[test]
-        #[ignore = "TODO: Fix identifier parsing to allow 'end' prefix"]
         fn should_handle_node_names_with_end_substring() {
             let input = "graph TD\nendpoint --> sender";
             let result = parse(input);
@@ -2112,7 +2111,6 @@ A[\LeanLeft\]"#;
             }
 
             #[test]
-            #[ignore = "TODO: Parser treats 'end' prefix as keyword, needs grammar fix"]
             fn should_handle_node_names_with_end_substring() {
                 let input = "graph TD\nendpoint --> sender";
                 let result = parse(input);

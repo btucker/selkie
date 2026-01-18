@@ -205,8 +205,8 @@ rel_type = @{
     "o--" | "--o" | "o.." | "..o" |
     // Dependency arrows
     "<--" | "-->" | "<.." | "..>" |
-    // Lollipop
-    "--o)" | "o)--" |
+    // Lollipop (interface notation) - ()-- and --(o)
+    "()--" | "--()" | "--o)" | "o)--" |
     // Simple lines (shortest - must be last)
     "--" | ".."
 }

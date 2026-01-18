@@ -322,8 +322,10 @@ subgraph_id = {
 // ==================
 
 // Reserved keywords that should not match as identifiers
+// Reserved keywords must be followed by a non-identifier character to match
 reserved_keyword = {
-    "end" | "subgraph" | "classDef" | "class" | "style" | "linkStyle" | "click" | "direction" | "accTitle" | "accDescr"
+    ("end" | "subgraph" | "classDef" | "class" | "style" | "linkStyle" | "click" | "direction" | "accTitle" | "accDescr")
+    ~ !id_char
 }
 
 // identifier cannot contain ::: (class separator)

@@ -260,14 +260,39 @@ fn process_relationship(
 
     for inner in pair.into_inner() {
         match inner.as_rule() {
-            Rule::relationship_src => {
-                src = extract_id(inner);
+            Rule::forward_relationship => {
+                // src - type -> dst
+                for rel_inner in inner.into_inner() {
+                    match rel_inner.as_rule() {
+                        Rule::relationship_src => {
+                            src = extract_id(rel_inner);
+                        }
+                        Rule::relationship_dst => {
+                            dst = extract_id(rel_inner);
+                        }
+                        Rule::relationship_type => {
+                            rel_type = rel_inner.as_str().to_lowercase();
+                        }
+                        _ => {}
+                    }
+                }
             }
-            Rule::relationship_dst => {
-                dst = extract_id(inner);
-            }
-            Rule::relationship_type => {
-                rel_type = inner.as_str().to_lowercase();
+            Rule::reverse_relationship => {
+                // dst <- type - src (note: order is reversed in the syntax)
+                for rel_inner in inner.into_inner() {
+                    match rel_inner.as_rule() {
+                        Rule::relationship_src => {
+                            src = extract_id(rel_inner);
+                        }
+                        Rule::relationship_dst => {
+                            dst = extract_id(rel_inner);
+                        }
+                        Rule::relationship_type => {
+                            rel_type = rel_inner.as_str().to_lowercase();
+                        }
+                        _ => {}
+                    }
+                }
             }
             _ => {}
         }
@@ -992,7 +1017,6 @@ element constructor {
         use super::*;
 
         #[test]
-        #[ignore = "TODO: Reverse relationship syntax (<-) not supported"]
         fn test_cypress_sample() {
             // From Cypress: sample
             let input = r#"requirementDiagram

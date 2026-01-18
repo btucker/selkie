@@ -133,7 +133,17 @@ docref_attr = { ^"docref" ~ ":" ~ attr_value }
 // ==================
 
 relationship_def = {
+    forward_relationship | reverse_relationship
+}
+
+// Standard: src - type -> dst
+forward_relationship = {
     relationship_src ~ "-" ~ relationship_type ~ "->" ~ relationship_dst
+}
+
+// Reverse: dst <- type - src
+reverse_relationship = {
+    relationship_dst ~ "<-" ~ relationship_type ~ "-" ~ relationship_src
 }
 
 relationship_src = { quoted_string | unquoted_id }
