@@ -34,6 +34,8 @@ pub struct SvgStructure {
     pub edge_geometry: EdgeGeometry,
     /// Font analysis: tracks font-size and font-weight on text elements
     pub font_analysis: FontAnalysis,
+    /// Color analysis: tracks fill and stroke colors used
+    pub color_analysis: ColorAnalysis,
 }
 
 /// Analysis of SVG element rendering order (z-order)
@@ -75,6 +77,19 @@ pub struct StrokeAnalysis {
     pub avg_rect_stroke: f64,
     /// Average stroke width on paths (0 if none)
     pub avg_path_stroke: f64,
+}
+
+/// Analysis of colors used in the SVG
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct ColorAnalysis {
+    /// Unique fill colors found (normalized to lowercase)
+    pub fill_colors: Vec<String>,
+    /// Unique stroke colors found (normalized to lowercase)
+    pub stroke_colors: Vec<String>,
+    /// Count of elements with fill
+    pub fill_count: usize,
+    /// Count of elements with stroke
+    pub stroke_count: usize,
 }
 
 /// Analysis of edge/path geometry
@@ -188,6 +203,9 @@ impl SvgStructure {
         // Analyze font styles
         let font_analysis = analyze_fonts(&doc);
 
+        // Analyze colors
+        let color_analysis = analyze_colors(&doc);
+
         Ok(SvgStructure {
             width,
             height,
@@ -202,6 +220,7 @@ impl SvgStructure {
             stroke_analysis,
             edge_geometry,
             font_analysis,
+            color_analysis,
         })
     }
 }
@@ -1290,6 +1309,105 @@ fn analyze_fonts(doc: &roxmltree::Document) -> FontAnalysis {
     }
 
     analysis
+}
+
+/// Analyze colors (fill and stroke) used in the SVG
+fn analyze_colors(doc: &roxmltree::Document) -> ColorAnalysis {
+    use std::collections::HashSet;
+
+    let mut fill_colors: HashSet<String> = HashSet::new();
+    let mut stroke_colors: HashSet<String> = HashSet::new();
+    let mut fill_count = 0;
+    let mut stroke_count = 0;
+
+    // Elements that typically have meaningful fill/stroke colors
+    let shape_tags = ["rect", "circle", "ellipse", "polygon", "path", "line", "polyline"];
+
+    for node in doc.descendants() {
+        let tag = node.tag_name().name();
+
+        // Skip defs, markers, and other non-rendered elements
+        if tag == "defs" || tag == "marker" || tag == "clipPath" || tag == "mask" {
+            continue;
+        }
+
+        // Check fill attribute
+        if let Some(fill) = node.attribute("fill") {
+            if fill != "none" && !fill.is_empty() {
+                fill_colors.insert(normalize_color(fill));
+                if shape_tags.contains(&tag) {
+                    fill_count += 1;
+                }
+            }
+        }
+
+        // Check stroke attribute
+        if let Some(stroke) = node.attribute("stroke") {
+            if stroke != "none" && !stroke.is_empty() {
+                stroke_colors.insert(normalize_color(stroke));
+                if shape_tags.contains(&tag) {
+                    stroke_count += 1;
+                }
+            }
+        }
+
+        // Also check inline style attribute for fill/stroke
+        if let Some(style) = node.attribute("style") {
+            if let Some(fill) = extract_style_property(style, "fill") {
+                if fill != "none" && !fill.is_empty() {
+                    fill_colors.insert(normalize_color(&fill));
+                    if shape_tags.contains(&tag) {
+                        fill_count += 1;
+                    }
+                }
+            }
+            if let Some(stroke) = extract_style_property(style, "stroke") {
+                if stroke != "none" && !stroke.is_empty() {
+                    stroke_colors.insert(normalize_color(&stroke));
+                    if shape_tags.contains(&tag) {
+                        stroke_count += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    let mut fill_vec: Vec<String> = fill_colors.into_iter().collect();
+    let mut stroke_vec: Vec<String> = stroke_colors.into_iter().collect();
+    fill_vec.sort();
+    stroke_vec.sort();
+
+    ColorAnalysis {
+        fill_colors: fill_vec,
+        stroke_colors: stroke_vec,
+        fill_count,
+        stroke_count,
+    }
+}
+
+/// Normalize a color string for comparison
+/// Converts to lowercase and handles common formats
+fn normalize_color(color: &str) -> String {
+    let color = color.trim().to_lowercase();
+
+    // Handle rgb/rgba by converting to canonical form
+    if color.starts_with("rgb") {
+        // Already in rgb format, just normalize spacing
+        color
+            .replace(", ", ",")
+            .replace(" ,", ",")
+            .replace("( ", "(")
+            .replace(" )", ")")
+    } else if color.starts_with("hsl") {
+        // HSL format - normalize spacing
+        color
+            .replace(", ", ",")
+            .replace(" ,", ",")
+            .replace("( ", "(")
+            .replace(" )", ")")
+    } else {
+        color
+    }
 }
 
 /// Extract a property value from an inline style string

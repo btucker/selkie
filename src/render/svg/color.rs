@@ -128,6 +128,20 @@ impl Color {
         format!("rgba({}, {}, {}, {})", self.r, self.g, self.b, self.a)
     }
 
+    /// Convert to hsl() string (matching mermaid.js output format)
+    /// Uses high precision to match mermaid.js computed values
+    pub fn to_hsl_string(&self) -> String {
+        let (h, s, l) = self.to_hsl();
+        // Mermaid.js outputs full precision HSL values
+        // Format: hsl(h, s%, l%) with high precision decimals
+        format!(
+            "hsl({}, {}%, {}%)",
+            h.round() as i32,
+            format_hsl_pct(s),
+            format_hsl_pct(l)
+        )
+    }
+
     /// Convert RGB to HSL (returns h: 0-360, s: 0-100, l: 0-100)
     pub fn to_hsl(&self) -> (f64, f64, f64) {
         let r = self.r as f64 / 255.0;
@@ -237,6 +251,19 @@ impl Color {
     /// Check if the color is dark (luminance < 0.5)
     pub fn is_dark(&self) -> bool {
         self.luminance() < 0.5
+    }
+}
+
+/// Format a percentage value for HSL output, matching mermaid.js precision
+/// Uses full precision for non-integer values, integer for whole numbers
+fn format_hsl_pct(value: f64) -> String {
+    // Check if value is close to a whole number
+    let rounded = value.round();
+    if (value - rounded).abs() < 0.0001 {
+        format!("{}", rounded as i32)
+    } else {
+        // Use full precision like mermaid.js does
+        format!("{}", value)
     }
 }
 

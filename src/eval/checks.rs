@@ -55,6 +55,7 @@ pub fn check_structure(
     // INFO checks - acceptable variations
     check_extra_labels(selkie, reference, &mut issues);
     check_markers(selkie, reference, &mut issues);
+    check_colors(selkie, reference, &mut issues);
 
     issues
 }
@@ -430,6 +431,63 @@ fn check_markers(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut V
                 reference.marker_count, selkie.marker_count
             ),
         ));
+    }
+}
+
+/// Check colors - WARNING if fill colors significantly different
+fn check_colors(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
+    let selkie_fills: HashSet<_> = selkie.color_analysis.fill_colors.iter().collect();
+    let ref_fills: HashSet<_> = reference.color_analysis.fill_colors.iter().collect();
+
+    // Find colors in reference that are missing in selkie
+    let missing_fills: Vec<_> = ref_fills.difference(&selkie_fills).cloned().collect();
+
+    // Find colors in selkie that aren't in reference
+    let extra_fills: Vec<_> = selkie_fills.difference(&ref_fills).cloned().collect();
+
+    // Report as warning if there are significant color differences
+    if !missing_fills.is_empty() || !extra_fills.is_empty() {
+        let mut msg = String::new();
+
+        if !missing_fills.is_empty() {
+            msg.push_str(&format!("Missing fill colors: {:?}", missing_fills));
+        }
+        if !extra_fills.is_empty() {
+            if !msg.is_empty() {
+                msg.push_str("; ");
+            }
+            msg.push_str(&format!("Extra fill colors: {:?}", extra_fills));
+        }
+
+        // Calculate color match percentage
+        let total_unique = selkie_fills.len().max(ref_fills.len());
+        let matching = selkie_fills.intersection(&ref_fills).count();
+        let match_pct = if total_unique > 0 {
+            (matching as f64 / total_unique as f64) * 100.0
+        } else {
+            100.0
+        };
+
+        if match_pct < 50.0 {
+            // Significant color mismatch
+            issues.push(
+                Issue::warning(
+                    "colors",
+                    format!("Color mismatch ({:.0}% match): {}", match_pct, msg),
+                )
+                .with_values(
+                    format!("{:?}", reference.color_analysis.fill_colors),
+                    format!("{:?}", selkie.color_analysis.fill_colors),
+                ),
+            );
+        } else if match_pct < 80.0 {
+            // Moderate color difference
+            issues.push(Issue::info(
+                "colors",
+                format!("Color differences ({:.0}% match): {}", match_pct, msg),
+            ));
+        }
+        // If >= 80% match, don't report (minor variations are acceptable)
     }
 }
 

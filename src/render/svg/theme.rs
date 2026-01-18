@@ -1,5 +1,30 @@
 //! Theme configuration for SVG rendering
 
+use super::color::{adjust, Color};
+
+/// Compute pie chart colors dynamically from theme base colors.
+/// This matches mermaid.js theme-default.js pie color calculation.
+fn compute_pie_colors(primary: &str, secondary: &str, tertiary: &str) -> Vec<String> {
+    let primary_color = Color::from_hex(primary).unwrap_or_else(|| Color::rgb(236, 236, 255));
+    let secondary_color = Color::from_hex(secondary).unwrap_or_else(|| Color::rgb(255, 255, 222));
+    let tertiary_color = Color::from_hex(tertiary).unwrap_or_else(|| Color::rgb(250, 250, 250));
+
+    vec![
+        primary_color.to_hsl_string(),                          // pie1 = primaryColor
+        secondary_color.to_hsl_string(),                        // pie2 = secondaryColor
+        adjust(&tertiary_color, 0.0, 0.0, -40.0).to_hsl_string(), // pie3 = adjust(tertiaryColor, { l: -40 })
+        adjust(&primary_color, 0.0, 0.0, -10.0).to_hsl_string(),  // pie4 = adjust(primaryColor, { l: -10 })
+        adjust(&secondary_color, 0.0, 0.0, -30.0).to_hsl_string(), // pie5 = adjust(secondaryColor, { l: -30 })
+        adjust(&tertiary_color, 0.0, 0.0, -20.0).to_hsl_string(),  // pie6 = adjust(tertiaryColor, { l: -20 })
+        adjust(&primary_color, 60.0, 0.0, -20.0).to_hsl_string(),  // pie7 = adjust(primaryColor, { h: +60, l: -20 })
+        adjust(&primary_color, -60.0, 0.0, -40.0).to_hsl_string(), // pie8 = adjust(primaryColor, { h: -60, l: -40 })
+        adjust(&primary_color, 120.0, 0.0, -40.0).to_hsl_string(), // pie9 = adjust(primaryColor, { h: 120, l: -40 })
+        adjust(&primary_color, 60.0, 0.0, -40.0).to_hsl_string(),  // pie10 = adjust(primaryColor, { h: +60, l: -40 })
+        adjust(&primary_color, -90.0, 0.0, -40.0).to_hsl_string(), // pie11 = adjust(primaryColor, { h: -90, l: -40 })
+        adjust(&primary_color, 120.0, 0.0, -30.0).to_hsl_string(), // pie12 = adjust(primaryColor, { h: 120, l: -30 })
+    ]
+}
+
 /// Color theme for diagram rendering
 #[derive(Debug, Clone)]
 pub struct Theme {
@@ -115,19 +140,8 @@ impl Default for Theme {
             edge_label_background: "rgba(232, 232, 232, 0.8)".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
-            // Pie chart - default theme (mermaid.js derived from primary/secondary)
-            pie_colors: vec![
-                "#ECECFF".to_string(), // pie1 - primary
-                "#ffffde".to_string(), // pie2 - secondary
-                "#b9b9ff".to_string(), // pie3 - tertiary
-                "#b5ff20".to_string(), // pie4
-                "#d4ffb2".to_string(), // pie5
-                "#ffb3e6".to_string(), // pie6
-                "#ffd700".to_string(), // pie7
-                "#c4c4ff".to_string(), // pie8
-                "#ffe6cc".to_string(), // pie9
-                "#ccffcc".to_string(), // pie10
-            ],
+            // Pie chart - dynamically computed from theme colors (matches mermaid.js)
+            pie_colors: compute_pie_colors("#ECECFF", "#ffffde", "#fafafa"),
             pie_stroke_color: "black".to_string(),
             pie_outer_stroke_color: "black".to_string(),
             pie_opacity: "0.7".to_string(),
@@ -181,19 +195,8 @@ impl Theme {
             edge_label_background: "#4a4a4a".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
-            // Pie chart - dark theme (lighter colors for dark background)
-            pie_colors: vec![
-                "#1f2020".to_string(), // pie1 - primary (dark)
-                "#8a8a8a".to_string(), // pie2 - secondary
-                "#333333".to_string(), // pie3 - tertiary
-                "#5f9ea0".to_string(), // pie4 - cadet blue
-                "#6b8e23".to_string(), // pie5 - olive
-                "#b8860b".to_string(), // pie6 - dark goldenrod
-                "#8b4513".to_string(), // pie7 - saddle brown
-                "#4682b4".to_string(), // pie8 - steel blue
-                "#9932cc".to_string(), // pie9 - dark orchid
-                "#2f4f4f".to_string(), // pie10 - dark slate gray
-            ],
+            // Pie chart - dynamically computed from dark theme colors
+            pie_colors: compute_pie_colors("#1f2020", "#8a8a8a", "#333333"),
             pie_stroke_color: "#81B1DB".to_string(),
             pie_outer_stroke_color: "#81B1DB".to_string(),
             pie_opacity: "0.7".to_string(),
@@ -245,19 +248,8 @@ impl Theme {
             edge_label_background: "white".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
-            // Pie chart - neutral theme (grayscale palette)
-            pie_colors: vec![
-                "#f0f0f0".to_string(), // pie1 - primary
-                "#e0e0e0".to_string(), // pie2 - secondary
-                "#d0d0d0".to_string(), // pie3
-                "#c0c0c0".to_string(), // pie4
-                "#b0b0b0".to_string(), // pie5
-                "#a0a0a0".to_string(), // pie6
-                "#909090".to_string(), // pie7
-                "#808080".to_string(), // pie8
-                "#707070".to_string(), // pie9
-                "#606060".to_string(), // pie10
-            ],
+            // Pie chart - dynamically computed from neutral theme colors
+            pie_colors: compute_pie_colors("#f0f0f0", "#e0e0e0", "#fafafa"),
             pie_stroke_color: "#333333".to_string(),
             pie_outer_stroke_color: "#333333".to_string(),
             pie_opacity: "0.7".to_string(),
@@ -310,19 +302,8 @@ impl Theme {
             edge_label_background: "#e8e8e8".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
-            // Pie chart - forest theme (green palette)
-            pie_colors: vec![
-                "#cde498".to_string(), // pie1 - primary light green
-                "#cdffb2".to_string(), // pie2 - secondary mint
-                "#6eaa49".to_string(), // pie3 - medium green
-                "#487e3a".to_string(), // pie4 - darker green
-                "#13540c".to_string(), // pie5 - dark green
-                "#98d439".to_string(), // pie6 - lime
-                "#4caf50".to_string(), // pie7 - material green
-                "#8bc34a".to_string(), // pie8 - light green
-                "#009688".to_string(), // pie9 - teal
-                "#00695c".to_string(), // pie10 - dark teal
-            ],
+            // Pie chart - dynamically computed from forest theme colors
+            pie_colors: compute_pie_colors("#cde498", "#cdffb2", "#e0f2c8"),
             pie_stroke_color: "black".to_string(),
             pie_outer_stroke_color: "black".to_string(),
             pie_opacity: "0.7".to_string(),
