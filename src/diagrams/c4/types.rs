@@ -307,8 +307,20 @@ impl C4Db {
 
     /// Add a relationship
     pub fn add_relationship(&mut self, from: &str, to: &str, label: &str, technology: &str) {
+        self.add_relationship_with_type("Rel", from, to, label, technology);
+    }
+
+    /// Add a relationship with a specific type (Rel, BiRel, Rel_Back, etc.)
+    pub fn add_relationship_with_type(
+        &mut self,
+        rel_type: &str,
+        from: &str,
+        to: &str,
+        label: &str,
+        technology: &str,
+    ) {
         let rel = C4Relationship {
-            rel_type: "Rel".to_string(),
+            rel_type: rel_type.to_string(),
             from: from.to_string(),
             to: to.to_string(),
             label: label.to_string(),

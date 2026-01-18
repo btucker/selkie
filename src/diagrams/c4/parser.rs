@@ -321,10 +321,36 @@ fn process_statement(db: &mut C4Db, pair: pest::iterators::Pair<Rule>) -> Result
             process_boundary(db, pair, "deployment_r")?;
         }
         // Relationships
-        Rule::rel_stmt | Rule::birel_stmt | Rule::rel_direction_stmt => {
+        Rule::rel_stmt => {
             let attrs = extract_all_attributes(pair);
             if attrs.len() >= 2 {
-                db.add_relationship(
+                db.add_relationship_with_type(
+                    "Rel",
+                    &attrs.first().cloned().unwrap_or_default(),
+                    &attrs.get(1).cloned().unwrap_or_default(),
+                    &attrs.get(2).cloned().unwrap_or_default(),
+                    &attrs.get(3).cloned().unwrap_or_default(),
+                );
+            }
+        }
+        Rule::birel_stmt => {
+            let attrs = extract_all_attributes(pair);
+            if attrs.len() >= 2 {
+                db.add_relationship_with_type(
+                    "BiRel",
+                    &attrs.first().cloned().unwrap_or_default(),
+                    &attrs.get(1).cloned().unwrap_or_default(),
+                    &attrs.get(2).cloned().unwrap_or_default(),
+                    &attrs.get(3).cloned().unwrap_or_default(),
+                );
+            }
+        }
+        Rule::rel_direction_stmt => {
+            let attrs = extract_all_attributes(pair);
+            if attrs.len() >= 2 {
+                // For directional rels, just use "Rel" type for now
+                db.add_relationship_with_type(
+                    "Rel",
                     &attrs.first().cloned().unwrap_or_default(),
                     &attrs.get(1).cloned().unwrap_or_default(),
                     &attrs.get(2).cloned().unwrap_or_default(),

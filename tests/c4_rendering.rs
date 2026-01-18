@@ -673,6 +673,15 @@ BiRel(user, sys, "Communicates")"#;
             svg_contains_text(&svg, "Communicates"),
             "Should contain BiRel label"
         );
+        // BiRel should have arrows on both ends
+        assert!(
+            svg.contains("marker-start"),
+            "BiRel should have marker-start for bidirectional arrow"
+        );
+        assert!(
+            svg.contains("marker-end"),
+            "BiRel should have marker-end for bidirectional arrow"
+        );
     }
 
     #[test]

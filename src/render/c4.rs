@@ -648,14 +648,21 @@ fn render_relationship(rel: &C4Relationship, layout: &Layout) -> Option<SvgEleme
 
     // Draw the line
     let path = format!("M {} {} L {} {}", start.0, start.1, end.0, end.1);
+    let mut line_attrs = Attrs::new()
+        .with_fill("none")
+        .with_stroke(COLOR_REL)
+        .with_stroke_width(1.0)
+        .with_attr("marker-end", "url(#c4-arrow)")
+        .with_class("c4-relationship");
+
+    // BiRel has arrows on both ends
+    if rel.rel_type == "BiRel" {
+        line_attrs = line_attrs.with_attr("marker-start", "url(#c4-arrow)");
+    }
+
     children.push(SvgElement::Path {
         d: path,
-        attrs: Attrs::new()
-            .with_fill("none")
-            .with_stroke(COLOR_REL)
-            .with_stroke_width(1.0)
-            .with_attr("marker-end", "url(#c4-arrow)")
-            .with_class("c4-relationship"),
+        attrs: line_attrs,
     });
 
     // Add label at midpoint
