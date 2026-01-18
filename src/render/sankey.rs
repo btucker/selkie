@@ -74,8 +74,8 @@ pub fn render_sankey(db: &SankeyDb, config: &RenderConfig) -> Result<String> {
     }
 
     // Add gradient definitions for links
-    let defs = create_gradient_defs(&layout_nodes, &layout_links, config);
-    doc.add_defs(vec![defs]);
+    let gradients = create_gradient_defs(&layout_nodes, &layout_links, config);
+    doc.add_defs(gradients);
 
     // Render order matches mermaid.js: nodes, labels, then links on top
     // Links use mix-blend-mode: multiply so they blend with background
@@ -353,14 +353,14 @@ fn create_gradient_defs(
     nodes: &[LayoutNode],
     links: &[LayoutLink],
     config: &RenderConfig,
-) -> SvgElement {
+) -> Vec<SvgElement> {
     let colors = &config.theme.sankey_node_colors;
     let node_colors: HashMap<_, _> = nodes
         .iter()
         .map(|n| (n.id.clone(), colors[n.index % colors.len()].as_str()))
         .collect();
 
-    let mut children = Vec::new();
+    let mut gradients = Vec::new();
 
     for (i, link) in links.iter().enumerate() {
         let source_color = node_colors
@@ -385,10 +385,10 @@ fn create_gradient_defs(
             ),
         };
 
-        children.push(gradient);
+        gradients.push(gradient);
     }
 
-    SvgElement::Defs { children }
+    gradients
 }
 
 /// Render all links as strokes (matching mermaid.js d3SankeyLinkHorizontal)
@@ -500,13 +500,14 @@ fn render_labels(nodes: &[LayoutNode], width: f64, config: &RenderConfig) -> Svg
 
         let label_y = (node.y0 + node.y1) / 2.0;
 
+        // Use dy="0.35em" for vertical centering (matches mermaid.js approach)
         let label = SvgElement::Text {
             x: label_x,
             y: label_y,
             content: node.id.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", text_anchor)
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("dy", "0.35em")
                 .with_attr("font-size", &format!("{}", FONT_SIZE))
                 .with_fill(&config.theme.sankey_label_color)
                 .with_class("sankey-label"),
