@@ -325,7 +325,10 @@ fn test_many_bars_vertical() {
 
     assert_valid_svg(&svg);
     // Verify bar elements exist
-    assert!(svg.contains("<rect"), "Should contain rect elements for bars");
+    assert!(
+        svg.contains("<rect"),
+        "Should contain rect elements for bars"
+    );
 }
 
 #[test]
@@ -391,7 +394,10 @@ fn test_line_chart_only() {
 
     assert_valid_svg(&svg);
     // Verify path elements exist for lines
-    assert!(svg.contains("<path"), "Should contain path elements for lines");
+    assert!(
+        svg.contains("<path"),
+        "Should contain path elements for lines"
+    );
 }
 
 #[test]
@@ -429,8 +435,14 @@ fn test_bar_and_line_combined() {
     let svg = render(&diagram).expect("Failed to render chart");
 
     assert_valid_svg(&svg);
-    assert!(svg.contains("<rect"), "Should contain rect elements for bars");
-    assert!(svg.contains("<path"), "Should contain path elements for lines");
+    assert!(
+        svg.contains("<rect"),
+        "Should contain rect elements for bars"
+    );
+    assert!(
+        svg.contains("<path"),
+        "Should contain path elements for lines"
+    );
 }
 
 // ============================================================================
@@ -450,7 +462,8 @@ fn test_with_dark_theme() {
         theme: Theme::dark(),
         ..Default::default()
     };
-    let svg = render_with_config(&diagram, &config).expect("Failed to render chart with dark theme");
+    let svg =
+        render_with_config(&diagram, &config).expect("Failed to render chart with dark theme");
 
     assert_valid_svg(&svg);
 }
@@ -468,7 +481,8 @@ fn test_with_forest_theme() {
         theme: Theme::forest(),
         ..Default::default()
     };
-    let svg = render_with_config(&diagram, &config).expect("Failed to render chart with forest theme");
+    let svg =
+        render_with_config(&diagram, &config).expect("Failed to render chart with forest theme");
 
     assert_valid_svg(&svg);
 }
@@ -486,7 +500,8 @@ fn test_with_neutral_theme() {
         theme: Theme::neutral(),
         ..Default::default()
     };
-    let svg = render_with_config(&diagram, &config).expect("Failed to render chart with neutral theme");
+    let svg =
+        render_with_config(&diagram, &config).expect("Failed to render chart with neutral theme");
 
     assert_valid_svg(&svg);
 }

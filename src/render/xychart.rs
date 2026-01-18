@@ -2,9 +2,7 @@
 //!
 //! Renders XY charts with line and bar plots, supporting both vertical and horizontal orientations.
 
-use crate::diagrams::xychart::{
-    ChartOrientation, Plot, PlotType, XAxisData, XYChartDb, YAxisData,
-};
+use crate::diagrams::xychart::{ChartOrientation, Plot, PlotType, XAxisData, XYChartDb, YAxisData};
 use crate::error::Result;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
@@ -137,8 +135,27 @@ fn render_vertical_chart(
     let plot_bottom = area.plot_top + area.plot_height;
 
     // Render axes
-    render_y_axis(doc, db, config, area.plot_left, area.plot_top, area.plot_height, area.y_min, area.y_max, false);
-    render_x_axis(doc, db, config, area.plot_left, plot_bottom, area.plot_width, area.num_points, false);
+    render_y_axis(
+        doc,
+        db,
+        config,
+        area.plot_left,
+        area.plot_top,
+        area.plot_height,
+        area.y_min,
+        area.y_max,
+        false,
+    );
+    render_x_axis(
+        doc,
+        db,
+        config,
+        area.plot_left,
+        plot_bottom,
+        area.plot_width,
+        area.num_points,
+        false,
+    );
 
     // Render plots
     for (plot_idx, plot) in db.get_plots().iter().enumerate() {
@@ -162,8 +179,27 @@ fn render_horizontal_chart(
     // X-axis (categories) goes on the left (vertical)
     // Y-axis (values) goes on the top (horizontal)
 
-    render_y_axis(doc, db, config, area.plot_left, area.plot_top, area.plot_width, area.y_min, area.y_max, true);
-    render_x_axis(doc, db, config, area.plot_left, area.plot_top, area.plot_height, area.num_points, true);
+    render_y_axis(
+        doc,
+        db,
+        config,
+        area.plot_left,
+        area.plot_top,
+        area.plot_width,
+        area.y_min,
+        area.y_max,
+        true,
+    );
+    render_x_axis(
+        doc,
+        db,
+        config,
+        area.plot_left,
+        area.plot_top,
+        area.plot_height,
+        area.num_points,
+        true,
+    );
 
     // Render plots
     for (plot_idx, plot) in db.get_plots().iter().enumerate() {
@@ -218,9 +254,7 @@ fn render_vertical_bars(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &
             height: actual_height.max(0.0),
             rx: None,
             ry: None,
-            attrs: Attrs::new()
-                .with_fill(color)
-                .with_class("xychart-bar"),
+            attrs: Attrs::new().with_fill(color).with_class("xychart-bar"),
         };
         doc.add_element(bar);
     }
@@ -253,9 +287,7 @@ fn render_horizontal_bars(doc: &mut SvgDocument, plot: &Plot, color: &str, area:
             height: bar_height.max(1.0),
             rx: None,
             ry: None,
-            attrs: Attrs::new()
-                .with_fill(color)
-                .with_class("xychart-bar"),
+            attrs: Attrs::new().with_fill(color).with_class("xychart-bar"),
         };
         doc.add_element(bar);
     }
@@ -460,7 +492,10 @@ fn render_y_axis(
                 attrs: Attrs::new()
                     .with_attr("text-anchor", "middle")
                     .with_attr("dominant-baseline", "middle")
-                    .with_attr("transform", &format!("rotate({} {} {})", rotation, title_x, title_y))
+                    .with_attr(
+                        "transform",
+                        &format!("rotate({} {} {})", rotation, title_x, title_y),
+                    )
                     .with_class("xychart-axis-title")
                     .with_attr("font-size", "12")
                     .with_fill(&config.theme.primary_text_color),
@@ -493,7 +528,13 @@ fn render_y_axis(
         };
 
         let tick = SvgElement::Path {
-            d: format!("M {} {} L {} {}", tick_x, tick_y, tick_x + tick_dx, tick_y + tick_dy),
+            d: format!(
+                "M {} {} L {} {}",
+                tick_x,
+                tick_y,
+                tick_x + tick_dx,
+                tick_y + tick_dy
+            ),
             attrs: Attrs::new()
                 .with_stroke(&config.theme.line_color)
                 .with_stroke_width(1.0)
@@ -510,7 +551,10 @@ fn render_y_axis(
             content: label_text,
             attrs: Attrs::new()
                 .with_attr("text-anchor", if is_horizontal { "middle" } else { "end" })
-                .with_attr("dominant-baseline", if is_horizontal { "auto" } else { "middle" })
+                .with_attr(
+                    "dominant-baseline",
+                    if is_horizontal { "auto" } else { "middle" },
+                )
                 .with_class("xychart-axis-label")
                 .with_attr("font-size", "10")
                 .with_fill(&config.theme.primary_text_color),
@@ -574,7 +618,10 @@ fn render_x_axis(
                 attrs: Attrs::new()
                     .with_attr("text-anchor", "middle")
                     .with_attr("dominant-baseline", "middle")
-                    .with_attr("transform", &format!("rotate({} {} {})", rotation, title_x, title_y))
+                    .with_attr(
+                        "transform",
+                        &format!("rotate({} {} {})", rotation, title_x, title_y),
+                    )
                     .with_class("xychart-axis-title")
                     .with_attr("font-size", "12")
                     .with_fill(&config.theme.primary_text_color),
@@ -607,7 +654,13 @@ fn render_x_axis(
         };
 
         let tick = SvgElement::Path {
-            d: format!("M {} {} L {} {}", tick_x, tick_y, tick_x + tick_dx, tick_y + tick_dy),
+            d: format!(
+                "M {} {} L {} {}",
+                tick_x,
+                tick_y,
+                tick_x + tick_dx,
+                tick_y + tick_dy
+            ),
             attrs: Attrs::new()
                 .with_stroke(&config.theme.line_color)
                 .with_stroke_width(1.0)
@@ -623,7 +676,10 @@ fn render_x_axis(
             content: truncate_label(category, 10),
             attrs: Attrs::new()
                 .with_attr("text-anchor", if is_horizontal { "end" } else { "middle" })
-                .with_attr("dominant-baseline", if is_horizontal { "middle" } else { "hanging" })
+                .with_attr(
+                    "dominant-baseline",
+                    if is_horizontal { "middle" } else { "hanging" },
+                )
                 .with_class("xychart-axis-label")
                 .with_attr("font-size", "10")
                 .with_fill(&config.theme.primary_text_color),
