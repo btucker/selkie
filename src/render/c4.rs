@@ -326,79 +326,55 @@ fn element_height(shape_type: &C4ShapeType) -> f64 {
 
 /// Render a C4 element
 fn render_element(element: &C4Element, position: &Position) -> SvgElement {
-    let (bg_color, text_color) = element_colors(&element.shape_type);
+    let (bg_color, stroke_color, text_color) = element_colors(&element.shape_type);
     let mut children = Vec::new();
 
-    // Create the shape based on type
+    // Create the shape based on type (using mermaid's approach)
     match element.shape_type {
-        C4ShapeType::Person | C4ShapeType::PersonExt => {
-            // Person shape: circle head + body rectangle
-            let head_r = 25.0;
-            let head_cx = position.x + position.width / 2.0;
-            let head_cy = position.y + head_r + 10.0;
-
-            children.push(SvgElement::Circle {
-                cx: head_cx,
-                cy: head_cy,
-                r: head_r,
-                attrs: Attrs::new()
-                    .with_fill(bg_color)
-                    .with_class("c4-person-head"),
-            });
-
-            let body_y = head_cy + head_r + 5.0;
-            let body_height = position.height - (body_y - position.y) - 10.0;
-            children.push(SvgElement::Rect {
-                x: position.x,
-                y: body_y,
-                width: position.width,
-                height: body_height.max(60.0),
-                rx: Some(5.0),
-                ry: Some(5.0),
-                attrs: Attrs::new()
-                    .with_fill(bg_color)
-                    .with_class("c4-person-body"),
-            });
-        }
         C4ShapeType::SystemDb
         | C4ShapeType::SystemDbExt
         | C4ShapeType::ContainerDb
         | C4ShapeType::ContainerDbExt
         | C4ShapeType::ComponentDb
         | C4ShapeType::ComponentDbExt => {
-            // Database shape: cylinder (ellipse top + rect body + ellipse bottom)
-            let ry = 12.0;
-            let cx = position.x + position.width / 2.0;
+            // Database shape: cylinder using SVG path (matching mermaid)
+            let half = position.width / 2.0;
+            let height = position.height;
 
-            // Top ellipse
-            children.push(SvgElement::Ellipse {
-                cx,
-                cy: position.y + ry,
-                rx: position.width / 2.0,
-                ry,
-                attrs: Attrs::new().with_fill(bg_color).with_class("c4-db-top"),
-            });
-
-            // Body rectangle
-            children.push(SvgElement::Rect {
-                x: position.x,
-                y: position.y + ry,
-                width: position.width,
-                height: position.height - ry * 2.0,
-                rx: None,
-                ry: None,
-                attrs: Attrs::new().with_fill(bg_color).with_class("c4-db-body"),
-            });
-
-            // Bottom ellipse
-            children.push(SvgElement::Ellipse {
-                cx,
-                cy: position.y + position.height - ry,
-                rx: position.width / 2.0,
-                ry,
+            // Main cylinder body path
+            let d = format!(
+                "M{},{}c0,-10 {},-10 {},-10c0,0 {},0 {},10l0,{}c0,10 -{},-10 -{},-10c0,0 -{},0 -{},-10l0,-{}",
+                position.x, position.y,
+                half, half,
+                half, half,
+                height,
+                half, half,
+                half, half,
+                height
+            );
+            children.push(SvgElement::Path {
+                d,
                 attrs: Attrs::new()
                     .with_fill(bg_color)
-                    .with_class("c4-db-bottom"),
+                    .with_stroke(stroke_color)
+                    .with_stroke_width(0.5)
+                    .with_class("c4-db"),
+            });
+
+            // Top ellipse highlight path
+            let d2 = format!(
+                "M{},{}c0,10 {},10 {},10c0,0 {},0 {},-10",
+                position.x, position.y,
+                half, half,
+                half, half
+            );
+            children.push(SvgElement::Path {
+                d: d2,
+                attrs: Attrs::new()
+                    .with_fill("none")
+                    .with_stroke(stroke_color)
+                    .with_stroke_width(0.5)
+                    .with_class("c4-db-top"),
             });
         }
         C4ShapeType::SystemQueue
@@ -407,43 +383,118 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
         | C4ShapeType::ContainerQueueExt
         | C4ShapeType::ComponentQueue
         | C4ShapeType::ComponentQueueExt => {
-            // Queue shape: rectangle with rounded ends (like a pipe)
-            children.push(SvgElement::Rect {
-                x: position.x,
-                y: position.y,
-                width: position.width,
-                height: position.height,
-                rx: Some(position.height / 3.0),
-                ry: Some(position.height / 3.0),
-                attrs: Attrs::new().with_fill(bg_color).with_class("c4-queue"),
+            // Queue shape: using SVG path (matching mermaid)
+            let width = position.width;
+            let half_h = position.height / 2.0;
+
+            // Main queue body path
+            let d = format!(
+                "M{},{}l{},0c5,0 5,{} 5,{}c0,0 0,{} -5,{}l-{},0c-5,0 -5,-{} -5,-{}c0,0 0,-{} 5,-{}",
+                position.x, position.y,
+                width,
+                half_h, half_h,
+                half_h, half_h,
+                width,
+                half_h, half_h,
+                half_h, half_h
+            );
+            children.push(SvgElement::Path {
+                d,
+                attrs: Attrs::new()
+                    .with_fill(bg_color)
+                    .with_stroke(stroke_color)
+                    .with_stroke_width(0.5)
+                    .with_class("c4-queue"),
+            });
+
+            // Right side curve path
+            let d2 = format!(
+                "M{},{}c-5,0 -5,{} -5,{}c0,{} 5,{} 5,{}",
+                position.x + width, position.y,
+                half_h, half_h,
+                half_h, half_h, half_h
+            );
+            children.push(SvgElement::Path {
+                d: d2,
+                attrs: Attrs::new()
+                    .with_fill("none")
+                    .with_stroke(stroke_color)
+                    .with_stroke_width(0.5)
+                    .with_class("c4-queue-right"),
             });
         }
         _ => {
-            // Standard rectangle for systems, containers, components
+            // Standard rectangle for persons, systems, containers, components
+            // Using rx/ry = 2.5 to match mermaid
             children.push(SvgElement::Rect {
                 x: position.x,
                 y: position.y,
                 width: position.width,
                 height: position.height,
-                rx: Some(5.0),
-                ry: Some(5.0),
-                attrs: Attrs::new().with_fill(bg_color).with_class("c4-element"),
+                rx: Some(2.5),
+                ry: Some(2.5),
+                attrs: Attrs::new()
+                    .with_fill(bg_color)
+                    .with_stroke(stroke_color)
+                    .with_stroke_width(0.5)
+                    .with_class("c4-element"),
             });
         }
     }
 
     // Calculate text starting position
     let text_x = position.x + position.width / 2.0;
-    let mut text_y = match element.shape_type {
-        C4ShapeType::Person | C4ShapeType::PersonExt => position.y + 80.0,
-        C4ShapeType::SystemDb
-        | C4ShapeType::ContainerDb
-        | C4ShapeType::ComponentDb
-        | C4ShapeType::SystemDbExt
-        | C4ShapeType::ContainerDbExt
-        | C4ShapeType::ComponentDbExt => position.y + 35.0,
-        _ => position.y + 25.0,
-    };
+    let mut text_y = position.y + 18.0;
+
+    // Type label (<<system>>, <<container>>, etc.) - matching mermaid
+    let type_label = shape_type_label(&element.shape_type);
+    children.push(SvgElement::Text {
+        x: text_x,
+        y: text_y,
+        content: format!("<<{}>>", type_label),
+        attrs: Attrs::new()
+            .with_fill(text_color)
+            .with_attr("text-anchor", "middle")
+            .with_attr("font-size", "11")
+            .with_attr("font-style", "italic")
+            .with_class("c4-type"),
+    });
+    text_y += 16.0;
+
+    // Person icon for person types
+    if matches!(
+        element.shape_type,
+        C4ShapeType::Person | C4ShapeType::PersonExt
+    ) {
+        // Draw a simple person icon (circle head + body)
+        let icon_cx = text_x;
+        let icon_cy = text_y + 16.0;
+        let head_r = 10.0;
+
+        // Head
+        children.push(SvgElement::Circle {
+            cx: icon_cx,
+            cy: icon_cy,
+            r: head_r,
+            attrs: Attrs::new()
+                .with_fill(text_color)
+                .with_class("c4-person-icon-head"),
+        });
+
+        // Body (simplified)
+        children.push(SvgElement::Path {
+            d: format!(
+                "M{},{} l-15,25 l30,0 z",
+                icon_cx,
+                icon_cy + head_r
+            ),
+            attrs: Attrs::new()
+                .with_fill(text_color)
+                .with_class("c4-person-icon-body"),
+        });
+
+        text_y += 50.0;
+    }
 
     // Element label (name)
     children.push(SvgElement::Text {
@@ -457,7 +508,7 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
             .with_attr("font-size", "14")
             .with_class("c4-label"),
     });
-    text_y += 18.0;
+    text_y += 16.0;
 
     // Technology (if present)
     if !element.technology.is_empty() {
@@ -472,12 +523,12 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
                 .with_attr("font-style", "italic")
                 .with_class("c4-technology"),
         });
-        text_y += 16.0;
+        text_y += 14.0;
     }
 
     // Description (wrapped)
     if !element.description.is_empty() {
-        text_y += 8.0;
+        text_y += 6.0;
         let wrapped = wrap_text(&element.description, 28);
         for line in wrapped {
             children.push(SvgElement::Text {
@@ -499,6 +550,32 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
         attrs: Attrs::new()
             .with_class("c4-element-group")
             .with_id(&element.alias),
+    }
+}
+
+/// Get the type label for a shape
+fn shape_type_label(shape_type: &C4ShapeType) -> &'static str {
+    match shape_type {
+        C4ShapeType::Person => "person",
+        C4ShapeType::PersonExt => "external_person",
+        C4ShapeType::System => "system",
+        C4ShapeType::SystemExt => "external_system",
+        C4ShapeType::SystemDb => "system_db",
+        C4ShapeType::SystemDbExt => "external_system_db",
+        C4ShapeType::SystemQueue => "system_queue",
+        C4ShapeType::SystemQueueExt => "external_system_queue",
+        C4ShapeType::Container => "container",
+        C4ShapeType::ContainerExt => "external_container",
+        C4ShapeType::ContainerDb => "container_db",
+        C4ShapeType::ContainerDbExt => "external_container_db",
+        C4ShapeType::ContainerQueue => "container_queue",
+        C4ShapeType::ContainerQueueExt => "external_container_queue",
+        C4ShapeType::Component => "component",
+        C4ShapeType::ComponentExt => "external_component",
+        C4ShapeType::ComponentDb => "component_db",
+        C4ShapeType::ComponentDbExt => "external_component_db",
+        C4ShapeType::ComponentQueue => "component_queue",
+        C4ShapeType::ComponentQueueExt => "external_component_queue",
     }
 }
 
@@ -695,29 +772,30 @@ fn get_rect_intersection(pos: &Position, cx: f64, cy: f64, dx: f64, dy: f64) -> 
     (cx, cy)
 }
 
-/// Get colors for an element type
-fn element_colors(shape_type: &C4ShapeType) -> (&'static str, &'static str) {
+/// Get colors for an element type (background, stroke, text)
+fn element_colors(shape_type: &C4ShapeType) -> (&'static str, &'static str, &'static str) {
+    // Stroke colors are slightly darker versions of bg (matching mermaid)
     match shape_type {
-        C4ShapeType::Person => (COLOR_PERSON, COLOR_TEXT_LIGHT),
-        C4ShapeType::PersonExt => (COLOR_PERSON_EXT, COLOR_TEXT_LIGHT),
+        C4ShapeType::Person => (COLOR_PERSON, "#073b6f", COLOR_TEXT_LIGHT),
+        C4ShapeType::PersonExt => (COLOR_PERSON_EXT, "#4e5b63", COLOR_TEXT_LIGHT),
         C4ShapeType::System | C4ShapeType::SystemDb | C4ShapeType::SystemQueue => {
-            (COLOR_SYSTEM, COLOR_TEXT_LIGHT)
+            (COLOR_SYSTEM, "#0e5a9d", COLOR_TEXT_LIGHT)
         }
         C4ShapeType::SystemExt | C4ShapeType::SystemDbExt | C4ShapeType::SystemQueueExt => {
-            (COLOR_SYSTEM_EXT, COLOR_TEXT_LIGHT)
+            (COLOR_SYSTEM_EXT, "#7a7a7a", COLOR_TEXT_LIGHT)
         }
         C4ShapeType::Container | C4ShapeType::ContainerDb | C4ShapeType::ContainerQueue => {
-            (COLOR_CONTAINER, COLOR_TEXT_LIGHT)
+            (COLOR_CONTAINER, "#3879b8", COLOR_TEXT_LIGHT)
         }
         C4ShapeType::ContainerExt
         | C4ShapeType::ContainerDbExt
-        | C4ShapeType::ContainerQueueExt => (COLOR_CONTAINER_EXT, COLOR_TEXT_LIGHT),
+        | C4ShapeType::ContainerQueueExt => (COLOR_CONTAINER_EXT, "#7a7a7a", COLOR_TEXT_LIGHT),
         C4ShapeType::Component | C4ShapeType::ComponentDb | C4ShapeType::ComponentQueue => {
-            (COLOR_COMPONENT, COLOR_TEXT_DARK)
+            (COLOR_COMPONENT, "#6fa8dc", COLOR_TEXT_DARK)
         }
         C4ShapeType::ComponentExt
         | C4ShapeType::ComponentDbExt
-        | C4ShapeType::ComponentQueueExt => (COLOR_COMPONENT_EXT, COLOR_TEXT_DARK),
+        | C4ShapeType::ComponentQueueExt => (COLOR_COMPONENT_EXT, "#a6a6a6", COLOR_TEXT_DARK),
     }
 }
 
@@ -833,11 +911,11 @@ mod tests {
 
     #[test]
     fn test_element_colors() {
-        let (bg, text) = element_colors(&C4ShapeType::Person);
+        let (bg, _stroke, text) = element_colors(&C4ShapeType::Person);
         assert_eq!(bg, COLOR_PERSON);
         assert_eq!(text, COLOR_TEXT_LIGHT);
 
-        let (bg, text) = element_colors(&C4ShapeType::Component);
+        let (bg, _stroke, text) = element_colors(&C4ShapeType::Component);
         assert_eq!(bg, COLOR_COMPONENT);
         assert_eq!(text, COLOR_TEXT_DARK);
     }
