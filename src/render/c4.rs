@@ -185,7 +185,10 @@ fn calculate_layout(db: &C4Db) -> Layout {
     let mut elements_by_boundary: HashMap<String, Vec<&C4Element>> = HashMap::new();
     for element in db.get_elements() {
         let parent = element.parent_boundary.clone();
-        elements_by_boundary.entry(parent).or_default().push(element);
+        elements_by_boundary
+            .entry(parent)
+            .or_default()
+            .push(element);
     }
 
     // Create root bounds
@@ -369,9 +372,7 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
             // Top ellipse highlight path
             let d2 = format!(
                 "M{},{}c0,10 {},10 {},10c0,0 {},0 {},-10",
-                position.x, position.y,
-                half, half,
-                half, half
+                position.x, position.y, half, half, half, half
             );
             children.push(SvgElement::Path {
                 d: d2,
@@ -393,7 +394,8 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
             let half_h = position.height / 2.0;
 
             // Main queue body path
-            let d = format!(
+            let d =
+                format!(
                 "M{},{}l{},0c5,0 5,{} 5,{}c0,0 0,{} -5,{}l-{},0c-5,0 -5,-{} -5,-{}c0,0 0,-{} 5,-{}",
                 position.x, position.y,
                 width,
@@ -415,9 +417,13 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
             // Right side curve path
             let d2 = format!(
                 "M{},{}c-5,0 -5,{} -5,{}c0,{} 5,{} 5,{}",
-                position.x + width, position.y,
-                half_h, half_h,
-                half_h, half_h, half_h
+                position.x + width,
+                position.y,
+                half_h,
+                half_h,
+                half_h,
+                half_h,
+                half_h
             );
             children.push(SvgElement::Path {
                 d: d2,
@@ -488,11 +494,7 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
 
         // Body (simplified)
         children.push(SvgElement::Path {
-            d: format!(
-                "M{},{} l-15,25 l30,0 z",
-                icon_cx,
-                icon_cy + head_r
-            ),
+            d: format!("M{},{} l-15,25 l30,0 z", icon_cx, icon_cy + head_r),
             attrs: Attrs::new()
                 .with_fill(text_color)
                 .with_class("c4-person-icon-body"),
@@ -954,7 +956,10 @@ mod tests {
 
     #[test]
     fn test_wrap_text_long() {
-        let result = wrap_text("This is a very long description that needs to be wrapped", 20);
+        let result = wrap_text(
+            "This is a very long description that needs to be wrapped",
+            20,
+        );
         assert!(result.len() > 1);
     }
 

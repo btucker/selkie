@@ -484,7 +484,10 @@ Person(user, "User", "A system user")"#;
 
         let svg = render_c4_svg(input).expect("Failed to render person");
         assert!(svg.contains("<svg"), "Should produce valid SVG");
-        assert!(svg_contains_text(&svg, "User"), "Should contain person label");
+        assert!(
+            svg_contains_text(&svg, "User"),
+            "Should contain person label"
+        );
     }
 
     #[test]
@@ -507,7 +510,10 @@ Container(api, "API", "Node.js", "REST API")"#;
 
         let svg = render_c4_svg(input).expect("Failed to render container");
         assert!(svg.contains("<svg"), "Should produce valid SVG");
-        assert!(svg_contains_text(&svg, "API"), "Should contain container label");
+        assert!(
+            svg_contains_text(&svg, "API"),
+            "Should contain container label"
+        );
     }
 
     #[test]
@@ -657,7 +663,10 @@ Rel(user, sys, "Uses")"#;
 
         let svg = render_c4_svg(input).expect("Failed to render relationship");
         assert!(svg.contains("<svg"), "Should produce valid SVG");
-        assert!(svg_contains_text(&svg, "Uses"), "Should contain relationship label");
+        assert!(
+            svg_contains_text(&svg, "Uses"),
+            "Should contain relationship label"
+        );
     }
 
     #[test]
