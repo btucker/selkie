@@ -718,6 +718,8 @@ fn detect_diagram_type(source: &str) -> String {
         "packet".to_string()
     } else if first_line.starts_with("block-beta") || first_line.starts_with("block") {
         "block".to_string()
+    } else if first_line.starts_with("kanban") {
+        "kanban".to_string()
     } else {
         "unknown".to_string()
     }

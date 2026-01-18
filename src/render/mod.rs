@@ -11,6 +11,7 @@ mod flowchart;
 mod gantt;
 mod git;
 mod journey;
+mod kanban;
 mod mindmap;
 mod packet;
 mod pie;
@@ -109,6 +110,7 @@ pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<St
         Diagram::Quadrant(db) => quadrant::render_quadrant(db, config),
         Diagram::Treemap(db) => treemap::render_treemap(db, config),
         Diagram::Journey(db) => journey::render_journey(db, config),
+        Diagram::Kanban(db) => kanban::render_kanban(db, config),
         _ => Err(MermaidError::RenderError(format!(
             "Diagram type {:?} not yet supported for rendering",
             diagram_type_name(diagram)
