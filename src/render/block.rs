@@ -371,7 +371,7 @@ fn render_edges(edges: &[PositionedEdge], _config: &RenderConfig) -> SvgElement 
             attrs: Attrs::new()
                 .with_class("block-edge")
                 .with_fill("none")
-                .with_stroke_width(2.0)
+                .with_stroke_width(1.0)
                 .with_attr("marker-end", "url(#arrowhead)"),
         });
 
@@ -500,9 +500,9 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
         BlockType::Diamond => {
             let cx = w / 2.0;
             let cy = h / 2.0;
-            let path = format!("M {} 0 L {} {} L {} {} L 0 {} Z", cx, w, cy, cx, h, cy);
-            SvgElement::Path {
-                d: path,
+            let points = format!("{},{} {},{} {},{} {},{}", cx, 0.0, w, cy, cx, h, 0.0, cy);
+            SvgElement::PolygonStr {
+                points,
                 attrs: Attrs::new().with_class("node-bkg"),
             }
         }
