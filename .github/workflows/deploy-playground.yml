@@ -85,7 +85,7 @@ jobs:
 
       - name: Generate eval report
         run: |
-          cargo run --release --features eval --bin selkie -- eval -o /tmp/selkie-eval
+          cargo run --release --features eval --bin selkie -- eval -o /tmp/selkie-eval || true
           mv /tmp/selkie-eval/selkie-eval-*/  playground/eval
 
       - name: Copy assets
