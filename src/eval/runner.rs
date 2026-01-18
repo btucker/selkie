@@ -115,8 +115,12 @@ impl EvalRunner {
             .collect();
 
         // Pre-render all reference SVGs in batch (uses cache for already-rendered diagrams)
-        let diagram_texts: Vec<&str> = filtered.iter().map(|i| i.text.as_str()).collect();
-        let reference_svgs = self.cache.render_batch(&diagram_texts);
+        // Pass both names and texts for named caching (saves to docs/images/reference/)
+        let named_diagrams: Vec<(&str, &str)> = filtered
+            .iter()
+            .map(|i| (i.name.as_str(), i.text.as_str()))
+            .collect();
+        let reference_svgs = self.cache.render_batch_named(&named_diagrams);
 
         // Evaluate each diagram with pre-rendered reference
         for (i, input) in filtered.iter().enumerate() {
