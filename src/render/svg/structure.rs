@@ -34,6 +34,8 @@ pub struct SvgStructure {
     pub edge_geometry: EdgeGeometry,
     /// Font analysis: tracks font-size and font-weight on text elements
     pub font_analysis: FontAnalysis,
+    /// Raw SVG string for additional parsing if needed
+    pub raw_svg: String,
 }
 
 /// Analysis of SVG element rendering order (z-order)
@@ -217,6 +219,7 @@ impl SvgStructure {
             stroke_analysis,
             edge_geometry,
             font_analysis,
+            raw_svg: svg.to_string(),
         })
     }
 }

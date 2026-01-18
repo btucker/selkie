@@ -1336,72 +1336,116 @@ fn point_touches_node_boundary(x: f64, y: f64, node: &NodeBounds, tolerance: f64
 /// Check for text that overflows/escapes its containing node
 /// This detects a common rendering issue where text is too long for its box
 fn check_text_overflow(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
-    let text_bounds = &selkie.edge_geometry.text_bounds;
     let node_bounds = &selkie.edge_geometry.node_bounds;
 
-    if text_bounds.is_empty() || node_bounds.is_empty() {
+    if node_bounds.is_empty() {
         return;
     }
 
     let mut overflow_issues = Vec::new();
-    let tolerance = 10.0; // Allow some small overflow
+    let tolerance = 5.0; // Allow small tolerance
 
-    for text in text_bounds {
-        // Find the containing node for this text
-        let containing_node = if let Some(ref parent_id) = text.parent_node_id {
-            node_bounds.iter().find(|n| n.id == *parent_id)
-        } else {
-            // Try to find a node that contains this text geometrically
-            node_bounds.iter().find(|n| {
-                text.x >= n.x - tolerance
-                    && text.y >= n.y - tolerance
-                    && text.x <= n.x + n.width + tolerance
-                    && text.y <= n.y + n.height + tolerance
-            })
-        };
+    // Parse SVG directly to check text bounds accurately
+    if let Ok(doc) = roxmltree::Document::parse(&selkie.raw_svg) {
+        for text_node in doc.descendants().filter(|n| n.tag_name().name() == "text") {
+            // Get text y coordinate
+            let text_y = text_node
+                .attribute("y")
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(0.0);
 
-        if let Some(node) = containing_node {
-            // Check if text extends beyond node bounds
-            let text_right = text.x + text.width;
-            let text_bottom = text.y + text.height;
-            let node_right = node.x + node.width;
-            let node_bottom = node.y + node.height;
+            // Count tspans and check for dy attributes
+            let tspans: Vec<_> = text_node
+                .descendants()
+                .filter(|n| n.tag_name().name() == "tspan")
+                .collect();
 
-            let overflow_right = text_right - node_right;
-            let overflow_bottom = text_bottom - node_bottom;
-            let overflow_left = node.x - text.x;
-            let overflow_top = node.y - text.y;
-
-            // Truncate text for display (first 30 chars)
-            let text_preview = if text.text.len() > 30 {
-                format!("{}...", &text.text[..30])
-            } else {
-                text.text.clone()
-            };
-
-            if overflow_right > tolerance {
-                overflow_issues.push(format!(
-                    "Text \"{}\" overflows right by {:.0}px (node: {})",
-                    text_preview, overflow_right, node.id
-                ));
+            if tspans.is_empty() {
+                continue; // Skip single-line text without tspans
             }
-            if overflow_bottom > tolerance {
-                overflow_issues.push(format!(
-                    "Text \"{}\" overflows bottom by {:.0}px (node: {})",
-                    text_preview, overflow_bottom, node.id
-                ));
+
+            // Calculate total dy offset for multi-line text
+            let font_size = 16.0; // Default font size
+            let mut total_dy = 0.0;
+            for tspan in &tspans {
+                if let Some(dy) = tspan.attribute("dy") {
+                    // Parse dy value (e.g., "1em", "1.1em")
+                    let dy_value = if dy.ends_with("em") {
+                        dy.trim_end_matches("em").parse::<f64>().unwrap_or(0.0) * font_size
+                    } else {
+                        dy.parse::<f64>().unwrap_or(0.0)
+                    };
+                    total_dy += dy_value;
+                }
             }
-            if overflow_left > tolerance {
-                overflow_issues.push(format!(
-                    "Text \"{}\" overflows left by {:.0}px (node: {})",
-                    text_preview, overflow_left, node.id
-                ));
+
+            // Calculate actual text bottom (y + all dy offsets + descender space)
+            let text_bottom = text_y + total_dy + font_size * 0.2;
+
+            // Get parent group transform to find absolute position
+            let mut group_y = 0.0;
+            let mut current = text_node.parent();
+            while let Some(parent) = current {
+                if let Some(transform) = parent.attribute("transform") {
+                    if let Some(ty) = parse_translate_y(transform) {
+                        group_y += ty;
+                    }
+                }
+                current = parent.parent();
             }
-            if overflow_top > tolerance {
-                overflow_issues.push(format!(
-                    "Text \"{}\" overflows top by {:.0}px (node: {})",
-                    text_preview, overflow_top, node.id
-                ));
+
+            let absolute_text_bottom = group_y + text_bottom;
+
+            // Find containing node by checking if it contains the text's position
+            let text_x = text_node
+                .attribute("x")
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(0.0);
+            let mut group_x = 0.0;
+            let mut current2 = text_node.parent();
+            while let Some(parent) = current2 {
+                if let Some(transform) = parent.attribute("transform") {
+                    if let Some(tx) = parse_translate_x(transform) {
+                        group_x += tx;
+                    }
+                }
+                current2 = parent.parent();
+            }
+            let absolute_text_x = group_x + text_x;
+
+            // Find the containing node
+            let containing_node = node_bounds.iter().find(|n| {
+                absolute_text_x >= n.x - tolerance
+                    && absolute_text_x <= n.x + n.width + tolerance
+                    && group_y + text_y >= n.y - tolerance
+                    && group_y + text_y <= n.y + n.height + tolerance
+            });
+
+            if let Some(node) = containing_node {
+                let node_bottom = node.y + node.height;
+                let overflow_bottom = absolute_text_bottom - node_bottom;
+
+                if overflow_bottom > tolerance {
+                    // Get text content for preview
+                    let text_content: String = text_node
+                        .descendants()
+                        .filter_map(|n| n.text())
+                        .collect::<Vec<_>>()
+                        .join(" ");
+                    let text_preview = if text_content.len() > 30 {
+                        format!("{}...", &text_content[..30])
+                    } else {
+                        text_content
+                    };
+
+                    overflow_issues.push(format!(
+                        "Text \"{}\" overflows bottom by {:.0}px (node height: {:.0}, text needs: {:.0})",
+                        text_preview,
+                        overflow_bottom,
+                        node.height,
+                        absolute_text_bottom - node.y
+                    ));
+                }
             }
         }
     }
@@ -1416,6 +1460,36 @@ fn check_text_overflow(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
             ),
         ));
     }
+}
+
+/// Parse x-coordinate from translate transform
+fn parse_translate_x(transform: &str) -> Option<f64> {
+    if let Some(start) = transform.find("translate(") {
+        let rest = &transform[start + 10..];
+        if let Some(end) = rest.find(')') {
+            let coords = &rest[..end];
+            let parts: Vec<&str> = coords.split([',', ' ']).filter(|s| !s.is_empty()).collect();
+            if !parts.is_empty() {
+                return parts[0].trim().parse::<f64>().ok();
+            }
+        }
+    }
+    None
+}
+
+/// Parse y-coordinate from translate transform
+fn parse_translate_y(transform: &str) -> Option<f64> {
+    if let Some(start) = transform.find("translate(") {
+        let rest = &transform[start + 10..];
+        if let Some(end) = rest.find(')') {
+            let coords = &rest[..end];
+            let parts: Vec<&str> = coords.split([',', ' ']).filter(|s| !s.is_empty()).collect();
+            if parts.len() >= 2 {
+                return parts[1].trim().parse::<f64>().ok();
+            }
+        }
+    }
+    None
 }
 
 /// Check for element spacing issues (overlapping or too close)

@@ -191,14 +191,18 @@ fn estimate_node_height(text: &str, width: f64) -> f64 {
         // Estimate characters per line
         let chars_per_line = (width / (FONT_SIZE * CHAR_WIDTH_FACTOR)).floor() as usize;
         let line_count = if chars_per_line > 0 {
-            (line.len() / chars_per_line).max(1)
+            // Use ceiling division to round up - ensures we allocate enough height
+            ((line.len() + chars_per_line - 1) / chars_per_line).max(1)
         } else {
             1
         };
         total_lines += line_count;
     }
 
-    let height = total_lines as f64 * FONT_SIZE * 1.1 + NODE_PADDING;
+    // Height formula matches reference: bbox.height + fontSize * 1.1 * 0.5 + padding
+    // For multi-line text: lines * lineHeight + extra padding for text y-offset (10px)
+    let line_height = FONT_SIZE * 1.1;
+    let height = total_lines as f64 * line_height + NODE_PADDING + 10.0;
     height.max(EVENT_HEIGHT)
 }
 
