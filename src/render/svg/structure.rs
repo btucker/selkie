@@ -304,11 +304,13 @@ fn count_nodes_and_edges(doc: &roxmltree::Document) -> (usize, usize) {
 
     // Node class patterns used by different diagram types in selkie and mermaid.js
     const NODE_CLASSES: &[&str] = &[
-        "node",           // flowchart (selkie)
-        "flowchart-node", // flowchart (mermaid.js)
-        "class-node",     // class diagram (selkie)
-        "state-node",     // state diagram (selkie)
-        "entity-node",    // ER diagram (selkie)
+        "node",             // flowchart (selkie)
+        "flowchart-node",   // flowchart (mermaid.js)
+        "class-node",       // class diagram (selkie)
+        "state-node",       // state diagram (selkie)
+        "entity-node",      // ER diagram (selkie)
+        "requirement-node", // requirement diagram (selkie)
+        "element-node",     // requirement diagram elements (selkie)
         "architecture-service",
         "architecture-junction",
     ];

@@ -15,6 +15,7 @@ mod packet;
 mod pie;
 mod quadrant;
 mod radar;
+mod requirement;
 mod sequence;
 mod state;
 pub mod svg;
@@ -96,6 +97,7 @@ pub fn render_with_config(diagram: &Diagram, config: &RenderConfig) -> Result<St
             gantt::render_gantt(&mut db_clone, config)
         }
         Diagram::Mindmap(db) => mindmap::render_mindmap(db, config),
+        Diagram::Requirement(db) => requirement::render_requirement(db, config),
         Diagram::Radar(db) => radar::render_radar(db, config),
         Diagram::Packet(db) => packet::render_packet(db, config),
         Diagram::XyChart(db) => xychart::render_xychart(db, config),
