@@ -252,9 +252,18 @@ fn packet_should_display_bit_numbers() {
     );
 
     // Should show start bit numbers
-    assert!(svg_contains_text(&svg, ">0<"), "Should contain bit number 0");
-    assert!(svg_contains_text(&svg, ">7<"), "Should contain bit number 7");
-    assert!(svg_contains_text(&svg, ">8<"), "Should contain bit number 8");
+    assert!(
+        svg_contains_text(&svg, ">0<"),
+        "Should contain bit number 0"
+    );
+    assert!(
+        svg_contains_text(&svg, ">7<"),
+        "Should contain bit number 7"
+    );
+    assert!(
+        svg_contains_text(&svg, ">8<"),
+        "Should contain bit number 8"
+    );
     assert!(
         svg_contains_text(&svg, ">15<"),
         "Should contain bit number 15"
@@ -301,9 +310,18 @@ fn packet_should_handle_bit_count_notation() {
     assert!(svg_contains_text(&svg, "word"), "Should contain 'word'");
 
     // Check bit numbers: byte is 0-7, word is 8-23
-    assert!(svg_contains_text(&svg, ">0<"), "Should contain bit number 0");
-    assert!(svg_contains_text(&svg, ">7<"), "Should contain bit number 7");
-    assert!(svg_contains_text(&svg, ">8<"), "Should contain bit number 8");
+    assert!(
+        svg_contains_text(&svg, ">0<"),
+        "Should contain bit number 0"
+    );
+    assert!(
+        svg_contains_text(&svg, ">7<"),
+        "Should contain bit number 7"
+    );
+    assert!(
+        svg_contains_text(&svg, ">8<"),
+        "Should contain bit number 8"
+    );
     assert!(
         svg_contains_text(&svg, ">23<"),
         "Should contain bit number 23"

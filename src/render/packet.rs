@@ -82,12 +82,7 @@ pub fn render_packet(db: &PacketDb, config: &RenderConfig) -> Result<String> {
 
     // Render each word (row)
     for (word_index, word) in words.iter().enumerate() {
-        draw_word(
-            &mut doc,
-            word,
-            word_index,
-            &packet_config,
-        );
+        draw_word(&mut doc, word, word_index, &packet_config);
     }
 
     // Render title at the bottom
