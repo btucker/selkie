@@ -397,6 +397,13 @@ fn detect_diagram_type(source: &str) -> String {
         "journey".to_string()
     } else if first_line.starts_with("architecture") {
         "architecture".to_string()
+    } else if first_line.starts_with("c4context")
+        || first_line.starts_with("c4container")
+        || first_line.starts_with("c4component")
+        || first_line.starts_with("c4dynamic")
+        || first_line.starts_with("c4deployment")
+    {
+        "c4".to_string()
     } else {
         "unknown".to_string()
     }

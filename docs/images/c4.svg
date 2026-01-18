@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="630" height="630" viewBox="0 0 630 630" class="mermaid">
+  <style>
+
+.c4-element-group {
+  cursor: pointer;
+}
+
+.c4-element, .c4-person-body {
+  stroke: rgba(0,0,0,0.3);
+  stroke-width: 1px;
+}
+
+.c4-person-head {
+  stroke: rgba(0,0,0,0.3);
+  stroke-width: 1px;
+}
+
+.c4-db-top, .c4-db-body {
+  stroke: rgba(0,0,0,0.3);
+  stroke-width: 1px;
+}
+
+.c4-queue {
+  stroke: rgba(0,0,0,0.3);
+  stroke-width: 1px;
+}
+
+.c4-boundary {
+  fill: none;
+}
+
+.c4-label, .c4-technology, .c4-description {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.c4-boundary-label {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.c4-rel-label, .c4-rel-technology {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.c4-relationship {
+  stroke-linecap: round;
+}
+
+  </style>
+  <defs>
+    <marker id="c4-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#666666"/>
+</marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="c4-boundary-group" id="b0">
+      <rect x="40" y="260" width="510" height="250" rx="5" ry="5" class="c4-boundary" stroke-width="2" stroke="#444444" fill="none" stroke-dasharray="10,5"/>
+      <text x="50" y="280" class="c4-boundary-label" font-weight="bold" font-size="14" fill="#444444">BankBoundary</text>
+    </g>
+    <g class="c4-element-group" id="email">
+      <rect x="40" y="80" width="200" height="120" rx="5" ry="5" class="c4-element" fill="#999999"/>
+      <text x="140" y="115" class="c4-label" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">E-mail System</text>
+      <text x="140" y="140" class="c4-description" font-size="11" fill="#ffffff" text-anchor="middle">External e-mail system</text>
+    </g>
+    <g class="c4-element-group" id="customer">
+      <circle cx="170" cy="330" r="25" class="c4-person-head" fill="#08427b"/>
+      <rect x="70" y="360" width="200" height="80" rx="5" ry="5" class="c4-person-body" fill="#08427b"/>
+      <text x="170" y="335" class="c4-label" fill="#ffffff" font-size="14" text-anchor="middle" font-weight="bold">Banking Customer</text>
+      <text x="170" y="360" class="c4-description" fill="#ffffff" font-size="11" text-anchor="middle">A customer of the bank</text>
+    </g>
+    <g class="c4-element-group" id="banking">
+      <rect x="310" y="300" width="200" height="120" rx="5" ry="5" class="c4-element" fill="#1168bd"/>
+      <text x="410" y="335" class="c4-label" fill="#ffffff" font-weight="bold" text-anchor="middle" font-size="14">Internet Banking System</text>
+      <text x="410" y="360" class="c4-description" text-anchor="middle" fill="#ffffff" font-size="11">Allows customers to view</text>
+      <text x="410" y="374" class="c4-description" text-anchor="middle" font-size="11" fill="#ffffff">accounts</text>
+    </g>
+    <g class="c4-relationship-group">
+      <path d="M 270 370 L 310 360" class="c4-relationship" marker-end="url(#c4-arrow)" stroke="#666666" fill="none" stroke-width="1.5"/>
+      <rect x="271" y="355" width="38" height="20" rx="3" ry="3" class="c4-rel-label-bg" stroke-width="1" fill="#ffffff" stroke="#666666"/>
+      <text x="290" y="369" class="c4-rel-label" text-anchor="middle" font-size="11" fill="#666666">Uses</text>
+    </g>
+    <g class="c4-relationship-group">
+      <path d="M 410 420 L 140 80" class="c4-relationship" fill="none" stroke-width="1.5" marker-end="url(#c4-arrow)" stroke="#666666"/>
+      <rect x="224.5" y="240" width="101" height="20" rx="3" ry="3" class="c4-rel-label-bg" fill="#ffffff" stroke="#666666" stroke-width="1"/>
+      <text x="275" y="254" class="c4-rel-label" fill="#666666" text-anchor="middle" font-size="11">Sends e-mails</text>
+      <text x="275" y="265" class="c4-rel-technology" fill="#666666" text-anchor="middle" font-size="10">[SMTP]</text>
+    </g>
+  </g>
+</svg>
