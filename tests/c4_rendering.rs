@@ -23,11 +23,6 @@ fn svg_contains_text(svg: &str, text: &str) -> bool {
     svg.contains(text) || svg.contains(&text.replace('\'', "&apos;"))
 }
 
-#[allow(dead_code)]
-fn count_text_elements(svg: &str, text: &str) -> usize {
-    svg.matches(text).count()
-}
-
 // ============================================================================
 // C4.1: C4Context with enterprise boundaries, persons, systems
 // ============================================================================
