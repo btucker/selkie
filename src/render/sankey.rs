@@ -22,6 +22,15 @@ const NODE_PADDING: f64 = 25.0;
 const LABEL_PADDING: f64 = 6.0;
 const FONT_SIZE: f64 = 14.0;
 
+/// Escape special XML characters for use in SVG text content
+fn escape_xml(s: &str) -> String {
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&apos;")
+}
+
 /// Computed node position and dimensions
 #[derive(Debug, Clone)]
 struct LayoutNode {
@@ -503,10 +512,15 @@ fn render_labels(nodes: &[LayoutNode], width: f64, _config: &RenderConfig) -> Sv
         // Label content: "node_id\nvalue" (matches mermaid showValues=true)
         // Use raw SVG with actual newline (matching mermaid.js output)
         // dy="0em" when showing values (multiline text)
+        // Escape node.id for XML safety (handles &, <, >, etc.)
         let label = SvgElement::Raw {
             content: format!(
                 "<text x=\"{}\" y=\"{}\" dy=\"0em\" text-anchor=\"{}\">{}\n{}</text>",
-                label_x, label_y, text_anchor, node.id, value_str
+                label_x,
+                label_y,
+                text_anchor,
+                escape_xml(&node.id),
+                value_str
             ),
         };
 
