@@ -457,29 +457,16 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
     let text_x = position.x + position.width / 2.0;
     let mut text_y = position.y + 18.0;
 
-    // Type label (<<system>>, <<container>>, etc.) - matching mermaid
-    let type_label = shape_type_label(&element.shape_type);
-    children.push(SvgElement::Text {
-        x: text_x,
-        y: text_y,
-        content: format!("<<{}>>", type_label),
-        attrs: Attrs::new()
-            .with_fill(text_color)
-            .with_attr("text-anchor", "middle")
-            .with_attr("font-size", "11")
-            .with_attr("font-style", "italic")
-            .with_class("c4-type"),
-    });
-    text_y += 16.0;
-
-    // Person icon for person types
-    if matches!(
+    // For person types, calculate icon position and add to text_y offset
+    // Add person icon shapes BEFORE text to ensure proper z-order
+    let is_person = matches!(
         element.shape_type,
         C4ShapeType::Person | C4ShapeType::PersonExt
-    ) {
+    );
+    if is_person {
         // Draw a simple person icon (circle head + body)
         let icon_cx = text_x;
-        let icon_cy = text_y + 16.0;
+        let icon_cy = text_y + 16.0 + 16.0; // After type label
         let head_r = 10.0;
 
         // Head
@@ -499,7 +486,25 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
                 .with_fill(text_color)
                 .with_class("c4-person-icon-body"),
         });
+    }
 
+    // Type label (<<system>>, <<container>>, etc.) - matching mermaid
+    let type_label = shape_type_label(&element.shape_type);
+    children.push(SvgElement::Text {
+        x: text_x,
+        y: text_y,
+        content: format!("<<{}>>", type_label),
+        attrs: Attrs::new()
+            .with_fill(text_color)
+            .with_attr("text-anchor", "middle")
+            .with_attr("font-size", "11")
+            .with_attr("font-style", "italic")
+            .with_class("c4-type"),
+    });
+    text_y += 16.0;
+
+    // Advance text_y past the person icon if present
+    if is_person {
         text_y += 50.0;
     }
 
