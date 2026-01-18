@@ -207,9 +207,8 @@ fn render_with_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Timelin
     let tasks = db.get_tasks();
 
     let mut master_x = LEFT_MARGIN;
-    let mut section_number = 0;
 
-    for section in sections {
+    for (section_number, section) in sections.iter().enumerate() {
         // Filter tasks for this section
         let section_tasks: Vec<&TimelineTask> = tasks
             .iter()
@@ -243,7 +242,6 @@ fn render_with_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Timelin
 
         // Move to next section column
         master_x += section_width + SECTION_GAP;
-        section_number += 1;
     }
 }
 
