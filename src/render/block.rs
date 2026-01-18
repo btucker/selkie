@@ -101,7 +101,7 @@ pub fn render_block(db: &BlockDb, config: &RenderConfig) -> Result<String> {
     }
 
     // Determine columns from root or default
-    let columns = DEFAULT_COLUMNS;
+    let columns = db.get_columns().unwrap_or(DEFAULT_COLUMNS);
 
     // Position blocks in grid layout
     let positioned_blocks = layout_blocks(blocks, &block_sizes, columns);
@@ -211,8 +211,8 @@ fn layout_blocks(
             continue;
         }
 
-        // Skip composite/edge types (handled separately)
-        if block.block_type == BlockType::Composite || block.block_type == BlockType::Edge {
+        // Skip edge types (handled separately)
+        if block.block_type == BlockType::Edge {
             continue;
         }
 
@@ -417,8 +417,9 @@ fn render_blocks(blocks: &[PositionedBlock], config: &RenderConfig) -> SvgElemen
 fn render_block_node(block: &PositionedBlock, _config: &RenderConfig) -> SvgElement {
     let mut node_children = Vec::new();
 
-    // Build class string
+    // Build class string - include "node" for eval detection
     let mut class_list = vec![
+        "node".to_string(),
         "block-node".to_string(),
         format!("block-{:?}", block.block_type).to_lowercase(),
     ];
@@ -649,7 +650,19 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
                 attrs: Attrs::new().with_class("node-bkg"),
             }
         }
-        BlockType::Space | BlockType::Composite | BlockType::Edge => {
+        BlockType::Composite => {
+            // Composite blocks render as dashed rectangle containers
+            SvgElement::Rect {
+                x: 0.0,
+                y: 0.0,
+                width: w,
+                height: h,
+                rx: None,
+                ry: None,
+                attrs: Attrs::new().with_class("block-composite"),
+            }
+        }
+        BlockType::Space | BlockType::Edge => {
             // These don't render shapes
             SvgElement::Group {
                 children: Vec::new(),
