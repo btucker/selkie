@@ -89,7 +89,7 @@ Selkie supports parsing and rendering for all major Mermaid diagram types.
 | **Journey** | <img src="docs/images/journey.svg" alt="User Journey" width="500"> |
 | **Radar** | <img src="docs/images/radar.svg" alt="Radar Chart" width="400"> |
 | **Block** | <img src="docs/images/block_complex.svg" alt="Block Diagram" width="200"> |
-| **Packet** | <img src="docs/images/packet.svg" alt="Packet Diagram" width="500"> |
+| **Packet** | <img src="docs/images/packet_complex.svg" alt="Packet Diagram" width="500"> |
 | **Treemap** | <img src="docs/images/treemap.svg" alt="Treemap" width="400"> |
 
 <details>

@@ -99,6 +99,10 @@ marker path {
   </style>
   <defs>
     <linearGradient id="linearGradient-1" gradientUnits="userSpaceOnUse" x1="10" x2="590"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#f28e2c"/></linearGradient>
+    <linearGradient id="linearGradient-2" gradientUnits="userSpaceOnUse" x1="10" x2="590"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#e15759"/></linearGradient>
+    <linearGradient id="linearGradient-3" gradientUnits="userSpaceOnUse" x1="10" x2="590"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#76b7b2"/></linearGradient>
+    <linearGradient id="linearGradient-4" gradientUnits="userSpaceOnUse" x1="10" x2="590"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#59a14f"/></linearGradient>
+    <linearGradient id="linearGradient-5" gradientUnits="userSpaceOnUse" x1="10" x2="590"><stop offset="0%" stop-color="#4e79a7"/><stop offset="100%" stop-color="#edc949"/></linearGradient>
   </defs>
   <g class="root">
     <g class="clusters">
@@ -114,22 +118,54 @@ marker path {
 
     </g>
     <g class="nodes">
-      <g class="node" id="node-1" transform="translate(0,0)" y="0" x="0">
-        <rect x="0" y="0" width="10" height="400" class="sankey-node" fill="#4e79a7"/>
+      <g class="node" x="0" y="15.375" transform="translate(0,15.375)" id="node-1">
+        <rect x="0" y="0" width="10" height="300" class="sankey-node" fill="#4e79a7"/>
       </g>
-      <g class="node" y="0" id="node-2" x="590" transform="translate(590,0)">
-        <rect x="0" y="0" width="10" height="400" class="sankey-node" fill="#f28e2c"/>
+      <g class="node" transform="translate(590,0)" x="590" id="node-2" y="0">
+        <rect x="0" y="0" width="10" height="120" class="sankey-node" fill="#f28e2c"/>
+      </g>
+      <g class="node" x="590" transform="translate(590,145)" id="node-3" y="145">
+        <rect x="0" y="0" width="10" height="75" class="sankey-node" fill="#e15759"/>
+      </g>
+      <g class="node" id="node-4" x="590" y="245" transform="translate(590,245)">
+        <rect x="0" y="0" width="10" height="45" class="sankey-node" fill="#76b7b2"/>
+      </g>
+      <g class="node" transform="translate(590,315)" x="590" id="node-5" y="315">
+        <rect x="0" y="0" width="10" height="36" class="sankey-node" fill="#59a14f"/>
+      </g>
+      <g class="node" x="590" y="376" id="node-6" transform="translate(590,376)">
+        <rect x="0" y="0" width="10" height="24" class="sankey-node" fill="#edc949"/>
       </g>
     </g>
     <g class="node-labels" font-size="14">
-      <text x="16" y="200" dy="0em" text-anchor="start">sourceNode
-10</text>
-      <text x="584" y="200" dy="0em" text-anchor="end">targetNode
-10</text>
+      <text x="16" y="165.375" dy="0em" text-anchor="start">Revenue
+100</text>
+      <text x="584" y="60" dy="0em" text-anchor="end">Salaries
+40</text>
+      <text x="584" y="182.5" dy="0em" text-anchor="end">Operations
+25</text>
+      <text x="584" y="267.5" dy="0em" text-anchor="end">Marketing
+15</text>
+      <text x="584" y="333" dy="0em" text-anchor="end">R&amp;D
+12</text>
+      <text x="584" y="388" dy="0em" text-anchor="end">Profit
+8</text>
     </g>
     <g class="links" fill="none" stroke-opacity="0.5">
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,200 C300,200 300,200 590,200" stroke="url(#linearGradient-1)" stroke-width="400"/>
+        <path d="M10,75.375 C300,75.375 300,60 590,60" stroke-width="120" stroke="url(#linearGradient-1)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,172.875 C300,172.875 300,182.5 590,182.5" stroke="url(#linearGradient-2)" stroke-width="75"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,232.875 C300,232.875 300,267.5 590,267.5" stroke-width="45" stroke="url(#linearGradient-3)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,273.375 C300,273.375 300,333 590,333" stroke-width="36" stroke="url(#linearGradient-4)"/>
+      </g>
+      <g class="link" style="mix-blend-mode: multiply">
+        <path d="M10,303.375 C300,303.375 300,388 590,388" stroke="url(#linearGradient-5)" stroke-width="24"/>
       </g>
     </g>
   </g>
