@@ -375,22 +375,16 @@ fn render_horizontal_line(doc: &mut SvgDocument, plot: &Plot, color: &str, area:
         return;
     }
 
-    let y_spacing = if area.num_points > 1 {
-        area.plot_height / (area.num_points - 1) as f64
-    } else {
-        area.plot_height
-    };
+    // Use same spacing as bars - centered on each category slot
+    let y_spacing = area.plot_height / area.num_points as f64;
 
     let y_range = area.y_max - area.y_min;
 
     let mut path_data = String::new();
 
     for (i, data_point) in plot.data.iter().enumerate() {
-        let y = if area.num_points > 1 {
-            area.plot_top + y_spacing * i as f64
-        } else {
-            area.plot_top + area.plot_height / 2.0
-        };
+        // Center on each category slot (same as bars)
+        let y = area.plot_top + y_spacing * (i as f64 + 0.5);
 
         let value_ratio = if y_range != 0.0 {
             (data_point.value - area.y_min) / y_range
@@ -418,11 +412,8 @@ fn render_horizontal_line(doc: &mut SvgDocument, plot: &Plot, color: &str, area:
 
     // Add circles at data points
     for (i, data_point) in plot.data.iter().enumerate() {
-        let y = if area.num_points > 1 {
-            area.plot_top + y_spacing * i as f64
-        } else {
-            area.plot_top + area.plot_height / 2.0
-        };
+        // Center on each category slot (same as bars)
+        let y = area.plot_top + y_spacing * (i as f64 + 0.5);
 
         let value_ratio = if y_range != 0.0 {
             (data_point.value - area.y_min) / y_range
