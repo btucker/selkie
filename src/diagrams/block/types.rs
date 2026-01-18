@@ -233,6 +233,11 @@ impl BlockDb {
     pub fn get_classes(&self) -> &HashMap<String, ClassDef> {
         &self.classes
     }
+
+    /// Get root columns setting
+    pub fn get_columns(&self) -> Option<usize> {
+        self.root_block.columns
+    }
 }
 
 #[cfg(test)]
