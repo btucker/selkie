@@ -12,11 +12,12 @@ use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 // C4 layout configuration (matching mermaid.js defaults)
 const SHAPES_PER_ROW: usize = 4;
 const ELEMENT_WIDTH: f64 = 216.0;
-const ELEMENT_HEIGHT: f64 = 150.0;
-const PERSON_HEIGHT: f64 = 180.0;
-const ELEMENT_MARGIN: f64 = 20.0;
-const DIAGRAM_MARGIN: f64 = 20.0;
-const BOUNDARY_PADDING: f64 = 20.0;
+const ELEMENT_HEIGHT: f64 = 119.0; // mermaid default is 60, but text content typically makes it ~119
+const PERSON_HEIGHT: f64 = 167.0; // Person shapes are taller due to icon
+const ELEMENT_MARGIN: f64 = 50.0; // mermaid c4ShapeMargin default
+const DIAGRAM_MARGIN: f64 = 50.0; // mermaid diagramMarginX default
+const BOUNDARY_PADDING: f64 = 20.0; // mermaid c4ShapePadding default
+const MAX_DIAGRAM_WIDTH: f64 = 800.0; // Max width before wrapping to new row
 
 // C4 colors (mermaid.js defaults)
 const COLOR_PERSON: &str = "#08427b";
@@ -119,6 +120,8 @@ struct Bounds {
     next_y: f64,
     row_count: usize,
     row_max_height: f64,
+    // Width limit for wrapping
+    width_limit: f64,
 }
 
 impl Bounds {
@@ -132,15 +135,22 @@ impl Bounds {
             next_y: y,
             row_count: 0,
             row_max_height: 0.0,
+            width_limit: MAX_DIAGRAM_WIDTH,
         }
+    }
+
+    fn with_width_limit(mut self, limit: f64) -> Self {
+        self.width_limit = limit;
+        self
     }
 
     /// Insert an element into the bounds, using grid layout
     fn insert(&mut self, width: f64, height: f64) -> (f64, f64) {
         self.row_count += 1;
 
-        // Check if we need to start a new row
-        if self.row_count > SHAPES_PER_ROW {
+        // Check if we need to start a new row (either by count or width limit)
+        let would_exceed_width = self.next_x + width > self.width_limit;
+        if self.row_count > SHAPES_PER_ROW || would_exceed_width {
             self.next_x = self.start_x;
             self.next_y = self.stop_y + ELEMENT_MARGIN;
             self.row_count = 1;
@@ -457,34 +467,30 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
     let text_x = position.x + position.width / 2.0;
     let mut text_y = position.y + 18.0;
 
-    // For person types, calculate icon position and add to text_y offset
-    // Add person icon shapes BEFORE text to ensure proper z-order
+    // For person types, add person icon image (matching mermaid's approach)
     let is_person = matches!(
         element.shape_type,
         C4ShapeType::Person | C4ShapeType::PersonExt
     );
     if is_person {
-        // Draw a simple person icon (circle head + body)
-        let icon_cx = text_x;
-        let icon_cy = text_y + 16.0 + 16.0; // After type label
-        let head_r = 10.0;
+        // Use base64 PNG image for person icon (matching mermaid)
+        let icon_x = text_x - 24.0; // Center the 48x48 icon
+        let icon_y = text_y + 16.0; // After type label
 
-        // Head
-        children.push(SvgElement::Circle {
-            cx: icon_cx,
-            cy: icon_cy,
-            r: head_r,
-            attrs: Attrs::new()
-                .with_fill(text_color)
-                .with_class("c4-person-icon-head"),
-        });
+        // Select icon based on person type (internal vs external)
+        let img_data = if matches!(element.shape_type, C4ShapeType::PersonExt) {
+            // External person (gray)
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAB6ElEQVR4Xu2YLY+EMBCG9+dWr0aj0Wg0Go1Go0+j8Xdv2uTCvv1gpt0ebHKPuhDaeW4605Z9mJvx4AdXUyTUdd08z+u6flmWZRnHsWkafk9DptAwDPu+f0eAYtu2PEaGWuj5fCIZrBAC2eLBAnRCsEkkxmeaJp7iDJ2QMDdHsLg8SxKFEJaAo8lAXnmuOFIhTMpxxKATebo4UiFknuNo4OniSIXQyRxEA3YsnjGCVEjVXD7yLUAqxBGUyPv/Y4W2beMgGuS7kVQIBycH0fD+oi5pezQETxdHKmQKGk1eQEYldK+jw5GxPfZ9z7Mk0Qnhf1W1m3w//EUn5BDmSZsbR44QQLBEqrBHqOrmSKaQAxdnLArCrxZcM7A7ZKs4ioRq8LFC+NpC3WCBJsvpVw5edm9iEXFuyNfxXAgSwfrFQ1c0iNda8AdejvUgnktOtJQQxmcfFzGglc5WVCj7oDgFqU18boeFSs52CUh8LE8BIVQDT1ABrB0HtgSEYlX5doJnCwv9TXocKCaKbnwhdDKPq4lf3SwU3HLq4V/+WYhHVMa/3b4IlfyikAduCkcBc7mQ3/z/Qq/cTuikhkzB12Ae/mcJC9U+Vo8Ej1gWAtgbeGgFsAMHr50BIWOLCbezvhpBFUdY6EJuJ/QDW0XoMX60zZ0AAAAASUVORK5CYII="
+        } else {
+            // Internal person (blue)
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAACD0lEQVR4Xu2YoU4EMRCGT+4j8Ai8AhaH4QHgAUjQuFMECUgMIUgwJAgMhgQsAYUiJCiQIBBY+EITsjfTdme6V24v4c8vyGbb+ZjOtN0bNcvjQXmkH83WvYBWto6PLm6v7p7uH1/w2fXD+PBycX1Pv2l3IdDm/vn7x+dXQiAubRzoURa7gRZWd0iGRIiJbOnhnfYBQZNJjNbuyY2eJG8fkDE3bbG4ep6MHUAsgYxmE3nVs6VsBWJSGccsOlFPmLIViMzLOB7pCVO2AtHJMohH7Fh6zqitQK7m0rJvAVYgGcEpe//PLdDz65sM4pF9N7ICcXDKIB5Nv6j7tD0NoSdM2QrU9Gg0ewE1LqBhHR3BBdvj2vapnidjHxD/q6vd7Pvhr31AwcY8eXMTXAKECZZJFXuEq27aLgQK5uLMohCenGGuGewOxSjBvYBqeG6B+Nqiblggdjnc+ZXDy+FNFpFzw76O3UBAROuXh6FoiAcf5g9eTvUgzy0nWg6I8cXHRUpg5bOVBCo+KDpFajOf23GgPme7RSQ+lacIENUgJ6gg1k6HjgOlqnLqip4tEuhv0hNEMXUD0clyXE3p6pZA0S2nnvTlXwLJEZWlb7cTQH1+USgTN4VhAenm/wea1OCAOmqo6fE1WCb9WSKBah+rbUWPWAmE2Rvk0ApiB45eOyNAzU8xcTvj8KvkKEoOaIYeHNA3ZuygAvFMUO0AAAAASUVORK5CYII="
+        };
 
-        // Body (simplified)
-        children.push(SvgElement::Path {
-            d: format!("M{},{} l-15,25 l30,0 z", icon_cx, icon_cy + head_r),
-            attrs: Attrs::new()
-                .with_fill(text_color)
-                .with_class("c4-person-icon-body"),
+        children.push(SvgElement::Raw {
+            content: format!(
+                r#"<image x="{}" y="{}" width="48" height="48" href="{}"/>"#,
+                icon_x, icon_y, img_data
+            ),
         });
     }
 
@@ -503,9 +509,9 @@ fn render_element(element: &C4Element, position: &Position) -> SvgElement {
     });
     text_y += 16.0;
 
-    // Advance text_y past the person icon if present
+    // Advance text_y past the person icon if present (48px image + 8px padding)
     if is_person {
-        text_y += 50.0;
+        text_y += 56.0;
     }
 
     // Element label (name)
