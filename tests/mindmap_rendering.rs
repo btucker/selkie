@@ -62,7 +62,10 @@ root"#;
     );
 
     // Should contain the root text
-    assert!(svg_contains_text(&svg, "root"), "Should contain 'root' text");
+    assert!(
+        svg_contains_text(&svg, "root"),
+        "Should contain 'root' text"
+    );
 }
 
 #[test]
@@ -76,7 +79,10 @@ root[root]"#;
         has_class(&doc, "mindmap-node"),
         "Should have mindmap-node class"
     );
-    assert!(svg_contains_text(&svg, "root"), "Should contain 'root' text");
+    assert!(
+        svg_contains_text(&svg, "root"),
+        "Should contain 'root' text"
+    );
 }
 
 #[test]
@@ -90,10 +96,7 @@ root[A root with a long text that wraps to keep the node size in check]"#;
         has_class(&doc, "mindmap-node"),
         "Should have mindmap-node class"
     );
-    assert!(
-        svg_contains_text(&svg, "root"),
-        "Should contain node text"
-    );
+    assert!(svg_contains_text(&svg, "root"), "Should contain node text");
 }
 
 #[test]
@@ -230,7 +233,10 @@ root
 
     // Should have multiple nodes
     let node_count = count_elements_with_class(&doc, "mindmap-node");
-    assert!(node_count >= 10, "Should have at least 10 nodes (1 root + 3 children + 6 grandchildren)");
+    assert!(
+        node_count >= 10,
+        "Should have at least 10 nodes (1 root + 3 children + 6 grandchildren)"
+    );
 }
 
 #[test]
@@ -364,7 +370,10 @@ root
     );
 
     let node_count = count_elements_with_class(&doc, "mindmap-node");
-    assert!(node_count >= 16, "Should have at least 16 nodes (1 root + 15 children)");
+    assert!(
+        node_count >= 16,
+        "Should have at least 16 nodes (1 root + 15 children)"
+    );
 }
 
 // ============================================================================

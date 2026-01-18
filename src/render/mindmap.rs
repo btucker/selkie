@@ -189,11 +189,12 @@ fn position_tree(
     });
 
     // Return subtree dimensions
-    let total_width = width + if node.children.is_empty() {
-        0.0
-    } else {
-        NODE_SPACING_H + max_subtree_width
-    };
+    let total_width = width
+        + if node.children.is_empty() {
+            0.0
+        } else {
+            NODE_SPACING_H + max_subtree_width
+        };
 
     (total_width, subtree_height)
 }
@@ -364,10 +365,7 @@ fn render_node(node: &PositionedNode, _config: &RenderConfig) -> SvgElement {
         attrs: Attrs::new()
             .with_class(&classes.join(" "))
             .with_id(&format!("node-{}", node.id))
-            .with_attr(
-                "transform",
-                &format!("translate({}, {})", node.x, node.y),
-            ),
+            .with_attr("transform", &format!("translate({}, {})", node.x, node.y)),
     }
 }
 
@@ -437,17 +435,29 @@ fn render_node_shape(node: &PositionedNode) -> SvgElement {
                  a{r1},{r1} 1 0,1 {},{} a{r4},{r4} 1 0,1 {},{} \
                  a{r2},{r1} 1 0,1 {},{} a{r3},{r3} 1 0,1 {},0 a{r1},{r1} 1 0,1 {},{} \
                  a{r1},{r1} 1 0,1 {},{} a{r4},{r4} 1 0,1 {},{} H0 V0 Z",
-                w * 0.25, -w * 0.1,
-                w * 0.4, -w * 0.1,
-                w * 0.35, w * 0.2,
-                w * 0.15, h * 0.35,
-                -w * 0.15, h * 0.65,
-                -w * 0.25, w * 0.15,
+                w * 0.25,
+                -w * 0.1,
+                w * 0.4,
+                -w * 0.1,
+                w * 0.35,
+                w * 0.2,
+                w * 0.15,
+                h * 0.35,
+                -w * 0.15,
+                h * 0.65,
+                -w * 0.25,
+                w * 0.15,
                 -w * 0.5,
-                -w * 0.25, -w * 0.15,
-                -w * 0.1, -h * 0.35,
-                w * 0.1, -h * 0.65,
-                r1 = r1, r2 = r2, r3 = r3, r4 = r4
+                -w * 0.25,
+                -w * 0.15,
+                -w * 0.1,
+                -h * 0.35,
+                w * 0.1,
+                -h * 0.65,
+                r1 = r1,
+                r2 = r2,
+                r3 = r3,
+                r4 = r4
             );
 
             SvgElement::Path {
@@ -495,12 +505,18 @@ fn render_node_shape(node: &PositionedNode) -> SvgElement {
             let w = node.width;
             let points = format!(
                 "{},{} {},{} {},{} {},{} {},{} {},{}",
-                m, 0.0,
-                w - m, 0.0,
-                w, h / 2.0,
-                w - m, h,
-                m, h,
-                0.0, h / 2.0
+                m,
+                0.0,
+                w - m,
+                0.0,
+                w,
+                h / 2.0,
+                w - m,
+                h,
+                m,
+                h,
+                0.0,
+                h / 2.0
             );
 
             SvgElement::PolygonStr {
@@ -530,7 +546,11 @@ fn render_node_text(node: &PositionedNode) -> SvgElement {
 fn render_node_icon(node: &PositionedNode, icon: &str, section_class: &str) -> SvgElement {
     // Mermaid.js uses foreignObject with an <i> tag for Font Awesome icons
     // This approach allows the icon to render properly in browsers that support foreignObject
-    let icon_class = format!("node-icon-{} {}", section_class.replace("section-", ""), icon);
+    let icon_class = format!(
+        "node-icon-{} {}",
+        section_class.replace("section-", ""),
+        icon
+    );
     let icon_size = 40.0;
 
     // Position icon above the text
@@ -574,9 +594,7 @@ fn generate_mindmap_css(config: &RenderConfig) -> String {
   stroke: {};
 }}
 "#,
-        theme.primary_color,
-        theme.primary_text_color,
-        theme.primary_color
+        theme.primary_color, theme.primary_text_color, theme.primary_color
     ));
 
     // Generate section colors from pie colors (similar to mermaid's cScale)
