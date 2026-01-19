@@ -2,6 +2,14 @@
 
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
 
+## Installing bd
+
+If `bd` is not installed, run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
+```
+
 ## Quick Reference
 
 ```bash
