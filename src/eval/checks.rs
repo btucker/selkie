@@ -74,6 +74,7 @@ pub fn check_structure(
     check_aspect_ratio(selkie, reference, &mut issues);
     check_vertical_distribution(selkie, reference, &mut issues);
     check_composite_state_structure(selkie, reference, &mut issues);
+    check_composite_centering(selkie, reference, &mut issues);
 
     issues
 }
@@ -2309,6 +2310,200 @@ fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
     }
 
     composites
+}
+
+/// Check if composite states have their children properly centered
+/// This compares the horizontal centering of child nodes within parent composites
+fn check_composite_centering(
+    selkie: &SvgStructure,
+    reference: &SvgStructure,
+    issues: &mut Vec<Issue>,
+) {
+    let selkie_centering = analyze_composite_centering(&selkie.raw_svg);
+    let ref_centering = analyze_composite_centering(&reference.raw_svg);
+
+    if selkie_centering.is_empty() && ref_centering.is_empty() {
+        return;
+    }
+
+    // Check for centering issues in selkie
+    for (composite_id, selkie_offset) in &selkie_centering {
+        // Threshold for centering (pixels) - children should be within 10px of center
+        let centering_threshold = 15.0;
+
+        if selkie_offset.abs() > centering_threshold {
+            // Check if reference has the same composite and is better centered
+            if let Some(ref_offset) = ref_centering.get(composite_id) {
+                if ref_offset.abs() < selkie_offset.abs() {
+                    issues.push(
+                        Issue::warning(
+                            "composite_centering",
+                            format!(
+                                "Composite '{}' children not centered: offset {:.0}px from center (reference: {:.0}px)",
+                                composite_id, selkie_offset, ref_offset
+                            ),
+                        )
+                        .with_values(
+                            format!("{:.0}px offset", ref_offset),
+                            format!("{:.0}px offset", selkie_offset),
+                        ),
+                    );
+                }
+            } else {
+                // Reference doesn't have this composite, just report the issue
+                issues.push(Issue::warning(
+                    "composite_centering",
+                    format!(
+                        "Composite '{}' children not centered: {:.0}px offset from center",
+                        composite_id, selkie_offset
+                    ),
+                ));
+            }
+        }
+    }
+}
+
+/// Analyze composite state centering - returns map of composite_id to center offset
+/// Positive offset means children are to the right of center, negative means left
+fn analyze_composite_centering(svg: &str) -> std::collections::HashMap<String, f64> {
+    let mut centering = std::collections::HashMap::new();
+
+    if let Ok(doc) = roxmltree::Document::parse(svg) {
+        for node in doc.descendants() {
+            if node.tag_name().name() != "g" {
+                continue;
+            }
+
+            let class = node.attribute("class").unwrap_or("");
+            let id = node.attribute("id").unwrap_or("");
+
+            // Check for composite state (mermaid or selkie)
+            let is_composite = class.contains("statediagram-cluster")
+                || class.contains("composite")
+                || (!id.is_empty()
+                    && node.descendants().any(|n| {
+                        n.attribute("class")
+                            .map(|c| c.contains("composite"))
+                            .unwrap_or(false)
+                    }));
+
+            if !is_composite {
+                continue;
+            }
+
+            let composite_id = if class.contains("statediagram-cluster") {
+                node.attribute("id")
+                    .or_else(|| node.attribute("data-id"))
+                    .unwrap_or("")
+                    .to_string()
+            } else {
+                id.trim_start_matches("state-").to_string()
+            };
+
+            if composite_id.is_empty()
+                || composite_id.contains("start")
+                || composite_id.contains("end")
+            {
+                continue;
+            }
+
+            // Find the outer rect bounds
+            let mut parent_x = 0.0;
+            let mut parent_width = 0.0;
+
+            for child in node.descendants() {
+                if child.tag_name().name() == "rect" {
+                    let child_class = child.attribute("class").unwrap_or("");
+                    if child_class.contains("outer") || child_class.contains("composite-outer") {
+                        parent_x = child
+                            .attribute("x")
+                            .and_then(|x| x.parse().ok())
+                            .unwrap_or(0.0);
+                        parent_width = child
+                            .attribute("width")
+                            .and_then(|w| w.parse().ok())
+                            .unwrap_or(0.0);
+                        break;
+                    }
+                }
+            }
+
+            // If no outer rect found, try first rect
+            if parent_width == 0.0 {
+                for child in node.descendants() {
+                    if child.tag_name().name() == "rect" {
+                        let w: f64 = child
+                            .attribute("width")
+                            .and_then(|w| w.parse().ok())
+                            .unwrap_or(0.0);
+                        if w > parent_width {
+                            parent_x = child
+                                .attribute("x")
+                                .and_then(|x| x.parse().ok())
+                                .unwrap_or(0.0);
+                            parent_width = w;
+                        }
+                    }
+                }
+            }
+
+            if parent_width == 0.0 {
+                continue;
+            }
+
+            let parent_center_x = parent_x + parent_width / 2.0;
+
+            // Find all child nodes (state nodes) within this composite
+            let mut child_min_x = f64::MAX;
+            let mut child_max_x = f64::MIN;
+            let mut found_children = false;
+
+            for child in node.descendants() {
+                let child_class = child.attribute("class").unwrap_or("");
+
+                // Skip the outer/inner rects of the composite itself
+                if child_class.contains("composite") || child_class.contains("cluster") {
+                    continue;
+                }
+
+                // Look for state nodes (rect or path elements that are state boxes)
+                if (child.tag_name().name() == "rect" || child.tag_name().name() == "path")
+                    && (child_class.contains("state-box") || child_class.contains("node"))
+                {
+                    if let Some(x) = child.attribute("x").and_then(|x| x.parse::<f64>().ok()) {
+                        let width: f64 = child
+                            .attribute("width")
+                            .and_then(|w| w.parse().ok())
+                            .unwrap_or(0.0);
+                        child_min_x = child_min_x.min(x);
+                        child_max_x = child_max_x.max(x + width);
+                        found_children = true;
+                    }
+                }
+
+                // Also check circles (start/end states)
+                if child.tag_name().name() == "circle" {
+                    if let Some(cx) = child.attribute("cx").and_then(|cx| cx.parse::<f64>().ok()) {
+                        let r: f64 = child
+                            .attribute("r")
+                            .and_then(|r| r.parse().ok())
+                            .unwrap_or(7.0);
+                        child_min_x = child_min_x.min(cx - r);
+                        child_max_x = child_max_x.max(cx + r);
+                        found_children = true;
+                    }
+                }
+            }
+
+            if found_children && child_min_x < f64::MAX {
+                let children_center_x = (child_min_x + child_max_x) / 2.0;
+                let offset = children_center_x - parent_center_x;
+                centering.insert(composite_id, offset);
+            }
+        }
+    }
+
+    centering
 }
 
 #[cfg(test)]
