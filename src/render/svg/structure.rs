@@ -336,6 +336,12 @@ fn count_visible_paths(doc: &roxmltree::Document) -> usize {
     doc.descendants()
         .filter(|n| n.tag_name().name() == "path")
         .filter(|n| {
+            // Exclude label backgrounds (not structural elements)
+            let class = n.attribute("class").unwrap_or("");
+            if class.contains("label-bg") {
+                return false;
+            }
+
             let stroke = n.attribute("stroke");
             if stroke == Some("none") {
                 return false;
@@ -849,7 +855,11 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
     for node in doc.descendants() {
         if node.tag_name().name() == "path" {
             let class = node.attribute("class").unwrap_or("");
-            // Look for relationship/edge paths
+            // Look for relationship/edge paths, but skip label backgrounds
+            // Label backgrounds have class like "transition-label-bg" which contains "transition"
+            if class.contains("label-bg") {
+                continue;
+            }
             if class.contains("relationship")
                 || class.contains("edge")
                 || class.contains("link")

@@ -210,10 +210,10 @@ fn compute_level_layout(
 
     let mut graph = LayoutGraph::new(parent_id.unwrap_or("root"));
 
-    // Mermaid v3 uses ranksep=50 at root level and adds 25 for each nesting level
-    // This creates natural spacing accumulation that matches reference diagrams
-    let base_ranksep = 50.0;
-    let ranksep_per_level = 25.0;
+    // Mermaid state diagrams use edgeLengthFactor for ranksep (default ~20-50)
+    // Tuned to match reference diagram heights
+    let base_ranksep = 35.0;
+    let ranksep_per_level = 15.0;
     let layer_spacing = base_ranksep + (depth as f64 * ranksep_per_level);
 
     graph.options = LayoutOptions {
