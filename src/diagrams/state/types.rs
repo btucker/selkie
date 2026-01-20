@@ -314,7 +314,9 @@ impl StateDb {
     }
 
     /// Add a relation between two states
-    /// Handles [*] specially: creates unique start/end state IDs
+    /// Handles [*] specially: creates parent-based start/end state IDs
+    /// Following mermaid's approach: [*] becomes {parent}_start or {parent}_end
+    /// This ensures all [*] at the same nesting level share the same ID (deduplication)
     /// If parent is provided, sets parent on auto-created [*] states
     pub fn add_relation(
         &mut self,
@@ -323,36 +325,40 @@ impl StateDb {
         description: Option<&str>,
         parent: Option<&str>,
     ) {
-        // Handle [*] as source (start state) - create unique ID
+        // Handle [*] as source (start state) - use parent-based ID like mermaid
+        // All [*] starts at the same level share the same ID
         let actual_state1 = if state1 == "[*]" {
-            let id = format!("[*]_start_{}", self.start_cnt);
-            self.start_cnt += 1;
-            // Add as a start state type
-            let mut state = State::new(id.clone());
-            state.state_type = StateType::Start;
-            // Set parent if inside a composite state
-            if let Some(p) = parent {
-                state.parent = Some(p.to_string());
+            let parent_name = parent.unwrap_or("root");
+            let id = format!("{}_start", parent_name);
+            // Only insert if not already present (deduplication)
+            if !self.states.contains_key(&id) {
+                let mut state = State::new(id.clone());
+                state.state_type = StateType::Start;
+                if let Some(p) = parent {
+                    state.parent = Some(p.to_string());
+                }
+                self.states.insert(id.clone(), state);
             }
-            self.states.insert(id.clone(), state);
             id
         } else {
             self.add_state(state1);
             state1.to_string()
         };
 
-        // Handle [*] as target (end state) - create unique ID
+        // Handle [*] as target (end state) - use parent-based ID like mermaid
+        // All [*] ends at the same level share the same ID
         let actual_state2 = if state2 == "[*]" {
-            let id = format!("[*]_end_{}", self.end_cnt);
-            self.end_cnt += 1;
-            // Add as an end state type
-            let mut state = State::new(id.clone());
-            state.state_type = StateType::End;
-            // Set parent if inside a composite state
-            if let Some(p) = parent {
-                state.parent = Some(p.to_string());
+            let parent_name = parent.unwrap_or("root");
+            let id = format!("{}_end", parent_name);
+            // Only insert if not already present (deduplication)
+            if !self.states.contains_key(&id) {
+                let mut state = State::new(id.clone());
+                state.state_type = StateType::End;
+                if let Some(p) = parent {
+                    state.parent = Some(p.to_string());
+                }
+                self.states.insert(id.clone(), state);
             }
-            self.states.insert(id.clone(), state);
             id
         } else {
             self.add_state(state2);

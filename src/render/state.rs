@@ -237,15 +237,12 @@ fn compute_level_layout(
             StateType::Choice => (NodeShape::Diamond, None),
             StateType::Divider => (NodeShape::Rectangle, None),
             StateType::Default => {
-                if state_id.starts_with("[*]") {
-                    if let Some(info) = start_end_states.get(*state_id) {
-                        if info.is_start {
-                            (NodeShape::Circle, None)
-                        } else {
-                            (NodeShape::DoubleCircle, None)
-                        }
-                    } else {
+                // Check if this is a start/end state (ID ends with _start or _end)
+                if let Some(info) = start_end_states.get(*state_id) {
+                    if info.is_start {
                         (NodeShape::Circle, None)
+                    } else {
+                        (NodeShape::DoubleCircle, None)
                     }
                 } else {
                     let desc = state.description.as_deref().filter(|d| !d.is_empty());
@@ -254,11 +251,9 @@ fn compute_level_layout(
             }
         };
 
-        let label_text = label.unwrap_or(if state_id.starts_with("[*]") {
-            ""
-        } else {
-            *state_id
-        });
+        // Start/end states have no label (IDs end with _start or _end)
+        let is_start_end = start_end_states.contains_key(*state_id);
+        let label_text = label.unwrap_or(if is_start_end { "" } else { *state_id });
 
         // Determine dimensions - use pre-computed layout for composites
         let (width, height) = if composite_ids.contains(state_id) {
@@ -272,9 +267,7 @@ fn compute_level_layout(
             } else {
                 (100.0, 60.0)
             }
-        } else if state_id.starts_with("[*]")
-            || matches!(state.state_type, StateType::Start | StateType::End)
-        {
+        } else if is_start_end || matches!(state.state_type, StateType::Start | StateType::End) {
             (14.0, 14.0)
         } else if matches!(state.state_type, StateType::Fork | StateType::Join) {
             (70.0, 10.0)
@@ -503,16 +496,12 @@ impl ToLayoutGraph for StateDb {
                 StateType::Choice => (NodeShape::Diamond, None),
                 StateType::Divider => (NodeShape::Rectangle, None),
                 StateType::Default => {
-                    // Check if this is a [*] state that's been classified
-                    if id.starts_with("[*]") {
-                        if let Some(state_info) = start_end_states.get(id.as_str()) {
-                            if state_info.is_start {
-                                (NodeShape::Circle, None)
-                            } else {
-                                (NodeShape::DoubleCircle, None)
-                            }
-                        } else {
+                    // Check if this is a start/end state (ID ends with _start or _end)
+                    if let Some(state_info) = start_end_states.get(id.as_str()) {
+                        if state_info.is_start {
                             (NodeShape::Circle, None)
+                        } else {
+                            (NodeShape::DoubleCircle, None)
                         }
                     } else {
                         let desc = state.descriptions.first().map(|s| s.as_str());
@@ -521,20 +510,21 @@ impl ToLayoutGraph for StateDb {
                 }
             };
 
-            let label_text = label.unwrap_or(if id.starts_with("[*]") { "" } else { &state.id });
+            // Start/end states have no label (IDs end with _start or _end)
+            let is_start_end = start_end_states.contains_key(id.as_str());
+            let label_text = label.unwrap_or(if is_start_end { "" } else { &state.id });
 
             // Size based on state type
-            let (width, height) = if id.starts_with("[*]")
-                || matches!(state.state_type, StateType::Start | StateType::End)
-            {
-                // Small fixed size for start/end circles (r=7, diameter=14)
-                (14.0, 14.0)
-            } else if matches!(state.state_type, StateType::Fork | StateType::Join) {
-                // Horizontal bar matching mermaid reference (70×10)
-                (70.0, 10.0)
-            } else {
-                size_estimator.estimate_node_size(Some(label_text), shape, &config)
-            };
+            let (width, height) =
+                if is_start_end || matches!(state.state_type, StateType::Start | StateType::End) {
+                    // Small fixed size for start/end circles (r=7, diameter=14)
+                    (14.0, 14.0)
+                } else if matches!(state.state_type, StateType::Fork | StateType::Join) {
+                    // Horizontal bar matching mermaid reference (70×10)
+                    (70.0, 10.0)
+                } else {
+                    size_estimator.estimate_node_size(Some(label_text), shape, &config)
+                };
 
             let mut node = LayoutNode::new(id, width, height).with_shape(shape);
 
@@ -1778,30 +1768,30 @@ fn render_state_node(
             });
         }
         StateType::Default => {
-            // Check if this is [*] which could be start or end
-            if state.id == "[*]" {
-                if is_end_state {
-                    // End state: double circle (bullseye)
-                    render_end_state_bullseye(
-                        &mut children,
-                        x,
-                        y,
-                        width,
-                        height,
-                        start_end_radius,
-                        theme,
-                    );
-                } else {
-                    // Start state: filled circle (specialStateColor = lineColor)
-                    children.push(SvgElement::Circle {
-                        cx: x + width / 2.0,
-                        cy: y + height / 2.0,
-                        r: start_end_radius,
-                        attrs: Attrs::new()
-                            .with_fill(&theme.line_color)
-                            .with_class("state-start"),
-                    });
-                }
+            // Check if this is a start/end state (ID ends with _start or _end)
+            let is_start_state = state.id.ends_with("_start");
+            let is_end_state_by_id = state.id.ends_with("_end");
+            if is_start_state {
+                // Start state: filled circle (specialStateColor = lineColor)
+                children.push(SvgElement::Circle {
+                    cx: x + width / 2.0,
+                    cy: y + height / 2.0,
+                    r: start_end_radius,
+                    attrs: Attrs::new()
+                        .with_fill(&theme.line_color)
+                        .with_class("state-start"),
+                });
+            } else if is_end_state || is_end_state_by_id {
+                // End state: double circle (bullseye)
+                render_end_state_bullseye(
+                    &mut children,
+                    x,
+                    y,
+                    width,
+                    height,
+                    start_end_radius,
+                    theme,
+                );
             } else {
                 // Rounded rectangle for regular state (stateBkg + stateBorder)
                 // Use path instead of rect to match mermaid reference output
@@ -2237,30 +2227,17 @@ struct StartEndInfo {
     is_start: bool,
 }
 
-/// Determine which [*] states are start vs end states based on transitions
-/// Creates unique IDs for each [*] occurrence to handle multiple start/end states
+/// Determine which [*] states are start vs end states based on their ID suffix
+/// IDs follow mermaid's pattern: {parent}_start or {parent}_end
 fn determine_start_end_states(db: &StateDb) -> HashMap<&str, StartEndInfo> {
     let mut result = HashMap::new();
-    let relations = db.get_relations();
 
-    // Classify states in the states map
+    // Classify states based on ID suffix (mermaid-style naming)
     for id in db.get_states().keys() {
-        if id.starts_with("[*]_start") {
+        if id.ends_with("_start") {
             result.insert(id.as_str(), StartEndInfo { is_start: true });
-        } else if id.starts_with("[*]_end") {
+        } else if id.ends_with("_end") {
             result.insert(id.as_str(), StartEndInfo { is_start: false });
-        } else if id == "[*]" {
-            // Single [*] - check if it's source or target in relations
-            let is_source = relations.iter().any(|r| r.state1 == "[*]");
-            let is_target = relations.iter().any(|r| r.state2 == "[*]");
-
-            // Start if it's only a source, end if it's only a target or both
-            result.insert(
-                "[*]",
-                StartEndInfo {
-                    is_start: is_source && !is_target,
-                },
-            );
         }
     }
 
