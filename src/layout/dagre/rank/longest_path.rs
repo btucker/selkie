@@ -7,39 +7,20 @@
 use crate::layout::dagre::graph::DagreGraph;
 use std::collections::HashSet;
 
+/// State for iterative DFS
+enum DfsState {
+    /// First visit - need to process predecessors
+    Explore(String),
+    /// Returning from predecessors - compute rank
+    Compute(String),
+}
+
 /// Assign ranks using the longest path algorithm
+/// Uses iterative DFS to avoid stack overflow on deep graphs
 pub fn run(g: &mut DagreGraph) {
     let mut visited = HashSet::new();
-
-    // Process nodes in topological order (sources first)
-    fn dfs(g: &mut DagreGraph, v: &str, visited: &mut HashSet<String>) {
-        if visited.contains(v) {
-            return;
-        }
-
-        // Visit all predecessors first
-        let preds: Vec<String> = g.predecessors(v).into_iter().cloned().collect();
-        for pred in &preds {
-            dfs(g, pred, visited);
-        }
-
-        visited.insert(v.to_string());
-
-        // Calculate rank as max predecessor rank + minlen
-        let mut rank = 0;
-        for edge_key in g.in_edges(v) {
-            if let Some(pred_label) = g.node(&edge_key.v) {
-                if let Some(pred_rank) = pred_label.rank {
-                    let minlen = g.edge_by_key(edge_key).map(|e| e.minlen).unwrap_or(1);
-                    rank = rank.max(pred_rank + minlen);
-                }
-            }
-        }
-
-        if let Some(label) = g.node_mut(v) {
-            label.rank = Some(rank);
-        }
-    }
+    let mut in_progress = HashSet::new(); // Track nodes currently on the stack
+    let mut stack: Vec<DfsState> = Vec::new();
 
     // Get all node keys first
     let nodes: Vec<String> = g.nodes().into_iter().cloned().collect();
@@ -54,9 +35,61 @@ pub fn run(g: &mut DagreGraph) {
         }
     }
 
-    // Process remaining nodes
-    for v in &nodes {
-        dfs(g, v, &mut visited);
+    // Process remaining nodes using iterative DFS
+    for start in &nodes {
+        if visited.contains(start) {
+            continue;
+        }
+
+        stack.push(DfsState::Explore(start.clone()));
+        in_progress.insert(start.clone());
+
+        while let Some(state) = stack.pop() {
+            match state {
+                DfsState::Explore(v) => {
+                    if visited.contains(&v) {
+                        in_progress.remove(&v);
+                        continue;
+                    }
+
+                    // Push compute state to be processed after predecessors
+                    stack.push(DfsState::Compute(v.clone()));
+
+                    // Push predecessors to explore first (skip visited and in-progress to handle cycles)
+                    let preds: Vec<String> = g.predecessors(&v).into_iter().cloned().collect();
+                    for pred in preds {
+                        if !visited.contains(&pred) && !in_progress.contains(&pred) {
+                            stack.push(DfsState::Explore(pred.clone()));
+                            in_progress.insert(pred);
+                        }
+                    }
+                }
+                DfsState::Compute(v) => {
+                    in_progress.remove(&v);
+
+                    if visited.contains(&v) {
+                        continue;
+                    }
+
+                    visited.insert(v.clone());
+
+                    // Calculate rank as max predecessor rank + minlen
+                    let mut rank = 0;
+                    for edge_key in g.in_edges(&v) {
+                        if let Some(pred_label) = g.node(&edge_key.v) {
+                            if let Some(pred_rank) = pred_label.rank {
+                                let minlen = g.edge_by_key(edge_key).map(|e| e.minlen).unwrap_or(1);
+                                rank = rank.max(pred_rank + minlen);
+                            }
+                        }
+                    }
+
+                    if let Some(label) = g.node_mut(&v) {
+                        label.rank = Some(rank);
+                    }
+                }
+            }
+        }
     }
 }
 

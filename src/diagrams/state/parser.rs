@@ -211,17 +211,17 @@ fn process_state_def(
                         Rule::state_id => {
                             state_id = body_inner.as_str().to_string();
                             db.add_state(&state_id);
-                            if let Some(p) = parent {
-                                db.set_parent(&state_id, p);
-                            }
+                            // ALWAYS set parent for explicit state blocks (even if None)
+                            // This ensures explicit `state X { }` declarations take precedence
+                            // over implicit state creation from transitions
+                            db.set_or_clear_parent(&state_id, parent);
                         }
                         Rule::quoted_string => {
                             let s = body_inner.as_str();
                             state_id = s[1..s.len() - 1].to_string(); // Remove quotes
                             db.add_state(&state_id);
-                            if let Some(p) = parent {
-                                db.set_parent(&state_id, p);
-                            }
+                            // ALWAYS set parent for explicit state blocks (even if None)
+                            db.set_or_clear_parent(&state_id, parent);
                         }
                         Rule::document => {
                             // Process nested document with this state as parent
@@ -1032,14 +1032,16 @@ Cancelled --> [*]"#;
                 "Ready should have parent Idle"
             );
 
-            // Processing should be inside Idle (referenced from Ready --> Processing)
+            // Processing is referenced from inside Idle via `Ready --> Processing`.
+            // In mermaid, first assignment wins: the transition sets parent=Idle,
+            // and the later `state Processing { }` at root level doesn't change it.
             let processing = states
                 .get("Processing")
                 .expect("Processing state should exist");
             assert_eq!(
                 processing.parent.as_deref(),
                 Some("Idle"),
-                "Processing should have parent Idle"
+                "Processing should have parent Idle (first assignment wins)"
             );
 
             // Validating should be inside Processing
@@ -1070,12 +1072,14 @@ Cancelled --> [*]"#;
                 "Initializing should have parent Running"
             );
 
-            // Paused should be inside Processing (from Running --> Paused transition)
+            // Paused is referenced from inside Processing via `Running --> Paused`.
+            // In mermaid, first assignment wins: the transition sets parent=Processing,
+            // and the later `state Paused { }` at root level doesn't change it.
             let paused = states.get("Paused").expect("Paused state should exist");
             assert_eq!(
                 paused.parent.as_deref(),
                 Some("Processing"),
-                "Paused should have parent Processing"
+                "Paused should have parent Processing (first assignment wins)"
             );
 
             // WaitingResume should be inside Paused

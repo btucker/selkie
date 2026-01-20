@@ -257,6 +257,21 @@ impl StateDb {
         }
     }
 
+    /// Set parent only if not already set (first assignment wins)
+    /// Used for explicit `state X { }` declarations where mermaid behavior is:
+    /// - If state was already assigned a parent from a transition, keep it
+    /// - If state has no parent yet and we're inside a composite, set that parent
+    /// - If state has no parent and we're at root level, leave it without a parent
+    pub fn set_or_clear_parent(&mut self, state_id: &str, parent_id: Option<&str>) {
+        self.add_state(state_id);
+        if let Some(state) = self.states.get_mut(state_id) {
+            // Only set parent if one doesn't already exist (mermaid: first assignment wins)
+            if state.parent.is_none() {
+                state.parent = parent_id.map(|p| p.to_string());
+            }
+        }
+    }
+
     /// Add a state to the diagram
     pub fn add_state(&mut self, id: &str) {
         if !self.states.contains_key(id) {

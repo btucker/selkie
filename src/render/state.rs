@@ -340,11 +340,15 @@ fn compute_level_layout(
             // Source at this level, target inside a composite
             // Add virtual edge: source -> composite (to position source before composite)
             if let Some(composite_id) = find_containing_composite(s2) {
-                let edge = LayoutEdge::new(
+                let mut edge = LayoutEdge::new(
                     format!("virtual_{}", virtual_edge_count),
                     s1.to_string(),
                     composite_id.to_string(),
                 );
+                // Preserve edge label for layout - affects horizontal spacing
+                if let Some(ref desc) = relation.description {
+                    edge = edge.with_label(desc);
+                }
                 graph.add_edge(edge);
                 virtual_edge_count += 1;
             }
@@ -352,11 +356,15 @@ fn compute_level_layout(
             // Source inside a composite, target at this level
             // Add virtual edge: composite -> target (to position target after composite)
             if let Some(composite_id) = find_containing_composite(s1) {
-                let edge = LayoutEdge::new(
+                let mut edge = LayoutEdge::new(
                     format!("virtual_{}", virtual_edge_count),
                     composite_id.to_string(),
                     s2.to_string(),
                 );
+                // Preserve edge label for layout - affects horizontal spacing
+                if let Some(ref desc) = relation.description {
+                    edge = edge.with_label(desc);
+                }
                 graph.add_edge(edge);
                 virtual_edge_count += 1;
             }
@@ -380,6 +388,24 @@ fn compute_level_layout(
             min_y = min_y.min(y);
             max_x = max_x.max(x + node.width);
             max_y = max_y.max(y + node.height);
+        }
+    }
+
+    // Include edge label bounds - mermaid includes labels in cluster sizing
+    for edge in &layout_result.edges {
+        if let Some(label_pos) = &edge.label_position {
+            if edge.label_width > 0.0 {
+                // Labels are centered on their position
+                let label_left = label_pos.x - edge.label_width / 2.0;
+                let label_right = label_pos.x + edge.label_width / 2.0;
+                let label_top = label_pos.y - edge.label_height / 2.0;
+                let label_bottom = label_pos.y + edge.label_height / 2.0;
+
+                min_x = min_x.min(label_left);
+                max_x = max_x.max(label_right);
+                min_y = min_y.min(label_top);
+                max_y = max_y.max(label_bottom);
+            }
         }
     }
 
@@ -431,15 +457,13 @@ impl ToLayoutGraph for StateDb {
         let mut graph = LayoutGraph::new("state");
 
         // Set layout options from diagram direction
-        // Optimized for state diagrams with compound graph support:
-        // - Tighter horizontal spacing to reduce width
-        // - Reasonable vertical spacing for proper height
-        // - LongestPath ranker (mermaid's tight-tree base algorithm)
+        // Following mermaid's state diagram config (stateRenderer-v3-unified.ts line 64-65):
+        // nodeSpacing = 50, rankSpacing = 50
         graph.options = LayoutOptions {
             direction: self.preferred_direction(),
-            node_spacing: 15.0, // Tighter horizontal spacing for narrower diagrams
-            layer_spacing: 40.0, // Compromise between fork/join spacing and composite edges
-            padding: Padding::uniform(12.0), // Balanced padding for composite states
+            node_spacing: 50.0, // mermaid's nodeSpacing
+            layer_spacing: 50.0, // mermaid's rankSpacing
+            padding: Padding::uniform(8.0), // mermaid's marginx/marginy
             ranker: LayoutRanker::LongestPath, // Use longest-path (mermaid's tight-tree base)
         };
 
@@ -2737,6 +2761,102 @@ mod tests {
             parent.width > 0.0,
             "Parent compound should have width > 0 after layout, got {}",
             parent.width
+        );
+    }
+
+    #[test]
+    fn test_nested_compound_layout() {
+        // Test nested composite state layout (state_complex2 pattern)
+        // Processing contains Running (nested composite)
+        let input = r#"stateDiagram-v2
+[*] --> Idle
+
+state Idle {
+    [*] --> Ready
+    Ready --> Processing: Start Job
+}
+
+state Processing {
+    [*] --> Validating
+    Validating --> Queued: Valid
+    Validating --> Failed: Invalid
+    Queued --> Running: Worker Available
+    Running --> Completed: Success
+    Running --> Failed: Error
+    Running --> Paused: Pause Request
+
+    state Running {
+        [*] --> Initializing
+        Initializing --> Executing
+        Executing --> Finalizing
+        Finalizing --> [*]
+    }
+}
+
+state Paused {
+    [*] --> WaitingResume
+    WaitingResume --> Timeout: 1 hour
+}
+
+Paused --> Running: Resume
+Paused --> Cancelled: Cancel Request
+Timeout --> Cancelled
+
+Completed --> Idle: Reset
+Failed --> Idle: Retry
+Cancelled --> Idle: Reset
+
+Completed --> [*]
+Cancelled --> [*]
+"#;
+        let db = parse(input).expect("Should parse");
+        let size_estimator = CharacterSizeEstimator::default();
+
+        // Test compound graph approach
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
+
+        eprintln!("\n=== Nested Compound Structure ===");
+        for node in &graph.nodes {
+            eprintln!(
+                "  {} (w={:.1}, h={:.1}, parent={:?}, is_group={:?})",
+                node.id,
+                node.width,
+                node.height,
+                node.parent_id,
+                node.metadata.get("is_group")
+            );
+        }
+        eprintln!("Node count: {}", graph.nodes.len());
+        eprintln!("Edge count: {}", graph.edges.len());
+
+        // Run layout
+        let result = layout(graph).expect("Layout should succeed");
+
+        eprintln!("\n=== Final Positions ===");
+        for node in &result.nodes {
+            if let (Some(x), Some(y)) = (node.x, node.y) {
+                eprintln!(
+                    "  {} -> x={:.1}, y={:.1}, w={:.1}, h={:.1}",
+                    node.id, x, y, node.width, node.height
+                );
+            }
+        }
+
+        // Verify composite states have non-zero dimensions
+        let processing = result.nodes.iter().find(|n| n.id == "Processing").unwrap();
+        assert!(
+            processing.width > 0.0,
+            "Processing compound should have width > 0 after layout, got {}",
+            processing.width
+        );
+
+        let running = result.nodes.iter().find(|n| n.id == "Running").unwrap();
+        assert!(
+            running.width > 0.0,
+            "Running nested compound should have width > 0 after layout, got {}",
+            running.width
         );
     }
 

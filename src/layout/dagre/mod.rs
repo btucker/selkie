@@ -102,6 +102,10 @@ pub enum Ranker {
 
 /// Run the dagre layout algorithm on a graph
 pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
+    #[cfg(test)]
+    eprintln!("[dagre] Starting layout. nodes={}, edges={}, compound={}",
+        graph.node_count(), graph.edge_count(), graph.is_compound());
+
     // Adjust coordinate system for LR/RL (swap width/height)
     adjust_coordinate_system(graph, config.rankdir);
 
@@ -118,27 +122,44 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     // This creates border nodes and nesting edges to constrain subgraph children
     let is_compound = graph.is_compound();
     if is_compound {
+        #[cfg(test)]
+        eprintln!("[dagre] Phase 3: Running nesting graph...");
         nesting_graph::run(graph);
+        #[cfg(test)]
+        eprintln!("[dagre] Phase 3: Nesting graph complete. nodes={}, edges={}",
+            graph.node_count(), graph.edge_count());
 
         // Phase 3.5: Redirect edges to/from compound nodes to their border nodes
         // This ensures edges like "[*] --> CompositeState" properly constrain ranking
         compound::redirect_edges_to_border_nodes(graph);
+        #[cfg(test)]
+        eprintln!("[dagre] Phase 3.5: Edges redirected");
     }
 
     // Phase 4: Assign ranks to nodes
+    #[cfg(test)]
+    eprintln!("[dagre] Phase 4: Assigning ranks...");
     rank::assign_ranks(graph, config.ranker);
+    #[cfg(test)]
+    eprintln!("[dagre] Phase 4: Ranks assigned");
 
     // Phase 5: Inject edge label proxies (create dummy nodes for labels)
     edge_labels::inject_edge_label_proxies(graph);
+    #[cfg(test)]
+    eprintln!("[dagre] Phase 5: Edge label proxies injected");
 
     // Phase 5.5: Remove empty ranks created by nesting graph minlen multiplier
     // This collapses sparse ranks except at border positions
     util::remove_empty_ranks(graph);
+    #[cfg(test)]
+    eprintln!("[dagre] Phase 5.5: Empty ranks removed");
 
     // Phase 6: Clean up nesting graph (remove nesting root and edges)
     // This keeps rank assignments but removes temporary nesting structure
     if is_compound {
         nesting_graph::cleanup(graph);
+        #[cfg(test)]
+        eprintln!("[dagre] Phase 6: Nesting graph cleaned up");
     }
 
     // Phase 7: Remove edge label proxies (store labelRank on edges)
@@ -147,23 +168,41 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     // Phase 8: Assign min/max ranks to compound nodes based on border positions
     if is_compound {
         compound::assign_rank_min_max(graph);
+        #[cfg(test)]
+        eprintln!("[dagre] Phase 8: Min/max ranks assigned to compound nodes");
     }
 
     // Phase 9: Normalize edges (break long edges into unit-length segments)
+    #[cfg(test)]
+    eprintln!("[dagre] Phase 9: Normalizing edges...");
     normalize::run(graph);
+    #[cfg(test)]
+    eprintln!("[dagre] Phase 9: Edges normalized. nodes={}", graph.node_count());
 
     // Phase 10: Parent dummy chains through LCA in compound graphs
     if is_compound {
+        #[cfg(test)]
+        eprintln!("[dagre] Phase 10: Parenting dummy chains...");
         parent_dummy_chains::run(graph);
+        #[cfg(test)]
+        eprintln!("[dagre] Phase 10: Dummy chains parented");
     }
 
     // Phase 11: Add border segments (left/right border nodes per rank)
     if is_compound {
+        #[cfg(test)]
+        eprintln!("[dagre] Phase 11: Adding border segments...");
         compound::add_border_segments(graph);
+        #[cfg(test)]
+        eprintln!("[dagre] Phase 11: Border segments added. nodes={}", graph.node_count());
     }
 
     // Phase 12: Order nodes within ranks (crossing minimization)
+    #[cfg(test)]
+    eprintln!("[dagre] Phase 12: Ordering nodes...");
     order::order(graph);
+    #[cfg(test)]
+    eprintln!("[dagre] Phase 12: Nodes ordered");
 
     // Phase 12.5: Insert self-edge dummy nodes (after ordering)
     self_edges::insert_self_edges(graph);
