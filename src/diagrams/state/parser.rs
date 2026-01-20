@@ -1017,44 +1017,94 @@ Cancelled --> [*]"#;
 
             // Verify state count - should have many states
             let states = db.get_states();
-            assert!(states.len() >= 10, "Expected at least 10 states, got {}", states.len());
+            assert!(
+                states.len() >= 10,
+                "Expected at least 10 states, got {}",
+                states.len()
+            );
 
             // Verify parent relationships for key states
             // Ready should be inside Idle
             let ready = states.get("Ready").expect("Ready state should exist");
-            assert_eq!(ready.parent.as_deref(), Some("Idle"), "Ready should have parent Idle");
+            assert_eq!(
+                ready.parent.as_deref(),
+                Some("Idle"),
+                "Ready should have parent Idle"
+            );
 
             // Processing should be inside Idle (referenced from Ready --> Processing)
-            let processing = states.get("Processing").expect("Processing state should exist");
-            assert_eq!(processing.parent.as_deref(), Some("Idle"), "Processing should have parent Idle");
+            let processing = states
+                .get("Processing")
+                .expect("Processing state should exist");
+            assert_eq!(
+                processing.parent.as_deref(),
+                Some("Idle"),
+                "Processing should have parent Idle"
+            );
 
             // Validating should be inside Processing
-            let validating = states.get("Validating").expect("Validating state should exist");
-            assert_eq!(validating.parent.as_deref(), Some("Processing"), "Validating should have parent Processing");
+            let validating = states
+                .get("Validating")
+                .expect("Validating state should exist");
+            assert_eq!(
+                validating.parent.as_deref(),
+                Some("Processing"),
+                "Validating should have parent Processing"
+            );
 
             // Running should be inside Processing
             let running = states.get("Running").expect("Running state should exist");
-            assert_eq!(running.parent.as_deref(), Some("Processing"), "Running should have parent Processing");
+            assert_eq!(
+                running.parent.as_deref(),
+                Some("Processing"),
+                "Running should have parent Processing"
+            );
 
             // Initializing should be inside Running (nested 3 levels deep)
-            let initializing = states.get("Initializing").expect("Initializing state should exist");
-            assert_eq!(initializing.parent.as_deref(), Some("Running"), "Initializing should have parent Running");
+            let initializing = states
+                .get("Initializing")
+                .expect("Initializing state should exist");
+            assert_eq!(
+                initializing.parent.as_deref(),
+                Some("Running"),
+                "Initializing should have parent Running"
+            );
 
             // Paused should be inside Processing (from Running --> Paused transition)
             let paused = states.get("Paused").expect("Paused state should exist");
-            assert_eq!(paused.parent.as_deref(), Some("Processing"), "Paused should have parent Processing");
+            assert_eq!(
+                paused.parent.as_deref(),
+                Some("Processing"),
+                "Paused should have parent Processing"
+            );
 
             // WaitingResume should be inside Paused
-            let waiting = states.get("WaitingResume").expect("WaitingResume state should exist");
-            assert_eq!(waiting.parent.as_deref(), Some("Paused"), "WaitingResume should have parent Paused");
+            let waiting = states
+                .get("WaitingResume")
+                .expect("WaitingResume state should exist");
+            assert_eq!(
+                waiting.parent.as_deref(),
+                Some("Paused"),
+                "WaitingResume should have parent Paused"
+            );
 
             // Cancelled should be at root level (defined in root transitions)
-            let cancelled = states.get("Cancelled").expect("Cancelled state should exist");
-            assert_eq!(cancelled.parent.as_deref(), None, "Cancelled should be at root level");
+            let cancelled = states
+                .get("Cancelled")
+                .expect("Cancelled state should exist");
+            assert_eq!(
+                cancelled.parent.as_deref(),
+                None,
+                "Cancelled should be at root level"
+            );
 
             // Verify relations count
             let relations = db.get_relations();
-            assert!(relations.len() >= 15, "Expected at least 15 relations, got {}", relations.len());
+            assert!(
+                relations.len() >= 15,
+                "Expected at least 15 relations, got {}",
+                relations.len()
+            );
         }
     }
 }

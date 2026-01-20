@@ -1649,7 +1649,13 @@ fn render_composite_state(
     // Create a divider path between title and content (use path instead of line for SVG consistency)
     let divider_y = min_y + title_height - 4.0;
     let divider = SvgElement::Path {
-        d: format!("M {} {} L {} {}", min_x, divider_y, min_x + width, divider_y),
+        d: format!(
+            "M {} {} L {} {}",
+            min_x,
+            divider_y,
+            min_x + width,
+            divider_y
+        ),
         attrs: Attrs::new().with_class("state-composite-divider"),
     };
 
