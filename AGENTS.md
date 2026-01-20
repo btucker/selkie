@@ -19,7 +19,14 @@ bd sync               # Sync with git
 **MANDATORY WORKFLOW:**
 
 1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
+2. **Run quality gates** (if code changed) - Tests, linters, builds:
+
+   ```bash
+   cargo fmt                                        # Fix formatting
+   cargo clippy --features all-formats -- -D warnings  # Lint (warnings = errors)
+   cargo test --features all-formats               # Run tests
+   ```
+
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
 
@@ -61,7 +68,7 @@ Rule 5: Always prefer the implementation approach of the reference-implementatio
 2. Follow all instructions from its output & confirm our changes are increasing scores
 3. Log new issues to log in bd & resolve completed ones
 4. When you resolve a rendering issue, update the svg in docs/images
-5. Follow TDD, Commit when tests are passing
+5. Follow TDD, run `cargo fmt && cargo clippy --features all-formats -- -D warnings` before committing, commit when tests pass
 6. Explore Reference implementations available as git submodules in reference-implementations:
     - mermaid
     - dagre
