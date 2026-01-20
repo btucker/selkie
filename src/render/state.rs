@@ -187,13 +187,45 @@ fn compute_level_layout(
 
     // First, recursively compute layouts for composite children at this level
     for composite_id in &composite_ids {
-        if let Some(inner_layout) = compute_level_layout(
+        if let Some(mut inner_layout) = compute_level_layout(
             Some(composite_id),
             db,
             size_estimator,
             level_layouts,
             depth + 1, // Increment depth for nested composites
         )? {
+            // Check if this is a leaf composite (no nested composites in its positions)
+            let is_leaf_composite = !inner_layout
+                .positions
+                .keys()
+                .any(|child_id| level_layouts.contains_key(child_id));
+
+            // Apply width expansion to leaf composites to approximate mermaid's getBBox()
+            // measurements. Mermaid measures actual rendered SVG which includes font-specific
+            // widths. Our character-based estimates are typically 40-70% narrower.
+            // Only expand leaf composites to avoid compounding at multiple levels.
+            if is_leaf_composite {
+                let expansion_factor = 1.5; // Balanced expansion to approximate mermaid getBBox()
+                let original_width = inner_layout.width;
+                let expanded_width = original_width * expansion_factor;
+                let width_offset = (expanded_width - original_width) / 2.0;
+
+                // Shift all positions to center content within expanded width
+                for (_, (x, _, _, _)) in inner_layout.positions.iter_mut() {
+                    *x += width_offset;
+                }
+                // Shift edge points and label positions
+                for edge in &mut inner_layout.edges {
+                    for point in &mut edge.bend_points {
+                        point.x += width_offset;
+                    }
+                    if let Some(ref mut pos) = edge.label_position {
+                        pos.x += width_offset;
+                    }
+                }
+                inner_layout.width = expanded_width;
+            }
+
             level_layouts.insert(composite_id.to_string(), inner_layout);
         }
     }
@@ -1464,9 +1496,13 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     // First, render composite state containers (behind everything else)
     // Sorted by depth ensures parents render before children for correct z-order
     for composite_id in &sorted_composites {
-        if let Some(composite_elem) =
-            render_composite_state(composite_id, db, &state_positions, &composite_states)
-        {
+        if let Some(composite_elem) = render_composite_state(
+            composite_id,
+            db,
+            &state_positions,
+            &composite_states,
+            &level_layouts,
+        ) {
             doc.add_element(composite_elem);
         }
     }
@@ -1554,6 +1590,7 @@ fn render_composite_state(
     db: &StateDb,
     state_positions: &HashMap<String, (f64, f64, f64, f64)>,
     composite_states: &std::collections::HashSet<&str>,
+    level_layouts: &HashMap<String, LevelLayout>,
 ) -> Option<SvgElement> {
     // Find all child states (states whose parent is this composite)
     let states = db.get_states();
@@ -1622,8 +1659,34 @@ fn render_composite_state(
     max_x += padding;
     max_y += padding;
 
-    let width = max_x - min_x;
+    let content_width = max_x - min_x;
     let height = max_y - min_y;
+
+    // For leaf composites, use the expanded width from level_layouts instead of
+    // the computed bounds. This applies the expansion that was calculated during layout.
+    // Leaf composites are those that don't contain nested composites.
+    let has_nested_composites = child_ids
+        .iter()
+        .any(|child_id| composite_states.contains(child_id));
+
+    let width = if !has_nested_composites {
+        // Use expanded width from level_layouts if available
+        if let Some(layout) = level_layouts.get(composite_id) {
+            // The expanded layout width plus padding (which we've already subtracted from bounds)
+            let expanded_total = layout.width + 2.0 * padding;
+            // Center the content within the expanded width
+            let width_expansion = (expanded_total - content_width) / 2.0;
+            if width_expansion > 0.0 {
+                min_x -= width_expansion;
+                // Note: max_x is implicitly min_x + expanded_total, used via width
+            }
+            expanded_total
+        } else {
+            content_width
+        }
+    } else {
+        content_width
+    };
 
     // Create the outer rect (border with fill matching reference)
     let outer_rect = SvgElement::Rect {
