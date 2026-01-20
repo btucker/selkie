@@ -103,8 +103,12 @@ pub enum Ranker {
 /// Run the dagre layout algorithm on a graph
 pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     #[cfg(test)]
-    eprintln!("[dagre] Starting layout. nodes={}, edges={}, compound={}",
-        graph.node_count(), graph.edge_count(), graph.is_compound());
+    eprintln!(
+        "[dagre] Starting layout. nodes={}, edges={}, compound={}",
+        graph.node_count(),
+        graph.edge_count(),
+        graph.is_compound()
+    );
 
     // Adjust coordinate system for LR/RL (swap width/height)
     adjust_coordinate_system(graph, config.rankdir);
@@ -126,8 +130,11 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
         eprintln!("[dagre] Phase 3: Running nesting graph...");
         nesting_graph::run(graph);
         #[cfg(test)]
-        eprintln!("[dagre] Phase 3: Nesting graph complete. nodes={}, edges={}",
-            graph.node_count(), graph.edge_count());
+        eprintln!(
+            "[dagre] Phase 3: Nesting graph complete. nodes={}, edges={}",
+            graph.node_count(),
+            graph.edge_count()
+        );
 
         // Phase 3.5: Redirect edges to/from compound nodes to their border nodes
         // This ensures edges like "[*] --> CompositeState" properly constrain ranking
@@ -177,7 +184,10 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     eprintln!("[dagre] Phase 9: Normalizing edges...");
     normalize::run(graph);
     #[cfg(test)]
-    eprintln!("[dagre] Phase 9: Edges normalized. nodes={}", graph.node_count());
+    eprintln!(
+        "[dagre] Phase 9: Edges normalized. nodes={}",
+        graph.node_count()
+    );
 
     // Phase 10: Parent dummy chains through LCA in compound graphs
     if is_compound {
@@ -194,7 +204,10 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
         eprintln!("[dagre] Phase 11: Adding border segments...");
         compound::add_border_segments(graph);
         #[cfg(test)]
-        eprintln!("[dagre] Phase 11: Border segments added. nodes={}", graph.node_count());
+        eprintln!(
+            "[dagre] Phase 11: Border segments added. nodes={}",
+            graph.node_count()
+        );
     }
 
     // Phase 12: Order nodes within ranks (crossing minimization)

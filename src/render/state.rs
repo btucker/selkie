@@ -461,9 +461,9 @@ impl ToLayoutGraph for StateDb {
         // nodeSpacing = 50, rankSpacing = 50
         graph.options = LayoutOptions {
             direction: self.preferred_direction(),
-            node_spacing: 50.0, // mermaid's nodeSpacing
-            layer_spacing: 50.0, // mermaid's rankSpacing
-            padding: Padding::uniform(8.0), // mermaid's marginx/marginy
+            node_spacing: 50.0,                // mermaid's nodeSpacing
+            layer_spacing: 50.0,               // mermaid's rankSpacing
+            padding: Padding::uniform(8.0),    // mermaid's marginx/marginy
             ranker: LayoutRanker::LongestPath, // Use longest-path (mermaid's tight-tree base)
         };
 
@@ -816,7 +816,12 @@ fn center_nested_composites(
         // Calculate the parent's bounds from NON-COMPOSITE children only
         // This gives us the "anchor" content that the nested composite should be centered with
         let (parent_non_comp_min_x, parent_non_comp_max_x) =
-            calculate_composite_x_bounds_for_centering(parent_id, db, state_positions, composite_ids);
+            calculate_composite_x_bounds_for_centering(
+                parent_id,
+                db,
+                state_positions,
+                composite_ids,
+            );
 
         // Calculate nested composite's RENDERED bounds (with padding)
         let nested_rendered = calculate_composite_bounds_recursive(nested_id, db, state_positions);
