@@ -251,7 +251,10 @@ fn layout_blocks(
 
     for row in &row_info {
         let mut current_x = 0.0;
-        let row_height = row.first().map(|(_, _, _, h)| *h).unwrap_or(MIN_BLOCK_HEIGHT);
+        let row_height = row
+            .first()
+            .map(|(_, _, _, h)| *h)
+            .unwrap_or(MIN_BLOCK_HEIGHT);
 
         for (id, block, width, height) in row {
             // Skip space blocks in rendering but account for their space
@@ -514,8 +517,7 @@ fn position_edges(
                 (start_x, shared_y, end_x, shared_y)
             } else {
                 // Diagonal/curved edge - use original calculation
-                let (sx, sy) =
-                    get_edge_point(start_block, start_cx, start_cy, end_cx, end_cy);
+                let (sx, sy) = get_edge_point(start_block, start_cx, start_cy, end_cx, end_cy);
                 let (ex, ey) = get_edge_point(end_block, end_cx, end_cy, start_cx, start_cy);
                 (sx, sy, ex, ey)
             };
