@@ -1614,13 +1614,10 @@ fn render_composite_state(
             .with_attr("text-anchor", "middle"), // Center the text
     };
 
-    // Create a divider line between title and content
+    // Create a divider path between title and content (use path instead of line for SVG consistency)
     let divider_y = min_y + title_height - 4.0;
-    let divider = SvgElement::Line {
-        x1: min_x,
-        y1: divider_y,
-        x2: min_x + width,
-        y2: divider_y,
+    let divider = SvgElement::Path {
+        d: format!("M {} {} L {} {}", min_x, divider_y, min_x + width, divider_y),
         attrs: Attrs::new().with_class("state-composite-divider"),
     };
 
@@ -1711,12 +1708,10 @@ fn render_state_node(
             });
         }
         StateType::Divider => {
-            // Horizontal line for divider
-            children.push(SvgElement::Line {
-                x1: x,
-                y1: y + height / 2.0,
-                x2: x + width,
-                y2: y + height / 2.0,
+            // Horizontal path for divider (use path instead of line for SVG consistency)
+            let divider_y = y + height / 2.0;
+            children.push(SvgElement::Path {
+                d: format!("M {} {} L {} {}", x, divider_y, x + width, divider_y),
                 attrs: Attrs::new()
                     .with_stroke(&theme.line_color)
                     .with_stroke_width(2.0)
@@ -2301,6 +2296,7 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
 .state-divider {{
   stroke: {line_color};
   stroke-dasharray: 5, 5;
+  fill: none;
 }}
 
 .transition-path {{
@@ -2350,6 +2346,7 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
 .state-composite-divider {{
   stroke: {primary_border_color};
   stroke-width: 1px;
+  fill: none;
 }}
 "#,
         text_color = theme.primary_text_color,
