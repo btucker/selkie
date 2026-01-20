@@ -2246,7 +2246,10 @@ fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
                     id.trim_start_matches("state-").to_string()
                 };
 
-                if composite_id.is_empty() || composite_id.contains("start") || composite_id.contains("end") {
+                if composite_id.is_empty()
+                    || composite_id.contains("start")
+                    || composite_id.contains("end")
+                {
                     continue;
                 }
 
@@ -2257,7 +2260,8 @@ fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
                 for child in node.descendants() {
                     if child.tag_name().name() == "rect" {
                         let child_class = child.attribute("class").unwrap_or("");
-                        if child_class.contains("outer") || child_class.contains("composite-outer") {
+                        if child_class.contains("outer") || child_class.contains("composite-outer")
+                        {
                             width = child
                                 .attribute("width")
                                 .and_then(|w| w.parse().ok())

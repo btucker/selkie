@@ -44,6 +44,27 @@ fn rounded_rect_path(x: f64, y: f64, width: f64, height: f64, rx: f64, ry: f64) 
     )
 }
 
+/// Generate SVG path for a circle
+/// This is used instead of <circle> elements to match mermaid reference output
+/// which uses rough.js that renders all shapes as paths
+fn circle_path(cx: f64, cy: f64, r: f64) -> String {
+    // Draw a circle using two arc commands
+    // Start at (cx - r, cy), draw top half arc, then bottom half arc
+    format!(
+        "M {} {} A {} {} 0 1 0 {} {} A {} {} 0 1 0 {} {} Z",
+        cx - r,
+        cy,
+        r,
+        r,
+        cx + r,
+        cy,
+        r,
+        r,
+        cx - r,
+        cy
+    )
+}
+
 /// Calculate the rendered bounds of a composite state
 /// Returns (x, y, width, height) of the composite box
 ///
@@ -1937,15 +1958,14 @@ fn render_transition(
             let text_height = font_size * 1.1; // Tighter for SVG text
             let padding = 2.0;
 
-            // Background rect (centered on label position)
-            // Using rect is fine for label backgrounds - only state boxes need to be paths
-            children.push(SvgElement::Rect {
-                x: label_x - text_width / 2.0 - padding,
-                y: label_y - text_height / 2.0 - padding,
-                width: text_width + padding * 2.0,
-                height: text_height + padding * 2.0,
-                rx: Some(2.0),
-                ry: Some(2.0),
+            // Background as path (centered on label position)
+            // Using path instead of rect to match mermaid reference (rough.js generates paths)
+            let bg_x = label_x - text_width / 2.0 - padding;
+            let bg_y = label_y - text_height / 2.0 - padding;
+            let bg_w = text_width + padding * 2.0;
+            let bg_h = text_height + padding * 2.0;
+            children.push(SvgElement::Path {
+                d: rounded_rect_path(bg_x, bg_y, bg_w, bg_h, 2.0, 2.0),
                 attrs: Attrs::new().with_class("transition-label-bg"),
             });
 
@@ -2258,23 +2278,22 @@ fn render_end_state_bullseye(
     start_end_radius: f64,
     theme: &crate::render::svg::Theme,
 ) {
-    // Outer circle: stroke only with primary_border_color (purple), no fill
-    children.push(SvgElement::Circle {
-        cx: x + width / 2.0,
-        cy: y + height / 2.0,
-        r: start_end_radius,
+    // Outer circle as path: stroke only with primary_border_color (purple), no fill
+    // Using path instead of circle to match mermaid reference (rough.js generates paths)
+    let cx = x + width / 2.0;
+    let cy = y + height / 2.0;
+    children.push(SvgElement::Path {
+        d: circle_path(cx, cy, start_end_radius),
         attrs: Attrs::new()
             .with_fill("none")
             .with_stroke(&theme.primary_border_color)
             .with_stroke_width(2.0)
             .with_class("state-end-outer"),
     });
-    // Inner circle: filled with primary_border_color (creates the center dot)
+    // Inner circle as path: filled with primary_border_color (creates the center dot)
     // Mermaid uses diameter ratio 5:14, so radius ratio ~0.36
-    children.push(SvgElement::Circle {
-        cx: x + width / 2.0,
-        cy: y + height / 2.0,
-        r: start_end_radius * 0.36,
+    children.push(SvgElement::Path {
+        d: circle_path(cx, cy, start_end_radius * 0.36),
         attrs: Attrs::new()
             .with_fill(&theme.primary_border_color)
             .with_stroke(&theme.primary_border_color)

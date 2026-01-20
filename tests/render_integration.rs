@@ -510,12 +510,11 @@ fn test_state_diagram_has_end_state_bullseye() {
     let svg = render(&diagram).expect("Failed to render state diagram");
 
     // End state should have double circles (outer ring + inner fill)
-    // Count circles - should have at least 2 for end state representation
-    let circle_count = svg.matches("<circle").count();
+    // These are rendered as paths (not circles) to match mermaid reference
+    // Check for both state-end-outer and state-end-inner classes
     assert!(
-        circle_count >= 2,
-        "End state should be rendered as double circles (bullseye), found {} circles",
-        circle_count
+        svg.contains("state-end-outer") && svg.contains("state-end-inner"),
+        "End state should be rendered as bullseye (outer + inner) paths"
     );
 }
 
@@ -577,7 +576,7 @@ fn test_state_diagram_both_start_and_end_states() {
 
     // Should have separate start and end states
     // Start state: 1 filled circle with state-start class
-    // End state: 2 circles (outer + inner) with state-end-* classes
+    // End state: 2 paths (outer + inner) with state-end-* classes (rendered as paths to match mermaid)
 
     // Check for start state (filled circle)
     assert!(
@@ -586,19 +585,20 @@ fn test_state_diagram_both_start_and_end_states() {
         svg
     );
 
-    // Check for end state (bullseye with outer and inner circles)
+    // Check for end state (bullseye with outer and inner paths)
     assert!(
         svg.contains("state-end-outer") && svg.contains("state-end-inner"),
-        "State diagram should have an end state with bullseye (outer and inner circles). SVG:\n{}",
+        "State diagram should have an end state with bullseye (outer and inner paths). SVG:\n{}",
         svg
     );
 
-    // Should have at least 3 circles total: 1 for start, 2 for end (bullseye)
+    // Should have at least 1 circle for start state
     let circle_count = svg.matches("<circle").count();
     assert!(
-        circle_count >= 3,
-        "State diagram should have at least 3 circles (1 start + 2 end bullseye), found {}. SVG:\n{}",
-        circle_count, svg
+        circle_count >= 1,
+        "State diagram should have at least 1 circle (start state), found {}. SVG:\n{}",
+        circle_count,
+        svg
     );
 }
 
