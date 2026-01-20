@@ -1701,13 +1701,12 @@ fn render_state_node(
         }
         StateType::Fork | StateType::Join => {
             // Black bar for fork/join (specialStateColor = lineColor)
-            children.push(SvgElement::Rect {
-                x: x + (width - fork_join_width) / 2.0,
-                y: y + (height - fork_join_height) / 2.0,
-                width: fork_join_width,
-                height: fork_join_height.min(height),
-                rx: Some(2.0),
-                ry: Some(2.0),
+            // Use path instead of rect to match mermaid reference (rough.js generates paths)
+            let bar_x = x + (width - fork_join_width) / 2.0;
+            let bar_y = y + (height - fork_join_height) / 2.0;
+            let bar_height = fork_join_height.min(height);
+            children.push(SvgElement::Path {
+                d: rounded_rect_path(bar_x, bar_y, fork_join_width, bar_height, 2.0, 2.0),
                 attrs: Attrs::new()
                     .with_fill(&theme.line_color)
                     .with_class("state-fork-join"),
@@ -1918,10 +1917,11 @@ fn render_transition(
     };
 
     // Transition path (curved) - colors from CSS via theme
+    // Use stroke-width 0.7 to match mermaid reference (dagre-wrapper)
     children.push(SvgElement::Path {
         d: path_d,
         attrs: Attrs::new()
-            .with_stroke_width(1.0)
+            .with_stroke_width(0.7)
             .with_fill("none")
             .with_attr("marker-end", "url(#arrow)")
             .with_class("transition-path"),

@@ -180,7 +180,7 @@ marker path {
   </style>
   <defs>
     <marker id="arrow" viewBox="0 0 20 14" refX="19" refY="7" markerWidth="20" markerHeight="14" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 19,7 L9,13 L14,7 L9,1 Z" stroke-width="1" fill="#333333" stroke="#333333"/>
+      <path d="M 19,7 L9,13 L14,7 L9,1 Z" stroke="#333333" stroke-width="1" fill="#333333"/>
     </marker>
   </defs>
   <g class="root">
@@ -197,49 +197,49 @@ marker path {
 
     </g>
     <g class="state-node" id="state-Error">
-      <path d="M 67.20000000000002 280.8 H 117.20000000000002 A 5 5 0 0 1 122.20000000000002 285.8 V 314.2 A 5 5 0 0 1 117.20000000000002 319.2 H 67.20000000000002 A 5 5 0 0 1 62.20000000000001 314.2 V 285.8 A 5 5 0 0 1 67.20000000000002 280.8 Z" class="state-box" fill="#ECECFF" stroke-width="1" stroke="#9370DB"/>
-      <text x="92.20000000000002" y="305" class="state-label" text-anchor="middle" font-size="16">Error</text>
+      <path d="M 67.20000000000002 280.8 H 117.20000000000002 A 5 5 0 0 1 122.20000000000002 285.8 V 314.2 A 5 5 0 0 1 117.20000000000002 319.2 H 67.20000000000002 A 5 5 0 0 1 62.20000000000001 314.2 V 285.8 A 5 5 0 0 1 67.20000000000002 280.8 Z" class="state-box" stroke-width="1" stroke="#9370DB" fill="#ECECFF"/>
+      <text x="92.20000000000002" y="305" class="state-label" font-size="16" text-anchor="middle">Error</text>
     </g>
     <g class="state-node" id="state-Idle">
       <path d="M 59.2 64 H 100.4 A 5 5 0 0 1 105.4 69 V 97.4 A 5 5 0 0 1 100.4 102.4 H 59.2 A 5 5 0 0 1 54.2 97.4 V 69 A 5 5 0 0 1 59.2 64 Z" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#9370DB"/>
       <text x="79.80000000000001" y="88.2" class="state-label" text-anchor="middle" font-size="16">Idle</text>
     </g>
     <g class="state-node" id="state-Running">
-      <path d="M 5 172.4 H 72.60000000000001 A 5 5 0 0 1 77.60000000000001 177.4 V 205.8 A 5 5 0 0 1 72.60000000000001 210.8 H 5 A 5 5 0 0 1 0 205.8 V 177.4 A 5 5 0 0 1 5 172.4 Z" class="state-box" stroke-width="1" stroke="#9370DB" fill="#ECECFF"/>
-      <text x="38.800000000000004" y="196.6" class="state-label" text-anchor="middle" font-size="16">Running</text>
+      <path d="M 5 172.4 H 72.60000000000001 A 5 5 0 0 1 77.60000000000001 177.4 V 205.8 A 5 5 0 0 1 72.60000000000001 210.8 H 5 A 5 5 0 0 1 0 205.8 V 177.4 A 5 5 0 0 1 5 172.4 Z" class="state-box" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+      <text x="38.800000000000004" y="196.6" class="state-label" font-size="16" text-anchor="middle">Running</text>
     </g>
     <g class="state-node" id="state-[*]_end_0">
-      <circle cx="92.20000000000002" cy="376.2" r="7" class="state-end-outer" stroke="#9370DB" stroke-width="2" fill="none"/>
-      <circle cx="92.20000000000002" cy="376.2" r="2.52" class="state-end-inner" stroke="#9370DB" stroke-width="2" fill="#9370DB"/>
+      <circle cx="92.20000000000002" cy="376.2" r="7" class="state-end-outer" fill="none" stroke="#9370DB" stroke-width="2"/>
+      <circle cx="92.20000000000002" cy="376.2" r="2.52" class="state-end-inner" fill="#9370DB" stroke="#9370DB" stroke-width="2"/>
     </g>
     <g class="state-node" id="state-[*]_start_0">
       <circle cx="79.80000000000001" cy="7" r="7" class="state-start" fill="#333333"/>
     </g>
     <g class="transition">
-      <path d="M 79.80 14.00 C 79.80 22.33, 79.80 30.67, 79.80 39.00 C 79.80 47.33, 79.80 55.67, 79.80 64.00" class="transition-path" stroke-width="1" marker-end="url(#arrow)" fill="none"/>
+      <path d="M 79.80 14.00 C 79.80 22.33, 79.80 30.67, 79.80 39.00 C 79.80 47.33, 79.80 55.67, 79.80 64.00" class="transition-path" fill="none" stroke-width="0.7" marker-end="url(#arrow)"/>
     </g>
     <g class="transition">
-      <path d="M 54.20 100.12 C 35.40 112.55, 16.60 124.97, 11.61 137.02 C 6.63 149.07, 15.45 160.73, 24.28 172.40" class="transition-path" marker-end="url(#arrow)" fill="none" stroke-width="1"/>
+      <path d="M 54.20 100.12 C 35.40 112.55, 16.60 124.97, 11.61 137.02 C 6.63 149.07, 15.45 160.73, 24.28 172.40" class="transition-path" marker-end="url(#arrow)" fill="none" stroke-width="0.7"/>
       <rect x="-14.305611669447785" y="120.06005064004965" width="44" height="21.6" rx="2" ry="2" class="transition-label-bg"/>
-      <text x="7.694388330552215" y="130.86005064004965" class="transition-label" font-size="16" text-anchor="middle" dominant-baseline="central">start</text>
+      <text x="7.694388330552215" y="130.86005064004965" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">start</text>
     </g>
     <g class="transition">
-      <path d="M 53.32 172.40 L 79.80 102.40" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 53.32 172.40 L 79.80 102.40" class="transition-path" stroke-width="0.7" fill="none" marker-end="url(#arrow)"/>
       <rect x="59.11958400166162" y="130.14337919780343" width="36" height="21.6" rx="2" ry="2" class="transition-label-bg"/>
-      <text x="77.11958400166162" y="140.94337919780344" class="transition-label" font-size="16" text-anchor="middle" dominant-baseline="central">stop</text>
+      <text x="77.11958400166162" y="140.94337919780344" class="transition-label" text-anchor="middle" dominant-baseline="central" font-size="16">stop</text>
     </g>
     <g class="transition">
-      <path d="M 38.80 210.80 L 73.28 280.80" class="transition-path" stroke-width="1" marker-end="url(#arrow)" fill="none"/>
+      <path d="M 38.80 210.80 L 73.28 280.80" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="0.7"/>
       <rect x="21.75967094792533" y="240.0339731344111" width="44" height="21.6" rx="2" ry="2" class="transition-label-bg"/>
-      <text x="43.75967094792533" y="250.8339731344111" class="transition-label" font-size="16" dominant-baseline="central" text-anchor="middle">error</text>
+      <text x="43.75967094792533" y="250.8339731344111" class="transition-label" text-anchor="middle" dominant-baseline="central" font-size="16">error</text>
     </g>
     <g class="transition">
-      <path d="M 115.40 280.80 C 129.50 269.13, 143.60 257.47, 150.65 233.57 C 157.70 209.67, 157.70 173.53, 148.98 149.40 C 122.83 113.14, 105.40 101.01, 105.40 101.01" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 115.40 280.80 C 129.50 269.13, 143.60 257.47, 150.65 233.57 C 157.70 209.67, 157.70 173.53, 148.98 149.40 C 122.83 113.14, 105.40 101.01, 105.40 101.01" class="transition-path" stroke-width="0.7" fill="none" marker-end="url(#arrow)"/>
       <rect x="135.70000000000002" y="176.39339185766266" width="44" height="21.6" rx="2" ry="2" class="transition-label-bg"/>
-      <text x="157.70000000000002" y="187.19339185766268" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">reset</text>
+      <text x="157.70000000000002" y="187.19339185766268" class="transition-label" text-anchor="middle" dominant-baseline="central" font-size="16">reset</text>
     </g>
     <g class="transition">
-      <path d="M 92.20 319.20 C 92.20 327.53, 92.20 335.87, 92.20 344.20 C 92.20 352.53, 92.20 360.87, 92.20 369.20" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 92.20 319.20 C 92.20 327.53, 92.20 335.87, 92.20 344.20 C 92.20 352.53, 92.20 360.87, 92.20 369.20" class="transition-path" fill="none" stroke-width="0.7" marker-end="url(#arrow)"/>
     </g>
   </g>
 </svg>

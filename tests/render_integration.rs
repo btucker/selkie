@@ -1693,6 +1693,20 @@ fn test_state_diagram_fork_join_centered() {
             }
         }
 
+        // For path (fork/join bars): d="M {x+rx} {y} H {right-rx} ..."
+        if state_section.contains("<path") && state_section.contains("state-fork-join") {
+            let path_pattern =
+                regex::Regex::new(r#"<path[^>]*d="M ([0-9.]+) [0-9.]+ H ([0-9.]+)"#).ok()?;
+            if let Some(caps) = path_pattern.captures(state_section) {
+                let x_plus_rx: f64 = caps.get(1)?.as_str().parse().ok()?;
+                let right_minus_rx: f64 = caps.get(2)?.as_str().parse().ok()?;
+                let rx = 2.0; // fork/join uses rx=2.0
+                let x = x_plus_rx - rx;
+                let w = right_minus_rx + rx - x;
+                return Some(x + w / 2.0);
+            }
+        }
+
         // For rect (fork/join bars): x="..." width="..."
         if let Some(x_start) = state_section.find(r#" x=""#) {
             let x_value_start = x_start + 4;
