@@ -104,6 +104,8 @@ pub struct ClassDef {
 pub struct BlockDb {
     /// All blocks by ID
     blocks: HashMap<String, Block>,
+    /// Block IDs in insertion order (for maintaining layout order)
+    block_order: Vec<String>,
     /// Root block (composite containing all top-level blocks)
     root_block: Block,
     /// All edges
@@ -158,6 +160,10 @@ impl BlockDb {
         block.block_type = block_type;
         block.parent_id = parent_id.map(|s| s.to_string());
 
+        // Track insertion order
+        if !self.blocks.contains_key(id) {
+            self.block_order.push(id.to_string());
+        }
         self.blocks.insert(id.to_string(), block.clone());
         // Only add to root children if no parent (top-level block)
         if parent_id.is_none() {
@@ -234,9 +240,17 @@ impl BlockDb {
         &self.blocks
     }
 
-    /// Get blocks as flat vec
+    /// Get blocks as flat vec (insertion order preserved)
     pub fn get_blocks_flat(&self) -> Vec<&Block> {
-        self.blocks.values().collect()
+        self.block_order
+            .iter()
+            .filter_map(|id| self.blocks.get(id))
+            .collect()
+    }
+
+    /// Get block IDs in insertion order
+    pub fn get_block_order(&self) -> &[String] {
+        &self.block_order
     }
 
     /// Get all edges

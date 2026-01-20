@@ -84,6 +84,7 @@ pub fn render_block(db: &BlockDb, config: &RenderConfig) -> Result<String> {
 
     // Get all blocks
     let blocks = db.get_blocks();
+    let block_order = db.get_block_order();
     let edges = db.get_edges();
     let classes = db.get_classes();
 
@@ -103,16 +104,17 @@ pub fn render_block(db: &BlockDb, config: &RenderConfig) -> Result<String> {
     // Determine columns from root or default
     let columns = db.get_columns().unwrap_or(DEFAULT_COLUMNS);
 
-    // Position blocks in grid layout
-    let positioned_blocks = layout_blocks(blocks, &block_sizes, columns);
+    // Position blocks in grid layout (preserving insertion order)
+    let positioned_blocks = layout_blocks(blocks, block_order, &block_sizes, columns);
 
     // Calculate bounds
     let (min_x, max_x, min_y, max_y) = calculate_bounds(&positioned_blocks);
-    let padding = 30.0;
-    let width = (max_x - min_x) + padding * 2.0;
-    let height = (max_y - min_y) + padding * 2.0;
+    // Use smaller padding similar to mermaid (5px)
+    let svg_padding = 5.0;
+    let width = (max_x - min_x) + svg_padding * 2.0;
+    let height = (max_y - min_y) + svg_padding * 2.0;
 
-    doc.set_size_with_origin(min_x - padding, min_y - padding, width, height);
+    doc.set_size_with_origin(min_x - svg_padding, min_y - svg_padding, width, height);
 
     // Add CSS styles
     if config.embed_css {
@@ -182,73 +184,225 @@ fn calculate_block_size(block: &Block) -> (f64, f64) {
 }
 
 /// Layout blocks in a grid with proper nesting for composite blocks
+/// Following mermaid's approach: all blocks in same row share same height,
+/// children inside composites are at same y-level as parent row
 fn layout_blocks(
     blocks: &HashMap<String, Block>,
+    block_order: &[String],
     sizes: &HashMap<String, (f64, f64)>,
     columns: usize,
 ) -> Vec<PositionedBlock> {
-    // First, build parent-child relationships
-    let mut children_by_parent: HashMap<String, Vec<&str>> = HashMap::new();
-    for (id, block) in blocks.iter() {
-        if let Some(ref parent_id) = block.parent_id {
-            children_by_parent
-                .entry(parent_id.clone())
-                .or_default()
-                .push(id);
+    // Build parent-child relationships preserving insertion order
+    let mut children_by_parent: HashMap<String, Vec<String>> = HashMap::new();
+    for id in block_order {
+        if let Some(block) = blocks.get(id) {
+            if let Some(ref parent_id) = block.parent_id {
+                children_by_parent
+                    .entry(parent_id.clone())
+                    .or_default()
+                    .push(id.clone());
+            }
         }
     }
 
     // Calculate sizes for composite blocks based on their children
     let mut effective_sizes: HashMap<String, (f64, f64)> = sizes.clone();
-    for (id, block) in blocks.iter() {
-        if block.block_type == BlockType::Composite {
-            if let Some(child_ids) = children_by_parent.get(id) {
-                let (comp_w, comp_h) =
-                    calculate_composite_size(child_ids, blocks, &effective_sizes);
-                effective_sizes.insert(id.clone(), (comp_w, comp_h));
+    for id in block_order {
+        if let Some(block) = blocks.get(id) {
+            if block.block_type == BlockType::Composite {
+                if let Some(child_ids) = children_by_parent.get(id) {
+                    let child_refs: Vec<&str> = child_ids.iter().map(|s| s.as_str()).collect();
+                    let (comp_w, comp_h) =
+                        calculate_composite_size(&child_refs, blocks, &effective_sizes);
+                    effective_sizes.insert(id.clone(), (comp_w, comp_h));
+                }
             }
         }
     }
 
-    // Layout root-level blocks only
-    let root_blocks: Vec<(&str, &Block)> = blocks
+    // Get root-level blocks (preserving insertion order)
+    let root_blocks: Vec<(&str, &Block)> = block_order
         .iter()
-        .filter(|(_, b)| b.parent_id.is_none())
-        .map(|(id, b)| (id.as_str(), b))
+        .filter_map(|id| {
+            blocks.get(id).and_then(|b| {
+                if b.parent_id.is_none() {
+                    Some((id.as_str(), b))
+                } else {
+                    None
+                }
+            })
+        })
         .collect();
 
-    let mut positioned = layout_block_list(&root_blocks, &effective_sizes, columns, 0.0, 0.0);
+    // First pass: determine row assignments and max heights per row
+    let mut row_info = calculate_row_info(&root_blocks, &effective_sizes, columns);
 
-    // Collect composite info for child positioning
-    let composite_info: Vec<_> = positioned
-        .iter()
-        .filter(|b| b.block_type == BlockType::Composite)
-        .map(|b| (b.id.clone(), b.x, b.y))
-        .collect();
-
-    // Now position children inside their parent composites
-    for (composite_id, comp_x, comp_y) in composite_info {
-        if let Some(child_ids) = children_by_parent.get(&composite_id) {
-            let child_blocks: Vec<(&str, &Block)> = child_ids
-                .iter()
-                .filter_map(|id| blocks.get(*id).map(|b| (*id, b)))
-                .collect();
-
-            // Get columns for this composite (default to auto based on children count)
-            let child_columns = child_ids.len().max(1);
-
-            // Layout children inside composite with padding
-            let padding = BLOCK_PADDING;
-            let child_positioned = layout_block_list(
-                &child_blocks,
-                &effective_sizes,
-                child_columns,
-                comp_x + padding,
-                comp_y + padding,
-            );
-
-            positioned.extend(child_positioned);
+    // Normalize heights - all blocks in same row get same height
+    for row in &mut row_info {
+        let max_height = row.iter().map(|(_, _, _, h)| *h).fold(0.0_f64, f64::max);
+        for item in row.iter_mut() {
+            item.3 = max_height;
         }
+    }
+
+    // Position all blocks based on row info
+    let mut positioned = Vec::new();
+    let mut current_y = 0.0;
+
+    for row in &row_info {
+        let mut current_x = 0.0;
+        let row_height = row.first().map(|(_, _, _, h)| *h).unwrap_or(MIN_BLOCK_HEIGHT);
+
+        for (id, block, width, height) in row {
+            // Skip space blocks in rendering but account for their space
+            if block.block_type == BlockType::Space {
+                current_x += *width + BLOCK_SPACING;
+                continue;
+            }
+
+            // Skip edge types
+            if block.block_type == BlockType::Edge {
+                continue;
+            }
+
+            positioned.push(PositionedBlock {
+                id: id.to_string(),
+                label: block.label.clone().unwrap_or_else(|| id.to_string()),
+                block_type: block.block_type.clone(),
+                x: current_x,
+                y: current_y,
+                width: *width,
+                height: *height,
+                column_span: block.width_in_columns.unwrap_or(1),
+                styles: block.styles.clone(),
+                classes: block.classes.clone(),
+            });
+
+            // If this is a composite, position children inside it
+            if block.block_type == BlockType::Composite {
+                if let Some(child_ids) = children_by_parent.get(*id) {
+                    let child_blocks: Vec<(&str, &Block)> = child_ids
+                        .iter()
+                        .filter_map(|cid| blocks.get(cid).map(|b| (cid.as_str(), b)))
+                        .collect();
+
+                    // Use minimal padding (8px like mermaid) for children inside composite
+                    let inner_padding = 8.0;
+                    let child_positioned = layout_composite_children(
+                        &child_blocks,
+                        &effective_sizes,
+                        current_x + inner_padding,
+                        current_y + inner_padding,
+                        *width - inner_padding * 2.0,
+                        *height - inner_padding * 2.0,
+                    );
+                    positioned.extend(child_positioned);
+                }
+            }
+
+            current_x += *width + BLOCK_SPACING;
+        }
+
+        current_y += row_height + BLOCK_SPACING;
+    }
+
+    positioned
+}
+
+/// Calculate row assignments and sizes for blocks
+fn calculate_row_info<'a>(
+    block_list: &[(&'a str, &'a Block)],
+    sizes: &HashMap<String, (f64, f64)>,
+    columns: usize,
+) -> Vec<Vec<(&'a str, &'a Block, f64, f64)>> {
+    let mut rows: Vec<Vec<(&str, &Block, f64, f64)>> = Vec::new();
+    let mut current_row: Vec<(&str, &Block, f64, f64)> = Vec::new();
+    let mut col = 0;
+
+    for &(id, block) in block_list {
+        let (width, height) = sizes
+            .get(id)
+            .cloned()
+            .unwrap_or((MIN_BLOCK_WIDTH, MIN_BLOCK_HEIGHT));
+        let span = block.width_in_columns.unwrap_or(1);
+
+        // Adjust width for column span
+        let block_width = if span > 1 {
+            (span as f64) * MIN_BLOCK_WIDTH + ((span - 1) as f64) * BLOCK_SPACING
+        } else {
+            width
+        };
+
+        // Check if we need to wrap to next row
+        if col + span > columns && col > 0 {
+            rows.push(current_row);
+            current_row = Vec::new();
+            col = 0;
+        }
+
+        current_row.push((id, block, block_width, height));
+        col += span;
+
+        // Wrap if we've filled the row
+        if col >= columns {
+            rows.push(current_row);
+            current_row = Vec::new();
+            col = 0;
+        }
+    }
+
+    // Don't forget the last row if it has items
+    if !current_row.is_empty() {
+        rows.push(current_row);
+    }
+
+    rows
+}
+
+/// Layout children inside a composite block
+fn layout_composite_children(
+    child_blocks: &[(&str, &Block)],
+    _sizes: &HashMap<String, (f64, f64)>,
+    start_x: f64,
+    start_y: f64,
+    available_width: f64,
+    available_height: f64,
+) -> Vec<PositionedBlock> {
+    let mut positioned = Vec::new();
+    let num_children = child_blocks.len();
+
+    if num_children == 0 {
+        return positioned;
+    }
+
+    // Calculate uniform size for children
+    let child_spacing = BLOCK_SPACING;
+    let total_spacing = (num_children - 1) as f64 * child_spacing;
+    let child_width = (available_width - total_spacing) / num_children as f64;
+    let child_height = available_height;
+
+    let mut current_x = start_x;
+
+    for &(id, block) in child_blocks {
+        if block.block_type == BlockType::Space {
+            current_x += child_width + child_spacing;
+            continue;
+        }
+
+        positioned.push(PositionedBlock {
+            id: id.to_string(),
+            label: block.label.clone().unwrap_or_else(|| id.to_string()),
+            block_type: block.block_type.clone(),
+            x: current_x,
+            y: start_y,
+            width: child_width,
+            height: child_height,
+            column_span: block.width_in_columns.unwrap_or(1),
+            styles: block.styles.clone(),
+            classes: block.classes.clone(),
+        });
+
+        current_x += child_width + child_spacing;
     }
 
     positioned
@@ -285,97 +439,6 @@ fn calculate_composite_size(
     }
 
     (total_width + padding * 2.0, max_height + padding * 2.0)
-}
-
-/// Layout a list of blocks in a grid starting at given offset
-fn layout_block_list(
-    block_list: &[(&str, &Block)],
-    sizes: &HashMap<String, (f64, f64)>,
-    columns: usize,
-    start_x: f64,
-    start_y: f64,
-) -> Vec<PositionedBlock> {
-    let mut positioned = Vec::new();
-    let mut y = start_y;
-    let mut col = 0;
-    let mut row_height = 0.0_f64;
-    let mut current_x = start_x;
-
-    // Sort by ID for consistent ordering
-    let mut sorted_list: Vec<_> = block_list.to_vec();
-    sorted_list.sort_by(|a, b| a.0.cmp(b.0));
-
-    for (id, block) in sorted_list {
-        // Skip space blocks in rendering (they still affect layout)
-        if block.block_type == BlockType::Space {
-            let span = block.width_in_columns.unwrap_or(1);
-            for _ in 0..span {
-                current_x += MIN_BLOCK_WIDTH + BLOCK_SPACING;
-                col += 1;
-                if col >= columns {
-                    col = 0;
-                    current_x = start_x;
-                    y += row_height + BLOCK_SPACING;
-                    row_height = 0.0;
-                }
-            }
-            continue;
-        }
-
-        // Skip edge types (handled separately)
-        if block.block_type == BlockType::Edge {
-            continue;
-        }
-
-        let (width, height) = sizes
-            .get(id)
-            .cloned()
-            .unwrap_or((MIN_BLOCK_WIDTH, MIN_BLOCK_HEIGHT));
-        let span = block.width_in_columns.unwrap_or(1);
-
-        // Check if we need to wrap to next row
-        if col + span > columns && col > 0 {
-            col = 0;
-            current_x = start_x;
-            y += row_height + BLOCK_SPACING;
-            row_height = 0.0;
-        }
-
-        // Adjust width for column span
-        let block_width = if span > 1 {
-            (span as f64) * MIN_BLOCK_WIDTH + ((span - 1) as f64) * BLOCK_SPACING
-        } else {
-            width
-        };
-
-        positioned.push(PositionedBlock {
-            id: id.to_string(),
-            label: block.label.clone().unwrap_or_else(|| id.to_string()),
-            block_type: block.block_type.clone(),
-            x: current_x,
-            y,
-            width: block_width,
-            height,
-            column_span: span,
-            styles: block.styles.clone(),
-            classes: block.classes.clone(),
-        });
-
-        // Advance x position by actual block width
-        current_x += block_width + BLOCK_SPACING;
-        row_height = row_height.max(height);
-        col += span;
-
-        // Wrap to next row if needed
-        if col >= columns {
-            col = 0;
-            current_x = start_x;
-            y += row_height + BLOCK_SPACING;
-            row_height = 0.0;
-        }
-    }
-
-    positioned
 }
 
 /// Calculate bounds of all blocks
