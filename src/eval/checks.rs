@@ -70,6 +70,11 @@ pub fn check_structure(
     // WARNING checks - text fill color mismatches
     check_text_fill_colors(selkie, reference, &mut issues);
 
+    // WARNING checks - layout/aspect ratio differences
+    check_aspect_ratio(selkie, reference, &mut issues);
+    check_vertical_distribution(selkie, reference, &mut issues);
+    check_composite_state_structure(selkie, reference, &mut issues);
+
     issues
 }
 
@@ -1916,6 +1921,390 @@ fn calculate_text_vertical_offsets(
     }
 
     offsets
+}
+
+/// Check aspect ratio differences - ERROR if orientation flipped (portrait vs landscape)
+fn check_aspect_ratio(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
+    if reference.width <= 0.0 || reference.height <= 0.0 {
+        return;
+    }
+    if selkie.width <= 0.0 || selkie.height <= 0.0 {
+        return;
+    }
+
+    let ref_aspect = reference.width / reference.height;
+    let selkie_aspect = selkie.width / selkie.height;
+
+    // Categorize orientation
+    let ref_orientation = if ref_aspect > 1.2 {
+        "landscape"
+    } else if ref_aspect < 0.8 {
+        "portrait"
+    } else {
+        "square"
+    };
+
+    let selkie_orientation = if selkie_aspect > 1.2 {
+        "landscape"
+    } else if selkie_aspect < 0.8 {
+        "portrait"
+    } else {
+        "square"
+    };
+
+    // Report if orientation category differs
+    if ref_orientation != selkie_orientation {
+        issues.push(
+            Issue::error(
+                "aspect_ratio",
+                format!(
+                    "Diagram orientation differs: reference is {} ({}x{}, ratio {:.2}), selkie is {} ({}x{}, ratio {:.2})",
+                    ref_orientation,
+                    reference.width as i32,
+                    reference.height as i32,
+                    ref_aspect,
+                    selkie_orientation,
+                    selkie.width as i32,
+                    selkie.height as i32,
+                    selkie_aspect
+                ),
+            )
+            .with_values(
+                format!("{} ({:.2})", ref_orientation, ref_aspect),
+                format!("{} ({:.2})", selkie_orientation, selkie_aspect),
+            ),
+        );
+    } else {
+        // Same orientation but check for significant aspect ratio difference
+        let ratio_diff = (ref_aspect - selkie_aspect).abs() / ref_aspect;
+        if ratio_diff > 0.3 {
+            issues.push(
+                Issue::warning(
+                    "aspect_ratio",
+                    format!(
+                        "Aspect ratio differs significantly: reference {:.2}, selkie {:.2} ({:.0}% difference)",
+                        ref_aspect, selkie_aspect, ratio_diff * 100.0
+                    ),
+                )
+                .with_values(format!("{:.2}", ref_aspect), format!("{:.2}", selkie_aspect)),
+            );
+        }
+    }
+}
+
+/// Check vertical distribution of nodes - WARNING if selkie stacks more vertically
+fn check_vertical_distribution(
+    selkie: &SvgStructure,
+    reference: &SvgStructure,
+    issues: &mut Vec<Issue>,
+) {
+    let selkie_nodes = &selkie.edge_geometry.node_bounds;
+    let ref_nodes = &reference.edge_geometry.node_bounds;
+
+    if selkie_nodes.len() < 3 || ref_nodes.len() < 3 {
+        return;
+    }
+
+    // Calculate Y-spread (range of Y positions)
+    let selkie_y_vals: Vec<f64> = selkie_nodes.iter().map(|n| n.y).collect();
+    let ref_y_vals: Vec<f64> = ref_nodes.iter().map(|n| n.y).collect();
+
+    let selkie_y_min = selkie_y_vals.iter().cloned().fold(f64::MAX, f64::min);
+    let selkie_y_max = selkie_y_vals.iter().cloned().fold(f64::MIN, f64::max);
+    let ref_y_min = ref_y_vals.iter().cloned().fold(f64::MAX, f64::min);
+    let ref_y_max = ref_y_vals.iter().cloned().fold(f64::MIN, f64::max);
+
+    let selkie_y_spread = selkie_y_max - selkie_y_min;
+    let ref_y_spread = ref_y_max - ref_y_min;
+
+    // Calculate X-spread
+    let selkie_x_vals: Vec<f64> = selkie_nodes.iter().map(|n| n.x).collect();
+    let ref_x_vals: Vec<f64> = ref_nodes.iter().map(|n| n.x).collect();
+
+    let selkie_x_min = selkie_x_vals.iter().cloned().fold(f64::MAX, f64::min);
+    let selkie_x_max = selkie_x_vals.iter().cloned().fold(f64::MIN, f64::max);
+    let ref_x_min = ref_x_vals.iter().cloned().fold(f64::MAX, f64::min);
+    let ref_x_max = ref_x_vals.iter().cloned().fold(f64::MIN, f64::max);
+
+    let selkie_x_spread = selkie_x_max - selkie_x_min;
+    let ref_x_spread = ref_x_max - ref_x_min;
+
+    // Compare Y/X spread ratios (high ratio = more vertical stacking)
+    let selkie_ratio = if selkie_x_spread > 0.0 {
+        selkie_y_spread / selkie_x_spread
+    } else {
+        selkie_y_spread
+    };
+    let ref_ratio = if ref_x_spread > 0.0 {
+        ref_y_spread / ref_x_spread
+    } else {
+        ref_y_spread
+    };
+
+    // If selkie has much higher Y/X ratio, it's stacking more vertically
+    if selkie_ratio > ref_ratio * 1.5 && selkie_y_spread > ref_y_spread * 1.2 {
+        issues.push(
+            Issue::warning(
+                "vertical_distribution",
+                format!(
+                    "Nodes are stacked more vertically: selkie Y-spread {:.0}px (ratio {:.2}), reference Y-spread {:.0}px (ratio {:.2}). Selkie is {:.0}% taller in node distribution.",
+                    selkie_y_spread,
+                    selkie_ratio,
+                    ref_y_spread,
+                    ref_ratio,
+                    ((selkie_y_spread - ref_y_spread) / ref_y_spread) * 100.0
+                ),
+            )
+            .with_values(
+                format!("Y-spread: {:.0}px", ref_y_spread),
+                format!("Y-spread: {:.0}px", selkie_y_spread),
+            ),
+        );
+    }
+
+    // Count nodes per "row" (cluster by Y position with tolerance)
+    let selkie_rows = count_y_clusters(&selkie_y_vals, 30.0);
+    let ref_rows = count_y_clusters(&ref_y_vals, 30.0);
+
+    if selkie_rows != ref_rows {
+        let selkie_per_row = selkie_nodes.len() as f64 / selkie_rows as f64;
+        let ref_per_row = ref_nodes.len() as f64 / ref_rows as f64;
+
+        issues.push(
+            Issue::info(
+                "row_distribution",
+                format!(
+                    "Node row distribution differs: reference has {} rows (~{:.1} nodes/row), selkie has {} rows (~{:.1} nodes/row)",
+                    ref_rows, ref_per_row, selkie_rows, selkie_per_row
+                ),
+            ),
+        );
+    }
+}
+
+/// Count clusters of Y values (nodes on same "row")
+fn count_y_clusters(y_vals: &[f64], tolerance: f64) -> usize {
+    if y_vals.is_empty() {
+        return 0;
+    }
+
+    let mut sorted = y_vals.to_vec();
+    sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+
+    let mut clusters = 1;
+    let mut last_y = sorted[0];
+
+    for &y in &sorted[1..] {
+        if (y - last_y).abs() > tolerance {
+            clusters += 1;
+            last_y = y;
+        }
+    }
+
+    clusters
+}
+
+/// Check composite state structure - compare nesting patterns for state diagrams
+fn check_composite_state_structure(
+    selkie: &SvgStructure,
+    reference: &SvgStructure,
+    issues: &mut Vec<Issue>,
+) {
+    // Extract composite state info from raw SVG
+    let selkie_composites = extract_composite_states(&selkie.raw_svg);
+    let ref_composites = extract_composite_states(&reference.raw_svg);
+
+    if selkie_composites.is_empty() && ref_composites.is_empty() {
+        return;
+    }
+
+    // Compare composite state counts
+    if selkie_composites.len() != ref_composites.len() {
+        issues.push(
+            Issue::warning(
+                "composite_structure",
+                format!(
+                    "Composite state count differs: reference has {}, selkie has {}",
+                    ref_composites.len(),
+                    selkie_composites.len()
+                ),
+            )
+            .with_values(
+                ref_composites.len().to_string(),
+                selkie_composites.len().to_string(),
+            ),
+        );
+    }
+
+    // Check if composite states are named the same
+    let selkie_names: HashSet<_> = selkie_composites.iter().map(|c| c.id.as_str()).collect();
+    let ref_names: HashSet<_> = ref_composites.iter().map(|c| c.id.as_str()).collect();
+
+    let missing: Vec<_> = ref_names.difference(&selkie_names).collect();
+    let extra: Vec<_> = selkie_names.difference(&ref_names).collect();
+
+    if !missing.is_empty() {
+        issues.push(Issue::warning(
+            "composite_structure",
+            format!("Missing composite states: {:?}", missing),
+        ));
+    }
+
+    if !extra.is_empty() {
+        issues.push(Issue::info(
+            "composite_structure",
+            format!("Extra composite states in selkie: {:?}", extra),
+        ));
+    }
+
+    // Compare composite state sizes (width/height ratios)
+    for ref_comp in &ref_composites {
+        if let Some(selkie_comp) = selkie_composites.iter().find(|c| c.id == ref_comp.id) {
+            // Compare dimensions
+            let width_diff = (selkie_comp.width - ref_comp.width).abs();
+            let height_diff = (selkie_comp.height - ref_comp.height).abs();
+
+            let width_pct = if ref_comp.width > 0.0 {
+                width_diff / ref_comp.width * 100.0
+            } else {
+                0.0
+            };
+            let height_pct = if ref_comp.height > 0.0 {
+                height_diff / ref_comp.height * 100.0
+            } else {
+                0.0
+            };
+
+            if width_pct > 30.0 || height_pct > 30.0 {
+                issues.push(
+                    Issue::warning(
+                        "composite_size",
+                        format!(
+                            "Composite '{}' size differs: reference {}x{}, selkie {}x{} (width {:.0}% diff, height {:.0}% diff)",
+                            ref_comp.id,
+                            ref_comp.width as i32,
+                            ref_comp.height as i32,
+                            selkie_comp.width as i32,
+                            selkie_comp.height as i32,
+                            width_pct,
+                            height_pct
+                        ),
+                    )
+                    .with_values(
+                        format!("{}x{}", ref_comp.width as i32, ref_comp.height as i32),
+                        format!("{}x{}", selkie_comp.width as i32, selkie_comp.height as i32),
+                    ),
+                );
+            }
+        }
+    }
+}
+
+/// Composite state info extracted from SVG
+#[derive(Debug)]
+struct CompositeState {
+    id: String,
+    width: f64,
+    height: f64,
+}
+
+/// Extract composite state information from raw SVG
+fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
+    let mut composites = Vec::new();
+
+    // Look for composite state patterns in both mermaid and selkie SVGs
+    // Mermaid pattern: <g class="... statediagram-cluster ..." id="StateName">
+    // Selkie pattern: <g id="state-CompositeName" class="...">
+
+    if let Ok(doc) = roxmltree::Document::parse(svg) {
+        for node in doc.descendants() {
+            if node.tag_name().name() != "g" {
+                continue;
+            }
+
+            // Check for mermaid composite (statediagram-cluster class)
+            let class = node.attribute("class").unwrap_or("");
+            let is_mermaid_composite = class.contains("statediagram-cluster");
+
+            // Check for selkie composite (id contains "Composite" or has composite children)
+            let id = node.attribute("id").unwrap_or("");
+            let is_selkie_composite = !id.is_empty()
+                && node.descendants().any(|n| {
+                    n.attribute("class")
+                        .map(|c| c.contains("composite"))
+                        .unwrap_or(false)
+                });
+
+            if is_mermaid_composite || is_selkie_composite {
+                // Extract composite ID
+                let composite_id = if is_mermaid_composite {
+                    node.attribute("id")
+                        .or_else(|| node.attribute("data-id"))
+                        .unwrap_or("")
+                        .to_string()
+                } else {
+                    id.trim_start_matches("state-").to_string()
+                };
+
+                if composite_id.is_empty() || composite_id.contains("start") || composite_id.contains("end") {
+                    continue;
+                }
+
+                // Find the outer rect for dimensions
+                let mut width = 0.0;
+                let mut height = 0.0;
+
+                for child in node.descendants() {
+                    if child.tag_name().name() == "rect" {
+                        let child_class = child.attribute("class").unwrap_or("");
+                        if child_class.contains("outer") || child_class.contains("composite-outer") {
+                            width = child
+                                .attribute("width")
+                                .and_then(|w| w.parse().ok())
+                                .unwrap_or(0.0);
+                            height = child
+                                .attribute("height")
+                                .and_then(|h| h.parse().ok())
+                                .unwrap_or(0.0);
+                            break;
+                        }
+                    }
+                }
+
+                // If no outer rect found, try to get dimensions from first rect
+                if width == 0.0 || height == 0.0 {
+                    for child in node.descendants() {
+                        if child.tag_name().name() == "rect" {
+                            let w: f64 = child
+                                .attribute("width")
+                                .and_then(|w| w.parse().ok())
+                                .unwrap_or(0.0);
+                            let h: f64 = child
+                                .attribute("height")
+                                .and_then(|h| h.parse().ok())
+                                .unwrap_or(0.0);
+                            if w > width {
+                                width = w;
+                            }
+                            if h > height {
+                                height = h;
+                            }
+                        }
+                    }
+                }
+
+                if width > 0.0 && height > 0.0 {
+                    composites.push(CompositeState {
+                        id: composite_id,
+                        width,
+                        height,
+                    });
+                }
+            }
+        }
+    }
+
+    composites
 }
 
 #[cfg(test)]
