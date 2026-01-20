@@ -12,6 +12,38 @@ use crate::layout::{
 use crate::render::svg::edges::{build_curved_path, build_curved_path_with_options};
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
+/// Generate SVG path for a rounded rectangle
+/// This is used instead of <rect> elements to match mermaid reference output
+fn rounded_rect_path(x: f64, y: f64, width: f64, height: f64, rx: f64, ry: f64) -> String {
+    let right = x + width;
+    let bottom = y + height;
+    format!(
+        "M {} {} H {} A {} {} 0 0 1 {} {} V {} A {} {} 0 0 1 {} {} H {} A {} {} 0 0 1 {} {} V {} A {} {} 0 0 1 {} {} Z",
+        x + rx,
+        y,
+        right - rx,
+        rx,
+        ry,
+        right,
+        y + ry,
+        bottom - ry,
+        rx,
+        ry,
+        right - rx,
+        bottom,
+        x + rx,
+        rx,
+        ry,
+        x,
+        bottom - ry,
+        y + ry,
+        rx,
+        ry,
+        x + rx,
+        y
+    )
+}
+
 /// Calculate the rendered bounds of a composite state
 /// Returns (x, y, width, height) of the composite box
 ///
@@ -1746,13 +1778,9 @@ fn render_state_node(
                 }
             } else {
                 // Rounded rectangle for regular state (stateBkg + stateBorder)
-                children.push(SvgElement::Rect {
-                    x,
-                    y,
-                    width,
-                    height,
-                    rx: Some(5.0),
-                    ry: Some(5.0),
+                // Use path instead of rect to match mermaid reference output
+                children.push(SvgElement::Path {
+                    d: rounded_rect_path(x, y, width, height, 5.0, 5.0),
                     attrs: Attrs::new()
                         .with_fill(&theme.primary_color)
                         .with_stroke(&theme.primary_border_color)
@@ -1904,6 +1932,7 @@ fn render_transition(
             let padding = 2.0;
 
             // Background rect (centered on label position)
+            // Using rect is fine for label backgrounds - only state boxes need to be paths
             children.push(SvgElement::Rect {
                 x: label_x - text_width / 2.0 - padding,
                 y: label_y - text_height / 2.0 - padding,
@@ -2831,18 +2860,25 @@ mod tests {
             idle_x, idle_y, idle_w, idle_h
         );
 
-        // Extract Active state bounds
+        // Extract Active state bounds from path element
+        // Path format from rounded_rect_path: M {x+rx} {y} H {right-rx} A rx ry 0 0 1 {right} {y+ry} V {bottom-ry} A ...
+        // We extract: first x coord (x+rx), y coord, right-rx (from H), and bottom-ry (from V)
         let active_re = regex::Regex::new(
-            r#"id="state-Active"[^>]*>\s*<rect[^>]*x="([^"]+)"[^>]*y="([^"]+)"[^>]*width="([^"]+)"[^>]*height="([^"]+)""#
+            r#"id="state-Active"[^>]*>\s*<path[^>]*d="M ([0-9.]+) ([0-9.]+) H ([0-9.]+) A [0-9.]+ [0-9.]+ 0 0 1 [0-9.]+ [0-9.]+ V ([0-9.]+)"#
         ).unwrap();
 
         let active_cap = active_re
             .captures(&svg)
-            .expect("Should find Active state rect");
-        let active_x: f64 = active_cap[1].parse().unwrap();
+            .expect("Should find Active state path");
+        let active_x_plus_rx: f64 = active_cap[1].parse().unwrap();
         let active_y: f64 = active_cap[2].parse().unwrap();
-        let active_w: f64 = active_cap[3].parse().unwrap();
-        let active_h: f64 = active_cap[4].parse().unwrap();
+        let active_right_minus_rx: f64 = active_cap[3].parse().unwrap();
+        let active_bottom_minus_ry: f64 = active_cap[4].parse().unwrap();
+        let rx = 5.0; // We know this from the rounded_rect_path call
+        let ry = 5.0;
+        let active_x = active_x_plus_rx - rx;
+        let active_w = active_right_minus_rx + rx - active_x;
+        let active_h = active_bottom_minus_ry + ry - active_y;
 
         eprintln!(
             "Active bounds: x={}, y={}, w={}, h={}",

@@ -1671,7 +1671,7 @@ fn test_state_diagram_fork_join_centered() {
     let diagram = parse(input).expect("Failed to parse state diagram");
     let svg = render(&diagram).expect("Failed to render state diagram");
 
-    // Extract center x-coordinate from a state's rect element
+    // Extract center x-coordinate from a state's path or rect element
     let extract_center_x = |svg: &str, state_id: &str| -> Option<f64> {
         let state_marker = format!(r#"id="state-{}""#, state_id);
         let state_start = svg.find(&state_marker)?;
@@ -1679,7 +1679,21 @@ fn test_state_diagram_fork_join_centered() {
         let state_end = state_section.find("</g>")?;
         let state_section = &state_section[..state_end];
 
-        // For rect: x="..." width="..."
+        // For path (state boxes): d="M {x+rx} {y} H {right-rx} ..."
+        if state_section.contains("<path") && state_section.contains("state-box") {
+            let path_pattern =
+                regex::Regex::new(r#"<path[^>]*d="M ([0-9.]+) [0-9.]+ H ([0-9.]+)"#).ok()?;
+            if let Some(caps) = path_pattern.captures(state_section) {
+                let x_plus_rx: f64 = caps.get(1)?.as_str().parse().ok()?;
+                let right_minus_rx: f64 = caps.get(2)?.as_str().parse().ok()?;
+                let rx = 5.0;
+                let x = x_plus_rx - rx;
+                let w = right_minus_rx + rx - x;
+                return Some(x + w / 2.0);
+            }
+        }
+
+        // For rect (fork/join bars): x="..." width="..."
         if let Some(x_start) = state_section.find(r#" x=""#) {
             let x_value_start = x_start + 4;
             let remaining = &state_section[x_value_start..];
@@ -3060,18 +3074,19 @@ fn test_state_fork_parallel_order_matches_definition() {
         let state_start = svg.find(&state_marker)?;
         let relevant_section = &svg[state_start..state_start.saturating_add(500)];
 
-        // Pre-compile regex outside the loop
-        let x_pattern = regex::Regex::new(r#"x="([0-9.]+)""#).ok()?;
-        let w_pattern = regex::Regex::new(r#"width="([0-9.]+)""#).ok()?;
+        // Path format from rounded_rect_path: M {x+rx} {y} H {right-rx} A ...
+        // We extract: first x coord (x+rx) and right-rx (from H) to calculate center
+        let path_pattern =
+            regex::Regex::new(r#"<path[^>]*d="M ([0-9.]+) [0-9.]+ H ([0-9.]+)"#).ok()?;
 
-        // Find rect and extract x + width/2
         for line in relevant_section.lines() {
-            if line.contains("<rect") {
-                if let (Some(x_caps), Some(w_caps)) =
-                    (x_pattern.captures(line), w_pattern.captures(line))
-                {
-                    let x: f64 = x_caps.get(1)?.as_str().parse().ok()?;
-                    let w: f64 = w_caps.get(1)?.as_str().parse().ok()?;
+            if line.contains("<path") && line.contains("state-box") {
+                if let Some(caps) = path_pattern.captures(line) {
+                    let x_plus_rx: f64 = caps.get(1)?.as_str().parse().ok()?;
+                    let right_minus_rx: f64 = caps.get(2)?.as_str().parse().ok()?;
+                    let rx = 5.0;
+                    let x = x_plus_rx - rx;
+                    let w = right_minus_rx + rx - x;
                     return Some(x + w / 2.0);
                 }
             }
