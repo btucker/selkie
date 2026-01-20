@@ -474,16 +474,51 @@ fn position_edges(
             block_map.get(edge.start.as_str()),
             block_map.get(edge.end.as_str()),
         ) {
-            // Calculate connection points (center of blocks)
+            // Calculate block centers
             let start_cx = start_block.x + start_block.width / 2.0;
             let start_cy = start_block.y + start_block.height / 2.0;
             let end_cx = end_block.x + end_block.width / 2.0;
             let end_cy = end_block.y + end_block.height / 2.0;
 
-            // Determine edge endpoints on block boundaries
-            let (start_x, start_y) =
-                get_edge_point(start_block, start_cx, start_cy, end_cx, end_cy);
-            let (end_x, end_y) = get_edge_point(end_block, end_cx, end_cy, start_cx, start_cy);
+            // Check if blocks overlap in x or y ranges
+            let x_overlap = blocks_overlap_x(start_block, end_block);
+            let y_overlap = blocks_overlap_y(start_block, end_block);
+
+            let (start_x, start_y, end_x, end_y) = if x_overlap && !y_overlap {
+                // Vertical edge - use shared x coordinate
+                let shared_x = (start_cx + end_cx) / 2.0;
+                let start_y = if start_cy < end_cy {
+                    start_block.y + start_block.height // Bottom of start
+                } else {
+                    start_block.y // Top of start
+                };
+                let end_y = if start_cy < end_cy {
+                    end_block.y // Top of end
+                } else {
+                    end_block.y + end_block.height // Bottom of end
+                };
+                (shared_x, start_y, shared_x, end_y)
+            } else if y_overlap && !x_overlap {
+                // Horizontal edge - use shared y coordinate
+                let shared_y = (start_cy + end_cy) / 2.0;
+                let start_x = if start_cx < end_cx {
+                    start_block.x + start_block.width // Right of start
+                } else {
+                    start_block.x // Left of start
+                };
+                let end_x = if start_cx < end_cx {
+                    end_block.x // Left of end
+                } else {
+                    end_block.x + end_block.width // Right of end
+                };
+                (start_x, shared_y, end_x, shared_y)
+            } else {
+                // Diagonal/curved edge - use original calculation
+                let (sx, sy) =
+                    get_edge_point(start_block, start_cx, start_cy, end_cx, end_cy);
+                let (ex, ey) = get_edge_point(end_block, end_cx, end_cy, start_cx, start_cy);
+                (sx, sy, ex, ey)
+            };
 
             positioned.push(PositionedEdge {
                 start: edge.start.clone(),
@@ -498,6 +533,25 @@ fn position_edges(
     }
 
     positioned
+}
+
+/// Check if two blocks overlap in x range
+fn blocks_overlap_x(a: &PositionedBlock, b: &PositionedBlock) -> bool {
+    let a_left = a.x;
+    let a_right = a.x + a.width;
+    let b_left = b.x;
+    let b_right = b.x + b.width;
+    // Overlap if one block's left is before other's right and vice versa
+    a_left < b_right && b_left < a_right
+}
+
+/// Check if two blocks overlap in y range
+fn blocks_overlap_y(a: &PositionedBlock, b: &PositionedBlock) -> bool {
+    let a_top = a.y;
+    let a_bottom = a.y + a.height;
+    let b_top = b.y;
+    let b_bottom = b.y + b.height;
+    a_top < b_bottom && b_top < a_bottom
 }
 
 /// Get the edge connection point on a block's boundary
