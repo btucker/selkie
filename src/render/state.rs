@@ -789,46 +789,33 @@ fn center_nested_composites(
 
     // Process from innermost to outermost
     for (nested_id, parent_id, _depth) in nested_composites {
-        // Calculate parent's content bounds from NON-composite children only
-        // This gives us the bounds that determine the parent's rendered width,
-        // excluding nested composites which will be centered within this space
-        let (parent_non_composite_min_x, parent_non_composite_max_x) =
-            calculate_composite_x_bounds_for_centering(
-                parent_id,
-                db,
-                state_positions,
-                composite_ids,
-            );
+        // Calculate the parent's bounds from NON-COMPOSITE children only
+        // This gives us the "anchor" content that the nested composite should be centered with
+        let (parent_non_comp_min_x, parent_non_comp_max_x) =
+            calculate_composite_x_bounds_for_centering(parent_id, db, state_positions, composite_ids);
 
-        // Calculate nested composite's content bounds (from its children)
-        let (nested_content_min_x, nested_content_max_x) =
-            calculate_composite_x_bounds(nested_id, db, state_positions, composite_ids);
+        // Calculate nested composite's RENDERED bounds (with padding)
+        let nested_rendered = calculate_composite_bounds_recursive(nested_id, db, state_positions);
 
-        if nested_content_min_x >= nested_content_max_x {
+        let Some((nested_x, _, nested_w, _)) = nested_rendered else {
+            continue;
+        };
+
+        // If there are non-composite children, center the nested composite with them
+        // Otherwise, the nested composite is the only content and doesn't need centering
+        if parent_non_comp_min_x >= parent_non_comp_max_x {
             continue;
         }
 
-        // Check if parent has valid non-composite content bounds
-        let nested_width = nested_content_max_x - nested_content_min_x;
-        let parent_non_composite_width = parent_non_composite_max_x - parent_non_composite_min_x;
+        // The non-composite children define the "anchor" center for the parent
+        // The nested composite should be centered around this same center
+        let non_comp_center_x = (parent_non_comp_min_x + parent_non_comp_max_x) / 2.0;
 
-        // Only center if parent has substantial non-composite content that's wider than the nested composite
-        // Otherwise, the nested composite IS the main content and shouldn't be shifted
-        if parent_non_composite_min_x >= parent_non_composite_max_x
-            || parent_non_composite_width < nested_width + 20.0
-        {
-            // Parent's content is dominated by the nested composite, skip centering
-            continue;
-        }
+        // The nested composite's current center
+        let nested_center_x = nested_x + nested_w / 2.0;
 
-        // Parent's visual center is determined by its non-composite content bounds
-        let parent_center_x = (parent_non_composite_min_x + parent_non_composite_max_x) / 2.0;
-
-        // The nested composite's rendered box center
-        let nested_center_x = (nested_content_min_x + nested_content_max_x) / 2.0;
-
-        // Calculate offset to center the nested composite within parent's bounds
-        let offset_x = parent_center_x - nested_center_x;
+        // Calculate offset to align nested composite's center with non-composite center
+        let offset_x = non_comp_center_x - nested_center_x;
 
         // Only shift if there's a meaningful offset
         if offset_x.abs() > 0.5 {

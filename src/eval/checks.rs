@@ -75,6 +75,7 @@ pub fn check_structure(
     check_vertical_distribution(selkie, reference, &mut issues);
     check_composite_state_structure(selkie, reference, &mut issues);
     check_composite_centering(selkie, reference, &mut issues);
+    check_nested_composite_centering(selkie, reference, &mut issues);
 
     issues
 }
@@ -2202,9 +2203,11 @@ fn check_composite_state_structure(
 }
 
 /// Composite state info extracted from SVG
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct CompositeState {
     id: String,
+    x: f64,
+    y: f64,
     width: f64,
     height: f64,
 }
@@ -2237,14 +2240,17 @@ fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
                 });
 
             if is_mermaid_composite || is_selkie_composite {
-                // Extract composite ID
+                // Extract composite ID (normalize by removing prefixes)
                 let composite_id = if is_mermaid_composite {
                     node.attribute("id")
                         .or_else(|| node.attribute("data-id"))
                         .unwrap_or("")
                         .to_string()
                 } else {
-                    id.trim_start_matches("state-").to_string()
+                    // Selkie uses "composite-StateName" format
+                    id.trim_start_matches("composite-")
+                        .trim_start_matches("state-")
+                        .to_string()
                 };
 
                 if composite_id.is_empty()
@@ -2254,7 +2260,9 @@ fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
                     continue;
                 }
 
-                // Find the outer rect for dimensions
+                // Find the outer rect for dimensions and position
+                let mut x = 0.0;
+                let mut y = 0.0;
                 let mut width = 0.0;
                 let mut height = 0.0;
 
@@ -2263,6 +2271,14 @@ fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
                         let child_class = child.attribute("class").unwrap_or("");
                         if child_class.contains("outer") || child_class.contains("composite-outer")
                         {
+                            x = child
+                                .attribute("x")
+                                .and_then(|v| v.parse().ok())
+                                .unwrap_or(0.0);
+                            y = child
+                                .attribute("y")
+                                .and_then(|v| v.parse().ok())
+                                .unwrap_or(0.0);
                             width = child
                                 .attribute("width")
                                 .and_then(|w| w.parse().ok())
@@ -2276,7 +2292,7 @@ fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
                     }
                 }
 
-                // If no outer rect found, try to get dimensions from first rect
+                // If no outer rect found, try to get dimensions from largest rect
                 if width == 0.0 || height == 0.0 {
                     for child in node.descendants() {
                         if child.tag_name().name() == "rect" {
@@ -2289,6 +2305,14 @@ fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
                                 .and_then(|h| h.parse().ok())
                                 .unwrap_or(0.0);
                             if w > width {
+                                x = child
+                                    .attribute("x")
+                                    .and_then(|v| v.parse().ok())
+                                    .unwrap_or(0.0);
+                                y = child
+                                    .attribute("y")
+                                    .and_then(|v| v.parse().ok())
+                                    .unwrap_or(0.0);
                                 width = w;
                             }
                             if h > height {
@@ -2301,6 +2325,8 @@ fn extract_composite_states(svg: &str) -> Vec<CompositeState> {
                 if width > 0.0 && height > 0.0 {
                     composites.push(CompositeState {
                         id: composite_id,
+                        x,
+                        y,
                         width,
                         height,
                     });
@@ -2504,6 +2530,127 @@ fn analyze_composite_centering(svg: &str) -> std::collections::HashMap<String, f
     }
 
     centering
+}
+
+/// Check if nested composite states are centered within their parent composites
+/// This uses bounding box containment to determine parent-child relationships
+fn check_nested_composite_centering(
+    selkie: &SvgStructure,
+    reference: &SvgStructure,
+    issues: &mut Vec<Issue>,
+) {
+    let selkie_composites = extract_composite_states(&selkie.raw_svg);
+    let ref_composites = extract_composite_states(&reference.raw_svg);
+
+    if selkie_composites.is_empty() {
+        return;
+    }
+
+    // Find parent-child relationships in selkie and check centering
+    let selkie_nesting = find_composite_nesting(&selkie_composites);
+    let ref_nesting = find_composite_nesting(&ref_composites);
+
+    // Check each nested relationship in selkie
+    for (child_id, parent_id) in &selkie_nesting {
+        let child = selkie_composites.iter().find(|c| &c.id == child_id);
+        let parent = selkie_composites.iter().find(|c| &c.id == parent_id);
+
+        if let (Some(child), Some(parent)) = (child, parent) {
+            let parent_center_x = parent.x + parent.width / 2.0;
+            let child_center_x = child.x + child.width / 2.0;
+            let offset = child_center_x - parent_center_x;
+
+            // Threshold for centering - child should be within 20px of parent center
+            let centering_threshold = 20.0;
+
+            if offset.abs() > centering_threshold {
+                // Check if reference has better centering for this relationship
+                let ref_offset = if let Some(ref_parent_id) = ref_nesting.get(child_id) {
+                    if ref_parent_id == parent_id {
+                        // Same parent-child relationship exists in reference
+                        let ref_child = ref_composites.iter().find(|c| &c.id == child_id);
+                        let ref_parent = ref_composites.iter().find(|c| &c.id == parent_id);
+                        if let (Some(rc), Some(rp)) = (ref_child, ref_parent) {
+                            let rp_center = rp.x + rp.width / 2.0;
+                            let rc_center = rc.x + rc.width / 2.0;
+                            Some(rc_center - rp_center)
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                };
+
+                let message = if let Some(ref_off) = ref_offset {
+                    format!(
+                        "Nested composite '{}' not centered in '{}': {:.0}px offset (reference: {:.0}px)",
+                        child_id, parent_id, offset, ref_off
+                    )
+                } else {
+                    format!(
+                        "Nested composite '{}' not centered in '{}': {:.0}px offset from center",
+                        child_id, parent_id, offset
+                    )
+                };
+
+                issues.push(
+                    Issue::warning("nested_composite_centering", message).with_values(
+                        ref_offset.map_or("N/A".to_string(), |o| format!("{:.0}px", o)),
+                        format!("{:.0}px", offset),
+                    ),
+                );
+            }
+        }
+    }
+}
+
+/// Find parent-child relationships between composites by checking bounding box containment
+/// Returns a map of child_id -> parent_id
+fn find_composite_nesting(
+    composites: &[CompositeState],
+) -> std::collections::HashMap<String, String> {
+    let mut nesting = std::collections::HashMap::new();
+
+    for child in composites {
+        // Find the smallest parent that contains this child
+        let mut best_parent: Option<&CompositeState> = None;
+        let mut best_parent_area = f64::MAX;
+
+        for parent in composites {
+            if parent.id == child.id {
+                continue;
+            }
+
+            // Check if child is contained within parent
+            let child_right = child.x + child.width;
+            let child_bottom = child.y + child.height;
+            let parent_right = parent.x + parent.width;
+            let parent_bottom = parent.y + parent.height;
+
+            // Child must be fully contained within parent (with small tolerance)
+            let tolerance = 2.0;
+            if child.x >= parent.x - tolerance
+                && child.y >= parent.y - tolerance
+                && child_right <= parent_right + tolerance
+                && child_bottom <= parent_bottom + tolerance
+            {
+                let parent_area = parent.width * parent.height;
+                if parent_area < best_parent_area {
+                    best_parent = Some(parent);
+                    best_parent_area = parent_area;
+                }
+            }
+        }
+
+        if let Some(parent) = best_parent {
+            nesting.insert(child.id.clone(), parent.id.clone());
+        }
+    }
+
+    nesting
 }
 
 #[cfg(test)]
