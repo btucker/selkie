@@ -1053,7 +1053,8 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     for edge in &all_edges {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
             // Check if this is a start node connecting to a composite
-            if source.contains("_start_") && composite_ids.contains(target) {
+            // Start node IDs are in format {parent}_start (e.g., root_start, Idle_start)
+            if source.ends_with("_start") && composite_ids.contains(target) {
                 // Use calculate_composite_bounds to get actual rendered composite bounds
                 // (not dagre's placeholder position which doesn't account for children)
                 if let (Some((start_x, start_y, start_w, start_h)), Some((comp_x, _, comp_w, _))) = (
