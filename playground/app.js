@@ -1,5 +1,59 @@
 // Selkie Playground - Main Application
 
+// Generate million data point examples
+function generateMillionPointXYChart() {
+    const count = 1_000_000;
+    const values = [];
+    for (let i = 0; i < count; i++) {
+        // Generate a wave pattern with some noise
+        const base = Math.sin(i * 0.0001) * 50 + 50;
+        const noise = Math.random() * 10 - 5;
+        values.push(Math.round(base + noise));
+    }
+    return `xychart-beta
+    title "1 Million Data Points - Performance Test"
+    x-axis "Index" 0 --> ${count}
+    y-axis "Value" 0 --> 100
+    line [${values.join(', ')}]`;
+}
+
+function generate100kPointXYChart() {
+    const count = 100_000;
+    const values = [];
+    for (let i = 0; i < count; i++) {
+        const base = Math.sin(i * 0.001) * 50 + 50;
+        const noise = Math.random() * 10 - 5;
+        values.push(Math.round(base + noise));
+    }
+    return `xychart-beta
+    title "100K Data Points - Performance Test"
+    x-axis "Index" 0 --> ${count}
+    y-axis "Value" 0 --> 100
+    line [${values.join(', ')}]`;
+}
+
+function generate10kPointXYChart() {
+    const count = 10_000;
+    const values = [];
+    for (let i = 0; i < count; i++) {
+        const base = Math.sin(i * 0.01) * 50 + 50;
+        const noise = Math.random() * 10 - 5;
+        values.push(Math.round(base + noise));
+    }
+    return `xychart-beta
+    title "10K Data Points - Performance Test"
+    x-axis "Index" 0 --> ${count}
+    y-axis "Value" 0 --> 100
+    line [${values.join(', ')}]`;
+}
+
+// Generated examples (computed on demand)
+const generatedExamples = {
+    'xychart-10k': generate10kPointXYChart,
+    'xychart-100k': generate100kPointXYChart,
+    'xychart-1m': generateMillionPointXYChart,
+};
+
 // Example diagrams
 const examples = {
     // Simple examples
@@ -971,10 +1025,22 @@ function setupEventListeners() {
     // Example selector
     exampleSelect.addEventListener('change', (e) => {
         const exampleKey = e.target.value;
-        if (exampleKey && examples[exampleKey]) {
-            editor.value = examples[exampleKey];
-            renderDiagram();
-            updateUrl();
+        if (exampleKey) {
+            let exampleCode;
+            if (examples[exampleKey]) {
+                exampleCode = examples[exampleKey];
+            } else if (generatedExamples[exampleKey]) {
+                // Show loading indicator for large generated examples
+                if (exampleKey.includes('100k') || exampleKey.includes('1m')) {
+                    preview.innerHTML = '<p style="color: var(--text-secondary)">Generating data...</p>';
+                }
+                exampleCode = generatedExamples[exampleKey]();
+            }
+            if (exampleCode) {
+                editor.value = exampleCode;
+                renderDiagram();
+                updateUrl();
+            }
         }
     });
 
