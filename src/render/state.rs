@@ -143,10 +143,12 @@ fn calculate_composite_bounds_recursive(
 /// Mermaid's approach: each composite level gets its own dagre layout
 #[derive(Clone, Debug)]
 struct LevelLayout {
-    /// Width of this level's content
+    /// Width of this level's content (after expansion for rendering)
     width: f64,
     /// Height of this level's content
     height: f64,
+    /// Original content width before expansion (used for parent layout sizing to avoid compounding)
+    content_width: f64,
     /// Positions of nodes at this level (relative to level origin)
     positions: HashMap<String, (f64, f64, f64, f64)>,
     /// Edges at this level with their bend points
@@ -225,6 +227,7 @@ fn compute_level_layout(
                 }
                 inner_layout.width = expanded_width;
             }
+            // For non-leaf composites, content_width stays at original width
 
             level_layouts.insert(composite_id.to_string(), inner_layout);
         }
@@ -288,12 +291,13 @@ fn compute_level_layout(
         let label_text = label.unwrap_or(if is_start_end { "" } else { *state_id });
 
         // Determine dimensions - use pre-computed layout for composites
+        // Use content_width (not expanded width) to prevent compounding expansion at each level
         let (width, height) = if composite_ids.contains(state_id) {
             if let Some(inner) = level_layouts.get(*state_id) {
                 let padding = 12.0;
                 let title_height = 25.0;
                 (
-                    inner.width + 2.0 * padding,
+                    inner.content_width + 2.0 * padding,
                     inner.height + 2.0 * padding + title_height,
                 )
             } else {
@@ -464,9 +468,11 @@ fn compute_level_layout(
         }
     }
 
+    let computed_width = max_x - min_x;
     Ok(Some(LevelLayout {
-        width: max_x - min_x,
+        width: computed_width,
         height: max_y - min_y,
+        content_width: computed_width, // Initially same as width, may differ after expansion
         positions,
         edges,
     }))
@@ -1662,28 +1668,19 @@ fn render_composite_state(
     let content_width = max_x - min_x;
     let height = max_y - min_y;
 
-    // For leaf composites, use the expanded width from level_layouts instead of
-    // the computed bounds. This applies the expansion that was calculated during layout.
-    // Leaf composites are those that don't contain nested composites.
-    let has_nested_composites = child_ids
-        .iter()
-        .any(|child_id| composite_states.contains(child_id));
-
-    let width = if !has_nested_composites {
-        // Use expanded width from level_layouts if available
-        if let Some(layout) = level_layouts.get(composite_id) {
-            // The expanded layout width plus padding (which we've already subtracted from bounds)
-            let expanded_total = layout.width + 2.0 * padding;
-            // Center the content within the expanded width
-            let width_expansion = (expanded_total - content_width) / 2.0;
-            if width_expansion > 0.0 {
-                min_x -= width_expansion;
-                // Note: max_x is implicitly min_x + expanded_total, used via width
-            }
-            expanded_total
-        } else {
-            content_width
+    // Use the expanded width from level_layouts instead of the computed bounds.
+    // This applies the expansion that was calculated during layout (both for leaf
+    // composites at 1.5x and non-leaf composites at 1.35x).
+    let width = if let Some(layout) = level_layouts.get(composite_id) {
+        // The expanded layout width plus padding (which we've already subtracted from bounds)
+        let expanded_total = layout.width + 2.0 * padding;
+        // Center the content within the expanded width
+        let width_expansion = (expanded_total - content_width) / 2.0;
+        if width_expansion > 0.0 {
+            min_x -= width_expansion;
+            // Note: max_x is implicitly min_x + expanded_total, used via width
         }
+        expanded_total
     } else {
         content_width
     };
