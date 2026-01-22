@@ -294,7 +294,7 @@ cargo install selkie --features all-formats
 
 ## Issue Tracking
 
-This project uses [Beads](https://github.com/steveyegge/beads) for issue tracking - an AI-native issue tracker that lives directly in the repository. Issues are stored in `.beads/` and sync with git, making them accessible to both humans and AI coding agents.
+This project uses [Microbeads](https://github.com/btucker/microbeads) for issue tracking - an AI-native issue tracker that lives directly in the repository. Issues are stored in `.beads/` and sync with git, making them accessible to both humans and AI coding agents.
 
 ```bash
 # View available work
