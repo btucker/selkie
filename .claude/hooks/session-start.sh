@@ -1,23 +1,18 @@
 #!/bin/bash
 
 # .claude/hooks/session-start.sh
-echo "Setting up bd (beads issue tracker)..."
+echo "Setting up mb (microbeads issue tracker)..."
 
-# Try npm first, fall back to binary download
-if ! command -v bd &> /dev/null; then
-    if npm install -g @beads/bd --quiet 2>/dev/null && command -v bd &> /dev/null; then
-        echo "Installed via npm"
+# Install microbeads via uv if not already available
+if ! command -v mb &> /dev/null; then
+    if command -v uv &> /dev/null; then
+        uv tool install microbeads --quiet
+        echo "Installed via uv"
     else
-        # Fallback: download pre-built binary (works in Claude Code Web)
-        echo "Trying binary download fallback..."
-        BD_PATH="${HOME}/.local/bin/bd"
-        mkdir -p "$(dirname "$BD_PATH")"
-        curl -fsSL https://raw.githubusercontent.com/btucker/bd-binaries/main/linux_amd64/bd -o "$BD_PATH"
-        chmod +x "$BD_PATH"
-        export PATH="${HOME}/.local/bin:$PATH"
-        echo "Installed via binary download"
+        echo "Error: uv is required to install microbeads"
+        exit 1
     fi
 fi
 
 # Verify and show version
-bd version
+mb --version
