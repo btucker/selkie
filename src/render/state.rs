@@ -6,7 +6,7 @@ use crate::diagrams::state::{NotePosition, State, StateDb, StateType};
 use crate::error::Result;
 use crate::layout::Point;
 use crate::layout::{
-    layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
+    create_size_estimator, layout, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
     LayoutOptions, LayoutRanker, NodeShape, NodeSizeConfig, Padding, SizeEstimator, ToLayoutGraph,
 };
 use crate::render::svg::edges::{build_curved_path, build_curved_path_with_options};
@@ -200,12 +200,12 @@ fn compute_level_layout(
                 .keys()
                 .any(|child_id| level_layouts.contains_key(child_id));
 
-            // Apply width expansion to leaf composites to approximate mermaid's getBBox()
-            // measurements. Mermaid measures actual rendered SVG which includes font-specific
-            // widths. Our character-based estimates are typically 40-70% narrower.
-            // Only expand leaf composites to avoid compounding at multiple levels.
+            // Apply width expansion to leaf composites to match mermaid's getBBox() behavior.
+            // Even with font metrics, composite bounds need expansion because mermaid measures
+            // the full rendered cluster including internal padding and margins.
+            // Reduced from 1.5x to 1.35x since font metrics now provide better node sizing.
             if is_leaf_composite {
-                let expansion_factor = 1.5; // Balanced expansion to approximate mermaid getBBox()
+                let expansion_factor = 1.5;
                 let original_width = inner_layout.width;
                 let expanded_width = original_width * expansion_factor;
                 let width_offset = (expanded_width - original_width) / 2.0;
@@ -933,14 +933,12 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
 
     // Use recursive layout like mermaid - each composite level gets its own dagre layout
     // This naturally accumulates spacing at each nesting level
-    let size_estimator = CharacterSizeEstimator {
-        char_width_ratio: 0.55, // Balanced estimate for proportional fonts
-        line_height_ratio: 1.4, // SVG text vs 2.3 for HTML foreignObject
-    };
+    // Try to use font-based measurements for accuracy, fall back to character estimates
+    let size_estimator = create_size_estimator();
 
     // Compute recursive layouts starting from root level
     let mut level_layouts: HashMap<String, LevelLayout> = HashMap::new();
-    let root_layout = compute_level_layout(None, db, &size_estimator, &mut level_layouts, 0)?
+    let root_layout = compute_level_layout(None, db, &*size_estimator, &mut level_layouts, 0)?
         .ok_or_else(|| {
             crate::error::MermaidError::LayoutError("No states to layout".to_string())
         })?;

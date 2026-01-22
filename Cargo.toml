@@ -37,6 +37,9 @@ thiserror = "1.0"
 # Logging
 log = "0.4"
 
+# Font metrics for accurate text measurement
+fontdue = "0.9"
+
 # File globbing (for CLI tools)
 glob = { version = "0.3", optional = true }
 
