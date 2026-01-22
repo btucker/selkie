@@ -147,8 +147,6 @@ struct LevelLayout {
     width: f64,
     /// Height of this level's content
     height: f64,
-    /// Original content width before expansion (used for parent layout sizing to avoid compounding)
-    content_width: f64,
     /// Positions of nodes at this level (relative to level origin)
     positions: HashMap<String, (f64, f64, f64, f64)>,
     /// Edges at this level with their bend points
@@ -227,7 +225,6 @@ fn compute_level_layout(
                 }
                 inner_layout.width = expanded_width;
             }
-            // For non-leaf composites, content_width stays at original width
 
             level_layouts.insert(composite_id.to_string(), inner_layout);
         }
@@ -291,13 +288,14 @@ fn compute_level_layout(
         let label_text = label.unwrap_or(if is_start_end { "" } else { *state_id });
 
         // Determine dimensions - use pre-computed layout for composites
-        // Use content_width (not expanded width) to prevent compounding expansion at each level
+        // Use the full `width` (including expansion) so parent composites
+        // properly include expanded children.
         let (width, height) = if composite_ids.contains(state_id) {
             if let Some(inner) = level_layouts.get(*state_id) {
                 let padding = 12.0;
                 let title_height = 25.0;
                 (
-                    inner.content_width + 2.0 * padding,
+                    inner.width + 2.0 * padding,
                     inner.height + 2.0 * padding + title_height,
                 )
             } else {
@@ -472,7 +470,6 @@ fn compute_level_layout(
     Ok(Some(LevelLayout {
         width: computed_width,
         height: max_y - min_y,
-        content_width: computed_width, // Initially same as width, may differ after expansion
         positions,
         edges,
     }))
