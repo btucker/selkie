@@ -298,17 +298,17 @@ This project uses [Microbeads](https://github.com/btucker/microbeads) for issue 
 
 ```bash
 # View available work
-bd ready
+mb ready
 
 # View issue details
-bd show <issue-id>
+mb show <issue-id>
 
 # Update issue status
-bd update <issue-id> --status in_progress
-bd close <issue-id>
+mb update <issue-id> --status in_progress
+mb close <issue-id>
 
 # Sync with remote
-bd sync
+mb sync
 ```
 
 ## Development
