@@ -861,6 +861,7 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                 continue;
             }
             if class.contains("relationship")
+                || class.contains("relation")
                 || class.contains("edge")
                 || class.contains("link")
                 || class.contains("transition")

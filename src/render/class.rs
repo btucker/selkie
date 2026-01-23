@@ -202,7 +202,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
     // Add marker definitions for relations
     doc.add_defs(create_class_markers());
 
-    // Render relations FIRST so they appear behind class nodes
+    // Render relations - edges go to edgePaths, labels go to edgeLabels
     for relation in &db.relations {
         let key = (relation.id1.clone(), relation.id2.clone());
 
@@ -221,7 +221,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
 
             let bend_points = edge_points.get(&key);
 
-            let relation_elem = render_relation(
+            let (edge_path, edge_labels) = render_relation_separated(
                 x1,
                 y1,
                 h1,
@@ -239,11 +239,14 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
                 bend_points,
                 &size_estimator,
             );
-            doc.add_element(relation_elem);
+            doc.add_edge_path(edge_path);
+            for label in edge_labels {
+                doc.add_edge_label(label);
+            }
         }
     }
 
-    // Render class nodes AFTER relations so they appear on top
+    // Render class nodes in nodes container (on top of edges)
     for class in &classes {
         if let Some(&(x, y)) = class_positions.get(&class.id) {
             let (width, height) = class_dimensions
@@ -265,11 +268,11 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
                 member_font_size,
                 &size_estimator,
             );
-            doc.add_element(class_elem);
+            doc.add_node(class_elem);
         }
     }
 
-    // Render notes
+    // Render notes in nodes container
     for note in db.notes.values() {
         if let Some(&(x, y)) = class_positions.get(&note.class) {
             let (width, _) = class_dimensions
@@ -277,7 +280,7 @@ pub fn render_class(db: &ClassDb, config: &RenderConfig) -> Result<String> {
                 .copied()
                 .unwrap_or((180.0, 60.0));
             let note_elem = render_note(x + width + 20.0, y, &note.text);
-            doc.add_element(note_elem);
+            doc.add_node(note_elem);
         }
     }
 
@@ -490,8 +493,9 @@ fn rounded_rect_path(x: f64, y: f64, width: f64, height: f64, rx: f64, ry: f64) 
 }
 
 /// Render a relation between two classes using dagre bend points
+/// Returns (edge_path, edge_labels) for proper SVG container placement
 #[allow(clippy::too_many_arguments)]
-fn render_relation(
+fn render_relation_separated(
     x1: f64,
     y1: f64,
     h1: f64,
@@ -508,8 +512,8 @@ fn render_relation(
     line_type: LineType,
     bend_points: Option<&Vec<Point>>,
     _size_estimator: &dyn SizeEstimator,
-) -> SvgElement {
-    let mut children = Vec::new();
+) -> (SvgElement, Vec<SvgElement>) {
+    let mut label_elements = Vec::new();
 
     // No marker offset needed - refX is now at the arrow tip, so path endpoints
     // should be exactly at node boundaries
@@ -601,7 +605,7 @@ fn render_relation(
         .with_stroke("#333333")
         .with_stroke_width(1.0)
         .with_fill("none")
-        .with_class("relation-line");
+        .with_class("relation relation-line");
 
     if line_type == LineType::Dotted {
         path_attrs = path_attrs.with_stroke_dasharray("5,5");
@@ -614,10 +618,10 @@ fn render_relation(
         path_attrs = path_attrs.with_attr("marker-end", marker);
     }
 
-    children.push(SvgElement::Path {
+    let path_element = SvgElement::Path {
         d: path_d.clone(),
         attrs: path_attrs,
-    });
+    };
 
     // Calculate label positions based on bend points or direct line
     let (start_x, start_y, end_x, end_y) = if let Some(points) = bend_points {
@@ -656,7 +660,7 @@ fn render_relation(
             0.0
         };
 
-        children.push(SvgElement::Text {
+        label_elements.push(SvgElement::Text {
             x: start_x + offset_x + perp_x,
             y: start_y + offset_y + perp_y,
             content: cardinality1.to_string(),
@@ -688,7 +692,7 @@ fn render_relation(
             0.0
         };
 
-        children.push(SvgElement::Text {
+        label_elements.push(SvgElement::Text {
             x: end_x - offset_x + perp_x,
             y: end_y - offset_y + perp_y,
             content: cardinality2.to_string(),
@@ -703,7 +707,7 @@ fn render_relation(
     if !label.is_empty() {
         let mid_x = (start_x + end_x) / 2.0;
         let mid_y = (start_y + end_y) / 2.0;
-        children.push(SvgElement::Text {
+        label_elements.push(SvgElement::Text {
             x: mid_x,
             y: mid_y,
             content: label.to_string(),
@@ -715,10 +719,7 @@ fn render_relation(
         });
     }
 
-    SvgElement::Group {
-        children,
-        attrs: Attrs::new().with_class("relation"),
-    }
+    (path_element, label_elements)
 }
 
 /// Offset a point toward a target by a given distance
