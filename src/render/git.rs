@@ -858,7 +858,11 @@ fn draw_branches(
     rotate_commit_label: bool,
     estimator: &CharacterSizeEstimator,
 ) -> SvgElement {
-    let mut elements = Vec::new();
+    // Collect shapes and text separately for correct z-order
+    // In SVG, later elements render on top, so we emit shapes first, then text
+    let mut shapes = Vec::new();
+    let mut text_elements = Vec::new();
+
     for branch in branches {
         let Some(position) = branch_pos.get(&branch.name) else {
             continue;
@@ -888,7 +892,7 @@ fn draw_branches(
                 attrs: Attrs::new().with_class(&format!("branch branch{}", adjust_index)),
             };
         }
-        elements.push(line);
+        shapes.push(line);
 
         let (bbox_w, bbox_h) = estimator.estimate_text_size(&branch.name, branch_font_size);
         let label_bbox_h = bbox_h + 3.0;
@@ -933,9 +937,13 @@ fn draw_branches(
                 .with_attr("text-anchor", "middle")
                 .with_attr("dominant-baseline", "middle"),
         };
-        elements.push(rect);
-        elements.push(text);
+        shapes.push(rect);
+        text_elements.push(text);
     }
+
+    // Combine shapes first, then text (correct z-order)
+    let mut elements = shapes;
+    elements.extend(text_elements);
 
     SvgElement::group(elements).with_attrs(Attrs::new().with_class("branches"))
 }
@@ -953,7 +961,9 @@ fn draw_commits(
     estimator: &CharacterSizeEstimator,
 ) -> SvgElement {
     let mut bullets = Vec::new();
-    let mut labels = Vec::new();
+    // Collect label shapes (rects) and text separately for correct z-order
+    let mut label_shapes = Vec::new();
+    let mut label_text = Vec::new();
 
     let mut keys: Vec<&String> = commits.keys().collect();
     keys.sort_by_key(|k| commits.get(*k).map(|c| c.seq).unwrap_or(0));
@@ -991,7 +1001,7 @@ fn draw_commits(
         ));
 
         if should_draw_commit_label(commit, show_commit_label) {
-            labels.extend(draw_commit_label(
+            let (shapes, text) = draw_commit_label_separated(
                 commit,
                 commit_position,
                 commit_position.pos_with_offset,
@@ -999,20 +1009,27 @@ fn draw_commits(
                 rotate_commit_label,
                 commit_label_font_size,
                 estimator,
-            ));
+            );
+            label_shapes.extend(shapes);
+            label_text.extend(text);
         }
-        labels.extend(draw_commit_tags(
+        let (tag_shapes, tag_text) = draw_commit_tags_separated(
             commit,
             commit_position,
             commit_position.pos_with_offset,
             dir,
             tag_label_font_size,
             estimator,
-        ));
+        );
+        label_shapes.extend(tag_shapes);
+        label_text.extend(tag_text);
     }
 
     let bullets_group =
         SvgElement::group(bullets).with_attrs(Attrs::new().with_class("commit-bullets"));
+    // Combine label shapes first, then text for correct z-order
+    let mut labels = label_shapes;
+    labels.extend(label_text);
     let labels_group =
         SvgElement::group(labels).with_attrs(Attrs::new().with_class("commit-labels"));
     SvgElement::group(vec![bullets_group, labels_group])
@@ -1198,7 +1215,9 @@ fn draw_commit_bullet(
     elements
 }
 
-fn draw_commit_label(
+/// Separated version that returns (shapes, text) for correct z-order
+#[allow(clippy::too_many_arguments)]
+fn draw_commit_label_separated(
     commit: &Commit,
     commit_position: CommitPositionOffset,
     pos: f64,
@@ -1206,8 +1225,7 @@ fn draw_commit_label(
     rotate_commit_label: bool,
     font_size: f64,
     estimator: &CharacterSizeEstimator,
-) -> Vec<SvgElement> {
-    let mut elements = Vec::new();
+) -> (Vec<SvgElement>, Vec<SvgElement>) {
     let (bbox_w, bbox_h) = estimator.estimate_text_size(&commit.id, font_size);
 
     let mut rect_x = commit_position.pos_with_offset - bbox_w / 2.0 - PY;
@@ -1265,24 +1283,24 @@ fn draw_commit_label(
         content: commit.id.clone(),
         attrs: text_attrs,
     };
-    elements.push(rect);
-    elements.push(text);
-    elements
+    (vec![rect], vec![text])
 }
 
-fn draw_commit_tags(
+/// Separated version that returns (shapes, text) for correct z-order
+fn draw_commit_tags_separated(
     commit: &Commit,
     commit_position: CommitPositionOffset,
     pos: f64,
     dir: DiagramOrientation,
     font_size: f64,
     estimator: &CharacterSizeEstimator,
-) -> Vec<SvgElement> {
+) -> (Vec<SvgElement>, Vec<SvgElement>) {
     if commit.tags.is_empty() {
-        return Vec::new();
+        return (Vec::new(), Vec::new());
     }
 
-    let mut elements = Vec::new();
+    let mut shapes = Vec::new();
+    let mut text_elements = Vec::new();
     let mut y_offset = 0.0;
     let mut max_tag_bbox_width: f64 = 0.0;
     let mut max_tag_bbox_height: f64 = 0.0;
@@ -1378,10 +1396,11 @@ fn draw_commit_tags(
             content: tag_value,
             attrs: text_attrs,
         };
-        elements.extend([polygon, hole, text]);
+        shapes.extend([polygon, hole]);
+        text_elements.push(text);
     }
 
-    elements
+    (shapes, text_elements)
 }
 
 fn get_commit_class_type(commit: &Commit) -> String {

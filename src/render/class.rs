@@ -300,18 +300,21 @@ fn render_class_box(
     member_font_size: f64,
     _size_estimator: &dyn SizeEstimator,
 ) -> SvgElement {
-    let mut children = Vec::new();
+    // Collect shapes and text separately for correct z-order
+    // In SVG, later elements render on top, so we emit shapes first, then text
+    let mut shapes = Vec::new();
+    let mut text_elements = Vec::new();
 
     // Background shape (path to match mermaid structure)
     let box_path = rounded_rect_path(x, y, width, height, 3.0, 3.0);
-    children.push(SvgElement::Path {
+    shapes.push(SvgElement::Path {
         d: box_path.clone(),
         attrs: Attrs::new()
             .with_fill("#ECECFF")
             .with_stroke("none")
             .with_class("class-box-bg"),
     });
-    children.push(SvgElement::Path {
+    shapes.push(SvgElement::Path {
         d: box_path,
         attrs: Attrs::new()
             .with_fill("none")
@@ -333,12 +336,37 @@ fn render_class_box(
     let num_header_lines = class.annotations.len() + 1; // annotations + class name
     let header_line_spacing = actual_header_height / (num_header_lines as f64 + 1.0);
 
+    // First divider is after the header section (annotations + name)
+    let divider1_y = y + actual_header_height;
+    let members_section_height = (class.members.len().max(1) as f64) * member_height + padding;
+    let divider2_y = divider1_y + members_section_height;
+
+    // Add dividers to shapes (before text for correct z-order)
+    // Divider after name (always present)
+    shapes.push(SvgElement::Path {
+        d: line_path(x, divider1_y, x + width, divider1_y),
+        attrs: Attrs::new()
+            .with_stroke("#333333")
+            .with_stroke_width(1.0)
+            .with_class("class-divider"),
+    });
+
+    // Divider between attributes and methods (always present)
+    shapes.push(SvgElement::Path {
+        d: line_path(x, divider2_y, x + width, divider2_y),
+        attrs: Attrs::new()
+            .with_stroke("#333333")
+            .with_stroke_width(1.0)
+            .with_class("class-divider"),
+    });
+
+    // Now add all text elements (rendered after shapes)
     let mut header_y = y + header_line_spacing;
 
     // Annotations (e.g. «interface», «abstract») - centered in header
     for annotation in &class.annotations {
         let annotation_text = format!("«{}»", annotation);
-        children.push(SvgElement::Text {
+        text_elements.push(SvgElement::Text {
             x: center_x,
             y: header_y,
             content: annotation_text,
@@ -364,7 +392,7 @@ fn render_class_box(
     };
 
     let class_text = format!("{}{}", class_label, type_suffix);
-    children.push(SvgElement::Text {
+    text_elements.push(SvgElement::Text {
         x: center_x,
         y: header_y,
         content: class_text,
@@ -375,29 +403,14 @@ fn render_class_box(
             .with_attr("font-weight", "bold"),
     });
 
-    // First divider is after the header section (annotations + name)
-    let divider1_y = y + actual_header_height;
-    let members_section_height = (class.members.len().max(1) as f64) * member_height + padding;
-    let divider2_y = divider1_y + members_section_height;
-    let mut current_y; // For positioning members and methods
-
-    // Divider after name (always present)
-    children.push(SvgElement::Path {
-        d: line_path(x, divider1_y, x + width, divider1_y),
-        attrs: Attrs::new()
-            .with_stroke("#333333")
-            .with_stroke_width(1.0)
-            .with_class("class-divider"),
-    });
-
     // Attributes section (left-aligned)
     // Position text centered within each row
     if !class.members.is_empty() {
-        current_y = divider1_y;
+        let mut current_y = divider1_y;
         for member in &class.members {
             current_y += member_height / 2.0; // Move to center of row
             let display = member.get_display_details();
-            children.push(SvgElement::Text {
+            text_elements.push(SvgElement::Text {
                 x: left_x,
                 y: current_y,
                 content: display.display_text,
@@ -409,24 +422,15 @@ fn render_class_box(
             current_y += member_height / 2.0; // Move to end of row
         }
     }
-
-    // Divider between attributes and methods (always present)
-    children.push(SvgElement::Path {
-        d: line_path(x, divider2_y, x + width, divider2_y),
-        attrs: Attrs::new()
-            .with_stroke("#333333")
-            .with_stroke_width(1.0)
-            .with_class("class-divider"),
-    });
 
     // Methods section (left-aligned)
     // Position text centered within each row
     if !class.methods.is_empty() {
-        current_y = divider2_y;
+        let mut current_y = divider2_y;
         for method in &class.methods {
             current_y += member_height / 2.0; // Move to center of row
             let display = method.get_display_details();
-            children.push(SvgElement::Text {
+            text_elements.push(SvgElement::Text {
                 x: left_x,
                 y: current_y,
                 content: display.display_text,
@@ -438,6 +442,10 @@ fn render_class_box(
             current_y += member_height / 2.0; // Move to end of row
         }
     }
+
+    // Combine shapes first, then text (correct z-order)
+    let mut children = shapes;
+    children.extend(text_elements);
 
     SvgElement::Group {
         children,
