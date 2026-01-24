@@ -10,15 +10,49 @@ use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
-    // Default pie chart dimensions (sized to match mermaid.js)
-    let radius = 185.0; // mermaid.js uses 185
-    let pie_diameter = radius * 2.0;
-    let pie_width = pie_diameter + 50.0; // Space for pie + padding
-    let legend_width = 180.0; // Space for legend
-    let width = pie_width + legend_width;
-    let height = 450.0; // mermaid.js uses 450
-    let cx = pie_width / 2.0; // center x (in pie area)
-    let cy = height / 2.0; // center y
+    // Mermaid.js layout constants (from pieRenderer.ts)
+    const MARGIN: f64 = 40.0;
+    const LEGEND_RECT_SIZE: f64 = 18.0;
+    const LEGEND_SPACING: f64 = 4.0;
+    let height: f64 = 450.0;
+    let pie_width: f64 = height; // mermaid.js uses pieWidth = height (square area for pie)
+
+    // Radius calculation matches mermaid.js exactly
+    let radius = (pie_width.min(height) / 2.0) - MARGIN; // = 185.0
+
+    // Pie center - exactly at center of pie area (mermaid.js: group.attr('transform', 'translate(' + pieWidth / 2 + ',' + height / 2 + ')'))
+    let cx = pie_width / 2.0; // = 225.0
+    let cy = height / 2.0; // = 225.0
+
+    // Calculate legend text width estimate (mermaid.js measures actual DOM text width)
+    // We estimate based on character count and typical font metrics
+    let sections = db.get_sections();
+    let longest_label = sections
+        .iter()
+        .map(|(label, value)| {
+            if db.get_show_data() {
+                format!(
+                    "{} [{}]",
+                    label,
+                    if value.fract() == 0.0 {
+                        format!("{}", *value as i64)
+                    } else {
+                        format!("{}", value)
+                    }
+                )
+            } else {
+                label.clone()
+            }
+        })
+        .max_by_key(|s| s.len())
+        .unwrap_or_default();
+    // Approximate text width for 17px Trebuchet MS font
+    // Variable-width font: narrower chars (i,l) ~5px, wider (m,w) ~12px
+    // Calibrated to best match mermaid.js getBoundingClientRect() results on average
+    let estimated_text_width = longest_label.len() as f64 * 9.0;
+
+    // Dynamic width calculation (mermaid.js: pieWidth + MARGIN + LEGEND_RECT_SIZE + LEGEND_SPACING + longestTextWidth)
+    let width = pie_width + MARGIN + LEGEND_RECT_SIZE + LEGEND_SPACING + estimated_text_width;
 
     doc.set_size(width, height);
 
@@ -29,7 +63,6 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
     }
 
     // Calculate total
-    let sections = db.get_sections();
     let total: f64 = sections.iter().map(|(_, v)| v).sum();
 
     if total <= 0.0 {
@@ -72,19 +105,17 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
 
     let mut start_angle = -PI / 2.0; // Start at top (12 o'clock)
 
-    // Title offset
-    let title_height = if db.get_diagram_title().is_some() {
-        40.0
-    } else {
-        0.0
-    };
-    let pie_cy = cy + title_height / 2.0;
+    // Pie center Y - mermaid.js does NOT offset for title, pie stays at center
+    let pie_cy = cy;
 
-    // Legend dimensions (positioned to the right of the pie)
-    let legend_x = pie_width + 10.0;
-    let legend_y = height / 2.0 - 50.0; // Vertically centered
-    let legend_item_height = 22.0;
-    let legend_box_size = 18.0; // mermaid.js uses 18x18
+    // Legend dimensions matching mermaid.js exactly:
+    // horizontal = 12 * LEGEND_RECT_SIZE (from pie center)
+    // vertical = index * (LEGEND_RECT_SIZE + LEGEND_SPACING) - offset (centered)
+    let legend_item_height = LEGEND_RECT_SIZE + LEGEND_SPACING; // 22.0
+    let num_items = sections_vec.len() as f64;
+    let legend_vertical_offset = (legend_item_height * num_items) / 2.0;
+    let legend_x = cx + 12.0 * LEGEND_RECT_SIZE; // 225 + 216 = 441
+    let legend_y = cy - legend_vertical_offset; // Centered vertically around pie center
 
     // === PHASE 1: Render all shapes first (for correct z-order) ===
 
@@ -216,7 +247,7 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
         legend_x,
         legend_y,
         legend_item_height,
-        legend_box_size,
+        LEGEND_RECT_SIZE,
         db.get_show_data(),
     );
     doc.add_element(legend_group);

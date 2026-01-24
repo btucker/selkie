@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450" viewBox="0 0 600 450" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="710" height="450" viewBox="0 0 710 450" class="mermaid">
   <style>
 
 .mermaid {
@@ -124,41 +124,41 @@ marker path {
     <g class="nodes">
 
     </g>
-    <circle cx="210" cy="245" r="186" class="pieOuterCircle" fill="none" stroke="black" stroke-width="2"/>
-    <path d="M 210 245 L 210 60 A 185 185 0 0 1 359.66814395936524 353.74027167410753 Z" class="pieCircle" stroke-width="2" stroke="black" opacity="0.7" fill="#ececff"/>
-    <path d="M 210 245 L 359.66814395936524 353.74027167410753 A 185 185 0 0 1 131.23083106046155 412.39300470621356 Z" class="pieCircle" fill="#ffffde" stroke="black" opacity="0.7" stroke-width="2"/>
-    <path d="M 210 245 L 131.23083106046155 412.39300470621356 A 185 185 0 0 1 25 245.00000000000003 Z" class="pieCircle" stroke-width="2" stroke="black" opacity="0.7" fill="hsl(80, 100%, 56.2745098039%)"/>
-    <path d="M 210 245 L 25 245.00000000000003 A 185 185 0 0 1 47.88326419188522 155.87557029118273 Z" class="pieCircle" fill="hsl(240, 100%, 86.2745098039%)" opacity="0.7" stroke-width="2" stroke="black"/>
-    <path d="M 210 245 L 47.88326419188522 155.87557029118273 A 185 185 0 0 1 92.07656189649231 102.45505008647908 Z" class="pieCircle" fill="hsl(60, 100%, 63.5294117647%)" stroke="black" stroke-width="2" opacity="0.7"/>
-    <path d="M 210 245 L 92.07656189649231 102.45505008647908 A 185 185 0 0 1 141.89695775333445 72.99135011067355 Z" class="pieCircle" fill="hsl(80, 100%, 76.2745098039%)" stroke-width="2" opacity="0.7" stroke="black"/>
-    <path d="M 210 245 L 141.89695775333445 72.99135011067355 A 185 185 0 0 1 186.81335179060366 61.458780256821626 Z" class="pieCircle" fill="hsl(300, 100%, 76.2745098039%)" opacity="0.7" stroke="black" stroke-width="2"/>
-    <path d="M 210 245 L 186.81335179060366 61.458780256821626 A 185 185 0 0 1 209.99999999999997 60 Z" class="pieCircle" stroke-width="2" fill="hsl(180, 100%, 56.2745098039%)" opacity="0.7" stroke="black"/>
-    <text x="210" y="25" class="pie-title" text-anchor="middle" font-weight="bold" font-size="20">Cloud Infrastructure Costs</text>
-    <text x="333.62715523113604" y="182.00881816113787" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">35%</text>
-    <text x="244.5057218441236" y="379.39091360659756" class="slice" font-size="17" dominant-baseline="middle" text-anchor="middle">22%</text>
-    <text x="92.84950033659541" y="319.3459678033358" class="slice" text-anchor="middle" font-size="17" dominant-baseline="middle">18%</text>
-    <text x="75.60908639340244" y="210.49427815587643" class="slice" font-size="17" text-anchor="middle" dominant-baseline="middle">8%</text>
-    <text x="103.0912875648592" y="156.55742142236937" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">6%</text>
-    <text x="139.3705035646359" y="125.57204375320286" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">5%</text>
-    <text x="175.49427815587632" y="110.60908639340246" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">4%</text>
-    <text x="201.28781541530768" y="106.52379143057732" class="slice" dominant-baseline="middle" font-size="17" text-anchor="middle">2%</text>
+    <circle cx="225" cy="225" r="186" class="pieOuterCircle" stroke="black" stroke-width="2" fill="none"/>
+    <path d="M 225 225 L 225 40 A 185 185 0 0 1 374.66814395936524 333.74027167410753 Z" class="pieCircle" opacity="0.7" stroke-width="2" fill="#ececff" stroke="black"/>
+    <path d="M 225 225 L 374.66814395936524 333.74027167410753 A 185 185 0 0 1 146.23083106046155 392.39300470621356 Z" class="pieCircle" stroke-width="2" fill="#ffffde" stroke="black" opacity="0.7"/>
+    <path d="M 225 225 L 146.23083106046155 392.39300470621356 A 185 185 0 0 1 40 225.00000000000003 Z" class="pieCircle" opacity="0.7" stroke="black" stroke-width="2" fill="hsl(80, 100%, 56.2745098039%)"/>
+    <path d="M 225 225 L 40 225.00000000000003 A 185 185 0 0 1 62.88326419188522 135.87557029118273 Z" class="pieCircle" opacity="0.7" stroke-width="2" stroke="black" fill="hsl(240, 100%, 86.2745098039%)"/>
+    <path d="M 225 225 L 62.88326419188522 135.87557029118273 A 185 185 0 0 1 107.07656189649231 82.45505008647908 Z" class="pieCircle" fill="hsl(60, 100%, 63.5294117647%)" stroke="black" stroke-width="2" opacity="0.7"/>
+    <path d="M 225 225 L 107.07656189649231 82.45505008647908 A 185 185 0 0 1 156.89695775333445 52.99135011067355 Z" class="pieCircle" fill="hsl(80, 100%, 76.2745098039%)" stroke-width="2" stroke="black" opacity="0.7"/>
+    <path d="M 225 225 L 156.89695775333445 52.99135011067355 A 185 185 0 0 1 201.81335179060366 41.458780256821626 Z" class="pieCircle" stroke="black" fill="hsl(300, 100%, 76.2745098039%)" stroke-width="2" opacity="0.7"/>
+    <path d="M 225 225 L 201.81335179060366 41.458780256821626 A 185 185 0 0 1 224.99999999999997 40 Z" class="pieCircle" fill="hsl(180, 100%, 56.2745098039%)" opacity="0.7" stroke-width="2" stroke="black"/>
+    <text x="225" y="25" class="pie-title" font-weight="bold" font-size="20" text-anchor="middle">Cloud Infrastructure Costs</text>
+    <text x="348.62715523113604" y="162.00881816113787" class="slice" font-size="17" dominant-baseline="middle" text-anchor="middle">35%</text>
+    <text x="259.50572184412357" y="359.39091360659756" class="slice" font-size="17" text-anchor="middle" dominant-baseline="middle">22%</text>
+    <text x="107.84950033659541" y="299.3459678033358" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">18%</text>
+    <text x="90.60908639340244" y="190.49427815587643" class="slice" text-anchor="middle" font-size="17" dominant-baseline="middle">8%</text>
+    <text x="118.0912875648592" y="136.55742142236937" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">6%</text>
+    <text x="154.3705035646359" y="105.57204375320286" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">5%</text>
+    <text x="190.49427815587632" y="90.60908639340246" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">4%</text>
+    <text x="216.28781541530768" y="86.52379143057732" class="slice" dominant-baseline="middle" font-size="17" text-anchor="middle">2%</text>
     <g class="legend">
-      <rect x="430" y="175" width="18" height="18" class="legend" stroke="#ececff" fill="#ececff"/>
-      <rect x="430" y="197" width="18" height="18" class="legend" stroke="hsl(80, 100%, 56.2745098039%)" fill="hsl(80, 100%, 56.2745098039%)"/>
-      <rect x="430" y="219" width="18" height="18" class="legend" fill="#ffffde" stroke="#ffffde"/>
-      <rect x="430" y="241" width="18" height="18" class="legend" stroke="hsl(240, 100%, 86.2745098039%)" fill="hsl(240, 100%, 86.2745098039%)"/>
-      <rect x="430" y="263" width="18" height="18" class="legend" fill="hsl(60, 100%, 63.5294117647%)" stroke="hsl(60, 100%, 63.5294117647%)"/>
-      <rect x="430" y="285" width="18" height="18" class="legend" stroke="hsl(80, 100%, 76.2745098039%)" fill="hsl(80, 100%, 76.2745098039%)"/>
-      <rect x="430" y="307" width="18" height="18" class="legend" stroke="hsl(300, 100%, 76.2745098039%)" fill="hsl(300, 100%, 76.2745098039%)"/>
-      <rect x="430" y="329" width="18" height="18" class="legend" fill="hsl(180, 100%, 56.2745098039%)" stroke="hsl(180, 100%, 56.2745098039%)"/>
-      <text x="452" y="189" class="legend" font-size="17">Compute (EC2/GKE) [35]</text>
-      <text x="452" y="211" class="legend" font-size="17">Storage (S3/GCS) [18]</text>
-      <text x="452" y="233" class="legend" font-size="17">Database (RDS) [22]</text>
-      <text x="452" y="255" class="legend" font-size="17">Networking [8]</text>
-      <text x="452" y="277" class="legend" font-size="17">CDN &amp; Edge [6]</text>
-      <text x="452" y="299" class="legend" font-size="17">Monitoring [5]</text>
-      <text x="452" y="321" class="legend" font-size="17">Security [4]</text>
-      <text x="452" y="343" class="legend" font-size="17">Other [2]</text>
+      <rect x="441" y="137" width="18" height="18" class="legend" fill="#ececff" stroke="#ececff"/>
+      <rect x="441" y="159" width="18" height="18" class="legend" stroke="hsl(80, 100%, 56.2745098039%)" fill="hsl(80, 100%, 56.2745098039%)"/>
+      <rect x="441" y="181" width="18" height="18" class="legend" fill="#ffffde" stroke="#ffffde"/>
+      <rect x="441" y="203" width="18" height="18" class="legend" fill="hsl(240, 100%, 86.2745098039%)" stroke="hsl(240, 100%, 86.2745098039%)"/>
+      <rect x="441" y="225" width="18" height="18" class="legend" fill="hsl(60, 100%, 63.5294117647%)" stroke="hsl(60, 100%, 63.5294117647%)"/>
+      <rect x="441" y="247" width="18" height="18" class="legend" fill="hsl(80, 100%, 76.2745098039%)" stroke="hsl(80, 100%, 76.2745098039%)"/>
+      <rect x="441" y="269" width="18" height="18" class="legend" stroke="hsl(300, 100%, 76.2745098039%)" fill="hsl(300, 100%, 76.2745098039%)"/>
+      <rect x="441" y="291" width="18" height="18" class="legend" fill="hsl(180, 100%, 56.2745098039%)" stroke="hsl(180, 100%, 56.2745098039%)"/>
+      <text x="463" y="151" class="legend" font-size="17">Compute (EC2/GKE) [35]</text>
+      <text x="463" y="173" class="legend" font-size="17">Storage (S3/GCS) [18]</text>
+      <text x="463" y="195" class="legend" font-size="17">Database (RDS) [22]</text>
+      <text x="463" y="217" class="legend" font-size="17">Networking [8]</text>
+      <text x="463" y="239" class="legend" font-size="17">CDN &amp; Edge [6]</text>
+      <text x="463" y="261" class="legend" font-size="17">Monitoring [5]</text>
+      <text x="463" y="283" class="legend" font-size="17">Security [4]</text>
+      <text x="463" y="305" class="legend" font-size="17">Other [2]</text>
     </g>
   </g>
 </svg>
