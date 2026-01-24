@@ -647,6 +647,7 @@ fn has_clip_paths(doc: &Document<'_>) -> bool {
 }
 
 /// Get viewBox height from SVG
+#[allow(dead_code)]
 fn get_viewbox_height(doc: &Document<'_>) -> Option<f64> {
     let svg_root = doc.root_element();
     if let Some(viewbox) = svg_root.attribute("viewBox") {
