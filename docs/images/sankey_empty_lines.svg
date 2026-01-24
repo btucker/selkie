@@ -116,16 +116,16 @@ marker path {
 
     </g>
     <g class="nodes">
-      <g class="node" id="node-1" transform="translate(0,4.341304258255889)" y="4.341304258255889" x="0">
+      <g class="node" transform="translate(0,4.341304258255889)" x="0" id="node-1" y="4.341304258255889">
         <rect x="0" y="0" width="10" height="350" class="sankey-node" fill="#4e79a7"/>
       </g>
-      <g class="node" transform="translate(590,375.7892812261799)" id="node-2" y="375.7892812261799" x="590">
+      <g class="node" x="590" y="375.7892812261799" transform="translate(590,375.7892812261799)" id="node-2">
         <rect x="0" y="0" width="10" height="24.210718773820076" class="sankey-node" fill="#f28e2c"/>
       </g>
-      <g class="node" x="590" y="0.00000000000005684341886080802" id="node-3" transform="translate(590,0.00000000000005684341886080802)">
+      <g class="node" x="590" id="node-3" y="0.00000000000005684341886080802" transform="translate(590,0.00000000000005684341886080802)">
         <rect x="0" y="0" width="10" height="252.65419954265462" class="sankey-node" fill="#e15759"/>
       </g>
-      <g class="node" id="node-4" transform="translate(590,277.6541995426547)" y="277.6541995426547" x="590">
+      <g class="node" y="277.6541995426547" id="node-4" x="590" transform="translate(590,277.6541995426547)">
         <rect x="0" y="0" width="10" height="73.13508168352524" class="sankey-node" fill="#76b7b2"/>
       </g>
     </g>
@@ -139,7 +139,7 @@ marker path {
       <text x="584" y="314.22174038441733" dy="0em" text-anchor="end">Gas
 81.14</text>
     </g>
-    <g class="links" fill="none" stroke-opacity="0.5">
+    <g class="links" stroke-opacity="0.5" fill="none">
       <g class="link" style="mix-blend-mode: multiply">
         <path d="M10,16.44666364516592 C300,16.44666364516592 300,387.89464061308996 590,387.89464061308996" stroke="url(#linearGradient-1)" stroke-width="24.210718773820066"/>
       </g>

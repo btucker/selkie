@@ -181,32 +181,32 @@ marker path {
     <g class="branches">
       <line x1="0" y1="0" x2="600" y2="0" class="branch branch0"/>
       <rect x="-87.4" y="-11.5" width="56.4" height="23" rx="4" ry="4" class="branchLabelBkg label0"/>
-      <text x="-59.2" y="0" class="branch-label0" text-anchor="middle" dominant-baseline="middle">main</text>
       <line x1="0" y1="90" x2="600" y2="90" class="branch branch1"/>
       <rect x="-116.2" y="78.5" width="85.2" height="23" rx="4" ry="4" class="branchLabelBkg label1"/>
-      <text x="-73.6" y="90" class="branch-label1" text-anchor="middle" dominant-baseline="middle">feature</text>
       <line x1="0" y1="180" x2="600" y2="180" class="branch branch2"/>
       <rect x="-106.6" y="168.5" width="75.6" height="23" rx="4" ry="4" class="branchLabelBkg label2"/>
-      <text x="-68.8" y="180" class="branch-label2" text-anchor="middle" dominant-baseline="middle">hotfix</text>
       <line x1="0" y1="270" x2="600" y2="270" class="branch branch3"/>
       <rect x="-116.2" y="258.5" width="85.2" height="23" rx="4" ry="4" class="branchLabelBkg label3"/>
+      <text x="-59.2" y="0" class="branch-label0" text-anchor="middle" dominant-baseline="middle">main</text>
+      <text x="-73.6" y="90" class="branch-label1" text-anchor="middle" dominant-baseline="middle">feature</text>
+      <text x="-68.8" y="180" class="branch-label2" dominant-baseline="middle" text-anchor="middle">hotfix</text>
       <text x="-73.6" y="270" class="branch-label3" dominant-baseline="middle" text-anchor="middle">release</text>
     </g>
     <g class="commit-arrows">
-      <path d="M 60 0 L 60 70 A 20 20, 0, 0, 0, 80 90 L 110 90" class="arrow arrow1"/>
       <path d="M 260 0 L 360 0" class="arrow arrow0"/>
       <path d="M 310 180 L 340 180 A 20 20, 0, 0, 0, 360 160 L 360 0" class="arrow arrow2"/>
-      <path d="M 10 0 L 60 0" class="arrow arrow0"/>
-      <path d="M 260 0 L 260 160 A 20 20, 0, 0, 0, 280 180 L 310 180" class="arrow arrow2"/>
-      <path d="M 110 90 L 160 90" class="arrow arrow1"/>
-      <path d="M 410 0 L 410 250 A 20 20, 0, 0, 0, 430 270 L 460 270" class="arrow arrow3"/>
-      <path d="M 460 270 L 510 270" class="arrow arrow3"/>
-      <path d="M 60 0 L 210 0" class="arrow arrow0"/>
       <path d="M 360 0 L 410 0" class="arrow arrow0"/>
-      <path d="M 210 0 L 260 0" class="arrow arrow0"/>
-      <path d="M 160 90 L 240 90 A 20 20, 0, 0, 0, 260 70 L 260 0" class="arrow arrow1"/>
+      <path d="M 10 0 L 60 0" class="arrow arrow0"/>
+      <path d="M 60 0 L 210 0" class="arrow arrow0"/>
+      <path d="M 410 0 L 410 250 A 20 20, 0, 0, 0, 430 270 L 460 270" class="arrow arrow3"/>
+      <path d="M 260 0 L 260 160 A 20 20, 0, 0, 0, 280 180 L 310 180" class="arrow arrow2"/>
+      <path d="M 460 270 L 510 270" class="arrow arrow3"/>
+      <path d="M 60 0 L 60 70 A 20 20, 0, 0, 0, 80 90 L 110 90" class="arrow arrow1"/>
       <path d="M 410 0 L 560 0" class="arrow arrow0"/>
       <path d="M 510 270 L 540 270 A 20 20, 0, 0, 0, 560 250 L 560 0" class="arrow arrow3"/>
+      <path d="M 110 90 L 160 90" class="arrow arrow1"/>
+      <path d="M 210 0 L 260 0" class="arrow arrow0"/>
+      <path d="M 160 90 L 240 90 A 20 20, 0, 0, 0, 260 70 L 260 0" class="arrow arrow1"/>
     </g>
     <g class="commits">
       <g class="commit-bullets">
@@ -215,35 +215,35 @@ marker path {
         <circle cx="110" cy="90" r="10" class="commit C commit1"/>
         <circle cx="160" cy="90" r="10" class="commit D commit1"/>
         <circle cx="210" cy="0" r="10" class="commit E commit0"/>
-        <circle cx="260" cy="0" r="9" class="commit 5-c75059cf commit0"/>
-        <circle cx="260" cy="0" r="6" class="commit commit-merge 5-c75059cf commit0"/>
+        <circle cx="260" cy="0" r="9" class="commit 5-f1eefeb6 commit0"/>
+        <circle cx="260" cy="0" r="6" class="commit commit-merge 5-f1eefeb6 commit0"/>
         <circle cx="310" cy="180" r="10" class="commit F commit2"/>
-        <circle cx="360" cy="0" r="9" class="commit 7-c750790f commit0"/>
-        <circle cx="360" cy="0" r="6" class="commit commit-merge 7-c750790f commit0"/>
+        <circle cx="360" cy="0" r="9" class="commit 7-f1ef1df6 commit0"/>
+        <circle cx="360" cy="0" r="6" class="commit commit-merge 7-f1ef1df6 commit0"/>
         <circle cx="410" cy="0" r="10" class="commit G commit0"/>
         <circle cx="460" cy="270" r="10" class="commit H commit3"/>
         <circle cx="510" cy="270" r="10" class="commit I commit3"/>
-        <circle cx="560" cy="0" r="9" class="commit 11-c750a01f commit0"/>
-        <circle cx="560" cy="0" r="6" class="commit commit-merge 11-c750a01f commit0"/>
+        <circle cx="560" cy="0" r="9" class="commit 11-f1ef4506 commit0"/>
+        <circle cx="560" cy="0" r="6" class="commit commit-merge 11-f1ef4506 commit0"/>
       </g>
       <g class="commit-labels">
         <rect x="5" y="13.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 10, 0)"/>
-        <text x="7" y="25" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 10, 0)">A</text>
         <rect x="55" y="13.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 60, 0)"/>
-        <text x="57" y="25" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 60, 0)">B</text>
         <rect x="105" y="103.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 110, 90)"/>
-        <text x="107" y="115" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 110, 90)">C</text>
         <rect x="155" y="103.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 160, 90)"/>
-        <text x="157" y="115" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 160, 90)">D</text>
         <rect x="205" y="13.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 210, 0)"/>
-        <text x="207" y="25" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 210, 0)">E</text>
         <rect x="305" y="193.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 310, 180)"/>
-        <text x="307" y="205" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 310, 180)">F</text>
         <rect x="405" y="13.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 410, 0)"/>
-        <text x="407" y="25" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 410, 0)">G</text>
         <rect x="455" y="283.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 460, 270)"/>
-        <text x="457" y="295" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 460, 270)">H</text>
         <rect x="505" y="283.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 510, 270)"/>
+        <text x="7" y="25" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 10, 0)">A</text>
+        <text x="57" y="25" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 60, 0)">B</text>
+        <text x="107" y="115" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 110, 90)">C</text>
+        <text x="157" y="115" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 160, 90)">D</text>
+        <text x="207" y="25" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 210, 0)">E</text>
+        <text x="307" y="205" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 310, 180)">F</text>
+        <text x="407" y="25" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 410, 0)">G</text>
+        <text x="457" y="295" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 460, 270)">H</text>
         <text x="507" y="295" class="commit-label" transform="translate(-13.58, 12.04) rotate(-45, 510, 270)">I</text>
       </g>
     </g>

@@ -90,7 +90,7 @@ marker path {
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -102,37 +102,37 @@ marker path {
   <g class="root">
     <g class="clusters">
       <g class="subgraph" id="subgraph-A">
-        <rect x="113.9" y="-20.000000000000014" width="492.9200000000001" height="532.8" class="cluster"/>
-        <text x="360.36" y="-4.000000000000014" class="cluster-label" text-anchor="middle">A</text>
+        <rect x="113.9" y="-20.000000000000014" width="358.31999999999994" height="532.8" class="cluster"/>
+        <text x="293.05999999999995" y="-4.000000000000014" class="cluster-label" text-anchor="middle">A</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-sq-ci-0">
-        <path d="M 1130.02 158.60 C 1130.02 193.87, 1130.02 229.13, 1052.71 252.60 C 975.41 276.07, 820.79 287.73, 804.95 312.28 C 912.04 374.24, 1034.97 411.66, 1034.97 411.66" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 1130.02 158.60 C 1130.02 193.87, 1130.02 229.13, 1052.71 252.60 C 975.41 276.07, 820.79 287.73, 804.95 312.28 C 912.04 374.24, 1034.97 411.66, 1034.97 411.66" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-od-ro-0">
-        <path d="M 521.70 158.60 C 521.70 193.87, 521.70 229.13, 562.71 252.60 C 603.72 276.07, 685.74 287.73, 637.64 313.42 C 411.32 378.83, 233.10 418.55, 233.10 418.55" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 387.10 158.60 C 387.10 193.87, 387.10 229.13, 450.54 252.60 C 513.99 276.07, 640.87 287.73, 615.21 313.42 C 411.32 378.83, 233.10 418.55, 233.10 418.55" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-di-ro-0">
-        <path d="M 294.58 239.40 C 294.58 247.73, 294.58 256.07, 342.52 266.07 C 390.45 276.07, 486.33 287.73, 476.08 312.57 C 349.47 375.40, 233.10 413.40, 233.10 413.40" class="edge-path" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2"/>
+        <path d="M 294.58 239.40 C 294.58 247.73, 294.58 256.07, 342.52 266.07 C 390.45 276.07, 486.33 287.73, 476.08 312.57 C 349.47 375.40, 233.10 413.40, 233.10 413.40" class="edge-path" stroke-width="2" marker-end="url(#arrow_point)" stroke-dasharray="3,3" fill="none"/>
       </g>
       <g class="edge" id="edge-L-di-ro2-0">
-        <path d="M 294.5799999999999 132.2 L 294.5799999999999 132.2" class="edge-path" stroke-width="3.5" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 294.5799999999999 132.2 L 294.5799999999999 132.2" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="3.5"/>
       </g>
       <g class="edge" id="edge-L-e-od3-0">
-        <path d="M 866.17 207.61 C 853.65 226.54, 841.14 245.47, 737.74 260.77 C 634.34 276.07, 440.06 287.73, 389.68 307.80 C 432.81 356.33, 526.33 384.80, 526.33 384.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 866.17 207.61 C 853.65 226.54, 841.14 245.47, 737.74 260.77 C 634.34 276.07, 440.06 287.73, 389.68 307.80 C 432.81 356.33, 526.33 384.80, 526.33 384.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-e-f-0">
-        <path d="M 969.50 205.08 C 984.01 224.86, 998.51 244.63, 920.29 260.35 C 842.07 276.07, 671.13 287.73, 647.87 312.51 C 749.06 375.16, 873.50 413.04, 873.50 413.04" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 969.50 205.08 C 984.01 224.86, 998.51 244.63, 920.29 260.35 C 842.07 276.07, 671.13 287.73, 647.87 312.51 C 749.06 375.16, 873.50 413.04, 873.50 413.04" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-cyr-cyr2-0">
-        <path d="M 721.22 158.60 C 721.22 193.87, 721.22 229.13, 601.02 252.60 C 480.81 276.07, 240.41 287.73, 168.25 310.10 C 192.19 365.55, 288.28 398.62, 288.28 398.62" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 721.22 158.60 C 721.22 193.87, 721.22 229.13, 601.02 252.60 C 480.81 276.07, 240.41 287.73, 168.25 310.10 C 192.19 365.55, 288.28 398.62, 288.28 398.62" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-od-ro-0">
-        <rect x="626.1566096268731" y="300.43741729124207" width="94.39999999999999" height="40" class="edge-label-bg"/>
-        <text x="673.3566096268731" y="320.43741729124207" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="673.3566096268731" y="320.43741729124207" dy="-0.6em">Two line</tspan><tspan x="673.3566096268731" dy="1.2em">edge comment</tspan></text>
+        <rect x="691.4201861519787" y="285.89369075927215" width="94.39999999999999" height="40" class="edge-label-bg"/>
+        <text x="738.6201861519787" y="305.89369075927215" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="738.6201861519787" y="305.89369075927215" dy="-0.6em">Two line</tspan><tspan x="738.6201861519787" dy="1.2em">edge comment</tspan></text>
       </g>
     </g>
     <g class="nodes">
@@ -146,31 +146,31 @@ marker path {
       </g>
       <g class="node" id="node-cyr2">
         <circle cx="378.29999999999995" cy="429.59999999999997" r="95.2"/>
-        <text x="378.29999999999995" y="429.59999999999997" class="label" text-anchor="middle" dominant-baseline="central">Circle shape Начало</text>
+        <text x="378.29999999999995" y="429.59999999999997" class="label" dominant-baseline="central" text-anchor="middle">Circle shape Начало</text>
       </g>
       <g class="node" id="node-di">
         <polygon points="294.5799999999999,24.999999999999986 401.78,132.2 294.5799999999999,239.39999999999998 187.37999999999994,132.2" style="fill:#f96 !important;stroke:#333 !important;stroke-width:4px !important"/>
-        <text x="294.5799999999999" y="132.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="294.5799999999999" y="132.2" dy="-0.6em">Diamond with </tspan><tspan x="294.5799999999999" dy="1.2em"> line break</tspan></text>
+        <text x="294.5799999999999" y="132.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="294.5799999999999" y="132.2" dy="-0.6em">Diamond with </tspan><tspan x="294.5799999999999" dy="1.2em"> line break</tspan></text>
       </g>
       <g class="node" id="node-e">
         <circle cx="916.02" cy="132.2" r="90.39999999999999" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
-        <text x="916.02" y="132.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="916.02" y="132.2" dy="-1.2em">Inner / circle</tspan><tspan x="916.02" dy="1.2em">and some odd </tspan><tspan x="916.02" dy="1.2em">special characters</tspan></text>
+        <text x="916.02" y="132.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="916.02" y="132.2" dy="-1.2em">Inner / circle</tspan><tspan x="916.02" dy="1.2em">and some odd </tspan><tspan x="916.02" dy="1.2em">special characters</tspan></text>
       </g>
       <g class="node" id="node-f">
         <path d="M 878.4999999999999 403.2 H 977.2999999999998 A 5 5 0 0 1 982.2999999999998 408.2 V 451 A 5 5 0 0 1 977.2999999999998 456 H 878.4999999999999 A 5 5 0 0 1 873.4999999999999 451 V 408.2 A 5 5 0 0 1 878.4999999999999 403.2 Z"/>
         <text x="927.8999999999999" y="429.59999999999997" class="label" text-anchor="middle" dominant-baseline="central">,.?!+-*ز</text>
       </g>
       <g class="node" id="node-od">
-        <path d="M 456.58000000000004 105.79999999999998 L 586.82 105.79999999999998 L 567.2840000000001 132.2 L 586.82 158.59999999999997 L 456.58000000000004 158.59999999999997 Z"/>
-        <text x="521.7" y="132.2" class="label" text-anchor="middle" dominant-baseline="central">Odd shape</text>
+        <path d="M 321.9799999999999 105.79999999999998 L 452.2199999999999 105.79999999999998 L 432.6839999999999 132.2 L 452.2199999999999 158.59999999999997 L 321.9799999999999 158.59999999999997 Z"/>
+        <text x="387.0999999999999" y="132.2" class="label" dominant-baseline="central" text-anchor="middle">Odd shape</text>
       </g>
       <g class="node" id="node-od3">
         <path d="M 523.5 384.79999999999995 L 823.5 384.79999999999995 L 778.5 429.59999999999997 L 823.5 474.4 L 523.5 474.4 Z"/>
-        <text x="673.5" y="429.59999999999997" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="673.5" y="429.59999999999997" dy="-0.6em">Really long text with linebreak</tspan><tspan x="673.5" dy="1.2em">in an Odd shape</tspan></text>
+        <text x="673.5" y="429.59999999999997" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="673.5" y="429.59999999999997" dy="-0.6em">Really long text with linebreak</tspan><tspan x="673.5" dy="1.2em">in an Odd shape</tspan></text>
       </g>
       <g class="node" id="node-ro">
         <path d="M 138.9 366.4 H 228.10000000000002 A 5 5 0 0 1 233.10000000000002 371.4 V 487.79999999999995 A 5 5 0 0 1 228.10000000000002 492.79999999999995 H 138.9 A 5 5 0 0 1 133.9 487.79999999999995 V 371.4 A 5 5 0 0 1 138.9 366.4 Z"/>
-        <text x="183.5" y="429.59999999999997" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="183.5" y="429.59999999999997" dy="-1.2em">Rounded</tspan><tspan x="183.5" dy="1.2em">square</tspan><tspan x="183.5" dy="1.2em">shape</tspan></text>
+        <text x="183.5" y="429.59999999999997" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="183.5" y="429.59999999999997" dy="-1.2em">Rounded</tspan><tspan x="183.5" dy="1.2em">square</tspan><tspan x="183.5" dy="1.2em">shape</tspan></text>
       </g>
       <g class="node" id="node-ro2">
         <path d="M 187.57999999999993 105.79999999999998 H 401.5799999999999 A 5 5 0 0 1 406.5799999999999 110.79999999999998 V 153.59999999999997 A 5 5 0 0 1 401.5799999999999 158.59999999999997 H 187.57999999999993 A 5 5 0 0 1 182.57999999999993 153.59999999999997 V 110.79999999999998 A 5 5 0 0 1 187.57999999999993 105.79999999999998 Z"/>
@@ -178,7 +178,7 @@ marker path {
       </g>
       <g class="node" id="node-sq">
         <rect x="1056.42" y="105.79999999999998" width="147.2" height="52.8" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
-        <text x="1130.02" y="132.2" class="label" dominant-baseline="central" text-anchor="middle">Square shape</text>
+        <text x="1130.02" y="132.2" class="label" text-anchor="middle" dominant-baseline="central">Square shape</text>
       </g>
     </g>
   </g>

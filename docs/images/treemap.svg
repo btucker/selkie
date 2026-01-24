@@ -228,41 +228,41 @@
       <g class="treemapContainer">
         <g class="treemapSections">
           <g class="treemapSection section-0">
-            <rect x="0" y="0" width="548.5714285714286" height="500" class="treemapSection section-0" fill-opacity="0.6" stroke-opacity="0.4" stroke-width="2"/>
-            <rect x="0" y="0" width="548.5714285714286" height="25" class="treemapSectionHeader" stroke-width="0" fill="none"/>
+            <rect x="0" y="0" width="548.5714285714286" height="500" class="treemapSection section-0" stroke-width="2" stroke-opacity="0.4" fill-opacity="0.6"/>
+            <rect x="0" y="0" width="548.5714285714286" height="25" class="treemapSectionHeader" fill="none" stroke-width="0"/>
             <text x="6" y="12.5" class="treemapSectionLabel section-0" font-size="12px" dominant-baseline="middle" font-weight="bold">Category B</text>
-            <text x="538.5714285714286" y="12.5" class="treemapSectionValue section-0" text-anchor="end" font-style="italic" font-size="10px" dominant-baseline="middle">40</text>
+            <text x="538.5714285714286" y="12.5" class="treemapSectionValue section-0" font-size="10px" dominant-baseline="middle" text-anchor="end" font-style="italic">40</text>
           </g>
           <g class="treemapSection section-1">
-            <rect x="548.5714285714286" y="0" width="411.42857142857144" height="500" class="treemapSection section-1" fill-opacity="0.6" stroke-width="2" stroke-opacity="0.4"/>
-            <rect x="548.5714285714286" y="0" width="411.42857142857144" height="25" class="treemapSectionHeader" fill="none" stroke-width="0"/>
-            <text x="554.5714285714286" y="12.5" class="treemapSectionLabel section-1" font-weight="bold" dominant-baseline="middle" font-size="12px">Category A</text>
-            <text x="950" y="12.5" class="treemapSectionValue section-1" font-size="10px" dominant-baseline="middle" font-style="italic" text-anchor="end">30</text>
+            <rect x="548.5714285714286" y="0" width="411.42857142857144" height="500" class="treemapSection section-1" stroke-opacity="0.4" stroke-width="2" fill-opacity="0.6"/>
+            <rect x="548.5714285714286" y="0" width="411.42857142857144" height="25" class="treemapSectionHeader" stroke-width="0" fill="none"/>
+            <text x="554.5714285714286" y="12.5" class="treemapSectionLabel section-1" font-size="12px" dominant-baseline="middle" font-weight="bold">Category A</text>
+            <text x="950" y="12.5" class="treemapSectionValue section-1" font-style="italic" text-anchor="end" font-size="10px" dominant-baseline="middle">30</text>
           </g>
         </g>
         <g class="treemapLeaves">
           <g class="treemapNode treemapLeafGroup section-0">
-            <rect x="10" y="35" width="330.35714285714283" height="455" class="treemapLeaf section-0" fill-opacity="0.3" stroke-width="3"/>
-            <text x="175.17857142857142" y="257.5" class="treemapLabel section-0" text-anchor="middle" dominant-baseline="middle" font-size="14px">Item B2</text>
-            <text x="175.17857142857142" y="271.5" class="treemapValue section-0" text-anchor="middle" font-size="10px" dominant-baseline="hanging">25</text>
+            <rect x="10" y="35" width="330.35714285714283" height="455" class="treemapLeaf section-0" stroke-width="3" fill-opacity="0.3"/>
+            <text x="175.17857142857142" y="257.5" class="treemapLabel section-0" font-size="14px" text-anchor="middle" dominant-baseline="middle">Item B2</text>
+            <text x="175.17857142857142" y="271.5" class="treemapValue section-0" dominant-baseline="hanging" font-size="10px" text-anchor="middle">25</text>
           </g>
           <g class="treemapNode treemapLeafGroup section-0">
-            <rect x="340.35714285714283" y="35" width="198.21428571428572" height="455" class="treemapLeaf section-0" fill-opacity="0.3" stroke-width="3"/>
-            <text x="439.46428571428567" y="257.5" class="treemapLabel section-0" dominant-baseline="middle" font-size="14px" text-anchor="middle">Item B1</text>
-            <text x="439.46428571428567" y="271.5" class="treemapValue section-0" text-anchor="middle" font-size="10px" dominant-baseline="hanging">15</text>
+            <rect x="340.35714285714283" y="35" width="198.21428571428572" height="455" class="treemapLeaf section-0" stroke-width="3" fill-opacity="0.3"/>
+            <text x="439.46428571428567" y="257.5" class="treemapLabel section-0" text-anchor="middle" font-size="14px" dominant-baseline="middle">Item B1</text>
+            <text x="439.46428571428567" y="271.5" class="treemapValue section-0" text-anchor="middle" dominant-baseline="hanging" font-size="10px">15</text>
           </g>
           <g class="treemapNode treemapLeafGroup section-1">
             <rect x="558.5714285714286" y="35" width="260.95238095238096" height="455" class="treemapLeaf section-1" fill-opacity="0.3" stroke-width="3"/>
-            <text x="689.047619047619" y="257.5" class="treemapLabel section-1" text-anchor="middle" font-size="14px" dominant-baseline="middle">Item A2</text>
-            <text x="689.047619047619" y="271.5" class="treemapValue section-1" dominant-baseline="hanging" font-size="10px" text-anchor="middle">20</text>
+            <text x="689.047619047619" y="257.5" class="treemapLabel section-1" font-size="14px" dominant-baseline="middle" text-anchor="middle">Item A2</text>
+            <text x="689.047619047619" y="271.5" class="treemapValue section-1" text-anchor="middle" dominant-baseline="hanging" font-size="10px">20</text>
           </g>
           <g class="treemapNode treemapLeafGroup section-1">
-            <rect x="819.5238095238095" y="35" width="130.4761904761905" height="455" class="treemapLeaf section-1" stroke-width="3" fill-opacity="0.3"/>
-            <text x="884.7619047619048" y="257.5" class="treemapLabel section-1" text-anchor="middle" dominant-baseline="middle" font-size="14px">Item A1</text>
-            <text x="884.7619047619048" y="271.5" class="treemapValue section-1" font-size="10px" text-anchor="middle" dominant-baseline="hanging">10</text>
+            <rect x="819.5238095238095" y="35" width="130.4761904761905" height="455" class="treemapLeaf section-1" fill-opacity="0.3" stroke-width="3"/>
+            <text x="884.7619047619048" y="257.5" class="treemapLabel section-1" dominant-baseline="middle" font-size="14px" text-anchor="middle">Item A1</text>
+            <text x="884.7619047619048" y="271.5" class="treemapValue section-1" text-anchor="middle" font-size="10px" dominant-baseline="hanging">10</text>
           </g>
         </g>
-        <text x="950" y="12.5" class="treemapSectionValue" dominant-baseline="middle" style="display: none;" font-style="italic" text-anchor="end">70</text>
+        <text x="950" y="12.5" class="treemapSectionValue" font-style="italic" text-anchor="end" dominant-baseline="middle" style="display: none;">70</text>
       </g>
     </g>
   </g>

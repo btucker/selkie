@@ -137,21 +137,21 @@
     <g class="nodes">
       <g class="sections">
         <rect x="0" y="0" width="200" height="136" rx="5" ry="5" class="section section-1 "/>
-        <text x="100" y="19" class="section-label" text-anchor="middle" dominant-baseline="middle">Todo</text>
+        <text x="100" y="19" class="section-label" dominant-baseline="middle" text-anchor="middle">Todo</text>
         <rect x="205" y="0" width="200" height="91" rx="5" ry="5" class="section section-2 "/>
-        <text x="305" y="19" class="section-label" text-anchor="middle" dominant-baseline="middle">In Progress</text>
+        <text x="305" y="19" class="section-label" dominant-baseline="middle" text-anchor="middle">In Progress</text>
       </g>
       <g class="items">
         <g class="kanban-item-group" transform="translate(10, 25)">
-          <rect x="0" y="0" width="180" height="40" rx="5" ry="5" class="kanban-item " fill="#fff" stroke="#ccc"/>
-          <text x="90" y="19" class="kanban-label" text-anchor="middle" dominant-baseline="middle">Create Documentation</text>
+          <rect x="0" y="0" width="180" height="40" rx="5" ry="5" class="kanban-item " stroke="#ccc" fill="#fff"/>
+          <text x="90" y="19" class="kanban-label" dominant-baseline="middle" text-anchor="middle">Create Documentation</text>
         </g>
         <g class="kanban-item-group" transform="translate(10, 70)">
           <rect x="0" y="0" width="180" height="56" rx="5" ry="5" class="kanban-item " fill="#fff" stroke="#ccc"/>
           <text x="90" y="10" text-anchor="middle" class="kanban-label"><tspan x="90" dy="0.5em">Create Blog about</tspan><tspan x="90" dy="1.2em">the new diagram</tspan></text>
         </g>
         <g class="kanban-item-group" transform="translate(215, 25)">
-          <rect x="0" y="0" width="180" height="56" rx="5" ry="5" class="kanban-item " stroke="#ccc" fill="#fff"/>
+          <rect x="0" y="0" width="180" height="56" rx="5" ry="5" class="kanban-item " fill="#fff" stroke="#ccc"/>
           <text x="90" y="10" text-anchor="middle" class="kanban-label"><tspan x="90" dy="0.5em">Create renderer for</tspan><tspan x="90" dy="1.2em">all cases</tspan></text>
         </g>
       </g>

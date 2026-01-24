@@ -136,45 +136,45 @@ marker path {
 
     </g>
     <rect x="0" y="0" width="700" height="500" class="xychart-background" fill="#ffffff"/>
-    <text x="350" y="50" class="xychart-title" text-anchor="middle" font-size="16" dominant-baseline="hanging" font-weight="bold" fill="#333333">Monthly Sales</text>
+    <text x="350" y="50" class="xychart-title" font-weight="bold" fill="#333333" font-size="16" dominant-baseline="hanging" text-anchor="middle">Monthly Sales</text>
     <path d="M 90 90 L 90 410" class="xychart-axis" fill="none" stroke="#333333" stroke-width="1"/>
-    <text x="15" y="250" class="xychart-axis-title" font-size="12" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 15 250)" fill="#333333">Sales (units)</text>
-    <path d="M 90 410 L 85 410" class="xychart-tick" stroke="#333333" stroke-width="1" fill="none"/>
-    <text x="80" y="410" class="xychart-axis-label" font-size="10" dominant-baseline="middle" text-anchor="end" fill="#333333">0</text>
+    <text x="15" y="250" class="xychart-axis-title" transform="rotate(-90 15 250)" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#333333">Sales (units)</text>
+    <path d="M 90 410 L 85 410" class="xychart-tick" fill="none" stroke="#333333" stroke-width="1"/>
+    <text x="80" y="410" class="xychart-axis-label" dominant-baseline="middle" text-anchor="end" fill="#333333" font-size="10">0</text>
     <path d="M 90 346 L 85 346" class="xychart-tick" fill="none" stroke="#333333" stroke-width="1"/>
-    <text x="80" y="346" class="xychart-axis-label" dominant-baseline="middle" fill="#333333" text-anchor="end" font-size="10">20</text>
-    <path d="M 90 282 L 85 282" class="xychart-tick" fill="none" stroke-width="1" stroke="#333333"/>
-    <text x="80" y="282" class="xychart-axis-label" font-size="10" text-anchor="end" fill="#333333" dominant-baseline="middle">40</text>
-    <path d="M 90 218 L 85 218" class="xychart-tick" stroke="#333333" stroke-width="1" fill="none"/>
-    <text x="80" y="218" class="xychart-axis-label" fill="#333333" text-anchor="end" dominant-baseline="middle" font-size="10">60</text>
-    <path d="M 90 154 L 85 154" class="xychart-tick" stroke="#333333" stroke-width="1" fill="none"/>
-    <text x="80" y="154" class="xychart-axis-label" text-anchor="end" fill="#333333" dominant-baseline="middle" font-size="10">80</text>
+    <text x="80" y="346" class="xychart-axis-label" dominant-baseline="middle" text-anchor="end" font-size="10" fill="#333333">20</text>
+    <path d="M 90 282 L 85 282" class="xychart-tick" stroke="#333333" stroke-width="1" fill="none"/>
+    <text x="80" y="282" class="xychart-axis-label" text-anchor="end" fill="#333333" dominant-baseline="middle" font-size="10">40</text>
+    <path d="M 90 218 L 85 218" class="xychart-tick" stroke-width="1" stroke="#333333" fill="none"/>
+    <text x="80" y="218" class="xychart-axis-label" dominant-baseline="middle" font-size="10" text-anchor="end" fill="#333333">60</text>
+    <path d="M 90 154 L 85 154" class="xychart-tick" stroke-width="1" fill="none" stroke="#333333"/>
+    <text x="80" y="154" class="xychart-axis-label" dominant-baseline="middle" text-anchor="end" font-size="10" fill="#333333">80</text>
     <path d="M 90 90 L 85 90" class="xychart-tick" stroke-width="1" fill="none" stroke="#333333"/>
-    <text x="80" y="90" class="xychart-axis-label" font-size="10" text-anchor="end" fill="#333333" dominant-baseline="middle">100</text>
-    <path d="M 90 410 L 650 410" class="xychart-axis" stroke="#333333" fill="none" stroke-width="1"/>
-    <path d="M 136.66666666666666 410 L 136.66666666666666 415" class="xychart-tick" stroke="#333333" fill="none" stroke-width="1"/>
-    <text x="136.66666666666666" y="425" class="xychart-axis-label" dominant-baseline="hanging" text-anchor="middle" font-size="10" fill="#333333">Jan</text>
+    <text x="80" y="90" class="xychart-axis-label" font-size="10" dominant-baseline="middle" fill="#333333" text-anchor="end">100</text>
+    <path d="M 90 410 L 650 410" class="xychart-axis" stroke-width="1" fill="none" stroke="#333333"/>
+    <path d="M 136.66666666666666 410 L 136.66666666666666 415" class="xychart-tick" stroke-width="1" fill="none" stroke="#333333"/>
+    <text x="136.66666666666666" y="425" class="xychart-axis-label" dominant-baseline="hanging" fill="#333333" font-size="10" text-anchor="middle">Jan</text>
     <path d="M 230 410 L 230 415" class="xychart-tick" fill="none" stroke-width="1" stroke="#333333"/>
-    <text x="230" y="425" class="xychart-axis-label" fill="#333333" text-anchor="middle" dominant-baseline="hanging" font-size="10">Feb</text>
-    <path d="M 323.3333333333333 410 L 323.3333333333333 415" class="xychart-tick" stroke="#333333" fill="none" stroke-width="1"/>
-    <text x="323.3333333333333" y="425" class="xychart-axis-label" text-anchor="middle" font-size="10" fill="#333333" dominant-baseline="hanging">Mar</text>
-    <path d="M 416.66666666666663 410 L 416.66666666666663 415" class="xychart-tick" stroke="#333333" stroke-width="1" fill="none"/>
-    <text x="416.66666666666663" y="425" class="xychart-axis-label" font-size="10" text-anchor="middle" dominant-baseline="hanging" fill="#333333">Apr</text>
-    <path d="M 510 410 L 510 415" class="xychart-tick" stroke="#333333" stroke-width="1" fill="none"/>
-    <text x="510" y="425" class="xychart-axis-label" font-size="10" fill="#333333" text-anchor="middle" dominant-baseline="hanging">May</text>
-    <path d="M 603.3333333333333 410 L 603.3333333333333 415" class="xychart-tick" fill="none" stroke="#333333" stroke-width="1"/>
-    <text x="603.3333333333333" y="425" class="xychart-axis-label" fill="#333333" dominant-baseline="hanging" font-size="10" text-anchor="middle">Jun</text>
+    <text x="230" y="425" class="xychart-axis-label" text-anchor="middle" font-size="10" dominant-baseline="hanging" fill="#333333">Feb</text>
+    <path d="M 323.3333333333333 410 L 323.3333333333333 415" class="xychart-tick" stroke-width="1" fill="none" stroke="#333333"/>
+    <text x="323.3333333333333" y="425" class="xychart-axis-label" font-size="10" fill="#333333" text-anchor="middle" dominant-baseline="hanging">Mar</text>
+    <path d="M 416.66666666666663 410 L 416.66666666666663 415" class="xychart-tick" fill="none" stroke-width="1" stroke="#333333"/>
+    <text x="416.66666666666663" y="425" class="xychart-axis-label" text-anchor="middle" dominant-baseline="hanging" fill="#333333" font-size="10">Apr</text>
+    <path d="M 510 410 L 510 415" class="xychart-tick" fill="none" stroke-width="1" stroke="#333333"/>
+    <text x="510" y="425" class="xychart-axis-label" font-size="10" dominant-baseline="hanging" text-anchor="middle" fill="#333333">May</text>
+    <path d="M 603.3333333333333 410 L 603.3333333333333 415" class="xychart-tick" stroke-width="1" stroke="#333333" fill="none"/>
+    <text x="603.3333333333333" y="425" class="xychart-axis-label" text-anchor="middle" dominant-baseline="hanging" fill="#333333" font-size="10">Jun</text>
     <rect x="99.33333333333331" y="346" width="74.66666666666667" height="64" class="xychart-bar" fill="#4C78A8"/>
     <rect x="192.66666666666666" y="298" width="74.66666666666667" height="112" class="xychart-bar" fill="#4C78A8"/>
     <rect x="286" y="266" width="74.66666666666667" height="144" class="xychart-bar" fill="#4C78A8"/>
     <rect x="379.3333333333333" y="211.6" width="74.66666666666667" height="198.4" class="xychart-bar" fill="#4C78A8"/>
     <rect x="472.6666666666667" y="160.39999999999998" width="74.66666666666667" height="249.60000000000002" class="xychart-bar" fill="#4C78A8"/>
     <rect x="565.9999999999999" y="118.80000000000001" width="74.66666666666667" height="291.2" class="xychart-bar" fill="#4C78A8"/>
-    <path d="M 90 362 L 202 314 L 314 282 L 426 234 L 538 186 L 650 138" class="xychart-line" fill="none" stroke="#F58518" stroke-width="2"/>
-    <circle cx="90" cy="362" r="4" class="xychart-point" fill="#F58518" stroke="#F58518"/>
+    <path d="M 90 362 L 202 314 L 314 282 L 426 234 L 538 186 L 650 138" class="xychart-line" stroke="#F58518" stroke-width="2" fill="none"/>
+    <circle cx="90" cy="362" r="4" class="xychart-point" stroke="#F58518" fill="#F58518"/>
     <circle cx="202" cy="314" r="4" class="xychart-point" fill="#F58518" stroke="#F58518"/>
     <circle cx="314" cy="282" r="4" class="xychart-point" fill="#F58518" stroke="#F58518"/>
-    <circle cx="426" cy="234" r="4" class="xychart-point" fill="#F58518" stroke="#F58518"/>
+    <circle cx="426" cy="234" r="4" class="xychart-point" stroke="#F58518" fill="#F58518"/>
     <circle cx="538" cy="186" r="4" class="xychart-point" stroke="#F58518" fill="#F58518"/>
     <circle cx="650" cy="138" r="4" class="xychart-point" fill="#F58518" stroke="#F58518"/>
   </g>

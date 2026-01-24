@@ -190,20 +190,20 @@
         <path d="M 45.6 0 Q 71.8 0 105.6 -145" class="edge section-edge-0" stroke-width="3" fill="none"/>
         <path d="M 181.6 -145 Q 221.60000000000002 -145 241.6 -213" class="edge section-edge-0" stroke-width="3" fill="none"/>
         <path d="M 181.6 -145 Q 233.60000000000002 -145 241.6 -145" class="edge section-edge-0" fill="none" stroke-width="3"/>
-        <path d="M 181.6 -145 Q 225.60000000000002 -145 241.6 -77" class="edge section-edge-0" stroke-width="3" fill="none"/>
+        <path d="M 181.6 -145 Q 225.60000000000002 -145 241.6 -77" class="edge section-edge-0" fill="none" stroke-width="3"/>
         <path d="M 373.6 -77 Q 463.6 -77 433.6 -77" class="edge section-edge-0" fill="none" stroke-width="3"/>
         <path d="M 45.6 0 Q 73.8 0 105.6 102" class="edge section-edge-1" stroke-width="3" fill="none"/>
-        <path d="M 189.6 102 Q 235.60000000000002 102 249.6 0" class="edge section-edge-1" fill="none" stroke-width="3"/>
+        <path d="M 189.6 102 Q 235.60000000000002 102 249.6 0" class="edge section-edge-1" stroke-width="3" fill="none"/>
         <path d="M 189.6 102 Q 245.60000000000002 102 249.6 145" class="edge section-edge-1" fill="none" stroke-width="3"/>
         <path d="M 437.6 145 Q 433.6 145 497.6 145" class="edge section-edge-1" fill="none" stroke-width="3"/>
-        <path d="M 549.6 145 Q 609.6 145 609.6 77" class="edge section-edge-1" stroke-width="3" fill="none"/>
+        <path d="M 549.6 145 Q 609.6 145 609.6 77" class="edge section-edge-1" fill="none" stroke-width="3"/>
         <path d="M 549.6 145 Q 607.6 145 609.6 145" class="edge section-edge-1" stroke-width="3" fill="none"/>
         <path d="M 549.6 145 Q 603.6 145 609.6 213" class="edge section-edge-1" stroke-width="3" fill="none"/>
-        <path d="M 45.6 0 Q -238.8 0 -507.6 0" class="edge section-edge-2" stroke-width="3" fill="none"/>
+        <path d="M 45.6 0 Q -238.8 0 -507.6 0" class="edge section-edge-2" fill="none" stroke-width="3"/>
         <path d="M -447.6 0 Q -553.6 0 -691.6 -88" class="edge section-edge-2" fill="none" stroke-width="3"/>
         <path d="M -447.6 0 Q -644.6 0 -849.6 34" class="edge section-edge-2" stroke-width="3" fill="none"/>
-        <path d="M -773.6 34 Q -897.0999999999999 34 -1055.6 -10" class="edge section-edge-2" stroke-width="3" fill="none"/>
-        <path d="M -773.6 34 Q -895.0999999999999 34 -1047.6 78" class="edge section-edge-2" stroke-width="3" fill="none"/>
+        <path d="M -773.6 34 Q -897.0999999999999 34 -1055.6 -10" class="edge section-edge-2" fill="none" stroke-width="3"/>
+        <path d="M -773.6 34 Q -895.0999999999999 34 -1047.6 78" class="edge section-edge-2" fill="none" stroke-width="3"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -213,63 +213,63 @@
       <g class="mindmap-nodes">
         <g class="mindmap-node section-0" id="node-Origins" transform="translate(105.6, -164)">
           <path d="M0 33 v-28 q0,-5 5,-5 h66 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="38" y="19" class="mindmap-node-label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Origins</text>
+          <text x="38" y="19" class="mindmap-node-label" font-size="14px" dominant-baseline="middle" text-anchor="middle">Origins</text>
         </g>
-        <g class="mindmap-node section-0" transform="translate(241.6, -232)" id="node-mindmap-node-1">
+        <g class="mindmap-node section-0" id="node-mindmap-node-1" transform="translate(241.6, -232)">
           <path d="M0 33 v-28 q0,-5 5,-5 h106 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="58" y="19" class="mindmap-node-label" font-size="14px" dominant-baseline="middle" text-anchor="middle">Long history</text>
+          <text x="58" y="19" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Long history</text>
         </g>
-        <g class="mindmap-node section-0" id="node-mindmap-node-2" transform="translate(241.6, -164)">
+        <g class="mindmap-node section-0" transform="translate(241.6, -164)" id="node-mindmap-node-2">
           <path d="M0 33 v-28 q0,-5 5,-5 h154 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="82" y="19" class="mindmap-node-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">::icon(fa fa-book)</text>
+          <text x="82" y="19" class="mindmap-node-label" text-anchor="middle" font-size="14px" dominant-baseline="middle">::icon(fa fa-book)</text>
         </g>
         <g class="mindmap-node section-0" id="node-Popularisation" transform="translate(241.6, -96)">
           <path d="M0 33 v-28 q0,-5 5,-5 h122 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
           <text x="66" y="19" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Popularisation</text>
         </g>
-        <g class="mindmap-node section-0" transform="translate(433.6, -96)" id="node-mindmap-node-4">
+        <g class="mindmap-node section-0" id="node-mindmap-node-4" transform="translate(433.6, -96)">
           <path d="M0 33 v-28 q0,-5 5,-5 h362 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
           <text x="186" y="19" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">British popular psychology author Tony Buzan</text>
         </g>
         <g class="mindmap-node section-1" id="node-Research" transform="translate(105.6, 83)">
           <path d="M0 33 v-28 q0,-5 5,-5 h74 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="42" y="19" class="mindmap-node-label" font-size="14px" dominant-baseline="middle" text-anchor="middle">Research</text>
+          <text x="42" y="19" class="mindmap-node-label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Research</text>
         </g>
         <g class="mindmap-node section-1" id="node-mindmap-node-6" transform="translate(249.6, -28)">
           <path d="M0 51 v-46 q0,-5 5,-5 h138 q5,0 5,5 v51 H0 Z" class="node-bkg node-default"/>
-          <text x="74" y="28" class="mindmap-node-label" dominant-baseline="middle" font-size="14px" text-anchor="middle"><tspan x="74" y="28" dy="-0.6em">On effectiveness</tspan><tspan x="74" dy="1.2em">and features</tspan></text>
+          <text x="74" y="28" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px"><tspan x="74" y="28" dy="-0.6em">On effectiveness</tspan><tspan x="74" dy="1.2em">and features</tspan></text>
         </g>
-        <g class="mindmap-node section-1" id="node-mindmap-node-7" transform="translate(249.6, 126)">
+        <g class="mindmap-node section-1" transform="translate(249.6, 126)" id="node-mindmap-node-7">
           <path d="M0 33 v-28 q0,-5 5,-5 h178 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="94" y="19" class="mindmap-node-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">On Automatic creation</text>
+          <text x="94" y="19" class="mindmap-node-label" dominant-baseline="middle" font-size="14px" text-anchor="middle">On Automatic creation</text>
         </g>
-        <g class="mindmap-node section-1" transform="translate(497.6, 126)" id="node-Uses">
+        <g class="mindmap-node section-1" id="node-Uses" transform="translate(497.6, 126)">
           <path d="M0 33 v-28 q0,-5 5,-5 h42 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="26" y="19" class="mindmap-node-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Uses</text>
+          <text x="26" y="19" class="mindmap-node-label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Uses</text>
         </g>
         <g class="mindmap-node section-1" id="node-mindmap-node-9" transform="translate(609.6, 58)">
           <path d="M0 33 v-28 q0,-5 5,-5 h162 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="86" y="19" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Creative techniques</text>
+          <text x="86" y="19" class="mindmap-node-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">Creative techniques</text>
         </g>
         <g class="mindmap-node section-1" id="node-mindmap-node-10" transform="translate(609.6, 126)">
           <path d="M0 33 v-28 q0,-5 5,-5 h154 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="82" y="19" class="mindmap-node-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Strategic planning</text>
+          <text x="82" y="19" class="mindmap-node-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">Strategic planning</text>
         </g>
         <g class="mindmap-node section-1" id="node-mindmap-node-11" transform="translate(609.6, 194)">
           <path d="M0 33 v-28 q0,-5 5,-5 h138 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="74" y="19" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Argument mapping</text>
+          <text x="74" y="19" class="mindmap-node-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Argument mapping</text>
         </g>
         <g class="mindmap-node section-2" transform="translate(-507.6, -19)" id="node-Tools">
           <path d="M0 33 v-28 q0,-5 5,-5 h50 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="30" y="19" class="mindmap-node-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">Tools</text>
+          <text x="30" y="19" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Tools</text>
         </g>
         <g class="mindmap-node section-2" id="node-mindmap-node-13" transform="translate(-691.6, -107)">
           <path d="M0 33 v-28 q0,-5 5,-5 h114 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="62" y="19" class="mindmap-node-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Pen and paper</text>
+          <text x="62" y="19" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Pen and paper</text>
         </g>
-        <g class="mindmap-node section-2" id="node-Mermaid" transform="translate(-849.6, 15)">
+        <g class="mindmap-node section-2" transform="translate(-849.6, 15)" id="node-Mermaid">
           <path d="M0 33 v-28 q0,-5 5,-5 h66 q5,0 5,5 v33 H0 Z" class="node-bkg node-default"/>
-          <text x="38" y="19" class="mindmap-node-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">Mermaid</text>
+          <text x="38" y="19" class="mindmap-node-label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Mermaid</text>
         </g>
         <g class="mindmap-node section-2" id="node-cloud" transform="translate(-1055.6, -39)">
           <path d="M0 0 a21.9,21.9 0 0,1 36.5,-14.600000000000001 a51.099999999999994,51.099999999999994 1 0,1 58.400000000000006,-14.600000000000001 a36.5,36.5 1 0,1 51.099999999999994,29.200000000000003 a21.9,21.9 1 0,1 21.9,20.299999999999997 a29.200000000000003,29.200000000000003 1 0,1 -21.9,37.7 a36.5,21.9 1 0,1 -36.5,21.9 a51.099999999999994,51.099999999999994 1 0,1 -73,0 a21.9,21.9 1 0,1 -36.5,-21.9 a21.9,21.9 1 0,1 -14.600000000000001,-20.299999999999997 a29.200000000000003,29.200000000000003 1 0,1 14.600000000000001,-37.7 H0 V0 Z" class="node-bkg node-cloud"/>
@@ -277,11 +277,11 @@
         </g>
         <g class="mindmap-node section-2" id="node-bang" transform="translate(-1047.6, 49)">
           <path d="M0 0 a20.7,20.7 1 0,0 34.5,-5.800000000000001 a20.7,20.7 1 0,0 34.5,0 a20.7,20.7 1 0,0 34.5,0 a20.7,20.7 1 0,0 34.5,5.800000000000001 a20.7,20.7 1 0,0 20.7,19.14 a16.56,16.56 1 0,0 0,19.720000000000002 a20.7,20.7 1 0,0 -20.7,19.14 a20.7,20.7 1 0,0 -34.5,8.7 a20.7,20.7 1 0,0 -34.5,0 a20.7,20.7 1 0,0 -34.5,0 a20.7,20.7 1 0,0 -34.5,-8.7 a20.7,20.7 1 0,0 -13.8,-19.14 a16.56,16.56 1 0,0 0,-19.720000000000002 a20.7,20.7 1 0,0 13.8,-19.14 H0 V0 Z" class="node-bkg node-bang"/>
-          <text x="69" y="29" class="mindmap-node-label" text-anchor="middle" font-size="14px" dominant-baseline="middle">I am a bang</text>
+          <text x="69" y="29" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">I am a bang</text>
         </g>
-        <g class="mindmap-node section-root" id="node-mindmap-root" transform="translate(-45.6, -45.6)">
+        <g class="mindmap-node section-root" transform="translate(-45.6, -45.6)" id="node-mindmap-root">
           <circle cx="45.6" cy="45.6" r="45.6" class="node-bkg node-circle"/>
-          <text x="45.6" y="45.6" class="mindmap-node-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">mindmap</text>
+          <text x="45.6" y="45.6" class="mindmap-node-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">mindmap</text>
         </g>
       </g>
     </g>

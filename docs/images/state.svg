@@ -180,7 +180,7 @@ marker path {
   </style>
   <defs>
     <marker id="arrow" viewBox="0 0 20 14" refX="19" refY="7" markerWidth="20" markerHeight="14" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 19,7 L9,13 L14,7 L9,1 Z" stroke="#333333" stroke-width="1" fill="#333333"/>
+      <path d="M 19,7 L9,13 L14,7 L9,1 Z" fill="#333333" stroke="#333333" stroke-width="1"/>
     </marker>
   </defs>
   <g class="root">
@@ -201,8 +201,8 @@ marker path {
       <text x="106.71381692786537" y="294" class="state-label" text-anchor="middle" font-size="16">Error</text>
     </g>
     <g class="state-node" id="state-Idle">
-      <path d="M 78.91498880286537 59 H 110.71186380286537 A 5 5 0 0 1 115.71186380286537 64 V 94 A 5 5 0 0 1 110.71186380286537 99 H 78.91498880286537 A 5 5 0 0 1 73.91498880286537 94 V 64 A 5 5 0 0 1 78.91498880286537 59 Z" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#9370DB"/>
-      <text x="94.81342630286537" y="84" class="state-label" text-anchor="middle" font-size="16">Idle</text>
+      <path d="M 78.91498880286537 59 H 110.71186380286537 A 5 5 0 0 1 115.71186380286537 64 V 94 A 5 5 0 0 1 110.71186380286537 99 H 78.91498880286537 A 5 5 0 0 1 73.91498880286537 94 V 64 A 5 5 0 0 1 78.91498880286537 59 Z" class="state-box" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+      <text x="94.81342630286537" y="84" class="state-label" font-size="16" text-anchor="middle">Idle</text>
     </g>
     <g class="state-node" id="state-Running">
       <path d="M 21.01264505286536 164 H 86.61420755286537 A 5 5 0 0 1 91.61420755286537 169 V 199 A 5 5 0 0 1 86.61420755286537 204 H 21.01264505286536 A 5 5 0 0 1 16.01264505286536 199 V 169 A 5 5 0 0 1 21.01264505286536 164 Z" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#9370DB"/>
@@ -210,23 +210,23 @@ marker path {
     </g>
     <g class="state-node" id="state-root_end">
       <path d="M 99.71381692786537 361 A 7 7 0 1 0 113.71381692786537 361 A 7 7 0 1 0 99.71381692786537 361 Z" class="state-end-outer" fill="none" stroke="#9370DB" stroke-width="2"/>
-      <path d="M 104.19381692786537 361 A 2.52 2.52 0 1 0 109.23381692786536 361 A 2.52 2.52 0 1 0 104.19381692786537 361 Z" class="state-end-inner" stroke="#9370DB" fill="#9370DB" stroke-width="2"/>
+      <path d="M 104.19381692786537 361 A 2.52 2.52 0 1 0 109.23381692786536 361 A 2.52 2.52 0 1 0 104.19381692786537 361 Z" class="state-end-inner" stroke="#9370DB" stroke-width="2" fill="#9370DB"/>
     </g>
     <g class="state-node" id="state-root_start">
       <circle cx="94.81342630286537" cy="7" r="7" class="state-start" fill="#333333"/>
     </g>
     <g class="transition">
-      <path d="M 94.81 14.00 C 94.81 21.50, 94.81 29.00, 94.81 36.50 C 94.81 44.00, 94.81 51.50, 94.81 59.00" class="transition-path" stroke-width="0.7" marker-end="url(#arrow)" fill="none"/>
+      <path d="M 94.81 14.00 C 94.81 21.50, 94.81 29.00, 94.81 36.50 C 94.81 44.00, 94.81 51.50, 94.81 59.00" class="transition-path" marker-end="url(#arrow)" fill="none" stroke-width="0.7"/>
     </g>
     <g class="transition">
-      <path d="M 73.91 92.38 C 53.55 105.42, 33.18 118.46, 27.23 130.40 C 21.27 142.33, 29.73 153.17, 38.19 164.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="0.7"/>
+      <path d="M 73.91 92.38 C 53.55 105.42, 33.18 118.46, 27.23 130.40 C 21.27 142.33, 29.73 153.17, 38.19 164.00" class="transition-path" stroke-width="0.7" marker-end="url(#arrow)" fill="none"/>
       <path d="M 6 112.25737659634673 H 46 A 2 2 0 0 1 48 114.25737659634673 V 131.85737659634674 A 2 2 0 0 1 46 133.85737659634674 H 6 A 2 2 0 0 1 4 131.85737659634674 V 114.25737659634673 A 2 2 0 0 1 6 112.25737659634673 Z" class="transition-label-bg"/>
-      <text x="26" y="123.05737659634673" class="transition-label" dominant-baseline="central" text-anchor="middle" font-size="16">start</text>
+      <text x="26" y="123.05737659634673" class="transition-label" font-size="16" text-anchor="middle" dominant-baseline="central">start</text>
     </g>
     <g class="transition">
-      <path d="M 69.43 164.00 L 94.81 99.00" class="transition-path" marker-end="url(#arrow)" fill="none" stroke-width="0.7"/>
+      <path d="M 69.43 164.00 L 94.81 99.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="0.7"/>
       <path d="M 76.12479863723811 124.1427549376934 H 108.12479863723811 A 2 2 0 0 1 110.12479863723811 126.1427549376934 V 143.7427549376934 A 2 2 0 0 1 108.12479863723811 145.7427549376934 H 76.12479863723811 A 2 2 0 0 1 74.12479863723811 143.7427549376934 V 126.1427549376934 A 2 2 0 0 1 76.12479863723811 124.1427549376934 Z" class="transition-label-bg"/>
-      <text x="92.12479863723811" y="134.9427549376934" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">stop</text>
+      <text x="92.12479863723811" y="134.9427549376934" class="transition-label" font-size="16" dominant-baseline="central" text-anchor="middle">stop</text>
     </g>
     <g class="transition">
       <path d="M 53.81 204.00 L 86.56 269.00" class="transition-path" stroke-width="0.7" fill="none" marker-end="url(#arrow)"/>
@@ -234,7 +234,7 @@ marker path {
       <text x="58.653305183497544" y="241.3032469747607" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">error</text>
     </g>
     <g class="transition">
-      <path d="M 131.67 269.00 C 145.18 258.17, 158.70 247.33, 165.46 224.42 C 172.21 201.50, 172.21 166.50, 162.80 142.61 C 134.55 105.95, 115.71 93.18, 115.71 93.18" class="transition-path" marker-end="url(#arrow)" stroke-width="0.7" fill="none"/>
+      <path d="M 131.67 269.00 C 145.18 258.17, 158.70 247.33, 165.46 224.42 C 172.21 201.50, 172.21 166.50, 162.80 142.61 C 134.55 105.95, 115.71 93.18, 115.71 93.18" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="0.7"/>
       <path d="M 152.21381692786537 165.04578423312887 H 192.21381692786537 A 2 2 0 0 1 194.21381692786537 167.04578423312887 V 184.64578423312886 A 2 2 0 0 1 192.21381692786537 186.64578423312886 H 152.21381692786537 A 2 2 0 0 1 150.21381692786537 184.64578423312886 V 167.04578423312887 A 2 2 0 0 1 152.21381692786537 165.04578423312887 Z" class="transition-label-bg"/>
       <text x="172.21381692786537" y="175.84578423312888" class="transition-label" text-anchor="middle" dominant-baseline="central" font-size="16">reset</text>
     </g>

@@ -218,25 +218,25 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     <g class="edgePaths">
       <line x1="125" y1="119" x2="325" y2="119" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1"/>
       <line x1="325" y1="163" x2="525" y2="163" class="message-line" stroke-dasharray="5,5" stroke-width="1" marker-end="url(#arrow-filled)"/>
-      <line x1="325" y1="207" x2="125" y2="207" class="message-line" stroke-width="1" marker-end="url(#arrow-cross)" stroke-dasharray="5,5"/>
-      <line x1="325" y1="251" x2="525" y2="251" class="message-line" marker-end="url(#arrow-cross)" stroke-width="1"/>
-      <line x1="325" y1="339" x2="125" y2="339" class="message-line" stroke-dasharray="5,5" stroke-width="1"/>
+      <line x1="325" y1="207" x2="125" y2="207" class="message-line" marker-end="url(#arrow-cross)" stroke-dasharray="5,5" stroke-width="1"/>
+      <line x1="325" y1="251" x2="525" y2="251" class="message-line" stroke-width="1" marker-end="url(#arrow-cross)"/>
+      <line x1="325" y1="339" x2="125" y2="339" class="message-line" stroke-width="1" stroke-dasharray="5,5"/>
       <line x1="125" y1="383" x2="525" y2="383" class="message-line" stroke-width="1"/>
     </g>
     <g class="edgeLabels">
       <text x="225" y="109" class="message-label" font-size="16" text-anchor="middle">Hello Bob, how are you?</text>
       <text x="425" y="153" class="message-label" font-size="16" text-anchor="middle">How about you John?</text>
-      <text x="225" y="197" class="message-label" text-anchor="middle" font-size="16">I am good thanks!</text>
+      <text x="225" y="197" class="message-label" font-size="16" text-anchor="middle">I am good thanks!</text>
       <text x="425" y="241" class="message-label" text-anchor="middle" font-size="16">I am good thanks!</text>
       <text x="225" y="329" class="message-label" text-anchor="middle" font-size="16">Checking with John...</text>
-      <text x="325" y="373" class="message-label" font-size="16" text-anchor="middle">Yes... John, how are you?</text>
+      <text x="325" y="373" class="message-label" text-anchor="middle" font-size="16">Yes... John, how are you?</text>
     </g>
     <g class="nodes">
 
     </g>
     <g class="actor">
       <rect x="50" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="125" y="42.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Alice</text>
+      <text x="125" y="42.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Alice</text>
     </g>
     <g class="actor">
       <rect x="250" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
@@ -244,7 +244,7 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="actor">
       <rect x="450" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="525" y="42.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">John</text>
+      <text x="525" y="42.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">John</text>
     </g>
     <g class="note">
       <path d="M 545 259 L 637 259 L 645 267 L 645 331 L 545 331 Z" class="note note-box" stroke-width="1"/>
@@ -252,11 +252,11 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
       <text x="595" y="280" class="note-text" font-size="11" text-anchor="middle">Bob thinks a long</text>
       <text x="595" y="293" class="note-text" text-anchor="middle" font-size="11">long time, so long</text>
       <text x="595" y="306" class="note-text" text-anchor="middle" font-size="11">that the text does</text>
-      <text x="595" y="319" class="note-text" font-size="11" text-anchor="middle">not fit on a row.</text>
+      <text x="595" y="319" class="note-text" text-anchor="middle" font-size="11">not fit on a row.</text>
     </g>
     <g class="actor">
       <rect x="50" y="427" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="125" y="459.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Alice</text>
+      <text x="125" y="459.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Alice</text>
     </g>
     <g class="actor">
       <rect x="250" y="427" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
@@ -264,7 +264,7 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="actor">
       <rect x="450" y="427" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="525" y="459.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">John</text>
+      <text x="525" y="459.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">John</text>
     </g>
   </g>
 </svg>
