@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="650" height="502" viewBox="0 0 650 502" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="672" height="478" viewBox="-50 -10 672 478" class="mermaid">
   <style>
 
 .mermaid {
@@ -211,60 +211,60 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
   </defs>
   <g class="root">
     <g class="clusters">
-      <rect x="440" y="141" width="170" height="88" rx="3" ry="3" class="loopLine" fill="none"/>
-      <line x1="125" y1="75" x2="125" y2="427" class="actor-line" stroke-width="0.5px"/>
-      <line x1="325" y1="75" x2="325" y2="427" class="actor-line" stroke-width="0.5px"/>
-      <line x1="525" y1="75" x2="525" y2="427" class="actor-line" stroke-width="0.5px"/>
+      <rect x="412" y="131" width="170" height="88" rx="3" ry="3" class="loopLine" fill="none"/>
+      <line x1="75" y1="65" x2="75" y2="393" class="actor-line" stroke-width="0.5px"/>
+      <line x1="286" y1="65" x2="286" y2="393" class="actor-line" stroke-width="0.5px"/>
+      <line x1="497" y1="65" x2="497" y2="393" class="actor-line" stroke-width="0.5px"/>
     </g>
     <g class="edgePaths">
-      <line x1="125" y1="119" x2="525" y2="119" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <path d="M 525 207 L 565 207 L 565 237 L 525 237" class="message-line" fill="none" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <line x1="525" y1="295" x2="125" y2="295" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
-      <line x1="525" y1="339" x2="325" y2="339" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
-      <line x1="325" y1="383" x2="525" y2="383" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
+      <line x1="75" y1="109" x2="497" y2="109" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
+      <path d="M 497 197 L 537 197 L 537 227 L 497 227" class="message-line" stroke-width="1.5" fill="none" marker-end="url(#arrow-filled)"/>
+      <line x1="497" y1="285" x2="75" y2="285" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
+      <line x1="497" y1="329" x2="286" y2="329" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
+      <line x1="286" y1="373" x2="497" y2="373" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
     </g>
     <g class="edgeLabels">
-      <text x="325" y="109" class="message-label" text-anchor="middle" font-size="16">Hello John, how are you?</text>
-      <text x="570" y="222" class="message-label" text-anchor="start" font-size="16">Fight against hypochondria</text>
-      <polygon points="450,141 500,141 500,154 492,161 450,161" class="labelBox"/>
-      <text x="475" y="154" class="labelText" font-size="16" text-anchor="middle">loop</text>
-      <text x="525" y="159" class="loopText" font-size="16" text-anchor="middle">[HealthCheck]</text>
-      <text x="325" y="285" class="message-label" text-anchor="middle" font-size="16">Great!</text>
-      <text x="425" y="329" class="message-label" text-anchor="middle" font-size="16">How about you?</text>
-      <text x="425" y="373" class="message-label" text-anchor="middle" font-size="16">Jolly good!</text>
+      <text x="286" y="99" class="message-label" text-anchor="middle" font-size="16">Hello John, how are you?</text>
+      <text x="542" y="212" class="message-label" font-size="16" text-anchor="start">Fight against hypochondria</text>
+      <polygon points="422,131 472,131 472,144 464,151 422,151" class="labelBox"/>
+      <text x="447" y="144" class="labelText" text-anchor="middle" font-size="16">loop</text>
+      <text x="497" y="149" class="loopText" text-anchor="middle" font-size="16">[HealthCheck]</text>
+      <text x="286" y="275" class="message-label" text-anchor="middle" font-size="16">Great!</text>
+      <text x="391.5" y="319" class="message-label" text-anchor="middle" font-size="16">How about you?</text>
+      <text x="391.5" y="363" class="message-label" font-size="16" text-anchor="middle">Jolly good!</text>
     </g>
     <g class="nodes">
 
     </g>
     <g class="actor">
-      <rect x="50" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="125" y="42.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Alice</text>
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="75" y="32.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Alice</text>
     </g>
     <g class="actor">
-      <rect x="250" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
-      <text x="325" y="42.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Bob</text>
+      <rect x="211" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="286" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Bob</text>
     </g>
     <g class="actor">
-      <rect x="450" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="525" y="42.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">John</text>
+      <rect x="422" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="497" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">John</text>
     </g>
     <g class="note">
-      <path d="M 545 222 L 637 222 L 645 230 L 645 280 L 545 280 Z" class="note note-box" fill="#EDF2AE" stroke-width="1" stroke="#666"/>
-      <path d="M 637 222 L 637 230 L 645 230" class="note" fill="none" stroke-width="1"/>
-      <text x="595" y="248" class="note-text" font-size="16" text-anchor="middle">Rational thoughts</text>
-      <text x="595" y="267" class="note-text" text-anchor="middle" font-size="16">prevail...</text>
+      <path d="M 517 212 L 609 212 L 617 220 L 617 270 L 517 270 Z" class="note note-box" stroke="#666" fill="#EDF2AE" stroke-width="1"/>
+      <path d="M 609 212 L 609 220 L 617 220" class="note" fill="none" stroke-width="1"/>
+      <text x="567" y="238" class="note-text" text-anchor="middle" font-size="16">Rational thoughts</text>
+      <text x="567" y="257" class="note-text" text-anchor="middle" font-size="16">prevail...</text>
     </g>
     <g class="actor">
-      <rect x="50" y="427" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="125" y="459.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Alice</text>
+      <rect x="0" y="393" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="75" y="425.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Alice</text>
     </g>
     <g class="actor">
-      <rect x="250" y="427" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="325" y="459.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Bob</text>
+      <rect x="211" y="393" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="286" y="425.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Bob</text>
     </g>
     <g class="actor">
-      <rect x="450" y="427" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
-      <text x="525" y="459.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">John</text>
+      <rect x="422" y="393" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="497" y="425.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">John</text>
     </g>
   </g>
 </svg>

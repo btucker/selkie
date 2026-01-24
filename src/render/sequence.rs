@@ -9,17 +9,34 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let mut doc = SvgDocument::new();
 
     // Layout constants (matching mermaid.js default theme)
-    let actor_spacing = 200.0;
+    let base_actor_spacing = 200.0;
     let actor_width = 150.0; // mermaid.js uses 150
     let actor_height = 65.0; // mermaid.js uses 65
     let message_spacing = 44.0; // mermaid.js uses ~44px
-    let margin_top = 10.0; // Small top margin (viewBox offset handles visual padding)
+    let margin_top = 0.0; // Actors start at y=0 (mermaid style - viewBox offset handles padding)
     let _margin_left = 0.0; // No left margin (handled by viewBox offset)
     let actor_box_padding = 0.0; // No padding - full width box
+    let diagram_margin_x = 50.0; // Mermaid.js default diagramMarginX
+    let diagram_margin_y = 10.0; // Mermaid.js default diagramMarginY
+    let char_width = 9.0; // Approximate character width in pixels for 16px font (trebuchet ms)
+    let wrap_padding = 10.0; // mermaid.js wrapPadding
+    let actor_margin = 50.0; // mermaid.js default actorMargin
 
     // Get actors in order
     let actors = db.get_actors_in_order();
     let messages = db.get_messages();
+
+    // Calculate dynamic actor spacing based on message text widths (mermaid.js style)
+    // Mermaid adjusts spacing to accommodate long message text
+    let actor_spacing = calculate_actor_spacing(
+        &actors,
+        messages,
+        base_actor_spacing,
+        actor_width,
+        char_width,
+        wrap_padding,
+        actor_margin,
+    );
 
     if actors.is_empty() {
         // Empty diagram
@@ -43,10 +60,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     // Calculate dimensions (mimicking mermaid.js layout)
     // mermaid.js uses negative viewBox offset for visual padding
     let content_width = (actors.len() as f64 - 1.0) * actor_spacing + actor_width;
-
-    // Add visual padding via width/viewBox (mermaid.js style)
-    let width = content_width + 100.0; // Total viewBox width with padding
-                                       // Height will be set later after we know the actual content height
+    // Height will be set later after we know the actual content height
 
     // Add theme styles
     if config.embed_css {
@@ -69,10 +83,10 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         0.0
     };
 
-    // Render title
+    // Render title (centered over content)
     if !db.diagram_title.is_empty() {
         let title_elem = SvgElement::Text {
-            x: width / 2.0,
+            x: content_width / 2.0,
             y: 25.0,
             content: db.diagram_title.clone(),
             attrs: Attrs::new()
@@ -84,9 +98,10 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         doc.add_element(title_elem);
     }
 
-    // Calculate actor positions (with padding offset for visual alignment)
-    let padding_x = 50.0; // Horizontal padding offset
-    let padding_y = margin_top; // Vertical padding offset
+    // Calculate actor positions
+    // Content starts at (0,0) - visual padding achieved via negative viewBox offset (mermaid style)
+    let padding_x = 0.0; // Content coordinate origin
+    let padding_y = margin_top; // Content coordinate origin
 
     let actor_y = padding_y + title_offset;
     let lifeline_start_y = actor_y + actor_height;
@@ -363,7 +378,10 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     }
 
     // Calculate final bottom actor position based on actual content
-    let bottom_actor_y = current_y;
+    // Mermaid uses boxMargin * 2 (~20px) between last content and bottom actors
+    // We subtract extra message_spacing and add boxMargin to match
+    let box_margin = 10.0; // mermaid.js default boxMargin
+    let bottom_actor_y = last_message_y.unwrap_or(current_y) + box_margin * 2.0;
     let lifeline_end_y = bottom_actor_y;
 
     // Render lifelines and bottom actors now that we know the final height
@@ -402,9 +420,17 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         doc.add_cluster(activation);
     }
 
-    // Set final SVG dimensions
-    let height = bottom_actor_y + actor_height + margin_top;
-    doc.set_size(width, height);
+    // Set final SVG dimensions with mermaid-style viewBox offset for visual padding
+    // Mermaid uses viewBox="-50 -10 width height" to create visual padding around content
+    let content_height = bottom_actor_y + actor_height;
+    let total_width = content_width + 2.0 * diagram_margin_x;
+    let total_height = content_height + 2.0 * diagram_margin_y;
+    doc.set_size_with_origin(
+        -diagram_margin_x,
+        -diagram_margin_y,
+        total_width,
+        total_height,
+    );
 
     Ok(doc.to_string())
 }
@@ -1350,4 +1376,62 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
         activation_bkg_color = theme.activation_bkg_color,
         activation_border_color = theme.activation_border_color,
     )
+}
+
+/// Calculate dynamic actor spacing based on message text widths
+/// Mimics mermaid.js getMaxMessageWidthPerActor and calculateActorMargins logic
+fn calculate_actor_spacing(
+    actors: &[&crate::diagrams::sequence::Actor],
+    messages: &[crate::diagrams::sequence::Message],
+    base_spacing: f64,
+    actor_width: f64,
+    char_width: f64,
+    wrap_padding: f64,
+    actor_margin: f64,
+) -> f64 {
+    // Build actor name to index mapping
+    let actor_index: std::collections::HashMap<&str, usize> = actors
+        .iter()
+        .enumerate()
+        .map(|(i, a)| (a.name.as_str(), i))
+        .collect();
+
+    // Calculate max message width per actor (between adjacent actors)
+    let mut max_width_per_actor: Vec<f64> = vec![0.0; actors.len()];
+
+    for msg in messages {
+        // Get from and to indices (handling Option<String>)
+        let from_idx = msg
+            .from
+            .as_ref()
+            .and_then(|f| actor_index.get(f.as_str()).copied());
+        let to_idx = msg
+            .to
+            .as_ref()
+            .and_then(|t| actor_index.get(t.as_str()).copied());
+
+        if let (Some(from), Some(to)) = (from_idx, to_idx) {
+            if from != to {
+                // Calculate message text width
+                let text_width =
+                    msg.message.chars().count() as f64 * char_width + 2.0 * wrap_padding;
+
+                // Determine which actor to assign the width to (the one with the smaller index)
+                let min_idx = std::cmp::min(from, to);
+                let current_max: f64 = max_width_per_actor[min_idx];
+                max_width_per_actor[min_idx] = current_max.max(text_width);
+            }
+        }
+    }
+
+    // Calculate required spacing: max of base_spacing or (message_width + actor_margin - actor_width/2)
+    let mut max_required_spacing = base_spacing;
+    for width in max_width_per_actor {
+        if width > 0.0 {
+            let required = width + actor_margin - actor_width / 2.0;
+            max_required_spacing = max_required_spacing.max(required);
+        }
+    }
+
+    max_required_spacing
 }

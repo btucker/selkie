@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1250" height="1294" viewBox="0 0 1250 1294" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1305" height="1270" viewBox="-50 -10 1305 1270" class="mermaid">
   <style>
 
 .mermaid {
@@ -211,170 +211,170 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
   </defs>
   <g class="root">
     <g class="clusters">
-      <line x1="40" y1="603" x2="610" y2="603" class="loopLine" stroke-dasharray="3,3"/>
-      <line x1="450" y1="823" x2="1200" y2="823" class="loopLine" stroke-dasharray="3,3"/>
-      <rect x="450" y="669" width="750" height="220" rx="3" ry="3" class="loopLine" fill="none"/>
-      <rect x="450" y="933" width="750" height="132" rx="3" ry="3" class="loopLine" fill="none"/>
-      <rect x="40" y="449" width="1170" height="748" rx="3" ry="3" class="loopLine" fill="none"/>
-      <line x1="125" y1="75" x2="125" y2="1219" class="actor-line" stroke-width="0.5px"/>
-      <line x1="325" y1="75" x2="325" y2="1219" class="actor-line" stroke-width="0.5px"/>
-      <line x1="525" y1="75" x2="525" y2="1219" class="actor-line" stroke-width="0.5px"/>
-      <line x1="725" y1="75" x2="725" y2="1219" class="actor-line" stroke-width="0.5px"/>
-      <line x1="925" y1="75" x2="925" y2="1219" class="actor-line" stroke-width="0.5px"/>
-      <line x1="1125" y1="75" x2="1125" y2="1219" class="actor-line" stroke-width="0.5px"/>
-      <rect x="720" y="295" width="10" height="132" rx="1" ry="1" class="activation"/>
-      <rect x="920" y="647" width="10" height="264" rx="1" ry="1" class="activation"/>
-      <rect x="520" y="207" width="10" height="924" rx="1" ry="1" class="activation"/>
-      <rect x="320" y="163" width="10" height="1012" rx="1" ry="1" class="activation"/>
+      <line x1="-10" y1="593" x2="582" y2="593" class="loopLine" stroke-dasharray="3,3"/>
+      <line x1="422" y1="813" x2="1205" y2="813" class="loopLine" stroke-dasharray="3,3"/>
+      <rect x="422" y="659" width="783" height="220" rx="3" ry="3" class="loopLine" fill="none"/>
+      <rect x="422" y="923" width="783" height="132" rx="3" ry="3" class="loopLine" fill="none"/>
+      <rect x="-10" y="439" width="1225" height="748" rx="3" ry="3" class="loopLine" fill="none"/>
+      <line x1="75" y1="65" x2="75" y2="1185" class="actor-line" stroke-width="0.5px"/>
+      <line x1="286" y1="65" x2="286" y2="1185" class="actor-line" stroke-width="0.5px"/>
+      <line x1="497" y1="65" x2="497" y2="1185" class="actor-line" stroke-width="0.5px"/>
+      <line x1="708" y1="65" x2="708" y2="1185" class="actor-line" stroke-width="0.5px"/>
+      <line x1="919" y1="65" x2="919" y2="1185" class="actor-line" stroke-width="0.5px"/>
+      <line x1="1130" y1="65" x2="1130" y2="1185" class="actor-line" stroke-width="0.5px"/>
+      <rect x="703" y="285" width="10" height="132" rx="1" ry="1" class="activation"/>
+      <rect x="914" y="637" width="10" height="264" rx="1" ry="1" class="activation"/>
+      <rect x="492" y="197" width="10" height="924" rx="1" ry="1" class="activation"/>
+      <rect x="281" y="153" width="10" height="1012" rx="1" ry="1" class="activation"/>
     </g>
     <g class="edgePaths">
-      <line x1="125" y1="163" x2="325" y2="163" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <circle cx="125" cy="163" r="11" class="sequenceNumber-circle"/>
-      <line x1="325" y1="207" x2="525" y2="207" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <circle cx="325" cy="207" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="295" x2="725" y2="295" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <circle cx="525" cy="295" r="11" class="sequenceNumber-circle"/>
-      <line x1="725" y1="339" x2="925" y2="339" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
-      <circle cx="725" cy="339" r="11" class="sequenceNumber-circle"/>
-      <line x1="925" y1="383" x2="725" y2="383" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="5,5" stroke-width="1.5"/>
-      <circle cx="925" cy="383" r="11" class="sequenceNumber-circle"/>
-      <line x1="725" y1="427" x2="525" y2="427" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
-      <circle cx="725" cy="427" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="515" x2="325" y2="515" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="5,5" stroke-width="1.5"/>
-      <circle cx="525" cy="515" r="11" class="sequenceNumber-circle"/>
-      <line x1="325" y1="559" x2="125" y2="559" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="5,5" stroke-width="1.5"/>
-      <circle cx="325" cy="559" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="647" x2="925" y2="647" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <circle cx="525" cy="647" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="735" x2="1125" y2="735" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
-      <circle cx="525" cy="735" r="11" class="sequenceNumber-circle"/>
-      <line x1="1125" y1="779" x2="525" y2="779" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
-      <circle cx="1125" cy="779" r="11" class="sequenceNumber-circle"/>
-      <path d="M 525 867 L 565 867 L 565 897 L 525 897" class="message-line" stroke-dasharray="5,5" fill="none" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
-      <circle cx="525" cy="867" r="11" class="sequenceNumber-circle"/>
-      <line x1="925" y1="911" x2="525" y2="911" class="message-line" stroke-dasharray="5,5" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <circle cx="925" cy="911" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="999" x2="1125" y2="999" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <circle cx="525" cy="999" r="11" class="sequenceNumber-circle"/>
-      <line x1="1125" y1="1043" x2="525" y2="1043" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
-      <circle cx="1125" cy="1043" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="1131" x2="325" y2="1131" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
-      <circle cx="525" cy="1131" r="11" class="sequenceNumber-circle"/>
-      <line x1="325" y1="1175" x2="125" y2="1175" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
-      <circle cx="325" cy="1175" r="11" class="sequenceNumber-circle"/>
+      <line x1="75" y1="153" x2="286" y2="153" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
+      <circle cx="75" cy="153" r="11" class="sequenceNumber-circle"/>
+      <line x1="286" y1="197" x2="497" y2="197" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
+      <circle cx="286" cy="197" r="11" class="sequenceNumber-circle"/>
+      <line x1="497" y1="285" x2="708" y2="285" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
+      <circle cx="497" cy="285" r="11" class="sequenceNumber-circle"/>
+      <line x1="708" y1="329" x2="919" y2="329" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
+      <circle cx="708" cy="329" r="11" class="sequenceNumber-circle"/>
+      <line x1="919" y1="373" x2="708" y2="373" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="5,5" stroke-width="1.5"/>
+      <circle cx="919" cy="373" r="11" class="sequenceNumber-circle"/>
+      <line x1="708" y1="417" x2="497" y2="417" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5" stroke-dasharray="5,5"/>
+      <circle cx="708" cy="417" r="11" class="sequenceNumber-circle"/>
+      <line x1="497" y1="505" x2="286" y2="505" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
+      <circle cx="497" cy="505" r="11" class="sequenceNumber-circle"/>
+      <line x1="286" y1="549" x2="75" y2="549" class="message-line" stroke-dasharray="5,5" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
+      <circle cx="286" cy="549" r="11" class="sequenceNumber-circle"/>
+      <line x1="497" y1="637" x2="919" y2="637" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
+      <circle cx="497" cy="637" r="11" class="sequenceNumber-circle"/>
+      <line x1="497" y1="725" x2="1130" y2="725" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
+      <circle cx="497" cy="725" r="11" class="sequenceNumber-circle"/>
+      <line x1="1130" y1="769" x2="497" y2="769" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5" stroke-dasharray="5,5"/>
+      <circle cx="1130" cy="769" r="11" class="sequenceNumber-circle"/>
+      <path d="M 497 857 L 537 857 L 537 887 L 497 887" class="message-line" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" fill="none"/>
+      <circle cx="497" cy="857" r="11" class="sequenceNumber-circle"/>
+      <line x1="919" y1="901" x2="497" y2="901" class="message-line" stroke-dasharray="5,5" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
+      <circle cx="919" cy="901" r="11" class="sequenceNumber-circle"/>
+      <line x1="497" y1="989" x2="1130" y2="989" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
+      <circle cx="497" cy="989" r="11" class="sequenceNumber-circle"/>
+      <line x1="1130" y1="1033" x2="497" y2="1033" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5" stroke-dasharray="5,5"/>
+      <circle cx="1130" cy="1033" r="11" class="sequenceNumber-circle"/>
+      <line x1="497" y1="1121" x2="286" y2="1121" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
+      <circle cx="497" cy="1121" r="11" class="sequenceNumber-circle"/>
+      <line x1="286" y1="1165" x2="75" y2="1165" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
+      <circle cx="286" cy="1165" r="11" class="sequenceNumber-circle"/>
     </g>
     <g class="edgeLabels">
-      <text x="125" y="167" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">1</text>
-      <text x="225" y="153" class="message-label" text-anchor="middle" font-size="16">Click Checkout</text>
-      <text x="325" y="211" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">2</text>
-      <text x="425" y="197" class="message-label" font-size="16" text-anchor="middle">POST /checkout</text>
-      <text x="525" y="299" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">3</text>
-      <text x="625" y="285" class="message-label" font-size="16" text-anchor="middle">Verify session</text>
-      <text x="725" y="343" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">4</text>
-      <text x="825" y="329" class="message-label" font-size="16" text-anchor="middle">Query user</text>
-      <text x="925" y="387" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">5</text>
-      <text x="825" y="373" class="message-label" text-anchor="middle" font-size="16">User record</text>
-      <text x="725" y="431" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">6</text>
-      <text x="625" y="417" class="message-label" text-anchor="middle" font-size="16">Session valid</text>
-      <text x="525" y="519" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">7</text>
-      <text x="425" y="505" class="message-label" text-anchor="middle" font-size="16">Error: Empty cart</text>
-      <text x="325" y="563" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">8</text>
-      <text x="225" y="549" class="message-label" font-size="16" text-anchor="middle">Show error</text>
-      <text x="325" y="621" class="loopText" font-size="16" text-anchor="middle">[Cart Valid]</text>
-      <text x="525" y="651" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">9</text>
-      <text x="725" y="637" class="message-label" font-size="16" text-anchor="middle">Reserve inventory</text>
-      <text x="525" y="739" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">10</text>
-      <text x="825" y="725" class="message-label" font-size="16" text-anchor="middle">Queue payment job</text>
-      <text x="1125" y="783" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">11</text>
-      <text x="825" y="769" class="message-label" text-anchor="middle" font-size="16">Job queued</text>
-      <text x="825" y="841" class="loopText" text-anchor="middle" font-size="16">[Send Notifications]</text>
-      <text x="525" y="871" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">12</text>
-      <text x="570" y="882" class="message-label" font-size="16" text-anchor="start">Queue email confirmation</text>
-      <polygon points="460,669 510,669 510,682 502,689 460,689" class="labelBox"/>
-      <text x="485" y="682" class="labelText" text-anchor="middle" font-size="16">par</text>
-      <text x="825" y="687" class="loopText" font-size="16" text-anchor="middle">[Process Payment]</text>
-      <text x="925" y="915" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">13</text>
-      <text x="725" y="901" class="message-label" text-anchor="middle" font-size="16">Inventory reserved</text>
-      <text x="525" y="1003" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">14</text>
-      <text x="825" y="989" class="message-label" font-size="16" text-anchor="middle">Check payment status</text>
-      <text x="1125" y="1047" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">15</text>
-      <text x="825" y="1033" class="message-label" text-anchor="middle" font-size="16">Payment pending</text>
-      <polygon points="460,933 510,933 510,946 502,953 460,953" class="labelBox"/>
-      <text x="485" y="946" class="labelText" text-anchor="middle" font-size="16">loop</text>
-      <text x="825" y="951" class="loopText" font-size="16" text-anchor="middle">[Retry up to 3 times]</text>
-      <text x="525" y="1135" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">16</text>
-      <text x="425" y="1121" class="message-label" text-anchor="middle" font-size="16">Order confirmed</text>
-      <text x="325" y="1179" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">17</text>
-      <text x="225" y="1165" class="message-label" font-size="16" text-anchor="middle">Show confirmation</text>
-      <polygon points="50,449 100,449 100,462 92,469 50,469" class="labelBox"/>
-      <text x="75" y="462" class="labelText" font-size="16" text-anchor="middle">alt</text>
-      <text x="625" y="467" class="loopText" text-anchor="middle" font-size="16">[Cart Empty]</text>
+      <text x="75" y="157" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">1</text>
+      <text x="180.5" y="143" class="message-label" text-anchor="middle" font-size="16">Click Checkout</text>
+      <text x="286" y="201" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">2</text>
+      <text x="391.5" y="187" class="message-label" text-anchor="middle" font-size="16">POST /checkout</text>
+      <text x="497" y="289" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">3</text>
+      <text x="602.5" y="275" class="message-label" text-anchor="middle" font-size="16">Verify session</text>
+      <text x="708" y="333" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">4</text>
+      <text x="813.5" y="319" class="message-label" font-size="16" text-anchor="middle">Query user</text>
+      <text x="919" y="377" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">5</text>
+      <text x="813.5" y="363" class="message-label" font-size="16" text-anchor="middle">User record</text>
+      <text x="708" y="421" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">6</text>
+      <text x="602.5" y="407" class="message-label" text-anchor="middle" font-size="16">Session valid</text>
+      <text x="497" y="509" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">7</text>
+      <text x="391.5" y="495" class="message-label" text-anchor="middle" font-size="16">Error: Empty cart</text>
+      <text x="286" y="553" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">8</text>
+      <text x="180.5" y="539" class="message-label" text-anchor="middle" font-size="16">Show error</text>
+      <text x="286" y="611" class="loopText" text-anchor="middle" font-size="16">[Cart Valid]</text>
+      <text x="497" y="641" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">9</text>
+      <text x="708" y="627" class="message-label" text-anchor="middle" font-size="16">Reserve inventory</text>
+      <text x="497" y="729" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">10</text>
+      <text x="813.5" y="715" class="message-label" font-size="16" text-anchor="middle">Queue payment job</text>
+      <text x="1130" y="773" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">11</text>
+      <text x="813.5" y="759" class="message-label" font-size="16" text-anchor="middle">Job queued</text>
+      <text x="813.5" y="831" class="loopText" font-size="16" text-anchor="middle">[Send Notifications]</text>
+      <text x="497" y="861" class="sequenceNumber" font-family="sans-serif" font-size="12" text-anchor="middle">12</text>
+      <text x="542" y="872" class="message-label" font-size="16" text-anchor="start">Queue email confirmation</text>
+      <polygon points="432,659 482,659 482,672 474,679 432,679" class="labelBox"/>
+      <text x="457" y="672" class="labelText" text-anchor="middle" font-size="16">par</text>
+      <text x="813.5" y="677" class="loopText" text-anchor="middle" font-size="16">[Process Payment]</text>
+      <text x="919" y="905" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">13</text>
+      <text x="708" y="891" class="message-label" font-size="16" text-anchor="middle">Inventory reserved</text>
+      <text x="497" y="993" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">14</text>
+      <text x="813.5" y="979" class="message-label" font-size="16" text-anchor="middle">Check payment status</text>
+      <text x="1130" y="1037" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">15</text>
+      <text x="813.5" y="1023" class="message-label" text-anchor="middle" font-size="16">Payment pending</text>
+      <polygon points="432,923 482,923 482,936 474,943 432,943" class="labelBox"/>
+      <text x="457" y="936" class="labelText" font-size="16" text-anchor="middle">loop</text>
+      <text x="813.5" y="941" class="loopText" font-size="16" text-anchor="middle">[Retry up to 3 times]</text>
+      <text x="497" y="1125" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">16</text>
+      <text x="391.5" y="1111" class="message-label" text-anchor="middle" font-size="16">Order confirmed</text>
+      <text x="286" y="1169" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">17</text>
+      <text x="180.5" y="1155" class="message-label" text-anchor="middle" font-size="16">Show confirmation</text>
+      <polygon points="0,439 50,439 50,452 42,459 0,459" class="labelBox"/>
+      <text x="25" y="452" class="labelText" text-anchor="middle" font-size="16">alt</text>
+      <text x="602.5" y="457" class="loopText" text-anchor="middle" font-size="16">[Cart Empty]</text>
     </g>
     <g class="nodes">
 
     </g>
     <g class="actor">
-      <rect x="50" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
-      <text x="125" y="42.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">User</text>
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
+      <text x="75" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">User</text>
     </g>
     <g class="actor">
-      <rect x="250" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="325" y="42.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Browser</text>
+      <rect x="211" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
+      <text x="286" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Browser</text>
     </g>
     <g class="actor">
-      <rect x="450" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
-      <text x="525" y="42.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">API</text>
+      <rect x="422" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
+      <text x="497" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">API</text>
     </g>
     <g class="actor">
-      <rect x="650" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="725" y="42.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Auth</text>
+      <rect x="633" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="708" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Auth</text>
     </g>
     <g class="actor">
-      <rect x="850" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="925" y="42.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">DB</text>
+      <rect x="844" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
+      <text x="919" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">DB</text>
     </g>
     <g class="actor">
-      <rect x="1050" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="1125" y="42.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Queue</text>
+      <rect x="1055" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="1130" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Queue</text>
     </g>
     <g class="note">
-      <path d="M 115 99 L 1127 99 L 1135 107 L 1135 139 L 115 139 Z" class="note note-box" fill="#EDF2AE" stroke="#666" stroke-width="1"/>
-      <path d="M 1127 99 L 1127 107 L 1135 107" class="note" stroke-width="1" fill="none"/>
-      <text x="625" y="125" class="note-text" font-size="16" text-anchor="middle">E-Commerce Checkout Flow</text>
+      <path d="M 65 89 L 1132 89 L 1140 97 L 1140 129 L 65 129 Z" class="note note-box" stroke="#666" stroke-width="1" fill="#EDF2AE"/>
+      <path d="M 1132 89 L 1132 97 L 1140 97" class="note" fill="none" stroke-width="1"/>
+      <text x="602.5" y="115" class="note-text" text-anchor="middle" font-size="16">E-Commerce Checkout Flow</text>
     </g>
     <g class="note">
-      <path d="M 545 231 L 637 231 L 645 239 L 645 271 L 545 271 Z" class="note note-box" fill="#EDF2AE" stroke="#666" stroke-width="1"/>
-      <path d="M 637 231 L 637 239 L 645 239" class="note" stroke-width="1" fill="none"/>
-      <text x="595" y="257" class="note-text" text-anchor="middle" font-size="16">Validate cart items</text>
+      <path d="M 517 221 L 609 221 L 617 229 L 617 261 L 517 261 Z" class="note note-box" stroke="#666" fill="#EDF2AE" stroke-width="1"/>
+      <path d="M 609 221 L 609 229 L 617 229" class="note" fill="none" stroke-width="1"/>
+      <text x="567" y="247" class="note-text" font-size="16" text-anchor="middle">Validate cart items</text>
     </g>
     <g class="note">
-      <path d="M 515 1067 L 1127 1067 L 1135 1075 L 1135 1107 L 515 1107 Z" class="note note-box" stroke-width="1" fill="#EDF2AE" stroke="#666"/>
-      <path d="M 1127 1067 L 1127 1075 L 1135 1075" class="note" fill="none" stroke-width="1"/>
-      <text x="825" y="1093" class="note-text" text-anchor="middle" font-size="16">Payment confirmed</text>
+      <path d="M 487 1057 L 1132 1057 L 1140 1065 L 1140 1097 L 487 1097 Z" class="note note-box" stroke-width="1" stroke="#666" fill="#EDF2AE"/>
+      <path d="M 1132 1057 L 1132 1065 L 1140 1065" class="note" stroke-width="1" fill="none"/>
+      <text x="813.5" y="1083" class="note-text" text-anchor="middle" font-size="16">Payment confirmed</text>
     </g>
     <g class="actor">
-      <rect x="50" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
-      <text x="125" y="1251.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">User</text>
+      <rect x="0" y="1185" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
+      <text x="75" y="1217.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">User</text>
     </g>
     <g class="actor">
-      <rect x="250" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
-      <text x="325" y="1251.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Browser</text>
+      <rect x="211" y="1185" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="286" y="1217.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Browser</text>
     </g>
     <g class="actor">
-      <rect x="450" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
-      <text x="525" y="1251.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">API</text>
+      <rect x="422" y="1185" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="497" y="1217.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">API</text>
     </g>
     <g class="actor">
-      <rect x="650" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="725" y="1251.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Auth</text>
+      <rect x="633" y="1185" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="708" y="1217.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Auth</text>
     </g>
     <g class="actor">
-      <rect x="850" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="925" y="1251.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">DB</text>
+      <rect x="844" y="1185" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
+      <text x="919" y="1217.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">DB</text>
     </g>
     <g class="actor">
-      <rect x="1050" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="1125" y="1251.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Queue</text>
+      <rect x="1055" y="1185" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="1130" y="1217.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Queue</text>
     </g>
   </g>
 </svg>
