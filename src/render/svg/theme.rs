@@ -243,6 +243,30 @@ pub struct Theme {
     pub journey_text_color: String,
     /// Journey actor colors (matching mermaid.js actorColours)
     pub journey_actor_colors: Vec<String>,
+
+    // === XY Chart colors ===
+    /// XY Chart background color
+    pub xychart_background_color: String,
+    /// XY Chart title color
+    pub xychart_title_color: String,
+    /// XY Chart x-axis title color
+    pub xychart_x_axis_title_color: String,
+    /// XY Chart x-axis label color
+    pub xychart_x_axis_label_color: String,
+    /// XY Chart x-axis tick color
+    pub xychart_x_axis_tick_color: String,
+    /// XY Chart x-axis line color
+    pub xychart_x_axis_line_color: String,
+    /// XY Chart y-axis title color
+    pub xychart_y_axis_title_color: String,
+    /// XY Chart y-axis label color
+    pub xychart_y_axis_label_color: String,
+    /// XY Chart y-axis tick color
+    pub xychart_y_axis_tick_color: String,
+    /// XY Chart y-axis line color
+    pub xychart_y_axis_line_color: String,
+    /// XY Chart plot color palette (comma-separated colors)
+    pub xychart_plot_color_palette: Vec<String>,
 }
 
 impl Default for Theme {
@@ -349,6 +373,32 @@ impl Default for Theme {
                 "#20B2AA".to_string(), // Light Sea Green
                 "#B0E0E6".to_string(), // Powder Blue
                 "#FFFFE0".to_string(), // Light Yellow
+            ],
+            // XY Chart - default theme (matching mermaid.js)
+            // mermaid.js computes primaryTextColor = invert(primaryColor)
+            // invert('#ECECFF') = '#131300' (dark olive-brown)
+            // All xychart text/line colors use primaryTextColor
+            xychart_background_color: "white".to_string(),
+            xychart_title_color: "#131300".to_string(),
+            xychart_x_axis_title_color: "#131300".to_string(),
+            xychart_x_axis_label_color: "#131300".to_string(),
+            xychart_x_axis_tick_color: "#131300".to_string(),
+            xychart_x_axis_line_color: "#131300".to_string(),
+            xychart_y_axis_title_color: "#131300".to_string(),
+            xychart_y_axis_label_color: "#131300".to_string(),
+            xychart_y_axis_tick_color: "#131300".to_string(),
+            xychart_y_axis_line_color: "#131300".to_string(),
+            xychart_plot_color_palette: vec![
+                "#ECECFF".to_string(),
+                "#8493A6".to_string(),
+                "#FFC3A0".to_string(),
+                "#DCDDE1".to_string(),
+                "#B8E994".to_string(),
+                "#D1A36F".to_string(),
+                "#C3CDE6".to_string(),
+                "#FFB6C1".to_string(),
+                "#496078".to_string(),
+                "#F8F3E3".to_string(),
             ],
         }
     }
@@ -458,6 +508,29 @@ impl Theme {
                 "#B0E0E6".to_string(),
                 "#FFFFE0".to_string(),
             ],
+            // XY Chart - dark theme
+            xychart_background_color: "#1f2020".to_string(),
+            xychart_title_color: "#ccc".to_string(),
+            xychart_x_axis_title_color: "#ccc".to_string(),
+            xychart_x_axis_label_color: "#ccc".to_string(),
+            xychart_x_axis_tick_color: "#ccc".to_string(),
+            xychart_x_axis_line_color: "#ccc".to_string(),
+            xychart_y_axis_title_color: "#ccc".to_string(),
+            xychart_y_axis_label_color: "#ccc".to_string(),
+            xychart_y_axis_tick_color: "#ccc".to_string(),
+            xychart_y_axis_line_color: "#ccc".to_string(),
+            xychart_plot_color_palette: vec![
+                "#1f2020".to_string(),
+                "#8493A6".to_string(),
+                "#FFC3A0".to_string(),
+                "#DCDDE1".to_string(),
+                "#B8E994".to_string(),
+                "#D1A36F".to_string(),
+                "#C3CDE6".to_string(),
+                "#FFB6C1".to_string(),
+                "#496078".to_string(),
+                "#F8F3E3".to_string(),
+            ],
         }
     }
 
@@ -563,6 +636,29 @@ impl Theme {
                 "#20B2AA".to_string(),
                 "#B0E0E6".to_string(),
                 "#FFFFE0".to_string(),
+            ],
+            // XY Chart - neutral theme
+            xychart_background_color: "white".to_string(),
+            xychart_title_color: "#333333".to_string(),
+            xychart_x_axis_title_color: "#333333".to_string(),
+            xychart_x_axis_label_color: "#333333".to_string(),
+            xychart_x_axis_tick_color: "#333333".to_string(),
+            xychart_x_axis_line_color: "#333333".to_string(),
+            xychart_y_axis_title_color: "#333333".to_string(),
+            xychart_y_axis_label_color: "#333333".to_string(),
+            xychart_y_axis_tick_color: "#333333".to_string(),
+            xychart_y_axis_line_color: "#333333".to_string(),
+            xychart_plot_color_palette: vec![
+                "#f0f0f0".to_string(),
+                "#808080".to_string(),
+                "#a0a0a0".to_string(),
+                "#606060".to_string(),
+                "#c0c0c0".to_string(),
+                "#707070".to_string(),
+                "#b0b0b0".to_string(),
+                "#505050".to_string(),
+                "#d0d0d0".to_string(),
+                "#404040".to_string(),
             ],
         }
     }
@@ -670,6 +766,30 @@ impl Theme {
                 "#20B2AA".to_string(),
                 "#B0E0E6".to_string(),
                 "#FFFFE0".to_string(),
+            ],
+            // XY Chart - forest theme (green palette)
+            // invert('#cde498') gives a dark purple/brown
+            xychart_background_color: "white".to_string(),
+            xychart_title_color: "#321b67".to_string(),
+            xychart_x_axis_title_color: "#321b67".to_string(),
+            xychart_x_axis_label_color: "#321b67".to_string(),
+            xychart_x_axis_tick_color: "#321b67".to_string(),
+            xychart_x_axis_line_color: "#321b67".to_string(),
+            xychart_y_axis_title_color: "#321b67".to_string(),
+            xychart_y_axis_label_color: "#321b67".to_string(),
+            xychart_y_axis_tick_color: "#321b67".to_string(),
+            xychart_y_axis_line_color: "#321b67".to_string(),
+            xychart_plot_color_palette: vec![
+                "#cde498".to_string(),
+                "#487e3a".to_string(),
+                "#6eaa49".to_string(),
+                "#13540c".to_string(),
+                "#98d439".to_string(),
+                "#4caf50".to_string(),
+                "#8bc34a".to_string(),
+                "#009688".to_string(),
+                "#00695c".to_string(),
+                "#2e7d32".to_string(),
             ],
         }
     }
@@ -790,6 +910,30 @@ impl Theme {
                 "#20B2AA".to_string(),
                 "#B0E0E6".to_string(),
                 "#FFFFE0".to_string(),
+            ],
+            // XY Chart - base theme (warm pastels)
+            // invert('#fff4dd') gives a dark blue
+            xychart_background_color: "#f4f4f4".to_string(),
+            xychart_title_color: "#000b22".to_string(),
+            xychart_x_axis_title_color: "#000b22".to_string(),
+            xychart_x_axis_label_color: "#000b22".to_string(),
+            xychart_x_axis_tick_color: "#000b22".to_string(),
+            xychart_x_axis_line_color: "#000b22".to_string(),
+            xychart_y_axis_title_color: "#000b22".to_string(),
+            xychart_y_axis_label_color: "#000b22".to_string(),
+            xychart_y_axis_tick_color: "#000b22".to_string(),
+            xychart_y_axis_line_color: "#000b22".to_string(),
+            xychart_plot_color_palette: vec![
+                "#fff4dd".to_string(),
+                "#dde4ff".to_string(),
+                "#f4ffdd".to_string(),
+                "#ffe4dd".to_string(),
+                "#e4ddff".to_string(),
+                "#ddfff4".to_string(),
+                "#fff0b3".to_string(),
+                "#ffddee".to_string(),
+                "#ddf4ff".to_string(),
+                "#f4ddff".to_string(),
             ],
         }
     }
@@ -1083,6 +1227,35 @@ marker path {{
                 "#20B2AA".to_string(),
                 "#B0E0E6".to_string(),
                 "#FFFFE0".to_string(),
+            ],
+
+            // XY Chart colors (derived from primary colors)
+            // xychart uses inverted primaryColor for text/line colors (matching mermaid.js)
+            xychart_background_color: if dark_mode {
+                bg_color.to_hex()
+            } else {
+                "white".to_string()
+            },
+            xychart_title_color: color::invert(&primary_color).to_hex(),
+            xychart_x_axis_title_color: color::invert(&primary_color).to_hex(),
+            xychart_x_axis_label_color: color::invert(&primary_color).to_hex(),
+            xychart_x_axis_tick_color: color::invert(&primary_color).to_hex(),
+            xychart_x_axis_line_color: color::invert(&primary_color).to_hex(),
+            xychart_y_axis_title_color: color::invert(&primary_color).to_hex(),
+            xychart_y_axis_label_color: color::invert(&primary_color).to_hex(),
+            xychart_y_axis_tick_color: color::invert(&primary_color).to_hex(),
+            xychart_y_axis_line_color: color::invert(&primary_color).to_hex(),
+            xychart_plot_color_palette: vec![
+                primary_color.to_hex(),
+                "#8493A6".to_string(),
+                "#FFC3A0".to_string(),
+                "#DCDDE1".to_string(),
+                "#B8E994".to_string(),
+                "#D1A36F".to_string(),
+                "#C3CDE6".to_string(),
+                "#FFB6C1".to_string(),
+                "#496078".to_string(),
+                "#F8F3E3".to_string(),
             ],
         }
     }

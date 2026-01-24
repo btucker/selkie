@@ -694,3 +694,48 @@ fn test_font_sizes_match_reference() {
         "Labels should use 14px font size (matching mermaid reference)"
     );
 }
+
+#[test]
+fn test_xychart_colors_match_reference() {
+    // Mermaid.js computes primaryTextColor as invert(primaryColor)
+    // For default theme: primaryColor = #ECECFF, so primaryTextColor = #131300
+    // xychart uses primaryTextColor for all text and axis lines
+    //
+    // Reference colors:
+    // - Background: "white"
+    // - Text/axis colors: "#131300" (invert of #ECECFF)
+    // - Bar fill: "#ECECFF" (primaryColor)
+    let input = r#"xychart-beta
+        title "Monthly Sales"
+        x-axis [Jan, Feb, Mar, Apr, May, Jun]
+        y-axis "Sales (units)" 0 --> 100
+        bar [20, 35, 45, 62, 78, 91]
+        line [15, 30, 40, 55, 70, 85]"#;
+
+    let diagram = parse(input).expect("Failed to parse xychart");
+    let svg = render(&diagram).expect("Failed to render xychart");
+
+    assert_valid_svg(&svg);
+
+    // Check that xychart uses correct text color (#131300, not #333333)
+    // The text fill should be #131300 (invert of primary color #ECECFF)
+    assert!(
+        svg.contains("fill=\"#131300\""),
+        "xychart text should use #131300 fill color (invert of #ECECFF). Got SVG:\n{}",
+        &svg[..svg.len().min(2000)]
+    );
+
+    // Check axis/tick stroke color
+    assert!(
+        svg.contains("stroke=\"#131300\""),
+        "xychart axis lines should use #131300 stroke color. Got SVG:\n{}",
+        &svg[..svg.len().min(2000)]
+    );
+
+    // Check background uses "white" (CSS color name)
+    assert!(
+        svg.contains("fill=\"white\""),
+        "xychart background should use 'white' (not #ffffff). Got SVG:\n{}",
+        &svg[..svg.len().min(2000)]
+    );
+}

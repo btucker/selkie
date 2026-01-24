@@ -75,7 +75,7 @@ pub fn render_xychart(db: &XYChartDb, config: &RenderConfig) -> Result<String> {
         rx: None,
         ry: None,
         attrs: Attrs::new()
-            .with_fill(&config.theme.background)
+            .with_fill(&config.theme.xychart_background_color)
             .with_class("xychart-background"),
     };
     doc.add_element(bg);
@@ -452,7 +452,7 @@ fn render_chart_title(doc: &mut SvgDocument, db: &XYChartDb, config: &RenderConf
                 .with_class("xychart-title")
                 .with_attr("font-size", "20")
                 .with_attr("font-weight", "bold")
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.xychart_title_color),
         };
         doc.add_element(title_elem);
     }
@@ -480,7 +480,7 @@ fn render_y_axis_shapes(
     let axis_line = SvgElement::Path {
         d: format!("M {} {} L {} {}", x1, y1, x2, y2),
         attrs: Attrs::new()
-            .with_stroke(&config.theme.line_color)
+            .with_stroke(&config.theme.xychart_y_axis_line_color)
             .with_stroke_width(2.0)
             .with_fill("none")
             .with_class("xychart-axis"),
@@ -520,7 +520,7 @@ fn render_y_axis_shapes(
                 tick_y + tick_dy
             ),
             attrs: Attrs::new()
-                .with_stroke(&config.theme.line_color)
+                .with_stroke(&config.theme.xychart_y_axis_tick_color)
                 .with_stroke_width(2.0)
                 .with_fill("none")
                 .with_class("xychart-tick"),
@@ -564,7 +564,7 @@ fn render_y_axis_text(
                     )
                     .with_class("xychart-axis-title")
                     .with_attr("font-size", "16")
-                    .with_fill(&config.theme.primary_text_color),
+                    .with_fill(&config.theme.xychart_y_axis_title_color),
             };
             doc.add_element(title);
         }
@@ -601,7 +601,7 @@ fn render_y_axis_text(
                 )
                 .with_class("xychart-axis-label")
                 .with_attr("font-size", "14")
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.xychart_y_axis_label_color),
         };
         doc.add_element(label);
     }
@@ -629,7 +629,7 @@ fn render_x_axis_shapes(
     let axis_line = SvgElement::Path {
         d: format!("M {} {} L {} {}", x1, y1, x2, y2),
         attrs: Attrs::new()
-            .with_stroke(&config.theme.line_color)
+            .with_stroke(&config.theme.xychart_x_axis_line_color)
             .with_stroke_width(2.0)
             .with_fill("none")
             .with_class("xychart-axis"),
@@ -670,7 +670,7 @@ fn render_x_axis_shapes(
                 tick_y + tick_dy
             ),
             attrs: Attrs::new()
-                .with_stroke(&config.theme.line_color)
+                .with_stroke(&config.theme.xychart_x_axis_tick_color)
                 .with_stroke_width(2.0)
                 .with_fill("none")
                 .with_class("xychart-tick"),
@@ -721,7 +721,7 @@ fn render_x_axis_text(
                     )
                     .with_class("xychart-axis-title")
                     .with_attr("font-size", "16")
-                    .with_fill(&config.theme.primary_text_color),
+                    .with_fill(&config.theme.xychart_x_axis_title_color),
             };
             doc.add_element(title_elem);
         }
@@ -755,7 +755,7 @@ fn render_x_axis_text(
                 )
                 .with_class("xychart-axis-label")
                 .with_attr("font-size", "14")
-                .with_fill(&config.theme.primary_text_color),
+                .with_fill(&config.theme.xychart_x_axis_label_color),
         };
         doc.add_element(label);
     }
@@ -907,27 +907,27 @@ fn generate_xychart_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .xychart-title {{
-  fill: {text_color};
+  fill: {title_color};
   font-family: {font_family};
 }}
 
 .xychart-axis {{
-  stroke: {line_color};
+  stroke: {axis_line_color};
   stroke-width: 2px;
 }}
 
 .xychart-axis-title {{
-  fill: {text_color};
+  fill: {axis_title_color};
   font-family: {font_family};
 }}
 
 .xychart-axis-label {{
-  fill: {text_color};
+  fill: {axis_label_color};
   font-family: {font_family};
 }}
 
 .xychart-tick {{
-  stroke: {line_color};
+  stroke: {tick_color};
   stroke-width: 2px;
 }}
 
@@ -944,9 +944,12 @@ fn generate_xychart_css(theme: &crate::render::svg::Theme) -> String {
   stroke-width: 1px;
 }}
 "#,
-        background = theme.background,
-        text_color = theme.primary_text_color,
-        line_color = theme.line_color,
+        background = theme.xychart_background_color,
+        title_color = theme.xychart_title_color,
+        axis_line_color = theme.xychart_x_axis_line_color,
+        axis_title_color = theme.xychart_x_axis_title_color,
+        axis_label_color = theme.xychart_x_axis_label_color,
+        tick_color = theme.xychart_x_axis_tick_color,
         font_family = theme.font_family,
     )
 }
