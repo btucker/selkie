@@ -10,9 +10,12 @@ use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 /// Default chart dimensions (matching mermaid.js defaults)
 const DEFAULT_WIDTH: f64 = 500.0;
 const DEFAULT_HEIGHT: f64 = 500.0;
-const PADDING: f64 = 10.0;
-const TITLE_HEIGHT: f64 = 50.0;
-const AXIS_LABEL_PADDING: f64 = 30.0;
+
+/// Mermaid.js quadrant chart defaults from defaultConfig.js
+const QUADRANT_PADDING: f64 = 5.0;
+const TITLE_PADDING: f64 = 10.0;
+const X_AXIS_LABEL_PADDING: f64 = 5.0;
+const Y_AXIS_LABEL_PADDING: f64 = 5.0;
 
 /// Default point radius
 const DEFAULT_POINT_RADIUS: f64 = 5.0;
@@ -20,7 +23,8 @@ const DEFAULT_POINT_RADIUS: f64 = 5.0;
 /// Default font sizes (matching mermaid.js)
 const TITLE_FONT_SIZE: f64 = 20.0;
 const QUADRANT_LABEL_FONT_SIZE: f64 = 16.0;
-const AXIS_LABEL_FONT_SIZE: f64 = 16.0;
+const X_AXIS_LABEL_FONT_SIZE: f64 = 16.0;
+const Y_AXIS_LABEL_FONT_SIZE: f64 = 16.0;
 const POINT_LABEL_FONT_SIZE: f64 = 12.0;
 
 /// Padding for quadrant text when points exist (text moves to top)
@@ -42,21 +46,58 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         doc.add_style(&generate_quadrant_css(&config.theme));
     }
 
-    // Calculate layout areas
-    let title_offset = if !db.title.is_empty() {
-        TITLE_HEIGHT
+    // Check if there are any points (affects axis position and layout)
+    let has_points = !db.get_points().is_empty();
+
+    // Calculate layout areas matching mermaid.js quadrantBuilder.ts
+    // X-axis position: bottom when points exist, top when no points
+    let x_axis_at_bottom = has_points;
+
+    // Axis label space calculation: padding * 2 + fontSize
+    let x_axis_space_calculation = X_AXIS_LABEL_PADDING * 2.0 + X_AXIS_LABEL_FONT_SIZE;
+    let y_axis_space_calculation = Y_AXIS_LABEL_PADDING * 2.0 + Y_AXIS_LABEL_FONT_SIZE;
+
+    // Show axes if labels are defined
+    let show_x_axis = !db.x_axis_left.is_empty() || !db.x_axis_right.is_empty();
+    let show_y_axis = !db.y_axis_bottom.is_empty() || !db.y_axis_top.is_empty();
+    let show_title = !db.title.is_empty();
+
+    // Calculate space allocations
+    let x_axis_space_top = if !x_axis_at_bottom && show_x_axis {
+        x_axis_space_calculation
+    } else {
+        0.0
+    };
+    let x_axis_space_bottom = if x_axis_at_bottom && show_x_axis {
+        x_axis_space_calculation
+    } else {
+        0.0
+    };
+    let y_axis_space_left = if show_y_axis {
+        y_axis_space_calculation
+    } else {
+        0.0
+    };
+    let title_space_top = if show_title {
+        TITLE_FONT_SIZE + TITLE_PADDING * 2.0
     } else {
         0.0
     };
 
-    // Chart area (excluding title and axis labels)
-    let chart_left = PADDING + AXIS_LABEL_PADDING;
-    let chart_top = PADDING + title_offset;
-    let chart_right = width - PADDING - AXIS_LABEL_PADDING;
-    let chart_bottom = height - PADDING - AXIS_LABEL_PADDING;
+    // Quadrant area calculation (matches mermaid.js)
+    let quadrant_left = QUADRANT_PADDING + y_axis_space_left;
+    let quadrant_top = QUADRANT_PADDING + x_axis_space_top + title_space_top;
+    let quadrant_width = width - QUADRANT_PADDING * 2.0 - y_axis_space_left; // Only left y-axis
+    let quadrant_height =
+        height - QUADRANT_PADDING * 2.0 - x_axis_space_top - x_axis_space_bottom - title_space_top;
 
-    let chart_width = chart_right - chart_left;
-    let chart_height = chart_bottom - chart_top;
+    // Alias for compatibility with existing code
+    let chart_left = quadrant_left;
+    let chart_top = quadrant_top;
+    let chart_width = quadrant_width;
+    let chart_height = quadrant_height;
+    let chart_right = chart_left + chart_width;
+    let chart_bottom = chart_top + chart_height;
 
     // Quadrant dimensions (each quadrant is half the chart)
     let quadrant_width = chart_width / 2.0;
@@ -195,9 +236,6 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
             .with_class("quadrant-border quadrant-border-horizontal"),
     });
 
-    // Check if there are any points (affects quadrant label positioning)
-    let has_points = !db.get_points().is_empty();
-
     // Render quadrant labels (part of quadrants group in reference)
     render_quadrant_labels(
         &mut doc,
@@ -235,13 +273,15 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
 
     // Render title last (matching mermaid.js reference - title appears on top)
     if !db.title.is_empty() {
+        // Title y position matches mermaid.js: titlePadding (10)
+        let title_y = TITLE_PADDING;
         let title_elem = SvgElement::Text {
             x: width / 2.0,
-            y: PADDING + TITLE_HEIGHT / 2.0,
+            y: title_y,
             content: db.title.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("dominant-baseline", "hanging") // Match mermaid's "top" horizontalPos
                 .with_class("quadrant-title")
                 .with_attr("font-size", &format!("{}", TITLE_FONT_SIZE))
                 .with_attr("font-weight", "bold")
@@ -374,12 +414,16 @@ fn render_axis_labels(
     let draw_y_labels_in_middle = !db.y_axis_top.is_empty();
 
     // X-axis Y position depends on whether there are points
+    // Mermaid.js: xAxisLabelPadding + (titleSpace if xAxisPosition === 'top')
+    // or: xAxisLabelPadding + quadrantTop + quadrantHeight + quadrantPadding
     let x_axis_y = if has_points {
         // With points: x-axis at bottom
-        chart_top + chart_height + AXIS_LABEL_PADDING / 2.0 + 5.0
+        // Position: xAxisLabelPadding + quadrantTop + quadrantHeight + quadrantPadding
+        chart_top + chart_height + QUADRANT_PADDING + X_AXIS_LABEL_PADDING
     } else {
         // No points: x-axis at top (just below title area)
-        chart_top - AXIS_LABEL_PADDING / 2.0 - 5.0
+        // Position: xAxisLabelPadding + titleSpace.top
+        X_AXIS_LABEL_PADDING
     };
 
     // X-axis left label
@@ -399,7 +443,7 @@ fn render_axis_labels(
                 .with_attr("text-anchor", text_anchor)
                 .with_attr("dominant-baseline", "middle")
                 .with_class("axis-label x-axis-left")
-                .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
+                .with_attr("font-size", &format!("{}", X_AXIS_LABEL_FONT_SIZE))
                 .with_fill(&config.theme.quadrant_x_axis_text_fill),
         });
     }
@@ -421,7 +465,7 @@ fn render_axis_labels(
                 .with_attr("text-anchor", text_anchor)
                 .with_attr("dominant-baseline", "middle")
                 .with_class("axis-label x-axis-right")
-                .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
+                .with_attr("font-size", &format!("{}", X_AXIS_LABEL_FONT_SIZE))
                 .with_fill(&config.theme.quadrant_x_axis_text_fill),
         });
     }
@@ -452,7 +496,7 @@ fn render_axis_labels(
                     &format!("rotate(-90, {}, {})", chart_left - 10.0, y_pos),
                 )
                 .with_class("axis-label y-axis-bottom")
-                .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
+                .with_attr("font-size", &format!("{}", X_AXIS_LABEL_FONT_SIZE))
                 .with_fill(&config.theme.quadrant_y_axis_text_fill),
         });
     }
@@ -483,7 +527,7 @@ fn render_axis_labels(
                     &format!("rotate(-90, {}, {})", chart_left - 10.0, y_pos),
                 )
                 .with_class("axis-label y-axis-top")
-                .with_attr("font-size", &format!("{}", AXIS_LABEL_FONT_SIZE))
+                .with_attr("font-size", &format!("{}", X_AXIS_LABEL_FONT_SIZE))
                 .with_fill(&config.theme.quadrant_y_axis_text_fill),
         });
     }

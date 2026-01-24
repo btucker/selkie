@@ -336,18 +336,20 @@ impl Default for Theme {
             sankey_link_opacity: "0.5".to_string(),
             sankey_label_color: "#333333".to_string(),
             // Quadrant chart - default theme (mermaid.js defaults derived from primaryColor #ECECFF)
+            // Text colors are computed from invert(primaryColor) = invert(#ECECFF) = #131300
+            // Then adjusted by r:-5, g:-5, b:-5 increments for each quadrant
             quadrant1_fill: "#ECECFF".to_string(),
             quadrant2_fill: "#f1f1ff".to_string(),
             quadrant3_fill: "#f6f6ff".to_string(),
             quadrant4_fill: "#fbfbff".to_string(),
             quadrant_internal_border_stroke: "#c7c7f1".to_string(),
             quadrant_external_border_stroke: "#c7c7f1".to_string(),
-            quadrant_title_fill: "#333333".to_string(),
-            quadrant_text_fill: "#333333".to_string(),
-            quadrant1_text_fill: "#343434".to_string(),
-            quadrant2_text_fill: "#2f2f2f".to_string(),
-            quadrant3_text_fill: "#2a2a2a".to_string(),
-            quadrant4_text_fill: "#252525".to_string(),
+            quadrant_title_fill: "#131300".to_string(), // invert(#ECECFF)
+            quadrant_text_fill: "#131300".to_string(),  // invert(#ECECFF)
+            quadrant1_text_fill: "#131300".to_string(), // invert(#ECECFF)
+            quadrant2_text_fill: "#0e0e00".to_string(), // adjust_rgb(#131300, -5, -5, -5)
+            quadrant3_text_fill: "#090900".to_string(), // adjust_rgb(#131300, -10, -10, -10)
+            quadrant4_text_fill: "#040400".to_string(), // adjust_rgb(#131300, -15, -15, -15)
             quadrant_point_fill: "#9370DB".to_string(),
             quadrant_point_text_fill: "#333333".to_string(),
             quadrant_x_axis_text_fill: "#333333".to_string(),
@@ -1937,6 +1939,49 @@ mod tests {
         let theme = Theme::from_directive(&config);
         // Should fall back to default theme
         assert_eq!(theme.primary_color, "#ECECFF");
+    }
+
+    #[test]
+    fn test_quadrant_text_fill_colors_match_mermaid() {
+        // Mermaid.js computes quadrant text fill colors from primaryTextColor:
+        // - primaryTextColor = invert(primaryColor) = invert(#ECECFF) = #131300
+        // - quadrant1TextFill = primaryTextColor = #131300
+        // - quadrant2TextFill = adjust(primaryTextColor, r:-5, g:-5, b:-5) = #0e0e00
+        // - quadrant3TextFill = adjust(primaryTextColor, r:-10, g:-10, b:-10) = #090900
+        // - quadrant4TextFill = adjust(primaryTextColor, r:-15, g:-15, b:-15) = #040400
+        //
+        // Note: The blue channel is already 0, so subtracting clamped to 0.
+        let theme = Theme::default();
+
+        // primaryColor = #ECECFF = RGB(236, 236, 255)
+        // Inverted = RGB(255-236, 255-236, 255-255) = RGB(19, 19, 0) = #131300
+        assert_eq!(
+            theme.quadrant1_text_fill.to_lowercase(),
+            "#131300",
+            "quadrant1_text_fill should be inverted primaryColor"
+        );
+
+        // quadrant2TextFill = RGB(19-5, 19-5, 0-5) = RGB(14, 14, 0) = #0e0e00
+        // (blue clamps to 0)
+        assert_eq!(
+            theme.quadrant2_text_fill.to_lowercase(),
+            "#0e0e00",
+            "quadrant2_text_fill should be adjust(primaryTextColor, r:-5, g:-5, b:-5)"
+        );
+
+        // quadrant3TextFill = RGB(19-10, 19-10, 0-10) = RGB(9, 9, 0) = #090900
+        assert_eq!(
+            theme.quadrant3_text_fill.to_lowercase(),
+            "#090900",
+            "quadrant3_text_fill should be adjust(primaryTextColor, r:-10, g:-10, b:-10)"
+        );
+
+        // quadrant4TextFill = RGB(19-15, 19-15, 0-15) = RGB(4, 4, 0) = #040400
+        assert_eq!(
+            theme.quadrant4_text_fill.to_lowercase(),
+            "#040400",
+            "quadrant4_text_fill should be adjust(primaryTextColor, r:-15, g:-15, b:-15)"
+        );
     }
 
     #[test]

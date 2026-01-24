@@ -327,6 +327,18 @@ pub fn invert(color: &Color) -> Color {
     Color::rgba(255 - color.r, 255 - color.g, 255 - color.b, color.a)
 }
 
+/// Adjust a color's RGB values directly (mermaid.js adjust with r, g, b params)
+/// This is different from HSL adjustment - it directly modifies RGB components.
+/// Clamping is applied to keep values in [0, 255] range.
+pub fn adjust_rgb(color: &Color, r: i16, g: i16, b: i16) -> Color {
+    Color::rgba(
+        ((color.r as i16 + r).clamp(0, 255)) as u8,
+        ((color.g as i16 + g).clamp(0, 255)) as u8,
+        ((color.b as i16 + b).clamp(0, 255)) as u8,
+        color.a,
+    )
+}
+
 /// Add or modify the alpha channel
 pub fn with_alpha(color: &Color, alpha: f64) -> Color {
     Color::rgba(color.r, color.g, color.b, alpha)
@@ -485,5 +497,30 @@ mod tests {
         let light_bg = Color::rgb(200, 200, 200);
         let text = contrasting_text(&light_bg);
         assert_eq!(text, Color::rgb(0, 0, 0));
+    }
+
+    #[test]
+    fn test_adjust_rgb() {
+        // Start with RGB(19, 19, 0) = #131300 (inverted primaryColor)
+        let c = Color::rgb(19, 19, 0);
+
+        // Adjust by (-5, -5, -5) should give RGB(14, 14, 0) = #0e0e00
+        // Blue clamped at 0
+        let adjusted = adjust_rgb(&c, -5, -5, -5);
+        assert_eq!(adjusted.r, 14);
+        assert_eq!(adjusted.g, 14);
+        assert_eq!(adjusted.b, 0); // Clamped at 0
+
+        // Adjust by (-10, -10, -10) should give RGB(9, 9, 0) = #090900
+        let adjusted = adjust_rgb(&c, -10, -10, -10);
+        assert_eq!(adjusted.r, 9);
+        assert_eq!(adjusted.g, 9);
+        assert_eq!(adjusted.b, 0);
+
+        // Adjust by (-15, -15, -15) should give RGB(4, 4, 0) = #040400
+        let adjusted = adjust_rgb(&c, -15, -15, -15);
+        assert_eq!(adjusted.r, 4);
+        assert_eq!(adjusted.g, 4);
+        assert_eq!(adjusted.b, 0);
     }
 }
