@@ -457,20 +457,19 @@ fn generate_kanban_css(config: &RenderConfig) -> String {
 
     // Generate section colors (matching mermaid.js theme)
     let mut section_css = String::new();
-    for i in 0..12 {
-        let hue = SECTION_HUES[i];
+    for (i, &hue) in SECTION_HUES.iter().enumerate() {
         // Mermaid uses ~86% lightness and 100% saturation for section fills
         let lightness = 86.3;
         let saturation = 100.0;
         section_css.push_str(&format!(
             r#"
-.section-{i} {{
+.section-{section_num} {{
   fill: hsl({hue}, {saturation}%, {lightness}%);
   stroke: hsl({hue}, {saturation}%, {lightness}%);
   stroke-width: 1px;
 }}
 "#,
-            i = i + 1, // Sections are numbered starting from 1
+            section_num = i + 1, // Sections are numbered starting from 1
             hue = hue,
             saturation = saturation,
             lightness = lightness
