@@ -137,74 +137,74 @@
     <g class="nodes">
       <g class="sections">
         <g class="cluster section-1" id="id1">
-          <rect x="0" y="0" width="200" height="152" rx="5" ry="5" class="section section-1 "/>
-          <text x="100" y="22" class="section-label" text-anchor="middle" dominant-baseline="middle">Todo</text>
+          <rect x="0" y="0" width="200" height="152" rx="5" ry="5" class="section section-1 " style="fill:hsl(80, 100%, 86.27%);stroke:hsl(80, 100%, 86.27%)"/>
+          <text x="100" y="22" class="section-label" dominant-baseline="middle" text-anchor="middle">Todo</text>
         </g>
         <g class="cluster section-2" id="id7">
-          <rect x="205" y="0" width="200" height="248" rx="5" ry="5" class="section section-2 "/>
+          <rect x="205" y="0" width="200" height="248" rx="5" ry="5" class="section section-2 " style="fill:hsl(270, 100%, 86.27%);stroke:hsl(270, 100%, 86.27%)"/>
           <text x="305" y="22" class="section-label" text-anchor="middle" dominant-baseline="middle">In progress</text>
         </g>
         <g class="cluster section-3" id="id9">
-          <rect x="410" y="0" width="200" height="50" rx="5" ry="5" class="section section-3 "/>
-          <text x="510" y="22" class="section-label" dominant-baseline="middle" text-anchor="middle">Ready for deploy</text>
+          <rect x="410" y="0" width="200" height="50" rx="5" ry="5" class="section section-3 " style="fill:hsl(300, 100%, 86.27%);stroke:hsl(300, 100%, 86.27%)"/>
+          <text x="510" y="22" class="section-label" text-anchor="middle" dominant-baseline="middle">Ready for deploy</text>
         </g>
         <g class="cluster section-4" id="id10">
-          <rect x="615" y="0" width="200" height="103" rx="5" ry="5" class="section section-4 "/>
+          <rect x="615" y="0" width="200" height="103" rx="5" ry="5" class="section section-4 " style="fill:hsl(330, 100%, 86.27%);stroke:hsl(330, 100%, 86.27%)"/>
           <text x="715" y="22" class="section-label" dominant-baseline="middle" text-anchor="middle">Ready for test</text>
         </g>
         <g class="cluster section-5" id="id11">
-          <rect x="820" y="0" width="200" height="297" rx="5" ry="5" class="section section-5 "/>
+          <rect x="820" y="0" width="200" height="297" rx="5" ry="5" class="section section-5 " style="fill:hsl(0, 100%, 86.27%);stroke:hsl(0, 100%, 86.27%)"/>
           <text x="920" y="22" class="section-label" text-anchor="middle" dominant-baseline="middle">Done</text>
         </g>
         <g class="cluster section-6" id="id12">
-          <rect x="1025" y="0" width="200" height="103" rx="5" ry="5" class="section section-6 "/>
-          <text x="1125" y="22" class="section-label" text-anchor="middle" dominant-baseline="middle">Can&apos;t reproduce</text>
+          <rect x="1025" y="0" width="200" height="103" rx="5" ry="5" class="section section-6 " style="fill:hsl(30, 100%, 86.27%);stroke:hsl(30, 100%, 86.27%)"/>
+          <text x="1125" y="22" class="section-label" dominant-baseline="middle" text-anchor="middle">Can&apos;t reproduce</text>
         </g>
       </g>
       <g class="items">
         <g class="node kanban-item-group" transform="translate(10, 25)">
-          <rect x="0" y="0" width="180" height="44" rx="5" ry="5" class="kanban-item "/>
-          <text x="90" y="22" class="kanban-label" text-anchor="middle" dominant-baseline="middle">Create Documentation</text>
+          <rect x="0" y="0" width="180" height="44" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
+          <text x="90" y="22" class="kanban-label" dominant-baseline="middle" text-anchor="middle">Create Documentation</text>
         </g>
         <g class="node kanban-item-group" transform="translate(10, 74)">
-          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item "/>
+          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
           <text x="90" y="10" text-anchor="middle" class="kanban-label"><tspan x="90" dy="0.5em">Create Blog about</tspan><tspan x="90" dy="1.2em">the new diagram</tspan></text>
         </g>
         <g class="node kanban-item-group" transform="translate(215, 25)">
-          <rect x="0" y="0" width="180" height="140" rx="5" ry="5" class="kanban-item "/>
+          <rect x="0" y="0" width="180" height="140" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
           <text x="90" y="10" text-anchor="middle" class="kanban-label"><tspan x="90" dy="0.5em">Create renderer so</tspan><tspan x="90" dy="1.2em">that it works in all</tspan><tspan x="90" dy="1.2em">cases. We also add</tspan><tspan x="90" dy="1.2em">some extra text here</tspan><tspan x="90" dy="1.2em">for testing</tspan><tspan x="90" dy="1.2em">purposes.</tspan></text>
         </g>
         <g class="node kanban-item-group" transform="translate(215, 170)">
-          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item "/>
-          <text x="90" y="22" class="kanban-label" text-anchor="middle" dominant-baseline="middle">Design grammar</text>
+          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
+          <text x="90" y="22" class="kanban-label" dominant-baseline="middle" text-anchor="middle">Design grammar</text>
           <text x="170" y="46" class="kanban-assigned" font-size="12px" text-anchor="end">knsv</text>
         </g>
         <g class="node kanban-item-group" transform="translate(625, 25)">
-          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item "/>
-          <line x1="2" y1="2.5" x2="2" y2="65.5" class="priority-indicator" stroke="orange" stroke-width="4"/>
+          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
+          <line x1="2" y1="2.5" x2="2" y2="65.5" class="priority-indicator" stroke-width="4" stroke="orange"/>
           <text x="90" y="22" class="kanban-label" text-anchor="middle" dominant-baseline="middle">Create parsing tests</text>
-          <text x="10" y="46" class="kanban-ticket" font-size="12px" text-anchor="start">MC-2038</text>
+          <text x="10" y="46" class="kanban-ticket" text-anchor="start" font-size="12px">MC-2038</text>
           <text x="170" y="46" class="kanban-assigned" font-size="12px" text-anchor="end">K.Sveidqvist</text>
         </g>
         <g class="node kanban-item-group" transform="translate(830, 25)">
-          <rect x="0" y="0" width="180" height="44" rx="5" ry="5" class="kanban-item "/>
-          <text x="90" y="22" class="kanban-label" dominant-baseline="middle" text-anchor="middle">define getData</text>
+          <rect x="0" y="0" width="180" height="44" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
+          <text x="90" y="22" class="kanban-label" text-anchor="middle" dominant-baseline="middle">define getData</text>
         </g>
         <g class="node kanban-item-group" transform="translate(830, 74)">
-          <rect x="0" y="0" width="180" height="140" rx="5" ry="5" class="kanban-item "/>
-          <line x1="2" y1="2.5" x2="2" y2="137.5" class="priority-indicator" stroke-width="4" stroke="red"/>
+          <rect x="0" y="0" width="180" height="140" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
+          <line x1="2" y1="2.5" x2="2" y2="137.5" class="priority-indicator" stroke="red" stroke-width="4"/>
           <text x="90" y="10" text-anchor="middle" class="kanban-label"><tspan x="90" dy="0.5em">Title of diagram is</tspan><tspan x="90" dy="1.2em">more than 100 chars</tspan><tspan x="90" dy="1.2em">when user duplicates</tspan><tspan x="90" dy="1.2em">diagram</tspan></text>
           <text x="10" y="118" class="kanban-ticket" font-size="12px" text-anchor="start">MC-2036</text>
         </g>
         <g class="node kanban-item-group" transform="translate(830, 219)">
-          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item "/>
-          <line x1="2" y1="2.5" x2="2" y2="65.5" class="priority-indicator" stroke="orange" stroke-width="4"/>
-          <text x="90" y="22" class="kanban-label" dominant-baseline="middle" text-anchor="middle">Update DB function</text>
-          <text x="10" y="46" class="kanban-ticket" text-anchor="start" font-size="12px">MC-2037</text>
-          <text x="170" y="46" class="kanban-assigned" text-anchor="end" font-size="12px">knsv</text>
+          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
+          <line x1="2" y1="2.5" x2="2" y2="65.5" class="priority-indicator" stroke-width="4" stroke="orange"/>
+          <text x="90" y="22" class="kanban-label" text-anchor="middle" dominant-baseline="middle">Update DB function</text>
+          <text x="10" y="46" class="kanban-ticket" font-size="12px" text-anchor="start">MC-2037</text>
+          <text x="170" y="46" class="kanban-assigned" font-size="12px" text-anchor="end">knsv</text>
         </g>
         <g class="node kanban-item-group" transform="translate(1035, 25)">
-          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item "/>
+          <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
           <text x="90" y="10" text-anchor="middle" class="kanban-label"><tspan x="90" dy="0.5em">Weird flickering in</tspan><tspan x="90" dy="1.2em">Firefox</tspan></text>
         </g>
       </g>

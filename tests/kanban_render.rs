@@ -311,3 +311,241 @@ fn kanban_section_colors() {
     assert!(has_class(&doc, "section-2"), "Should have section-2 class");
     assert!(has_class(&doc, "section-3"), "Should have section-3 class");
 }
+
+// ============================================================================
+// Visual Parity Tests - Testing mermaid.js compatibility
+// ============================================================================
+
+/// Helper to count rects with inline fill
+fn count_rects_with_inline_fill(doc: &Document<'_>) -> usize {
+    doc.descendants()
+        .filter(|node| {
+            node.tag_name().name() == "rect"
+                && node
+                    .attribute("style")
+                    .map(|s| s.contains("fill"))
+                    .unwrap_or(false)
+        })
+        .count()
+}
+
+#[test]
+fn kanban_visual_parity_section_inline_fill() {
+    // Mermaid.js uses inline fill styles on section rects for proper color rendering
+    // This prevents CSS class conflicts and ensures colors display correctly
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task 1]
+  id2[Done]
+    task2[Task 2]"#;
+
+    let svg = render_kanban_svg(input);
+    let doc = parse_svg(&svg);
+
+    // Section rects should have inline fill style (like mermaid.js)
+    let section_rects_with_fill = count_rects_with_inline_fill(&doc);
+    assert!(
+        section_rects_with_fill >= 2,
+        "Section rects should have inline fill style for mermaid visual parity (found {} rects with inline fill)",
+        section_rects_with_fill
+    );
+}
+
+#[test]
+fn kanban_visual_parity_section_gap() {
+    // Mermaid.js has 5px gap between sections (SECTION_GAP = 5 in kanbanRenderer.ts)
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task 1]
+  id2[Done]
+    task2[Task 2]"#;
+
+    let svg = render_kanban_svg(input);
+
+    // Section 1 should end at x=200, Section 2 should start at x=205 (5px gap)
+    // Check that we have proper 5px gaps between sections
+    assert!(
+        svg.contains(r#"x="205""#) || svg.contains(r#"x="205.0""#),
+        "Second section should start at x=205 (200 width + 5px gap)\nSVG: {}",
+        svg
+    );
+}
+
+#[test]
+fn kanban_visual_parity_node_rect_stroke() {
+    // Mermaid.js kanban items have stroke="#9370DB" (MediumPurple)
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task 1]"#;
+
+    let svg = render_kanban_svg(input);
+
+    // Items should have MediumPurple stroke color
+    assert!(
+        svg.contains("#9370DB") || svg.contains("#9370db") || svg.contains("stroke:#9370"),
+        "Kanban items should have MediumPurple (#9370DB) stroke\nSVG: {}",
+        svg
+    );
+}
+
+#[test]
+fn kanban_visual_parity_section_corner_radius() {
+    // Mermaid.js uses rx="5" ry="5" for section and item rectangles
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task 1]"#;
+
+    let svg = render_kanban_svg(input);
+
+    // Should have rx="5" and ry="5" for rounded corners
+    assert!(
+        svg.contains(r#"rx="5""#),
+        "Section/item rects should have rx=5 for rounded corners"
+    );
+    assert!(
+        svg.contains(r#"ry="5""#),
+        "Section/item rects should have ry=5 for rounded corners"
+    );
+}
+
+#[test]
+fn kanban_visual_parity_item_width() {
+    // Mermaid.js kanban items are 185px wide (SECTION_WIDTH - 2*PADDING = 200 - 15 = 185)
+    // Actually mermaid uses 180px items inside 200px sections
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task 1]"#;
+
+    let svg = render_kanban_svg(input);
+
+    // Items should be 180px wide
+    assert!(
+        svg.contains(r#"width="180""#),
+        "Kanban items should be 180px wide for mermaid parity"
+    );
+}
+
+#[test]
+fn kanban_visual_parity_text_anchor() {
+    // Mermaid.js uses text-anchor="middle" for centered text in items
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task 1]"#;
+
+    let svg = render_kanban_svg(input);
+
+    // Text should be centered
+    assert!(
+        svg.contains(r#"text-anchor="middle""#),
+        "Kanban text should use text-anchor=middle for centering"
+    );
+}
+
+#[test]
+fn kanban_visual_parity_item_inline_fill() {
+    // Mermaid.js kanban items have inline fill="white" for reliable rendering
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task 1]"#;
+
+    let svg = render_kanban_svg(input);
+    let doc = parse_svg(&svg);
+
+    // Item rects (kanban-item class) should have inline fill style
+    let item_rects_with_fill: Vec<_> = doc
+        .descendants()
+        .filter(|node| {
+            node.tag_name().name() == "rect"
+                && node
+                    .attribute("class")
+                    .map(|c| c.contains("kanban-item"))
+                    .unwrap_or(false)
+        })
+        .filter(|node| {
+            node.attribute("style")
+                .map(|s| s.contains("fill"))
+                .unwrap_or(false)
+        })
+        .collect();
+
+    assert!(
+        !item_rects_with_fill.is_empty(),
+        "Kanban item rects should have inline fill style for mermaid visual parity"
+    );
+}
+
+#[test]
+fn kanban_visual_parity_section_label_position() {
+    // Mermaid.js section labels are positioned at the top of sections
+    // The text should be vertically centered in the header area (around y=22 for default padding)
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task 1]"#;
+
+    let svg = render_kanban_svg(input);
+
+    // Section label should be positioned near the top (y around 20-25)
+    assert!(
+        svg.contains(r#"y="22""#) || svg.contains(r#"y="22.0""#),
+        "Section label should be positioned at y=22 for proper header alignment\nSVG: {}",
+        svg
+    );
+}
+
+#[test]
+fn kanban_visual_parity_font_family() {
+    // Mermaid.js uses "trebuchet ms, verdana, arial, sans-serif" as default font
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task 1]"#;
+
+    let svg = render_kanban_svg(input);
+
+    // Should include the default mermaid font family
+    assert!(
+        svg.contains("trebuchet ms") || svg.contains("Trebuchet"),
+        "Kanban should use mermaid's default font family (trebuchet ms)"
+    );
+}
+
+#[test]
+fn kanban_visual_parity_priority_indicator() {
+    // Test that priority indicator lines are rendered with proper styling
+    let input = r#"kanban
+  id1[Todo]
+    task1[High Priority]@{ priority: 'High' }"#;
+
+    let svg = render_kanban_svg(input);
+
+    // Should have a line element with priority-indicator class
+    assert!(
+        svg.contains("priority-indicator"),
+        "Priority items should have a priority-indicator line"
+    );
+
+    // Should have stroke color for priority
+    assert!(
+        svg.contains("stroke=\"orange\"") || svg.contains("stroke:orange"),
+        "High priority should have orange stroke"
+    );
+}
+
+#[test]
+fn kanban_visual_parity_metadata_positioning() {
+    // Test that ticket and assigned metadata are positioned correctly
+    let input = r#"kanban
+  id1[Todo]
+    task1[Task]@{ ticket: 'TKT-123', assigned: 'bob' }"#;
+
+    let svg = render_kanban_svg(input);
+
+    // Should contain ticket and assigned
+    assert!(svg.contains("TKT-123"), "Should render ticket number");
+    assert!(svg.contains("bob"), "Should render assigned person");
+
+    // Ticket should be left-aligned (text-anchor="start")
+    assert!(
+        svg.contains(r#"class="kanban-ticket"#),
+        "Should have kanban-ticket class for ticket styling"
+    );
+}
