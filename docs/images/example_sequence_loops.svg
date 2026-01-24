@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="650" height="546" viewBox="0 0 650 546" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="450" height="546" viewBox="0 0 450 546" class="mermaid">
   <style>
 
 .mermaid {
@@ -211,51 +211,45 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
   </defs>
   <g class="root">
     <g class="clusters">
+      <line x1="50" y1="295" x2="400" y2="295" class="loopLine" stroke-dasharray="3,3"/>
+      <rect x="50" y="185" width="350" height="176" rx="3" ry="3" class="loopLine" fill="none"/>
+      <rect x="50" y="361" width="350" height="88" rx="3" ry="3" class="loopLine" fill="none"/>
+      <rect x="40" y="97" width="370" height="352" rx="3" ry="3" class="loopLine" fill="none"/>
       <line x1="125" y1="75" x2="125" y2="471" class="actor-line" stroke-width="0.5px"/>
       <line x1="325" y1="75" x2="325" y2="471" class="actor-line" stroke-width="0.5px"/>
-      <line x1="525" y1="75" x2="525" y2="471" class="actor-line" stroke-width="0.5px"/>
-      <rect x="520" y="251" width="10" height="44" rx="1" ry="1" class="activation"/>
     </g>
     <g class="edgePaths">
-      <line x1="125" y1="119" x2="325" y2="119" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
-      <line x1="325" y1="163" x2="125" y2="163" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
-      <line x1="125" y1="251" x2="525" y2="251" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
-      <line x1="525" y1="295" x2="125" y2="295" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
-      <line x1="125" y1="339" x2="325" y2="339" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
-      <line x1="325" y1="383" x2="125" y2="383" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1"/>
+      <line x1="125" y1="163" x2="325" y2="163" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1"/>
+      <line x1="325" y1="251" x2="125" y2="251" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1"/>
+      <line x1="325" y1="339" x2="125" y2="339" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
+      <line x1="325" y1="427" x2="125" y2="427" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
     </g>
     <g class="edgeLabels">
-      <text x="225" y="109" class="message-label" font-size="16" text-anchor="middle">Hello Bob!</text>
-      <text x="225" y="153" class="message-label" text-anchor="middle" font-size="16">Hi Alice!</text>
-      <text x="325" y="241" class="message-label" text-anchor="middle" font-size="16">Login request</text>
-      <text x="325" y="285" class="message-label" font-size="16" text-anchor="middle">Token</text>
-      <text x="225" y="329" class="message-label" text-anchor="middle" font-size="16">How are you?</text>
-      <text x="225" y="373" class="message-label" font-size="16" text-anchor="middle">I&apos;m good, thanks!</text>
+      <text x="225" y="153" class="message-label" text-anchor="middle" font-size="16">Hello Bob, how are you?</text>
+      <text x="225" y="241" class="message-label" font-size="16" text-anchor="middle">Not so good :(</text>
+      <text x="225" y="313" class="loopText" font-size="16" text-anchor="middle">[is well]</text>
+      <text x="225" y="329" class="message-label" text-anchor="middle" font-size="16">Feeling fresh like a daisy</text>
+      <polygon points="60,185 110,185 110,198 102,205 60,205" class="labelBox"/>
+      <text x="85" y="198" class="labelText" font-size="16" text-anchor="middle">alt</text>
+      <text x="225" y="203" class="loopText" font-size="16" text-anchor="middle">[is sick]</text>
+      <text x="225" y="417" class="message-label" text-anchor="middle" font-size="16">Thanks for asking</text>
+      <polygon points="60,361 110,361 110,374 102,381 60,381" class="labelBox"/>
+      <text x="85" y="374" class="labelText" text-anchor="middle" font-size="16">opt</text>
+      <text x="225" y="379" class="loopText" font-size="16" text-anchor="middle">[Extra response]</text>
+      <polygon points="50,97 100,97 100,110 92,117 50,117" class="labelBox"/>
+      <text x="75" y="110" class="labelText" text-anchor="middle" font-size="16">loop</text>
+      <text x="225" y="115" class="loopText" text-anchor="middle" font-size="16">[Daily query]</text>
     </g>
     <g class="nodes">
 
     </g>
     <g class="actor">
       <rect x="50" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="125" y="42.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Alice</text>
+      <text x="125" y="42.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Alice</text>
     </g>
     <g class="actor">
       <rect x="250" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="325" y="42.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Bob</text>
-    </g>
-    <g class="actor">
-      <rect x="450" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="525" y="42.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Server</text>
-    </g>
-    <g class="note">
-      <path d="M 115 187 L 327 187 L 335 195 L 335 227 L 115 227 Z" class="note note-box" stroke-width="1"/>
-      <path d="M 327 187 L 327 195 L 335 195" class="note" stroke-width="1" fill="none"/>
-      <text x="225" y="208" class="note-text" text-anchor="middle" font-size="11">Authentication</text>
-    </g>
-    <g class="note">
-      <path d="M 345 407 L 437 407 L 445 415 L 445 447 L 345 447 Z" class="note note-box" stroke-width="1"/>
-      <path d="M 437 407 L 437 415 L 445 415" class="note" stroke-width="1" fill="none"/>
-      <text x="395" y="428" class="note-text" text-anchor="middle" font-size="11">Bob thinks</text>
+      <text x="325" y="42.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Bob</text>
     </g>
     <g class="actor">
       <rect x="50" y="471" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
@@ -263,11 +257,7 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="actor">
       <rect x="250" y="471" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="325" y="503.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Bob</text>
-    </g>
-    <g class="actor">
-      <rect x="450" y="471" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="525" y="503.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Server</text>
+      <text x="325" y="503.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Bob</text>
     </g>
   </g>
 </svg>

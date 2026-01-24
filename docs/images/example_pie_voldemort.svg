@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450" viewBox="0 0 600 450" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.pieCircle {
+  stroke: black;
+  stroke-width: 2px;
+  opacity: 0.7;
+}
+
+.pieOuterCircle {
+  stroke: black;
+  stroke-width: 2px;
+  fill: none;
+}
+
+.pieTitleText {
+  text-anchor: middle;
+  font-size: 25px;
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.slice {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  fill: #333333;
+  font-size: 17px;
+}
+
+.legend text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 17px;
+}
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <circle cx="210" cy="245" r="186" class="pieOuterCircle" stroke-width="2" stroke="black" fill="none"/>
+    <path d="M 210 245 L 210 60 A 185 185 0 1 1 101.25972832589245 95.33185604063473 Z" class="pieCircle" opacity="0.7" stroke-width="2" fill="hsl(0, 0%, 58.03921568627452%)" stroke="black"/>
+    <path d="M 210 245 L 101.25972832589245 95.33185604063473 A 185 185 0 0 1 163.99237087450177 65.81211519120328 Z" class="pieCircle" stroke="black" opacity="0.7" fill="hsl(60, 100%, 93.52941176470588%)" stroke-width="2"/>
+    <path d="M 210 245 L 163.99237087450177 65.81211519120328 A 185 185 0 0 1 209.99999999999997 60 Z" class="pieCircle" stroke="black" opacity="0.7" stroke-width="2" fill="hsl(240, 100%, 96.27450980392157%)"/>
+    <text x="210" y="25" class="pie-title" text-anchor="middle" font-size="20" font-weight="bold">What Voldemort doesn&apos;t have?</text>
+    <text x="252.87610796952396" y="376.9590916359525" class="slice" dominant-baseline="middle" text-anchor="middle" font-size="17">90%</text>
+    <text x="150.92312329534613" y="119.45524647033982" class="slice" font-size="17" dominant-baseline="middle" text-anchor="middle">6%</text>
+    <text x="192.61001384295275" y="107.3440851926162" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">4%</text>
+    <g class="legend">
+      <rect x="430" y="175" width="18" height="18" class="legend" fill="hsl(240, 100%, 96.27450980392157%)" stroke="hsl(240, 100%, 96.27450980392157%)"/>
+      <rect x="430" y="197" width="18" height="18" class="legend" fill="hsl(60, 100%, 93.52941176470588%)" stroke="hsl(60, 100%, 93.52941176470588%)"/>
+      <rect x="430" y="219" width="18" height="18" class="legend" fill="hsl(0, 0%, 58.03921568627452%)" stroke="hsl(0, 0%, 58.03921568627452%)"/>
+      <text x="452" y="189" class="legend" font-size="17">FRIENDS</text>
+      <text x="452" y="211" class="legend" font-size="17">FAMILY</text>
+      <text x="452" y="233" class="legend" font-size="17">NOSE</text>
+    </g>
+  </g>
+</svg>

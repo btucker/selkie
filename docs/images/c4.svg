@@ -70,36 +70,36 @@
     </g>
     <text x="336" y="25" class="c4-title" fill="#333333" text-anchor="middle" font-weight="bold" font-size="16">System Context diagram for Internet Banking System</text>
     <g class="c4-boundary-group" id="b0">
-      <rect x="316" y="269" width="256" height="406" rx="2.5" ry="2.5" class="c4-boundary" fill="none" stroke="#444444" stroke-dasharray="7,7" stroke-width="1"/>
-      <text x="326" y="289" class="c4-boundary-label" fill="#444444" font-size="14" font-weight="bold">BankBoundary</text>
-      <text x="326" y="304" class="c4-boundary-type" fill="#444444" font-size="12">[ENTERPRISE]</text>
+      <rect x="316" y="269" width="256" height="406" rx="2.5" ry="2.5" class="c4-boundary" fill="none" stroke-width="1" stroke-dasharray="7,7" stroke="#444444"/>
+      <text x="326" y="289" class="c4-boundary-label" font-weight="bold" font-size="14" fill="#444444">BankBoundary</text>
+      <text x="326" y="304" class="c4-boundary-type" font-size="12" fill="#444444">[ENTERPRISE]</text>
     </g>
     <g class="c4-element-group" id="email">
       <rect x="50" y="50" width="216" height="119" rx="2.5" ry="2.5" class="c4-element" stroke-width="0.5" fill="#999999" stroke="#7a7a7a"/>
-      <text x="158" y="68" class="c4-type" fill="#ffffff" text-anchor="middle" font-size="11" font-style="italic">&lt;&lt;external_system&gt;&gt;</text>
-      <text x="158" y="84" class="c4-label" font-weight="bold" text-anchor="middle" font-size="14" fill="#ffffff">E-mail System</text>
-      <text x="158" y="106" class="c4-description" fill="#ffffff" font-size="11" text-anchor="middle">External e-mail system</text>
+      <text x="158" y="68" class="c4-type" fill="#ffffff" font-style="italic" text-anchor="middle" font-size="11">&lt;&lt;external_system&gt;&gt;</text>
+      <text x="158" y="84" class="c4-label" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">E-mail System</text>
+      <text x="158" y="106" class="c4-description" text-anchor="middle" fill="#ffffff" font-size="11">External e-mail system</text>
     </g>
     <g class="c4-element-group" id="customer">
-      <rect x="336" y="319" width="216" height="167" rx="2.5" ry="2.5" class="c4-element" stroke-width="0.5" fill="#08427b" stroke="#073b6f"/>
+      <rect x="336" y="319" width="216" height="167" rx="2.5" ry="2.5" class="c4-element" stroke="#073b6f" fill="#08427b" stroke-width="0.5"/>
       <image x="420" y="353" width="48" height="48" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAACD0lEQVR4Xu2YoU4EMRCGT+4j8Ai8AhaH4QHgAUjQuFMECUgMIUgwJAgMhgQsAYUiJCiQIBBY+EITsjfTdme6V24v4c8vyGbb+ZjOtN0bNcvjQXmkH83WvYBWto6PLm6v7p7uH1/w2fXD+PBycX1Pv2l3IdDm/vn7x+dXQiAubRzoURa7gRZWd0iGRIiJbOnhnfYBQZNJjNbuyY2eJG8fkDE3bbG4ep6MHUAsgYxmE3nVs6VsBWJSGccsOlFPmLIViMzLOB7pCVO2AtHJMohH7Fh6zqitQK7m0rJvAVYgGcEpe//PLdDz65sM4pF9N7ICcXDKIB5Nv6j7tD0NoSdM2QrU9Gg0ewE1LqBhHR3BBdvj2vapnidjHxD/q6vd7Pvhr31AwcY8eXMTXAKECZZJFXuEq27aLgQK5uLMohCenGGuGewOxSjBvYBqeG6B+Nqiblggdjnc+ZXDy+FNFpFzw76O3UBAROuXh6FoiAcf5g9eTvUgzy0nWg6I8cXHRUpg5bOVBCo+KDpFajOf23GgPme7RSQ+lacIENUgJ6gg1k6HjgOlqnLqip4tEuhv0hNEMXUD0clyXE3p6pZA0S2nnvTlXwLJEZWlb7cTQH1+USgTN4VhAenm/wea1OCAOmqo6fE1WCb9WSKBah+rbUWPWAmE2Rvk0ApiB45eOyNAzU8xcTvj8KvkKEoOaIYeHNA3ZuygAvFMUO0AAAAASUVORK5CYII="/>
-      <text x="444" y="337" class="c4-type" fill="#ffffff" font-size="11" font-style="italic" text-anchor="middle">&lt;&lt;person&gt;&gt;</text>
-      <text x="444" y="409" class="c4-label" font-weight="bold" text-anchor="middle" font-size="14" fill="#ffffff">Banking Customer</text>
+      <text x="444" y="337" class="c4-type" font-size="11" fill="#ffffff" font-style="italic" text-anchor="middle">&lt;&lt;person&gt;&gt;</text>
+      <text x="444" y="409" class="c4-label" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="14">Banking Customer</text>
       <text x="444" y="431" class="c4-description" text-anchor="middle" font-size="11" fill="#ffffff">A customer of the bank</text>
     </g>
     <g class="c4-element-group" id="banking">
-      <rect x="336" y="536" width="216" height="119" rx="2.5" ry="2.5" class="c4-element" stroke="#0e5a9d" fill="#1168bd" stroke-width="0.5"/>
-      <text x="444" y="554" class="c4-type" font-size="11" font-style="italic" fill="#ffffff" text-anchor="middle">&lt;&lt;system&gt;&gt;</text>
-      <text x="444" y="570" class="c4-label" fill="#ffffff" text-anchor="middle" font-size="14" font-weight="bold">Internet Banking System</text>
-      <text x="444" y="592" class="c4-description" text-anchor="middle" font-size="11" fill="#ffffff">Allows customers to view accounts</text>
+      <rect x="336" y="536" width="216" height="119" rx="2.5" ry="2.5" class="c4-element" fill="#1168bd" stroke="#0e5a9d" stroke-width="0.5"/>
+      <text x="444" y="554" class="c4-type" fill="#ffffff" font-style="italic" font-size="11" text-anchor="middle">&lt;&lt;system&gt;&gt;</text>
+      <text x="444" y="570" class="c4-label" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">Internet Banking System</text>
+      <text x="444" y="592" class="c4-description" fill="#ffffff" text-anchor="middle" font-size="11">Allows customers to view accounts</text>
     </g>
     <g class="c4-relationship-group">
       <line x1="444" y1="486" x2="444" y2="536" class="c4-relationship" stroke-width="1" stroke="#666666" marker-end="url(#c4-arrow)"/>
       <text x="444" y="515" class="c4-rel-label" font-size="12" text-anchor="middle" fill="#666666">Uses</text>
     </g>
     <g class="c4-relationship-group">
-      <path d="M408.9855967078189,536 Q354.99279835390945,352.5 193.01440329218107,169" class="c4-relationship" stroke-width="1" fill="none" marker-end="url(#c4-arrow)" stroke="#666666"/>
-      <text x="301" y="356.5" class="c4-rel-label" text-anchor="middle" fill="#666666" font-size="12">Sends e-mails</text>
+      <path d="M408.9855967078189,536 Q354.99279835390945,352.5 193.01440329218107,169" class="c4-relationship" marker-end="url(#c4-arrow)" stroke-width="1" stroke="#666666" fill="none"/>
+      <text x="301" y="356.5" class="c4-rel-label" font-size="12" fill="#666666" text-anchor="middle">Sends e-mails</text>
       <text x="301" y="369.5" class="c4-rel-technology" font-size="12" text-anchor="middle" font-style="italic" fill="#666666">[SMTP]</text>
     </g>
   </g>

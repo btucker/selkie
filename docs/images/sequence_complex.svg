@@ -228,7 +228,7 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
       <rect x="320" y="163" width="10" height="1012" rx="1" ry="1" class="activation"/>
     </g>
     <g class="edgePaths">
-      <line x1="125" y1="163" x2="325" y2="163" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
+      <line x1="125" y1="163" x2="325" y2="163" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1"/>
       <circle cx="125" cy="163" r="11" class="sequenceNumber-circle"/>
       <line x1="325" y1="207" x2="525" y2="207" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1"/>
       <circle cx="325" cy="207" r="11" class="sequenceNumber-circle"/>
@@ -236,86 +236,86 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
       <circle cx="525" cy="295" r="11" class="sequenceNumber-circle"/>
       <line x1="725" y1="339" x2="925" y2="339" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
       <circle cx="725" cy="339" r="11" class="sequenceNumber-circle"/>
-      <line x1="925" y1="383" x2="725" y2="383" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
+      <line x1="925" y1="383" x2="725" y2="383" class="message-line" stroke-dasharray="5,5" stroke-width="1" marker-end="url(#arrow-filled)"/>
       <circle cx="925" cy="383" r="11" class="sequenceNumber-circle"/>
-      <line x1="725" y1="427" x2="525" y2="427" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
+      <line x1="725" y1="427" x2="525" y2="427" class="message-line" stroke-dasharray="5,5" stroke-width="1" marker-end="url(#arrow-filled)"/>
       <circle cx="725" cy="427" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="515" x2="325" y2="515" class="message-line" stroke-dasharray="5,5" stroke-width="1" marker-end="url(#arrow-filled)"/>
+      <line x1="525" y1="515" x2="325" y2="515" class="message-line" stroke-width="1" stroke-dasharray="5,5" marker-end="url(#arrow-filled)"/>
       <circle cx="525" cy="515" r="11" class="sequenceNumber-circle"/>
-      <line x1="325" y1="559" x2="125" y2="559" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
+      <line x1="325" y1="559" x2="125" y2="559" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1"/>
       <circle cx="325" cy="559" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="647" x2="925" y2="647" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1"/>
+      <line x1="525" y1="647" x2="925" y2="647" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
       <circle cx="525" cy="647" r="11" class="sequenceNumber-circle"/>
       <line x1="525" y1="735" x2="1125" y2="735" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
       <circle cx="525" cy="735" r="11" class="sequenceNumber-circle"/>
-      <line x1="1125" y1="779" x2="525" y2="779" class="message-line" stroke-width="1" stroke-dasharray="5,5" marker-end="url(#arrow-filled)"/>
+      <line x1="1125" y1="779" x2="525" y2="779" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="5,5" stroke-width="1"/>
       <circle cx="1125" cy="779" r="11" class="sequenceNumber-circle"/>
-      <path d="M 525 867 L 565 867 L 565 897 L 525 897" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1" fill="none" stroke-dasharray="5,5"/>
+      <path d="M 525 867 L 565 867 L 565 897 L 525 897" class="message-line" stroke-width="1" stroke-dasharray="5,5" fill="none" marker-end="url(#arrow-filled)"/>
       <circle cx="525" cy="867" r="11" class="sequenceNumber-circle"/>
       <line x1="925" y1="911" x2="525" y2="911" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="5,5" stroke-width="1"/>
       <circle cx="925" cy="911" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="999" x2="1125" y2="999" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1"/>
+      <line x1="525" y1="999" x2="1125" y2="999" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)"/>
       <circle cx="525" cy="999" r="11" class="sequenceNumber-circle"/>
-      <line x1="1125" y1="1043" x2="525" y2="1043" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="5,5" stroke-width="1"/>
+      <line x1="1125" y1="1043" x2="525" y2="1043" class="message-line" stroke-dasharray="5,5" stroke-width="1" marker-end="url(#arrow-filled)"/>
       <circle cx="1125" cy="1043" r="11" class="sequenceNumber-circle"/>
-      <line x1="525" y1="1131" x2="325" y2="1131" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="5,5" stroke-width="1"/>
+      <line x1="525" y1="1131" x2="325" y2="1131" class="message-line" stroke-dasharray="5,5" stroke-width="1" marker-end="url(#arrow-filled)"/>
       <circle cx="525" cy="1131" r="11" class="sequenceNumber-circle"/>
-      <line x1="325" y1="1175" x2="125" y2="1175" class="message-line" stroke-width="1" marker-end="url(#arrow-filled)" stroke-dasharray="5,5"/>
+      <line x1="325" y1="1175" x2="125" y2="1175" class="message-line" stroke-dasharray="5,5" marker-end="url(#arrow-filled)" stroke-width="1"/>
       <circle cx="325" cy="1175" r="11" class="sequenceNumber-circle"/>
     </g>
     <g class="edgeLabels">
-      <text x="125" y="167" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">1</text>
+      <text x="125" y="167" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">1</text>
       <text x="225" y="153" class="message-label" text-anchor="middle" font-size="16">Click Checkout</text>
-      <text x="325" y="211" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">2</text>
-      <text x="425" y="197" class="message-label" text-anchor="middle" font-size="16">POST /checkout</text>
-      <text x="525" y="299" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">3</text>
-      <text x="625" y="285" class="message-label" font-size="16" text-anchor="middle">Verify session</text>
-      <text x="725" y="343" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">4</text>
+      <text x="325" y="211" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">2</text>
+      <text x="425" y="197" class="message-label" font-size="16" text-anchor="middle">POST /checkout</text>
+      <text x="525" y="299" class="sequenceNumber" font-family="sans-serif" font-size="12" text-anchor="middle">3</text>
+      <text x="625" y="285" class="message-label" text-anchor="middle" font-size="16">Verify session</text>
+      <text x="725" y="343" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">4</text>
       <text x="825" y="329" class="message-label" text-anchor="middle" font-size="16">Query user</text>
       <text x="925" y="387" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">5</text>
       <text x="825" y="373" class="message-label" text-anchor="middle" font-size="16">User record</text>
-      <text x="725" y="431" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">6</text>
-      <text x="625" y="417" class="message-label" font-size="16" text-anchor="middle">Session valid</text>
+      <text x="725" y="431" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">6</text>
+      <text x="625" y="417" class="message-label" text-anchor="middle" font-size="16">Session valid</text>
       <text x="525" y="519" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">7</text>
-      <text x="425" y="505" class="message-label" text-anchor="middle" font-size="16">Error: Empty cart</text>
-      <text x="325" y="563" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">8</text>
-      <text x="225" y="549" class="message-label" font-size="16" text-anchor="middle">Show error</text>
+      <text x="425" y="505" class="message-label" font-size="16" text-anchor="middle">Error: Empty cart</text>
+      <text x="325" y="563" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">8</text>
+      <text x="225" y="549" class="message-label" text-anchor="middle" font-size="16">Show error</text>
       <text x="325" y="621" class="loopText" text-anchor="middle" font-size="16">[Cart Valid]</text>
-      <text x="525" y="651" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">9</text>
-      <text x="725" y="637" class="message-label" font-size="16" text-anchor="middle">Reserve inventory</text>
-      <text x="525" y="739" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">10</text>
-      <text x="825" y="725" class="message-label" font-size="16" text-anchor="middle">Queue payment job</text>
-      <text x="1125" y="783" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">11</text>
+      <text x="525" y="651" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">9</text>
+      <text x="725" y="637" class="message-label" text-anchor="middle" font-size="16">Reserve inventory</text>
+      <text x="525" y="739" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">10</text>
+      <text x="825" y="725" class="message-label" text-anchor="middle" font-size="16">Queue payment job</text>
+      <text x="1125" y="783" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">11</text>
       <text x="825" y="769" class="message-label" font-size="16" text-anchor="middle">Job queued</text>
-      <text x="825" y="841" class="loopText" font-size="16" text-anchor="middle">[Send Notifications]</text>
-      <text x="525" y="871" class="sequenceNumber" font-size="12" text-anchor="middle" font-family="sans-serif">12</text>
-      <text x="570" y="882" class="message-label" text-anchor="start" font-size="16">Queue email confirmation</text>
+      <text x="825" y="841" class="loopText" text-anchor="middle" font-size="16">[Send Notifications]</text>
+      <text x="525" y="871" class="sequenceNumber" text-anchor="middle" font-family="sans-serif" font-size="12">12</text>
+      <text x="570" y="882" class="message-label" font-size="16" text-anchor="start">Queue email confirmation</text>
       <polygon points="460,669 510,669 510,682 502,689 460,689" class="labelBox"/>
-      <text x="485" y="682" class="labelText" text-anchor="middle" font-size="16">par</text>
+      <text x="485" y="682" class="labelText" font-size="16" text-anchor="middle">par</text>
       <text x="825" y="687" class="loopText" text-anchor="middle" font-size="16">[Process Payment]</text>
       <text x="925" y="915" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">13</text>
-      <text x="725" y="901" class="message-label" text-anchor="middle" font-size="16">Inventory reserved</text>
-      <text x="525" y="1003" class="sequenceNumber" font-family="sans-serif" font-size="12" text-anchor="middle">14</text>
+      <text x="725" y="901" class="message-label" font-size="16" text-anchor="middle">Inventory reserved</text>
+      <text x="525" y="1003" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">14</text>
       <text x="825" y="989" class="message-label" font-size="16" text-anchor="middle">Check payment status</text>
-      <text x="1125" y="1047" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">15</text>
+      <text x="1125" y="1047" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">15</text>
       <text x="825" y="1033" class="message-label" font-size="16" text-anchor="middle">Payment pending</text>
       <polygon points="460,933 510,933 510,946 502,953 460,953" class="labelBox"/>
-      <text x="485" y="946" class="labelText" text-anchor="middle" font-size="16">loop</text>
-      <text x="825" y="951" class="loopText" text-anchor="middle" font-size="16">[Retry up to 3 times]</text>
-      <text x="525" y="1135" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">16</text>
-      <text x="425" y="1121" class="message-label" text-anchor="middle" font-size="16">Order confirmed</text>
-      <text x="325" y="1179" class="sequenceNumber" text-anchor="middle" font-size="12" font-family="sans-serif">17</text>
-      <text x="225" y="1165" class="message-label" font-size="16" text-anchor="middle">Show confirmation</text>
+      <text x="485" y="946" class="labelText" font-size="16" text-anchor="middle">loop</text>
+      <text x="825" y="951" class="loopText" font-size="16" text-anchor="middle">[Retry up to 3 times]</text>
+      <text x="525" y="1135" class="sequenceNumber" font-size="12" font-family="sans-serif" text-anchor="middle">16</text>
+      <text x="425" y="1121" class="message-label" font-size="16" text-anchor="middle">Order confirmed</text>
+      <text x="325" y="1179" class="sequenceNumber" font-family="sans-serif" text-anchor="middle" font-size="12">17</text>
+      <text x="225" y="1165" class="message-label" text-anchor="middle" font-size="16">Show confirmation</text>
       <polygon points="50,449 100,449 100,462 92,469 50,469" class="labelBox"/>
       <text x="75" y="462" class="labelText" text-anchor="middle" font-size="16">alt</text>
-      <text x="625" y="467" class="loopText" font-size="16" text-anchor="middle">[Cart Empty]</text>
+      <text x="625" y="467" class="loopText" text-anchor="middle" font-size="16">[Cart Empty]</text>
     </g>
     <g class="nodes">
 
     </g>
     <g class="actor">
       <rect x="50" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="125" y="42.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">User</text>
+      <text x="125" y="42.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">User</text>
     </g>
     <g class="actor">
       <rect x="250" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
@@ -327,7 +327,7 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="actor">
       <rect x="650" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="725" y="42.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Auth</text>
+      <text x="725" y="42.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Auth</text>
     </g>
     <g class="actor">
       <rect x="850" y="10" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
@@ -344,13 +344,13 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="note">
       <path d="M 545 231 L 637 231 L 645 239 L 645 271 L 545 271 Z" class="note note-box" stroke-width="1"/>
-      <path d="M 637 231 L 637 239 L 645 239" class="note" stroke-width="1" fill="none"/>
-      <text x="595" y="252" class="note-text" text-anchor="middle" font-size="11">Validate cart items</text>
+      <path d="M 637 231 L 637 239 L 645 239" class="note" fill="none" stroke-width="1"/>
+      <text x="595" y="252" class="note-text" font-size="11" text-anchor="middle">Validate cart items</text>
     </g>
     <g class="note">
       <path d="M 515 1067 L 1127 1067 L 1135 1075 L 1135 1107 L 515 1107 Z" class="note note-box" stroke-width="1"/>
       <path d="M 1127 1067 L 1127 1075 L 1135 1075" class="note" stroke-width="1" fill="none"/>
-      <text x="825" y="1088" class="note-text" font-size="11" text-anchor="middle">Payment confirmed</text>
+      <text x="825" y="1088" class="note-text" text-anchor="middle" font-size="11">Payment confirmed</text>
     </g>
     <g class="actor">
       <rect x="50" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
@@ -362,11 +362,11 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="actor">
       <rect x="450" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="525" y="1251.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">API</text>
+      <text x="525" y="1251.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">API</text>
     </g>
     <g class="actor">
       <rect x="650" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="725" y="1251.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Auth</text>
+      <text x="725" y="1251.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Auth</text>
     </g>
     <g class="actor">
       <rect x="850" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
@@ -374,7 +374,7 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="actor">
       <rect x="1050" y="1219" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1"/>
-      <text x="1125" y="1251.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Queue</text>
+      <text x="1125" y="1251.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Queue</text>
     </g>
   </g>
 </svg>

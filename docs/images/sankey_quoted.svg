@@ -116,22 +116,22 @@ marker path {
 
     </g>
     <g class="nodes">
-      <g class="node" transform="translate(0,0)" id="node-1" y="0" x="0">
+      <g class="node" x="0" y="0" id="node-1" transform="translate(0,0)">
         <rect x="0" y="0" width="10" height="89.52453337620767" class="sankey-node" fill="#4e79a7"/>
       </g>
-      <g class="node" x="0" id="node-3" transform="translate(0,114.52453337620769)" y="114.52453337620769">
+      <g class="node" y="114.52453337620769" transform="translate(0,114.52453337620769)" x="0" id="node-3">
         <rect x="0" y="0" width="10" height="202.91119166289081" class="sankey-node" fill="#e15759"/>
       </g>
-      <g class="node" transform="translate(0,342.4357250390985)" id="node-5" y="342.4357250390985" x="0">
+      <g class="node" id="node-5" x="0" transform="translate(0,342.4357250390985)" y="342.4357250390985">
         <rect x="0" y="0" width="10" height="57.564274960901514" class="sankey-node" fill="#59a14f"/>
       </g>
-      <g class="node" id="node-2" transform="translate(590,0)" x="590" y="0">
+      <g class="node" id="node-2" x="590" transform="translate(590,0)" y="0">
         <rect x="0" y="0" width="10" height="89.52453337620767" class="sankey-node" fill="#f28e2c"/>
       </g>
-      <g class="node" transform="translate(590,114.52453337620769)" id="node-4" y="114.52453337620769" x="590">
+      <g class="node" id="node-4" transform="translate(590,114.52453337620769)" x="590" y="114.52453337620769">
         <rect x="0" y="0" width="10" height="202.91119166289081" class="sankey-node" fill="#76b7b2"/>
       </g>
-      <g class="node" y="342.4357250390985" x="590" transform="translate(590,342.4357250390985)" id="node-6">
+      <g class="node" id="node-6" transform="translate(590,342.4357250390985)" y="342.4357250390985" x="590">
         <rect x="0" y="0" width="10" height="57.564274960901514" class="sankey-node" fill="#edc949"/>
       </g>
     </g>
@@ -149,15 +149,15 @@ marker path {
       <text x="584" y="371.21786251954927" dy="0em" text-anchor="end">Heating and cooling, commercial
 22.51</text>
     </g>
-    <g class="links" stroke-opacity="0.5" fill="none">
+    <g class="links" fill="none" stroke-opacity="0.5">
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,44.762266688103836 C300,44.762266688103836 300,44.762266688103836 590,44.762266688103836" stroke="url(#linearGradient-1)" stroke-width="89.52453337620767"/>
+        <path d="M10,44.762266688103836 C300,44.762266688103836 300,44.762266688103836 590,44.762266688103836" stroke-width="89.52453337620767" stroke="url(#linearGradient-1)"/>
       </g>
       <g class="link" style="mix-blend-mode: multiply">
         <path d="M10,215.98012920765308 C300,215.98012920765308 300,215.98012920765308 590,215.98012920765308" stroke="url(#linearGradient-2)" stroke-width="202.9111916628908"/>
       </g>
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,371.21786251954927 C300,371.21786251954927 300,371.21786251954927 590,371.21786251954927" stroke-width="57.56427496090153" stroke="url(#linearGradient-3)"/>
+        <path d="M10,371.21786251954927 C300,371.21786251954927 300,371.21786251954927 590,371.21786251954927" stroke="url(#linearGradient-3)" stroke-width="57.56427496090153"/>
       </g>
     </g>
   </g>

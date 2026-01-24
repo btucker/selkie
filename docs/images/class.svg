@@ -129,28 +129,28 @@ marker path {
   </style>
   <defs>
     <marker id="aggregation-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="18" markerHeight="14" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" stroke="#333333" fill="none"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="none" stroke="#333333" stroke-width="1"/>
     </marker>
     <marker id="aggregation-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="18" markerHeight="14" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" stroke="#333333" fill="none"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="none" stroke="#333333" stroke-width="1"/>
     </marker>
     <marker id="inheritance-start" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="20" markerHeight="28" orient="auto">
-      <path d="M 1 7 L 18 13 V 1 Z" stroke-width="1" stroke="#333333" fill="#ECECFF"/>
+      <path d="M 1 7 L 18 13 V 1 Z" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
     </marker>
     <marker id="inheritance-end" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="20" markerHeight="28" orient="auto">
-      <path d="M 18 7 L 1 13 V 1 Z" stroke="#333333" stroke-width="1" fill="#ECECFF"/>
+      <path d="M 18 7 L 1 13 V 1 Z" fill="#ECECFF" stroke="#333333" stroke-width="1"/>
     </marker>
     <marker id="composition-start" viewBox="0 0 20 14" refX="18" refY="7" markerWidth="18" markerHeight="14" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" fill="#333333" stroke="#333333"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke="#333333" stroke-width="1"/>
     </marker>
     <marker id="composition-end" viewBox="0 0 20 14" refX="1" refY="7" markerWidth="18" markerHeight="14" orient="auto">
-      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" stroke-width="1" fill="#333333" stroke="#333333"/>
+      <path d="M 18 7 L 9 13 L 1 7 L 9 1 Z" fill="#333333" stroke="#333333" stroke-width="1"/>
     </marker>
     <marker id="dependency-start" viewBox="0 0 20 20" refX="0" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 0 10 L 20 0 L 20 20 Z" stroke-width="1" fill="none" stroke="#333333"/>
+      <path d="M 0 10 L 20 0 L 20 20 Z" stroke="#333333" fill="none" stroke-width="1"/>
     </marker>
     <marker id="dependency-end" viewBox="0 0 20 20" refX="20" refY="10" markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M 20 10 L 0 0 L 0 20 Z" stroke-width="1" fill="none" stroke="#333333"/>
+      <path d="M 20 10 L 0 0 L 0 20 Z" stroke-width="1" stroke="#333333" fill="none"/>
     </marker>
     <marker id="lollipop-start" viewBox="0 0 20 20" refX="13" refY="10" markerWidth="14" markerHeight="14" orient="auto">
       <circle cx="10" cy="10" r="8" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
@@ -173,65 +173,65 @@ marker path {
 
     </g>
     <g class="relation">
-      <path d="M 234.00 96.00 C 184.40 141.33, 134.80 186.67, 110.00 216.00 C 85.20 245.33, 85.20 258.67, 85.20 272.00" class="relation-line" stroke-width="1" stroke="#333333" fill="none" marker-start="url(#inheritance-start)"/>
+      <path d="M 234.00 96.00 C 184.40 141.33, 134.80 186.67, 110.00 216.00 C 85.20 245.33, 85.20 258.67, 85.20 272.00" class="relation-line" marker-start="url(#inheritance-start)" stroke="#333333" stroke-width="1" fill="none"/>
     </g>
     <g class="relation">
-      <path d="M 308.40 192.00 C 308.40 205.33, 308.40 218.67, 308.40 234.00 C 308.40 249.33, 308.40 266.67, 308.40 284.00" class="relation-line" marker-start="url(#inheritance-start)" stroke-width="1" fill="none" stroke="#333333"/>
+      <path d="M 308.40 192.00 C 308.40 205.33, 308.40 218.67, 308.40 234.00 C 308.40 249.33, 308.40 266.67, 308.40 284.00" class="relation-line" stroke="#333333" marker-start="url(#inheritance-start)" fill="none" stroke-width="1"/>
     </g>
     <g class="relation">
-      <path d="M 382.80 96.00 C 427.60 141.33, 472.40 186.67, 494.80 218.00 C 517.20 249.33, 517.20 266.67, 517.20 284.00" class="relation-line" fill="none" stroke-width="1" stroke="#333333" marker-start="url(#inheritance-start)"/>
+      <path d="M 382.80 96.00 C 427.60 141.33, 472.40 186.67, 494.80 218.00 C 517.20 249.33, 517.20 266.67, 517.20 284.00" class="relation-line" stroke="#333333" marker-start="url(#inheritance-start)" fill="none" stroke-width="1"/>
     </g>
     <g class="relation">
-      <path d="M 85.20 440.00 C 85.20 456.67, 85.20 473.33, 85.20 490.00 C 85.20 506.67, 85.20 523.33, 85.20 540.00" class="relation-line" stroke="#333333" marker-start="url(#composition-start)" fill="none" stroke-width="1"/>
-      <text x="73.20000000000005" y="460" class="cardinality-label" text-anchor="middle" font-size="11">1</text>
-      <text x="73.20000000000005" y="520" class="cardinality-label" text-anchor="middle" font-size="11">many</text>
-      <text x="85.20000000000005" y="490" class="relation-label" font-size="11" dominant-baseline="central" text-anchor="middle">has</text>
-    </g>
-    <g class="class-node" id="class-Egg">
-      <path d="M 38.200000000000045 540 H 132.20000000000005 A 3 3 0 0 1 135.20000000000005 543 V 633 A 3 3 0 0 1 132.20000000000005 636 H 38.200000000000045 A 3 3 0 0 1 35.200000000000045 633 V 543 A 3 3 0 0 1 38.200000000000045 540 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 38.200000000000045 540 H 132.20000000000005 A 3 3 0 0 1 135.20000000000005 543 V 633 A 3 3 0 0 1 132.20000000000005 636 H 38.200000000000045 A 3 3 0 0 1 35.200000000000045 633 V 543 A 3 3 0 0 1 38.200000000000045 540 Z" class="class-box" stroke="#333333" stroke-width="1" fill="none"/>
-      <text x="85.20000000000005" y="564" text-anchor="middle" font-weight="bold" font-size="16" dominant-baseline="middle">Egg</text>
-      <path d="M 35.200000000000045 588 L 135.20000000000005 588" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <path d="M 35.200000000000045 636 L 135.20000000000005 636" class="class-divider" stroke="#333333" stroke-width="1"/>
-    </g>
-    <g class="class-node" id="class-Duck">
-      <path d="M 3.000000000000057 272 H 167.40000000000003 A 3 3 0 0 1 170.40000000000003 275 V 437 A 3 3 0 0 1 167.40000000000003 440 H 3.000000000000057 A 3 3 0 0 1 0.00000000000005684341886080802 437 V 275 A 3 3 0 0 1 3.000000000000057 272 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
-      <path d="M 3.000000000000057 272 H 167.40000000000003 A 3 3 0 0 1 170.40000000000003 275 V 437 A 3 3 0 0 1 167.40000000000003 440 H 3.000000000000057 A 3 3 0 0 1 0.00000000000005684341886080802 437 V 275 A 3 3 0 0 1 3.000000000000057 272 Z" class="class-box" stroke="#333333" fill="none" stroke-width="1"/>
-      <text x="85.20000000000005" y="296" dominant-baseline="middle" font-size="16" font-weight="bold" text-anchor="middle">Duck</text>
-      <path d="M 0.00000000000005684341886080802 320 L 170.40000000000003 320" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="24.000000000000057" y="332" dominant-baseline="middle" font-size="16" text-anchor="start">+String beakColor</text>
-      <path d="M 0.00000000000005684341886080802 368 L 170.40000000000003 368" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="24.000000000000057" y="380" font-size="16" text-anchor="start" dominant-baseline="middle">+swim()</text>
-      <text x="24.000000000000057" y="404" text-anchor="start" dominant-baseline="middle" font-size="16">+quack()</text>
-    </g>
-    <g class="class-node" id="class-Fish">
-      <path d="M 233.40000000000003 284 H 383.40000000000003 A 3 3 0 0 1 386.40000000000003 287 V 425 A 3 3 0 0 1 383.40000000000003 428 H 233.40000000000003 A 3 3 0 0 1 230.40000000000003 425 V 287 A 3 3 0 0 1 233.40000000000003 284 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
-      <path d="M 233.40000000000003 284 H 383.40000000000003 A 3 3 0 0 1 386.40000000000003 287 V 425 A 3 3 0 0 1 383.40000000000003 428 H 233.40000000000003 A 3 3 0 0 1 230.40000000000003 425 V 287 A 3 3 0 0 1 233.40000000000003 284 Z" class="class-box" fill="none" stroke="#333333" stroke-width="1"/>
-      <text x="308.40000000000003" y="308" text-anchor="middle" dominant-baseline="middle" font-size="16" font-weight="bold">Fish</text>
-      <path d="M 230.40000000000003 332 L 386.40000000000003 332" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="254.40000000000003" y="344" dominant-baseline="middle" font-size="16" text-anchor="start">-int sizeInFeet</text>
-      <path d="M 230.40000000000003 380 L 386.40000000000003 380" class="class-divider" stroke="#333333" stroke-width="1"/>
-      <text x="254.40000000000003" y="392" font-size="16" text-anchor="start" dominant-baseline="middle">-canEat()</text>
-    </g>
-    <g class="class-node" id="class-Animal">
-      <path d="M 237.00000000000003 0 H 379.80000000000007 A 3 3 0 0 1 382.80000000000007 3 V 189 A 3 3 0 0 1 379.80000000000007 192 H 237.00000000000003 A 3 3 0 0 1 234.00000000000003 189 V 3 A 3 3 0 0 1 237.00000000000003 0 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 237.00000000000003 0 H 379.80000000000007 A 3 3 0 0 1 382.80000000000007 3 V 189 A 3 3 0 0 1 379.80000000000007 192 H 237.00000000000003 A 3 3 0 0 1 234.00000000000003 189 V 3 A 3 3 0 0 1 237.00000000000003 0 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
-      <text x="308.40000000000003" y="24" text-anchor="middle" font-size="16" dominant-baseline="middle" font-weight="bold">Animal</text>
-      <path d="M 234.00000000000003 48 L 382.80000000000007 48" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="258" y="60" font-size="16" text-anchor="start" dominant-baseline="middle">+int age</text>
-      <text x="258" y="84" dominant-baseline="middle" font-size="16" text-anchor="start">+String gender</text>
-      <path d="M 234.00000000000003 120 L 382.80000000000007 120" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="258" y="132" text-anchor="start" dominant-baseline="middle" font-size="16">+isMammal()</text>
-      <text x="258" y="156" text-anchor="start" dominant-baseline="middle" font-size="16">+mate()</text>
+      <path d="M 85.20 440.00 C 85.20 456.67, 85.20 473.33, 85.20 490.00 C 85.20 506.67, 85.20 523.33, 85.20 540.00" class="relation-line" stroke-width="1" marker-start="url(#composition-start)" fill="none" stroke="#333333"/>
+      <text x="73.19999999999999" y="460" class="cardinality-label" text-anchor="middle" font-size="11">1</text>
+      <text x="73.19999999999999" y="520" class="cardinality-label" font-size="11" text-anchor="middle">many</text>
+      <text x="85.19999999999999" y="490" class="relation-label" dominant-baseline="central" font-size="11" text-anchor="middle">has</text>
     </g>
     <g class="class-node" id="class-Zebra">
       <path d="M 449.40000000000003 284 H 585 A 3 3 0 0 1 588 287 V 425 A 3 3 0 0 1 585 428 H 449.40000000000003 A 3 3 0 0 1 446.40000000000003 425 V 287 A 3 3 0 0 1 449.40000000000003 284 Z" class="class-box-bg" fill="#ECECFF" stroke="none"/>
-      <path d="M 449.40000000000003 284 H 585 A 3 3 0 0 1 588 287 V 425 A 3 3 0 0 1 585 428 H 449.40000000000003 A 3 3 0 0 1 446.40000000000003 425 V 287 A 3 3 0 0 1 449.40000000000003 284 Z" class="class-box" stroke="#333333" fill="none" stroke-width="1"/>
-      <text x="517.2" y="308" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Zebra</text>
+      <path d="M 449.40000000000003 284 H 585 A 3 3 0 0 1 588 287 V 425 A 3 3 0 0 1 585 428 H 449.40000000000003 A 3 3 0 0 1 446.40000000000003 425 V 287 A 3 3 0 0 1 449.40000000000003 284 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
+      <text x="517.2" y="308" font-size="16" font-weight="bold" dominant-baseline="middle" text-anchor="middle">Zebra</text>
       <path d="M 446.40000000000003 332 L 588 332" class="class-divider" stroke="#333333" stroke-width="1"/>
       <text x="470.40000000000003" y="344" dominant-baseline="middle" text-anchor="start" font-size="16">+bool is_wild</text>
-      <path d="M 446.40000000000003 380 L 588 380" class="class-divider" stroke-width="1" stroke="#333333"/>
-      <text x="470.40000000000003" y="392" dominant-baseline="middle" text-anchor="start" font-size="16">+run()</text>
+      <path d="M 446.40000000000003 380 L 588 380" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="470.40000000000003" y="392" dominant-baseline="middle" font-size="16" text-anchor="start">+run()</text>
+    </g>
+    <g class="class-node" id="class-Fish">
+      <path d="M 233.39999999999998 284 H 383.4 A 3 3 0 0 1 386.4 287 V 425 A 3 3 0 0 1 383.4 428 H 233.39999999999998 A 3 3 0 0 1 230.39999999999998 425 V 287 A 3 3 0 0 1 233.39999999999998 284 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 233.39999999999998 284 H 383.4 A 3 3 0 0 1 386.4 287 V 425 A 3 3 0 0 1 383.4 428 H 233.39999999999998 A 3 3 0 0 1 230.39999999999998 425 V 287 A 3 3 0 0 1 233.39999999999998 284 Z" class="class-box" fill="none" stroke-width="1" stroke="#333333"/>
+      <text x="308.4" y="308" dominant-baseline="middle" font-size="16" font-weight="bold" text-anchor="middle">Fish</text>
+      <path d="M 230.39999999999998 332 L 386.4 332" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="254.39999999999998" y="344" dominant-baseline="middle" font-size="16" text-anchor="start">-int sizeInFeet</text>
+      <path d="M 230.39999999999998 380 L 386.4 380" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="254.39999999999998" y="392" dominant-baseline="middle" font-size="16" text-anchor="start">-canEat()</text>
+    </g>
+    <g class="class-node" id="class-Animal">
+      <path d="M 236.99999999999997 0 H 379.79999999999995 A 3 3 0 0 1 382.79999999999995 3 V 189 A 3 3 0 0 1 379.79999999999995 192 H 236.99999999999997 A 3 3 0 0 1 233.99999999999997 189 V 3 A 3 3 0 0 1 236.99999999999997 0 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 236.99999999999997 0 H 379.79999999999995 A 3 3 0 0 1 382.79999999999995 3 V 189 A 3 3 0 0 1 379.79999999999995 192 H 236.99999999999997 A 3 3 0 0 1 233.99999999999997 189 V 3 A 3 3 0 0 1 236.99999999999997 0 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
+      <text x="308.4" y="24" font-size="16" text-anchor="middle" dominant-baseline="middle" font-weight="bold">Animal</text>
+      <path d="M 233.99999999999997 48 L 382.79999999999995 48" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="258" y="60" dominant-baseline="middle" text-anchor="start" font-size="16">+int age</text>
+      <text x="258" y="84" text-anchor="start" font-size="16" dominant-baseline="middle">+String gender</text>
+      <path d="M 233.99999999999997 120 L 382.79999999999995 120" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <text x="258" y="132" dominant-baseline="middle" font-size="16" text-anchor="start">+isMammal()</text>
+      <text x="258" y="156" dominant-baseline="middle" font-size="16" text-anchor="start">+mate()</text>
+    </g>
+    <g class="class-node" id="class-Egg">
+      <path d="M 38.19999999999999 540 H 132.2 A 3 3 0 0 1 135.2 543 V 633 A 3 3 0 0 1 132.2 636 H 38.19999999999999 A 3 3 0 0 1 35.19999999999999 633 V 543 A 3 3 0 0 1 38.19999999999999 540 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 38.19999999999999 540 H 132.2 A 3 3 0 0 1 135.2 543 V 633 A 3 3 0 0 1 132.2 636 H 38.19999999999999 A 3 3 0 0 1 35.19999999999999 633 V 543 A 3 3 0 0 1 38.19999999999999 540 Z" class="class-box" stroke="#333333" fill="none" stroke-width="1"/>
+      <text x="85.19999999999999" y="564" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Egg</text>
+      <path d="M 35.19999999999999 588 L 135.2 588" class="class-divider" stroke-width="1" stroke="#333333"/>
+      <path d="M 35.19999999999999 636 L 135.2 636" class="class-divider" stroke="#333333" stroke-width="1"/>
+    </g>
+    <g class="class-node" id="class-Duck">
+      <path d="M 3 272 H 167.39999999999998 A 3 3 0 0 1 170.39999999999998 275 V 437 A 3 3 0 0 1 167.39999999999998 440 H 3 A 3 3 0 0 1 0 437 V 275 A 3 3 0 0 1 3 272 Z" class="class-box-bg" stroke="none" fill="#ECECFF"/>
+      <path d="M 3 272 H 167.39999999999998 A 3 3 0 0 1 170.39999999999998 275 V 437 A 3 3 0 0 1 167.39999999999998 440 H 3 A 3 3 0 0 1 0 437 V 275 A 3 3 0 0 1 3 272 Z" class="class-box" stroke-width="1" fill="none" stroke="#333333"/>
+      <text x="85.19999999999999" y="296" text-anchor="middle" dominant-baseline="middle" font-size="16" font-weight="bold">Duck</text>
+      <path d="M 0 320 L 170.39999999999998 320" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="24" y="332" dominant-baseline="middle" font-size="16" text-anchor="start">+String beakColor</text>
+      <path d="M 0 368 L 170.39999999999998 368" class="class-divider" stroke="#333333" stroke-width="1"/>
+      <text x="24" y="380" dominant-baseline="middle" text-anchor="start" font-size="16">+swim()</text>
+      <text x="24" y="404" text-anchor="start" dominant-baseline="middle" font-size="16">+quack()</text>
     </g>
   </g>
 </svg>

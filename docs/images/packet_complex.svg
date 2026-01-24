@@ -118,70 +118,70 @@ marker path {
     </g>
     <rect x="1" y="8" width="510" height="32" class="packetBlock"/>
     <text x="256" y="24" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Source Port</text>
-    <text x="1" y="6" class="packetByte start" text-anchor="start" dominant-baseline="auto">0</text>
+    <text x="1" y="6" class="packetByte start" dominant-baseline="auto" text-anchor="start">0</text>
     <text x="511" y="6" class="packetByte end" text-anchor="end" dominant-baseline="auto">15</text>
     <rect x="513" y="8" width="510" height="32" class="packetBlock"/>
     <text x="768" y="24" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Destination Port</text>
-    <text x="513" y="6" class="packetByte start" dominant-baseline="auto" text-anchor="start">16</text>
+    <text x="513" y="6" class="packetByte start" text-anchor="start" dominant-baseline="auto">16</text>
     <text x="1023" y="6" class="packetByte end" text-anchor="end" dominant-baseline="auto">31</text>
     <rect x="1" y="48" width="1022" height="32" class="packetBlock"/>
     <text x="512" y="64" class="packetLabel" text-anchor="middle" dominant-baseline="middle">Sequence Number</text>
-    <text x="1" y="46" class="packetByte start" text-anchor="start" dominant-baseline="auto">32</text>
-    <text x="1023" y="46" class="packetByte end" dominant-baseline="auto" text-anchor="end">63</text>
+    <text x="1" y="46" class="packetByte start" dominant-baseline="auto" text-anchor="start">32</text>
+    <text x="1023" y="46" class="packetByte end" text-anchor="end" dominant-baseline="auto">63</text>
     <rect x="1" y="88" width="1022" height="32" class="packetBlock"/>
     <text x="512" y="104" class="packetLabel" text-anchor="middle" dominant-baseline="middle">Acknowledgment Number</text>
-    <text x="1" y="86" class="packetByte start" dominant-baseline="auto" text-anchor="start">64</text>
+    <text x="1" y="86" class="packetByte start" text-anchor="start" dominant-baseline="auto">64</text>
     <text x="1023" y="86" class="packetByte end" dominant-baseline="auto" text-anchor="end">95</text>
     <rect x="1" y="128" width="126" height="32" class="packetBlock"/>
-    <text x="64" y="144" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Data Offset</text>
-    <text x="1" y="126" class="packetByte start" text-anchor="start" dominant-baseline="auto">96</text>
-    <text x="127" y="126" class="packetByte end" text-anchor="end" dominant-baseline="auto">99</text>
+    <text x="64" y="144" class="packetLabel" text-anchor="middle" dominant-baseline="middle">Data Offset</text>
+    <text x="1" y="126" class="packetByte start" dominant-baseline="auto" text-anchor="start">96</text>
+    <text x="127" y="126" class="packetByte end" dominant-baseline="auto" text-anchor="end">99</text>
     <rect x="129" y="128" width="190" height="32" class="packetBlock"/>
-    <text x="224" y="144" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Reserved</text>
-    <text x="129" y="126" class="packetByte start" dominant-baseline="auto" text-anchor="start">100</text>
+    <text x="224" y="144" class="packetLabel" text-anchor="middle" dominant-baseline="middle">Reserved</text>
+    <text x="129" y="126" class="packetByte start" text-anchor="start" dominant-baseline="auto">100</text>
     <text x="319" y="126" class="packetByte end" text-anchor="end" dominant-baseline="auto">105</text>
     <rect x="321" y="128" width="30" height="32" class="packetBlock"/>
-    <text x="336" y="144" class="packetLabel" text-anchor="middle" dominant-baseline="middle">URG</text>
-    <text x="336" y="126" class="packetByte start" dominant-baseline="auto" text-anchor="middle">106</text>
+    <text x="336" y="144" class="packetLabel" dominant-baseline="middle" text-anchor="middle">URG</text>
+    <text x="336" y="126" class="packetByte start" text-anchor="middle" dominant-baseline="auto">106</text>
     <rect x="353" y="128" width="30" height="32" class="packetBlock"/>
-    <text x="368" y="144" class="packetLabel" dominant-baseline="middle" text-anchor="middle">ACK</text>
-    <text x="368" y="126" class="packetByte start" text-anchor="middle" dominant-baseline="auto">107</text>
+    <text x="368" y="144" class="packetLabel" text-anchor="middle" dominant-baseline="middle">ACK</text>
+    <text x="368" y="126" class="packetByte start" dominant-baseline="auto" text-anchor="middle">107</text>
     <rect x="385" y="128" width="30" height="32" class="packetBlock"/>
     <text x="400" y="144" class="packetLabel" dominant-baseline="middle" text-anchor="middle">PSH</text>
-    <text x="400" y="126" class="packetByte start" text-anchor="middle" dominant-baseline="auto">108</text>
+    <text x="400" y="126" class="packetByte start" dominant-baseline="auto" text-anchor="middle">108</text>
     <rect x="417" y="128" width="30" height="32" class="packetBlock"/>
-    <text x="432" y="144" class="packetLabel" text-anchor="middle" dominant-baseline="middle">RST</text>
-    <text x="432" y="126" class="packetByte start" text-anchor="middle" dominant-baseline="auto">109</text>
+    <text x="432" y="144" class="packetLabel" dominant-baseline="middle" text-anchor="middle">RST</text>
+    <text x="432" y="126" class="packetByte start" dominant-baseline="auto" text-anchor="middle">109</text>
     <rect x="449" y="128" width="30" height="32" class="packetBlock"/>
-    <text x="464" y="144" class="packetLabel" dominant-baseline="middle" text-anchor="middle">SYN</text>
+    <text x="464" y="144" class="packetLabel" text-anchor="middle" dominant-baseline="middle">SYN</text>
     <text x="464" y="126" class="packetByte start" dominant-baseline="auto" text-anchor="middle">110</text>
     <rect x="481" y="128" width="30" height="32" class="packetBlock"/>
     <text x="496" y="144" class="packetLabel" dominant-baseline="middle" text-anchor="middle">FIN</text>
-    <text x="496" y="126" class="packetByte start" text-anchor="middle" dominant-baseline="auto">111</text>
+    <text x="496" y="126" class="packetByte start" dominant-baseline="auto" text-anchor="middle">111</text>
     <rect x="513" y="128" width="510" height="32" class="packetBlock"/>
     <text x="768" y="144" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Window</text>
-    <text x="513" y="126" class="packetByte start" text-anchor="start" dominant-baseline="auto">112</text>
-    <text x="1023" y="126" class="packetByte end" dominant-baseline="auto" text-anchor="end">127</text>
+    <text x="513" y="126" class="packetByte start" dominant-baseline="auto" text-anchor="start">112</text>
+    <text x="1023" y="126" class="packetByte end" text-anchor="end" dominant-baseline="auto">127</text>
     <rect x="1" y="168" width="510" height="32" class="packetBlock"/>
     <text x="256" y="184" class="packetLabel" text-anchor="middle" dominant-baseline="middle">Checksum</text>
-    <text x="1" y="166" class="packetByte start" dominant-baseline="auto" text-anchor="start">128</text>
-    <text x="511" y="166" class="packetByte end" dominant-baseline="auto" text-anchor="end">143</text>
+    <text x="1" y="166" class="packetByte start" text-anchor="start" dominant-baseline="auto">128</text>
+    <text x="511" y="166" class="packetByte end" text-anchor="end" dominant-baseline="auto">143</text>
     <rect x="513" y="168" width="510" height="32" class="packetBlock"/>
-    <text x="768" y="184" class="packetLabel" text-anchor="middle" dominant-baseline="middle">Urgent Pointer</text>
-    <text x="513" y="166" class="packetByte start" text-anchor="start" dominant-baseline="auto">144</text>
-    <text x="1023" y="166" class="packetByte end" text-anchor="end" dominant-baseline="auto">159</text>
+    <text x="768" y="184" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Urgent Pointer</text>
+    <text x="513" y="166" class="packetByte start" dominant-baseline="auto" text-anchor="start">144</text>
+    <text x="1023" y="166" class="packetByte end" dominant-baseline="auto" text-anchor="end">159</text>
     <rect x="1" y="208" width="1022" height="32" class="packetBlock"/>
-    <text x="512" y="224" class="packetLabel" dominant-baseline="middle" text-anchor="middle">(Options and Padding)</text>
+    <text x="512" y="224" class="packetLabel" text-anchor="middle" dominant-baseline="middle">(Options and Padding)</text>
     <text x="1" y="206" class="packetByte start" text-anchor="start" dominant-baseline="auto">160</text>
     <text x="1023" y="206" class="packetByte end" dominant-baseline="auto" text-anchor="end">191</text>
     <rect x="1" y="248" width="1022" height="32" class="packetBlock"/>
     <text x="512" y="264" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Data</text>
-    <text x="1" y="246" class="packetByte start" text-anchor="start" dominant-baseline="auto">192</text>
+    <text x="1" y="246" class="packetByte start" dominant-baseline="auto" text-anchor="start">192</text>
     <text x="1023" y="246" class="packetByte end" dominant-baseline="auto" text-anchor="end">223</text>
     <rect x="1" y="288" width="1022" height="32" class="packetBlock"/>
     <text x="512" y="304" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Data</text>
-    <text x="1" y="286" class="packetByte start" text-anchor="start" dominant-baseline="auto">224</text>
-    <text x="1023" y="286" class="packetByte end" text-anchor="end" dominant-baseline="auto">255</text>
+    <text x="1" y="286" class="packetByte start" dominant-baseline="auto" text-anchor="start">224</text>
+    <text x="1023" y="286" class="packetByte end" dominant-baseline="auto" text-anchor="end">255</text>
     <text x="513" y="340" class="packetTitle" text-anchor="middle" dominant-baseline="middle">TCP Packet Structure</text>
   </g>
 </svg>
