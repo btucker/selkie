@@ -1,7 +1,7 @@
 //! Mindmap diagram renderer
 //!
-//! Renders mindmap diagrams using a bidirectional tree layout.
-//! The root is centered with branches spreading left and right.
+//! Renders mindmap diagrams using a radial tree layout.
+//! The root is centered with branches spreading outward at angles.
 
 use crate::diagrams::mindmap::{MindmapDb, MindmapNode, NodeType};
 use crate::error::Result;
@@ -16,11 +16,8 @@ const MIN_NODE_WIDTH: f64 = 50.0;
 /// Minimum node height
 const MIN_NODE_HEIGHT: f64 = 30.0;
 
-/// Horizontal spacing between nodes
-const NODE_SPACING_H: f64 = 60.0;
-
-/// Vertical spacing between sibling nodes
-const NODE_SPACING_V: f64 = 30.0;
+/// Radial distance from parent to child
+const RADIAL_DISTANCE: f64 = 68.0;
 
 /// Maximum number of color sections (matches mermaid.js)
 const MAX_SECTIONS: usize = 12;
@@ -30,13 +27,6 @@ const FONT_SIZE: f64 = 14.0;
 
 /// Character width estimate for text sizing
 const CHAR_WIDTH: f64 = 8.0;
-
-/// Direction for branch placement
-#[derive(Debug, Clone, Copy, PartialEq)]
-enum BranchDirection {
-    Left,
-    Right,
-}
 
 /// A positioned node for rendering
 #[derive(Debug, Clone)]
@@ -48,9 +38,9 @@ struct PositionedNode {
     text: String,
     /// Node type (shape)
     node_type: NodeType,
-    /// X position (center)
+    /// X position (top-left corner)
     x: f64,
-    /// Y position (center)
+    /// Y position (top-left corner)
     y: f64,
     /// Width
     width: f64,
@@ -64,6 +54,8 @@ struct PositionedNode {
     icon: Option<String>,
     /// CSS class (if any)
     class: Option<String>,
+    /// Depth in the tree (0 = root)
+    depth: usize,
 }
 
 /// Render a mindmap diagram to SVG
@@ -80,72 +72,14 @@ pub fn render_mindmap(db: &MindmapDb, config: &RenderConfig) -> Result<String> {
         }
     };
 
-    // Position all nodes using bidirectional tree layout
+    // Position all nodes using radial tree layout
     let mut positioned_nodes = Vec::new();
     let mut node_counter = 0;
 
     // Calculate root node size
     let (root_width, root_height) = calculate_node_size(&root.descr, root.node_type);
 
-    // First, measure the subtrees to balance left and right
-    let children = &root.children;
-    let num_children = children.len();
-
-    // Split children: first half goes right, second half goes left
-    // (This matches mermaid.js behavior where first branch goes right)
-    let split_point = num_children.div_ceil(2);
-    let right_children: Vec<&MindmapNode> = children.iter().take(split_point).collect();
-    let left_children: Vec<&MindmapNode> = children.iter().skip(split_point).collect();
-
-    // Calculate subtree heights for each side
-    let right_height = calculate_subtree_height(&right_children);
-    let left_height = calculate_subtree_height(&left_children);
-
-    // Position root at center (we'll adjust based on bounds later)
-    // Root x is 0, y is calculated to center between the two sides
-    let root_y = 0.0;
-
-    // Position right-side subtrees
-    let mut right_y_offset = root_y - right_height / 2.0;
-    for (i, child) in right_children.iter().enumerate() {
-        let section = (i as i32) % (MAX_SECTIONS as i32 - 1);
-        let child_x = root_width / 2.0 + NODE_SPACING_H;
-        position_tree_directional(
-            child,
-            child_x,
-            right_y_offset,
-            section,
-            BranchDirection::Right,
-            Some("mindmap-root".to_string()),
-            &mut positioned_nodes,
-            &mut node_counter,
-        );
-        let subtree_height = measure_subtree_height(child);
-        right_y_offset += subtree_height + NODE_SPACING_V;
-    }
-
-    // Position left-side subtrees
-    let mut left_y_offset = root_y - left_height / 2.0;
-    for (i, child) in left_children.iter().enumerate() {
-        let section = ((right_children.len() + i) as i32) % (MAX_SECTIONS as i32 - 1);
-        // For left side, we need to measure the subtree width first to position correctly
-        let subtree_width = measure_subtree_width(child, BranchDirection::Left);
-        let child_x = -root_width / 2.0 - NODE_SPACING_H - subtree_width;
-        position_tree_directional(
-            child,
-            child_x,
-            left_y_offset,
-            section,
-            BranchDirection::Left,
-            Some("mindmap-root".to_string()),
-            &mut positioned_nodes,
-            &mut node_counter,
-        );
-        let subtree_height = measure_subtree_height(child);
-        left_y_offset += subtree_height + NODE_SPACING_V;
-    }
-
-    // Add the root node (centered at 0,0)
+    // Position root at center (0,0)
     positioned_nodes.push(PositionedNode {
         id: "mindmap-root".to_string(),
         text: root.descr.clone(),
@@ -158,7 +92,34 @@ pub fn render_mindmap(db: &MindmapDb, config: &RenderConfig) -> Result<String> {
         parent_id: None,
         icon: root.icon.clone(),
         class: root.class.clone(),
+        depth: 0,
     });
+
+    // Position children using radial layout
+    // Distribute root's children across angles around the root
+    let children = &root.children;
+    let num_children = children.len();
+
+    if num_children > 0 {
+        // Assign angles to each top-level branch
+        // Mermaid pattern: first branch goes right, then spread downward and upward
+        let branch_angles = calculate_branch_angles(num_children);
+
+        for (i, (child, &angle)) in children.iter().zip(branch_angles.iter()).enumerate() {
+            let section = (i as i32) % (MAX_SECTIONS as i32 - 1);
+            position_radial_tree(
+                child,
+                0.0, // parent center x
+                0.0, // parent center y
+                angle,
+                section,
+                Some("mindmap-root".to_string()),
+                &mut positioned_nodes,
+                &mut node_counter,
+                1, // depth
+            );
+        }
+    }
 
     // Calculate bounds
     let (min_x, max_x, min_y, max_y) = calculate_bounds(&positioned_nodes);
@@ -184,63 +145,70 @@ pub fn render_mindmap(db: &MindmapDb, config: &RenderConfig) -> Result<String> {
     Ok(doc.to_string())
 }
 
-/// Calculate total height needed for a list of child subtrees
-fn calculate_subtree_height(children: &[&MindmapNode]) -> f64 {
-    if children.is_empty() {
-        return 0.0;
+/// Calculate branch angles for root children
+/// Layout pattern: first branch goes strongly right (landscape), others spread in back-left
+/// Optimized for landscape aspect ratio
+fn calculate_branch_angles(num_children: usize) -> Vec<f64> {
+    use std::f64::consts::PI;
+
+    match num_children {
+        0 => vec![],
+        1 => vec![0.1],            // Single child goes right, slightly down
+        2 => vec![0.1, PI * 0.75], // First right, second left-down (135°)
+        3 => {
+            // Layout pattern for 3 branches:
+            // - First: right with slight downward tilt (creates horizontal extent)
+            // - Second: down-left quadrant
+            // - Third: up-left quadrant
+            vec![0.15, PI * 0.65, -PI * 0.65] // ~9°, ~117°, ~-117°
+        }
+        _ => {
+            let mut angles = Vec::with_capacity(num_children);
+
+            // First child always goes right with slight downward tilt
+            angles.push(0.1);
+
+            // Distribute remaining children in back-left quadrant
+            let remaining = num_children - 1;
+            if remaining > 0 {
+                let down_count = remaining.div_ceil(2);
+                let up_count = remaining - down_count;
+
+                // Down-left quadrant (angles from ~100° to ~150°)
+                for i in 0..down_count {
+                    let t = (i as f64 + 0.5) / (down_count as f64);
+                    let angle = PI * 0.55 + t * PI * 0.28; // ~100° to ~150°
+                    angles.push(angle);
+                }
+
+                // Up-left quadrant (angles from ~-100° to ~-150°)
+                for i in 0..up_count {
+                    let t = (i as f64 + 0.5) / (up_count as f64);
+                    let angle = -PI * 0.55 - t * PI * 0.28; // ~-100° to ~-150°
+                    angles.push(angle);
+                }
+            }
+
+            angles
+        }
     }
-    let mut total = 0.0;
-    for child in children {
-        total += measure_subtree_height(child) + NODE_SPACING_V;
-    }
-    total - NODE_SPACING_V // Remove trailing spacing
 }
 
-/// Measure the height of a subtree rooted at this node
-fn measure_subtree_height(node: &MindmapNode) -> f64 {
-    let (_, node_height) = calculate_node_size(&node.descr, node.node_type);
-
-    if node.children.is_empty() {
-        return node_height;
-    }
-
-    let mut children_height = 0.0;
-    for child in &node.children {
-        children_height += measure_subtree_height(child) + NODE_SPACING_V;
-    }
-    children_height -= NODE_SPACING_V; // Remove trailing spacing
-
-    children_height.max(node_height)
-}
-
-/// Measure the width of a subtree
-fn measure_subtree_width(node: &MindmapNode, _direction: BranchDirection) -> f64 {
-    let (node_width, _) = calculate_node_size(&node.descr, node.node_type);
-
-    if node.children.is_empty() {
-        return node_width;
-    }
-
-    let mut max_child_width: f64 = 0.0;
-    for child in &node.children {
-        max_child_width = max_child_width.max(measure_subtree_width(child, _direction));
-    }
-
-    node_width + NODE_SPACING_H + max_child_width
-}
-
-/// Position nodes in a directional tree layout
+/// Position nodes in a radial tree layout
 #[allow(clippy::too_many_arguments)]
-fn position_tree_directional(
+fn position_radial_tree(
     node: &MindmapNode,
-    x: f64,
-    y: f64,
+    parent_cx: f64,
+    parent_cy: f64,
+    angle: f64,
     section: i32,
-    direction: BranchDirection,
     parent_id: Option<String>,
     positioned: &mut Vec<PositionedNode>,
     counter: &mut usize,
+    depth: usize,
 ) {
+    use std::f64::consts::PI;
+
     // Generate node ID
     let id = node
         .node_id
@@ -252,18 +220,32 @@ fn position_tree_directional(
     let text = &node.descr;
     let (width, height) = calculate_node_size(text, node.node_type);
 
-    // Calculate this subtree's total height for vertical centering
-    let subtree_height = measure_subtree_height(node);
+    // Determine if this is a "right-going" branch (to create landscape layout)
+    let is_right_branch = angle.abs() < PI / 3.0;
 
-    // Center this node vertically relative to its subtree
-    let node_y = y + (subtree_height - height) / 2.0;
+    // Calculate distance based on depth and direction
+    // Right branches get more distance to create landscape aspect ratio
+    let base_distance = if is_right_branch {
+        RADIAL_DISTANCE * 1.5 // More distance for right-going branches
+    } else {
+        RADIAL_DISTANCE * 1.1 // Slightly more for other branches
+    };
+    let distance = base_distance * (1.0 + (depth.saturating_sub(1)) as f64 * 0.12);
+
+    // Calculate node center position
+    let node_cx = parent_cx + distance * angle.cos();
+    let node_cy = parent_cy + distance * angle.sin();
+
+    // Convert to top-left corner
+    let node_x = node_cx - width / 2.0;
+    let node_y = node_cy - height / 2.0;
 
     // Add this node
     positioned.push(PositionedNode {
         id: id.clone(),
         text: text.clone(),
         node_type: node.node_type,
-        x,
+        x: node_x,
         y: node_y,
         width,
         height,
@@ -271,38 +253,68 @@ fn position_tree_directional(
         parent_id,
         icon: node.icon.clone(),
         class: node.class.clone(),
+        depth,
     });
 
     // Position children
     if !node.children.is_empty() {
-        let mut child_y_offset = y;
+        let num_children = node.children.len();
 
-        for child in &node.children {
-            let child_height = measure_subtree_height(child);
+        // Calculate angular spread for children
+        // Right-going branches keep children more horizontal
+        let spread_angle = if is_right_branch {
+            // Keep right-branch children tightly spread vertically around horizontal
+            calculate_children_spread(num_children, depth) * 0.6
+        } else {
+            calculate_children_spread(num_children, depth)
+        };
 
-            // Calculate child x position based on direction
-            let child_x = match direction {
-                BranchDirection::Right => x + width + NODE_SPACING_H,
-                BranchDirection::Left => {
-                    let child_width = measure_subtree_width(child, direction);
-                    x - NODE_SPACING_H - child_width
+        // Start angle - children spread around the parent's direction
+        let start_angle = angle - spread_angle / 2.0;
+
+        for (i, child) in node.children.iter().enumerate() {
+            // Calculate child's angle
+            let child_angle = if num_children == 1 {
+                // Single child continues in same direction (with slight horizontal bias for right branches)
+                if is_right_branch {
+                    angle * 0.7 // Trend toward horizontal
+                } else {
+                    angle
                 }
+            } else {
+                start_angle + (i as f64) * spread_angle / (num_children - 1).max(1) as f64
             };
 
-            position_tree_directional(
+            position_radial_tree(
                 child,
-                child_x,
-                child_y_offset,
+                node_cx,
+                node_cy,
+                child_angle,
                 section, // Children inherit parent's section
-                direction,
                 Some(id.clone()),
                 positioned,
                 counter,
+                depth + 1,
             );
-
-            child_y_offset += child_height + NODE_SPACING_V;
         }
     }
+}
+
+/// Calculate angular spread for children based on count and depth
+fn calculate_children_spread(num_children: usize, depth: usize) -> f64 {
+    use std::f64::consts::PI;
+
+    // Base spread decreases significantly with depth to create compact layout
+    let base_spread = match depth {
+        1 => PI / 3.0, // First level: 60 degrees
+        2 => PI / 4.0, // Second level: 45 degrees
+        _ => PI / 5.0, // Deeper: 36 degrees
+    };
+
+    // Adjust for number of children
+    let spread = base_spread * (num_children as f64 * 0.7).sqrt();
+
+    spread.min(PI * 0.6) // Cap at ~108 degrees
 }
 
 /// Calculate node size based on text content
@@ -375,24 +387,50 @@ fn render_edges(nodes: &[PositionedNode], _config: &RenderConfig) -> SvgElement 
     for node in nodes {
         if let Some(parent_id) = &node.parent_id {
             if let Some(parent) = node_map.get(parent_id.as_str()) {
-                // Draw edge from parent to child
+                // Draw edge from parent center to child center
                 let parent_cx = parent.x + parent.width / 2.0;
                 let parent_cy = parent.y + parent.height / 2.0;
                 let child_cx = node.x + node.width / 2.0;
                 let child_cy = node.y + node.height / 2.0;
 
-                // Use a curved path (quadratic bezier)
-                let control_x = (parent_cx + child_cx) / 2.0;
-                let control_y = parent_cy;
+                // Calculate edge attachment points on node boundaries
+                let (start_x, start_y) = get_edge_attachment_point(
+                    parent_cx,
+                    parent_cy,
+                    parent.width,
+                    parent.height,
+                    child_cx,
+                    child_cy,
+                    parent.node_type,
+                );
+                let (end_x, end_y) = get_edge_attachment_point(
+                    child_cx,
+                    child_cy,
+                    node.width,
+                    node.height,
+                    parent_cx,
+                    parent_cy,
+                    node.node_type,
+                );
+
+                // Use a curved path with cubic bezier to match mermaid's "basis" curve style
+                // Mermaid uses d3-shape's curveBasis which creates smooth S-curves
+                let dx = end_x - start_x;
+                let dy = end_y - start_y;
+
+                // Calculate control points for smooth cubic bezier curve
+                // Similar to d3's basis curve interpolation
+                let t1 = 0.3;
+                let t2 = 0.7;
+
+                let ctrl1_x = start_x + dx * t1;
+                let ctrl1_y = start_y + dy * t1 * 0.5; // Bias toward horizontal
+                let ctrl2_x = start_x + dx * t2;
+                let ctrl2_y = end_y - dy * (1.0 - t2) * 0.5; // Bias toward end
 
                 let path = format!(
-                    "M {} {} Q {} {} {} {}",
-                    parent.x + parent.width,
-                    parent_cy,
-                    control_x,
-                    control_y,
-                    node.x,
-                    child_cy
+                    "M{:.1},{:.1} C{:.1},{:.1} {:.1},{:.1} {:.1},{:.1}",
+                    start_x, start_y, ctrl1_x, ctrl1_y, ctrl2_x, ctrl2_y, end_x, end_y
                 );
 
                 // Get section class for edge color
@@ -402,11 +440,15 @@ fn render_edges(nodes: &[PositionedNode], _config: &RenderConfig) -> SvgElement 
                     "section-edge-root".to_string()
                 };
 
+                // Add depth class for stroke width
+                let depth_class = format!("edge-depth-{}", node.depth.min(10));
+
                 children.push(SvgElement::Path {
                     d: path,
                     attrs: Attrs::new()
                         .with_class("edge")
                         .with_class(&section_class)
+                        .with_class(&depth_class)
                         .with_fill("none")
                         .with_stroke_width(3.0),
                 });
@@ -418,6 +460,54 @@ fn render_edges(nodes: &[PositionedNode], _config: &RenderConfig) -> SvgElement 
         children,
         attrs: Attrs::new().with_class("mindmap-edges"),
     }
+}
+
+/// Calculate the attachment point on a node's boundary for an edge
+fn get_edge_attachment_point(
+    cx: f64,
+    cy: f64,
+    width: f64,
+    height: f64,
+    target_x: f64,
+    target_y: f64,
+    node_type: NodeType,
+) -> (f64, f64) {
+    // For circles, use the circle boundary
+    if matches!(node_type, NodeType::Circle) {
+        let radius = width.min(height) / 2.0;
+        let dx = target_x - cx;
+        let dy = target_y - cy;
+        let dist = (dx * dx + dy * dy).sqrt().max(0.001);
+        return (cx + dx / dist * radius, cy + dy / dist * radius);
+    }
+
+    // For other shapes, use rectangle boundary intersection
+    let dx = target_x - cx;
+    let dy = target_y - cy;
+
+    if dx.abs() < 0.001 && dy.abs() < 0.001 {
+        return (cx, cy);
+    }
+
+    // Calculate intersection with rectangle boundary
+    let half_w = width / 2.0;
+    let half_h = height / 2.0;
+
+    // Check which edge we intersect
+    let tx = if dx.abs() > 0.001 {
+        half_w / dx.abs()
+    } else {
+        f64::MAX
+    };
+    let ty = if dy.abs() > 0.001 {
+        half_h / dy.abs()
+    } else {
+        f64::MAX
+    };
+
+    let t = tx.min(ty);
+
+    (cx + dx * t, cy + dy * t)
 }
 
 /// Render all nodes
@@ -706,31 +796,44 @@ fn generate_mindmap_css(config: &RenderConfig) -> String {
     // Generate section colors
     let mut section_css = String::new();
 
-    // Root section uses primary color (similar to mermaid.js)
-    section_css.push_str(&format!(
+    // Root section uses a distinctive blue (matching mermaid.js)
+    // mermaid uses hsl(240, 100%, 76.3%) for section--1 (root)
+    section_css.push_str(
         r#"
-.section-root rect, .section-root path, .section-root circle, .section-root polygon {{
-  fill: {};
-}}
-.section-root text {{
-  fill: {};
-}}
-.section-edge-root {{
-  stroke: {};
-}}
+.section-root rect, .section-root path, .section-root circle, .section-root polygon {
+  fill: hsl(240, 100%, 46.3%);
+}
+.section-root text {
+  fill: #ffffff;
+}
+.section-edge-root {
+  stroke: hsl(240, 100%, 76.3%);
+}
 "#,
-        theme.primary_color, theme.primary_text_color, theme.primary_color
-    ));
+    );
 
-    // Generate section colors from pie colors (similar to mermaid's cScale)
+    // Section colors matching mermaid.js pattern
+    // mermaid uses a specific hue sequence for sections
+    let mindmap_colors = [
+        "hsl(60, 100%, 73.5%)",  // Section 0: yellow
+        "hsl(80, 100%, 76.3%)",  // Section 1: lime green
+        "hsl(270, 100%, 76.3%)", // Section 2: purple
+        "hsl(300, 100%, 76.3%)", // Section 3: pink
+        "hsl(330, 100%, 76.3%)", // Section 4: rose
+        "hsl(0, 100%, 76.3%)",   // Section 5: red
+        "hsl(30, 100%, 76.3%)",  // Section 6: orange
+        "hsl(90, 100%, 76.3%)",  // Section 7: green
+        "hsl(150, 100%, 76.3%)", // Section 8: teal
+        "hsl(180, 100%, 76.3%)", // Section 9: cyan
+        "hsl(210, 100%, 76.3%)", // Section 10: blue
+    ];
+
     for i in 0..(MAX_SECTIONS - 1) {
-        let color = theme
-            .pie_colors
-            .get(i)
-            .map(|s| s.as_str())
-            .unwrap_or("#ECECFF");
-
+        let color = mindmap_colors.get(i).unwrap_or(&"hsl(60, 100%, 73.5%)");
         let stroke_width = 17 - 3 * (i as i32);
+
+        // Determine text color based on lightness
+        let text_color = if i == 2 { "#ffffff" } else { "black" };
 
         section_css.push_str(&format!(
             r#"
@@ -749,7 +852,7 @@ fn generate_mindmap_css(config: &RenderConfig) -> String {
 "#,
             i = i,
             color = color,
-            text_color = theme.primary_text_color,
+            text_color = text_color,
             stroke_width = stroke_width
         ));
     }
