@@ -49,7 +49,7 @@ fn compute_pie_colors(primary: &str, secondary: &str) -> Vec<String> {
 
     // Use adjust_to_hsl_string to avoid RGB roundtrip precision loss
     vec![
-        primary.to_lowercase(),   // pie1 = primaryColor (keep original hex format like mermaid)
+        primary.to_lowercase(), // pie1 = primaryColor (keep original hex format like mermaid)
         secondary.to_lowercase(), // pie2 = secondaryColor (keep original hex format like mermaid)
         // pie3 = adjust(tertiaryColor, { l: -40 })
         format!(
@@ -82,7 +82,10 @@ fn format_hsl_pct(value: f64) -> String {
     if (value - rounded).abs() < 0.0001 {
         format!("{}", rounded as i32)
     } else {
-        format!("{:.10}", value).trim_end_matches('0').trim_end_matches('.').to_string()
+        format!("{:.10}", value)
+            .trim_end_matches('0')
+            .trim_end_matches('.')
+            .to_string()
     }
 }
 
@@ -1789,7 +1792,11 @@ mod tests {
                 let inner = &color_str[4..color_str.len() - 1];
                 let parts: Vec<&str> = inner.split(',').collect();
                 if parts.len() >= 2 {
-                    let saturation = parts[1].trim().trim_end_matches('%').parse::<f64>().unwrap_or(100.0);
+                    let saturation = parts[1]
+                        .trim()
+                        .trim_end_matches('%')
+                        .parse::<f64>()
+                        .unwrap_or(100.0);
                     assert!(
                         saturation > 0.0,
                         "pie{} has 0% saturation (gray): {} - tertiaryColor may not be derived correctly",
@@ -1808,7 +1815,13 @@ mod tests {
         // Parse pie1 to verify it's the purple color (hue ~240)
         if pie1.starts_with("hsl(") {
             let inner = &pie1[4..pie1.len() - 1];
-            let hue: f64 = inner.split(',').next().unwrap().trim().parse().unwrap_or(0.0);
+            let hue: f64 = inner
+                .split(',')
+                .next()
+                .unwrap()
+                .trim()
+                .parse()
+                .unwrap_or(0.0);
             assert!(
                 (hue - 240.0).abs() < 5.0,
                 "pie1 should have hue ~240 (purple), got {}",
@@ -1819,7 +1832,13 @@ mod tests {
         // Parse pie2 to verify it's the yellow color (hue ~60)
         if pie2.starts_with("hsl(") {
             let inner = &pie2[4..pie2.len() - 1];
-            let hue: f64 = inner.split(',').next().unwrap().trim().parse().unwrap_or(0.0);
+            let hue: f64 = inner
+                .split(',')
+                .next()
+                .unwrap()
+                .trim()
+                .parse()
+                .unwrap_or(0.0);
             assert!(
                 (hue - 60.0).abs() < 5.0,
                 "pie2 should have hue ~60 (yellow), got {}",

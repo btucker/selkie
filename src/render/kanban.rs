@@ -209,10 +209,7 @@ fn render_sections(db: &KanbanDb, layout: &KanbanLayout, _config: &RenderConfig)
         let section_group = SvgElement::Group {
             children: vec![rect, label],
             attrs: Attrs::new()
-                .with_class(&format!(
-                    "cluster section-{}",
-                    (idx % 12) + 1
-                ))
+                .with_class(&format!("cluster section-{}", (idx % 12) + 1))
                 .with_attr("id", &section.id),
         };
         children.push(section_group);

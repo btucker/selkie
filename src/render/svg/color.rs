@@ -303,7 +303,10 @@ fn format_mermaid_pct(value: f64) -> String {
         format!("{}", rounded as i32)
     } else {
         // Match mermaid's precision: up to 10 decimal places
-        format!("{:.10}", value).trim_end_matches('0').trim_end_matches('.').to_string()
+        format!("{:.10}", value)
+            .trim_end_matches('0')
+            .trim_end_matches('.')
+            .to_string()
     }
 }
 

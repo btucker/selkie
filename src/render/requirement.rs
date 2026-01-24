@@ -177,8 +177,8 @@ impl ToLayoutGraph for RequirementDb {
 
         graph.options = LayoutOptions {
             direction,
-            node_spacing: 50.0,  // Match mermaid's default nodeSpacing
-            layer_spacing: 50.0, // Match mermaid's default rankSpacing
+            node_spacing: 50.0,             // Match mermaid's default nodeSpacing
+            layer_spacing: 50.0,            // Match mermaid's default rankSpacing
             padding: Padding::uniform(8.0), // Match mermaid's padding
             ..Default::default()
         };
@@ -326,7 +326,8 @@ pub fn render_requirement(db: &RequirementDb, config: &RenderConfig) -> Result<S
                 width: DEFAULT_REQ_BOX_WIDTH,
                 height: DEFAULT_BOX_HEIGHT,
             });
-            let req_elem = render_requirement_box(req, x, y, dims.width, dims.height, &config.theme);
+            let req_elem =
+                render_requirement_box(req, x, y, dims.width, dims.height, &config.theme);
             doc.add_element(req_elem);
         }
     }

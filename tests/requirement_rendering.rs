@@ -1122,7 +1122,8 @@ fn should_use_mermaid_default_fill_color() {
     assert!(
         has_correct_fill,
         "Requirement boxes should use mermaid default fill color #ECECFF. \
-         SVG content: {}", &svg[..svg.len().min(500)]
+         SVG content: {}",
+        &svg[..svg.len().min(500)]
     );
 }
 
@@ -1204,6 +1205,8 @@ fn should_produce_portrait_aspect_ratio_for_tb_layout() {
         "TB layout should produce portrait diagram (height > width). \
          Current: width={}, height={}, aspect_ratio={}. \
          Expected aspect_ratio < 1.0 (portrait). Mermaid produces ~0.82",
-        width, height, aspect_ratio
+        width,
+        height,
+        aspect_ratio
     );
 }
