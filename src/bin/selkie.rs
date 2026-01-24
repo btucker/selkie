@@ -564,6 +564,12 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     // Write SVGs to subdirectories organized by diagram type
     eprint!("Writing SVG files...");
+
+    // Also write to docs/images directories if they exist
+    let docs_images = Path::new("docs/images");
+    let docs_images_ref = Path::new("docs/images/reference");
+    let write_to_docs = docs_images.exists() && docs_images_ref.exists();
+
     for diagram in &result.diagrams {
         let type_dir = output_dir.join(&diagram.diagram_type);
         let safe_name = diagram.name.replace(['/', ' '], "_");
@@ -577,12 +583,24 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         if let Some(ref svg) = diagram.selkie_svg {
             let path = type_dir.join(format!("{}_selkie.svg", safe_name));
             fs::write(&path, svg)?;
+
+            // Also write to docs/images/ (without _selkie suffix)
+            if write_to_docs {
+                let docs_path = docs_images.join(format!("{}.svg", safe_name));
+                fs::write(&docs_path, svg)?;
+            }
         }
 
         // Write reference SVG if available
         if let Some(ref svg) = diagram.reference_svg {
             let path = type_dir.join(format!("{}_reference.svg", safe_name));
             fs::write(&path, svg)?;
+
+            // Also write to docs/images/reference/ (without _reference suffix)
+            if write_to_docs {
+                let docs_path = docs_images_ref.join(format!("{}.svg", safe_name));
+                fs::write(&docs_path, svg)?;
+            }
         }
     }
     eprintln!(" done");
