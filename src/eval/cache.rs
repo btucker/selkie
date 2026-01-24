@@ -137,6 +137,25 @@ impl ReferenceCache {
             .unwrap_or(false)
     }
 
+    /// Check if a named diagram exists in the repo cache (without hash verification)
+    ///
+    /// Returns true if the SVG file exists, regardless of whether it has a valid hash.
+    /// Use this as a fallback when mmdc is not available.
+    pub fn has_unverified_by_name(&self, name: &str) -> bool {
+        self.repo_cache_path(name)
+            .map(|path| path.exists())
+            .unwrap_or(false)
+    }
+
+    /// Get a cached SVG by name without hash verification
+    ///
+    /// This is a fallback for when mmdc is not available. The SVG may be stale
+    /// if the source has changed since it was cached.
+    pub fn get_unverified_by_name(&self, name: &str) -> Option<String> {
+        self.repo_cache_path(name)
+            .and_then(|path| fs::read_to_string(path).ok())
+    }
+
     /// Get a cached SVG by name from the repo cache, only if it matches the diagram content
     pub fn get_by_name(&self, name: &str, diagram: &str) -> Option<String> {
         self.repo_cache_path(name)
@@ -373,6 +392,7 @@ impl ReferenceCache {
         }
 
         // Build final results: batch results for uncached, cache for cached
+        // If mmdc failed but we have an unverified cached SVG, use it as fallback
         let mut batch_iter = batch_results.into_iter();
         let mut uncached_idx = 0;
 
@@ -382,7 +402,14 @@ impl ReferenceCache {
             .map(|(i, (name, diagram))| {
                 if uncached_idx < uncached.len() && uncached[uncached_idx].0 == i {
                     uncached_idx += 1;
-                    batch_iter.next().unwrap()
+                    let result = batch_iter.next().unwrap();
+                    // If mmdc failed, try unverified cache as fallback
+                    if result.is_err() {
+                        if let Some(svg) = self.get_unverified_by_name(name) {
+                            return Ok(svg);
+                        }
+                    }
+                    result
                 } else {
                     // Try repo cache first (with hash verification), then hash cache
                     self.get_by_name(name, diagram)

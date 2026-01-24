@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "mb prime"
+            "command": "uvx microbeads prime"
           }
         ]
       }
@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "mb prime"
+            "command": "uvx microbeads prime"
           }
         ]
       }
