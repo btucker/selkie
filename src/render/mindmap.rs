@@ -1,6 +1,7 @@
 //! Mindmap diagram renderer
 //!
-//! Renders mindmap diagrams using a radial tree layout.
+//! Renders mindmap diagrams using a bidirectional tree layout.
+//! The root is centered with branches spreading left and right.
 
 use crate::diagrams::mindmap::{MindmapDb, MindmapNode, NodeType};
 use crate::error::Result;
@@ -16,10 +17,10 @@ const MIN_NODE_WIDTH: f64 = 50.0;
 const MIN_NODE_HEIGHT: f64 = 30.0;
 
 /// Horizontal spacing between nodes
-const NODE_SPACING_H: f64 = 80.0;
+const NODE_SPACING_H: f64 = 60.0;
 
 /// Vertical spacing between sibling nodes
-const NODE_SPACING_V: f64 = 40.0;
+const NODE_SPACING_V: f64 = 30.0;
 
 /// Maximum number of color sections (matches mermaid.js)
 const MAX_SECTIONS: usize = 12;
@@ -29,6 +30,13 @@ const FONT_SIZE: f64 = 14.0;
 
 /// Character width estimate for text sizing
 const CHAR_WIDTH: f64 = 8.0;
+
+/// Direction for branch placement
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum BranchDirection {
+    Left,
+    Right,
+}
 
 /// A positioned node for rendering
 #[derive(Debug, Clone)]
@@ -72,18 +80,85 @@ pub fn render_mindmap(db: &MindmapDb, config: &RenderConfig) -> Result<String> {
         }
     };
 
-    // Position all nodes using tree layout
+    // Position all nodes using bidirectional tree layout
     let mut positioned_nodes = Vec::new();
     let mut node_counter = 0;
-    position_tree(
-        root,
-        0.0,
-        0.0,
-        -1, // Root section is -1 (section-root)
-        None,
-        &mut positioned_nodes,
-        &mut node_counter,
-    );
+
+    // Calculate root node size
+    let (root_width, root_height) = calculate_node_size(&root.descr, root.node_type);
+
+    // First, measure the subtrees to balance left and right
+    let children = &root.children;
+    let num_children = children.len();
+
+    // Split children: first half goes right, second half goes left
+    // (This matches mermaid.js behavior where first branch goes right)
+    let split_point = num_children.div_ceil(2);
+    let right_children: Vec<&MindmapNode> = children.iter().take(split_point).collect();
+    let left_children: Vec<&MindmapNode> = children.iter().skip(split_point).collect();
+
+    // Calculate subtree heights for each side
+    let right_height = calculate_subtree_height(&right_children);
+    let left_height = calculate_subtree_height(&left_children);
+
+    // Position root at center (we'll adjust based on bounds later)
+    // Root x is 0, y is calculated to center between the two sides
+    let root_y = 0.0;
+
+    // Position right-side subtrees
+    let mut right_y_offset = root_y - right_height / 2.0;
+    for (i, child) in right_children.iter().enumerate() {
+        let section = (i as i32) % (MAX_SECTIONS as i32 - 1);
+        let child_x = root_width / 2.0 + NODE_SPACING_H;
+        position_tree_directional(
+            child,
+            child_x,
+            right_y_offset,
+            section,
+            BranchDirection::Right,
+            Some("mindmap-root".to_string()),
+            &mut positioned_nodes,
+            &mut node_counter,
+        );
+        let subtree_height = measure_subtree_height(child);
+        right_y_offset += subtree_height + NODE_SPACING_V;
+    }
+
+    // Position left-side subtrees
+    let mut left_y_offset = root_y - left_height / 2.0;
+    for (i, child) in left_children.iter().enumerate() {
+        let section = ((right_children.len() + i) as i32) % (MAX_SECTIONS as i32 - 1);
+        // For left side, we need to measure the subtree width first to position correctly
+        let subtree_width = measure_subtree_width(child, BranchDirection::Left);
+        let child_x = -root_width / 2.0 - NODE_SPACING_H - subtree_width;
+        position_tree_directional(
+            child,
+            child_x,
+            left_y_offset,
+            section,
+            BranchDirection::Left,
+            Some("mindmap-root".to_string()),
+            &mut positioned_nodes,
+            &mut node_counter,
+        );
+        let subtree_height = measure_subtree_height(child);
+        left_y_offset += subtree_height + NODE_SPACING_V;
+    }
+
+    // Add the root node (centered at 0,0)
+    positioned_nodes.push(PositionedNode {
+        id: "mindmap-root".to_string(),
+        text: root.descr.clone(),
+        node_type: root.node_type,
+        x: -root_width / 2.0,
+        y: -root_height / 2.0,
+        width: root_width,
+        height: root_height,
+        section: -1, // Root section
+        parent_id: None,
+        icon: root.icon.clone(),
+        class: root.class.clone(),
+    });
 
     // Calculate bounds
     let (min_x, max_x, min_y, max_y) = calculate_bounds(&positioned_nodes);
@@ -109,16 +184,63 @@ pub fn render_mindmap(db: &MindmapDb, config: &RenderConfig) -> Result<String> {
     Ok(doc.to_string())
 }
 
-/// Position nodes in a tree layout
-fn position_tree(
+/// Calculate total height needed for a list of child subtrees
+fn calculate_subtree_height(children: &[&MindmapNode]) -> f64 {
+    if children.is_empty() {
+        return 0.0;
+    }
+    let mut total = 0.0;
+    for child in children {
+        total += measure_subtree_height(child) + NODE_SPACING_V;
+    }
+    total - NODE_SPACING_V // Remove trailing spacing
+}
+
+/// Measure the height of a subtree rooted at this node
+fn measure_subtree_height(node: &MindmapNode) -> f64 {
+    let (_, node_height) = calculate_node_size(&node.descr, node.node_type);
+
+    if node.children.is_empty() {
+        return node_height;
+    }
+
+    let mut children_height = 0.0;
+    for child in &node.children {
+        children_height += measure_subtree_height(child) + NODE_SPACING_V;
+    }
+    children_height -= NODE_SPACING_V; // Remove trailing spacing
+
+    children_height.max(node_height)
+}
+
+/// Measure the width of a subtree
+fn measure_subtree_width(node: &MindmapNode, _direction: BranchDirection) -> f64 {
+    let (node_width, _) = calculate_node_size(&node.descr, node.node_type);
+
+    if node.children.is_empty() {
+        return node_width;
+    }
+
+    let mut max_child_width: f64 = 0.0;
+    for child in &node.children {
+        max_child_width = max_child_width.max(measure_subtree_width(child, _direction));
+    }
+
+    node_width + NODE_SPACING_H + max_child_width
+}
+
+/// Position nodes in a directional tree layout
+#[allow(clippy::too_many_arguments)]
+fn position_tree_directional(
     node: &MindmapNode,
     x: f64,
     y: f64,
     section: i32,
+    direction: BranchDirection,
     parent_id: Option<String>,
     positioned: &mut Vec<PositionedNode>,
     counter: &mut usize,
-) -> (f64, f64) {
+) {
     // Generate node ID
     let id = node
         .node_id
@@ -130,52 +252,15 @@ fn position_tree(
     let text = &node.descr;
     let (width, height) = calculate_node_size(text, node.node_type);
 
-    // Position children
-    let mut child_y_offset: f64 = 0.0;
-    let mut max_subtree_width: f64 = 0.0;
+    // Calculate this subtree's total height for vertical centering
+    let subtree_height = measure_subtree_height(node);
 
-    for (i, child) in node.children.iter().enumerate() {
-        // Assign section based on position (for root's children) or inherit
-        let child_section = if section == -1 {
-            (i as i32) % (MAX_SECTIONS as i32 - 1)
-        } else {
-            section
-        };
-
-        let child_x = x + width / 2.0 + NODE_SPACING_H;
-        let child_y = y + child_y_offset;
-
-        let (subtree_width, subtree_height) = position_tree(
-            child,
-            child_x,
-            child_y,
-            child_section,
-            Some(id.clone()),
-            positioned,
-            counter,
-        );
-
-        child_y_offset += subtree_height + NODE_SPACING_V;
-        max_subtree_width = max_subtree_width.max(subtree_width);
-    }
-
-    // Calculate this subtree's height
-    let subtree_height = if node.children.is_empty() {
-        height
-    } else {
-        (child_y_offset - NODE_SPACING_V).max(height)
-    };
-
-    // Center this node vertically relative to its children
-    let node_y = if node.children.is_empty() {
-        y
-    } else {
-        y + (subtree_height - height) / 2.0
-    };
+    // Center this node vertically relative to its subtree
+    let node_y = y + (subtree_height - height) / 2.0;
 
     // Add this node
     positioned.push(PositionedNode {
-        id,
+        id: id.clone(),
         text: text.clone(),
         node_type: node.node_type,
         x,
@@ -188,15 +273,36 @@ fn position_tree(
         class: node.class.clone(),
     });
 
-    // Return subtree dimensions
-    let total_width = width
-        + if node.children.is_empty() {
-            0.0
-        } else {
-            NODE_SPACING_H + max_subtree_width
-        };
+    // Position children
+    if !node.children.is_empty() {
+        let mut child_y_offset = y;
 
-    (total_width, subtree_height)
+        for child in &node.children {
+            let child_height = measure_subtree_height(child);
+
+            // Calculate child x position based on direction
+            let child_x = match direction {
+                BranchDirection::Right => x + width + NODE_SPACING_H,
+                BranchDirection::Left => {
+                    let child_width = measure_subtree_width(child, direction);
+                    x - NODE_SPACING_H - child_width
+                }
+            };
+
+            position_tree_directional(
+                child,
+                child_x,
+                child_y_offset,
+                section, // Children inherit parent's section
+                direction,
+                Some(id.clone()),
+                positioned,
+                counter,
+            );
+
+            child_y_offset += child_height + NODE_SPACING_V;
+        }
+    }
 }
 
 /// Calculate node size based on text content

@@ -130,28 +130,28 @@ marker path {
 
     </g>
     <g transform="translate(250, 250)">
-      <circle cx="0" cy="0" r="40" class="radarGraticule" stroke-width="1" fill="none" stroke="#999999" stroke-opacity="0.3"/>
-      <circle cx="0" cy="0" r="80" class="radarGraticule" stroke-width="1" stroke-opacity="0.3" fill="none" stroke="#999999"/>
-      <circle cx="0" cy="0" r="120" class="radarGraticule" stroke="#999999" fill="none" stroke-opacity="0.3" stroke-width="1"/>
-      <circle cx="0" cy="0" r="160" class="radarGraticule" stroke-opacity="0.3" stroke="#999999" fill="none" stroke-width="1"/>
-      <circle cx="0" cy="0" r="200" class="radarGraticule" stroke="#999999" stroke-width="1" stroke-opacity="0.3" fill="none"/>
-      <line x1="0" y1="0" x2="0.000000000000010409497792752502" y2="-170" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
-      <text x="0.000000000000013471114790620887" y="-220.00000000000003" class="radarAxisLabel" text-anchor="middle" fill="#333333" dominant-baseline="middle" font-size="12">Speed</text>
-      <line x1="0" y1="0" x2="161.6796077701761" y2="-52.53288904374106" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
-      <text x="209.2324335849338" y="-67.98373876248844" class="radarAxisLabel" text-anchor="middle" font-size="12" dominant-baseline="middle" fill="#333333">Power</text>
+      <polygon points="0.0000000000000024492935982947065,-40 38.04226065180614,-12.360679774997896 23.511410091698927,32.3606797749979 -23.51141009169892,32.3606797749979 -38.042260651806146,-12.360679774997891" class="radarGraticule" stroke-opacity="0.3" stroke-width="1" fill="none" stroke="#999999"/>
+      <polygon points="0.000000000000004898587196589413,-80 76.08452130361228,-24.721359549995793 47.022820183397855,64.7213595499958 -47.02282018339784,64.7213595499958 -76.08452130361229,-24.721359549995782" class="radarGraticule" fill="none" stroke-width="1" stroke-opacity="0.3" stroke="#999999"/>
+      <polygon points="0.00000000000000734788079488412,-120 114.12678195541842,-37.08203932499369 70.53423027509677,97.0820393249937 -70.53423027509676,97.0820393249937 -114.12678195541844,-37.08203932499367" class="radarGraticule" stroke-width="1" stroke="#999999" fill="none" stroke-opacity="0.3"/>
+      <polygon points="0.000000000000009797174393178826,-160 152.16904260722455,-49.442719099991585 94.04564036679571,129.4427190999916 -94.04564036679568,129.4427190999916 -152.16904260722458,-49.442719099991564" class="radarGraticule" stroke-width="1" stroke-opacity="0.3" stroke="#999999" fill="none"/>
+      <polygon points="0.000000000000012246467991473532,-200 190.2113032590307,-61.803398874989476 117.55705045849463,161.80339887498948 -117.5570504584946,161.80339887498948 -190.21130325903073,-61.803398874989455" class="radarGraticule" stroke-opacity="0.3" fill="none" stroke="#999999" stroke-width="1"/>
+      <line x1="0" y1="0" x2="0.000000000000010409497792752502" y2="-170" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
+      <text x="0.000000000000013471114790620887" y="-220.00000000000003" class="radarAxisLabel" fill="#333333" font-size="12" dominant-baseline="middle" text-anchor="middle">Coding</text>
+      <line x1="0" y1="0" x2="161.6796077701761" y2="-52.53288904374106" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
+      <text x="209.2324335849338" y="-67.98373876248844" class="radarAxisLabel" font-size="12" dominant-baseline="middle" fill="#333333" text-anchor="middle">Testing</text>
       <line x1="0" y1="0" x2="99.92349288972044" y2="137.53288904374108" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
-      <text x="129.3127555043441" y="177.98373876248846" class="radarAxisLabel" font-size="12" fill="#333333" text-anchor="middle" dominant-baseline="middle">Agility</text>
+      <text x="129.3127555043441" y="177.98373876248846" class="radarAxisLabel" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="#333333">Design</text>
       <line x1="0" y1="0" x2="-99.92349288972042" y2="137.53288904374108" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
-      <text x="-129.3127555043441" y="177.98373876248846" class="radarAxisLabel" fill="#333333" dominant-baseline="middle" text-anchor="middle" font-size="12">Stamina</text>
+      <text x="-129.3127555043441" y="177.98373876248846" class="radarAxisLabel" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="#333333">Code Review</text>
       <line x1="0" y1="0" x2="-161.67960777017612" y2="-52.53288904374104" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
-      <text x="-209.23243358493383" y="-67.98373876248841" class="radarAxisLabel" font-size="12" text-anchor="middle" fill="#333333" dominant-baseline="middle">Intelligence</text>
-      <path d="M0.00000000000000734788079488412,-120 C50.824460230813024,-120 132.53701518065594,-96.50388671211483 152.16904260722455,-49.442719099991585 C171.80107003379317,-2.381551487868336 150.82209154452858,142.73799774044159 117.55705045849463,161.80339887498948 C84.29200937246068,180.86880000953738 -1.9785626414227266,99.99946125181764 -47.02282018339784,64.7213595499958 C-92.06707772537295,29.443257848173957 -160.02185357785203,-18.594252055142267 -152.16904260722458,-49.442719099991564 C-144.31623163659714,-80.29118614484086 -50.82446023081301,-120 0.00000000000000734788079488412,-120 Z" class="radarCurve-0" stroke="#4C78A8" fill="#4C78A8" fill-opacity="0.3" stroke-width="2"/>
-      <path d="M0.000000000000009797174393178826,-160 C31.765287644258144,-157.93576647757536 64.30530484767112,-67.65406011726975 76.08452130361228,-24.721359549995793 C87.86373775955343,18.211341017278162 102.87237275936863,65.93240466802116 70.53423027509677,97.0820393249937 C38.196087790824926,128.23167398196625 -86.71866141599855,184.20880000953738 -117.5570504584946,161.80339887498948 C-148.39543950099065,139.39799774044158 -133.75880938198705,16.659128287129576 -114.12678195541844,-37.08203932499367 C-94.49475452884984,-90.82320693711692 -31.765287644258123,-162.06423352242464 0.000000000000009797174393178826,-160 Z" class="radarCurve-1" stroke-width="2" fill="#F58518" fill-opacity="0.3" stroke="#F58518"/>
+      <text x="-209.23243358493383" y="-67.98373876248841" class="radarAxisLabel" fill="#333333" dominant-baseline="middle" text-anchor="middle" font-size="12">Documentation</text>
+      <polygon points="0.000000000000009797174393178826,-160 114.12678195541842,-37.08203932499369 70.53423027509677,97.0820393249937 -94.04564036679568,129.4427190999916 -76.08452130361229,-24.721359549995782" class="radarCurve-0" stroke-width="2" fill-opacity="0.3" stroke="#4C78A8" fill="#4C78A8"/>
+      <polygon points="0.00000000000000734788079488412,-120 152.16904260722455,-49.442719099991585 94.04564036679571,129.4427190999916 -70.53423027509676,97.0820393249937 -190.21130325903073,-61.803398874989455" class="radarCurve-1" fill="#F58518" stroke-width="2" stroke="#F58518" fill-opacity="0.3"/>
       <rect x="187.5" y="-187.5" width="12" height="12" class="radarLegendBox-0" fill="#4C78A8"/>
-      <text x="203.5" y="-187.5" class="radarLegendText" font-size="12" dominant-baseline="hanging">Player 1</text>
+      <text x="203.5" y="-187.5" class="radarLegendText" font-size="12" dominant-baseline="hanging">Team Alpha</text>
       <rect x="187.5" y="-167.5" width="12" height="12" class="radarLegendBox-1" fill="#F58518"/>
-      <text x="203.5" y="-167.5" class="radarLegendText" dominant-baseline="hanging" font-size="12">Player 2</text>
-      <text x="0" y="-230" class="radarTitle" font-weight="bold" text-anchor="middle" fill="#333333" font-size="16">Skill Comparison</text>
+      <text x="203.5" y="-167.5" class="radarLegendText" dominant-baseline="hanging" font-size="12">Team Beta</text>
+      <text x="0" y="-230" class="radarTitle" font-size="16" font-weight="bold" text-anchor="middle" fill="#333333">Skills Assessment</text>
     </g>
   </g>
 </svg>

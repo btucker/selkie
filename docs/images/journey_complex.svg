@@ -140,39 +140,39 @@
     <g class="nodes">
       <g class="actor-legend">
         <g class="actor-legend-0">
-          <circle cx="20" cy="110" r="7" class="actor-0" stroke="#000" fill="#8FBC8F"/>
+          <circle cx="20" cy="110" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
           <text x="40" y="117" class="legend" text-anchor="start" fill="#333">Customer</text>
         </g>
         <g class="actor-legend-1">
-          <circle cx="20" cy="135" r="7" class="actor-1" stroke="#000" fill="#7CFC00"/>
+          <circle cx="20" cy="135" r="7" class="actor-1" fill="#7CFC00" stroke="#000"/>
           <text x="40" y="142" class="legend" fill="#333" text-anchor="start">System</text>
         </g>
       </g>
       <g class="journey-sections">
         <g>
           <rect x="150" y="100" width="550" height="50" rx="3" ry="3" class="journey-section section-type-0" fill="#191970"/>
-          <text x="425" y="130" class="label" text-anchor="middle" dominant-baseline="middle">Discovery</text>
+          <text x="425" y="130" class="label" dominant-baseline="middle" text-anchor="middle">Discovery</text>
         </g>
         <g>
           <rect x="750" y="100" width="750" height="50" rx="3" ry="3" class="journey-section section-type-1" fill="#8B008B"/>
-          <text x="1125" y="130" class="label" dominant-baseline="middle" text-anchor="middle">Selection</text>
+          <text x="1125" y="130" class="label" text-anchor="middle" dominant-baseline="middle">Selection</text>
         </g>
         <g>
           <rect x="1550" y="100" width="750" height="50" rx="3" ry="3" class="journey-section section-type-2" fill="#4B0082"/>
-          <text x="1925" y="130" class="label" text-anchor="middle" dominant-baseline="middle">Checkout</text>
+          <text x="1925" y="130" class="label" dominant-baseline="middle" text-anchor="middle">Checkout</text>
         </g>
         <g>
           <rect x="2350" y="100" width="550" height="50" rx="3" ry="3" class="journey-section section-type-3" fill="#2F4F4F"/>
-          <text x="2625" y="130" class="label" text-anchor="middle" dominant-baseline="middle">Post-Purchase</text>
+          <text x="2625" y="130" class="label" dominant-baseline="middle" text-anchor="middle">Post-Purchase</text>
         </g>
       </g>
       <g class="journey-tasks">
         <g class="task-group task-0" id="task0">
-          <line x1="225" y1="150" x2="225" y2="450" class="task-line" stroke="#666" stroke-dasharray="4 2" id="task0" stroke-width="1"/>
+          <line x1="225" y1="150" x2="225" y2="450" class="task-line" stroke="#666" id="task0" stroke-dasharray="4 2" stroke-width="1"/>
           <g class="face-group">
-            <circle cx="225" cy="300" r="15" class="face" overflow="visible" fill="#FFF8DC" stroke-width="2"/>
-            <circle cx="220" cy="295" r="1.5" stroke="#666" stroke-width="2" fill="#666"/>
-            <circle cx="230" cy="295" r="1.5" stroke="#666" stroke-width="2" fill="#666"/>
+            <circle cx="225" cy="300" r="15" class="face" fill="#FFF8DC" overflow="visible" stroke-width="2"/>
+            <circle cx="220" cy="295" r="1.5" stroke-width="2" stroke="#666" fill="#666"/>
+            <circle cx="230" cy="295" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
             <path d="M 217.5,302 A 7.5,6.8181818181818175 0 0,0 232.5,302" class="mouth" fill="none" stroke="#666"/>
           </g>
           <rect x="150" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-0" fill="#191970"/>
@@ -183,11 +183,11 @@
           <text x="225" y="180" class="label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Visit homepage</text>
         </g>
         <g class="task-group task-1" id="task1">
-          <line x1="425" y1="150" x2="425" y2="450" class="task-line" stroke-dasharray="4 2" stroke="#666" id="task1" stroke-width="1"/>
+          <line x1="425" y1="150" x2="425" y2="450" class="task-line" id="task1" stroke="#666" stroke-dasharray="4 2" stroke-width="1"/>
           <g class="face-group">
-            <circle cx="425" cy="330" r="15" class="face" overflow="visible" stroke-width="2" fill="#FFF8DC"/>
-            <circle cx="420" cy="325" r="1.5" fill="#666" stroke-width="2" stroke="#666"/>
-            <circle cx="430" cy="325" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
+            <circle cx="425" cy="330" r="15" class="face" overflow="visible" fill="#FFF8DC" stroke-width="2"/>
+            <circle cx="420" cy="325" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
+            <circle cx="430" cy="325" r="1.5" stroke-width="2" stroke="#666" fill="#666"/>
             <path d="M 417.5,332 A 7.5,6.8181818181818175 0 0,0 432.5,332" class="mouth" fill="none" stroke="#666"/>
           </g>
           <rect x="350" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-0" fill="#191970"/>
@@ -195,12 +195,12 @@
             <circle cx="364" cy="150" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
             <title>Customer</title>
           </g>
-          <text x="425" y="180" class="label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Search for product</text>
+          <text x="425" y="180" class="label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Search for product</text>
         </g>
         <g class="task-group task-2" id="task2">
-          <line x1="625" y1="150" x2="625" y2="450" class="task-line" stroke-width="1" id="task2" stroke="#666" stroke-dasharray="4 2"/>
+          <line x1="625" y1="150" x2="625" y2="450" class="task-line" stroke-dasharray="4 2" stroke="#666" stroke-width="1" id="task2"/>
           <g class="face-group">
-            <circle cx="625" cy="360" r="15" class="face" stroke-width="2" overflow="visible" fill="#FFF8DC"/>
+            <circle cx="625" cy="360" r="15" class="face" fill="#FFF8DC" overflow="visible" stroke-width="2"/>
             <circle cx="620" cy="355" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
             <circle cx="630" cy="355" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
             <line x1="620" y1="367" x2="630" y2="367" class="mouth" stroke="#666" stroke-width="1"/>
@@ -210,124 +210,124 @@
             <circle cx="564" cy="150" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
             <title>Customer</title>
           </g>
-          <text x="625" y="180" class="label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Browse categories</text>
+          <text x="625" y="180" class="label" font-size="14px" text-anchor="middle" dominant-baseline="middle">Browse categories</text>
         </g>
         <g class="task-group task-3" id="task3">
-          <line x1="825" y1="150" x2="825" y2="450" class="task-line" stroke-width="1" id="task3" stroke="#666" stroke-dasharray="4 2"/>
+          <line x1="825" y1="150" x2="825" y2="450" class="task-line" stroke-dasharray="4 2" stroke="#666" id="task3" stroke-width="1"/>
           <g class="face-group">
-            <circle cx="825" cy="300" r="15" class="face" stroke-width="2" fill="#FFF8DC" overflow="visible"/>
+            <circle cx="825" cy="300" r="15" class="face" overflow="visible" fill="#FFF8DC" stroke-width="2"/>
             <circle cx="820" cy="295" r="1.5" fill="#666" stroke="#666" stroke-width="2"/>
-            <circle cx="830" cy="295" r="1.5" fill="#666" stroke-width="2" stroke="#666"/>
-            <path d="M 817.5,302 A 7.5,6.8181818181818175 0 0,0 832.5,302" class="mouth" stroke="#666" fill="none"/>
+            <circle cx="830" cy="295" r="1.5" stroke="#666" stroke-width="2" fill="#666"/>
+            <path d="M 817.5,302 A 7.5,6.8181818181818175 0 0,0 832.5,302" class="mouth" fill="none" stroke="#666"/>
           </g>
           <rect x="750" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-1" fill="#8B008B"/>
           <g>
             <circle cx="764" cy="150" r="7" class="actor-0" stroke="#000" fill="#8FBC8F"/>
             <title>Customer</title>
           </g>
-          <text x="825" y="180" class="label" dominant-baseline="middle" text-anchor="middle" font-size="14px">View product details</text>
+          <text x="825" y="180" class="label" text-anchor="middle" dominant-baseline="middle" font-size="14px">View product details</text>
         </g>
         <g class="task-group task-4" id="task4">
-          <line x1="1025" y1="150" x2="1025" y2="450" class="task-line" stroke-width="1" stroke-dasharray="4 2" stroke="#666" id="task4"/>
+          <line x1="1025" y1="150" x2="1025" y2="450" class="task-line" id="task4" stroke="#666" stroke-dasharray="4 2" stroke-width="1"/>
           <g class="face-group">
             <circle cx="1025" cy="330" r="15" class="face" fill="#FFF8DC" overflow="visible" stroke-width="2"/>
             <circle cx="1020" cy="325" r="1.5" stroke="#666" stroke-width="2" fill="#666"/>
-            <circle cx="1030" cy="325" r="1.5" stroke-width="2" stroke="#666" fill="#666"/>
+            <circle cx="1030" cy="325" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
             <path d="M 1017.5,332 A 7.5,6.8181818181818175 0 0,0 1032.5,332" class="mouth" stroke="#666" fill="none"/>
           </g>
           <rect x="950" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-1" fill="#8B008B"/>
           <g>
-            <circle cx="964" cy="150" r="7" class="actor-0" stroke="#000" fill="#8FBC8F"/>
+            <circle cx="964" cy="150" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
             <title>Customer</title>
           </g>
-          <text x="1025" y="180" class="label" text-anchor="middle" font-size="14px" dominant-baseline="middle">Read reviews</text>
+          <text x="1025" y="180" class="label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Read reviews</text>
         </g>
         <g class="task-group task-5" id="task5">
-          <line x1="1225" y1="150" x2="1225" y2="450" class="task-line" stroke-dasharray="4 2" stroke-width="1" stroke="#666" id="task5"/>
+          <line x1="1225" y1="150" x2="1225" y2="450" class="task-line" stroke-width="1" id="task5" stroke="#666" stroke-dasharray="4 2"/>
           <g class="face-group">
-            <circle cx="1225" cy="360" r="15" class="face" overflow="visible" stroke-width="2" fill="#FFF8DC"/>
-            <circle cx="1220" cy="355" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
+            <circle cx="1225" cy="360" r="15" class="face" fill="#FFF8DC" overflow="visible" stroke-width="2"/>
+            <circle cx="1220" cy="355" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
             <circle cx="1230" cy="355" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
-            <line x1="1220" y1="367" x2="1230" y2="367" class="mouth" stroke="#666" stroke-width="1"/>
+            <line x1="1220" y1="367" x2="1230" y2="367" class="mouth" stroke-width="1" stroke="#666"/>
           </g>
           <rect x="1150" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-1" fill="#8B008B"/>
           <g>
-            <circle cx="1164" cy="150" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
+            <circle cx="1164" cy="150" r="7" class="actor-0" stroke="#000" fill="#8FBC8F"/>
             <title>Customer</title>
           </g>
           <text x="1225" y="180" class="label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Compare prices</text>
         </g>
         <g class="task-group task-6" id="task6">
-          <line x1="1425" y1="150" x2="1425" y2="450" class="task-line" stroke="#666" stroke-width="1" stroke-dasharray="4 2" id="task6"/>
+          <line x1="1425" y1="150" x2="1425" y2="450" class="task-line" id="task6" stroke-width="1" stroke="#666" stroke-dasharray="4 2"/>
           <g class="face-group">
-            <circle cx="1425" cy="300" r="15" class="face" fill="#FFF8DC" overflow="visible" stroke-width="2"/>
-            <circle cx="1420" cy="295" r="1.5" stroke-width="2" stroke="#666" fill="#666"/>
-            <circle cx="1430" cy="295" r="1.5" stroke-width="2" stroke="#666" fill="#666"/>
-            <path d="M 1417.5,302 A 7.5,6.8181818181818175 0 0,0 1432.5,302" class="mouth" fill="none" stroke="#666"/>
+            <circle cx="1425" cy="300" r="15" class="face" overflow="visible" stroke-width="2" fill="#FFF8DC"/>
+            <circle cx="1420" cy="295" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
+            <circle cx="1430" cy="295" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
+            <path d="M 1417.5,302 A 7.5,6.8181818181818175 0 0,0 1432.5,302" class="mouth" stroke="#666" fill="none"/>
           </g>
           <rect x="1350" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-1" fill="#8B008B"/>
           <g>
-            <circle cx="1364" cy="150" r="7" class="actor-0" stroke="#000" fill="#8FBC8F"/>
+            <circle cx="1364" cy="150" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
             <title>Customer</title>
           </g>
-          <text x="1425" y="180" class="label" font-size="14px" dominant-baseline="middle" text-anchor="middle">Add to cart</text>
+          <text x="1425" y="180" class="label" text-anchor="middle" font-size="14px" dominant-baseline="middle">Add to cart</text>
         </g>
         <g class="task-group task-7" id="task7">
-          <line x1="1625" y1="150" x2="1625" y2="450" class="task-line" stroke-dasharray="4 2" stroke="#666" stroke-width="1" id="task7"/>
+          <line x1="1625" y1="150" x2="1625" y2="450" class="task-line" stroke-dasharray="4 2" id="task7" stroke="#666" stroke-width="1"/>
           <g class="face-group">
-            <circle cx="1625" cy="330" r="15" class="face" stroke-width="2" fill="#FFF8DC" overflow="visible"/>
+            <circle cx="1625" cy="330" r="15" class="face" stroke-width="2" overflow="visible" fill="#FFF8DC"/>
             <circle cx="1620" cy="325" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
             <circle cx="1630" cy="325" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
-            <path d="M 1617.5,332 A 7.5,6.8181818181818175 0 0,0 1632.5,332" class="mouth" stroke="#666" fill="none"/>
+            <path d="M 1617.5,332 A 7.5,6.8181818181818175 0 0,0 1632.5,332" class="mouth" fill="none" stroke="#666"/>
           </g>
           <rect x="1550" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-2" fill="#4B0082"/>
           <g>
             <circle cx="1564" cy="150" r="7" class="actor-0" stroke="#000" fill="#8FBC8F"/>
             <title>Customer</title>
           </g>
-          <text x="1625" y="180" class="label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Review cart</text>
+          <text x="1625" y="180" class="label" text-anchor="middle" font-size="14px" dominant-baseline="middle">Review cart</text>
         </g>
         <g class="task-group task-8" id="task8">
-          <line x1="1825" y1="150" x2="1825" y2="450" class="task-line" id="task8" stroke="#666" stroke-width="1" stroke-dasharray="4 2"/>
+          <line x1="1825" y1="150" x2="1825" y2="450" class="task-line" stroke="#666" stroke-width="1" stroke-dasharray="4 2" id="task8"/>
           <g class="face-group">
-            <circle cx="1825" cy="360" r="15" class="face" overflow="visible" fill="#FFF8DC" stroke-width="2"/>
-            <circle cx="1820" cy="355" r="1.5" fill="#666" stroke="#666" stroke-width="2"/>
-            <circle cx="1830" cy="355" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
+            <circle cx="1825" cy="360" r="15" class="face" fill="#FFF8DC" overflow="visible" stroke-width="2"/>
+            <circle cx="1820" cy="355" r="1.5" stroke-width="2" stroke="#666" fill="#666"/>
+            <circle cx="1830" cy="355" r="1.5" fill="#666" stroke-width="2" stroke="#666"/>
             <line x1="1820" y1="367" x2="1830" y2="367" class="mouth" stroke-width="1" stroke="#666"/>
           </g>
           <rect x="1750" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-2" fill="#4B0082"/>
           <g>
-            <circle cx="1764" cy="150" r="7" class="actor-0" stroke="#000" fill="#8FBC8F"/>
+            <circle cx="1764" cy="150" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
             <title>Customer</title>
           </g>
           <g>
-            <circle cx="1774" cy="150" r="7" class="actor-1" fill="#7CFC00" stroke="#000"/>
+            <circle cx="1774" cy="150" r="7" class="actor-1" stroke="#000" fill="#7CFC00"/>
             <title>System</title>
           </g>
           <text x="1825" y="180" class="label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Enter shipping info</text>
         </g>
         <g class="task-group task-9" id="task9">
-          <line x1="2025" y1="150" x2="2025" y2="450" class="task-line" stroke="#666" stroke-width="1" stroke-dasharray="4 2" id="task9"/>
+          <line x1="2025" y1="150" x2="2025" y2="450" class="task-line" stroke="#666" stroke-width="1" id="task9" stroke-dasharray="4 2"/>
           <g class="face-group">
-            <circle cx="2025" cy="330" r="15" class="face" fill="#FFF8DC" overflow="visible" stroke-width="2"/>
-            <circle cx="2020" cy="325" r="1.5" fill="#666" stroke="#666" stroke-width="2"/>
-            <circle cx="2030" cy="325" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
+            <circle cx="2025" cy="330" r="15" class="face" fill="#FFF8DC" stroke-width="2" overflow="visible"/>
+            <circle cx="2020" cy="325" r="1.5" fill="#666" stroke-width="2" stroke="#666"/>
+            <circle cx="2030" cy="325" r="1.5" stroke="#666" stroke-width="2" fill="#666"/>
             <path d="M 2017.5,332 A 7.5,6.8181818181818175 0 0,0 2032.5,332" class="mouth" stroke="#666" fill="none"/>
           </g>
           <rect x="1950" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-2" fill="#4B0082"/>
           <g>
-            <circle cx="1964" cy="150" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
+            <circle cx="1964" cy="150" r="7" class="actor-0" stroke="#000" fill="#8FBC8F"/>
             <title>Customer</title>
           </g>
-          <text x="2025" y="180" class="label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Select payment method</text>
+          <text x="2025" y="180" class="label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Select payment method</text>
         </g>
         <g class="task-group task-10" id="task10">
-          <line x1="2225" y1="150" x2="2225" y2="450" class="task-line" id="task10" stroke-width="1" stroke-dasharray="4 2" stroke="#666"/>
+          <line x1="2225" y1="150" x2="2225" y2="450" class="task-line" stroke="#666" id="task10" stroke-width="1" stroke-dasharray="4 2"/>
           <g class="face-group">
-            <circle cx="2225" cy="300" r="15" class="face" fill="#FFF8DC" overflow="visible" stroke-width="2"/>
-            <circle cx="2220" cy="295" r="1.5" stroke="#666" stroke-width="2" fill="#666"/>
-            <circle cx="2230" cy="295" r="1.5" fill="#666" stroke="#666" stroke-width="2"/>
-            <path d="M 2217.5,302 A 7.5,6.8181818181818175 0 0,0 2232.5,302" class="mouth" stroke="#666" fill="none"/>
+            <circle cx="2225" cy="300" r="15" class="face" overflow="visible" stroke-width="2" fill="#FFF8DC"/>
+            <circle cx="2220" cy="295" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
+            <circle cx="2230" cy="295" r="1.5" stroke-width="2" fill="#666" stroke="#666"/>
+            <path d="M 2217.5,302 A 7.5,6.8181818181818175 0 0,0 2232.5,302" class="mouth" fill="none" stroke="#666"/>
           </g>
           <rect x="2150" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-2" fill="#4B0082"/>
           <g>
@@ -338,44 +338,44 @@
             <circle cx="2174" cy="150" r="7" class="actor-1" stroke="#000" fill="#7CFC00"/>
             <title>System</title>
           </g>
-          <text x="2225" y="180" class="label" text-anchor="middle" font-size="14px" dominant-baseline="middle">Complete purchase</text>
+          <text x="2225" y="180" class="label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Complete purchase</text>
         </g>
         <g class="task-group task-11" id="task11">
-          <line x1="2425" y1="150" x2="2425" y2="450" class="task-line" stroke-width="1" id="task11" stroke="#666" stroke-dasharray="4 2"/>
+          <line x1="2425" y1="150" x2="2425" y2="450" class="task-line" stroke="#666" id="task11" stroke-width="1" stroke-dasharray="4 2"/>
           <g class="face-group">
-            <circle cx="2425" cy="300" r="15" class="face" overflow="visible" stroke-width="2" fill="#FFF8DC"/>
-            <circle cx="2420" cy="295" r="1.5" fill="#666" stroke="#666" stroke-width="2"/>
-            <circle cx="2430" cy="295" r="1.5" stroke-width="2" stroke="#666" fill="#666"/>
-            <path d="M 2417.5,302 A 7.5,6.8181818181818175 0 0,0 2432.5,302" class="mouth" stroke="#666" fill="none"/>
+            <circle cx="2425" cy="300" r="15" class="face" stroke-width="2" fill="#FFF8DC" overflow="visible"/>
+            <circle cx="2420" cy="295" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
+            <circle cx="2430" cy="295" r="1.5" stroke="#666" stroke-width="2" fill="#666"/>
+            <path d="M 2417.5,302 A 7.5,6.8181818181818175 0 0,0 2432.5,302" class="mouth" fill="none" stroke="#666"/>
           </g>
           <rect x="2350" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-3" fill="#2F4F4F"/>
           <g>
-            <circle cx="2364" cy="150" r="7" class="actor-1" fill="#7CFC00" stroke="#000"/>
+            <circle cx="2364" cy="150" r="7" class="actor-1" stroke="#000" fill="#7CFC00"/>
             <title>System</title>
           </g>
-          <text x="2425" y="180" class="label" font-size="14px" text-anchor="middle" dominant-baseline="middle">Receive confirmation</text>
+          <text x="2425" y="180" class="label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Receive confirmation</text>
         </g>
         <g class="task-group task-12" id="task12">
-          <line x1="2625" y1="150" x2="2625" y2="450" class="task-line" stroke-width="1" id="task12" stroke-dasharray="4 2" stroke="#666"/>
+          <line x1="2625" y1="150" x2="2625" y2="450" class="task-line" stroke-dasharray="4 2" stroke-width="1" stroke="#666" id="task12"/>
           <g class="face-group">
             <circle cx="2625" cy="330" r="15" class="face" stroke-width="2" overflow="visible" fill="#FFF8DC"/>
-            <circle cx="2620" cy="325" r="1.5" fill="#666" stroke-width="2" stroke="#666"/>
-            <circle cx="2630" cy="325" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
-            <path d="M 2617.5,332 A 7.5,6.8181818181818175 0 0,0 2632.5,332" class="mouth" stroke="#666" fill="none"/>
+            <circle cx="2620" cy="325" r="1.5" fill="#666" stroke="#666" stroke-width="2"/>
+            <circle cx="2630" cy="325" r="1.5" fill="#666" stroke="#666" stroke-width="2"/>
+            <path d="M 2617.5,332 A 7.5,6.8181818181818175 0 0,0 2632.5,332" class="mouth" fill="none" stroke="#666"/>
           </g>
           <rect x="2550" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-3" fill="#2F4F4F"/>
           <g>
-            <circle cx="2564" cy="150" r="7" class="actor-0" stroke="#000" fill="#8FBC8F"/>
+            <circle cx="2564" cy="150" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
             <title>Customer</title>
           </g>
           <text x="2625" y="180" class="label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Track shipment</text>
         </g>
         <g class="task-group task-13" id="task13">
-          <line x1="2825" y1="150" x2="2825" y2="450" class="task-line" stroke="#666" id="task13" stroke-width="1" stroke-dasharray="4 2"/>
+          <line x1="2825" y1="150" x2="2825" y2="450" class="task-line" stroke="#666" stroke-dasharray="4 2" stroke-width="1" id="task13"/>
           <g class="face-group">
-            <circle cx="2825" cy="300" r="15" class="face" stroke-width="2" fill="#FFF8DC" overflow="visible"/>
-            <circle cx="2820" cy="295" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
-            <circle cx="2830" cy="295" r="1.5" stroke="#666" fill="#666" stroke-width="2"/>
+            <circle cx="2825" cy="300" r="15" class="face" fill="#FFF8DC" overflow="visible" stroke-width="2"/>
+            <circle cx="2820" cy="295" r="1.5" stroke-width="2" stroke="#666" fill="#666"/>
+            <circle cx="2830" cy="295" r="1.5" stroke="#666" stroke-width="2" fill="#666"/>
             <path d="M 2817.5,302 A 7.5,6.8181818181818175 0 0,0 2832.5,302" class="mouth" stroke="#666" fill="none"/>
           </g>
           <rect x="2750" y="150" width="150" height="50" rx="3" ry="3" class="task task-type-3" fill="#2F4F4F"/>
@@ -383,10 +383,10 @@
             <circle cx="2764" cy="150" r="7" class="actor-0" fill="#8FBC8F" stroke="#000"/>
             <title>Customer</title>
           </g>
-          <text x="2825" y="180" class="label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Receive delivery</text>
+          <text x="2825" y="180" class="label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Receive delivery</text>
         </g>
       </g>
-      <text x="150" y="25" class="journey-title" font-size="4ex" font-weight="bold" fill="#333333">E-Commerce User Journey</text>
+      <text x="150" y="25" class="journey-title" fill="#333333" font-size="4ex" font-weight="bold">E-Commerce User Journey</text>
     </g>
   </g>
 </svg>

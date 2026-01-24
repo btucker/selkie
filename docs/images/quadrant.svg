@@ -137,33 +137,33 @@ marker path {
 
     </g>
     <rect x="0" y="0" width="500" height="500" class="quadrant-background" fill="#ffffff"/>
-    <text x="250" y="35" class="quadrant-title" dominant-baseline="middle" fill="#333333" font-weight="bold" text-anchor="middle" font-size="20">Reach and Engagement</text>
+    <text x="250" y="35" class="quadrant-title" text-anchor="middle" dominant-baseline="middle" font-size="20" fill="#333333" font-weight="bold">Reach and Engagement</text>
     <rect x="40" y="60" width="210" height="200" class="quadrant quadrant-2" fill="#f1f1ff"/>
     <rect x="250" y="60" width="210" height="200" class="quadrant quadrant-1" fill="#ECECFF"/>
     <rect x="40" y="260" width="210" height="200" class="quadrant quadrant-3" fill="#f6f6ff"/>
     <rect x="250" y="260" width="210" height="200" class="quadrant quadrant-4" fill="#fbfbff"/>
-    <line x1="250" y1="60" x2="250" y2="460" class="quadrant-border" stroke-width="1" stroke="#c7c7f1"/>
+    <line x1="250" y1="60" x2="250" y2="460" class="quadrant-border" stroke="#c7c7f1" stroke-width="1"/>
     <line x1="40" y1="260" x2="460" y2="260" class="quadrant-border" stroke="#c7c7f1" stroke-width="1"/>
-    <rect x="40" y="60" width="420" height="400" class="quadrant-outer-border" stroke="#c7c7f1" fill="none" stroke-width="2"/>
-    <text x="355" y="65" class="quadrant-label" fill="#343434" text-anchor="middle" font-size="16" dominant-baseline="hanging">We should expand</text>
-    <text x="145" y="65" class="quadrant-label" dominant-baseline="hanging" fill="#2f2f2f" font-size="16" text-anchor="middle">Need to promote</text>
-    <text x="145" y="265" class="quadrant-label" text-anchor="middle" fill="#2a2a2a" dominant-baseline="hanging" font-size="16">Re-evaluate</text>
-    <text x="355" y="265" class="quadrant-label" fill="#252525" font-size="16" text-anchor="middle" dominant-baseline="hanging">May be improved</text>
-    <text x="145" y="480" class="axis-label x-axis-left" text-anchor="middle" dominant-baseline="middle" font-size="16" fill="#333333">Low Reach</text>
-    <text x="355" y="480" class="axis-label x-axis-right" dominant-baseline="middle" text-anchor="middle" fill="#333333" font-size="16">High Reach</text>
-    <text x="30" y="360" class="axis-label y-axis-bottom" transform="rotate(-90, 30, 360)" font-size="16" text-anchor="middle" dominant-baseline="middle" fill="#333333">Low Engagement</text>
-    <text x="30" y="160" class="axis-label y-axis-top" text-anchor="middle" dominant-baseline="middle" fill="#333333" font-size="16" transform="rotate(-90, 30, 160)">High Engagement</text>
+    <rect x="40" y="60" width="420" height="400" class="quadrant-outer-border" stroke="#c7c7f1" stroke-width="2" fill="none"/>
+    <text x="355" y="65" class="quadrant-label" dominant-baseline="hanging" fill="#343434" text-anchor="middle" font-size="16">We should expand</text>
+    <text x="145" y="65" class="quadrant-label" dominant-baseline="hanging" font-size="16" text-anchor="middle" fill="#2f2f2f">Need to promote</text>
+    <text x="145" y="265" class="quadrant-label" dominant-baseline="hanging" text-anchor="middle" font-size="16" fill="#2a2a2a">Re-evaluate</text>
+    <text x="355" y="265" class="quadrant-label" font-size="16" fill="#252525" text-anchor="middle" dominant-baseline="hanging">May be improved</text>
+    <text x="145" y="480" class="axis-label x-axis-left" font-size="16" text-anchor="middle" fill="#333333" dominant-baseline="middle">Low Reach</text>
+    <text x="355" y="480" class="axis-label x-axis-right" dominant-baseline="middle" font-size="16" text-anchor="middle" fill="#333333">High Reach</text>
+    <text x="30" y="360" class="axis-label y-axis-bottom" transform="rotate(-90, 30, 360)" font-size="16" dominant-baseline="middle" text-anchor="middle" fill="#333333">Low Engagement</text>
+    <text x="30" y="160" class="axis-label y-axis-top" dominant-baseline="middle" fill="#333333" text-anchor="middle" font-size="16" transform="rotate(-90, 30, 160)">High Engagement</text>
     <circle cx="166" cy="220" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="166" y="225" class="quadrant-point-label" font-size="12" text-anchor="middle" dominant-baseline="hanging" fill="#333333">Campaign A</text>
+    <text x="166" y="225" class="quadrant-point-label" dominant-baseline="hanging" text-anchor="middle" font-size="12" fill="#333333">Campaign A</text>
     <circle cx="229" cy="368" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="229" y="373" class="quadrant-point-label" text-anchor="middle" font-size="12" dominant-baseline="hanging" fill="#333333">Campaign B</text>
+    <text x="229" y="373" class="quadrant-point-label" dominant-baseline="hanging" font-size="12" text-anchor="middle" fill="#333333">Campaign B</text>
     <circle cx="279.4" cy="184.00000000000003" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="279.4" y="189.00000000000003" class="quadrant-point-label" fill="#333333" text-anchor="middle" dominant-baseline="hanging" font-size="12">Campaign C</text>
+    <text x="279.4" y="189.00000000000003" class="quadrant-point-label" text-anchor="middle" dominant-baseline="hanging" font-size="12" fill="#333333">Campaign C</text>
     <circle cx="367.6" cy="323.99999999999994" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="367.6" y="328.99999999999994" class="quadrant-point-label" fill="#333333" text-anchor="middle" font-size="12" dominant-baseline="hanging">Campaign D</text>
+    <text x="367.6" y="328.99999999999994" class="quadrant-point-label" dominant-baseline="hanging" fill="#333333" font-size="12" text-anchor="middle">Campaign D</text>
     <circle cx="208" cy="323.99999999999994" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="208" y="328.99999999999994" class="quadrant-point-label" text-anchor="middle" fill="#333333" dominant-baseline="hanging" font-size="12">Campaign E</text>
+    <text x="208" y="328.99999999999994" class="quadrant-point-label" fill="#333333" text-anchor="middle" dominant-baseline="hanging" font-size="12">Campaign E</text>
     <circle cx="187" cy="148" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="187" y="153" class="quadrant-point-label" font-size="12" text-anchor="middle" fill="#333333" dominant-baseline="hanging">Campaign F</text>
+    <text x="187" y="153" class="quadrant-point-label" fill="#333333" text-anchor="middle" dominant-baseline="hanging" font-size="12">Campaign F</text>
   </g>
 </svg>

@@ -48,10 +48,10 @@
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -74,19 +74,19 @@
       <g class="block-nodes">
         <g class="node block-node block-composite" transform="translate(0, 0)" id="block-composite_1">
           <rect x="0" y="0" width="280" height="60" class="block-composite"/>
-          <text x="140" y="30" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px"></text>
+          <text x="140" y="30" class="block-label" text-anchor="middle" font-size="14px" dominant-baseline="middle"></text>
         </g>
-        <g class="node block-node block-square" id="block-id2" transform="translate(8, 8)">
+        <g class="node block-node block-square" transform="translate(8, 8)" id="block-id2">
           <rect x="0" y="0" width="122" height="44" class="node-bkg"/>
-          <text x="61" y="22" class="block-label" text-anchor="middle" font-size="14px" dominant-baseline="middle">I am a wide one</text>
+          <text x="61" y="22" class="block-label" dominant-baseline="middle" font-size="14px" text-anchor="middle">I am a wide one</text>
         </g>
-        <g class="node block-node block-square" transform="translate(150, 8)" id="block-id1">
+        <g class="node block-node block-square" id="block-id1" transform="translate(150, 8)">
           <rect x="0" y="0" width="122" height="44" class="node-bkg"/>
           <text x="61" y="22" class="block-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">id1</text>
         </g>
         <g class="node block-node block-square" transform="translate(300, 0)" id="block-id">
           <rect x="0" y="0" width="104" height="60" class="node-bkg"/>
-          <text x="52" y="30" class="block-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Next row</text>
+          <text x="52" y="30" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Next row</text>
         </g>
       </g>
     </g>
