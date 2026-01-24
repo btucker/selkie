@@ -253,13 +253,19 @@ fn render_with_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Timelin
             tasks.iter().filter(|t| t.section == *section).collect();
 
         let task_count = section_tasks.len().max(1);
-        let section_width = (task_count as f64) * COLUMN_WIDTH - SECTION_GAP;
+        // Mermaid.js: width = 200 * taskCount - 50, then adds 2*padding when drawing
+        // We include the padding in our calculation for the total drawn width
+        let section_width = (task_count as f64) * COLUMN_WIDTH - SECTION_GAP + 2.0 * NODE_PADDING;
+
+        // Mermaid.js uses section color indices starting at -1 for sectioned timelines
+        // (section--1 for first section, section-0 for second, etc.)
+        let section_color = section_number as i32 - 1;
 
         // Render section box
         render_section_node(
             doc,
             section,
-            section_number as i32,
+            section_color,
             master_x,
             layout.section_begin_y,
             section_width,
@@ -271,7 +277,7 @@ fn render_with_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Timelin
         render_tasks(
             doc,
             &section_tasks,
-            section_number as i32,
+            section_color,
             master_x,
             master_y,
             layout,
@@ -937,6 +943,45 @@ mod tests {
         let svg = result.unwrap();
         // Forest theme uses green colors
         assert!(svg.contains("cde498") || svg.contains("#cde498"));
+    }
+
+    /// Test that section color indexing starts at -1 for sectioned timelines
+    /// Mermaid.js uses section--1 for first section, section-0 for second, etc.
+    /// This is critical for visual parity with the reference implementation.
+    #[test]
+    fn test_sectioned_timeline_uses_section_minus_1_for_first_section() {
+        let mut db = TimelineDb::new();
+        db.add_section("First Section");
+        db.add_task("Task 1", &[]);
+        db.add_section("Second Section");
+        db.add_task("Task 2", &[]);
+
+        let config = RenderConfig::default();
+        let result = render_timeline(&db, &config);
+        assert!(result.is_ok());
+        let svg = result.unwrap();
+
+        // First section header and tasks should use section--1 class (note double minus)
+        // Check for the actual element class, not just CSS definitions
+        assert!(
+            svg.contains(r#"class="timeline-node section--1""#),
+            "First section element should have section--1 class for mermaid.js parity. SVG:\n{}",
+            svg
+        );
+
+        // Second section should use section-0 class
+        assert!(
+            svg.contains(r#"class="timeline-node section-0""#),
+            "Second section element should have section-0 class for mermaid.js parity. SVG:\n{}",
+            svg
+        );
+
+        // Make sure we're NOT using section-1 for the second section (old behavior)
+        assert!(
+            !svg.contains(r#"class="timeline-node section-1""#),
+            "Should not use section-1 for second section. SVG:\n{}",
+            svg
+        );
     }
 
     /// Test that layout positions match mermaid reference for timeline_simple
