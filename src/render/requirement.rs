@@ -10,7 +10,7 @@ use crate::diagrams::requirement::{
 use crate::error::Result;
 use crate::layout::{
     layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
-    LayoutOptions, NodeShape, Padding, Point, SizeEstimator, ToLayoutGraph,
+    LayoutOptions, LayoutRanker, NodeShape, Padding, Point, SizeEstimator, ToLayoutGraph,
 };
 use crate::render::svg::edges::build_curved_path;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement, Theme};
@@ -22,76 +22,71 @@ struct BoxDimensions {
     height: f64,
 }
 
-/// Default box dimensions - sized to match mermaid reference
-/// Mermaid uses padding=20 and gap=20 between elements
-const DEFAULT_REQ_BOX_WIDTH: f64 = 160.0;
-const DEFAULT_ELEM_BOX_WIDTH: f64 = 140.0;
-const DEFAULT_BOX_HEIGHT: f64 = 150.0;
-const BOX_PADDING: f64 = 20.0; // Match mermaid's padding
-const LINE_HEIGHT: f64 = 24.0; // Match mermaid's gap between elements
-const HEADER_HEIGHT: f64 = 30.0; // Slightly taller header
-const FONT_SIZE: f64 = 12.0;
-const HEADER_FONT_SIZE: f64 = 14.0;
+/// Box dimensions sized to match mermaid reference exactly
+/// Mermaid requirement boxes are ~158-241px wide (content-based), 184px tall
+/// Element boxes are ~138-203px wide, 112-136px tall
+/// Mermaid uses 16px base font with 24px line height
+const DEFAULT_REQ_BOX_WIDTH: f64 = 158.0; // Match mermaid minimum
+const DEFAULT_ELEM_BOX_WIDTH: f64 = 138.0; // Match mermaid element minimum
+const DEFAULT_BOX_HEIGHT: f64 = 184.0; // Match mermaid requirement height
+const BOX_PADDING: f64 = 10.0; // Inner padding (mermaid uses ~10px)
+const LINE_HEIGHT: f64 = 24.0; // Match mermaid's 24px line height exactly
+const FONT_SIZE: f64 = 16.0; // Match mermaid's base font size
 
-/// Calculate box dimensions based on content
+/// Calculate box dimensions based on content - matches mermaid's sizing
 fn calculate_requirement_dimensions(req: &Requirement) -> BoxDimensions {
-    let char_width = FONT_SIZE * 0.6;
-    let header_char_width = HEADER_FONT_SIZE * 0.65;
+    // Character width tuned to match reference diagram widths
+    // Reference: 551px, with 7.0 we get 530px, with 7.5 we should get ~560px
+    let char_width = 7.5;
 
-    // Calculate width needed for each line
-    let name_width = req.name.len() as f64 * header_char_width;
+    // Calculate width needed for each line of content
     let type_width = format_requirement_type(&req.req_type).len() as f64 * char_width;
+    let name_width = req.name.len() as f64 * char_width;
     let id_width = if !req.requirement_id.is_empty() {
         format!("ID: {}", req.requirement_id).len() as f64 * char_width
     } else {
         0.0
     };
     let text_width = if !req.text.is_empty() {
-        // Text wraps, but estimate max line length
-        let text_label = format!("Text: {}", req.text);
-        text_label.len().min(40) as f64 * char_width
+        format!("Text: {}", req.text).len() as f64 * char_width
     } else {
         0.0
     };
-    let risk_width = format!("Risk: {:?}", req.risk).len() as f64 * char_width;
-    let verify_width = format!("Verification: {:?}", req.verify_method).len() as f64 * char_width;
+    let risk_width = format!("Risk: {}", format_risk(&req.risk)).len() as f64 * char_width;
+    let verify_width = format!("Verification: {}", format_verify_method(&req.verify_method)).len()
+        as f64
+        * char_width;
 
-    let content_width = name_width
-        .max(type_width)
+    // Find widest content line
+    let content_width = type_width
+        .max(name_width)
         .max(id_width)
         .max(text_width)
         .max(risk_width)
         .max(verify_width);
 
+    // Add padding on both sides
     let width = (content_width + BOX_PADDING * 2.0).max(DEFAULT_REQ_BOX_WIDTH);
 
-    // Calculate height based on content
-    let mut line_count = 1; // Type header
-    if !req.requirement_id.is_empty() {
-        line_count += 1;
-    }
-    if !req.text.is_empty() {
-        // Text may wrap across multiple lines
-        let text_lines = (req.text.len() as f64 / 35.0).ceil() as usize;
-        line_count += text_lines.max(1);
-    }
-    line_count += 1; // Risk
-    line_count += 1; // Verify method
-
-    let height = (HEADER_HEIGHT + line_count as f64 * LINE_HEIGHT + BOX_PADDING * 2.0)
-        .max(DEFAULT_BOX_HEIGHT);
+    // Mermaid requirement boxes are consistently 184px tall
+    // This provides enough space for: type label, name, ID, text, risk, verification
+    let height = DEFAULT_BOX_HEIGHT;
 
     BoxDimensions { width, height }
 }
 
-/// Calculate element dimensions based on content
+/// Calculate element dimensions based on content - matches mermaid's sizing
+/// Mermaid element boxes are 112-136px tall depending on content
 fn calculate_element_dimensions(elem: &Element) -> BoxDimensions {
-    let char_width = FONT_SIZE * 0.6;
-    let header_char_width = HEADER_FONT_SIZE * 0.65;
+    // Character width tuned to match reference diagram widths
+    let char_width = 7.5;
 
-    let name_width = elem.name.len() as f64 * header_char_width;
+    // Calculate width for each line
+    let header_width = "<<Element>>".len() as f64 * char_width;
+    let name_width = elem.name.len() as f64 * char_width;
     let type_width = if !elem.element_type.is_empty() {
-        format!("Type: {}", elem.element_type).len() as f64 * char_width
+        let type_text = elem.element_type.trim_matches('"');
+        format!("Type: {}", type_text).len() as f64 * char_width
     } else {
         0.0
     };
@@ -101,18 +96,29 @@ fn calculate_element_dimensions(elem: &Element) -> BoxDimensions {
         0.0
     };
 
-    let content_width = name_width.max(type_width).max(docref_width);
+    let content_width = header_width
+        .max(name_width)
+        .max(type_width)
+        .max(docref_width);
     let width = (content_width + BOX_PADDING * 2.0).max(DEFAULT_ELEM_BOX_WIDTH);
 
-    let mut line_count = 1; // Element header
+    // Calculate height based on content lines
+    // Base: header line + name line + divider area = ~48px
+    // Plus content lines at 24px each
+    let mut content_lines = 0;
     if !elem.element_type.is_empty() {
-        line_count += 1;
+        content_lines += 1;
     }
     if !elem.doc_ref.is_empty() {
-        line_count += 1;
+        content_lines += 1;
     }
 
-    let height = (HEADER_HEIGHT + line_count as f64 * LINE_HEIGHT + BOX_PADDING * 2.0).max(80.0);
+    // Match mermaid's element heights: 112px (2 lines), 136px (3 lines)
+    let height = match content_lines {
+        0 => 88.0,  // Just header + name
+        1 => 112.0, // + type OR docref
+        _ => 136.0, // + type AND docref
+    };
 
     BoxDimensions { width, height }
 }
@@ -175,16 +181,23 @@ impl ToLayoutGraph for RequirementDb {
             _ => LayoutDirection::TopToBottom,
         };
 
+        // Match mermaid's dagre configuration for requirement diagrams
+        // Using longest-path ranker - produces better visual parity for this diagram type
         graph.options = LayoutOptions {
             direction,
-            node_spacing: 50.0,             // Match mermaid's default nodeSpacing
-            layer_spacing: 50.0,            // Match mermaid's default rankSpacing
-            padding: Padding::uniform(8.0), // Match mermaid's padding
-            ..Default::default()
+            node_spacing: 50.0,
+            layer_spacing: 50.0,
+            padding: Padding::uniform(8.0),
+            ranker: LayoutRanker::LongestPath,
         };
 
-        // Add requirement nodes
-        for (name, req) in self.get_requirements() {
+        // Add nodes in sorted order for consistent layout
+        // This helps match mermaid's dagre behavior which is sensitive to node order
+        let mut req_names: Vec<_> = self.get_requirements().keys().collect();
+        req_names.sort();
+
+        for name in req_names {
+            let req = self.get_requirements().get(name).unwrap();
             let dims = calculate_requirement_dimensions(req);
             let node = LayoutNode::new(name, dims.width, dims.height)
                 .with_shape(NodeShape::Rectangle)
@@ -192,8 +205,11 @@ impl ToLayoutGraph for RequirementDb {
             graph.add_node(node);
         }
 
-        // Add element nodes
-        for (name, elem) in self.get_elements() {
+        let mut elem_names: Vec<_> = self.get_elements().keys().collect();
+        elem_names.sort();
+
+        for name in elem_names {
+            let elem = self.get_elements().get(name).unwrap();
             let dims = calculate_element_dimensions(elem);
             let node = LayoutNode::new(name, dims.width, dims.height)
                 .with_shape(NodeShape::Rectangle)
@@ -226,7 +242,7 @@ impl ToLayoutGraph for RequirementDb {
 /// Render a requirement diagram to SVG
 pub fn render_requirement(db: &RequirementDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
-    let margin = 50.0;
+    let margin = 8.0; // Match mermaid's minimal padding
 
     let requirements = db.get_requirements();
     let elements = db.get_elements();
@@ -347,7 +363,8 @@ pub fn render_requirement(db: &RequirementDb, config: &RenderConfig) -> Result<S
     Ok(doc.to_string())
 }
 
-/// Render a requirement box
+/// Render a requirement box - matches mermaid's layout
+/// Mermaid uses centered type label at top, then left-aligned content below divider
 fn render_requirement_box(
     req: &Requirement,
     x: f64,
@@ -360,10 +377,16 @@ fn render_requirement_box(
     // This ensures proper z-order (text appears on top of shapes)
     let mut children = Vec::new();
 
-    // === SHAPES FIRST ===
-    // Use inline fill and stroke for better SVG compatibility
-    // (eval and some viewers don't parse CSS classes)
+    // Mermaid positions:
+    // - Type label at y + 8 (centered)
+    // - Name at y + 32 (bold, centered)
+    // - Divider at y + 68
+    // - Content starts at y + 76
 
+    let divider_y = y + 68.0; // Match mermaid's divider position
+    let content_start_y = divider_y + 8.0;
+
+    // === SHAPES FIRST ===
     // Main box
     children.push(SvgElement::Rect {
         x,
@@ -379,12 +402,12 @@ fn render_requirement_box(
             .with_class("requirement-box"),
     });
 
-    // Header background
+    // Header background (same color, for visual consistency)
     children.push(SvgElement::Rect {
         x,
         y,
         width,
-        height: HEADER_HEIGHT,
+        height: divider_y - y,
         rx: Some(0.0),
         ry: Some(0.0),
         attrs: Attrs::new()
@@ -396,9 +419,9 @@ fn render_requirement_box(
     // Divider line
     children.push(SvgElement::Line {
         x1: x,
-        y1: y + HEADER_HEIGHT,
+        y1: divider_y,
         x2: x + width,
-        y2: y + HEADER_HEIGHT,
+        y2: divider_y,
         attrs: Attrs::new()
             .with_stroke(&theme.primary_border_color)
             .with_stroke_width(1.0)
@@ -407,40 +430,39 @@ fn render_requirement_box(
 
     // === TEXT ELEMENTS AFTER SHAPES ===
 
-    // Type label (in header)
+    // Type label (centered, at top of header)
     let type_text = format_requirement_type(&req.req_type);
     children.push(SvgElement::Text {
         x: x + width / 2.0,
-        y: y + HEADER_HEIGHT / 2.0 + 5.0,
+        y: y + 8.0 + 12.0, // y + 8 + half line height for baseline
         content: type_text.to_string(),
         attrs: Attrs::new()
             .with_attr("text-anchor", "middle")
             .with_class("requirement-type")
-            .with_attr("font-size", &HEADER_FONT_SIZE.to_string()),
+            .with_attr("font-size", &FONT_SIZE.to_string()),
     });
 
-    // Content area
-    let content_y = y + HEADER_HEIGHT + BOX_PADDING;
-    let mut current_y = content_y;
-
-    // Name
+    // Name (bold, centered, below type)
     children.push(SvgElement::Text {
-        x: x + BOX_PADDING,
-        y: current_y + LINE_HEIGHT / 2.0 + 4.0,
+        x: x + width / 2.0,
+        y: y + 32.0 + 12.0,
         content: req.name.clone(),
         attrs: Attrs::new()
-            .with_attr("text-anchor", "start")
+            .with_attr("text-anchor", "middle")
             .with_class("requirement-name")
             .with_attr("font-size", &FONT_SIZE.to_string())
             .with_attr("font-weight", "bold"),
     });
-    current_y += LINE_HEIGHT;
+
+    // Content area - all left-aligned, starting below divider
+    let mut current_y = content_start_y;
+    let left_margin = x + BOX_PADDING;
 
     // ID
     if !req.requirement_id.is_empty() {
         children.push(SvgElement::Text {
-            x: x + BOX_PADDING,
-            y: current_y + LINE_HEIGHT / 2.0 + 4.0,
+            x: left_margin,
+            y: current_y + 16.0, // baseline position
             content: format!("ID: {}", req.requirement_id),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
@@ -450,33 +472,24 @@ fn render_requirement_box(
         current_y += LINE_HEIGHT;
     }
 
-    // Text (may need wrapping for long text)
+    // Text
     if !req.text.is_empty() {
-        let max_chars_per_line = ((width - BOX_PADDING * 2.0) / (FONT_SIZE * 0.6)) as usize;
-        let text_lines = wrap_text(&req.text, max_chars_per_line.max(20));
-
-        for line in text_lines {
-            children.push(SvgElement::Text {
-                x: x + BOX_PADDING,
-                y: current_y + LINE_HEIGHT / 2.0 + 4.0,
-                content: if current_y == content_y + LINE_HEIGHT * 2.0 {
-                    format!("Text: {}", line)
-                } else {
-                    line
-                },
-                attrs: Attrs::new()
-                    .with_attr("text-anchor", "start")
-                    .with_class("requirement-attr")
-                    .with_attr("font-size", &FONT_SIZE.to_string()),
-            });
-            current_y += LINE_HEIGHT;
-        }
+        children.push(SvgElement::Text {
+            x: left_margin,
+            y: current_y + 16.0,
+            content: format!("Text: {}", req.text),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "start")
+                .with_class("requirement-attr")
+                .with_attr("font-size", &FONT_SIZE.to_string()),
+        });
+        current_y += LINE_HEIGHT;
     }
 
     // Risk
     children.push(SvgElement::Text {
-        x: x + BOX_PADDING,
-        y: current_y + LINE_HEIGHT / 2.0 + 4.0,
+        x: left_margin,
+        y: current_y + 16.0,
         content: format!("Risk: {}", format_risk(&req.risk)),
         attrs: Attrs::new()
             .with_attr("text-anchor", "start")
@@ -487,8 +500,8 @@ fn render_requirement_box(
 
     // Verify method
     children.push(SvgElement::Text {
-        x: x + BOX_PADDING,
-        y: current_y + LINE_HEIGHT / 2.0 + 4.0,
+        x: left_margin,
+        y: current_y + 16.0,
         content: format!("Verification: {}", format_verify_method(&req.verify_method)),
         attrs: Attrs::new()
             .with_attr("text-anchor", "start")
@@ -504,7 +517,8 @@ fn render_requirement_box(
     }
 }
 
-/// Render an element box
+/// Render an element box - matches mermaid's layout
+/// Mermaid elements have: <<Element>> header, name (bold), then type/docref below divider
 fn render_element_box(
     elem: &Element,
     x: f64,
@@ -513,15 +527,18 @@ fn render_element_box(
     height: f64,
     theme: &Theme,
 ) -> SvgElement {
-    // IMPORTANT: Render all shapes first, then all text elements
-    // This ensures proper z-order (text appears on top of shapes)
-    // Content area
-    let content_y = y + HEADER_HEIGHT + BOX_PADDING;
-    let mut current_y = content_y + LINE_HEIGHT;
+    // Mermaid element layout:
+    // - <<Element>> at y + 8 (centered)
+    // - Name at y + 32 (bold, centered)
+    // - Divider at y + 56
+    // - Content starts at y + 64
+
+    let divider_y = y + 56.0;
+    let content_start_y = divider_y + 8.0;
+    let left_margin = x + BOX_PADDING;
 
     let mut children = vec![
         // === SHAPES FIRST ===
-        // Use inline fill and stroke for better SVG compatibility
         // Main box
         SvgElement::Rect {
             x,
@@ -541,7 +558,7 @@ fn render_element_box(
             x,
             y,
             width,
-            height: HEADER_HEIGHT,
+            height: divider_y - y,
             rx: Some(0.0),
             ry: Some(0.0),
             attrs: Attrs::new()
@@ -552,44 +569,47 @@ fn render_element_box(
         // Divider line
         SvgElement::Line {
             x1: x,
-            y1: y + HEADER_HEIGHT,
+            y1: divider_y,
             x2: x + width,
-            y2: y + HEADER_HEIGHT,
+            y2: divider_y,
             attrs: Attrs::new()
                 .with_stroke(&theme.primary_border_color)
                 .with_stroke_width(1.0)
                 .with_class("divider"),
         },
         // === TEXT ELEMENTS AFTER SHAPES ===
-        // Element label (in header)
+        // Element label (centered, at top)
         SvgElement::Text {
             x: x + width / 2.0,
-            y: y + HEADER_HEIGHT / 2.0 + 5.0,
+            y: y + 8.0 + 12.0,
             content: "<<Element>>".to_string(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
                 .with_class("element-type")
-                .with_attr("font-size", &HEADER_FONT_SIZE.to_string()),
+                .with_attr("font-size", &FONT_SIZE.to_string()),
         },
-        // Name
+        // Name (bold, centered)
         SvgElement::Text {
-            x: x + BOX_PADDING,
-            y: content_y + LINE_HEIGHT / 2.0 + 4.0,
+            x: x + width / 2.0,
+            y: y + 32.0 + 12.0,
             content: elem.name.clone(),
             attrs: Attrs::new()
-                .with_attr("text-anchor", "start")
+                .with_attr("text-anchor", "middle")
                 .with_class("element-name")
                 .with_attr("font-size", &FONT_SIZE.to_string())
                 .with_attr("font-weight", "bold"),
         },
     ];
 
+    // Content below divider
+    let mut current_y = content_start_y;
+
     // Type (strip surrounding quotes if present)
     if !elem.element_type.is_empty() {
         let type_text = elem.element_type.trim_matches('"');
         children.push(SvgElement::Text {
-            x: x + BOX_PADDING,
-            y: current_y + LINE_HEIGHT / 2.0 + 4.0,
+            x: left_margin,
+            y: current_y + 16.0,
             content: format!("Type: {}", type_text),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
@@ -602,8 +622,8 @@ fn render_element_box(
     // Doc ref
     if !elem.doc_ref.is_empty() {
         children.push(SvgElement::Text {
-            x: x + BOX_PADDING,
-            y: current_y + LINE_HEIGHT / 2.0 + 4.0,
+            x: left_margin,
+            y: current_y + 16.0,
             content: format!("Doc Ref: {}", elem.doc_ref),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "start")
@@ -777,34 +797,6 @@ fn render_relationship_line(
         children,
         attrs: Attrs::new().with_class("relationship"),
     }
-}
-
-/// Wrap text to fit within a certain character width
-fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
-    let mut lines = Vec::new();
-    let mut current_line = String::new();
-
-    for word in text.split_whitespace() {
-        if current_line.is_empty() {
-            current_line = word.to_string();
-        } else if current_line.len() + 1 + word.len() <= max_chars {
-            current_line.push(' ');
-            current_line.push_str(word);
-        } else {
-            lines.push(current_line);
-            current_line = word.to_string();
-        }
-    }
-
-    if !current_line.is_empty() {
-        lines.push(current_line);
-    }
-
-    if lines.is_empty() {
-        lines.push(String::new());
-    }
-
-    lines
 }
 
 /// Generate CSS for requirement diagrams
