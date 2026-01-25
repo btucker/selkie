@@ -821,3 +821,136 @@ fn treemap_visual_parity_inline_colors() {
         "treemapSection elements should have inline fill attribute"
     );
 }
+
+// ============================================================================
+// Test: Text positioning - labels should be top-left, not centered
+// ============================================================================
+
+/// Get text-anchor attribute from text elements with a specific class
+fn get_text_anchor(doc: &Document<'_>, class_name: &str) -> Option<String> {
+    for node in doc.descendants() {
+        if let Some(class) = node.attribute("class") {
+            if class.split_whitespace().any(|c| c == class_name) {
+                if let Some(anchor) = node.attribute("text-anchor") {
+                    return Some(anchor.to_string());
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Get position attributes (x, y) from the first element with a specific class
+fn get_element_position(doc: &Document<'_>, class_name: &str) -> Option<(f64, f64)> {
+    for node in doc.descendants() {
+        if let Some(class) = node.attribute("class") {
+            if class.split_whitespace().any(|c| c == class_name) {
+                let x: f64 = node.attribute("x")?.parse().ok()?;
+                let y: f64 = node.attribute("y")?.parse().ok()?;
+                return Some((x, y));
+            }
+        }
+    }
+    None
+}
+
+/// Get rect bounds (x, y, width, height) from the first element with a specific class
+fn get_rect_bounds(doc: &Document<'_>, class_name: &str) -> Option<(f64, f64, f64, f64)> {
+    for node in doc.descendants() {
+        if let Some(class) = node.attribute("class") {
+            if class.split_whitespace().any(|c| c == class_name) && node.tag_name().name() == "rect"
+            {
+                let x: f64 = node.attribute("x")?.parse().ok()?;
+                let y: f64 = node.attribute("y")?.parse().ok()?;
+                let w: f64 = node.attribute("width")?.parse().ok()?;
+                let h: f64 = node.attribute("height")?.parse().ok()?;
+                return Some((x, y, w, h));
+            }
+        }
+    }
+    None
+}
+
+#[test]
+fn treemap_text_positioning_top_left() {
+    // Test: Leaf labels should be positioned at top-left, not centered
+    // Reference: mermaid.js positions labels at top-left with padding
+    let input = r#"treemap-beta
+"Category"
+    "Backend": 400000
+    "Frontend": 200000
+"#;
+    let svg = render_treemap_svg(input);
+    let doc = parse_svg(&svg);
+
+    // Get text-anchor from treemapLabel elements
+    // Should be "start" for left-aligned text (mermaid.js behavior)
+    // Currently returns "middle" which is the bug
+    let anchor = get_text_anchor(&doc, "treemapLabel");
+    assert!(
+        anchor.is_some(),
+        "treemapLabel should have text-anchor attribute"
+    );
+    assert_eq!(
+        anchor.unwrap(),
+        "start",
+        "treemapLabel text-anchor should be 'start' (left-aligned) for top-left positioning"
+    );
+}
+
+#[test]
+fn treemap_text_position_relative_to_rect() {
+    // Test: Label position should be near top-left of the leaf rect, not center
+    let input = r#"treemap-beta
+"Category"
+    "Backend": 400000
+"#;
+    let svg = render_treemap_svg(input);
+    let doc = parse_svg(&svg);
+
+    // Get the leaf rect bounds
+    let rect_bounds = get_rect_bounds(&doc, "treemapLeaf");
+    assert!(rect_bounds.is_some(), "Should have treemapLeaf rect");
+    let (rect_x, rect_y, rect_w, rect_h) = rect_bounds.unwrap();
+
+    // Get the label position
+    let label_pos = get_element_position(&doc, "treemapLabel");
+    assert!(label_pos.is_some(), "Should have treemapLabel element");
+    let (label_x, label_y) = label_pos.unwrap();
+
+    // Label X should be near left edge (within 20% of width from left)
+    // Not centered (which would be rect_x + rect_w / 2.0)
+    let max_x_offset = rect_w * 0.2;
+    let center_x = rect_x + rect_w / 2.0;
+    assert!(
+        label_x < center_x,
+        "Label x ({}) should be left of center ({}), near top-left",
+        label_x,
+        center_x
+    );
+    assert!(
+        label_x - rect_x <= max_x_offset,
+        "Label x ({}) should be within 20% of left edge (rect_x={}, max_offset={})",
+        label_x,
+        rect_x,
+        max_x_offset
+    );
+
+    // Label Y should be near top edge (within 30% of height from top)
+    // Not centered (which would be rect_y + rect_h / 2.0)
+    let max_y_offset = rect_h * 0.3;
+    let center_y = rect_y + rect_h / 2.0;
+    assert!(
+        label_y < center_y,
+        "Label y ({}) should be above center ({}), near top-left",
+        label_y,
+        center_y
+    );
+    assert!(
+        label_y - rect_y <= max_y_offset,
+        "Label y ({}) should be within 30% of top edge (rect_y={}, max_offset={})",
+        label_y,
+        rect_y,
+        max_y_offset
+    );
+}

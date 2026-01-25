@@ -964,16 +964,18 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
         ),
     });
 
-    // Calculate center position for labels
-    let center_x = rect.x + rect.width / 2.0;
-    let center_y = rect.y + rect.height / 2.0;
+    // Calculate top-left position for labels (matching mermaid.js)
+    // Labels should be positioned at top-left with padding, not centered
+    let padding = 8.0; // Padding from edges
+    let label_x = rect.x + padding;
+    let label_y = rect.y + padding;
 
     // Extract text color from styles
     let text_style = extract_text_style(&rect.styles);
 
     // Calculate font size based on available space
-    let available_width = rect.width - 8.0; // 4px padding on each side
-    let available_height = rect.height - 8.0;
+    let available_width = rect.width - 2.0 * padding;
+    let available_height = rect.height - 2.0 * padding;
 
     // Estimate text width (rough approximation)
     let char_width = LEAF_FONT_SIZE * 0.6;
@@ -999,40 +1001,38 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
     // Only show text if there's enough space
     let min_display_size = 20.0;
     if rect.width >= min_display_size && rect.height >= min_display_size {
-        // Calculate positions to center label + value together
-        // The label and value form a text block that should be centered
-        let gap = 2.0; // Gap between label and value
-        let total_text_height = label_font_size + gap + value_font_size;
-        let label_y = center_y - total_text_height / 2.0 + label_font_size / 2.0;
-        let value_y = label_y + label_font_size / 2.0 + gap;
+        // Position label at top-left with padding
+        // Use "hanging" baseline so y coordinate is at top of text
+        let text_y = label_y + label_font_size * 0.85; // Adjust for baseline
 
-        // Leaf label (centered) with clip-path reference
+        // Leaf label (left-aligned, top-left position) with clip-path reference
         children.push(SvgElement::Text {
-            x: center_x,
-            y: label_y,
+            x: label_x,
+            y: text_y,
             content: rect.name.clone(),
             attrs: Attrs::new()
                 .with_class(&format!("treemapLabel {}", section_class))
-                .with_attr("text-anchor", "middle")
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("text-anchor", "start")
+                .with_attr("dominant-baseline", "auto")
                 .with_attr("font-size", &format!("{}px", label_font_size))
                 .with_attr("clip-path", &format!("url(#{})", clip_id))
                 .with_fill(&text_color)
                 .with_style_if(!text_style.is_empty(), &text_style),
         });
 
-        // Leaf value (below label) with clip-path reference
+        // Leaf value (below label, also left-aligned) with clip-path reference
         // Note: mermaid.js uses rgb(255, 255, 255) format for white value text
         if let Some(value) = rect.value {
             let value_text_color = convert_white_to_rgb(&text_color);
+            let value_y = text_y + label_font_size * 0.3 + value_font_size * 0.85;
             children.push(SvgElement::Text {
-                x: center_x,
+                x: label_x,
                 y: value_y,
                 content: format_value(value),
                 attrs: Attrs::new()
                     .with_class(&format!("treemapValue {}", section_class))
-                    .with_attr("text-anchor", "middle")
-                    .with_attr("dominant-baseline", "hanging")
+                    .with_attr("text-anchor", "start")
+                    .with_attr("dominant-baseline", "auto")
                     .with_attr("font-size", &format!("{}px", value_font_size))
                     .with_attr("clip-path", &format!("url(#{})", clip_id))
                     .with_fill(&value_text_color)
