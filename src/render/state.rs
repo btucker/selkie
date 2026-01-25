@@ -202,9 +202,8 @@ fn compute_level_layout(
 
             // Apply width expansion to match mermaid's getBBox() behavior.
             // Mermaid measures the full rendered cluster including internal padding and margins.
-            // Leaf composites need more expansion (1.6x) as they have minimal content.
-            // Non-leaf composites need less expansion (1.15x) since they inherit expanded
-            // child sizes but still need some extra space for visual padding.
+            // Leaf composites need more expansion for visual padding balance.
+            // Non-leaf composites need moderate expansion since they inherit child sizes.
             let expansion_factor = if is_leaf_composite { 1.6 } else { 1.25 };
             let original_width = inner_layout.width;
             let expanded_width = original_width * expansion_factor;
@@ -2000,12 +1999,12 @@ fn render_transition(
     };
 
     // Transition path (curved) - colors from CSS via theme
-    // Use stroke-width 1.3 to match mermaid reference (handDrawnShapeStyles.ts default)
-    // Note: mermaid's v3 renderer uses handDrawn shapes which default to 1.3
+    // Use stroke-width 1.0 to match mermaid's CSS default (.transition { stroke-width: 1; })
+    // Note: mermaid's inline styles may override to 1.3, but CSS base is 1.0
     children.push(SvgElement::Path {
         d: path_d,
         attrs: Attrs::new()
-            .with_stroke_width(1.3)
+            .with_stroke_width(1.0)
             .with_fill("none")
             .with_attr("marker-end", "url(#arrow)")
             .with_class("transition-path"),
@@ -3281,8 +3280,7 @@ Cancelled --> [*]
 
     #[test]
     fn test_transition_stroke_width_matches_mermaid() {
-        // Mermaid's v3 renderer uses handDrawn shapes which default to strokeWidth 1.3
-        // (see handDrawnShapeStyles.ts default value)
+        // Mermaid's CSS uses .transition { stroke-width: 1; }
         // Our rendered SVG should match this for visual parity
         let input = r#"stateDiagram-v2
     [*] --> Idle
@@ -3292,11 +3290,11 @@ Cancelled --> [*]
         let config = crate::render::RenderConfig::default();
         let svg = render_state(&db, &config).expect("Should render");
 
-        // The SVG should contain transition paths with stroke-width="1.3"
-        // to match mermaid's handDrawn shape default
+        // The SVG should contain transition paths with stroke-width="1"
+        // to match mermaid's CSS default
         assert!(
-            svg.contains(r#"stroke-width="1.3""#),
-            "Transition paths should have stroke-width=\"1.3\" to match mermaid reference. \
+            svg.contains(r#"stroke-width="1""#),
+            "Transition paths should have stroke-width=\"1\" to match mermaid CSS. \
              Found SVG content: {}",
             &svg[..svg.len().min(500)]
         );

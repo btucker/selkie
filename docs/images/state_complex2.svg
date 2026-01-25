@@ -200,7 +200,7 @@ marker path {
       <rect x="138.448046875" y="64" width="967.641357421875" height="1706" rx="5" ry="5" class="state-composite-outer"/>
       <rect x="139.448046875" y="85" width="965.641357421875" height="1681" rx="0" ry="0" class="state-composite-inner"/>
       <path d="M 138.448046875 85 L 1106.089404296875 85" class="state-composite-divider"/>
-      <text x="622.2687255859375" y="80" class="state-composite-label" font-size="14" text-anchor="middle">Idle</text>
+      <text x="622.2687255859375" y="80" class="state-composite-label" text-anchor="middle" font-size="14">Idle</text>
     </g>
     <g class="composite-state" id="composite-Processing">
       <rect x="106.36413574218747" y="305" width="754.9130859375" height="1453" rx="5" ry="5" class="state-composite-outer"/>
@@ -212,7 +212,7 @@ marker path {
       <rect x="368.6769287109375" y="1393" width="230.28750000000002" height="353" rx="5" ry="5" class="state-composite-outer"/>
       <rect x="369.6769287109375" y="1414" width="228.28750000000002" height="328" rx="0" ry="0" class="state-composite-inner-alt"/>
       <path d="M 368.6769287109375 1414 L 598.9644287109375 1414" class="state-composite-divider"/>
-      <text x="483.8206787109375" y="1409" class="state-composite-label" text-anchor="middle" font-size="14">Paused</text>
+      <text x="483.8206787109375" y="1409" class="state-composite-label" font-size="14" text-anchor="middle">Paused</text>
     </g>
     <g class="composite-state" id="composite-Running">
       <rect x="402.8081787109375" y="716" width="162.025" height="577" rx="5" ry="5" class="state-composite-outer"/>
@@ -221,30 +221,30 @@ marker path {
       <text x="483.8206787109375" y="732" class="state-composite-label" font-size="14" text-anchor="middle">Running</text>
     </g>
     <g class="state-node" id="state-Cancelled">
-      <path d="M 445.2425537109375 1840 H 522.3988037109375 A 5 5 0 0 1 527.3988037109375 1845 V 1875 A 5 5 0 0 1 522.3988037109375 1880 H 445.2425537109375 A 5 5 0 0 1 440.2425537109375 1875 V 1845 A 5 5 0 0 1 445.2425537109375 1840 Z" class="state-box" stroke="#9370DB" stroke-width="1" fill="#ECECFF"/>
-      <text x="483.8206787109375" y="1865" class="state-label" text-anchor="middle" font-size="16">Cancelled</text>
+      <path d="M 445.2425537109375 1840 H 522.3988037109375 A 5 5 0 0 1 527.3988037109375 1845 V 1875 A 5 5 0 0 1 522.3988037109375 1880 H 445.2425537109375 A 5 5 0 0 1 440.2425537109375 1875 V 1845 A 5 5 0 0 1 445.2425537109375 1840 Z" class="state-box" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+      <text x="483.8206787109375" y="1865" class="state-label" font-size="16" text-anchor="middle">Cancelled</text>
     </g>
     <g class="state-node" id="state-Completed">
-      <path d="M 334.9034912109375 1549.5 H 418.2784912109375 A 5 5 0 0 1 423.2784912109375 1554.5 V 1584.5 A 5 5 0 0 1 418.2784912109375 1589.5 H 334.9034912109375 A 5 5 0 0 1 329.9034912109375 1584.5 V 1554.5 A 5 5 0 0 1 334.9034912109375 1549.5 Z" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#9370DB"/>
+      <path d="M 334.9034912109375 1549.5 H 418.2784912109375 A 5 5 0 0 1 423.2784912109375 1554.5 V 1584.5 A 5 5 0 0 1 418.2784912109375 1589.5 H 334.9034912109375 A 5 5 0 0 1 329.9034912109375 1584.5 V 1554.5 A 5 5 0 0 1 334.9034912109375 1549.5 Z" class="state-box" stroke="#9370DB" stroke-width="1" fill="#ECECFF"/>
       <text x="376.5909912109375" y="1574.5" class="state-label" font-size="16" text-anchor="middle">Completed</text>
     </g>
     <g class="state-node" id="state-Executing">
       <path d="M 445.6878662109375 997 H 521.9534912109375 A 5 5 0 0 1 526.9534912109375 1002 V 1032 A 5 5 0 0 1 521.9534912109375 1037 H 445.6878662109375 A 5 5 0 0 1 440.6878662109375 1032 V 1002 A 5 5 0 0 1 445.6878662109375 997 Z" class="state-box" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
-      <text x="483.8206787109375" y="1022" class="state-label" font-size="16" text-anchor="middle">Executing</text>
+      <text x="483.8206787109375" y="1022" class="state-label" text-anchor="middle" font-size="16">Executing</text>
     </g>
     <g class="state-node" id="state-Failed">
-      <path d="M 480.3120849609375 1549.5 H 529.8902099609375 A 5 5 0 0 1 534.8902099609375 1554.5 V 1584.5 A 5 5 0 0 1 529.8902099609375 1589.5 H 480.3120849609375 A 5 5 0 0 1 475.3120849609375 1584.5 V 1554.5 A 5 5 0 0 1 480.3120849609375 1549.5 Z" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#9370DB"/>
-      <text x="505.1011474609375" y="1574.5" class="state-label" font-size="16" text-anchor="middle">Failed</text>
+      <path d="M 480.3120849609375 1549.5 H 529.8902099609375 A 5 5 0 0 1 534.8902099609375 1554.5 V 1584.5 A 5 5 0 0 1 529.8902099609375 1589.5 H 480.3120849609375 A 5 5 0 0 1 475.3120849609375 1584.5 V 1554.5 A 5 5 0 0 1 480.3120849609375 1549.5 Z" class="state-box" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+      <text x="505.1011474609375" y="1574.5" class="state-label" text-anchor="middle" font-size="16">Failed</text>
     </g>
     <g class="state-node" id="state-Finalizing">
-      <path d="M 447.0277099609375 1132 H 520.6136474609375 A 5 5 0 0 1 525.6136474609375 1137 V 1167 A 5 5 0 0 1 520.6136474609375 1172 H 447.0277099609375 A 5 5 0 0 1 442.0277099609375 1167 V 1137 A 5 5 0 0 1 447.0277099609375 1132 Z" class="state-box" stroke="#9370DB" fill="#ECECFF" stroke-width="1"/>
+      <path d="M 447.0277099609375 1132 H 520.6136474609375 A 5 5 0 0 1 525.6136474609375 1137 V 1167 A 5 5 0 0 1 520.6136474609375 1172 H 447.0277099609375 A 5 5 0 0 1 442.0277099609375 1167 V 1137 A 5 5 0 0 1 447.0277099609375 1132 Z" class="state-box" stroke="#9370DB" stroke-width="1" fill="#ECECFF"/>
       <text x="483.8206787109375" y="1157" class="state-label" font-size="16" text-anchor="middle">Finalizing</text>
     </g>
     <g class="state-node" id="state-Idle_start">
       <circle cx="483.8206787109375" cy="108" r="7" class="state-start" fill="#333333"/>
     </g>
     <g class="state-node" id="state-Initializing">
-      <path d="M 445.6917724609375 862 H 521.9495849609375 A 5 5 0 0 1 526.9495849609375 867 V 897 A 5 5 0 0 1 521.9495849609375 902 H 445.6917724609375 A 5 5 0 0 1 440.6917724609375 897 V 867 A 5 5 0 0 1 445.6917724609375 862 Z" class="state-box" stroke="#9370DB" stroke-width="1" fill="#ECECFF"/>
+      <path d="M 445.6917724609375 862 H 521.9495849609375 A 5 5 0 0 1 526.9495849609375 867 V 897 A 5 5 0 0 1 521.9495849609375 902 H 445.6917724609375 A 5 5 0 0 1 440.6917724609375 897 V 867 A 5 5 0 0 1 445.6917724609375 862 Z" class="state-box" stroke="#9370DB" fill="#ECECFF" stroke-width="1"/>
       <text x="483.8206787109375" y="887" class="state-label" text-anchor="middle" font-size="16">Initializing</text>
     </g>
     <g class="state-node" id="state-Paused_start">
@@ -254,136 +254,136 @@ marker path {
       <circle cx="594.6011474609375" cy="349" r="7" class="state-start" fill="#333333"/>
     </g>
     <g class="state-node" id="state-Queued">
-      <path d="M 473.6323974609375 576 H 536.5698974609375 A 5 5 0 0 1 541.5698974609375 581 V 611 A 5 5 0 0 1 536.5698974609375 616 H 473.6323974609375 A 5 5 0 0 1 468.6323974609375 611 V 581 A 5 5 0 0 1 473.6323974609375 576 Z" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#9370DB"/>
+      <path d="M 473.6323974609375 576 H 536.5698974609375 A 5 5 0 0 1 541.5698974609375 581 V 611 A 5 5 0 0 1 536.5698974609375 616 H 473.6323974609375 A 5 5 0 0 1 468.6323974609375 611 V 581 A 5 5 0 0 1 473.6323974609375 576 Z" class="state-box" stroke="#9370DB" stroke-width="1" fill="#ECECFF"/>
       <text x="505.1011474609375" y="601" class="state-label" text-anchor="middle" font-size="16">Queued</text>
     </g>
     <g class="state-node" id="state-Ready">
-      <path d="M 457.6956787109375 180 H 509.9456787109375 A 5 5 0 0 1 514.9456787109375 185 V 215 A 5 5 0 0 1 509.9456787109375 220 H 457.6956787109375 A 5 5 0 0 1 452.6956787109375 215 V 185 A 5 5 0 0 1 457.6956787109375 180 Z" class="state-box" stroke="#9370DB" stroke-width="1" fill="#ECECFF"/>
+      <path d="M 457.6956787109375 180 H 509.9456787109375 A 5 5 0 0 1 514.9456787109375 185 V 215 A 5 5 0 0 1 509.9456787109375 220 H 457.6956787109375 A 5 5 0 0 1 452.6956787109375 215 V 185 A 5 5 0 0 1 457.6956787109375 180 Z" class="state-box" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
       <text x="483.8206787109375" y="205" class="state-label" text-anchor="middle" font-size="16">Ready</text>
     </g>
     <g class="state-node" id="state-Running_end">
       <path d="M 476.8206787109375 1274 A 7 7 0 1 0 490.8206787109375 1274 A 7 7 0 1 0 476.8206787109375 1274 Z" class="state-end-outer" fill="none" stroke="#9370DB" stroke-width="2"/>
-      <path d="M 481.3006787109375 1274 A 2.52 2.52 0 1 0 486.3406787109375 1274 A 2.52 2.52 0 1 0 481.3006787109375 1274 Z" class="state-end-inner" fill="#9370DB" stroke-width="2" stroke="#9370DB"/>
+      <path d="M 481.3006787109375 1274 A 2.52 2.52 0 1 0 486.3406787109375 1274 A 2.52 2.52 0 1 0 481.3006787109375 1274 Z" class="state-end-inner" stroke-width="2" stroke="#9370DB" fill="#9370DB"/>
     </g>
     <g class="state-node" id="state-Running_start">
       <circle cx="483.8206787109375" cy="760" r="7" class="state-start" fill="#333333"/>
     </g>
     <g class="state-node" id="state-Timeout">
-      <path d="M 451.9222412109375 1694 H 515.7191162109375 A 5 5 0 0 1 520.7191162109375 1699 V 1729 A 5 5 0 0 1 515.7191162109375 1734 H 451.9222412109375 A 5 5 0 0 1 446.9222412109375 1729 V 1699 A 5 5 0 0 1 451.9222412109375 1694 Z" class="state-box" stroke="#9370DB" stroke-width="1" fill="#ECECFF"/>
-      <text x="483.8206787109375" y="1719" class="state-label" text-anchor="middle" font-size="16">Timeout</text>
+      <path d="M 451.9222412109375 1694 H 515.7191162109375 A 5 5 0 0 1 520.7191162109375 1699 V 1729 A 5 5 0 0 1 515.7191162109375 1734 H 451.9222412109375 A 5 5 0 0 1 446.9222412109375 1729 V 1699 A 5 5 0 0 1 451.9222412109375 1694 Z" class="state-box" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+      <text x="483.8206787109375" y="1719" class="state-label" font-size="16" text-anchor="middle">Timeout</text>
     </g>
     <g class="state-node" id="state-Validating">
-      <path d="M 556.4644287109375 436 H 632.7378662109375 A 5 5 0 0 1 637.7378662109375 441 V 471 A 5 5 0 0 1 632.7378662109375 476 H 556.4644287109375 A 5 5 0 0 1 551.4644287109375 471 V 441 A 5 5 0 0 1 556.4644287109375 436 Z" class="state-box" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
-      <text x="594.6011474609375" y="461" class="state-label" text-anchor="middle" font-size="16">Validating</text>
+      <path d="M 556.4644287109375 436 H 632.7378662109375 A 5 5 0 0 1 637.7378662109375 441 V 471 A 5 5 0 0 1 632.7378662109375 476 H 556.4644287109375 A 5 5 0 0 1 551.4644287109375 471 V 441 A 5 5 0 0 1 556.4644287109375 436 Z" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#9370DB"/>
+      <text x="594.6011474609375" y="461" class="state-label" font-size="16" text-anchor="middle">Validating</text>
     </g>
     <g class="state-node" id="state-WaitingResume">
-      <path d="M 424.3558349609375 1539 H 543.2855224609375 A 5 5 0 0 1 548.2855224609375 1544 V 1574 A 5 5 0 0 1 543.2855224609375 1579 H 424.3558349609375 A 5 5 0 0 1 419.3558349609375 1574 V 1544 A 5 5 0 0 1 424.3558349609375 1539 Z" class="state-box" stroke="#9370DB" stroke-width="1" fill="#ECECFF"/>
+      <path d="M 424.3558349609375 1539 H 543.2855224609375 A 5 5 0 0 1 548.2855224609375 1544 V 1574 A 5 5 0 0 1 543.2855224609375 1579 H 424.3558349609375 A 5 5 0 0 1 419.3558349609375 1574 V 1544 A 5 5 0 0 1 424.3558349609375 1539 Z" class="state-box" stroke-width="1" stroke="#9370DB" fill="#ECECFF"/>
       <text x="483.8206787109375" y="1564" class="state-label" font-size="16" text-anchor="middle">WaitingResume</text>
     </g>
     <g class="state-node" id="state-root_end">
-      <path d="M 486.8206787109375 1937 A 7 7 0 1 0 500.8206787109375 1937 A 7 7 0 1 0 486.8206787109375 1937 Z" class="state-end-outer" fill="none" stroke-width="2" stroke="#9370DB"/>
-      <path d="M 491.3006787109375 1937 A 2.52 2.52 0 1 0 496.3406787109375 1937 A 2.52 2.52 0 1 0 491.3006787109375 1937 Z" class="state-end-inner" fill="#9370DB" stroke-width="2" stroke="#9370DB"/>
+      <path d="M 486.8206787109375 1937 A 7 7 0 1 0 500.8206787109375 1937 A 7 7 0 1 0 486.8206787109375 1937 Z" class="state-end-outer" fill="none" stroke="#9370DB" stroke-width="2"/>
+      <path d="M 491.3006787109375 1937 A 2.52 2.52 0 1 0 496.3406787109375 1937 A 2.52 2.52 0 1 0 491.3006787109375 1937 Z" class="state-end-inner" stroke="#9370DB" stroke-width="2" fill="#9370DB"/>
     </g>
     <g class="state-node" id="state-root_start">
       <circle cx="622.2687255859375" cy="7" r="7" class="state-start" fill="#333333"/>
     </g>
     <g class="transition">
-      <path d="M 622.27 14.00 C 622.27 22.33, 622.27 30.67, 622.27 39.00 C 622.27 47.33, 622.27 55.67, 622.27 64.00" class="transition-path" stroke-width="1.3" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 622.27 14.00 C 622.27 22.33, 622.27 30.67, 622.27 39.00 C 622.27 47.33, 622.27 55.67, 622.27 64.00" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
     </g>
     <g class="transition">
-      <path d="M 483.82 115.00 C 483.82 125.83, 483.82 136.67, 483.82 147.50 C 483.82 158.33, 483.82 169.17, 483.82 180.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 483.82 115.00 C 483.82 125.83, 483.82 136.67, 483.82 147.50 C 483.82 158.33, 483.82 169.17, 483.82 180.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1"/>
     </g>
     <g class="transition">
-      <path d="M 483.82 220.00 C 483.82 234.17, 483.82 248.33, 483.82 262.50 C 483.82 276.67, 483.82 290.83, 483.82 305.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 483.82 220.00 C 483.82 234.17, 483.82 248.33, 483.82 262.50 C 483.82 276.67, 483.82 290.83, 483.82 305.00" class="transition-path" stroke-width="1" marker-end="url(#arrow)" fill="none"/>
       <path d="M 447.8206787109375 251.7 H 519.8206787109375 A 2 2 0 0 1 521.8206787109375 253.7 V 271.3 A 2 2 0 0 1 519.8206787109375 273.3 H 447.8206787109375 A 2 2 0 0 1 445.8206787109375 271.3 V 253.7 A 2 2 0 0 1 447.8206787109375 251.7 Z" class="transition-label-bg"/>
-      <text x="483.8206787109375" y="262.5" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">Start Job</text>
+      <text x="483.8206787109375" y="262.5" class="transition-label" text-anchor="middle" font-size="16" dominant-baseline="central">Start Job</text>
     </g>
     <g class="transition">
-      <path d="M 594.60 356.00 C 594.60 369.33, 594.60 382.67, 594.60 396.00 C 594.60 409.33, 594.60 422.67, 594.60 436.00" class="transition-path" stroke-width="1.3" marker-end="url(#arrow)" fill="none"/>
+      <path d="M 594.60 356.00 C 594.60 369.33, 594.60 382.67, 594.60 396.00 C 594.60 409.33, 594.60 422.67, 594.60 436.00" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
     </g>
     <g class="transition">
-      <path d="M 569.03 476.00 C 547.72 492.67, 526.41 509.33, 515.76 526.00 C 505.10 542.67, 505.10 559.33, 505.10 576.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 569.03 476.00 C 547.72 492.67, 526.41 509.33, 515.76 526.00 C 505.10 542.67, 505.10 559.33, 505.10 576.00" class="transition-path" fill="none" stroke-width="1" marker-end="url(#arrow)"/>
       <path d="M 497.37316607093203 505.6017731541942 H 537.373166070932 A 2 2 0 0 1 539.373166070932 507.6017731541942 V 525.2017731541941 A 2 2 0 0 1 537.373166070932 527.2017731541941 H 497.37316607093203 A 2 2 0 0 1 495.37316607093203 525.2017731541941 V 507.6017731541942 A 2 2 0 0 1 497.37316607093203 505.6017731541942 Z" class="transition-label-bg"/>
-      <text x="517.373166070932" y="516.4017731541942" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">Valid</text>
+      <text x="517.373166070932" y="516.4017731541942" class="transition-label" dominant-baseline="central" text-anchor="middle" font-size="16">Valid</text>
     </g>
     <g class="transition">
-      <path d="M 637.74 466.62 C 718.17 486.41, 798.60 506.21, 838.82 652.27 C 879.03 798.33, 879.03 1070.67, 821.68 1241.58 C 649.60 1481.97, 534.89 1551.46, 534.89 1551.46" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 637.74 466.62 C 718.17 486.41, 798.60 506.21, 838.82 652.27 C 879.03 798.33, 879.03 1070.67, 821.68 1241.58 C 649.60 1481.97, 534.89 1551.46, 534.89 1551.46" class="transition-path" marker-end="url(#arrow)" stroke-width="1" fill="none"/>
       <path d="M 851.0339599609374 1000.6290772559483 H 907.0339599609374 A 2 2 0 0 1 909.0339599609374 1002.6290772559483 V 1020.2290772559484 A 2 2 0 0 1 907.0339599609374 1022.2290772559484 H 851.0339599609374 A 2 2 0 0 1 849.0339599609374 1020.2290772559484 V 1002.6290772559483 A 2 2 0 0 1 851.0339599609374 1000.6290772559483 Z" class="transition-label-bg"/>
       <text x="879.0339599609374" y="1011.4290772559483" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">Invalid</text>
     </g>
     <g class="transition">
-      <path d="M 505.10 616.00 L 483.82 716.00" class="transition-path" marker-end="url(#arrow)" fill="none" stroke-width="1.3"/>
+      <path d="M 505.10 616.00 L 483.82 716.00" class="transition-path" fill="none" stroke-width="1" marker-end="url(#arrow)"/>
       <path d="M 441.1011474609375 655.2 H 569.1011474609375 A 2 2 0 0 1 571.1011474609375 657.2 V 674.8000000000001 A 2 2 0 0 1 569.1011474609375 676.8000000000001 H 441.1011474609375 A 2 2 0 0 1 439.1011474609375 674.8000000000001 V 657.2 A 2 2 0 0 1 441.1011474609375 655.2 Z" class="transition-label-bg"/>
-      <text x="505.1011474609375" y="666" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">Worker Available</text>
+      <text x="505.1011474609375" y="666" class="transition-label" dominant-baseline="central" text-anchor="middle" font-size="16">Worker Available</text>
     </g>
     <g class="transition">
-      <path d="M 483.82 1293.00 C 448.08 1309.67, 412.33 1326.33, 394.46 1369.08 C 376.59 1411.83, 376.59 1480.67, 376.59 1549.50" class="transition-path" stroke-width="1.3" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 483.82 1293.00 C 448.08 1309.67, 412.33 1326.33, 394.46 1369.08 C 376.59 1411.83, 376.59 1480.67, 376.59 1549.50" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
       <path d="M 348.5909912109375 1368.538418910764 H 404.5909912109375 A 2 2 0 0 1 406.5909912109375 1370.538418910764 V 1388.138418910764 A 2 2 0 0 1 404.5909912109375 1390.138418910764 H 348.5909912109375 A 2 2 0 0 1 346.5909912109375 1388.138418910764 V 1370.538418910764 A 2 2 0 0 1 348.5909912109375 1368.538418910764 Z" class="transition-label-bg"/>
-      <text x="376.5909912109375" y="1379.338418910764" class="transition-label" text-anchor="middle" font-size="16" dominant-baseline="central">Success</text>
+      <text x="376.5909912109375" y="1379.338418910764" class="transition-label" font-size="16" dominant-baseline="central" text-anchor="middle">Success</text>
     </g>
     <g class="transition">
-      <path d="M 483.82 1293.00 L 504.92 1549.50" class="transition-path" stroke-width="1.3" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 483.82 1293.00 L 504.92 1549.50" class="transition-path" stroke-width="1" marker-end="url(#arrow)" fill="none"/>
       <path d="M 483.7701137220509 1410.4505564433387 H 523.7701137220508 A 2 2 0 0 1 525.7701137220508 1412.4505564433387 V 1430.0505564433386 A 2 2 0 0 1 523.7701137220508 1432.0505564433386 H 483.7701137220509 A 2 2 0 0 1 481.7701137220509 1430.0505564433386 V 1412.4505564433387 A 2 2 0 0 1 483.7701137220509 1410.4505564433387 Z" class="transition-label-bg"/>
-      <text x="503.7701137220509" y="1421.2505564433386" class="transition-label" text-anchor="middle" dominant-baseline="central" font-size="16">Error</text>
+      <text x="503.7701137220509" y="1421.2505564433386" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">Error</text>
     </g>
     <g class="transition">
-      <path d="M 483.82 1293.00 C 542.39 1309.67, 600.96 1326.33, 600.96 1343.00 C 600.96 1359.67, 542.39 1376.33, 483.82 1393.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 483.82 1293.00 C 542.39 1309.67, 600.96 1326.33, 600.96 1343.00 C 600.96 1359.67, 542.39 1376.33, 483.82 1393.00" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
       <path d="M 581.5702941850383 1275.29045647186 H 685.5702941850383 A 2 2 0 0 1 687.5702941850383 1277.29045647186 V 1294.8904564718598 A 2 2 0 0 1 685.5702941850383 1296.8904564718598 H 581.5702941850383 A 2 2 0 0 1 579.5702941850383 1294.8904564718598 V 1277.29045647186 A 2 2 0 0 1 581.5702941850383 1275.29045647186 Z" class="transition-label-bg"/>
-      <text x="633.5702941850383" y="1286.0904564718599" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">Pause Request</text>
+      <text x="633.5702941850383" y="1286.0904564718599" class="transition-label" dominant-baseline="central" text-anchor="middle" font-size="16">Pause Request</text>
     </g>
     <g class="transition">
-      <path d="M 483.82 767.00 C 483.82 782.83, 483.82 798.67, 483.82 814.50 C 483.82 830.33, 483.82 846.17, 483.82 862.00" class="transition-path" stroke-width="1.3" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 483.82 767.00 C 483.82 782.83, 483.82 798.67, 483.82 814.50 C 483.82 830.33, 483.82 846.17, 483.82 862.00" class="transition-path" stroke-width="1" marker-end="url(#arrow)" fill="none"/>
     </g>
     <g class="transition">
-      <path d="M 483.82 902.00 C 483.82 917.83, 483.82 933.67, 483.82 949.50 C 483.82 965.33, 483.82 981.17, 483.82 997.00" class="transition-path" marker-end="url(#arrow)" fill="none" stroke-width="1.3"/>
+      <path d="M 483.82 902.00 C 483.82 917.83, 483.82 933.67, 483.82 949.50 C 483.82 965.33, 483.82 981.17, 483.82 997.00" class="transition-path" marker-end="url(#arrow)" stroke-width="1" fill="none"/>
     </g>
     <g class="transition">
-      <path d="M 483.82 1037.00 C 483.82 1052.83, 483.82 1068.67, 483.82 1084.50 C 483.82 1100.33, 483.82 1116.17, 483.82 1132.00" class="transition-path" fill="none" stroke-width="1.3" marker-end="url(#arrow)"/>
+      <path d="M 483.82 1037.00 C 483.82 1052.83, 483.82 1068.67, 483.82 1084.50 C 483.82 1100.33, 483.82 1116.17, 483.82 1132.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1"/>
     </g>
     <g class="transition">
-      <path d="M 483.82 1172.00 C 483.82 1187.83, 483.82 1203.67, 483.82 1219.50 C 483.82 1235.33, 483.82 1251.17, 483.82 1267.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 483.82 1172.00 C 483.82 1187.83, 483.82 1203.67, 483.82 1219.50 C 483.82 1235.33, 483.82 1251.17, 483.82 1267.00" class="transition-path" fill="none" stroke-width="1" marker-end="url(#arrow)"/>
     </g>
     <g class="transition">
-      <path d="M 483.82 1444.00 C 483.82 1459.83, 483.82 1475.67, 483.82 1491.50 C 483.82 1507.33, 483.82 1523.17, 483.82 1539.00" class="transition-path" stroke-width="1.3" marker-end="url(#arrow)" fill="none"/>
+      <path d="M 483.82 1444.00 C 483.82 1459.83, 483.82 1475.67, 483.82 1491.50 C 483.82 1507.33, 483.82 1523.17, 483.82 1539.00" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
     </g>
     <g class="transition">
-      <path d="M 483.82 1579.00 C 483.82 1598.17, 483.82 1617.33, 483.82 1636.50 C 483.82 1655.67, 483.82 1674.83, 483.82 1694.00" class="transition-path" fill="none" stroke-width="1.3" marker-end="url(#arrow)"/>
+      <path d="M 483.82 1579.00 C 483.82 1598.17, 483.82 1617.33, 483.82 1636.50 C 483.82 1655.67, 483.82 1674.83, 483.82 1694.00" class="transition-path" marker-end="url(#arrow)" stroke-width="1" fill="none"/>
       <path d="M 459.8206787109375 1625.7 H 507.8206787109375 A 2 2 0 0 1 509.8206787109375 1627.7 V 1645.3 A 2 2 0 0 1 507.8206787109375 1647.3 H 459.8206787109375 A 2 2 0 0 1 457.8206787109375 1645.3 V 1627.7 A 2 2 0 0 1 459.8206787109375 1625.7 Z" class="transition-label-bg"/>
-      <text x="483.8206787109375" y="1636.5" class="transition-label" dominant-baseline="central" text-anchor="middle" font-size="16">1 hour</text>
+      <text x="483.8206787109375" y="1636.5" class="transition-label" font-size="16" text-anchor="middle" dominant-baseline="central">1 hour</text>
     </g>
     <g class="transition">
-      <path d="M 483.82 1746.00 C 583.06 1611.67, 682.30 1477.33, 682.30 1305.67 C 682.30 1134.00, 583.06 925.00, 483.82 716.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 483.82 1746.00 C 583.06 1611.67, 682.30 1477.33, 682.30 1305.67 C 682.30 1134.00, 583.06 925.00, 483.82 716.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1"/>
       <path d="M 676.200294433256 1232.604566548625 H 724.200294433256 A 2 2 0 0 1 726.200294433256 1234.604566548625 V 1252.2045665486248 A 2 2 0 0 1 724.200294433256 1254.2045665486248 H 676.200294433256 A 2 2 0 0 1 674.200294433256 1252.2045665486248 V 1234.604566548625 A 2 2 0 0 1 676.200294433256 1232.604566548625 Z" class="transition-label-bg"/>
-      <text x="700.200294433256" y="1243.4045665486249" class="transition-label" dominant-baseline="central" text-anchor="middle" font-size="16">Resume</text>
+      <text x="700.200294433256" y="1243.4045665486249" class="transition-label" font-size="16" dominant-baseline="central" text-anchor="middle">Resume</text>
     </g>
     <g class="transition">
-      <path d="M 483.82 1746.00 C 483.82 1761.67, 483.82 1777.33, 483.82 1793.00 C 483.82 1808.67, 483.82 1824.33, 483.82 1840.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 483.82 1746.00 C 483.82 1761.67, 483.82 1777.33, 483.82 1793.00 C 483.82 1808.67, 483.82 1824.33, 483.82 1840.00" class="transition-path" stroke-width="1" fill="none" marker-end="url(#arrow)"/>
       <path d="M 427.8206787109375 1782.2 H 539.8206787109375 A 2 2 0 0 1 541.8206787109375 1784.2 V 1801.8 A 2 2 0 0 1 539.8206787109375 1803.8 H 427.8206787109375 A 2 2 0 0 1 425.8206787109375 1801.8 V 1784.2 A 2 2 0 0 1 427.8206787109375 1782.2 Z" class="transition-label-bg"/>
-      <text x="483.8206787109375" y="1793" class="transition-label" font-size="16" text-anchor="middle" dominant-baseline="central">Cancel Request</text>
+      <text x="483.8206787109375" y="1793" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">Cancel Request</text>
     </g>
     <g class="transition">
-      <path d="M 483.82 1734.00 C 483.82 1751.67, 483.82 1769.33, 483.82 1787.00 C 483.82 1804.67, 483.82 1822.33, 483.82 1840.00" class="transition-path" marker-end="url(#arrow)" stroke-width="1.3" fill="none"/>
+      <path d="M 483.82 1734.00 C 483.82 1751.67, 483.82 1769.33, 483.82 1787.00 C 483.82 1804.67, 483.82 1822.33, 483.82 1840.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1"/>
     </g>
     <g class="transition">
-      <path d="M 376.59 1549.50 C 394.46 1586.25, 412.33 1623.00, 430.21 1659.75 C 448.08 1696.50, 465.95 1733.25, 483.82 1770.00" class="transition-path" marker-end="url(#arrow)" fill="none" stroke-width="1.3"/>
+      <path d="M 376.59 1549.50 C 394.46 1586.25, 412.33 1623.00, 430.21 1659.75 C 448.08 1696.50, 465.95 1733.25, 483.82 1770.00" class="transition-path" marker-end="url(#arrow)" stroke-width="1" fill="none"/>
       <path d="M 410.2058349609375 1648.95 H 450.2058349609375 A 2 2 0 0 1 452.2058349609375 1650.95 V 1668.55 A 2 2 0 0 1 450.2058349609375 1670.55 H 410.2058349609375 A 2 2 0 0 1 408.2058349609375 1668.55 V 1650.95 A 2 2 0 0 1 410.2058349609375 1648.95 Z" class="transition-label-bg"/>
-      <text x="430.2058349609375" y="1659.75" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">Reset</text>
+      <text x="430.2058349609375" y="1659.75" class="transition-label" text-anchor="middle" font-size="16" dominant-baseline="central">Reset</text>
     </g>
     <g class="transition">
-      <path d="M 505.10 1549.50 C 501.55 1586.25, 498.01 1623.00, 494.46 1659.75 C 490.91 1696.50, 487.37 1733.25, 483.82 1770.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 505.10 1549.50 C 501.55 1586.25, 498.01 1623.00, 494.46 1659.75 C 490.91 1696.50, 487.37 1733.25, 483.82 1770.00" class="transition-path" fill="none" stroke-width="1" marker-end="url(#arrow)"/>
       <path d="M 474.4609130859375 1648.95 H 514.4609130859375 A 2 2 0 0 1 516.4609130859375 1650.95 V 1668.55 A 2 2 0 0 1 514.4609130859375 1670.55 H 474.4609130859375 A 2 2 0 0 1 472.4609130859375 1668.55 V 1650.95 A 2 2 0 0 1 474.4609130859375 1648.95 Z" class="transition-label-bg"/>
-      <text x="494.4609130859375" y="1659.75" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">Retry</text>
+      <text x="494.4609130859375" y="1659.75" class="transition-label" dominant-baseline="central" text-anchor="middle" font-size="16">Retry</text>
     </g>
     <g class="transition">
-      <path d="M 497.09 1840.00 C 504.84 1828.33, 512.58 1816.67, 533.44 1520.67 C 554.30 1224.67, 588.29 644.33, 622.27 64.00" class="transition-path" stroke-width="1.3" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 497.09 1840.00 C 504.84 1828.33, 512.58 1816.67, 533.44 1520.67 C 554.30 1224.67, 588.29 644.33, 622.27 64.00" class="transition-path" marker-end="url(#arrow)" stroke-width="1" fill="none"/>
       <path d="M 498.39185526655456 1797.1064462860566 H 538.3918552665546 A 2 2 0 0 1 540.3918552665546 1799.1064462860566 V 1816.7064462860565 A 2 2 0 0 1 538.3918552665546 1818.7064462860565 H 498.39185526655456 A 2 2 0 0 1 496.39185526655456 1816.7064462860565 V 1799.1064462860566 A 2 2 0 0 1 498.39185526655456 1797.1064462860566 Z" class="transition-label-bg"/>
-      <text x="518.3918552665546" y="1807.9064462860565" class="transition-label" font-size="16" dominant-baseline="central" text-anchor="middle">Reset</text>
+      <text x="518.3918552665546" y="1807.9064462860565" class="transition-label" font-size="16" text-anchor="middle" dominant-baseline="central">Reset</text>
     </g>
     <g class="transition">
-      <path d="M 376.59 1589.50 C 395.77 1646.31, 414.96 1703.11, 434.14 1759.92 C 453.33 1816.72, 472.51 1873.53, 491.69 1930.33" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="1.3"/>
+      <path d="M 376.59 1589.50 C 395.77 1646.31, 414.96 1703.11, 434.14 1759.92 C 453.33 1816.72, 472.51 1873.53, 491.69 1930.33" class="transition-path" fill="none" stroke-width="1" marker-end="url(#arrow)"/>
     </g>
     <g class="transition">
-      <path d="M 483.82 1880.00 C 483.82 1888.33, 483.82 1896.67, 485.14 1905.05 C 486.46 1913.44, 489.10 1921.88, 491.73 1930.32" class="transition-path" stroke-width="1.3" marker-end="url(#arrow)" fill="none"/>
+      <path d="M 483.82 1880.00 C 483.82 1888.33, 483.82 1896.67, 485.14 1905.05 C 486.46 1913.44, 489.10 1921.88, 491.73 1930.32" class="transition-path" marker-end="url(#arrow)" stroke-width="1" fill="none"/>
     </g>
   </g>
 </svg>
