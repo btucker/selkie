@@ -800,64 +800,74 @@ fn generate_mindmap_css(config: &RenderConfig) -> String {
     // Generate section colors
     let mut section_css = String::new();
 
-    // Root section uses a distinctive blue (matching mermaid.js)
-    // mermaid uses hsl(240, 100%, 76.3%) for section--1 (root)
+    // Root section uses a distinctive blue (matching mermaid.js exactly)
+    // mermaid uses hsl(240, 100%, 46.2745098039%) for section-root fill
+    // and hsl(240, 100%, 76.2745098039%) for section--1 shapes
     section_css.push_str(
         r#"
 .section-root rect, .section-root path, .section-root circle, .section-root polygon {
-  fill: hsl(240, 100%, 46.3%);
+  fill: hsl(240, 100%, 46.2745098039%);
 }
 .section-root text {
   fill: #ffffff;
 }
 .section-edge-root {
-  stroke: hsl(240, 100%, 76.3%);
+  stroke: hsl(240, 100%, 76.2745098039%);
+}
+.edge-depth-root {
+  stroke-width: 17;
 }
 "#,
     );
 
-    // Section colors matching mermaid.js pattern
-    // mermaid uses a specific hue sequence for sections
+    // Section colors matching mermaid.js pattern exactly
+    // mermaid uses specific hue sequence with precise HSL values
+    // Each section also has a complementary line color (hue + 180, lightness + 10)
     let mindmap_colors = [
-        "hsl(60, 100%, 73.5%)",  // Section 0: yellow
-        "hsl(80, 100%, 76.3%)",  // Section 1: lime green
-        "hsl(270, 100%, 76.3%)", // Section 2: purple
-        "hsl(300, 100%, 76.3%)", // Section 3: pink
-        "hsl(330, 100%, 76.3%)", // Section 4: rose
-        "hsl(0, 100%, 76.3%)",   // Section 5: red
-        "hsl(30, 100%, 76.3%)",  // Section 6: orange
-        "hsl(90, 100%, 76.3%)",  // Section 7: green
-        "hsl(150, 100%, 76.3%)", // Section 8: teal
-        "hsl(180, 100%, 76.3%)", // Section 9: cyan
-        "hsl(210, 100%, 76.3%)", // Section 10: blue
+        ("hsl(60, 100%, 73.5294117647%)", "hsl(240, 100%, 83.5294117647%)"),   // Section 0: yellow, line purple
+        ("hsl(80, 100%, 76.2745098039%)", "hsl(260, 100%, 86.2745098039%)"),   // Section 1: lime, line purple
+        ("hsl(270, 100%, 76.2745098039%)", "hsl(90, 100%, 86.2745098039%)"),   // Section 2: purple, line green
+        ("hsl(300, 100%, 76.2745098039%)", "hsl(120, 100%, 86.2745098039%)"),  // Section 3: pink, line green
+        ("hsl(330, 100%, 76.2745098039%)", "hsl(150, 100%, 86.2745098039%)"),  // Section 4: rose, line teal
+        ("hsl(0, 100%, 76.2745098039%)", "hsl(180, 100%, 86.2745098039%)"),    // Section 5: red, line cyan
+        ("hsl(30, 100%, 76.2745098039%)", "hsl(210, 100%, 86.2745098039%)"),   // Section 6: orange, line blue
+        ("hsl(90, 100%, 76.2745098039%)", "hsl(270, 100%, 86.2745098039%)"),   // Section 7: green, line purple
+        ("hsl(150, 100%, 76.2745098039%)", "hsl(330, 100%, 86.2745098039%)"),  // Section 8: teal, line rose
+        ("hsl(180, 100%, 76.2745098039%)", "hsl(0, 100%, 86.2745098039%)"),    // Section 9: cyan, line red
+        ("hsl(210, 100%, 76.2745098039%)", "hsl(30, 100%, 86.2745098039%)"),   // Section 10: blue, line orange
     ];
 
     for i in 0..(MAX_SECTIONS - 1) {
-        let color = mindmap_colors.get(i).unwrap_or(&"hsl(60, 100%, 73.5%)");
+        let (fill_color, line_color) = mindmap_colors.get(i).unwrap_or(&("hsl(60, 100%, 73.5%)", "hsl(240, 100%, 83.5%)"));
         let stroke_width = 17 - 3 * (i as i32);
 
-        // Determine text color based on lightness
+        // Determine text color based on section (section 2 is purple which needs white text)
         let text_color = if i == 2 { "#ffffff" } else { "black" };
 
         section_css.push_str(&format!(
             r#"
 .section-{i} rect, .section-{i} path, .section-{i} circle, .section-{i} polygon {{
-  fill: {color};
+  fill: {fill_color};
 }}
 .section-{i} text {{
   fill: {text_color};
 }}
 .section-edge-{i} {{
-  stroke: {color};
+  stroke: {fill_color};
 }}
 .edge-depth-{i} {{
   stroke-width: {stroke_width};
 }}
+.node-line-{i} {{
+  stroke: {line_color};
+  stroke-width: 3;
+}}
 "#,
             i = i,
-            color = color,
+            fill_color = fill_color,
             text_color = text_color,
-            stroke_width = stroke_width
+            stroke_width = stroke_width,
+            line_color = line_color
         ));
     }
 
@@ -885,6 +895,10 @@ fn generate_mindmap_css(config: &RenderConfig) -> String {
 }}
 .icon-container i {{
   font-size: 40px;
+}}
+.node-line-root {{
+  stroke: hsl(60, 100%, 86.2745098039%);
+  stroke-width: 3;
 }}
 {section_css}
 "#,
