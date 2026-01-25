@@ -824,21 +824,56 @@ fn generate_mindmap_css(config: &RenderConfig) -> String {
     // mermaid uses specific hue sequence with precise HSL values
     // Each section also has a complementary line color (hue + 180, lightness + 10)
     let mindmap_colors = [
-        ("hsl(60, 100%, 73.5294117647%)", "hsl(240, 100%, 83.5294117647%)"),   // Section 0: yellow, line purple
-        ("hsl(80, 100%, 76.2745098039%)", "hsl(260, 100%, 86.2745098039%)"),   // Section 1: lime, line purple
-        ("hsl(270, 100%, 76.2745098039%)", "hsl(90, 100%, 86.2745098039%)"),   // Section 2: purple, line green
-        ("hsl(300, 100%, 76.2745098039%)", "hsl(120, 100%, 86.2745098039%)"),  // Section 3: pink, line green
-        ("hsl(330, 100%, 76.2745098039%)", "hsl(150, 100%, 86.2745098039%)"),  // Section 4: rose, line teal
-        ("hsl(0, 100%, 76.2745098039%)", "hsl(180, 100%, 86.2745098039%)"),    // Section 5: red, line cyan
-        ("hsl(30, 100%, 76.2745098039%)", "hsl(210, 100%, 86.2745098039%)"),   // Section 6: orange, line blue
-        ("hsl(90, 100%, 76.2745098039%)", "hsl(270, 100%, 86.2745098039%)"),   // Section 7: green, line purple
-        ("hsl(150, 100%, 76.2745098039%)", "hsl(330, 100%, 86.2745098039%)"),  // Section 8: teal, line rose
-        ("hsl(180, 100%, 76.2745098039%)", "hsl(0, 100%, 86.2745098039%)"),    // Section 9: cyan, line red
-        ("hsl(210, 100%, 76.2745098039%)", "hsl(30, 100%, 86.2745098039%)"),   // Section 10: blue, line orange
+        (
+            "hsl(60, 100%, 73.5294117647%)",
+            "hsl(240, 100%, 83.5294117647%)",
+        ), // Section 0: yellow, line purple
+        (
+            "hsl(80, 100%, 76.2745098039%)",
+            "hsl(260, 100%, 86.2745098039%)",
+        ), // Section 1: lime, line purple
+        (
+            "hsl(270, 100%, 76.2745098039%)",
+            "hsl(90, 100%, 86.2745098039%)",
+        ), // Section 2: purple, line green
+        (
+            "hsl(300, 100%, 76.2745098039%)",
+            "hsl(120, 100%, 86.2745098039%)",
+        ), // Section 3: pink, line green
+        (
+            "hsl(330, 100%, 76.2745098039%)",
+            "hsl(150, 100%, 86.2745098039%)",
+        ), // Section 4: rose, line teal
+        (
+            "hsl(0, 100%, 76.2745098039%)",
+            "hsl(180, 100%, 86.2745098039%)",
+        ), // Section 5: red, line cyan
+        (
+            "hsl(30, 100%, 76.2745098039%)",
+            "hsl(210, 100%, 86.2745098039%)",
+        ), // Section 6: orange, line blue
+        (
+            "hsl(90, 100%, 76.2745098039%)",
+            "hsl(270, 100%, 86.2745098039%)",
+        ), // Section 7: green, line purple
+        (
+            "hsl(150, 100%, 76.2745098039%)",
+            "hsl(330, 100%, 86.2745098039%)",
+        ), // Section 8: teal, line rose
+        (
+            "hsl(180, 100%, 76.2745098039%)",
+            "hsl(0, 100%, 86.2745098039%)",
+        ), // Section 9: cyan, line red
+        (
+            "hsl(210, 100%, 76.2745098039%)",
+            "hsl(30, 100%, 86.2745098039%)",
+        ), // Section 10: blue, line orange
     ];
 
     for i in 0..(MAX_SECTIONS - 1) {
-        let (fill_color, line_color) = mindmap_colors.get(i).unwrap_or(&("hsl(60, 100%, 73.5%)", "hsl(240, 100%, 83.5%)"));
+        let (fill_color, line_color) = mindmap_colors
+            .get(i)
+            .unwrap_or(&("hsl(60, 100%, 73.5%)", "hsl(240, 100%, 83.5%)"));
         let stroke_width = 17 - 3 * (i as i32);
 
         // Determine text color based on section (section 2 is purple which needs white text)
