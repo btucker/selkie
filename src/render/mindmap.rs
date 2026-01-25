@@ -155,7 +155,7 @@ fn calculate_branch_angles(num_children: usize) -> Vec<f64> {
 
     match num_children {
         0 => vec![],
-        1 => vec![0.04], // Single child goes right
+        1 => vec![0.04],            // Single child goes right
         2 => vec![0.04, PI * 0.80], // First right, second left-down (~144°)
         3 => {
             // Derived from mermaid reference output analysis:
