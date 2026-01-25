@@ -9,10 +9,22 @@ use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 /// Default chart dimensions (matching mermaid.js defaults)
 const DEFAULT_WIDTH: f64 = 700.0;
 const DEFAULT_HEIGHT: f64 = 500.0;
-const PADDING: f64 = 50.0;
-const TITLE_HEIGHT: f64 = 30.0;
-const AXIS_LABEL_PADDING: f64 = 40.0;
+
+/// Layout constants matching mermaid.js config defaults
+/// These values are derived from analyzing mermaid's chartBuilder
+const TITLE_FONT_SIZE: f64 = 20.0;
+const TITLE_PADDING: f64 = 10.0;
+const AXIS_LABEL_FONT_SIZE: f64 = 14.0;
+const AXIS_LABEL_PADDING: f64 = 5.0;
+const AXIS_TITLE_FONT_SIZE: f64 = 16.0;
+const AXIS_TITLE_PADDING: f64 = 5.0;
 const TICK_LENGTH: f64 = 5.0;
+const AXIS_LINE_WIDTH: f64 = 2.0;
+
+/// Estimated character width as fraction of font size (for label width calculation)
+const CHAR_WIDTH_RATIO: f64 = 0.6;
+/// Estimated character height as fraction of font size
+const CHAR_HEIGHT_RATIO: f64 = 1.2;
 
 /// XY Chart color palette (matching mermaid.js default theme)
 const PLOT_COLORS: &[&str] = &[
@@ -35,6 +47,87 @@ struct ChartArea {
     y_min: f64,
     y_max: f64,
     num_points: usize,
+    /// Outer padding for bar charts (half of bar width space at edges)
+    outer_padding: f64,
+}
+
+/// Layout dimensions calculated from content
+struct LayoutDimensions {
+    /// Width of Y-axis area (title + labels + ticks + axis line)
+    y_axis_width: f64,
+    /// Height of X-axis area (title + labels + ticks + axis line)
+    x_axis_height: f64,
+    /// Height of chart title area
+    title_height: f64,
+}
+
+/// Calculate layout dimensions based on chart content (similar to mermaid's space calculation)
+fn calculate_layout(db: &XYChartDb, y_min: f64, y_max: f64) -> LayoutDimensions {
+    // Calculate Y-axis label width (widest number in tick values)
+    let tick_values = calculate_nice_ticks(y_min, y_max);
+    let max_label_len = tick_values
+        .iter()
+        .map(|v| format_number(*v).len())
+        .max()
+        .unwrap_or(1);
+    let y_label_width = max_label_len as f64 * AXIS_LABEL_FONT_SIZE * CHAR_WIDTH_RATIO;
+
+    // Y-axis width: title + padding + labels + padding + ticks + axis line
+    let has_y_title = db
+        .y_axis
+        .as_ref()
+        .map(|y| match y {
+            YAxisData::Linear(d) => !d.title.is_empty(),
+        })
+        .unwrap_or(false);
+
+    let y_axis_width = if has_y_title {
+        AXIS_TITLE_FONT_SIZE * CHAR_HEIGHT_RATIO
+            + AXIS_TITLE_PADDING * 2.0
+            + y_label_width
+            + AXIS_LABEL_PADDING
+            + TICK_LENGTH
+            + AXIS_LINE_WIDTH
+    } else {
+        y_label_width + AXIS_LABEL_PADDING + TICK_LENGTH + AXIS_LINE_WIDTH
+    };
+
+    // X-axis height: axis line + ticks + labels + padding + title
+    let has_x_title = db
+        .x_axis
+        .as_ref()
+        .map(|x| match x {
+            XAxisData::Band(d) => !d.title.is_empty(),
+            XAxisData::Linear(d) => !d.title.is_empty(),
+        })
+        .unwrap_or(false);
+
+    let x_axis_height = if has_x_title {
+        AXIS_LINE_WIDTH
+            + TICK_LENGTH
+            + AXIS_LABEL_FONT_SIZE * CHAR_HEIGHT_RATIO
+            + AXIS_LABEL_PADDING * 2.0
+            + AXIS_TITLE_FONT_SIZE * CHAR_HEIGHT_RATIO
+            + AXIS_TITLE_PADDING
+    } else {
+        AXIS_LINE_WIDTH
+            + TICK_LENGTH
+            + AXIS_LABEL_FONT_SIZE * CHAR_HEIGHT_RATIO
+            + AXIS_LABEL_PADDING * 2.0
+    };
+
+    // Title height
+    let title_height = if !db.title.is_empty() {
+        TITLE_FONT_SIZE * CHAR_HEIGHT_RATIO + TITLE_PADDING * 2.0
+    } else {
+        0.0
+    };
+
+    LayoutDimensions {
+        y_axis_width,
+        x_axis_height,
+        title_height,
+    }
 }
 
 /// Render an XY chart to SVG
@@ -51,17 +144,18 @@ pub fn render_xychart(db: &XYChartDb, config: &RenderConfig) -> Result<String> {
         doc.add_style(&generate_xychart_css(&config.theme));
     }
 
-    // Calculate plot area
-    let title_offset = if !db.title.is_empty() {
-        TITLE_HEIGHT + 10.0
-    } else {
-        0.0
-    };
+    // Calculate data range first (needed for layout calculation)
+    let (y_min, y_max) = calculate_y_range(db);
+    let num_points = calculate_num_points(db);
 
-    let plot_left = PADDING + AXIS_LABEL_PADDING;
-    let plot_right = width - PADDING;
-    let plot_top = PADDING + title_offset;
-    let plot_bottom = height - PADDING - AXIS_LABEL_PADDING;
+    // Calculate layout dimensions based on content
+    let layout = calculate_layout(db, y_min, y_max);
+
+    // Calculate plot area based on layout
+    let plot_left = layout.y_axis_width;
+    let plot_right = width; // Plot extends to right edge
+    let plot_top = layout.title_height;
+    let plot_bottom = height - layout.x_axis_height;
 
     let plot_width = plot_right - plot_left;
     let plot_height = plot_bottom - plot_top;
@@ -80,15 +174,15 @@ pub fn render_xychart(db: &XYChartDb, config: &RenderConfig) -> Result<String> {
     };
     doc.add_element(bg);
 
-    // Note: Title is rendered after chart shapes for proper z-order (see render_chart_title)
-
-    // Calculate data range
-    let (y_min, y_max) = calculate_y_range(db);
-    let num_points = calculate_num_points(db);
-
     if num_points == 0 {
         return Ok(doc.to_string());
     }
+
+    // Calculate outer padding for bar charts
+    // This matches mermaid's recalculateOuterPaddingToDrawBar logic
+    let tick_distance = plot_width / num_points as f64;
+    let bar_width_ratio = 0.7; // BAR_WIDTH_TO_TICK_WIDTH_RATIO in mermaid
+    let outer_padding = (bar_width_ratio * tick_distance / 2.0).floor();
 
     let area = ChartArea {
         plot_left,
@@ -98,6 +192,7 @@ pub fn render_xychart(db: &XYChartDb, config: &RenderConfig) -> Result<String> {
         y_min,
         y_max,
         num_points,
+        outer_padding,
     };
 
     // Render based on orientation
@@ -146,16 +241,7 @@ fn render_vertical_chart(
         area.y_max,
         false,
     );
-    render_x_axis_shapes(
-        doc,
-        db,
-        config,
-        area.plot_left,
-        plot_bottom,
-        area.plot_width,
-        area.num_points,
-        false,
-    );
+    render_x_axis_shapes(doc, db, config, area, plot_bottom, false);
 
     // PHASE 2: Render all text labels (after shapes for z-order)
     render_chart_title(doc, db, config);
@@ -170,16 +256,7 @@ fn render_vertical_chart(
         area.y_max,
         false,
     );
-    render_x_axis_text(
-        doc,
-        db,
-        config,
-        area.plot_left,
-        plot_bottom,
-        area.plot_width,
-        area.num_points,
-        false,
-    );
+    render_x_axis_text(doc, db, config, area, plot_bottom, false);
 }
 
 /// Render a horizontal chart (x-axis at left, y-axis at top)
@@ -220,16 +297,7 @@ fn render_horizontal_chart(
         area.y_max,
         true,
     );
-    render_x_axis_shapes(
-        doc,
-        db,
-        config,
-        area.plot_left,
-        area.plot_top,
-        area.plot_height,
-        area.num_points,
-        true,
-    );
+    render_x_axis_shapes(doc, db, config, area, area.plot_top, true);
 
     // PHASE 2: Render all text labels (after shapes for z-order)
     render_chart_title(doc, db, config);
@@ -244,29 +312,46 @@ fn render_horizontal_chart(
         area.y_max,
         true,
     );
-    render_x_axis_text(
-        doc,
-        db,
-        config,
-        area.plot_left,
-        area.plot_top,
-        area.plot_height,
-        area.num_points,
-        true,
-    );
+    render_x_axis_text(doc, db, config, area, area.plot_top, true);
+}
+
+/// Get the x-coordinate for a data point at index i (tick-centered positioning)
+/// This mimics D3's scaleBand with paddingInner(1), paddingOuter(0), align(0.5)
+fn get_tick_x(area: &ChartArea, i: usize) -> f64 {
+    // Calculate range with outer padding applied
+    let range_start = area.plot_left + area.outer_padding;
+    let range_end = area.plot_left + area.plot_width - area.outer_padding;
+    let range_width = range_end - range_start;
+
+    if area.num_points <= 1 {
+        // Single point centered
+        range_start + range_width / 2.0
+    } else {
+        // Points distributed evenly across the range
+        range_start + range_width * (i as f64) / (area.num_points - 1) as f64
+    }
 }
 
 /// Render vertical bars for a bar plot
 fn render_vertical_bars(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &ChartArea) {
-    let bar_spacing = area.plot_width / area.num_points as f64;
-    let bar_padding = 0.1; // 10% padding on each side
-    let bar_width = bar_spacing * (1.0 - 2.0 * bar_padding);
+    // Bar width calculation matching mermaid: min(outerPadding * 2, tickDistance) * (1 - barPaddingPercent)
+    let tick_distance = if area.num_points > 1 {
+        let range_width = area.plot_width - 2.0 * area.outer_padding;
+        range_width / (area.num_points - 1) as f64
+    } else {
+        area.plot_width
+    };
+
+    let bar_padding_percent = 0.05;
+    let bar_width = (area.outer_padding * 2.0).min(tick_distance) * (1.0 - bar_padding_percent);
+    let bar_width_half = bar_width / 2.0;
 
     let plot_bottom = area.plot_top + area.plot_height;
     let y_range = area.y_max - area.y_min;
 
     for (i, data_point) in plot.data.iter().enumerate() {
-        let x = area.plot_left + bar_spacing * (i as f64 + 0.5) - bar_width / 2.0;
+        let tick_x = get_tick_x(area, i);
+        let x = tick_x - bar_width_half;
 
         // Calculate bar height and y position
         let value_ratio = if y_range != 0.0 {
@@ -304,16 +389,39 @@ fn render_vertical_bars(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &
     }
 }
 
+/// Get the y-coordinate for a data point at index i in horizontal mode (tick-centered)
+fn get_tick_y(area: &ChartArea, i: usize) -> f64 {
+    // Calculate range with outer padding applied
+    let range_start = area.plot_top + area.outer_padding;
+    let range_end = area.plot_top + area.plot_height - area.outer_padding;
+    let range_height = range_end - range_start;
+
+    if area.num_points <= 1 {
+        range_start + range_height / 2.0
+    } else {
+        range_start + range_height * (i as f64) / (area.num_points - 1) as f64
+    }
+}
+
 /// Render horizontal bars for a bar plot
 fn render_horizontal_bars(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &ChartArea) {
-    let bar_spacing = area.plot_height / area.num_points as f64;
-    let bar_padding = 0.1;
-    let bar_height = bar_spacing * (1.0 - 2.0 * bar_padding);
+    // Bar height calculation for horizontal mode
+    let tick_distance = if area.num_points > 1 {
+        let range_height = area.plot_height - 2.0 * area.outer_padding;
+        range_height / (area.num_points - 1) as f64
+    } else {
+        area.plot_height
+    };
+
+    let bar_padding_percent = 0.05;
+    let bar_height = (area.outer_padding * 2.0).min(tick_distance) * (1.0 - bar_padding_percent);
+    let bar_height_half = bar_height / 2.0;
 
     let y_range = area.y_max - area.y_min;
 
     for (i, data_point) in plot.data.iter().enumerate() {
-        let y = area.plot_top + bar_spacing * (i as f64 + 0.5) - bar_height / 2.0;
+        let tick_y = get_tick_y(area, i);
+        let y = tick_y - bar_height_half;
 
         // Calculate bar width
         let value_ratio = if y_range != 0.0 {
@@ -344,23 +452,14 @@ fn render_vertical_line(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &
         return;
     }
 
-    let x_spacing = if area.num_points > 1 {
-        area.plot_width / (area.num_points - 1) as f64
-    } else {
-        area.plot_width
-    };
-
     let plot_bottom = area.plot_top + area.plot_height;
     let y_range = area.y_max - area.y_min;
 
     let mut path_data = String::new();
 
     for (i, data_point) in plot.data.iter().enumerate() {
-        let x = if area.num_points > 1 {
-            area.plot_left + x_spacing * i as f64
-        } else {
-            area.plot_left + area.plot_width / 2.0
-        };
+        // Use same tick positioning as bars
+        let x = get_tick_x(area, i);
 
         let value_ratio = if y_range != 0.0 {
             (data_point.value - area.y_min) / y_range
@@ -395,23 +494,13 @@ fn render_horizontal_line(doc: &mut SvgDocument, plot: &Plot, color: &str, area:
         return;
     }
 
-    // Use edge-to-edge spacing (like vertical lines) for visual consistency
-    let y_spacing = if area.num_points > 1 {
-        area.plot_height / (area.num_points - 1) as f64
-    } else {
-        area.plot_height
-    };
-
     let y_range = area.y_max - area.y_min;
 
     let mut path_data = String::new();
 
     for (i, data_point) in plot.data.iter().enumerate() {
-        let y = if area.num_points > 1 {
-            area.plot_top + y_spacing * i as f64
-        } else {
-            area.plot_top + area.plot_height / 2.0
-        };
+        // Use same tick positioning as horizontal bars
+        let y = get_tick_y(area, i);
 
         let value_ratio = if y_range != 0.0 {
             (data_point.value - area.y_min) / y_range
@@ -442,13 +531,16 @@ fn render_horizontal_line(doc: &mut SvgDocument, plot: &Plot, color: &str, area:
 /// Render chart title - called after shapes for proper z-order
 fn render_chart_title(doc: &mut SvgDocument, db: &XYChartDb, config: &RenderConfig) {
     if !db.title.is_empty() {
+        // Position title centered horizontally, with padding from top
+        // Mermaid uses titlePadding + titleHeight/2 with dominant-baseline: middle
+        let title_y = TITLE_PADDING + (TITLE_FONT_SIZE * CHAR_HEIGHT_RATIO) / 2.0;
         let title_elem = SvgElement::Text {
             x: DEFAULT_WIDTH / 2.0,
-            y: PADDING,
+            y: title_y,
             content: db.title.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
-                .with_attr("dominant-baseline", "hanging")
+                .with_attr("dominant-baseline", "middle")
                 .with_class("xychart-title")
                 .with_attr("font-size", "20")
                 .with_attr("font-weight", "bold")
@@ -613,12 +705,17 @@ fn render_x_axis_shapes(
     doc: &mut SvgDocument,
     db: &XYChartDb,
     config: &RenderConfig,
-    plot_left: f64,
+    area: &ChartArea,
     axis_y: f64,
-    axis_length: f64,
-    num_points: usize,
     is_horizontal: bool,
 ) {
+    let plot_left = area.plot_left;
+    let axis_length = if is_horizontal {
+        area.plot_height
+    } else {
+        area.plot_width
+    };
+
     // Axis line
     let (x1, y1, x2, y2) = if is_horizontal {
         (plot_left, axis_y, plot_left, axis_y + axis_length)
@@ -637,21 +734,15 @@ fn render_x_axis_shapes(
     doc.add_element(axis_line);
 
     // Get category labels for tick count
-    let categories = get_x_axis_categories(db, num_points);
+    let categories = get_x_axis_categories(db, area.num_points);
 
-    // X-axis tick marks
-    let spacing = if num_points > 0 {
-        axis_length / num_points as f64
-    } else {
-        axis_length
-    };
-
+    // X-axis tick marks at tick-centered positions
     for i in 0..categories.len() {
         let (tick_x, tick_y) = if is_horizontal {
-            let y = axis_y + spacing * (i as f64 + 0.5);
+            let y = get_tick_y(area, i);
             (plot_left, y)
         } else {
-            let x = plot_left + spacing * (i as f64 + 0.5);
+            let x = get_tick_x(area, i);
             (x, axis_y)
         };
 
@@ -685,14 +776,19 @@ fn render_x_axis_text(
     doc: &mut SvgDocument,
     db: &XYChartDb,
     config: &RenderConfig,
-    plot_left: f64,
+    area: &ChartArea,
     axis_y: f64,
-    axis_length: f64,
-    num_points: usize,
     is_horizontal: bool,
 ) {
+    let plot_left = area.plot_left;
+    let axis_length = if is_horizontal {
+        area.plot_height
+    } else {
+        area.plot_width
+    };
+
     // Get category labels
-    let categories = get_x_axis_categories(db, num_points);
+    let categories = get_x_axis_categories(db, area.num_points);
 
     // X-axis title
     if let Some(x_axis) = &db.x_axis {
@@ -727,20 +823,16 @@ fn render_x_axis_text(
         }
     }
 
-    // X-axis labels
-    let spacing = if num_points > 0 {
-        axis_length / num_points as f64
-    } else {
-        axis_length
-    };
-
+    // X-axis labels at tick-centered positions
+    // Position: axisY + labelPadding + tickLength + axisLineWidth (matching mermaid)
+    let label_offset = AXIS_LABEL_PADDING + TICK_LENGTH + AXIS_LINE_WIDTH;
     for (i, category) in categories.iter().enumerate() {
         let (label_x, label_y) = if is_horizontal {
-            let y = axis_y + spacing * (i as f64 + 0.5);
+            let y = get_tick_y(area, i);
             (plot_left - 10.0, y)
         } else {
-            let x = plot_left + spacing * (i as f64 + 0.5);
-            (x, axis_y + 15.0)
+            let x = get_tick_x(area, i);
+            (x, axis_y + label_offset)
         };
 
         let label = SvgElement::Text {

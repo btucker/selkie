@@ -136,50 +136,50 @@ marker path {
 
     </g>
     <rect x="0" y="0" width="700" height="500" class="xychart-background" fill="white"/>
-    <rect x="99.33333333333331" y="346" width="74.66666666666667" height="64" class="xychart-bar" fill="#ECECFF"/>
-    <rect x="192.66666666666666" y="298" width="74.66666666666667" height="112" class="xychart-bar" fill="#ECECFF"/>
-    <rect x="286" y="266" width="74.66666666666667" height="144" class="xychart-bar" fill="#ECECFF"/>
-    <rect x="379.3333333333333" y="211.6" width="74.66666666666667" height="198.4" class="xychart-bar" fill="#ECECFF"/>
-    <rect x="472.6666666666667" y="160.39999999999998" width="74.66666666666667" height="249.60000000000002" class="xychart-bar" fill="#ECECFF"/>
-    <rect x="565.9999999999999" y="118.80000000000001" width="74.66666666666667" height="291.2" class="xychart-bar" fill="#ECECFF"/>
-    <path d="M 90 362 L 202 314 L 314 282 L 426 234 L 538 186 L 650 138" class="xychart-line" stroke="#4C78A8" stroke-width="2" fill="none"/>
-    <path d="M 90 90 L 90 410" class="xychart-axis" stroke-width="2" fill="none" stroke="#131300"/>
-    <path d="M 90 410 L 85 410" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 90 378 L 85 378" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 90 346 L 85 346" class="xychart-tick" fill="none" stroke-width="2" stroke="#131300"/>
-    <path d="M 90 314 L 85 314" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
-    <path d="M 90 282 L 85 282" class="xychart-tick" stroke="#131300" fill="none" stroke-width="2"/>
-    <path d="M 90 250 L 85 250" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
-    <path d="M 90 218 L 85 218" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 90 186 L 85 186" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
-    <path d="M 90 154 L 85 154" class="xychart-tick" stroke="#131300" fill="none" stroke-width="2"/>
-    <path d="M 90 122 L 85 122" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
-    <path d="M 90 90 L 85 90" class="xychart-tick" stroke="#131300" fill="none" stroke-width="2"/>
-    <path d="M 90 410 L 650 410" class="xychart-axis" stroke="#131300" stroke-width="2" fill="none"/>
-    <path d="M 136.66666666666666 410 L 136.66666666666666 415" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 230 410 L 230 415" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 323.3333333333333 410 L 323.3333333333333 415" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
-    <path d="M 416.66666666666663 410 L 416.66666666666663 415" class="xychart-tick" stroke="#131300" fill="none" stroke-width="2"/>
-    <path d="M 510 410 L 510 415" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 603.3333333333333 410 L 603.3333333333333 415" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
-    <text x="350" y="50" class="xychart-title" fill="#131300" text-anchor="middle" font-weight="bold" font-size="20" dominant-baseline="hanging">Monthly Sales</text>
-    <text x="15" y="250" class="xychart-axis-title" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 15 250)" fill="#131300" font-size="16">Sales (units)</text>
-    <text x="80" y="410" class="xychart-axis-label" text-anchor="end" dominant-baseline="middle" fill="#131300" font-size="14">0</text>
-    <text x="80" y="378" class="xychart-axis-label" text-anchor="end" dominant-baseline="middle" font-size="14" fill="#131300">10</text>
-    <text x="80" y="346" class="xychart-axis-label" font-size="14" text-anchor="end" dominant-baseline="middle" fill="#131300">20</text>
-    <text x="80" y="314" class="xychart-axis-label" text-anchor="end" font-size="14" dominant-baseline="middle" fill="#131300">30</text>
-    <text x="80" y="282" class="xychart-axis-label" fill="#131300" font-size="14" text-anchor="end" dominant-baseline="middle">40</text>
-    <text x="80" y="250" class="xychart-axis-label" fill="#131300" font-size="14" dominant-baseline="middle" text-anchor="end">50</text>
-    <text x="80" y="218" class="xychart-axis-label" dominant-baseline="middle" fill="#131300" text-anchor="end" font-size="14">60</text>
-    <text x="80" y="186" class="xychart-axis-label" font-size="14" fill="#131300" dominant-baseline="middle" text-anchor="end">70</text>
-    <text x="80" y="154" class="xychart-axis-label" font-size="14" fill="#131300" text-anchor="end" dominant-baseline="middle">80</text>
-    <text x="80" y="122" class="xychart-axis-label" fill="#131300" dominant-baseline="middle" text-anchor="end" font-size="14">90</text>
-    <text x="80" y="90" class="xychart-axis-label" dominant-baseline="middle" fill="#131300" text-anchor="end" font-size="14">100</text>
-    <text x="136.66666666666666" y="425" class="xychart-axis-label" text-anchor="middle" font-size="14" fill="#131300" dominant-baseline="hanging">Jan</text>
-    <text x="230" y="425" class="xychart-axis-label" text-anchor="middle" font-size="14" dominant-baseline="hanging" fill="#131300">Feb</text>
-    <text x="323.3333333333333" y="425" class="xychart-axis-label" dominant-baseline="hanging" font-size="14" text-anchor="middle" fill="#131300">Mar</text>
-    <text x="416.66666666666663" y="425" class="xychart-axis-label" dominant-baseline="hanging" text-anchor="middle" fill="#131300" font-size="14">Apr</text>
-    <text x="510" y="425" class="xychart-axis-label" dominant-baseline="hanging" fill="#131300" text-anchor="middle" font-size="14">May</text>
-    <text x="603.3333333333333" y="425" class="xychart-axis-label" text-anchor="middle" dominant-baseline="hanging" fill="#131300" font-size="14">Jun</text>
+    <rect x="68.20000000000002" y="381.76" width="68.39999999999999" height="84.44" class="xychart-bar" fill="#ECECFF"/>
+    <rect x="180.52000000000004" y="318.43" width="68.39999999999999" height="147.76999999999998" class="xychart-bar" fill="#ECECFF"/>
+    <rect x="292.84000000000003" y="276.21" width="68.39999999999999" height="189.99" class="xychart-bar" fill="#ECECFF"/>
+    <rect x="405.16" y="204.43599999999998" width="68.39999999999999" height="261.764" class="xychart-bar" fill="#ECECFF"/>
+    <rect x="517.48" y="136.88400000000001" width="68.39999999999999" height="329.316" class="xychart-bar" fill="#ECECFF"/>
+    <rect x="629.8" y="81.99799999999999" width="68.39999999999999" height="384.202" class="xychart-bar" fill="#ECECFF"/>
+    <path d="M 102.4 402.87 L 214.72000000000003 339.53999999999996 L 327.04 297.32 L 439.36 233.98999999999998 L 551.6800000000001 170.66000000000003 L 664 107.32999999999998" class="xychart-line" fill="none" stroke="#4C78A8" stroke-width="2"/>
+    <path d="M 66.4 44 L 66.4 466.2" class="xychart-axis" fill="none" stroke-width="2" stroke="#131300"/>
+    <path d="M 66.4 466.2 L 61.400000000000006 466.2" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
+    <path d="M 66.4 423.98 L 61.400000000000006 423.98" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 66.4 381.76 L 61.400000000000006 381.76" class="xychart-tick" fill="none" stroke-width="2" stroke="#131300"/>
+    <path d="M 66.4 339.53999999999996 L 61.400000000000006 339.53999999999996" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 66.4 297.32 L 61.400000000000006 297.32" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 66.4 255.1 L 61.400000000000006 255.1" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
+    <path d="M 66.4 212.88 L 61.400000000000006 212.88" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
+    <path d="M 66.4 170.66000000000003 L 61.400000000000006 170.66000000000003" class="xychart-tick" stroke="#131300" fill="none" stroke-width="2"/>
+    <path d="M 66.4 128.44 L 61.400000000000006 128.44" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
+    <path d="M 66.4 86.22 L 61.400000000000006 86.22" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
+    <path d="M 66.4 44 L 61.400000000000006 44" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
+    <path d="M 66.4 466.2 L 700 466.2" class="xychart-axis" fill="none" stroke-width="2" stroke="#131300"/>
+    <path d="M 102.4 466.2 L 102.4 471.2" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
+    <path d="M 214.72000000000003 466.2 L 214.72000000000003 471.2" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 327.04 466.2 L 327.04 471.2" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 439.36 466.2 L 439.36 471.2" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
+    <path d="M 551.6800000000001 466.2 L 551.6800000000001 471.2" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 664 466.2 L 664 471.2" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
+    <text x="350" y="22" class="xychart-title" dominant-baseline="middle" font-weight="bold" fill="#131300" text-anchor="middle" font-size="20">Monthly Sales</text>
+    <text x="15" y="255.1" class="xychart-axis-title" font-size="16" text-anchor="middle" fill="#131300" dominant-baseline="middle" transform="rotate(-90 15 255.1)">Sales (units)</text>
+    <text x="56.400000000000006" y="466.2" class="xychart-axis-label" fill="#131300" font-size="14" dominant-baseline="middle" text-anchor="end">0</text>
+    <text x="56.400000000000006" y="423.98" class="xychart-axis-label" font-size="14" dominant-baseline="middle" fill="#131300" text-anchor="end">10</text>
+    <text x="56.400000000000006" y="381.76" class="xychart-axis-label" fill="#131300" font-size="14" dominant-baseline="middle" text-anchor="end">20</text>
+    <text x="56.400000000000006" y="339.53999999999996" class="xychart-axis-label" text-anchor="end" fill="#131300" font-size="14" dominant-baseline="middle">30</text>
+    <text x="56.400000000000006" y="297.32" class="xychart-axis-label" text-anchor="end" dominant-baseline="middle" fill="#131300" font-size="14">40</text>
+    <text x="56.400000000000006" y="255.1" class="xychart-axis-label" font-size="14" text-anchor="end" dominant-baseline="middle" fill="#131300">50</text>
+    <text x="56.400000000000006" y="212.88" class="xychart-axis-label" dominant-baseline="middle" font-size="14" fill="#131300" text-anchor="end">60</text>
+    <text x="56.400000000000006" y="170.66000000000003" class="xychart-axis-label" dominant-baseline="middle" fill="#131300" text-anchor="end" font-size="14">70</text>
+    <text x="56.400000000000006" y="128.44" class="xychart-axis-label" text-anchor="end" font-size="14" dominant-baseline="middle" fill="#131300">80</text>
+    <text x="56.400000000000006" y="86.22" class="xychart-axis-label" font-size="14" fill="#131300" text-anchor="end" dominant-baseline="middle">90</text>
+    <text x="56.400000000000006" y="44" class="xychart-axis-label" fill="#131300" text-anchor="end" dominant-baseline="middle" font-size="14">100</text>
+    <text x="102.4" y="478.2" class="xychart-axis-label" dominant-baseline="hanging" font-size="14" text-anchor="middle" fill="#131300">Jan</text>
+    <text x="214.72000000000003" y="478.2" class="xychart-axis-label" fill="#131300" font-size="14" dominant-baseline="hanging" text-anchor="middle">Feb</text>
+    <text x="327.04" y="478.2" class="xychart-axis-label" fill="#131300" text-anchor="middle" dominant-baseline="hanging" font-size="14">Mar</text>
+    <text x="439.36" y="478.2" class="xychart-axis-label" font-size="14" text-anchor="middle" dominant-baseline="hanging" fill="#131300">Apr</text>
+    <text x="551.6800000000001" y="478.2" class="xychart-axis-label" font-size="14" fill="#131300" text-anchor="middle" dominant-baseline="hanging">May</text>
+    <text x="664" y="478.2" class="xychart-axis-label" dominant-baseline="hanging" text-anchor="middle" font-size="14" fill="#131300">Jun</text>
   </g>
 </svg>
