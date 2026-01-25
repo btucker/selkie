@@ -28,8 +28,11 @@ const LEAF_FONT_SIZE: f64 = 38.0;
 /// Font size for section labels
 const SECTION_FONT_SIZE: f64 = 12.0;
 
-/// Font size for value labels
-const VALUE_FONT_SIZE: f64 = 10.0;
+/// Font size for section value labels (smaller than leaf values)
+const SECTION_VALUE_FONT_SIZE: f64 = 10.0;
+
+/// Font size for leaf value labels (approximately 60% of label font, matching mermaid.js ~23px)
+const VALUE_FONT_SIZE: f64 = 23.0;
 
 /// Default diagram width
 const DEFAULT_WIDTH: f64 = 960.0;
@@ -290,15 +293,25 @@ fn layout_treemap(
     }
 
     // Choose layout algorithm based on depth and node type
-    // Mermaid.js uses horizontal strip layout for sections at top levels
-    // - depth=0: virtual root laying out first-level sections
-    // - depth=1: first section (like "Company Budget") laying out subsections
+    // Mermaid.js uses horizontal strip layout for top-level sections
+    // For leaves, it uses a squarified layout that considers aspect ratios
     let all_children_are_sections = children.iter().all(|c| !c.children.is_empty());
+    let all_children_are_leaves = children.iter().all(|c| c.value.is_some());
+
     let rects = if depth <= 1 && all_children_are_sections {
         // Top-level sections: use horizontal strip layout (width proportional to value)
         horizontal_strip_layout(&child_values, child_bounds, children_total)
+    } else if all_children_are_leaves && children.len() == 2 {
+        // For exactly 2 leaves, choose layout based on container aspect ratio
+        // Wide containers -> horizontal strip (better aspect ratios)
+        // Tall containers -> vertical strip (better aspect ratios)
+        if child_bounds.width >= child_bounds.height * 1.2 {
+            horizontal_strip_layout(&child_values, child_bounds, children_total)
+        } else {
+            vertical_strip_layout(&child_values, child_bounds, children_total)
+        }
     } else {
-        // Use squarified layout for leaves and nested content
+        // Use squarified layout for 3+ leaves or mixed content
         squarify_layout(&child_values, child_bounds, children_total)
     };
 
@@ -358,6 +371,38 @@ fn horizontal_strip_layout(values: &[f64], bounds: Bounds, total: f64) -> Vec<Bo
     result
 }
 
+/// Vertical strip layout - arranges all items in a single column with heights proportional to values
+/// This is used when vertical arrangement gives better aspect ratios
+fn vertical_strip_layout(values: &[f64], bounds: Bounds, total: f64) -> Vec<Bounds> {
+    if values.is_empty() || total <= 0.0 {
+        return vec![];
+    }
+
+    let mut result = Vec::with_capacity(values.len());
+    let mut y = bounds.y;
+
+    for (i, value) in values.iter().enumerate() {
+        let ratio = value / total;
+        let height = if i == values.len() - 1 {
+            // Last item takes remaining height to avoid floating point gaps
+            bounds.y + bounds.height - y
+        } else {
+            bounds.height * ratio
+        };
+
+        result.push(Bounds {
+            x: bounds.x,
+            y,
+            width: bounds.width,
+            height,
+        });
+
+        y += height;
+    }
+
+    result
+}
+
 /// Squarified treemap layout algorithm
 /// Returns a list of Bounds for each value
 fn squarify_layout(values: &[f64], bounds: Bounds, total: f64) -> Vec<Bounds> {
@@ -374,10 +419,10 @@ fn squarify_layout(values: &[f64], bounds: Bounds, total: f64) -> Vec<Bounds> {
     let normalized: Vec<f64> = values.iter().map(|v| (v / total) * area).collect();
 
     // Start with direction based on aspect ratio:
-    // - If wider than tall, start with horizontal=false (vertical split creates columns)
-    // - If taller than wide, start with horizontal=true (horizontal split creates rows)
-    // This matches mermaid.js behavior for better squareness
-    let start_horizontal = bounds.height > bounds.width;
+    // - If wider than tall, start with horizontal=true (horizontal split, items side by side)
+    // - If taller than wide, start with horizontal=false (vertical split, items stacked)
+    // This creates more square-like rectangles in the available space
+    let start_horizontal = bounds.width >= bounds.height;
     squarify_recursive(&normalized, bounds, start_horizontal)
 }
 
@@ -464,8 +509,8 @@ fn squarify_recursive(areas: &[f64], bounds: Bounds, horizontal: bool) -> Vec<Bo
     result
 }
 
-/// Find the best split point using squarify heuristic
-/// Classic squarify groups items to minimize worst aspect ratio
+/// Find the best split point using mermaid-style squarify heuristic
+/// Groups larger items together to create more visually balanced treemaps
 fn find_best_split(areas: &[f64]) -> (Vec<f64>, Vec<f64>, f64) {
     let total: f64 = areas.iter().sum();
 
@@ -473,45 +518,48 @@ fn find_best_split(areas: &[f64]) -> (Vec<f64>, Vec<f64>, f64) {
         return (areas.to_vec(), vec![], 1.0);
     }
 
-    // Squarify heuristic: keep adding items to the left group as long as
-    // it improves or maintains squareness. The goal is to make rectangles
-    // as square as possible, not to balance areas.
-    //
-    // For treemaps, this typically means grouping more items together on one side.
+    if areas.len() == 2 {
+        // For 2 items, just split them
+        let split_ratio = areas[0] / total;
+        return (vec![areas[0]], vec![areas[1]], split_ratio);
+    }
+
+    // For 3+ items, mermaid-style: prefer keeping the largest items together
+    // This creates layouts with one large block and one smaller block
+    // Score: prefer splits where left side has higher total (grouping large items)
     let mut best_split = 1;
-    let mut best_score = f64::MAX;
+    let mut best_score = f64::MIN;
 
     for split in 1..areas.len() {
         let left_sum: f64 = areas[..split].iter().sum();
         let right_sum: f64 = areas[split..].iter().sum();
+        let left_count = split;
+        let right_count = areas.len() - split;
 
-        // Calculate how well the split creates square-ish regions
-        // Prefer splits where larger groups are together (makes them more square)
-        let left_count = split as f64;
-        let right_count = (areas.len() - split) as f64;
+        // Mermaid tends to:
+        // 1. Group multiple items together when their total is larger
+        // 2. Isolate single items when they're relatively small
+        // Score formula: prefer splits where we have many items on one side
+        // and their combined value makes sense
 
-        // Score: penalize having many small items split across both sides
-        // Favor grouping items together when they have similar sizes
-        let left_avg = left_sum / left_count;
-        let right_avg = if right_count > 0.0 {
-            right_sum / right_count
+        let left_ratio = left_sum / total;
+        let right_ratio = right_sum / total;
+
+        // Prefer splits where:
+        // - The larger group (by value) has more items
+        // - Single items are isolated only when they're small
+        let score = if left_count > right_count {
+            // More items on left - prefer if left has larger total
+            left_ratio - right_ratio * 0.5
+        } else if right_count > left_count {
+            // More items on right - prefer if right has larger total
+            right_ratio - left_ratio * 0.5
         } else {
-            0.0
+            // Equal counts - prefer balanced value split
+            -((left_ratio - 0.5).abs())
         };
 
-        // Score based on how different the average item sizes are in each group
-        // and how unbalanced the split is (we want unbalanced for squareness)
-        let size_ratio = if left_avg > 0.0 && right_avg > 0.0 {
-            (left_avg / right_avg).max(right_avg / left_avg)
-        } else {
-            1.0
-        };
-
-        // Favor splits that put items of similar size together
-        // Lower score is better
-        let score = size_ratio;
-
-        if score < best_score {
+        if score > best_score {
             best_score = score;
             best_split = split;
         }
@@ -711,7 +759,7 @@ fn render_section(rect: &TreemapRect, index: usize, config: &RenderConfig) -> Sv
             .with_style_if(!text_style.is_empty(), &text_style),
     });
 
-    // Section value (right-aligned)
+    // Section value (right-aligned, uses smaller font for section headers)
     let value_x = rect.x + rect.width - 10.0;
     children.push(SvgElement::Text {
         x: value_x,
@@ -722,7 +770,7 @@ fn render_section(rect: &TreemapRect, index: usize, config: &RenderConfig) -> Sv
             .with_attr("text-anchor", "end")
             .with_attr("dominant-baseline", "middle")
             .with_attr("font-style", "italic")
-            .with_attr("font-size", &format!("{}px", VALUE_FONT_SIZE))
+            .with_attr("font-size", &format!("{}px", SECTION_VALUE_FONT_SIZE))
             .with_fill(&text_color)
             .with_style_if(!text_style.is_empty(), &text_style),
     });
@@ -778,13 +826,14 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
     });
 
     // ClipPath for text overflow handling (matching mermaid.js)
+    // Position the clipPath rect at the leaf's position since we use absolute coordinates
     let clip_id = format!("clip-leaf-{}", index);
     let clip_width = (rect.width - 4.0).max(0.0);
     let clip_height = (rect.height - 4.0).max(0.0);
     children.push(SvgElement::Raw {
         content: format!(
-            "<clipPath id=\"{}\"><rect width=\"{}\" height=\"{}\"/></clipPath>",
-            clip_id, clip_width, clip_height
+            "<clipPath id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"/></clipPath>",
+            clip_id, rect.x + 2.0, rect.y + 2.0, clip_width, clip_height
         ),
     });
 
@@ -823,10 +872,17 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
     // Only show text if there's enough space
     let min_display_size = 20.0;
     if rect.width >= min_display_size && rect.height >= min_display_size {
+        // Calculate positions to center label + value together
+        // The label and value form a text block that should be centered
+        let gap = 2.0; // Gap between label and value
+        let total_text_height = label_font_size + gap + value_font_size;
+        let label_y = center_y - total_text_height / 2.0 + label_font_size / 2.0;
+        let value_y = label_y + label_font_size / 2.0 + gap;
+
         // Leaf label (centered) with clip-path reference
         children.push(SvgElement::Text {
             x: center_x,
-            y: center_y - value_font_size / 2.0,
+            y: label_y,
             content: rect.name.clone(),
             attrs: Attrs::new()
                 .with_class(&format!("treemapLabel {}", section_class))
@@ -842,7 +898,7 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
         if let Some(value) = rect.value {
             children.push(SvgElement::Text {
                 x: center_x,
-                y: center_y + label_font_size / 2.0 + 2.0,
+                y: value_y,
                 content: format_value(value),
                 attrs: Attrs::new()
                     .with_class(&format!("treemapValue {}", section_class))
