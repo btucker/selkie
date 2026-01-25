@@ -37,8 +37,9 @@ const VALUE_FONT_SIZE: f64 = 23.0;
 /// Default diagram width
 const DEFAULT_WIDTH: f64 = 960.0;
 
-/// Default diagram height (matches mermaid.js ~400px content area)
-const DEFAULT_HEIGHT: f64 = 400.0;
+/// Default diagram height (matches mermaid.js viewBox height of 371px)
+/// Mermaid uses viewBox="2 27 996 371" - the 371 is the visible height
+const DEFAULT_HEIGHT: f64 = 371.0;
 
 /// A positioned rectangle for treemap rendering
 #[derive(Debug, Clone)]

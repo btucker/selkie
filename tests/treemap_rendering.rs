@@ -688,8 +688,8 @@ fn get_viewbox_dimensions(doc: &Document<'_>) -> Option<(f64, f64, f64, f64)> {
 
 #[test]
 fn treemap_visual_parity_height() {
-    // Test: Height should be closer to mermaid's 400px, not 500px
-    // Mermaid uses viewBox "2 27 996 371" for a 400px content area
+    // Test: Height should match mermaid's 371px viewBox height
+    // Reference: viewBox="2 27 996 371" means the viewBox height is 371
     let input = r#"treemap-beta
 "Category A"
     "Item A1": 10
@@ -705,10 +705,13 @@ fn treemap_visual_parity_height() {
     assert!(dims.is_some(), "SVG should have viewBox");
 
     let (_, _, _, height) = dims.unwrap();
-    // Should be within 20% of mermaid's ~400px, not 500px
+    // Should match mermaid's 371px viewBox height (allow 5% tolerance)
+    // Reference: docs/images/reference/treemap.svg uses viewBox="2 27 996 371"
+    let expected_height = 371.0;
+    let tolerance = expected_height * 0.05; // 5% tolerance
     assert!(
-        height <= 420.0,
-        "SVG height should be ~400px for visual parity (got {}px)",
+        (height - expected_height).abs() <= tolerance,
+        "SVG viewBox height should be ~371px for visual parity with mermaid (got {}px)",
         height
     );
 }
