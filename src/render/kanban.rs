@@ -186,10 +186,8 @@ fn render_sections(db: &KanbanDb, layout: &KanbanLayout, _config: &RenderConfig)
         let x = (idx as f64) * (SECTION_WIDTH + PADDING / 2.0);
         let height = layout.section_heights.get(idx).cloned().unwrap_or(200.0);
 
-        // Get section color for inline style (mermaid.js uses inline fill for visual parity)
-        let section_color = get_section_color(idx);
-
-        // Section background with inline fill style for mermaid.js visual parity
+        // Section background - CSS classes apply fill colors (like mermaid.js)
+        // Using empty style attribute and CSS classes for visual parity
         let rect = SvgElement::Rect {
             x,
             y: 0.0,
@@ -203,10 +201,7 @@ fn render_sections(db: &KanbanDb, layout: &KanbanLayout, _config: &RenderConfig)
                     (idx % 12) + 1,
                     section.css_classes.as_deref().unwrap_or("")
                 ))
-                .with_attr(
-                    "style",
-                    &format!("fill:{};stroke:{}", section_color, section_color),
-                ),
+                .with_attr("style", ""),
         };
 
         // Section label
@@ -310,8 +305,8 @@ fn render_items(db: &KanbanDb, layout: &KanbanLayout, _config: &RenderConfig) ->
 fn render_item(node: &KanbanNode, x: f64, y: f64, width: f64, height: f64) -> SvgElement {
     let mut children = Vec::new();
 
-    // Item background rectangle with inline fill for mermaid.js visual parity
-    // Using inline style ensures proper rendering regardless of CSS specificity
+    // Item background rectangle - CSS classes apply fill colors (like mermaid.js)
+    // Using empty style attribute and CSS classes for visual parity
     let rect = SvgElement::Rect {
         x: 0.0,
         y: 0.0,
@@ -324,7 +319,7 @@ fn render_item(node: &KanbanNode, x: f64, y: f64, width: f64, height: f64) -> Sv
                 "kanban-item {}",
                 node.css_classes.as_deref().unwrap_or("")
             ))
-            .with_attr("style", "fill:white;stroke:#9370DB"),
+            .with_attr("style", ""),
     };
     children.push(rect);
 
@@ -393,7 +388,7 @@ fn render_item(node: &KanbanNode, x: f64, y: f64, width: f64, height: f64) -> Sv
     }
 }
 
-/// Render item label with text wrapping
+/// Render item label with text wrapping using SVG text elements
 fn render_item_label(text: &str, cx: f64, y: f64, max_width: f64) -> SvgElement {
     let lines = wrap_text_lines(text, max_width);
 
@@ -441,31 +436,6 @@ fn priority_color(priority: &Priority) -> &'static str {
         Priority::Low => "blue",
         Priority::VeryLow => "lightblue",
     }
-}
-
-/// Get section fill color for a given section index (0-based)
-/// Returns HSL color string matching mermaid.js default theme
-fn get_section_color(idx: usize) -> String {
-    // Section colors matching mermaid.js default theme cScale values
-    // These hues match the section-1 through section-12 CSS classes from mermaid reference output.
-    const SECTION_HUES: [f64; 12] = [
-        80.0,  // section-1: yellow-green
-        270.0, // section-2: purple
-        300.0, // section-3: pink
-        330.0, // section-4: light red
-        0.0,   // section-5: red
-        30.0,  // section-6: orange
-        90.0,  // section-7: green
-        150.0, // section-8: teal
-        180.0, // section-9: cyan
-        210.0, // section-10: light blue
-        240.0, // section-11: blue
-        60.0,  // section-12: yellow
-    ];
-
-    let hue = SECTION_HUES[idx % 12];
-    // Mermaid uses ~86.27% lightness and 100% saturation
-    format!("hsl({}, 100%, 86.27%)", hue)
 }
 
 /// Generate CSS for kanban diagrams

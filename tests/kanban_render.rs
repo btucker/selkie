@@ -330,9 +330,9 @@ fn count_rects_with_inline_fill(doc: &Document<'_>) -> usize {
 }
 
 #[test]
-fn kanban_visual_parity_section_inline_fill() {
-    // Mermaid.js uses inline fill styles on section rects for proper color rendering
-    // This prevents CSS class conflicts and ensures colors display correctly
+fn kanban_visual_parity_section_css_fill() {
+    // CSS classes define section fill colors for proper visual parity
+    // This matches how mermaid.js applies colors via CSS classes (section-1, section-2, etc.)
     let input = r#"kanban
   id1[Todo]
     task1[Task 1]
@@ -340,14 +340,18 @@ fn kanban_visual_parity_section_inline_fill() {
     task2[Task 2]"#;
 
     let svg = render_kanban_svg(input);
-    let doc = parse_svg(&svg);
 
-    // Section rects should have inline fill style (like mermaid.js)
-    let section_rects_with_fill = count_rects_with_inline_fill(&doc);
+    // Section rects should have CSS classes that define fills
     assert!(
-        section_rects_with_fill >= 2,
-        "Section rects should have inline fill style for mermaid visual parity (found {} rects with inline fill)",
-        section_rects_with_fill
+        svg.contains("section-1") && svg.contains("section-2"),
+        "Section rects should have section-N CSS classes for fill colors\nSVG: {}",
+        svg
+    );
+    // CSS should define the fill colors
+    assert!(
+        svg.contains(".section-1") && svg.contains("fill: hsl"),
+        "CSS should define fill colors for section classes\nSVG: {}",
+        svg
     );
 }
 
@@ -442,35 +446,26 @@ fn kanban_visual_parity_text_anchor() {
 }
 
 #[test]
-fn kanban_visual_parity_item_inline_fill() {
-    // Mermaid.js kanban items have inline fill="white" for reliable rendering
+fn kanban_visual_parity_item_css_fill() {
+    // Kanban items use CSS classes for fill styling
+    // The CSS defines fill: white for .kanban-item class
     let input = r#"kanban
   id1[Todo]
     task1[Task 1]"#;
 
     let svg = render_kanban_svg(input);
-    let doc = parse_svg(&svg);
 
-    // Item rects (kanban-item class) should have inline fill style
-    let item_rects_with_fill: Vec<_> = doc
-        .descendants()
-        .filter(|node| {
-            node.tag_name().name() == "rect"
-                && node
-                    .attribute("class")
-                    .map(|c| c.contains("kanban-item"))
-                    .unwrap_or(false)
-        })
-        .filter(|node| {
-            node.attribute("style")
-                .map(|s| s.contains("fill"))
-                .unwrap_or(false)
-        })
-        .collect();
-
+    // Item rects should have kanban-item class
     assert!(
-        !item_rects_with_fill.is_empty(),
-        "Kanban item rects should have inline fill style for mermaid visual parity"
+        svg.contains("kanban-item"),
+        "Kanban item rects should have kanban-item class\nSVG: {}",
+        svg
+    );
+    // CSS should define the fill color for items
+    assert!(
+        svg.contains(".kanban-item") && svg.contains("fill: white"),
+        "CSS should define fill: white for kanban-item class\nSVG: {}",
+        svg
     );
 }
 

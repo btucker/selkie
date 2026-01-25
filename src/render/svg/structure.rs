@@ -421,41 +421,16 @@ fn extract_labels(doc: &roxmltree::Document) -> Vec<String> {
     for node in doc.descendants() {
         let tag = node.tag_name().name();
 
-        // For text elements, check if they have tspan children
+        // For text elements, combine all text content into a single label
         if tag == "text" {
-            let tspans: Vec<_> = node
-                .children()
-                .filter(|c| c.tag_name().name() == "tspan")
-                .collect();
-
-            // Check if this is multi-line text (tspans with dy attribute)
-            // vs multi-word single-line text (tspans without dy)
-            let is_multiline =
-                tspans.len() > 1 && tspans.iter().skip(1).any(|t| t.attribute("dy").is_some());
-
-            if is_multiline {
-                // Multi-line text: capture only the first line, matching HTML <p> extraction.
-                if let Some(first) = tspans.first() {
-                    let text: String = first
-                        .text()
-                        .unwrap_or("")
-                        .split_whitespace()
-                        .collect::<Vec<_>>()
-                        .join(" ");
-                    if !text.is_empty() && !seen.contains(&text) {
-                        seen.insert(text.clone());
-                        labels.push(text);
-                    }
-                }
-            } else {
-                // Single-line or multi-word: get combined content
-                let combined = collect_text_content(&node);
-                // Normalize whitespace: collapse multiple spaces/newlines into single space
-                let combined: String = combined.split_whitespace().collect::<Vec<_>>().join(" ");
-                if !combined.is_empty() && !seen.contains(&combined) {
-                    seen.insert(combined.clone());
-                    labels.push(combined);
-                }
+            // Combine ALL tspans into a single label (whether multi-line with dy or not)
+            // This matches HTML <p> extraction which gets the full text content
+            let combined = collect_text_content(&node);
+            // Normalize whitespace: collapse multiple spaces/newlines into single space
+            let combined: String = combined.split_whitespace().collect::<Vec<_>>().join(" ");
+            if !combined.is_empty() && !seen.contains(&combined) {
+                seen.insert(combined.clone());
+                labels.push(combined);
             }
         }
         // For tspan directly under text, handled above
@@ -477,6 +452,7 @@ fn extract_labels(doc: &roxmltree::Document) -> Vec<String> {
 }
 
 /// Recursively collect all text content from a node and its descendants
+/// Adds spaces between tspan elements to ensure proper word boundaries
 fn collect_text_content(node: &roxmltree::Node) -> String {
     let mut result = String::new();
 
@@ -485,6 +461,13 @@ fn collect_text_content(node: &roxmltree::Node) -> String {
             if let Some(text) = child.text() {
                 result.push_str(text);
             }
+        } else if child.tag_name().name() == "tspan" {
+            // Add a space before tspan content if result doesn't already end with space
+            // This ensures proper word boundaries when tspans are concatenated
+            if !result.is_empty() && !result.ends_with(' ') && !result.ends_with('\n') {
+                result.push(' ');
+            }
+            result.push_str(&collect_text_content(&child));
         } else {
             result.push_str(&collect_text_content(&child));
         }
@@ -2020,7 +2003,7 @@ mod tests {
     }
 
     #[test]
-    fn test_extract_multiline_tspans_uses_first_line() {
+    fn test_extract_multiline_tspans_combines_all() {
         // Multi-line text uses dy attribute to position lines
         let multiline_svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
             <text x="10" y="20">
@@ -2032,10 +2015,12 @@ mod tests {
 
         let structure = SvgStructure::from_svg(multiline_svg).unwrap();
 
-        // Should use only the first line
+        // Should combine all tspans into a single label (matching HTML <p> behavior)
         assert!(
-            structure.labels.contains(&"Line one".to_string()),
-            "Should extract first line only. Got: {:?}",
+            structure
+                .labels
+                .contains(&"Line one Line two Line three".to_string()),
+            "Should combine all tspans into single label. Got: {:?}",
             structure.labels
         );
     }
