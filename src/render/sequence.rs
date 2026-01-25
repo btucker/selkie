@@ -12,7 +12,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let base_actor_spacing = 200.0;
     let actor_width = 150.0; // mermaid.js uses 150
     let actor_height = 65.0; // mermaid.js uses 65
-    let message_spacing = 44.0; // mermaid.js uses ~44px
+    let message_spacing = 44.0; // mermaid.js uses ~44px spacing in rendered output
     let margin_top = 0.0; // Actors start at y=0 (mermaid style - viewBox offset handles padding)
     let _margin_left = 0.0; // No left margin (handled by viewBox offset)
     let actor_box_padding = 0.0; // No padding - full width box
@@ -346,6 +346,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 }
             },
             TimelineEvent::Note(note) => {
+                // Mermaid.js positions notes at previous_message_y + noteMargin
+                let note_margin = 10.0; // mermaid.js default noteMargin
+                let note_height = 39.0; // mermaid.js default note height
+                let note_y = last_message_y.unwrap_or(current_y - message_spacing) + note_margin;
+
                 if let Some(&actor_x) = actor_positions.get(&note.actor) {
                     let span_x = note
                         .actor_to
@@ -353,7 +358,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                         .and_then(|actor| actor_positions.get(actor))
                         .copied();
                     let note_element =
-                        render_note(actor_x, span_x, current_y, &note.message, note.placement);
+                        render_note(actor_x, span_x, note_y, &note.message, note.placement);
                     doc.add_element(note_element);
                 }
                 if let Some(actor_idx) = actor_index.get(&note.actor).copied() {
@@ -371,8 +376,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                         fragment.update_bounds(min_idx, max_idx);
                     }
                 }
-                last_message_y = Some(current_y);
-                current_y += message_spacing;
+                // Update current_y to be after the note bottom + message_spacing
+                // This matches mermaid.js behavior where next message is message_spacing below note
+                let note_bottom = note_y + note_height;
+                last_message_y = Some(note_bottom);
+                current_y = note_bottom + message_spacing;
             }
         }
     }
@@ -724,7 +732,7 @@ fn render_message(
     }
 
     if is_dotted {
-        line_attrs = line_attrs.with_stroke_dasharray("5,5");
+        line_attrs = line_attrs.with_stroke_dasharray("3,3");
     }
 
     shapes.push(SvgElement::Line {
@@ -996,7 +1004,7 @@ fn render_self_message(
         .with_attr("marker-end", "url(#arrow-filled)");
 
     if is_dotted {
-        path_attrs = path_attrs.with_stroke_dasharray("5,5");
+        path_attrs = path_attrs.with_stroke_dasharray("3,3");
     }
 
     shapes.push(SvgElement::Path {
@@ -1054,8 +1062,8 @@ fn render_note(
     let font_size = 16.0_f64; // Match mermaid.js default
     let line_height = (font_size * 1.2_f64).round();
     let text_padding = 10.0;
-    let min_note_height = 40.0;
-    let fold_size = 8.0;
+    // Mermaid.js uses 39px height for notes (observed in reference)
+    let min_note_height = 39.0;
     let min_note_width = 100.0;
 
     let line_count = count_text_lines(message);
@@ -1065,83 +1073,64 @@ fn render_note(
         Placement::Over => {
             if let Some(span_x) = span_x {
                 let span = (span_x - actor_x).abs();
-                let width = (span + 20.0).max(min_note_width);
+                // Match mermaid.js: note spans between actors with extra padding
+                // Reference uses span + 50 for spanning notes
+                let width = (span + 50.0).max(min_note_width);
                 (width, (actor_x + span_x) / 2.0)
             } else {
                 (min_note_width, actor_x)
             }
+        }
+        Placement::RightOf => {
+            // Match mermaid.js: note width of 150 for right-of notes
+            (150.0, actor_x)
         }
         _ => (min_note_width, actor_x),
     };
 
     let x = match placement {
         Placement::LeftOf => actor_x - note_width - 20.0,
-        Placement::RightOf => actor_x + 20.0,
+        Placement::RightOf => actor_x + 25.0, // Match mermaid.js offset from actor center
         Placement::Over => x_center - note_width / 2.0,
     };
-    let top_y = y - note_height / 2.0;
+    // y is passed as the note's top position (mermaid.js style)
+    let top_y = y;
 
     let mut children = Vec::new();
 
-    // Note box with folded corner
-    let path = format!(
-        "M {} {} L {} {} L {} {} L {} {} L {} {} Z",
+    // Note box - use rect like mermaid.js (no folded corner)
+    children.push(SvgElement::Rect {
         x,
-        top_y,
-        x + note_width - fold_size,
-        top_y,
-        x + note_width,
-        top_y + fold_size,
-        x + note_width,
-        top_y + note_height,
-        x,
-        top_y + note_height
-    );
-
-    // Note box with inline fill for mermaid visual parity
-    children.push(SvgElement::Path {
-        d: path,
+        y: top_y,
+        width: note_width,
+        height: note_height,
+        rx: None,
+        ry: None,
         attrs: Attrs::new()
             .with_class("note")
-            .with_stroke_width(1.0)
             .with_fill("#EDF2AE")
-            .with_stroke("#666")
-            .with_class("note-box"),
-    });
-
-    // Fold line
-    let fold_path = format!(
-        "M {} {} L {} {} L {} {}",
-        x + note_width - fold_size,
-        top_y,
-        x + note_width - fold_size,
-        top_y + fold_size,
-        x + note_width,
-        top_y + fold_size
-    );
-
-    children.push(SvgElement::Path {
-        d: fold_path,
-        attrs: Attrs::new()
-            .with_fill("none")
-            .with_stroke_width(1.0)
-            .with_class("note"),
+            .with_stroke("#666"),
     });
 
     // Note text - render each line as a separate text element (like mermaid.js)
+    // Use dy="1em" pattern matching mermaid.js text positioning
     let normalized = message
         .replace("<br />", "\n")
         .replace("<br/>", "\n")
         .replace("<br>", "\n");
     for (idx, line) in normalized.lines().enumerate() {
-        let text_y = top_y + text_padding + font_size + (idx as f64 * line_height);
+        // Mermaid.js positions text at top with dy="1em" offset
+        let text_y = top_y + 5.0 + (idx as f64 * line_height);
         children.push(SvgElement::Text {
             x: x + note_width / 2.0,
             y: text_y,
             content: line.to_string(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", "middle")
-                .with_class("note-text")
+                .with_attr("dominant-baseline", "middle")
+                .with_attr("alignment-baseline", "middle")
+                .with_attr("dy", "1em")
+                .with_class("noteText")
                 .with_attr("font-size", "16"),
         });
     }
