@@ -651,6 +651,48 @@ fn get_section_fill_color(section: usize, _config: &RenderConfig) -> String {
     )
 }
 
+/// Get a darker stroke color for a section (15% lower lightness)
+/// Mermaid.js uses a darker stroke than fill to create visual definition for sections
+fn get_section_stroke_color(section: usize, _config: &RenderConfig) -> String {
+    // Same hue sequence as fill colors
+    let hues = [
+        240.0, // blue (index 0)
+        60.0,  // yellow (index 1)
+        80.0,  // yellow-green (index 2)
+        270.0, // purple (index 3)
+        0.0,   // red (index 4)
+        180.0, // cyan (index 5)
+        300.0, // magenta (index 6)
+        120.0, // green (index 7)
+        30.0,  // orange (index 8)
+        150.0, // teal (index 9)
+        210.0, // sky blue (index 10)
+        330.0, // pink (index 11)
+    ];
+
+    // Stroke lightness is 15% lower than fill lightness (matching mermaid.js)
+    // Fill: 76.27% -> Stroke: 61.27%
+    // Fill: 73.53% -> Stroke: 48.53%
+    let (lightness, hue) = if section < hues.len() {
+        let l = if section == 1 {
+            48.5294117647 // yellow section: 73.53 - 25 = ~48.53 (matches reference)
+        } else {
+            61.2745098039 // other sections: 76.27 - 15 = ~61.27 (matches reference)
+        };
+        (l, hues[section])
+    } else {
+        let h = ((section as f64) * 30.0) % 360.0;
+        (61.2745098039, h)
+    };
+
+    format!(
+        "hsl({}, {}%, {}%)",
+        hue.round() as i32,
+        100,
+        format_lightness(lightness)
+    )
+}
+
 /// Get contrasting text color (white or #333) for a given fill color string
 fn get_text_color_for_fill(fill_color: &str) -> String {
     // Try parsing as HSL string first
@@ -685,8 +727,10 @@ fn render_section(rect: &TreemapRect, index: usize, config: &RenderConfig) -> Sv
     // Section color class
     let section_class = format!("section-{}", rect.section);
 
-    // Get the inline fill color for this section
+    // Get the inline fill and stroke colors for this section
+    // Mermaid.js uses a darker stroke (15% lower lightness) for better visual definition
     let fill_color = get_section_fill_color(rect.section, config);
+    let stroke_color = get_section_stroke_color(rect.section, config);
 
     // Get contrasting text color for the section background
     let text_color = get_text_color_for_fill(&fill_color);
@@ -698,7 +742,7 @@ fn render_section(rect: &TreemapRect, index: usize, config: &RenderConfig) -> Sv
         rect.styles.join(";")
     };
 
-    // Section background rect with inline fill color
+    // Section background rect with inline fill and darker stroke color
     children.push(SvgElement::Rect {
         x: rect.x,
         y: rect.y,
@@ -709,7 +753,7 @@ fn render_section(rect: &TreemapRect, index: usize, config: &RenderConfig) -> Sv
         attrs: Attrs::new()
             .with_class(&format!("treemapSection {}", section_class))
             .with_fill(&fill_color)
-            .with_stroke(&fill_color)
+            .with_stroke(&stroke_color)
             .with_attr("fill-opacity", "0.6")
             .with_attr("stroke-opacity", "0.4")
             .with_attr("stroke-width", "2")
