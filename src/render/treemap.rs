@@ -833,7 +833,11 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
     children.push(SvgElement::Raw {
         content: format!(
             "<clipPath id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"/></clipPath>",
-            clip_id, rect.x + 2.0, rect.y + 2.0, clip_width, clip_height
+            clip_id,
+            rect.x + 2.0,
+            rect.y + 2.0,
+            clip_width,
+            clip_height
         ),
     });
 
