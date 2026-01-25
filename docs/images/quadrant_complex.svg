@@ -128,49 +128,49 @@ marker path {
     <line x1="30" y1="45" x2="496" y2="45" class="quadrant-border quadrant-border-top" stroke="#c7c7f1" stroke-width="2"/>
     <line x1="495" y1="46" x2="495" y2="468" class="quadrant-border quadrant-border-right" stroke="#c7c7f1" stroke-width="2"/>
     <line x1="30" y1="469" x2="496" y2="469" class="quadrant-border quadrant-border-bottom" stroke-width="2" stroke="#c7c7f1"/>
-    <line x1="31" y1="46" x2="31" y2="468" class="quadrant-border quadrant-border-left" stroke-width="2" stroke="#c7c7f1"/>
+    <line x1="31" y1="46" x2="31" y2="468" class="quadrant-border quadrant-border-left" stroke="#c7c7f1" stroke-width="2"/>
     <line x1="263" y1="46" x2="263" y2="468" class="quadrant-border quadrant-border-vertical" stroke="#c7c7f1" stroke-width="1"/>
-    <line x1="32" y1="257" x2="494" y2="257" class="quadrant-border quadrant-border-horizontal" stroke-width="1" stroke="#c7c7f1"/>
-    <text x="379" y="50" class="quadrant-label" dominant-baseline="hanging" fill="#131300" font-size="16" text-anchor="middle">Leaders</text>
-    <text x="147" y="50" class="quadrant-label" dominant-baseline="hanging" fill="#0e0e00" font-size="16" text-anchor="middle">Challengers</text>
-    <text x="147" y="262" class="quadrant-label" fill="#090900" dominant-baseline="hanging" text-anchor="middle" font-size="16">Niche Players</text>
-    <text x="379" y="262" class="quadrant-label" fill="#040400" font-size="16" text-anchor="middle" dominant-baseline="hanging">Visionaries</text>
+    <line x1="32" y1="257" x2="494" y2="257" class="quadrant-border quadrant-border-horizontal" stroke="#c7c7f1" stroke-width="1"/>
+    <text x="379" y="50" class="quadrant-label" dominant-baseline="hanging" text-anchor="middle" font-size="16" fill="#131300">Leaders</text>
+    <text x="147" y="50" class="quadrant-label" text-anchor="middle" font-size="16" fill="#0e0e00" dominant-baseline="hanging">Challengers</text>
+    <text x="147" y="262" class="quadrant-label" font-size="16" text-anchor="middle" fill="#090900" dominant-baseline="hanging">Niche Players</text>
+    <text x="379" y="262" class="quadrant-label" fill="#040400" text-anchor="middle" font-size="16" dominant-baseline="hanging">Visionaries</text>
     <circle cx="379" cy="151" r="10" class="quadrant-point" fill="#9370DB"/>
-    <text x="379" y="156" class="quadrant-point-label" font-size="12" fill="#333333" text-anchor="middle" dominant-baseline="hanging">Microsoft</text>
+    <text x="379" y="156" class="quadrant-point-label" font-size="12" fill="#131300" dominant-baseline="hanging" text-anchor="middle">Microsoft</text>
     <circle cx="286.20000000000005" cy="214.60000000000002" r="8" class="quadrant-point" fill="#9370DB"/>
-    <text x="286.20000000000005" y="219.60000000000002" class="quadrant-point-label" font-size="12" fill="#333333" text-anchor="middle" dominant-baseline="hanging">Salesforce</text>
+    <text x="286.20000000000005" y="219.60000000000002" class="quadrant-point-label" fill="#131300" dominant-baseline="hanging" font-size="12" text-anchor="middle">Salesforce</text>
     <circle cx="355.79999999999995" cy="193.39999999999998" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="355.79999999999995" y="198.39999999999998" class="quadrant-point-label" font-size="12" fill="#333333" text-anchor="middle" dominant-baseline="hanging">SAP</text>
+    <text x="355.79999999999995" y="198.39999999999998" class="quadrant-point-label" text-anchor="middle" dominant-baseline="hanging" fill="#131300" font-size="12">SAP</text>
     <circle cx="267.64" cy="299.4" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="267.64" y="304.4" class="quadrant-point-label" dominant-baseline="hanging" font-size="12" fill="#333333" text-anchor="middle">IBM</text>
+    <text x="267.64" y="304.4" class="quadrant-point-label" fill="#131300" text-anchor="middle" font-size="12" dominant-baseline="hanging">IBM</text>
     <circle cx="332.6" cy="235.79999999999998" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="332.6" y="240.79999999999998" class="quadrant-point-label" font-size="12" fill="#333333" dominant-baseline="hanging" text-anchor="middle">Oracle</text>
+    <text x="332.6" y="240.79999999999998" class="quadrant-point-label" dominant-baseline="hanging" font-size="12" text-anchor="middle" fill="#131300">Oracle</text>
     <circle cx="309.4" cy="278.20000000000005" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="309.4" y="283.20000000000005" class="quadrant-point-label" dominant-baseline="hanging" font-size="12" text-anchor="middle" fill="#333333">Qlik</text>
+    <text x="309.4" y="283.20000000000005" class="quadrant-point-label" dominant-baseline="hanging" font-size="12" text-anchor="middle" fill="#131300">Qlik</text>
     <circle cx="346.52000000000004" cy="163.72000000000003" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="346.52000000000004" y="168.72000000000003" class="quadrant-point-label" dominant-baseline="hanging" fill="#333333" font-size="12" text-anchor="middle">Tableau</text>
+    <text x="346.52000000000004" y="168.72000000000003" class="quadrant-point-label" dominant-baseline="hanging" text-anchor="middle" fill="#131300" font-size="12">Tableau</text>
     <circle cx="239.8" cy="223.08" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="239.8" y="228.08" class="quadrant-point-label" dominant-baseline="hanging" fill="#333333" font-size="12" text-anchor="middle">SAS</text>
+    <text x="239.8" y="228.08" class="quadrant-point-label" text-anchor="middle" font-size="12" fill="#131300" dominant-baseline="hanging">SAS</text>
     <circle cx="263" cy="257" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="263" y="262" class="quadrant-point-label" fill="#333333" dominant-baseline="hanging" text-anchor="middle" font-size="12">MicroStrategy</text>
+    <text x="263" y="262" class="quadrant-point-label" font-size="12" fill="#131300" dominant-baseline="hanging" text-anchor="middle">MicroStrategy</text>
     <circle cx="193.39999999999998" cy="290.92" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="193.39999999999998" y="295.92" class="quadrant-point-label" text-anchor="middle" font-size="12" dominant-baseline="hanging" fill="#333333">Alteryx</text>
+    <text x="193.39999999999998" y="295.92" class="quadrant-point-label" dominant-baseline="hanging" text-anchor="middle" fill="#131300" font-size="12">Alteryx</text>
     <circle cx="170.2" cy="320.6" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="170.2" y="325.6" class="quadrant-point-label" fill="#333333" text-anchor="middle" dominant-baseline="hanging" font-size="12">Sisense</text>
+    <text x="170.2" y="325.6" class="quadrant-point-label" font-size="12" text-anchor="middle" dominant-baseline="hanging" fill="#131300">Sisense</text>
     <circle cx="147" cy="278.20000000000005" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="147" y="283.20000000000005" class="quadrant-point-label" text-anchor="middle" font-size="12" dominant-baseline="hanging" fill="#333333">ThoughtSpot</text>
+    <text x="147" y="283.20000000000005" class="quadrant-point-label" fill="#131300" dominant-baseline="hanging" font-size="12" text-anchor="middle">ThoughtSpot</text>
     <circle cx="123.80000000000001" cy="341.79999999999995" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="123.80000000000001" y="346.79999999999995" class="quadrant-point-label" dominant-baseline="hanging" text-anchor="middle" font-size="12" fill="#333333">Domo</text>
+    <text x="123.80000000000001" y="346.79999999999995" class="quadrant-point-label" text-anchor="middle" dominant-baseline="hanging" font-size="12" fill="#131300">Domo</text>
     <circle cx="286.20000000000005" cy="248.51999999999998" r="5" class="quadrant-point" fill="#9370DB"/>
-    <text x="286.20000000000005" y="253.51999999999998" class="quadrant-point-label" font-size="12" dominant-baseline="hanging" text-anchor="middle" fill="#333333">Looker</text>
+    <text x="286.20000000000005" y="253.51999999999998" class="quadrant-point-label" text-anchor="middle" font-size="12" fill="#131300" dominant-baseline="hanging">Looker</text>
     <circle cx="402.20000000000005" cy="180.67999999999998" r="5" class="quadrant-point" fill="#ff9900"/>
-    <text x="402.20000000000005" y="185.67999999999998" class="quadrant-point-label" text-anchor="middle" dominant-baseline="hanging" font-size="12" fill="#333333">Amazon</text>
+    <text x="402.20000000000005" y="185.67999999999998" class="quadrant-point-label" dominant-baseline="hanging" font-size="12" fill="#131300" text-anchor="middle">Amazon</text>
     <circle cx="365.08" cy="214.60000000000002" r="5" class="quadrant-point" fill="#4285f4"/>
-    <text x="365.08" y="219.60000000000002" class="quadrant-point-label" fill="#333333" font-size="12" text-anchor="middle" dominant-baseline="hanging">Google</text>
-    <text x="147" y="479" class="axis-label x-axis-left" font-size="16" text-anchor="middle" dominant-baseline="middle" fill="#333333">Completeness of Vision</text>
-    <text x="379" y="479" class="axis-label x-axis-right" fill="#333333" font-size="16" dominant-baseline="middle" text-anchor="middle">x-axis-2</text>
-    <text x="21" y="363" class="axis-label y-axis-bottom" transform="rotate(-90, 21, 363)" dominant-baseline="middle" font-size="16" fill="#333333" text-anchor="middle">Ability to Execute</text>
-    <text x="21" y="151" class="axis-label y-axis-top" fill="#333333" dominant-baseline="middle" font-size="16" transform="rotate(-90, 21, 151)" text-anchor="middle">y-axis-2</text>
-    <text x="250" y="10" class="quadrant-title" dominant-baseline="hanging" font-size="20" font-weight="bold" text-anchor="middle" fill="#131300">Analytics and Business Intelligence Platforms</text>
+    <text x="365.08" y="219.60000000000002" class="quadrant-point-label" fill="#131300" font-size="12" text-anchor="middle" dominant-baseline="hanging">Google</text>
+    <text x="147" y="479" class="axis-label x-axis-left" text-anchor="middle" font-size="16" dominant-baseline="hanging" fill="#131300">Completeness of Vision</text>
+    <text x="379" y="479" class="axis-label x-axis-right" font-size="16" fill="#131300" text-anchor="middle" dominant-baseline="hanging">x-axis-2</text>
+    <text x="5" y="363" class="axis-label y-axis-bottom" font-size="16" fill="#131300" text-anchor="middle" transform="rotate(-90, 5, 363)" dominant-baseline="hanging">Ability to Execute</text>
+    <text x="5" y="151" class="axis-label y-axis-top" fill="#131300" dominant-baseline="hanging" transform="rotate(-90, 5, 151)" font-size="16" text-anchor="middle">y-axis-2</text>
+    <text x="250" y="10" class="quadrant-title" font-size="20" text-anchor="middle" dominant-baseline="hanging" font-weight="bold" fill="#131300">Analytics and Business Intelligence Platforms</text>
   </g>
 </svg>

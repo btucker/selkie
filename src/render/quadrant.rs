@@ -441,7 +441,7 @@ fn render_axis_labels(
             content: db.x_axis_left.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", text_anchor)
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("dominant-baseline", "hanging")
                 .with_class("axis-label x-axis-left")
                 .with_attr("font-size", &format!("{}", X_AXIS_LABEL_FONT_SIZE))
                 .with_fill(&config.theme.quadrant_x_axis_text_fill),
@@ -463,12 +463,15 @@ fn render_axis_labels(
             content: db.x_axis_right.clone(),
             attrs: Attrs::new()
                 .with_attr("text-anchor", text_anchor)
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("dominant-baseline", "hanging")
                 .with_class("axis-label x-axis-right")
                 .with_attr("font-size", &format!("{}", X_AXIS_LABEL_FONT_SIZE))
                 .with_fill(&config.theme.quadrant_x_axis_text_fill),
         });
     }
+
+    // Y-axis x position matches mermaid.js: yAxisLabelPadding = 5
+    let y_axis_x = Y_AXIS_LABEL_PADDING;
 
     // Y-axis bottom label (left side, at bottom)
     if !db.y_axis_bottom.is_empty() {
@@ -479,24 +482,20 @@ fn render_axis_labels(
             // At bottom edge when only bottom label exists
             chart_top + chart_height
         };
-        let text_anchor = if draw_y_labels_in_middle {
-            "middle"
-        } else {
-            "end"
-        };
+        // Mermaid always uses text-anchor="middle" for y-axis labels
         doc.add_element(SvgElement::Text {
-            x: chart_left - 10.0,
+            x: y_axis_x,
             y: y_pos,
             content: db.y_axis_bottom.clone(),
             attrs: Attrs::new()
-                .with_attr("text-anchor", text_anchor)
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("text-anchor", "middle")
+                .with_attr("dominant-baseline", "hanging")
                 .with_attr(
                     "transform",
-                    &format!("rotate(-90, {}, {})", chart_left - 10.0, y_pos),
+                    &format!("rotate(-90, {}, {})", y_axis_x, y_pos),
                 )
                 .with_class("axis-label y-axis-bottom")
-                .with_attr("font-size", &format!("{}", X_AXIS_LABEL_FONT_SIZE))
+                .with_attr("font-size", &format!("{}", Y_AXIS_LABEL_FONT_SIZE))
                 .with_fill(&config.theme.quadrant_y_axis_text_fill),
         });
     }
@@ -510,24 +509,20 @@ fn render_axis_labels(
             // At top edge when only top label exists
             chart_top
         };
-        let text_anchor = if draw_y_labels_in_middle {
-            "middle"
-        } else {
-            "start"
-        };
+        // Mermaid always uses text-anchor="middle" for y-axis labels
         doc.add_element(SvgElement::Text {
-            x: chart_left - 10.0,
+            x: y_axis_x,
             y: y_pos,
             content: db.y_axis_top.clone(),
             attrs: Attrs::new()
-                .with_attr("text-anchor", text_anchor)
-                .with_attr("dominant-baseline", "middle")
+                .with_attr("text-anchor", "middle")
+                .with_attr("dominant-baseline", "hanging")
                 .with_attr(
                     "transform",
-                    &format!("rotate(-90, {}, {})", chart_left - 10.0, y_pos),
+                    &format!("rotate(-90, {}, {})", y_axis_x, y_pos),
                 )
                 .with_class("axis-label y-axis-top")
-                .with_attr("font-size", &format!("{}", X_AXIS_LABEL_FONT_SIZE))
+                .with_attr("font-size", &format!("{}", Y_AXIS_LABEL_FONT_SIZE))
                 .with_fill(&config.theme.quadrant_y_axis_text_fill),
         });
     }

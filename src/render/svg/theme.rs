@@ -351,9 +351,9 @@ impl Default for Theme {
             quadrant3_text_fill: "#090900".to_string(), // adjust_rgb(#131300, -10, -10, -10)
             quadrant4_text_fill: "#040400".to_string(), // adjust_rgb(#131300, -15, -15, -15)
             quadrant_point_fill: "#9370DB".to_string(),
-            quadrant_point_text_fill: "#333333".to_string(),
-            quadrant_x_axis_text_fill: "#333333".to_string(),
-            quadrant_y_axis_text_fill: "#333333".to_string(),
+            quadrant_point_text_fill: "#131300".to_string(), // same as quadrant text fill per mermaid
+            quadrant_x_axis_text_fill: "#131300".to_string(), // same as quadrant text fill per mermaid
+            quadrant_y_axis_text_fill: "#131300".to_string(), // same as quadrant text fill per mermaid
             // Journey diagram - default theme (computed from primary/secondary colors)
             journey_fill_types: compute_journey_fill_types("#ECECFF", "#ffffde"),
             // sectionFills - dark colors used for inline fill attributes (mermaid.js defaults)
