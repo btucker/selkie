@@ -650,7 +650,7 @@ fn get_section_fill_color(section: usize, _config: &RenderConfig) -> String {
     )
 }
 
-/// Get contrasting text color (white or black) for a given fill color string
+/// Get contrasting text color (white or #333) for a given fill color string
 fn get_text_color_for_fill(fill_color: &str) -> String {
     // Try parsing as HSL string first
     if let Some((h, s, l)) = parse_hsl_string(fill_color) {
@@ -659,7 +659,7 @@ fn get_text_color_for_fill(fill_color: &str) -> String {
         if text.r == 255 {
             return "#ffffff".to_string();
         } else {
-            return "black".to_string();
+            return "#333".to_string();
         }
     }
 
@@ -669,12 +669,12 @@ fn get_text_color_for_fill(fill_color: &str) -> String {
         if text.r == 255 {
             return "#ffffff".to_string();
         } else {
-            return "black".to_string();
+            return "#333".to_string();
         }
     }
 
-    // Default to black text
-    "black".to_string()
+    // Default to #333 text (standard mermaid dark text color)
+    "#333".to_string()
 }
 
 /// Render a section (branch node with header)
