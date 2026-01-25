@@ -239,9 +239,10 @@ pub fn render_pie(db: &PieDb, config: &RenderConfig) -> Result<String> {
                     attrs: Attrs::new(),
                 },
             ],
-            attrs: Attrs::new()
-                .with_class("legend")
-                .with_transform(&format!("translate({},{:.0})", legend_x_from_center, item_y)),
+            attrs: Attrs::new().with_class("legend").with_transform(&format!(
+                "translate({},{:.0})",
+                legend_x_from_center, item_y
+            )),
         };
         pie_group_children.push(legend_item);
     }
@@ -265,7 +266,10 @@ fn color_to_rgb(color: &str) -> String {
             .trim_start_matches("hsl(")
             .trim_end_matches(')')
             .trim_end_matches('%');
-        let parts: Vec<&str> = inner.split(',').map(|s| s.trim().trim_end_matches('%')).collect();
+        let parts: Vec<&str> = inner
+            .split(',')
+            .map(|s| s.trim().trim_end_matches('%'))
+            .collect();
         if parts.len() >= 3 {
             if let (Ok(h), Ok(s), Ok(l)) = (
                 parts[0].parse::<f64>(),
