@@ -94,18 +94,18 @@ marker path {
 .pieTitleText {
   text-anchor: middle;
   font-size: 25px;
-  fill: #333333;
+  fill: black;
   font-family: trebuchet ms, verdana, arial, sans-serif;
 }
 
 .slice {
   font-family: trebuchet ms, verdana, arial, sans-serif;
-  fill: #333333;
+  fill: #333;
   font-size: 17px;
 }
 
 .legend text {
-  fill: #333333;
+  fill: black;
   font-family: trebuchet ms, verdana, arial, sans-serif;
   font-size: 17px;
 }
@@ -124,41 +124,57 @@ marker path {
     <g class="nodes">
 
     </g>
-    <circle cx="225" cy="225" r="186" class="pieOuterCircle" fill="none" stroke-width="2" stroke="black"/>
-    <path d="M 225 225 L 225 40 A 185 185 0 0 1 374.66814395936524 333.74027167410753 Z" class="pieCircle" fill="#ececff" stroke-width="2" opacity="0.7" stroke="black"/>
-    <path d="M 225 225 L 374.66814395936524 333.74027167410753 A 185 185 0 0 1 146.23083106046155 392.39300470621356 Z" class="pieCircle" stroke-width="2" opacity="0.7" stroke="black" fill="#ffffde"/>
-    <path d="M 225 225 L 146.23083106046155 392.39300470621356 A 185 185 0 0 1 40 225.00000000000003 Z" class="pieCircle" stroke-width="2" fill="hsl(80, 100%, 56.2745098039%)" opacity="0.7" stroke="black"/>
-    <path d="M 225 225 L 40 225.00000000000003 A 185 185 0 0 1 62.88326419188522 135.87557029118273 Z" class="pieCircle" fill="hsl(240, 100%, 86.2745098039%)" stroke="black" stroke-width="2" opacity="0.7"/>
-    <path d="M 225 225 L 62.88326419188522 135.87557029118273 A 185 185 0 0 1 107.07656189649231 82.45505008647908 Z" class="pieCircle" fill="hsl(60, 100%, 63.5294117647%)" stroke-width="2" stroke="black" opacity="0.7"/>
-    <path d="M 225 225 L 107.07656189649231 82.45505008647908 A 185 185 0 0 1 156.89695775333445 52.99135011067355 Z" class="pieCircle" fill="hsl(80, 100%, 76.2745098039%)" stroke-width="2" opacity="0.7" stroke="black"/>
-    <path d="M 225 225 L 156.89695775333445 52.99135011067355 A 185 185 0 0 1 201.81335179060366 41.458780256821626 Z" class="pieCircle" stroke="black" stroke-width="2" fill="hsl(300, 100%, 76.2745098039%)" opacity="0.7"/>
-    <path d="M 225 225 L 201.81335179060366 41.458780256821626 A 185 185 0 0 1 224.99999999999997 40 Z" class="pieCircle" stroke-width="2" stroke="black" opacity="0.7" fill="hsl(180, 100%, 56.2745098039%)"/>
-    <text x="225" y="25" class="pie-title" font-weight="bold" font-size="20" text-anchor="middle">Cloud Infrastructure Costs</text>
-    <text x="348.62715523113604" y="162.00881816113787" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">35%</text>
-    <text x="259.50572184412357" y="359.39091360659756" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">22%</text>
-    <text x="107.84950033659541" y="299.3459678033358" class="slice" font-size="17" text-anchor="middle" dominant-baseline="middle">18%</text>
-    <text x="90.60908639340244" y="190.49427815587643" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">8%</text>
-    <text x="118.0912875648592" y="136.55742142236937" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">6%</text>
-    <text x="154.3705035646359" y="105.57204375320286" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">5%</text>
-    <text x="190.49427815587632" y="90.60908639340246" class="slice" dominant-baseline="middle" font-size="17" text-anchor="middle">4%</text>
-    <text x="216.28781541530768" y="86.52379143057732" class="slice" font-size="17" dominant-baseline="middle" text-anchor="middle">2%</text>
-    <g class="legend">
-      <rect x="441" y="137" width="18" height="18" class="legend" fill="#ececff" stroke="#ececff"/>
-      <rect x="441" y="159" width="18" height="18" class="legend" stroke="hsl(80, 100%, 56.2745098039%)" fill="hsl(80, 100%, 56.2745098039%)"/>
-      <rect x="441" y="181" width="18" height="18" class="legend" fill="#ffffde" stroke="#ffffde"/>
-      <rect x="441" y="203" width="18" height="18" class="legend" stroke="hsl(240, 100%, 86.2745098039%)" fill="hsl(240, 100%, 86.2745098039%)"/>
-      <rect x="441" y="225" width="18" height="18" class="legend" fill="hsl(60, 100%, 63.5294117647%)" stroke="hsl(60, 100%, 63.5294117647%)"/>
-      <rect x="441" y="247" width="18" height="18" class="legend" fill="hsl(80, 100%, 76.2745098039%)" stroke="hsl(80, 100%, 76.2745098039%)"/>
-      <rect x="441" y="269" width="18" height="18" class="legend" stroke="hsl(300, 100%, 76.2745098039%)" fill="hsl(300, 100%, 76.2745098039%)"/>
-      <rect x="441" y="291" width="18" height="18" class="legend" fill="hsl(180, 100%, 56.2745098039%)" stroke="hsl(180, 100%, 56.2745098039%)"/>
-      <text x="463" y="151" class="legend" font-size="17">Compute (EC2/GKE) [35]</text>
-      <text x="463" y="173" class="legend" font-size="17">Storage (S3/GCS) [18]</text>
-      <text x="463" y="195" class="legend" font-size="17">Database (RDS) [22]</text>
-      <text x="463" y="217" class="legend" font-size="17">Networking [8]</text>
-      <text x="463" y="239" class="legend" font-size="17">CDN &amp; Edge [6]</text>
-      <text x="463" y="261" class="legend" font-size="17">Monitoring [5]</text>
-      <text x="463" y="283" class="legend" font-size="17">Security [4]</text>
-      <text x="463" y="305" class="legend" font-size="17">Other [2]</text>
+    <g transform="translate(225,225)">
+      <circle cx="0" cy="0" r="186" class="pieOuterCircle"/>
+      <path d="M0.000,-185.000A185,185,0,0,1,149.668,108.740L0,0Z" class="pieCircle" fill="#ececff"/>
+      <path d="M149.668,108.740A185,185,0,0,1,-78.769,167.393L0,0Z" class="pieCircle" fill="#ffffde"/>
+      <path d="M-78.769,167.393A185,185,0,0,1,-185.000,0.000L0,0Z" class="pieCircle" fill="hsl(80, 100%, 56.2745098039%)"/>
+      <path d="M-185.000,0.000A185,185,0,0,1,-162.117,-89.124L0,0Z" class="pieCircle" fill="hsl(240, 100%, 86.2745098039%)"/>
+      <path d="M-162.117,-89.124A185,185,0,0,1,-117.923,-142.545L0,0Z" class="pieCircle" fill="hsl(60, 100%, 63.5294117647%)"/>
+      <path d="M-117.923,-142.545A185,185,0,0,1,-68.103,-172.009L0,0Z" class="pieCircle" fill="hsl(80, 100%, 76.2745098039%)"/>
+      <path d="M-68.103,-172.009A185,185,0,0,1,-23.187,-183.541L0,0Z" class="pieCircle" fill="hsl(300, 100%, 76.2745098039%)"/>
+      <path d="M-23.187,-183.541A185,185,0,0,1,-0.000,-185.000L0,0Z" class="pieCircle" fill="hsl(180, 100%, 56.2745098039%)"/>
+      <text x="0" y="0" class="slice" style="text-anchor: middle;" transform="translate(123.627,-62.991)">35%</text>
+      <text x="0" y="0" class="slice" transform="translate(34.506,134.391)" style="text-anchor: middle;">22%</text>
+      <text x="0" y="0" class="slice" style="text-anchor: middle;" transform="translate(-117.150,74.346)">18%</text>
+      <text x="0" y="0" class="slice" transform="translate(-134.391,-34.506)" style="text-anchor: middle;">8%</text>
+      <text x="0" y="0" class="slice" transform="translate(-106.909,-88.443)" style="text-anchor: middle;">6%</text>
+      <text x="0" y="0" class="slice" style="text-anchor: middle;" transform="translate(-70.629,-119.428)">5%</text>
+      <text x="0" y="0" class="slice" style="text-anchor: middle;" transform="translate(-34.506,-134.391)">4%</text>
+      <text x="0" y="0" class="slice" style="text-anchor: middle;" transform="translate(-8.712,-138.476)">2%</text>
+      <text x="0" y="-200" class="pieTitleText">Cloud Infrastructure Costs</text>
+      <g class="legend" transform="translate(216,-88)">
+        <rect x="0" y="0" width="18" height="18" style="fill: rgb(236, 236, 255); stroke: rgb(236, 236, 255);"/>
+        <text x="22" y="14">Compute (EC2/GKE) [35]</text>
+      </g>
+      <g class="legend" transform="translate(216,-66)">
+        <rect x="0" y="0" width="18" height="18" style="fill: rgb(181, 255, 32); stroke: rgb(181, 255, 32);"/>
+        <text x="22" y="14">Storage (S3/GCS) [18]</text>
+      </g>
+      <g class="legend" transform="translate(216,-44)">
+        <rect x="0" y="0" width="18" height="18" style="fill: rgb(255, 255, 222); stroke: rgb(255, 255, 222);"/>
+        <text x="22" y="14">Database (RDS) [22]</text>
+      </g>
+      <g class="legend" transform="translate(216,-22)">
+        <rect x="0" y="0" width="18" height="18" style="fill: rgb(185, 185, 255); stroke: rgb(185, 185, 255);"/>
+        <text x="22" y="14">Networking [8]</text>
+      </g>
+      <g class="legend" transform="translate(216,0)">
+        <rect x="0" y="0" width="18" height="18" style="fill: rgb(255, 255, 69); stroke: rgb(255, 255, 69);"/>
+        <text x="22" y="14">CDN &amp; Edge [6]</text>
+      </g>
+      <g class="legend" transform="translate(216,22)">
+        <rect x="0" y="0" width="18" height="18" style="fill: rgb(215, 255, 134); stroke: rgb(215, 255, 134);"/>
+        <text x="22" y="14">Monitoring [5]</text>
+      </g>
+      <g class="legend" transform="translate(216,44)">
+        <rect x="0" y="0" width="18" height="18" style="fill: rgb(255, 134, 255); stroke: rgb(255, 134, 255);"/>
+        <text x="22" y="14">Security [4]</text>
+      </g>
+      <g class="legend" transform="translate(216,66)">
+        <rect x="0" y="0" width="18" height="18" style="fill: rgb(32, 255, 255); stroke: rgb(32, 255, 255);"/>
+        <text x="22" y="14">Other [2]</text>
+      </g>
     </g>
   </g>
 </svg>
