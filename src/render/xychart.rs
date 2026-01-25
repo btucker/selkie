@@ -26,17 +26,10 @@ const CHAR_WIDTH_RATIO: f64 = 0.6;
 /// Estimated character height as fraction of font size
 const CHAR_HEIGHT_RATIO: f64 = 1.2;
 
-/// XY Chart color palette (matching mermaid.js default theme)
-const PLOT_COLORS: &[&str] = &[
-    "#4C78A8", // Blue
-    "#F58518", // Orange
-    "#E45756", // Red
-    "#72B7B2", // Teal
-    "#54A24B", // Green
-    "#EECA3B", // Yellow
-    "#B279A2", // Purple
-    "#FF9DA6", // Pink
-];
+// Note: Plot colors are now taken from theme.xychart_plot_color_palette
+// The palette is defined in Theme and includes the correct mermaid.js colors:
+// - First color: primary_color (#ECECFF for bars)
+// - Second color: #8493A6 (for lines, matching mermaid.js lineColor)
 
 /// Chart area dimensions and data range
 struct ChartArea {
@@ -217,13 +210,22 @@ fn render_vertical_chart(
 
     // PHASE 1: Render all shapes first (for correct z-order)
     // Render plot shapes (bars, lines)
-    // Use theme primary_color for bars (matching mermaid reference)
-    let mut line_color_idx = 0;
+    // Use theme xychart_plot_color_palette for colors (matching mermaid reference)
+    let palette = &config.theme.xychart_plot_color_palette;
+    let mut line_color_idx = 1; // Start at 1, as index 0 is for bars
     for plot in db.get_plots().iter() {
         match plot.plot_type {
-            PlotType::Bar => render_vertical_bars(doc, plot, &config.theme.primary_color, area),
+            PlotType::Bar => {
+                // Bars use first palette color (primary_color)
+                let color = palette.first().map(|s| s.as_str()).unwrap_or("#ECECFF");
+                render_vertical_bars(doc, plot, color, area);
+            }
             PlotType::Line => {
-                let color = PLOT_COLORS[line_color_idx % PLOT_COLORS.len()];
+                // Lines use subsequent palette colors starting from index 1
+                let color = palette
+                    .get(line_color_idx % palette.len())
+                    .map(|s| s.as_str())
+                    .unwrap_or("#8493A6");
                 render_vertical_line(doc, plot, color, area);
                 line_color_idx += 1;
             }
@@ -273,13 +275,22 @@ fn render_horizontal_chart(
 
     // PHASE 1: Render all shapes first (for correct z-order)
     // Render plot shapes (bars, lines)
-    // Use theme primary_color for bars (matching mermaid reference)
-    let mut line_color_idx = 0;
+    // Use theme xychart_plot_color_palette for colors (matching mermaid reference)
+    let palette = &config.theme.xychart_plot_color_palette;
+    let mut line_color_idx = 1; // Start at 1, as index 0 is for bars
     for plot in db.get_plots().iter() {
         match plot.plot_type {
-            PlotType::Bar => render_horizontal_bars(doc, plot, &config.theme.primary_color, area),
+            PlotType::Bar => {
+                // Bars use first palette color (primary_color)
+                let color = palette.first().map(|s| s.as_str()).unwrap_or("#ECECFF");
+                render_horizontal_bars(doc, plot, color, area);
+            }
             PlotType::Line => {
-                let color = PLOT_COLORS[line_color_idx % PLOT_COLORS.len()];
+                // Lines use subsequent palette colors starting from index 1
+                let color = palette
+                    .get(line_color_idx % palette.len())
+                    .map(|s| s.as_str())
+                    .unwrap_or("#8493A6");
                 render_horizontal_line(doc, plot, color, area);
                 line_color_idx += 1;
             }
@@ -843,7 +854,11 @@ fn render_x_axis_text(
                 .with_attr("text-anchor", if is_horizontal { "end" } else { "middle" })
                 .with_attr(
                     "dominant-baseline",
-                    if is_horizontal { "middle" } else { "hanging" },
+                    if is_horizontal {
+                        "middle"
+                    } else {
+                        "text-before-edge"
+                    },
                 )
                 .with_class("xychart-axis-label")
                 .with_attr("font-size", "14")

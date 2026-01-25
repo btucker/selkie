@@ -143,47 +143,47 @@ marker path {
     <rect x="444.93333333333334" y="212.88" width="60.8" height="253.32" class="xychart-bar" fill="#ECECFF"/>
     <rect x="541.2666666666668" y="86.21999999999997" width="60.8" height="379.98" class="xychart-bar" fill="#ECECFF"/>
     <rect x="637.6" y="111.55200000000002" width="60.8" height="354.64799999999997" class="xychart-bar" fill="#ECECFF"/>
-    <path d="M 90 381.76 L 186.33333333333331 339.53999999999996 L 282.66666666666663 297.32 L 379 314.20799999999997 L 475.3333333333333 255.1 L 571.6666666666667 128.44 L 668 145.32799999999997" class="xychart-line" stroke="#4C78A8" stroke-width="2" fill="none"/>
-    <path d="M 90 398.648 L 186.33333333333331 364.872 L 282.66666666666663 314.20799999999997 L 379 339.53999999999996 L 475.3333333333333 280.432 L 571.6666666666667 170.66000000000003 L 668 212.88" class="xychart-line" stroke="#F58518" fill="none" stroke-width="2"/>
-    <path d="M 58 44 L 58 466.2" class="xychart-axis" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 90 381.76 L 186.33333333333331 339.53999999999996 L 282.66666666666663 297.32 L 379 314.20799999999997 L 475.3333333333333 255.1 L 571.6666666666667 128.44 L 668 145.32799999999997" class="xychart-line" stroke-width="2" fill="none" stroke="#8493A6"/>
+    <path d="M 90 398.648 L 186.33333333333331 364.872 L 282.66666666666663 314.20799999999997 L 379 339.53999999999996 L 475.3333333333333 280.432 L 571.6666666666667 170.66000000000003 L 668 212.88" class="xychart-line" stroke="#FFC3A0" stroke-width="2" fill="none"/>
+    <path d="M 58 44 L 58 466.2" class="xychart-axis" stroke-width="2" fill="none" stroke="#131300"/>
     <path d="M 58 466.2 L 53 466.2" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
-    <path d="M 58 423.98 L 53 423.98" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
-    <path d="M 58 381.76 L 53 381.76" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
-    <path d="M 58 339.53999999999996 L 53 339.53999999999996" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
-    <path d="M 58 297.32 L 53 297.32" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 58 255.1 L 53 255.1" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 58 212.88 L 53 212.88" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 58 170.66000000000003 L 53 170.66000000000003" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
-    <path d="M 58 128.44 L 53 128.44" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
-    <path d="M 58 86.22 L 53 86.22" class="xychart-tick" stroke="#131300" fill="none" stroke-width="2"/>
+    <path d="M 58 423.98 L 53 423.98" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
+    <path d="M 58 381.76 L 53 381.76" class="xychart-tick" fill="none" stroke-width="2" stroke="#131300"/>
+    <path d="M 58 339.53999999999996 L 53 339.53999999999996" class="xychart-tick" fill="none" stroke-width="2" stroke="#131300"/>
+    <path d="M 58 297.32 L 53 297.32" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 58 255.1 L 53 255.1" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 58 212.88 L 53 212.88" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
+    <path d="M 58 170.66000000000003 L 53 170.66000000000003" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
+    <path d="M 58 128.44 L 53 128.44" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
+    <path d="M 58 86.22 L 53 86.22" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
     <path d="M 58 44 L 53 44" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
     <path d="M 58 466.2 L 700 466.2" class="xychart-axis" stroke="#131300" stroke-width="2" fill="none"/>
-    <path d="M 90 466.2 L 90 471.2" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
-    <path d="M 186.33333333333331 466.2 L 186.33333333333331 471.2" class="xychart-tick" stroke="#131300" fill="none" stroke-width="2"/>
-    <path d="M 282.66666666666663 466.2 L 282.66666666666663 471.2" class="xychart-tick" stroke-width="2" stroke="#131300" fill="none"/>
-    <path d="M 379 466.2 L 379 471.2" class="xychart-tick" fill="none" stroke-width="2" stroke="#131300"/>
-    <path d="M 475.3333333333333 466.2 L 475.3333333333333 471.2" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <path d="M 90 466.2 L 90 471.2" class="xychart-tick" stroke="#131300" fill="none" stroke-width="2"/>
+    <path d="M 186.33333333333331 466.2 L 186.33333333333331 471.2" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
+    <path d="M 282.66666666666663 466.2 L 282.66666666666663 471.2" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
+    <path d="M 379 466.2 L 379 471.2" class="xychart-tick" stroke="#131300" fill="none" stroke-width="2"/>
+    <path d="M 475.3333333333333 466.2 L 475.3333333333333 471.2" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
     <path d="M 571.6666666666667 466.2 L 571.6666666666667 471.2" class="xychart-tick" fill="none" stroke="#131300" stroke-width="2"/>
-    <path d="M 668 466.2 L 668 471.2" class="xychart-tick" stroke-width="2" fill="none" stroke="#131300"/>
-    <text x="350" y="22" class="xychart-title" text-anchor="middle" font-weight="bold" fill="#131300" dominant-baseline="middle" font-size="20">Website Analytics</text>
-    <text x="15" y="255.1" class="xychart-axis-title" text-anchor="middle" dominant-baseline="middle" fill="#131300" font-size="16" transform="rotate(-90 15 255.1)">Visitors (thousands)</text>
-    <text x="48" y="466.2" class="xychart-axis-label" dominant-baseline="middle" text-anchor="end" fill="#131300" font-size="14">0</text>
-    <text x="48" y="423.98" class="xychart-axis-label" text-anchor="end" fill="#131300" dominant-baseline="middle" font-size="14">5</text>
-    <text x="48" y="381.76" class="xychart-axis-label" dominant-baseline="middle" font-size="14" fill="#131300" text-anchor="end">10</text>
-    <text x="48" y="339.53999999999996" class="xychart-axis-label" text-anchor="end" fill="#131300" dominant-baseline="middle" font-size="14">15</text>
-    <text x="48" y="297.32" class="xychart-axis-label" fill="#131300" dominant-baseline="middle" font-size="14" text-anchor="end">20</text>
-    <text x="48" y="255.1" class="xychart-axis-label" font-size="14" fill="#131300" text-anchor="end" dominant-baseline="middle">25</text>
-    <text x="48" y="212.88" class="xychart-axis-label" dominant-baseline="middle" fill="#131300" text-anchor="end" font-size="14">30</text>
-    <text x="48" y="170.66000000000003" class="xychart-axis-label" font-size="14" dominant-baseline="middle" fill="#131300" text-anchor="end">35</text>
-    <text x="48" y="128.44" class="xychart-axis-label" font-size="14" text-anchor="end" fill="#131300" dominant-baseline="middle">40</text>
-    <text x="48" y="86.22" class="xychart-axis-label" dominant-baseline="middle" font-size="14" fill="#131300" text-anchor="end">45</text>
-    <text x="48" y="44" class="xychart-axis-label" font-size="14" dominant-baseline="middle" text-anchor="end" fill="#131300">50</text>
-    <text x="90" y="478.2" class="xychart-axis-label" font-size="14" fill="#131300" dominant-baseline="hanging" text-anchor="middle">Mon</text>
-    <text x="186.33333333333331" y="478.2" class="xychart-axis-label" fill="#131300" font-size="14" text-anchor="middle" dominant-baseline="hanging">Tue</text>
-    <text x="282.66666666666663" y="478.2" class="xychart-axis-label" font-size="14" dominant-baseline="hanging" text-anchor="middle" fill="#131300">Wed</text>
-    <text x="379" y="478.2" class="xychart-axis-label" font-size="14" fill="#131300" text-anchor="middle" dominant-baseline="hanging">Thu</text>
-    <text x="475.3333333333333" y="478.2" class="xychart-axis-label" font-size="14" dominant-baseline="hanging" fill="#131300" text-anchor="middle">Fri</text>
-    <text x="571.6666666666667" y="478.2" class="xychart-axis-label" text-anchor="middle" dominant-baseline="hanging" font-size="14" fill="#131300">Sat</text>
-    <text x="668" y="478.2" class="xychart-axis-label" dominant-baseline="hanging" fill="#131300" text-anchor="middle" font-size="14">Sun</text>
+    <path d="M 668 466.2 L 668 471.2" class="xychart-tick" stroke="#131300" stroke-width="2" fill="none"/>
+    <text x="350" y="22" class="xychart-title" dominant-baseline="middle" font-weight="bold" font-size="20" text-anchor="middle" fill="#131300">Website Analytics</text>
+    <text x="15" y="255.1" class="xychart-axis-title" text-anchor="middle" transform="rotate(-90 15 255.1)" fill="#131300" dominant-baseline="middle" font-size="16">Visitors (thousands)</text>
+    <text x="48" y="466.2" class="xychart-axis-label" font-size="14" dominant-baseline="middle" text-anchor="end" fill="#131300">0</text>
+    <text x="48" y="423.98" class="xychart-axis-label" font-size="14" fill="#131300" dominant-baseline="middle" text-anchor="end">5</text>
+    <text x="48" y="381.76" class="xychart-axis-label" text-anchor="end" font-size="14" fill="#131300" dominant-baseline="middle">10</text>
+    <text x="48" y="339.53999999999996" class="xychart-axis-label" font-size="14" fill="#131300" text-anchor="end" dominant-baseline="middle">15</text>
+    <text x="48" y="297.32" class="xychart-axis-label" text-anchor="end" dominant-baseline="middle" fill="#131300" font-size="14">20</text>
+    <text x="48" y="255.1" class="xychart-axis-label" text-anchor="end" dominant-baseline="middle" fill="#131300" font-size="14">25</text>
+    <text x="48" y="212.88" class="xychart-axis-label" text-anchor="end" font-size="14" fill="#131300" dominant-baseline="middle">30</text>
+    <text x="48" y="170.66000000000003" class="xychart-axis-label" fill="#131300" font-size="14" dominant-baseline="middle" text-anchor="end">35</text>
+    <text x="48" y="128.44" class="xychart-axis-label" dominant-baseline="middle" text-anchor="end" font-size="14" fill="#131300">40</text>
+    <text x="48" y="86.22" class="xychart-axis-label" text-anchor="end" fill="#131300" dominant-baseline="middle" font-size="14">45</text>
+    <text x="48" y="44" class="xychart-axis-label" dominant-baseline="middle" text-anchor="end" fill="#131300" font-size="14">50</text>
+    <text x="90" y="478.2" class="xychart-axis-label" dominant-baseline="text-before-edge" fill="#131300" text-anchor="middle" font-size="14">Mon</text>
+    <text x="186.33333333333331" y="478.2" class="xychart-axis-label" text-anchor="middle" dominant-baseline="text-before-edge" font-size="14" fill="#131300">Tue</text>
+    <text x="282.66666666666663" y="478.2" class="xychart-axis-label" font-size="14" dominant-baseline="text-before-edge" text-anchor="middle" fill="#131300">Wed</text>
+    <text x="379" y="478.2" class="xychart-axis-label" text-anchor="middle" dominant-baseline="text-before-edge" font-size="14" fill="#131300">Thu</text>
+    <text x="475.3333333333333" y="478.2" class="xychart-axis-label" font-size="14" fill="#131300" dominant-baseline="text-before-edge" text-anchor="middle">Fri</text>
+    <text x="571.6666666666667" y="478.2" class="xychart-axis-label" font-size="14" text-anchor="middle" dominant-baseline="text-before-edge" fill="#131300">Sat</text>
+    <text x="668" y="478.2" class="xychart-axis-label" text-anchor="middle" dominant-baseline="text-before-edge" font-size="14" fill="#131300">Sun</text>
   </g>
 </svg>
