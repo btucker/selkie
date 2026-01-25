@@ -173,7 +173,7 @@ fn calculate_branch_angles(num_children: usize) -> Vec<f64> {
             // Distribute remaining children alternating between down-left and up-left
             let remaining = num_children - 1;
             if remaining > 0 {
-                let down_count = (remaining + 1) / 2;
+                let down_count = remaining.div_ceil(2);
                 let up_count = remaining - down_count;
 
                 // Down-left quadrant (angles from ~130° to ~160°)
