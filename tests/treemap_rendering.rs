@@ -670,6 +670,49 @@ fn has_inline_fill(doc: &Document<'_>, class_name: &str) -> bool {
         .any(|node| node.attribute("fill").is_some())
 }
 
+/// Get viewBox dimensions from SVG
+fn get_viewbox_dimensions(doc: &Document<'_>) -> Option<(f64, f64, f64, f64)> {
+    let svg_root = doc.root_element();
+    if let Some(viewbox) = svg_root.attribute("viewBox") {
+        let parts: Vec<&str> = viewbox.split_whitespace().collect();
+        if parts.len() >= 4 {
+            let x: f64 = parts[0].parse().ok()?;
+            let y: f64 = parts[1].parse().ok()?;
+            let w: f64 = parts[2].parse().ok()?;
+            let h: f64 = parts[3].parse().ok()?;
+            return Some((x, y, w, h));
+        }
+    }
+    None
+}
+
+#[test]
+fn treemap_visual_parity_height() {
+    // Test: Height should be closer to mermaid's 400px, not 500px
+    // Mermaid uses viewBox "2 27 996 371" for a 400px content area
+    let input = r#"treemap-beta
+"Category A"
+    "Item A1": 10
+    "Item A2": 20
+"Category B"
+    "Item B1": 15
+    "Item B2": 25
+"#;
+    let svg = render_treemap_svg(input);
+    let doc = parse_svg(&svg);
+
+    let dims = get_viewbox_dimensions(&doc);
+    assert!(dims.is_some(), "SVG should have viewBox");
+
+    let (_, _, _, height) = dims.unwrap();
+    // Should be within 20% of mermaid's ~400px, not 500px
+    assert!(
+        height <= 420.0,
+        "SVG height should be ~400px for visual parity (got {}px)",
+        height
+    );
+}
+
 #[test]
 fn treemap_visual_parity_leaf_font_size() {
     // Test: Leaf labels should use 38px font size (matching mermaid.js)

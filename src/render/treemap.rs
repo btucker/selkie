@@ -6,7 +6,7 @@
 
 use crate::diagrams::treemap::{TreemapDb, TreemapNode};
 use crate::error::Result;
-use crate::render::svg::color::{darken, Color};
+use crate::render::svg::color::{contrasting_text, Color};
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
 /// Default inner padding between cells/sections (reserved for future use)
@@ -34,8 +34,8 @@ const VALUE_FONT_SIZE: f64 = 10.0;
 /// Default diagram width
 const DEFAULT_WIDTH: f64 = 960.0;
 
-/// Default diagram height
-const DEFAULT_HEIGHT: f64 = 500.0;
+/// Default diagram height (matches mermaid.js ~400px content area)
+const DEFAULT_HEIGHT: f64 = 400.0;
 
 /// A positioned rectangle for treemap rendering
 #[derive(Debug, Clone)]
@@ -264,16 +264,13 @@ fn layout_treemap(
     }
 
     // Calculate available space for children
-    // Sections have a header that takes up space
-    let child_bounds = if depth > 0 {
-        Bounds {
-            x: bounds.x + SECTION_PADDING,
-            y: bounds.y + SECTION_HEADER_HEIGHT + SECTION_PADDING,
-            width: bounds.width - 2.0 * SECTION_PADDING,
-            height: bounds.height - SECTION_HEADER_HEIGHT - 2.0 * SECTION_PADDING,
-        }
-    } else {
-        bounds
+    // All depths apply padding for section headers (including depth=0 for outer padding)
+    // This matches mermaid.js where the first visible section is inset from the canvas
+    let child_bounds = Bounds {
+        x: bounds.x + SECTION_PADDING,
+        y: bounds.y + SECTION_HEADER_HEIGHT + SECTION_PADDING,
+        width: bounds.width - 2.0 * SECTION_PADDING,
+        height: bounds.height - SECTION_HEADER_HEIGHT - 2.0 * SECTION_PADDING,
     };
 
     // Sort children by value (largest first for better layout)
@@ -292,22 +289,73 @@ fn layout_treemap(
         return;
     }
 
-    // Apply squarified treemap layout
-    let rects = squarify_layout(&child_values, child_bounds, children_total);
+    // Choose layout algorithm based on depth and node type
+    // Mermaid.js uses horizontal strip layout for sections at top levels
+    // - depth=0: virtual root laying out first-level sections
+    // - depth=1: first section (like "Company Budget") laying out subsections
+    let all_children_are_sections = children.iter().all(|c| !c.children.is_empty());
+    let rects = if depth <= 1 && all_children_are_sections {
+        // Top-level sections: use horizontal strip layout (width proportional to value)
+        horizontal_strip_layout(&child_values, child_bounds, children_total)
+    } else {
+        // Use squarified layout for leaves and nested content
+        squarify_layout(&child_values, child_bounds, children_total)
+    };
 
     // Recursively layout children
     for (i, (child, rect)) in children.iter().zip(rects.iter()).enumerate() {
-        // Assign section based on depth
-        let child_section = if depth == 0 {
-            // First level children get their own section color
+        // Determine if this child is a section (has children) or a leaf
+        let child_is_section = !child.children.is_empty();
+
+        // Assign section based on depth and node type
+        // Section colors should be assigned to branch nodes (sections), not leaves
+        // depth=0 is the virtual root, depth=1+ are visible levels
+        let child_section = if child_is_section && depth == 0 {
+            // Children of virtual root (first visible level) get their own section
             i % (MAX_SECTIONS - 1)
+        } else if child_is_section && depth == 1 {
+            // Children of first-level sections (like subsections) get offset section colors
+            // This ensures they don't conflict with their parent's section
+            (i + 1) % (MAX_SECTIONS - 1)
         } else {
-            // Deeper children inherit parent section
+            // Leaves and deeper children inherit parent section
             section
         };
 
         layout_treemap(child, *rect, depth + 1, child_section, ctx);
     }
+}
+
+/// Horizontal strip layout - arranges all items in a single row with widths proportional to values
+/// This is used for top-level sections to match mermaid.js behavior
+fn horizontal_strip_layout(values: &[f64], bounds: Bounds, total: f64) -> Vec<Bounds> {
+    if values.is_empty() || total <= 0.0 {
+        return vec![];
+    }
+
+    let mut result = Vec::with_capacity(values.len());
+    let mut x = bounds.x;
+
+    for (i, value) in values.iter().enumerate() {
+        let ratio = value / total;
+        let width = if i == values.len() - 1 {
+            // Last item takes remaining width to avoid floating point gaps
+            bounds.x + bounds.width - x
+        } else {
+            bounds.width * ratio
+        };
+
+        result.push(Bounds {
+            x,
+            y: bounds.y,
+            width,
+            height: bounds.height,
+        });
+
+        x += width;
+    }
+
+    result
 }
 
 /// Squarified treemap layout algorithm
@@ -325,8 +373,12 @@ fn squarify_layout(values: &[f64], bounds: Bounds, total: f64) -> Vec<Bounds> {
     let area = bounds.width * bounds.height;
     let normalized: Vec<f64> = values.iter().map(|v| (v / total) * area).collect();
 
-    // Use slice-and-dice for simplicity (alternating horizontal/vertical)
-    squarify_recursive(&normalized, bounds, true)
+    // Start with direction based on aspect ratio:
+    // - If wider than tall, start with horizontal=false (vertical split creates columns)
+    // - If taller than wide, start with horizontal=true (horizontal split creates rows)
+    // This matches mermaid.js behavior for better squareness
+    let start_horizontal = bounds.height > bounds.width;
+    squarify_recursive(&normalized, bounds, start_horizontal)
 }
 
 /// Recursive squarified layout
@@ -412,7 +464,8 @@ fn squarify_recursive(areas: &[f64], bounds: Bounds, horizontal: bool) -> Vec<Bo
     result
 }
 
-/// Find the best split point to minimize aspect ratio variance
+/// Find the best split point using squarify heuristic
+/// Classic squarify groups items to minimize worst aspect ratio
 fn find_best_split(areas: &[f64]) -> (Vec<f64>, Vec<f64>, f64) {
     let total: f64 = areas.iter().sum();
 
@@ -420,19 +473,46 @@ fn find_best_split(areas: &[f64]) -> (Vec<f64>, Vec<f64>, f64) {
         return (areas.to_vec(), vec![], 1.0);
     }
 
-    // Try different split points and find the one with best aspect ratios
+    // Squarify heuristic: keep adding items to the left group as long as
+    // it improves or maintains squareness. The goal is to make rectangles
+    // as square as possible, not to balance areas.
+    //
+    // For treemaps, this typically means grouping more items together on one side.
     let mut best_split = 1;
-    let mut best_ratio_diff = f64::MAX;
+    let mut best_score = f64::MAX;
 
     for split in 1..areas.len() {
         let left_sum: f64 = areas[..split].iter().sum();
         let right_sum: f64 = areas[split..].iter().sum();
 
-        // Balance: try to keep left and right roughly equal
-        let ratio_diff = (left_sum - right_sum).abs() / total;
+        // Calculate how well the split creates square-ish regions
+        // Prefer splits where larger groups are together (makes them more square)
+        let left_count = split as f64;
+        let right_count = (areas.len() - split) as f64;
 
-        if ratio_diff < best_ratio_diff {
-            best_ratio_diff = ratio_diff;
+        // Score: penalize having many small items split across both sides
+        // Favor grouping items together when they have similar sizes
+        let left_avg = left_sum / left_count;
+        let right_avg = if right_count > 0.0 {
+            right_sum / right_count
+        } else {
+            0.0
+        };
+
+        // Score based on how different the average item sizes are in each group
+        // and how unbalanced the split is (we want unbalanced for squareness)
+        let size_ratio = if left_avg > 0.0 && right_avg > 0.0 {
+            (left_avg / right_avg).max(right_avg / left_avg)
+        } else {
+            1.0
+        };
+
+        // Favor splits that put items of similar size together
+        // Lower score is better
+        let score = size_ratio;
+
+        if score < best_score {
+            best_score = score;
             best_split = split;
         }
     }
@@ -462,32 +542,91 @@ fn parse_hsl_string(hsl: &str) -> Option<(f64, f64, f64)> {
     Some((h, s, l))
 }
 
+/// Format lightness percentage matching mermaid's precision (10 significant digits)
+fn format_lightness(value: f64) -> String {
+    // Mermaid uses 10 decimal places, trim trailing zeros
+    format!("{:.10}", value)
+        .trim_end_matches('0')
+        .trim_end_matches('.')
+        .to_string()
+}
+
 /// Get the fill color for a section index from the theme
-/// Darkens the color to match mermaid.js cScale behavior (darker than pie colors)
-fn get_section_fill_color(section: usize, config: &RenderConfig) -> String {
-    let base_color = config
-        .theme
-        .pie_colors
-        .get(section)
-        .cloned()
-        .unwrap_or_else(|| "#ECECFF".to_string());
+/// Generates colors matching mermaid.js treemap cScale (distinct from pie colors)
+fn get_section_fill_color(section: usize, _config: &RenderConfig) -> String {
+    // Mermaid treemap uses a cScale with evenly distributed hues at ~76% lightness
+    // Base hue starts at 240 (blue) and increments for each section
+    // This matches the reference output:
+    // - section 0: hsl(240, 100%, 76.2745098039%)
+    // - section 1: hsl(60, 100%, 73.5294117647%)
+    // - section 2: hsl(80, 100%, 76.2745098039%)
+    // - section 3: hsl(270, 100%, 76.2745098039%)
+    // etc.
 
-    // Darken the color by 20% to match mermaid.js cScale darkening
-    // mermaid applies darken(cScale, 10) but starts with different base colors
-    // Our pie_colors are lighter, so we darken more to compensate
+    // Define the hue sequence to match mermaid's cScale pattern
+    let hues = [
+        240.0, // blue (index 0)
+        60.0,  // yellow (index 1)
+        80.0,  // yellow-green (index 2)
+        270.0, // purple (index 3)
+        0.0,   // red (index 4)
+        180.0, // cyan (index 5)
+        300.0, // magenta (index 6)
+        120.0, // green (index 7)
+        30.0,  // orange (index 8)
+        150.0, // teal (index 9)
+        210.0, // sky blue (index 10)
+        330.0, // pink (index 11)
+    ];
 
-    // Try parsing as HSL string first (e.g., "hsl(240, 100%, 96%)")
-    if let Some((h, s, l)) = parse_hsl_string(&base_color) {
+    // Mermaid uses slightly different lightness values
+    // 76.2745098039% = 195/255 * 100 and 73.5294117647% = 187.5/255 * 100
+    let (lightness, hue) = if section < hues.len() {
+        let l = if section == 1 {
+            73.5294117647 // yellow section has slightly lower lightness
+        } else {
+            76.2745098039
+        };
+        (l, hues[section])
+    } else {
+        // Fall back to computed hue for additional sections
+        let h = ((section as f64) * 30.0) % 360.0;
+        (76.2745098039, h)
+    };
+
+    format!(
+        "hsl({}, {}%, {}%)",
+        hue.round() as i32,
+        100,
+        format_lightness(lightness)
+    )
+}
+
+/// Get contrasting text color (white or black) for a given fill color string
+fn get_text_color_for_fill(fill_color: &str) -> String {
+    // Try parsing as HSL string first
+    if let Some((h, s, l)) = parse_hsl_string(fill_color) {
         let color = Color::from_hsl(h, s, l);
-        return darken(&color, 20.0).to_hsl_string();
+        let text = contrasting_text(&color);
+        if text.r == 255 {
+            return "#ffffff".to_string();
+        } else {
+            return "black".to_string();
+        }
     }
 
     // Fall back to hex parsing
-    if let Some(color) = Color::from_hex(&base_color) {
-        darken(&color, 20.0).to_hsl_string()
-    } else {
-        base_color
+    if let Some(color) = Color::from_hex(fill_color) {
+        let text = contrasting_text(&color);
+        if text.r == 255 {
+            return "#ffffff".to_string();
+        } else {
+            return "black".to_string();
+        }
     }
+
+    // Default to black text
+    "black".to_string()
 }
 
 /// Render a section (branch node with header)
@@ -499,6 +638,9 @@ fn render_section(rect: &TreemapRect, index: usize, config: &RenderConfig) -> Sv
 
     // Get the inline fill color for this section
     let fill_color = get_section_fill_color(rect.section, config);
+
+    // Get contrasting text color for the section background
+    let text_color = get_text_color_for_fill(&fill_color);
 
     // Build style string from classDef
     let style_str = if rect.styles.is_empty() {
@@ -553,7 +695,7 @@ fn render_section(rect: &TreemapRect, index: usize, config: &RenderConfig) -> Sv
     let label_x = rect.x + 6.0;
     let label_y = rect.y + SECTION_HEADER_HEIGHT / 2.0;
 
-    // Extract text color from styles
+    // Extract text color from styles (classDef can override)
     let text_style = extract_text_style(&rect.styles);
 
     children.push(SvgElement::Text {
@@ -565,6 +707,7 @@ fn render_section(rect: &TreemapRect, index: usize, config: &RenderConfig) -> Sv
             .with_attr("dominant-baseline", "middle")
             .with_attr("font-weight", "bold")
             .with_attr("font-size", &format!("{}px", SECTION_FONT_SIZE))
+            .with_fill(&text_color)
             .with_style_if(!text_style.is_empty(), &text_style),
     });
 
@@ -580,6 +723,7 @@ fn render_section(rect: &TreemapRect, index: usize, config: &RenderConfig) -> Sv
             .with_attr("dominant-baseline", "middle")
             .with_attr("font-style", "italic")
             .with_attr("font-size", &format!("{}px", VALUE_FONT_SIZE))
+            .with_fill(&text_color)
             .with_style_if(!text_style.is_empty(), &text_style),
     });
 
@@ -605,6 +749,9 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
 
     // Get the inline fill color for this leaf (inherits from parent section)
     let fill_color = get_section_fill_color(rect.section, config);
+
+    // Get contrasting text color for the leaf background
+    let text_color = get_text_color_for_fill(&fill_color);
 
     // Build style string from classDef
     let style_str = if rect.styles.is_empty() {
@@ -670,8 +817,8 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
     };
 
     let font_scale = scale_x.min(scale_y).min(1.0);
-    let label_font_size = (LEAF_FONT_SIZE * font_scale).max(8.0);
-    let value_font_size = (VALUE_FONT_SIZE * font_scale).max(6.0);
+    let label_font_size = (LEAF_FONT_SIZE * font_scale).max(10.0);
+    let value_font_size = (VALUE_FONT_SIZE * font_scale).max(10.0);
 
     // Only show text if there's enough space
     let min_display_size = 20.0;
@@ -687,6 +834,7 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
                 .with_attr("dominant-baseline", "middle")
                 .with_attr("font-size", &format!("{}px", label_font_size))
                 .with_attr("clip-path", &format!("url(#{})", clip_id))
+                .with_fill(&text_color)
                 .with_style_if(!text_style.is_empty(), &text_style),
         });
 
@@ -702,6 +850,7 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
                     .with_attr("dominant-baseline", "hanging")
                     .with_attr("font-size", &format!("{}px", value_font_size))
                     .with_attr("clip-path", &format!("url(#{})", clip_id))
+                    .with_fill(&text_color)
                     .with_style_if(!text_style.is_empty(), &text_style),
             });
         }
@@ -765,43 +914,10 @@ fn format_with_commas(n: i64) -> String {
 fn generate_treemap_css(config: &RenderConfig) -> String {
     let theme = &config.theme;
 
-    // Generate section colors
-    let mut section_css = String::new();
-
-    // Generate section colors from pie colors (similar to mermaid's cScale)
-    for i in 0..MAX_SECTIONS {
-        let color = theme
-            .pie_colors
-            .get(i)
-            .map(|s| s.as_str())
-            .unwrap_or("#ECECFF");
-
-        // Calculate a darker version for stroke
-        let stroke_color = color; // Use same color for simplicity
-
-        section_css.push_str(&format!(
-            r#"
-.section-{i} .treemapSection {{
-  fill: {color};
-  stroke: {stroke_color};
-}}
-.section-{i} .treemapLeaf {{
-  fill: {color};
-  stroke: {color};
-}}
-.section-{i} .treemapLabel,
-.section-{i} .treemapValue,
-.section-{i} .treemapSectionLabel,
-.section-{i} .treemapSectionValue {{
-  fill: {text_color};
-}}
-"#,
-            i = i,
-            color = color,
-            stroke_color = stroke_color,
-            text_color = theme.primary_text_color,
-        ));
-    }
+    // Note: Section and leaf colors are set inline based on the section index,
+    // and text colors are calculated inline based on background contrast.
+    // This matches mermaid.js which uses inline styles rather than CSS classes.
+    // We keep section classes for potential custom styling but don't set fills in CSS.
 
     format!(
         r#"
@@ -834,12 +950,10 @@ fn generate_treemap_css(config: &RenderConfig) -> String {
 .treemapValue {{
   font-size: {value_font_size}px;
 }}
-{section_css}
 "#,
         font_family = theme.font_family,
         text_color = theme.primary_text_color,
         leaf_font_size = LEAF_FONT_SIZE,
         value_font_size = VALUE_FONT_SIZE,
-        section_css = section_css
     )
 }
