@@ -98,7 +98,7 @@ Selkie supports parsing and rendering for all major Mermaid diagram types.
 ## Installation
 
 ```bash
-cargo install selkie
+cargo install selkie-rs
 ```
 
 Or build from source:
@@ -240,7 +240,7 @@ cargo build --release --features png
 cargo build --release --features all-formats
 
 # Install with PDF support
-cargo install selkie --features pdf
+cargo install selkie-rs --features pdf
 
 # Library only (no CLI, minimal dependencies)
 cargo build --release --no-default-features
@@ -289,7 +289,7 @@ wasm-pack build --target web --features wasm
 Convenience feature that enables `png`, `pdf`, and `kitty` together. Best for development or when you need maximum flexibility:
 
 ```bash
-cargo install selkie --features all-formats
+cargo install selkie-rs --features all-formats
 ```
 
 ## Issue Tracking
