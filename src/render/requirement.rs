@@ -307,6 +307,7 @@ pub fn render_requirement(db: &RequirementDb, config: &RenderConfig) -> Result<S
             let rel_elem = render_relationship_from_bend_points(
                 bend_points,
                 format_relationship_type(&rel.rel_type),
+                &rel.rel_type,
             );
             doc.add_element(rel_elem);
         } else {
@@ -329,6 +330,7 @@ pub fn render_requirement(db: &RequirementDb, config: &RenderConfig) -> Result<S
                     d2.width,
                     d2.height,
                     format_relationship_type(&rel.rel_type),
+                    &rel.rel_type,
                 );
                 doc.add_element(rel_elem);
             }
@@ -639,7 +641,11 @@ fn render_element_box(
 }
 
 /// Render a relationship line using bend points from layout
-fn render_relationship_from_bend_points(bend_points: &[Point], label: &str) -> SvgElement {
+fn render_relationship_from_bend_points(
+    bend_points: &[Point],
+    label: &str,
+    rel_type: &RelationshipType,
+) -> SvgElement {
     let mut children = Vec::new();
 
     if bend_points.is_empty() {
@@ -652,11 +658,25 @@ fn render_relationship_from_bend_points(bend_points: &[Point], label: &str) -> S
     // Build curved path
     let path_d = build_curved_path(bend_points);
 
+    // Determine line styling based on relationship type
+    // Mermaid uses solid lines for "contains", dashed for all others
+    let is_contains = matches!(rel_type, RelationshipType::Contains);
+
+    let mut path_attrs = Attrs::new()
+        .with_class("relationship-line")
+        .with_attr("marker-end", "url(#requirement-arrow)");
+
+    if is_contains {
+        // Contains relationship: solid line with start marker (circle with +)
+        path_attrs = path_attrs.with_attr("marker-start", "url(#requirement-contains-start)");
+    } else {
+        // All other relationships: dashed line (matches mermaid's stroke-dasharray: 10,7)
+        path_attrs = path_attrs.with_attr("stroke-dasharray", "10,7");
+    }
+
     children.push(SvgElement::Path {
         d: path_d,
-        attrs: Attrs::new()
-            .with_class("relationship-line")
-            .with_attr("marker-end", "url(#requirement-arrow)"),
+        attrs: path_attrs,
     });
 
     // Add label at midpoint
@@ -705,6 +725,7 @@ fn render_relationship_line(
     w2: f64,
     h2: f64,
     label: &str,
+    rel_type: &RelationshipType,
 ) -> SvgElement {
     let mut children = Vec::new();
 
@@ -758,11 +779,25 @@ fn render_relationship_line(
         )
     };
 
+    // Determine line styling based on relationship type
+    // Mermaid uses solid lines for "contains", dashed for all others
+    let is_contains = matches!(rel_type, RelationshipType::Contains);
+
+    let mut path_attrs = Attrs::new()
+        .with_class("relationship-line")
+        .with_attr("marker-end", "url(#requirement-arrow)");
+
+    if is_contains {
+        // Contains relationship: solid line with start marker (circle with +)
+        path_attrs = path_attrs.with_attr("marker-start", "url(#requirement-contains-start)");
+    } else {
+        // All other relationships: dashed line (matches mermaid's stroke-dasharray: 10,7)
+        path_attrs = path_attrs.with_attr("stroke-dasharray", "10,7");
+    }
+
     children.push(SvgElement::Path {
         d: path_d,
-        attrs: Attrs::new()
-            .with_class("relationship-line")
-            .with_attr("marker-end", "url(#requirement-arrow)"),
+        attrs: path_attrs,
     });
 
     // Add label at midpoint
@@ -865,9 +900,8 @@ fn generate_requirement_css(theme: &Theme) -> String {
 }}
 
 .relationship-label-bg {{
-  fill: {background};
-  stroke: {border_color};
-  stroke-width: 0.5;
+  fill: rgba(232, 232, 232, 0.8);
+  stroke: none;
 }}
 
 .marker {{
@@ -879,14 +913,13 @@ fn generate_requirement_css(theme: &Theme) -> String {
         border_color = theme.primary_border_color,
         text_color = theme.primary_text_color,
         line_color = theme.line_color,
-        background = theme.background,
     )
 }
 
 /// Generate SVG marker definitions for requirement diagram arrows
 fn generate_requirement_markers() -> Vec<SvgElement> {
     vec![
-        // Standard arrow marker
+        // Standard arrow marker (end marker for all relationships)
         SvgElement::Marker {
             id: "requirement-arrow".to_string(),
             view_box: "0 0 10 10".to_string(),
@@ -901,7 +934,50 @@ fn generate_requirement_markers() -> Vec<SvgElement> {
                 attrs: Attrs::new().with_class("marker"),
             }],
         },
-        // Contains marker (diamond)
+        // Contains start marker - circle with + symbol (matches mermaid.js)
+        // This is placed at the source end of "contains" relationships
+        SvgElement::Marker {
+            id: "requirement-contains-start".to_string(),
+            view_box: "0 0 20 20".to_string(),
+            ref_x: 0.0,
+            ref_y: 10.0,
+            marker_width: 20.0,
+            marker_height: 20.0,
+            orient: "auto".to_string(),
+            marker_units: None,
+            children: vec![SvgElement::Group {
+                children: vec![
+                    // Circle outline (unfilled)
+                    SvgElement::Circle {
+                        cx: 10.0,
+                        cy: 10.0,
+                        r: 9.0,
+                        attrs: Attrs::new()
+                            .with_fill("none")
+                            .with_stroke("#333333")
+                            .with_stroke_width(1.0),
+                    },
+                    // Horizontal line of the +
+                    SvgElement::Line {
+                        x1: 1.0,
+                        y1: 10.0,
+                        x2: 19.0,
+                        y2: 10.0,
+                        attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
+                    },
+                    // Vertical line of the +
+                    SvgElement::Line {
+                        x1: 10.0,
+                        y1: 1.0,
+                        x2: 10.0,
+                        y2: 19.0,
+                        attrs: Attrs::new().with_stroke("#333333").with_stroke_width(1.0),
+                    },
+                ],
+                attrs: Attrs::new(),
+            }],
+        },
+        // Contains end marker (diamond) - for backwards compatibility
         SvgElement::Marker {
             id: "requirement-contains".to_string(),
             view_box: "0 0 20 20".to_string(),

@@ -1210,3 +1210,105 @@ fn should_produce_portrait_aspect_ratio_for_tb_layout() {
         aspect_ratio
     );
 }
+
+/// Test that non-contains relationships use dashed lines (matches mermaid.js)
+/// Mermaid uses stroke-dasharray: 10,7 for satisfies, traces, verifies, etc.
+#[test]
+fn should_use_dashed_lines_for_non_contains_relationships() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let svg = render_requirement_svg(input);
+
+    // The satisfies relationship should have dashed styling
+    assert!(
+        svg.contains("stroke-dasharray"),
+        "Non-contains relationships (satisfies, traces, verifies) should have dashed lines. \
+         Expected stroke-dasharray attribute but not found in SVG."
+    );
+}
+
+/// Test that contains relationships use solid lines with start marker (matches mermaid.js)
+/// Mermaid uses a circle+plus marker at the start of contains relationships
+#[test]
+fn should_use_solid_line_with_marker_for_contains_relationship() {
+    let input = r#"requirementDiagram
+    requirement parent_req {
+    id: 1
+    text: parent requirement
+    risk: high
+    verifymethod: test
+    }
+
+    requirement child_req {
+    id: 2
+    text: child requirement
+    risk: low
+    verifymethod: test
+    }
+
+    parent_req - contains -> child_req"#;
+
+    let svg = render_requirement_svg(input);
+
+    // The contains relationship should have the start marker
+    assert!(
+        svg.contains("marker-start=\"url(#requirement-contains-start)\""),
+        "Contains relationship should have start marker (circle with +). \
+         Expected marker-start attribute but not found."
+    );
+
+    // The contains relationship should NOT have dashed styling
+    // Count the relationships - if there's only one relationship (contains),
+    // there should be no stroke-dasharray on any path
+    let contains_paths: Vec<&str> = svg
+        .lines()
+        .filter(|line| line.contains("marker-start=\"url(#requirement-contains-start)\""))
+        .collect();
+
+    for path in &contains_paths {
+        assert!(
+            !path.contains("stroke-dasharray"),
+            "Contains relationship should use solid lines (no stroke-dasharray). \
+             Found dashed styling on contains relationship."
+        );
+    }
+}
+
+/// Test that the contains start marker (circle with +) is defined
+#[test]
+fn should_have_contains_start_marker_definition() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    }
+
+    element test_entity {
+    type: simulation
+    }"#;
+
+    let svg = render_requirement_svg(input);
+
+    // Should have the contains-start marker defined
+    assert!(
+        svg.contains("id=\"requirement-contains-start\""),
+        "SVG should define the requirement-contains-start marker for contains relationships."
+    );
+
+    // The marker should contain a circle and lines (the + symbol)
+    assert!(
+        svg.contains("<circle") && svg.contains("<line"),
+        "The contains-start marker should contain a circle and lines (for the + symbol)."
+    );
+}
