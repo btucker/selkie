@@ -124,12 +124,12 @@ marker path {
     <g class="nodes">
 
     </g>
-    <circle cx="225" cy="225" r="186" class="pieOuterCircle" fill="none" stroke="black" stroke-width="2"/>
-    <path d="M 225 225 L 225 40 A 185 185 0 1 1 116.25972832589245 75.33185604063473 Z" class="pieCircle" fill="#ececff" stroke-width="2" opacity="0.7" stroke="black"/>
-    <path d="M 225 225 L 116.25972832589245 75.33185604063473 A 185 185 0 0 1 224.99999999999997 40 Z" class="pieCircle" stroke="black" fill="#ffffde" opacity="0.7" stroke-width="2"/>
-    <text x="225" y="25" class="pie-title" font-weight="bold" font-size="20" text-anchor="middle">NETFLIX</text>
-    <text x="267.87610796952396" y="356.9590916359525" class="slice" text-anchor="middle" dominant-baseline="middle" font-size="17">90%</text>
-    <text x="182.12389203047604" y="93.04090836404745" class="slice" dominant-baseline="middle" text-anchor="middle" font-size="17">10%</text>
+    <circle cx="225" cy="225" r="186" class="pieOuterCircle" stroke-width="2" stroke="black" fill="none"/>
+    <path d="M 225 225 L 225 40 A 185 185 0 1 1 116.25972832589245 75.33185604063473 Z" class="pieCircle" stroke-width="2" fill="#ececff" stroke="black" opacity="0.7"/>
+    <path d="M 225 225 L 116.25972832589245 75.33185604063473 A 185 185 0 0 1 224.99999999999997 40 Z" class="pieCircle" fill="#ffffde" stroke="black" stroke-width="2" opacity="0.7"/>
+    <text x="225" y="25" class="pie-title" text-anchor="middle" font-size="20" font-weight="bold">NETFLIX</text>
+    <text x="267.87610796952396" y="356.9590916359525" class="slice" dominant-baseline="middle" font-size="17" text-anchor="middle">90%</text>
+    <text x="182.12389203047604" y="93.04090836404745" class="slice" dominant-baseline="middle" font-size="17" text-anchor="middle">10%</text>
     <g class="legend">
       <rect x="441" y="203" width="18" height="18" class="legend" fill="#ececff" stroke="#ececff"/>
       <rect x="441" y="225" width="18" height="18" class="legend" stroke="#ffffde" fill="#ffffde"/>

@@ -115,13 +115,13 @@ marker path {
 
     </g>
     <g class="nodes">
-      <g class="node" y="3.350044368937205" x="0" transform="translate(0,3.350044368937205)" id="node-1">
+      <g class="node" id="node-1" transform="translate(0,3.350044368937205)" x="0" y="3.350044368937205">
         <rect x="0" y="0" width="10" height="375" class="sankey-node" style="fill: #4e79a7"/>
       </g>
-      <g class="node" x="590" id="node-2" y="0" transform="translate(590,0)">
+      <g class="node" transform="translate(590,0)" x="590" y="0" id="node-2">
         <rect x="0" y="0" width="10" height="274.49866893188425" class="sankey-node" style="fill: #f28e2c"/>
       </g>
-      <g class="node" y="299.4986689318842" transform="translate(590,299.4986689318842)" id="node-3" x="590">
+      <g class="node" y="299.4986689318842" id="node-3" transform="translate(590,299.4986689318842)" x="590">
         <rect x="0" y="0" width="10" height="100.5013310681158" class="sankey-node" style="fill: #e15759"/>
       </g>
     </g>

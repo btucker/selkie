@@ -142,13 +142,13 @@
         </g>
         <g class="cluster section-2" id="id2">
           <rect x="205" y="0" width="200" height="103" rx="5" ry="5" class="section section-2 " style="fill:hsl(270, 100%, 86.27%);stroke:hsl(270, 100%, 86.27%)"/>
-          <text x="305" y="22" class="section-label" dominant-baseline="middle" text-anchor="middle">In Progress</text>
+          <text x="305" y="22" class="section-label" text-anchor="middle" dominant-baseline="middle">In Progress</text>
         </g>
       </g>
       <g class="items">
         <g class="node kanban-item-group" transform="translate(10, 25)">
           <rect x="0" y="0" width="180" height="44" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>
-          <text x="90" y="22" class="kanban-label" dominant-baseline="middle" text-anchor="middle">Create Documentation</text>
+          <text x="90" y="22" class="kanban-label" text-anchor="middle" dominant-baseline="middle">Create Documentation</text>
         </g>
         <g class="node kanban-item-group" transform="translate(10, 74)">
           <rect x="0" y="0" width="180" height="68" rx="5" ry="5" class="kanban-item " style="fill:white;stroke:#9370DB"/>

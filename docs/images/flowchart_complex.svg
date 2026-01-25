@@ -129,22 +129,22 @@ marker path {
         <path d="M 241.10 77.80 L 315.40 225.20" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Auth-Rate-0">
-        <path d="M 401.51 326.29 L 453.50 435.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 401.51 326.29 L 453.50 435.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Auth-Reject-0">
-        <path d="M 334.19 336.39 C 324.86 357.60, 315.53 378.80, 287.57 395.81 C 259.60 412.83, 213.00 425.66, 166.40 438.49" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 334.19 336.39 C 324.86 357.60, 315.53 378.80, 287.57 395.81 C 259.60 412.83, 213.00 425.66, 166.40 438.49" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Rate-Cache-0">
-        <path d="M 453.50 487.80 C 453.50 496.13, 453.50 504.47, 453.50 512.80 C 453.50 521.13, 453.50 529.47, 453.50 537.80 C 453.50 554.47, 453.50 562.80, 453.50 562.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 453.50 487.80 C 453.50 496.13, 453.50 504.47, 453.50 512.80 C 453.50 521.13, 453.50 529.47, 453.50 537.80 C 453.50 554.47, 453.50 562.80, 453.50 562.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Cache-Response-0">
         <path d="M 400.85 631.44 L 362.50 726.44" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Cache-UserSvc-0">
-        <path d="M 516.39 631.44 C 566.33 651.44, 616.26 671.44, 641.23 687.27 C 666.20 703.11, 666.20 714.77, 666.20 726.44" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 516.39 631.44 C 566.33 651.44, 616.26 671.44, 641.23 687.27 C 666.20 703.11, 666.20 714.77, 666.20 726.44" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-UserSvc-DB-0">
-        <path d="M 715.61 779.24 L 798.73 879.24" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 715.61 779.24 L 798.73 879.24" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-UserSvc-Search-0">
         <path d="M 661.06 779.24 C 659.44 787.57, 657.82 795.91, 657.01 804.24 C 656.20 812.57, 656.20 820.91, 656.20 829.24 C 656.20 837.57, 656.20 845.91, 656.20 854.24 C 656.20 870.91, 656.20 879.24, 656.20 879.24" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
@@ -156,10 +156,10 @@ marker path {
         <path d="M 1226.80 779.24 L 1195.61 879.24" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-PaymentSvc-DB-0">
-        <path d="M 880.19 623.52 L 843.28 879.24" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 880.19 623.52 L 843.28 879.24" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-PaymentSvc-NotifySvc-0">
-        <path d="M 945.61 623.52 L 986.40 726.44" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 945.61 623.52 L 986.40 726.44" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-NotifySvc-Queue-0">
         <path d="M 986.40 779.24 C 986.40 804.24, 986.40 829.24, 1001.07 846.97 C 1015.73 864.70, 1045.07 875.15, 1074.40 885.61" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
@@ -168,17 +168,17 @@ marker path {
         <path d="M 1074.40 926.81 C 983.57 942.17, 892.73 957.52, 847.32 973.54 C 801.90 989.55, 801.90 1006.21, 801.90 1022.88" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Queue-SMSWorker-0">
-        <path d="M 1195.61 947.88 L 1226.80 1022.88" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 1195.61 947.88 L 1226.80 1022.88" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-Auth-Rate-0">
         <rect x="415.5922301020454" y="366.4449921843775" width="44" height="22" class="edge-label-bg"/>
-        <text x="437.5922301020454" y="377.4449921843775" class="edge-label" dominant-baseline="central" text-anchor="middle">Valid</text>
+        <text x="437.5922301020454" y="377.4449921843775" class="edge-label" text-anchor="middle" dominant-baseline="central">Valid</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Auth-Reject-0">
         <rect x="240.60016784660485" y="399.0221959381994" width="58.4" height="22" class="edge-label-bg"/>
-        <text x="269.80016784660484" y="410.0221959381994" class="edge-label" text-anchor="middle" dominant-baseline="central">Invalid</text>
+        <text x="269.80016784660484" y="410.0221959381994" class="edge-label" dominant-baseline="central" text-anchor="middle">Invalid</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Cache-Response-0">
         <rect x="326.1" y="657.5499183338633" width="72.8" height="22" class="edge-label-bg"/>
@@ -186,25 +186,25 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-Cache-UserSvc-0">
         <rect x="566.0546670620357" y="660.1987821843388" width="80" height="22" class="edge-label-bg"/>
-        <text x="606.0546670620357" y="671.1987821843388" class="edge-label" dominant-baseline="central" text-anchor="middle">Cache Miss</text>
+        <text x="606.0546670620357" y="671.1987821843388" class="edge-label" text-anchor="middle" dominant-baseline="central">Cache Miss</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-Auth">
         <polygon points="362.79999999999995,177.79999999999998 456.3999999999999,271.4 362.79999999999995,365 269.19999999999993,271.4"/>
-        <text x="362.79999999999995" y="271.4" class="label" text-anchor="middle" dominant-baseline="central">Authentication</text>
+        <text x="362.79999999999995" y="271.4" class="label" dominant-baseline="central" text-anchor="middle">Authentication</text>
       </g>
       <g class="node" id="node-CLI">
         <rect x="186.70000000000013" y="25" width="108.8" height="52.8"/>
-        <text x="241.10000000000014" y="51.4" class="label" text-anchor="middle" dominant-baseline="central">CLI Tool</text>
+        <text x="241.10000000000014" y="51.4" class="label" dominant-baseline="central" text-anchor="middle">CLI Tool</text>
       </g>
       <g class="node" id="node-Cache">
         <path d="M 384.7 573.096 a 68.8 10.296 0 0 0 137.6 0 a 68.8 10.296 0 0 0 -137.6 0 l 0 48.048 a 68.8 10.296 0 0 0 137.6 0 l 0 -48.048"/>
-        <text x="453.5" y="597.12" class="label" text-anchor="middle" dominant-baseline="central">Redis Cache</text>
+        <text x="453.5" y="597.12" class="label" dominant-baseline="central" text-anchor="middle">Redis Cache</text>
       </g>
       <g class="node" id="node-DB">
         <path d="M 784.6 889.536 a 64 10.296 0 0 0 128 0 a 64 10.296 0 0 0 -128 0 l 0 48.048 a 64 10.296 0 0 0 128 0 l 0 -48.048"/>
-        <text x="848.6" y="913.56" class="label" text-anchor="middle" dominant-baseline="central">PostgreSQL</text>
+        <text x="848.6" y="913.56" class="label" dominant-baseline="central" text-anchor="middle">PostgreSQL</text>
       </g>
       <g class="node" id="node-EmailWorker">
         <rect x="728.3000000000001" y="1022.88" width="147.2" height="52.8"/>
@@ -216,7 +216,7 @@ marker path {
       </g>
       <g class="node" id="node-NotifySvc">
         <rect x="874.4" y="726.4399999999999" width="224" height="52.8"/>
-        <text x="986.4" y="752.8399999999999" class="label" dominant-baseline="central" text-anchor="middle">Notification Service</text>
+        <text x="986.4" y="752.8399999999999" class="label" text-anchor="middle" dominant-baseline="central">Notification Service</text>
       </g>
       <g class="node" id="node-OrderSvc">
         <rect x="1148.3999999999999" y="726.4399999999999" width="156.8" height="52.8"/>
@@ -224,7 +224,7 @@ marker path {
       </g>
       <g class="node" id="node-PaymentSvc">
         <rect x="824.9" y="570.72" width="176" height="52.8"/>
-        <text x="912.9" y="597.12" class="label" text-anchor="middle" dominant-baseline="central">Payment Service</text>
+        <text x="912.9" y="597.12" class="label" dominant-baseline="central" text-anchor="middle">Payment Service</text>
       </g>
       <g class="node" id="node-Queue">
         <path d="M 1074.3999999999999 889.536 a 78.4 10.296 0 0 0 156.8 0 a 78.4 10.296 0 0 0 -156.8 0 l 0 48.048 a 78.4 10.296 0 0 0 156.8 0 l 0 -48.048"/>
@@ -232,7 +232,7 @@ marker path {
       </g>
       <g class="node" id="node-Rate">
         <rect x="379.9" y="435" width="147.2" height="52.8"/>
-        <text x="453.5" y="461.4" class="label" text-anchor="middle" dominant-baseline="central">Rate Limiter</text>
+        <text x="453.5" y="461.4" class="label" dominant-baseline="central" text-anchor="middle">Rate Limiter</text>
       </g>
       <g class="node" id="node-Reject">
         <rect x="0.00000000000004263256414560601" y="435" width="166.4" height="52.8"/>
@@ -248,7 +248,7 @@ marker path {
       </g>
       <g class="node" id="node-Search">
         <path d="M 577.8000000000001 889.536 a 78.4 10.296 0 0 0 156.8 0 a 78.4 10.296 0 0 0 -156.8 0 l 0 48.048 a 78.4 10.296 0 0 0 156.8 0 l 0 -48.048"/>
-        <text x="656.2" y="913.56" class="label" dominant-baseline="central" text-anchor="middle">Elasticsearch</text>
+        <text x="656.2" y="913.56" class="label" text-anchor="middle" dominant-baseline="central">Elasticsearch</text>
       </g>
       <g class="node" id="node-UI">
         <rect x="523.5000000000001" y="25" width="156.8" height="52.8"/>
@@ -256,7 +256,7 @@ marker path {
       </g>
       <g class="node" id="node-UserSvc">
         <rect x="592.6" y="726.4399999999999" width="147.2" height="52.8"/>
-        <text x="666.2" y="752.8399999999999" class="label" dominant-baseline="central" text-anchor="middle">User Service</text>
+        <text x="666.2" y="752.8399999999999" class="label" text-anchor="middle" dominant-baseline="central">User Service</text>
       </g>
     </g>
   </g>

@@ -8,25 +8,25 @@ use crate::error::Result;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
 /// Padding around nodes
-const NODE_PADDING: f64 = 10.0;
+const NODE_PADDING: f64 = 15.0;
 
 /// Minimum node width
 const MIN_NODE_WIDTH: f64 = 50.0;
 
 /// Minimum node height
-const MIN_NODE_HEIGHT: f64 = 30.0;
+const MIN_NODE_HEIGHT: f64 = 34.0;
 
 /// Radial distance from parent to child
-const RADIAL_DISTANCE: f64 = 68.0;
+const RADIAL_DISTANCE: f64 = 85.0;
 
 /// Maximum number of color sections (matches mermaid.js)
 const MAX_SECTIONS: usize = 12;
 
-/// Font size for node labels
-const FONT_SIZE: f64 = 14.0;
+/// Font size for node labels (mermaid uses 16px)
+const FONT_SIZE: f64 = 16.0;
 
-/// Character width estimate for text sizing
-const CHAR_WIDTH: f64 = 8.0;
+/// Character width estimate for text sizing (increased for 16px font)
+const CHAR_WIDTH: f64 = 9.0;
 
 /// A positioned node for rendering
 #[derive(Debug, Clone)]
@@ -146,45 +146,47 @@ pub fn render_mindmap(db: &MindmapDb, config: &RenderConfig) -> Result<String> {
 }
 
 /// Calculate branch angles for root children
-/// Layout pattern: first branch goes strongly right (landscape), others spread in back-left
-/// Optimized for landscape aspect ratio
+/// Layout pattern derived from analyzing mermaid.js cose-bilkent reference output:
+/// - First branch goes right (0°)
+/// - Second branch goes down-left (~145°)
+/// - Third branch goes up-left (~-72°)
 fn calculate_branch_angles(num_children: usize) -> Vec<f64> {
     use std::f64::consts::PI;
 
     match num_children {
         0 => vec![],
-        1 => vec![0.1],            // Single child goes right, slightly down
-        2 => vec![0.1, PI * 0.75], // First right, second left-down (135°)
+        1 => vec![0.04], // Single child goes right
+        2 => vec![0.04, PI * 0.80], // First right, second left-down (~144°)
         3 => {
-            // Layout pattern for 3 branches:
-            // - First: right with slight downward tilt (creates horizontal extent)
-            // - Second: down-left quadrant
-            // - Third: up-left quadrant
-            vec![0.15, PI * 0.65, -PI * 0.65] // ~9°, ~117°, ~-117°
+            // Derived from mermaid reference output analysis:
+            // - Origins: ~2° (almost pure right)
+            // - Research: ~145° (down-left)
+            // - Tools: ~-72° (up-left)
+            vec![0.04, PI * 0.80, -PI * 0.40] // ~2°, ~144°, ~-72°
         }
         _ => {
             let mut angles = Vec::with_capacity(num_children);
 
-            // First child always goes right with slight downward tilt
-            angles.push(0.1);
+            // First child always goes right
+            angles.push(0.04);
 
-            // Distribute remaining children in back-left quadrant
+            // Distribute remaining children alternating between down-left and up-left
             let remaining = num_children - 1;
             if remaining > 0 {
-                let down_count = remaining.div_ceil(2);
+                let down_count = (remaining + 1) / 2;
                 let up_count = remaining - down_count;
 
-                // Down-left quadrant (angles from ~100° to ~150°)
+                // Down-left quadrant (angles from ~130° to ~160°)
                 for i in 0..down_count {
-                    let t = (i as f64 + 0.5) / (down_count as f64);
-                    let angle = PI * 0.55 + t * PI * 0.28; // ~100° to ~150°
+                    let t = (i as f64 + 0.5) / (down_count.max(1) as f64);
+                    let angle = PI * 0.72 + t * PI * 0.17; // ~130° to ~160°
                     angles.push(angle);
                 }
 
-                // Up-left quadrant (angles from ~-100° to ~-150°)
+                // Up-left quadrant (angles from ~-50° to ~-90°)
                 for i in 0..up_count {
-                    let t = (i as f64 + 0.5) / (up_count as f64);
-                    let angle = -PI * 0.55 - t * PI * 0.28; // ~-100° to ~-150°
+                    let t = (i as f64 + 0.5) / (up_count.max(1) as f64);
+                    let angle = -PI * 0.28 - t * PI * 0.22; // ~-50° to ~-90°
                     angles.push(angle);
                 }
             }
@@ -224,13 +226,15 @@ fn position_radial_tree(
     let is_right_branch = angle.abs() < PI / 3.0;
 
     // Calculate distance based on depth and direction
-    // Right branches get more distance to create landscape aspect ratio
+    // Mermaid's cose-bilkent spreads nodes based on edge tensions
+    // We approximate this with moderate distances
     let base_distance = if is_right_branch {
-        RADIAL_DISTANCE * 1.5 // More distance for right-going branches
+        RADIAL_DISTANCE * 1.35 // More distance for right-going branches
     } else {
-        RADIAL_DISTANCE * 1.1 // Slightly more for other branches
+        RADIAL_DISTANCE * 1.15 // Slightly less for other branches
     };
-    let distance = base_distance * (1.0 + (depth.saturating_sub(1)) as f64 * 0.12);
+    // Increase distance with depth to prevent crowding
+    let distance = base_distance * (1.0 + (depth.saturating_sub(1)) as f64 * 0.15);
 
     // Calculate node center position
     let node_cx = parent_cx + distance * angle.cos();
@@ -304,17 +308,17 @@ fn position_radial_tree(
 fn calculate_children_spread(num_children: usize, depth: usize) -> f64 {
     use std::f64::consts::PI;
 
-    // Base spread decreases significantly with depth to create compact layout
+    // Base spread - mermaid groups children tighter than pure radial layouts
     let base_spread = match depth {
-        1 => PI / 3.0, // First level: 60 degrees
-        2 => PI / 4.0, // Second level: 45 degrees
-        _ => PI / 5.0, // Deeper: 36 degrees
+        1 => PI / 2.5, // First level: 72 degrees
+        2 => PI / 3.5, // Second level: ~51 degrees
+        _ => PI / 4.5, // Deeper: 40 degrees
     };
 
-    // Adjust for number of children
-    let spread = base_spread * (num_children as f64 * 0.7).sqrt();
+    // Adjust for number of children (less aggressive scaling)
+    let spread = base_spread * (num_children as f64 * 0.6).sqrt();
 
-    spread.min(PI * 0.6) // Cap at ~108 degrees
+    spread.min(PI * 0.55) // Cap at ~99 degrees
 }
 
 /// Calculate node size based on text content

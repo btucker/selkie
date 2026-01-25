@@ -217,15 +217,15 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="edgePaths">
       <line x1="75" y1="109" x2="295" y2="109" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <line x1="295" y1="153" x2="515" y2="153" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="5,5" stroke-width="1.5"/>
-      <line x1="295" y1="197" x2="75" y2="197" class="message-line" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#arrow-cross)"/>
+      <line x1="295" y1="153" x2="515" y2="153" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5" stroke-dasharray="5,5"/>
+      <line x1="295" y1="197" x2="75" y2="197" class="message-line" stroke-dasharray="5,5" stroke-width="1.5" marker-end="url(#arrow-cross)"/>
       <line x1="295" y1="241" x2="515" y2="241" class="message-line" marker-end="url(#arrow-cross)" stroke-width="1.5"/>
-      <line x1="295" y1="329" x2="75" y2="329" class="message-line" stroke-width="1.5" stroke-dasharray="5,5"/>
+      <line x1="295" y1="329" x2="75" y2="329" class="message-line" stroke-dasharray="5,5" stroke-width="1.5"/>
       <line x1="75" y1="373" x2="515" y2="373" class="message-line" stroke-width="1.5"/>
     </g>
     <g class="edgeLabels">
       <text x="185" y="99" class="message-label" font-size="16" text-anchor="middle">Hello Bob, how are you?</text>
-      <text x="405" y="143" class="message-label" text-anchor="middle" font-size="16">How about you John?</text>
+      <text x="405" y="143" class="message-label" font-size="16" text-anchor="middle">How about you John?</text>
       <text x="185" y="187" class="message-label" text-anchor="middle" font-size="16">I am good thanks!</text>
       <text x="405" y="231" class="message-label" font-size="16" text-anchor="middle">I am good thanks!</text>
       <text x="185" y="319" class="message-label" text-anchor="middle" font-size="16">Checking with John...</text>
@@ -235,36 +235,36 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
 
     </g>
     <g class="actor">
-      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
       <text x="75" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Alice</text>
     </g>
     <g class="actor">
-      <rect x="220" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
-      <text x="295" y="32.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Bob</text>
+      <rect x="220" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="295" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Bob</text>
     </g>
     <g class="actor">
-      <rect x="440" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
+      <rect x="440" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
       <text x="515" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">John</text>
     </g>
     <g class="note">
-      <path d="M 535 237 L 627 237 L 635 245 L 635 333 L 535 333 Z" class="note note-box" fill="#EDF2AE" stroke="#666" stroke-width="1"/>
-      <path d="M 627 237 L 627 245 L 635 245" class="note" fill="none" stroke-width="1"/>
+      <path d="M 535 237 L 627 237 L 635 245 L 635 333 L 535 333 Z" class="note note-box" stroke="#666" fill="#EDF2AE" stroke-width="1"/>
+      <path d="M 627 237 L 627 245 L 635 245" class="note" stroke-width="1" fill="none"/>
       <text x="585" y="263" class="note-text" font-size="16" text-anchor="middle">Bob thinks a long</text>
       <text x="585" y="282" class="note-text" font-size="16" text-anchor="middle">long time, so long</text>
-      <text x="585" y="301" class="note-text" text-anchor="middle" font-size="16">that the text does</text>
+      <text x="585" y="301" class="note-text" font-size="16" text-anchor="middle">that the text does</text>
       <text x="585" y="320" class="note-text" text-anchor="middle" font-size="16">not fit on a row.</text>
     </g>
     <g class="actor">
-      <rect x="0" y="393" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="75" y="425.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Alice</text>
+      <rect x="0" y="393" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="75" y="425.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Alice</text>
     </g>
     <g class="actor">
       <rect x="220" y="393" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="295" y="425.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Bob</text>
+      <text x="295" y="425.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Bob</text>
     </g>
     <g class="actor">
-      <rect x="440" y="393" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
-      <text x="515" y="425.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">John</text>
+      <rect x="440" y="393" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="515" y="425.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">John</text>
     </g>
   </g>
 </svg>

@@ -199,8 +199,8 @@ marker path {
         <circle cx="60" cy="0" r="10" class="commit B commit0"/>
         <circle cx="110" cy="90" r="10" class="commit C commit1"/>
         <circle cx="160" cy="0" r="10" class="commit D commit0"/>
-        <circle cx="210" cy="0" r="9" class="commit 4-e9e6eb3e commit0"/>
-        <circle cx="210" cy="0" r="6" class="commit commit-merge 4-e9e6eb3e commit0"/>
+        <circle cx="210" cy="0" r="9" class="commit 4-1533bc5a commit0"/>
+        <circle cx="210" cy="0" r="6" class="commit commit-merge 4-1533bc5a commit0"/>
       </g>
       <g class="commit-labels">
         <rect x="5" y="13.5" width="10" height="14" class="commit-label-bkg" transform="translate(-13.58, 12.04) rotate(-45, 10, 0)"/>

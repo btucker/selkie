@@ -117,19 +117,19 @@ marker path {
 
     </g>
     <g class="nodes">
-      <g class="node" x="0" id="node-1" y="4.3224283843291005" transform="translate(0,4.3224283843291005)">
+      <g class="node" x="0" y="4.3224283843291005" id="node-1" transform="translate(0,4.3224283843291005)">
         <rect x="0" y="0" width="10" height="325" class="sankey-node" style="fill: #4e79a7"/>
       </g>
-      <g class="node" x="590" id="node-2" transform="translate(590,399)" y="399">
+      <g class="node" transform="translate(590,399)" id="node-2" x="590" y="399">
         <rect x="0" y="0" width="10" height="1" class="sankey-node" style="fill: #f28e2c"/>
       </g>
-      <g class="node" y="351.55312720961626" transform="translate(590,351.55312720961626)" x="590" id="node-3">
+      <g class="node" x="590" id="node-3" y="351.55312720961626" transform="translate(590,351.55312720961626)">
         <rect x="0" y="0" width="10" height="22.446872790383736" class="sankey-node" style="fill: #e15759"/>
       </g>
-      <g class="node" id="node-4" x="590" transform="translate(590,0)" y="0">
+      <g class="node" transform="translate(590,0)" x="590" id="node-4" y="0">
         <rect x="0" y="0" width="10" height="234.2473484605001" class="sankey-node" style="fill: #76b7b2"/>
       </g>
-      <g class="node" transform="translate(590,258.7462235649547)" x="590" y="258.7462235649547" id="node-5">
+      <g class="node" id="node-5" transform="translate(590,258.7462235649547)" x="590" y="258.7462235649547">
         <rect x="0" y="0" width="10" height="67.80690364466159" class="sankey-node" style="fill: #59a14f"/>
       </g>
     </g>
@@ -145,18 +145,18 @@ marker path {
       <text x="584" y="292.64967538728547" dy="0em" text-anchor="end">Gas
 81.14</text>
     </g>
-    <g class="links" stroke-opacity="0.5" fill="none">
+    <g class="links" fill="none" stroke-opacity="0.5">
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,4.8224283843291005 C300,4.8224283843291005 300,399.5 590,399.5" stroke="url(#linearGradient-1)" stroke-width="1"/>
+        <path d="M10,4.8224283843291005 C300,4.8224283843291005 300,399.5 590,399.5" stroke-width="1" stroke="url(#linearGradient-1)"/>
       </g>
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,16.545864779520976 C300,16.545864779520976 300,362.77656360480813 590,362.77656360480813" stroke-width="22.446872790383747" stroke="url(#linearGradient-2)"/>
+        <path d="M10,16.545864779520976 C300,16.545864779520976 300,362.77656360480813 590,362.77656360480813" stroke="url(#linearGradient-2)" stroke-width="22.446872790383747"/>
       </g>
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,144.8929754049629 C300,144.8929754049629 300,117.12367423025005 590,117.12367423025005" stroke="url(#linearGradient-3)" stroke-width="234.2473484605001"/>
+        <path d="M10,144.8929754049629 C300,144.8929754049629 300,117.12367423025005 590,117.12367423025005" stroke-width="234.2473484605001" stroke="url(#linearGradient-3)"/>
       </g>
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,295.92010145754375 C300,295.92010145754375 300,292.64967538728547 590,292.64967538728547" stroke-width="67.80690364466157" stroke="url(#linearGradient-4)"/>
+        <path d="M10,295.92010145754375 C300,295.92010145754375 300,292.64967538728547 590,292.64967538728547" stroke="url(#linearGradient-4)" stroke-width="67.80690364466157"/>
       </g>
     </g>
   </g>

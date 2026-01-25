@@ -116,16 +116,16 @@ marker path {
 
     </g>
     <g class="nodes">
-      <g class="node" id="node-1" transform="translate(0,0)" x="0" y="0">
+      <g class="node" y="0" x="0" transform="translate(0,0)" id="node-1">
         <rect x="0" y="0" width="10" height="400" class="sankey-node" style="fill: #4e79a7"/>
       </g>
-      <g class="node" transform="translate(196.66666666666666,0)" x="196.66666666666666" id="node-2" y="0">
+      <g class="node" y="0" x="196.66666666666666" transform="translate(196.66666666666666,0)" id="node-2">
         <rect x="0" y="0" width="10" height="400" class="sankey-node" style="fill: #f28e2c"/>
       </g>
-      <g class="node" id="node-3" x="393.3333333333333" y="0" transform="translate(393.3333333333333,0)">
+      <g class="node" id="node-3" transform="translate(393.3333333333333,0)" x="393.3333333333333" y="0">
         <rect x="0" y="0" width="10" height="400" class="sankey-node" style="fill: #e15759"/>
       </g>
-      <g class="node" id="node-4" y="0" x="590" transform="translate(590,0)">
+      <g class="node" transform="translate(590,0)" id="node-4" x="590" y="0">
         <rect x="0" y="0" width="10" height="400" class="sankey-node" style="fill: #76b7b2"/>
       </g>
     </g>
