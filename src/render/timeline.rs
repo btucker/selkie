@@ -11,22 +11,25 @@ use crate::error::Result;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
 // Mermaid-compatible layout constants
-// Mermaid uses masterX = 50 + LEFT_MARGIN where LEFT_MARGIN defaults to 50, giving x=100
-// But mermaid's viewBox starts at x=100, so content appears at x=200 from viewport origin
-// We use a simple viewBox starting at 0, so we need LEFT_MARGIN=200 to match visual output
-const LEFT_MARGIN: f64 = 200.0;
+// Mermaid's timeline positions first task at translate(200, 50)
+// viewBox starts at x=100, y=-61 to accommodate title and padding
+const LEFT_MARGIN: f64 = 50.0; // Match mermaid's default LEFT_MARGIN
+const VIEWBOX_X_OFFSET: f64 = 100.0; // Match mermaid's viewBox x offset
+const VIEWBOX_Y_OFFSET: f64 = -61.0; // Match mermaid's viewBox y offset for title
+const MASTER_X_BASE: f64 = 150.0; // Base X position so first task is at 200 (150 + 50)
 const TOP_MARGIN: f64 = 50.0;
 const NODE_WIDTH: f64 = 150.0; // Reference uses width: 150 for node content (total = 150 + 2*padding = 190)
 const TEXT_WRAP_WIDTH: f64 = 150.0; // Reference uses width: 150 for text wrapping
 const NODE_PADDING: f64 = 20.0;
 const COLUMN_WIDTH: f64 = 200.0; // Reference uses masterX += 200 spacing between task centers
-const SECTION_HEIGHT: f64 = 68.0; // ~68px in reference
-const TASK_HEIGHT: f64 = 68.0; // ~68px in reference
-const EVENT_HEIGHT: f64 = 50.0; // ~45-50px minimum in reference
+const MIN_SECTION_HEIGHT: f64 = 50.0; // Minimum height for sections
+const MIN_TASK_HEIGHT: f64 = 50.0; // Minimum height for tasks
+const MIN_EVENT_HEIGHT: f64 = 50.0; // Minimum height for events
 const EVENT_SPACING: f64 = 10.0;
 const SECTION_GAP: f64 = 50.0;
 const TASK_GAP: f64 = 100.0;
 const FONT_SIZE: f64 = 16.0; // Match mermaid.js default
+const LINE_HEIGHT: f64 = 17.6; // fontSize * 1.1
 const TITLE_FONT_SIZE: f64 = 24.0;
 const MAX_SECTIONS: usize = 12;
 
@@ -60,7 +63,14 @@ pub fn render_timeline(db: &TimelineDb, config: &RenderConfig) -> Result<String>
     let has_sections = !sections.is_empty();
     let layout = calculate_layout(tasks, sections, has_sections);
 
-    doc.set_size(layout.total_width, layout.total_height);
+    // Set SVG size with viewBox matching mermaid's approach
+    // Mermaid uses viewBox="x y width height" where x and y offset the origin
+    doc.set_size_with_origin(
+        layout.viewbox_x,
+        layout.viewbox_y,
+        layout.total_width,
+        layout.total_height,
+    );
 
     // Add theme styles
     if config.embed_css {
@@ -72,9 +82,10 @@ pub fn render_timeline(db: &TimelineDb, config: &RenderConfig) -> Result<String>
     add_arrowhead_marker(&mut doc);
 
     // Render title (at top)
+    // Mermaid positions title at box.width / 2 - LEFT_MARGIN, y=20
     if !db.title.is_empty() {
         let title_elem = SvgElement::Text {
-            x: layout.total_width / 2.0 - LEFT_MARGIN,
+            x: layout.total_width / 2.0 + layout.viewbox_x - LEFT_MARGIN,
             y: 20.0,
             content: db.title.clone(),
             attrs: Attrs::new()
@@ -108,6 +119,9 @@ struct TimelineLayout {
     max_section_height: f64,    // Maximum height of section boxes
     max_task_height: f64,       // Maximum height of task boxes
     max_event_line_length: f64, // Maximum total height of events for any task
+    viewbox_x: f64,             // ViewBox x offset
+    viewbox_y: f64,             // ViewBox y offset
+    master_x_start: f64,        // Starting x position for content
 }
 
 /// Calculate layout dimensions
@@ -117,25 +131,28 @@ fn calculate_layout(
     has_sections: bool,
 ) -> TimelineLayout {
     // Calculate maximum section height based on text wrapping
+    // Mermaid adds 20 to the calculated height
     let max_section_height: f64 = if has_sections {
         let mut max_height: f64 = 0.0;
         for section in sections {
-            let height = estimate_node_height(section, TEXT_WRAP_WIDTH);
-            max_height = max_height.max(height);
+            let height =
+                estimate_node_height_with_min(section, TEXT_WRAP_WIDTH, MIN_SECTION_HEIGHT);
+            max_height = max_height.max(height + 20.0);
         }
-        max_height.max(SECTION_HEIGHT)
+        max_height
     } else {
         0.0
     };
 
     // Calculate maximum task height and event line length
+    // Mermaid adds 20 to each calculated height
     let mut max_task_height: f64 = 0.0;
     let mut _max_event_count = 0;
     let mut max_event_line_length: f64 = 0.0;
 
     for task in tasks {
-        let height = estimate_node_height(&task.task, TEXT_WRAP_WIDTH);
-        max_task_height = max_task_height.max(height);
+        let height = estimate_node_height_with_min(&task.task, TEXT_WRAP_WIDTH, MIN_TASK_HEIGHT);
+        max_task_height = max_task_height.max(height + 20.0);
         _max_event_count = _max_event_count.max(task.events.len());
 
         // Calculate event line length for this task
@@ -148,21 +165,25 @@ fn calculate_layout(
         }
         max_event_line_length = max_event_line_length.max(event_line_length);
     }
-    max_task_height = max_task_height.max(TASK_HEIGHT);
 
     // Calculate total number of columns (tasks across all sections)
     let total_columns = tasks.len().max(1);
+
+    // Mermaid positions first task at masterX = 200
+    // Then adds 200 * section_task_count for each section
+    let master_x_start = MASTER_X_BASE + LEFT_MARGIN; // = 200 to match mermaid
+
     // Width calculation to match mermaid reference:
-    // - First task at x = LEFT_MARGIN (200)
-    // - Subsequent tasks spaced by COLUMN_WIDTH (200)
-    // - Node width = NODE_WIDTH + 2*NODE_PADDING (190)
-    // - Right margin = LEFT_MARGIN (200)
-    // Formula: (columns - 1) * spacing + node_width + left_margin + right_margin
-    let node_width = NODE_WIDTH + NODE_PADDING * 2.0;
-    let total_width =
-        (total_columns as f64 - 1.0).max(0.0) * COLUMN_WIDTH + node_width + LEFT_MARGIN * 2.0;
+    // Mermaid: box.width + 3 * LEFT_MARGIN where box.width comes from getBBox()
+    // Content width = (tasks - 1) * 200 + 190 (node width)
+    // Plus margins on both sides (3 * LEFT_MARGIN in mermaid)
+    let node_width = NODE_WIDTH + NODE_PADDING * 2.0; // 190
+    let content_width = (total_columns as f64 - 1.0).max(0.0) * COLUMN_WIDTH + node_width;
+    // Add master_x_start offset and right padding to match mermaid
+    let total_width = content_width + master_x_start + LEFT_MARGIN * 3.0;
 
     // Calculate depth_y (position of timeline line)
+    // Mermaid: depthY = hasSections ? maxSectionHeight + maxTaskHeight + 150 : maxTaskHeight + 100
     let section_begin_y = TOP_MARGIN;
     let depth_y = if has_sections {
         max_section_height + max_task_height + 150.0
@@ -170,9 +191,9 @@ fn calculate_layout(
         max_task_height + 100.0
     };
 
-    // Total height includes title, sections, tasks, events, and timeline line
-    // Add extra margin for bottom spacing
-    let total_height = depth_y + max_event_line_length + 250.0;
+    // Total height calculation
+    // Mermaid uses padding around content via setupGraphViewbox
+    let total_height = depth_y + max_event_line_length + 200.0 + 100.0;
 
     TimelineLayout {
         total_width,
@@ -182,11 +203,20 @@ fn calculate_layout(
         max_section_height,
         max_task_height,
         max_event_line_length,
+        viewbox_x: VIEWBOX_X_OFFSET,
+        viewbox_y: VIEWBOX_Y_OFFSET,
+        master_x_start,
     }
 }
 
 /// Estimate node height based on text content and wrapping
+/// Uses mermaid's formula: bbox.height + fontSize * 1.1 * 0.5 + padding
 fn estimate_node_height(text: &str, max_width: f64) -> f64 {
+    estimate_node_height_with_min(text, max_width, MIN_EVENT_HEIGHT)
+}
+
+/// Estimate node height with a custom minimum height
+fn estimate_node_height_with_min(text: &str, max_width: f64, min_height: f64) -> f64 {
     // Split on <br> tags and whitespace to simulate wrap_text
     let text = text
         .replace("<br>", "\n")
@@ -195,7 +225,7 @@ fn estimate_node_height(text: &str, max_width: f64) -> f64 {
     let words: Vec<&str> = text.split_whitespace().collect();
 
     if words.is_empty() {
-        return EVENT_HEIGHT;
+        return min_height;
     }
 
     // Count lines using same algorithm as wrap_text
@@ -221,11 +251,14 @@ fn estimate_node_height(text: &str, max_width: f64) -> f64 {
         line_count += 1;
     }
 
-    // Height formula matches reference: bbox.height + fontSize * 1.1 * 0.5 + padding
-    // For multi-line text: lines * lineHeight + extra padding for text y-offset (10px)
-    let line_height = FONT_SIZE * 1.1;
-    let height = line_count as f64 * line_height + NODE_PADDING + 10.0;
-    height.max(EVENT_HEIGHT)
+    // Mermaid's height formula: bbox.height + fontSize * 1.1 * 0.5 + padding
+    // bbox.height = line_count * lineHeight (where lineHeight ≈ fontSize * 1.1)
+    // So: height = lines * (fontSize * 1.1) + (fontSize * 1.1 * 0.5) + padding
+    let bbox_height = line_count as f64 * LINE_HEIGHT;
+    let font_adjustment = FONT_SIZE * 1.1 * 0.5; // ~8.8px
+    let height = bbox_height + font_adjustment + NODE_PADDING;
+
+    height.max(min_height)
 }
 
 /// Add arrowhead marker definition
@@ -245,7 +278,8 @@ fn render_with_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Timelin
     let sections = db.get_sections();
     let tasks = db.get_tasks();
 
-    let mut master_x = LEFT_MARGIN;
+    // Start at masterX = 50 + LEFT_MARGIN to match mermaid
+    let mut master_x = layout.master_x_start;
 
     for (section_number, section) in sections.iter().enumerate() {
         // Filter tasks for this section
@@ -293,7 +327,8 @@ fn render_without_sections(doc: &mut SvgDocument, db: &TimelineDb, layout: &Time
     let tasks = db.get_tasks();
     let tasks_ref: Vec<&TimelineTask> = tasks.iter().collect();
 
-    let master_x = LEFT_MARGIN;
+    // Start at masterX = 50 + LEFT_MARGIN to match mermaid
+    let master_x = layout.master_x_start;
     let master_y = layout.section_begin_y;
 
     // Render tasks, each in a different section color
@@ -561,11 +596,12 @@ fn render_event_node(
 
 /// Render the horizontal timeline line
 fn render_timeline_line(doc: &mut SvgDocument, layout: &TimelineLayout) {
+    // Mermaid positions line from LEFT_MARGIN to box.width + 3 * LEFT_MARGIN
     let line_wrapper = SvgElement::Group {
         children: vec![SvgElement::Line {
             x1: LEFT_MARGIN,
             y1: layout.depth_y,
-            x2: layout.total_width - LEFT_MARGIN,
+            x2: layout.total_width + layout.viewbox_x,
             y2: layout.depth_y,
             attrs: Attrs::new()
                 .with_attr("stroke-width", "4")
