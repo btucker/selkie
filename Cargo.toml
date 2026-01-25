@@ -1,5 +1,5 @@
 [package]
-name = "selkie"
+name = "selkie-diagrams"
 version = "0.1.0"
 edition = "2021"
 description = "A Rust implementation of the mermaid diagramming parser and renderer"
