@@ -316,19 +316,6 @@ fn kanban_section_colors() {
 // Visual Parity Tests - Testing mermaid.js compatibility
 // ============================================================================
 
-/// Helper to count rects with inline fill
-fn count_rects_with_inline_fill(doc: &Document<'_>) -> usize {
-    doc.descendants()
-        .filter(|node| {
-            node.tag_name().name() == "rect"
-                && node
-                    .attribute("style")
-                    .map(|s| s.contains("fill"))
-                    .unwrap_or(false)
-        })
-        .count()
-}
-
 #[test]
 fn kanban_visual_parity_section_css_fill() {
     // CSS classes define section fill colors for proper visual parity
