@@ -954,3 +954,119 @@ fn treemap_text_position_relative_to_rect() {
         max_y_offset
     );
 }
+
+// ============================================================================
+// Bug fix: Text truncation tests (se-029ri)
+// ============================================================================
+
+/// Extract clip-path width from a leaf's clipPath element
+fn get_clip_width_for_leaf(svg: &str, leaf_index: usize) -> Option<f64> {
+    let clip_id = format!("clip-leaf-{}", leaf_index);
+    // Look for pattern: <clipPath id="clip-leaf-N"><rect ... width="W" .../>
+    let pattern = format!(r#"<clipPath id="{}">"#, clip_id);
+    if let Some(start) = svg.find(&pattern) {
+        let after = &svg[start..];
+        if let Some(width_start) = after.find("width=\"") {
+            let width_str_start = width_start + 7;
+            if let Some(width_end) = after[width_str_start..].find('"') {
+                let width_str = &after[width_str_start..width_str_start + width_end];
+                return width_str.parse().ok();
+            }
+        }
+    }
+    None
+}
+
+/// Extract font-size from a text element containing specific label text
+fn get_font_size_for_label(svg: &str, label: &str) -> Option<f64> {
+    // Look for pattern: font-size="Npx" ... >Label<
+    // The label should appear shortly after the font-size attribute
+    let label_pattern = format!(">{}<", label);
+    if let Some(label_pos) = svg.find(&label_pattern) {
+        // Search backwards for font-size in the same element
+        let before = &svg[..label_pos];
+        // Find the opening tag for this text element
+        if let Some(tag_start) = before.rfind("<text ") {
+            let element = &svg[tag_start..label_pos];
+            if let Some(fs_start) = element.find("font-size=\"") {
+                let fs_str_start = fs_start + 11;
+                if let Some(fs_end) = element[fs_str_start..].find('"') {
+                    let fs_str = &element[fs_str_start..fs_str_start + fs_end];
+                    return fs_str.trim_end_matches("px").parse().ok();
+                }
+            }
+        }
+    }
+    None
+}
+
+#[test]
+fn treemap_text_truncation_devops_events() {
+    // Bug: Labels like 'DevOps' render as 'DevOp' and 'Events' renders as 'vent'
+    // This test verifies that the estimated text width at the calculated font size
+    // fits within the clip bounds with a safety margin.
+    let input = r#"treemap-beta
+"Company Budget"
+    "Engineering"
+        "Frontend": 300000
+        "Backend": 400000
+        "DevOps": 200000
+    "Marketing"
+        "Digital": 250000
+        "Print": 100000
+        "Events": 150000
+    "Sales"
+        "Direct": 500000
+        "Channel": 300000
+"#;
+    let svg = render_treemap_svg(input);
+
+    // Verify that the full label text is present in the SVG
+    assert!(
+        svg_contains_text(&svg, "DevOps"),
+        "SVG should contain 'DevOps' label"
+    );
+    assert!(
+        svg_contains_text(&svg, "Events"),
+        "SVG should contain 'Events' label"
+    );
+
+    // For each label, verify estimated text width fits within clip bounds
+    // Using actual character width factor that browsers render at (approximately 0.65)
+    // The code should scale fonts to ensure text fits at this actual width
+    let char_width_factor = 0.65;
+
+    // Find all leaf data by parsing the SVG
+    // DevOps uses clip-leaf-2 (75.19px width), Events uses clip-leaf-6 (66.91px width)
+    // These are narrow cells where text truncation is most likely
+
+    // Check DevOps - it should have a font size that allows full text display
+    if let Some(font_size) = get_font_size_for_label(&svg, "DevOps") {
+        let text_len = 6; // "DevOps" has 6 characters
+        let estimated_width = text_len as f64 * font_size * char_width_factor;
+
+        // DevOps is rendered in clip-leaf-2 which has a narrow width
+        // We need to verify the text fits in its SPECIFIC clip, not just any clip
+        if let Some(clip_width) = get_clip_width_for_leaf(&svg, 2) {
+            assert!(
+                estimated_width <= clip_width,
+                "DevOps text (est. {:.1}px at {:.1}px font) should fit within its clip ({:.1}px)",
+                estimated_width, font_size, clip_width
+            );
+        }
+    }
+
+    // Check Events - it uses clip-leaf-6 which is even narrower
+    if let Some(font_size) = get_font_size_for_label(&svg, "Events") {
+        let text_len = 6; // "Events" has 6 characters
+        let estimated_width = text_len as f64 * font_size * char_width_factor;
+
+        if let Some(clip_width) = get_clip_width_for_leaf(&svg, 6) {
+            assert!(
+                estimated_width <= clip_width,
+                "Events text (est. {:.1}px at {:.1}px font) should fit within its clip ({:.1}px)",
+                estimated_width, font_size, clip_width
+            );
+        }
+    }
+}

@@ -985,7 +985,9 @@ fn render_leaf(rect: &TreemapRect, index: usize, config: &RenderConfig) -> SvgEl
     let available_height = rect.height - 2.0 * padding;
 
     // Estimate text width (rough approximation)
-    let char_width = LEAF_FONT_SIZE * 0.6;
+    // Use 0.65 factor which better matches actual font rendering width in browsers
+    // This ensures scaled fonts produce text that actually fits within clip bounds
+    let char_width = LEAF_FONT_SIZE * 0.65;
     let text_width = rect.name.len() as f64 * char_width;
 
     // Scale font size to fit
