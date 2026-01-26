@@ -158,7 +158,7 @@ Requires [Mermaid CLI](https://github.com/mermaid-js/mermaid-cli) for reference 
 ### As a Library
 
 ```rust
-use mermaid::{parse, render};
+use selkie::{parse, render};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let diagram_source = r#"
