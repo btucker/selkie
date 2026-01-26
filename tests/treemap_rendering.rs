@@ -1051,7 +1051,9 @@ fn treemap_text_truncation_devops_events() {
             assert!(
                 estimated_width <= clip_width,
                 "DevOps text (est. {:.1}px at {:.1}px font) should fit within its clip ({:.1}px)",
-                estimated_width, font_size, clip_width
+                estimated_width,
+                font_size,
+                clip_width
             );
         }
     }
@@ -1065,7 +1067,9 @@ fn treemap_text_truncation_devops_events() {
             assert!(
                 estimated_width <= clip_width,
                 "Events text (est. {:.1}px at {:.1}px font) should fit within its clip ({:.1}px)",
-                estimated_width, font_size, clip_width
+                estimated_width,
+                font_size,
+                clip_width
             );
         }
     }
