@@ -394,7 +394,11 @@ fn render_vertical_bars(doc: &mut SvgDocument, plot: &Plot, color: &str, area: &
             height: actual_height.max(0.0),
             rx: None,
             ry: None,
-            attrs: Attrs::new().with_fill(color).with_class("xychart-bar"),
+            attrs: Attrs::new()
+                .with_fill(color)
+                .with_stroke(color)
+                .with_stroke_width(0.0)
+                .with_class("xychart-bar"),
         };
         doc.add_element(bar);
     }
@@ -450,7 +454,11 @@ fn render_horizontal_bars(doc: &mut SvgDocument, plot: &Plot, color: &str, area:
             height: bar_height.max(1.0),
             rx: None,
             ry: None,
-            attrs: Attrs::new().with_fill(color).with_class("xychart-bar"),
+            attrs: Attrs::new()
+                .with_fill(color)
+                .with_stroke(color)
+                .with_stroke_width(0.0)
+                .with_class("xychart-bar"),
         };
         doc.add_element(bar);
     }
