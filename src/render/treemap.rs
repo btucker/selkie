@@ -22,7 +22,7 @@ const SECTION_PADDING: f64 = 10.0;
 /// Maximum number of color sections (matches mermaid.js cScale)
 const MAX_SECTIONS: usize = 12;
 
-/// Font size for leaf labels (matches mermaid.js default of 38px)
+/// Font size for leaf labels (matches mermaid.js inline style of 38px)
 const LEAF_FONT_SIZE: f64 = 38.0;
 
 /// Font size for section labels
@@ -33,6 +33,13 @@ const SECTION_VALUE_FONT_SIZE: f64 = 10.0;
 
 /// Font size for leaf value labels (approximately 60% of label font, matching mermaid.js ~23px)
 const VALUE_FONT_SIZE: f64 = 23.0;
+
+/// CSS fallback font size for leaf labels (matches mermaid.js CSS of 12px)
+/// Inline styles override this, but CSS provides safe fallback if inline styles are stripped
+const CSS_LEAF_FONT_SIZE: f64 = 12.0;
+
+/// CSS fallback font size for leaf values (matches mermaid.js CSS of 10px)
+const CSS_VALUE_FONT_SIZE: f64 = 10.0;
 
 /// Default diagram width
 const DEFAULT_WIDTH: f64 = 960.0;
@@ -1112,6 +1119,11 @@ fn generate_treemap_css(config: &RenderConfig) -> String {
     // and text colors are calculated inline based on background contrast.
     // This matches mermaid.js which uses inline styles rather than CSS classes.
     // We keep section classes for potential custom styling but don't set fills in CSS.
+    //
+    // IMPORTANT: CSS font sizes here are fallback values (12px/10px) matching mermaid.js CSS.
+    // Actual font sizes are set via inline styles (38px/23px for large cells, scaled for smaller).
+    // This ensures if inline styles are stripped (e.g., security sanitization), text remains
+    // readable at small sizes rather than huge 38px defaults.
 
     format!(
         r#"
@@ -1139,15 +1151,15 @@ fn generate_treemap_css(config: &RenderConfig) -> String {
   stroke-width: 3px;
 }}
 .treemapLabel {{
-  font-size: {leaf_font_size}px;
+  font-size: {css_leaf_font_size}px;
 }}
 .treemapValue {{
-  font-size: {value_font_size}px;
+  font-size: {css_value_font_size}px;
 }}
 "#,
         font_family = theme.font_family,
         text_color = theme.primary_text_color,
-        leaf_font_size = LEAF_FONT_SIZE,
-        value_font_size = VALUE_FONT_SIZE,
+        css_leaf_font_size = CSS_LEAF_FONT_SIZE,
+        css_value_font_size = CSS_VALUE_FONT_SIZE,
     )
 }
