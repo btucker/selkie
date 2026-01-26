@@ -267,6 +267,9 @@ fn render_section_label(text: &str, section_x: f64, section_width: f64) -> SvgEl
     }
 }
 
+/// Card width matches mermaid.js (185px)
+const CARD_WIDTH: f64 = 185.0;
+
 /// Render kanban items (cards)
 fn render_items(db: &KanbanDb, layout: &KanbanLayout, _config: &RenderConfig) -> SvgElement {
     let sections = db.get_sections();
@@ -283,11 +286,13 @@ fn render_items(db: &KanbanDb, layout: &KanbanLayout, _config: &RenderConfig) ->
 
         for (item_idx, item) in items.iter().enumerate() {
             if let Some((y, height)) = positions.get(item_idx) {
+                // Center card horizontally within section: (200 - 185) / 2 = 7.5px margin
+                let card_margin = (SECTION_WIDTH - CARD_WIDTH) / 2.0;
                 let item_elem = render_item(
                     item,
-                    section_x + PADDING,
+                    section_x + card_margin,
                     *y,
-                    SECTION_WIDTH - 2.0 * PADDING,
+                    CARD_WIDTH,
                     *height,
                 );
                 children.push(item_elem);

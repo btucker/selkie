@@ -401,18 +401,18 @@ fn kanban_visual_parity_section_corner_radius() {
 
 #[test]
 fn kanban_visual_parity_item_width() {
-    // Mermaid.js kanban items are 185px wide (SECTION_WIDTH - 2*PADDING = 200 - 15 = 185)
-    // Actually mermaid uses 180px items inside 200px sections
+    // Mermaid.js kanban items are 185px wide inside 200px sections
+    // Cards are centered with 7.5px margin on each side
     let input = r#"kanban
   id1[Todo]
     task1[Task 1]"#;
 
     let svg = render_kanban_svg(input);
 
-    // Items should be 180px wide
+    // Items should be 185px wide (matching mermaid reference)
     assert!(
-        svg.contains(r#"width="180""#),
-        "Kanban items should be 180px wide for mermaid parity"
+        svg.contains(r#"width="185""#),
+        "Kanban items should be 185px wide for mermaid parity"
     );
 }
 
