@@ -288,13 +288,7 @@ fn render_items(db: &KanbanDb, layout: &KanbanLayout, _config: &RenderConfig) ->
             if let Some((y, height)) = positions.get(item_idx) {
                 // Center card horizontally within section: (200 - 185) / 2 = 7.5px margin
                 let card_margin = (SECTION_WIDTH - CARD_WIDTH) / 2.0;
-                let item_elem = render_item(
-                    item,
-                    section_x + card_margin,
-                    *y,
-                    CARD_WIDTH,
-                    *height,
-                );
+                let item_elem = render_item(item, section_x + card_margin, *y, CARD_WIDTH, *height);
                 children.push(item_elem);
             }
         }
