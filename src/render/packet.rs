@@ -96,12 +96,32 @@ pub fn render_packet(db: &PacketDb, config: &RenderConfig) -> Result<String> {
         doc.add_style(&generate_packet_css());
     }
 
-    // Render each word (row)
+    // Collect all shapes and text elements from all words
+    // This ensures correct z-order across all rows (all shapes before all text)
+    let mut all_rect_elements: Vec<SvgElement> = Vec::new();
+    let mut all_text_elements: Vec<SvgElement> = Vec::new();
+
     for (word_index, word) in words.iter().enumerate() {
-        draw_word(&mut doc, word, word_index, &packet_config);
+        collect_word_elements(
+            word,
+            word_index,
+            &packet_config,
+            &mut all_rect_elements,
+            &mut all_text_elements,
+        );
     }
 
-    // Render title at the bottom
+    // Emit all rect elements first (shapes behind text)
+    for elem in all_rect_elements {
+        doc.add_element(elem);
+    }
+
+    // Emit all text elements second (text on top of shapes)
+    for elem in all_text_elements {
+        doc.add_element(elem);
+    }
+
+    // Render title at the bottom (after all other content)
     if has_title {
         let title_y = svg_height - total_row_height / 2.0;
         let title_elem = SvgElement::Text {
@@ -119,12 +139,14 @@ pub fn render_packet(db: &PacketDb, config: &RenderConfig) -> Result<String> {
     Ok(doc.to_string())
 }
 
-/// Draw a word (row) of packet blocks
-fn draw_word(
-    doc: &mut SvgDocument,
+/// Collect elements for a word (row) of packet blocks into shape and text vectors.
+/// This allows the caller to batch all shapes before all text for correct z-order.
+fn collect_word_elements(
     word: &[crate::diagrams::packet::PacketBlock],
     row_number: usize,
     config: &PacketConfig,
+    rect_elements: &mut Vec<SvgElement>,
+    text_elements: &mut Vec<SvgElement>,
 ) {
     let PacketConfig {
         row_height,
@@ -155,7 +177,7 @@ fn draw_word(
             ry: None,
             attrs: Attrs::new().with_class("packetBlock"),
         };
-        doc.add_element(rect);
+        rect_elements.push(rect);
 
         // Block label (centered in the block)
         let label = SvgElement::Text {
@@ -167,7 +189,7 @@ fn draw_word(
                 .with_attr("dominant-baseline", "middle")
                 .with_attr("text-anchor", "middle"),
         };
-        doc.add_element(label);
+        text_elements.push(label);
 
         if show_bits {
             let is_single_block = block.end == block.start;
@@ -187,7 +209,7 @@ fn draw_word(
                         if is_single_block { "middle" } else { "start" },
                     ),
             };
-            doc.add_element(start_bit);
+            text_elements.push(start_bit);
 
             // End bit number (if different from start)
             if !is_single_block {
@@ -201,7 +223,7 @@ fn draw_word(
                         .with_attr("dominant-baseline", "auto")
                         .with_attr("text-anchor", "end"),
                 };
-                doc.add_element(end_bit);
+                text_elements.push(end_bit);
             }
         }
     }
