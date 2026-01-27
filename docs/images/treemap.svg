@@ -47,51 +47,51 @@
       <g class="treemapContainer">
         <g class="treemapSections">
           <g class="treemapSection">
-            <rect x="0" y="0" width="960" height="25" class="treemapSectionHeader" fill-opacity="0.6" stroke-width="0.6" style="display: none;" fill="none"/>
+            <rect x="0" y="0" width="960" height="25" class="treemapSectionHeader" fill-opacity="0.6" style="display: none;" stroke-width="0.6" fill="none"/>
             <clipPath id="clip-section-0"><rect width="948" height="25"/></clipPath>
-            <rect x="0" y="0" width="960" height="371" class="treemapSection section0" stroke-width="2" stroke="transparent" style="display: none;" fill-opacity="0.6" fill="transparent" stroke-opacity="0.4"/>
+            <rect x="0" y="0" width="960" height="371" class="treemapSection section0" stroke-width="2" fill="transparent" fill-opacity="0.6" stroke="transparent" stroke-opacity="0.4" style="display: none;"/>
             <text x="6" y="12.5" class="treemapSectionLabel" font-weight="bold" dominant-baseline="middle" style="display: none;"></text>
-            <text x="950" y="12.5" class="treemapSectionValue" style="display: none;" font-style="italic" dominant-baseline="middle" text-anchor="end">70</text>
+            <text x="950" y="12.5" class="treemapSectionValue" font-style="italic" style="display: none;" dominant-baseline="middle" text-anchor="end">70</text>
           </g>
           <g class="treemapSection section-0">
-            <rect x="10" y="35" width="537.1428571428571" height="326" class="treemapSection section-0" stroke-width="2" fill="hsl(240, 100%, 76.2745098039%)" stroke-opacity="0.4" stroke="hsl(240, 100%, 61.2745098039%)" fill-opacity="0.6"/>
+            <rect x="10" y="35" width="537.1428571428571" height="326" class="treemapSection section-0" stroke-width="2" stroke="hsl(240, 100%, 61.2745098039%)" fill-opacity="0.6" fill="hsl(240, 100%, 76.2745098039%)" stroke-opacity="0.4"/>
             <rect x="10" y="35" width="537.1428571428571" height="25" class="treemapSectionHeader" fill="none" stroke-width="0"/>
             <clipPath id="clip-section-1"><rect width="525.1428571428571" height="25"/></clipPath>
-            <text x="16" y="47.5" class="treemapSectionLabel section-0" font-weight="bold" fill="#ffffff" font-size="12px" dominant-baseline="middle">Category B</text>
-            <text x="537.1428571428571" y="47.5" class="treemapSectionValue section-0" fill="#ffffff" font-style="italic" text-anchor="end" dominant-baseline="middle" font-size="10px">40</text>
+            <text x="16" y="47.5" class="treemapSectionLabel section-0" dominant-baseline="middle" fill="#ffffff" font-size="12px" font-weight="bold">Category B</text>
+            <text x="537.1428571428571" y="47.5" class="treemapSectionValue section-0" text-anchor="end" font-size="10px" font-style="italic" fill="#ffffff" dominant-baseline="middle">40</text>
           </g>
           <g class="treemapSection section-1">
-            <rect x="547.1428571428571" y="35" width="402.8571428571429" height="326" class="treemapSection section-1" fill-opacity="0.6" fill="hsl(60, 100%, 73.5294117647%)" stroke-width="2" stroke="hsl(60, 100%, 48.5294117647%)" stroke-opacity="0.4"/>
-            <rect x="547.1428571428571" y="35" width="402.8571428571429" height="25" class="treemapSectionHeader" fill="none" stroke-width="0"/>
+            <rect x="547.1428571428571" y="35" width="402.8571428571429" height="326" class="treemapSection section-1" fill-opacity="0.6" stroke-width="2" stroke-opacity="0.4" stroke="hsl(60, 100%, 48.5294117647%)" fill="hsl(60, 100%, 73.5294117647%)"/>
+            <rect x="547.1428571428571" y="35" width="402.8571428571429" height="25" class="treemapSectionHeader" stroke-width="0" fill="none"/>
             <clipPath id="clip-section-2"><rect width="390.8571428571429" height="25"/></clipPath>
-            <text x="553.1428571428571" y="47.5" class="treemapSectionLabel section-1" font-size="12px" dominant-baseline="middle" font-weight="bold" fill="#333">Category A</text>
-            <text x="940" y="47.5" class="treemapSectionValue section-1" dominant-baseline="middle" fill="#333" text-anchor="end" font-style="italic" font-size="10px">30</text>
+            <text x="553.1428571428571" y="47.5" class="treemapSectionLabel section-1" font-weight="bold" dominant-baseline="middle" fill="#333" font-size="12px">Category A</text>
+            <text x="940" y="47.5" class="treemapSectionValue section-1" text-anchor="end" fill="#333" dominant-baseline="middle" font-style="italic" font-size="10px">30</text>
           </g>
         </g>
         <g class="treemapLeaves">
           <g class="treemapNode treemapLeafGroup section-0">
-            <rect x="20" y="70" width="323.21428571428567" height="281" class="treemapLeaf section-0" fill-opacity="0.3" stroke="hsl(240, 100%, 76.2745098039%)" stroke-width="3" fill="hsl(240, 100%, 76.2745098039%)"/>
+            <rect x="20" y="70" width="323.21428571428567" height="281" class="treemapLeaf section-0" stroke-width="3" fill="hsl(240, 100%, 76.2745098039%)" fill-opacity="0.3" stroke="hsl(240, 100%, 76.2745098039%)"/>
             <clipPath id="clip-leaf-0"><rect x="22" y="72" width="319.21428571428567" height="277"/></clipPath>
-            <text x="28" y="110.3" class="treemapLabel section-0" clip-path="url(#clip-leaf-0)" dominant-baseline="auto" font-size="38px" text-anchor="start" fill="#ffffff">Item B2</text>
-            <text x="28" y="141.25" class="treemapValue section-0" fill="rgb(255, 255, 255)" clip-path="url(#clip-leaf-0)" font-size="23px" dominant-baseline="auto" text-anchor="start">25</text>
+            <text x="28" y="110.3" class="treemapLabel section-0" clip-path="url(#clip-leaf-0)" font-size="38px" fill="#ffffff" text-anchor="start" dominant-baseline="auto">Item B2</text>
+            <text x="28" y="141.25" class="treemapValue section-0" font-size="23px" fill="rgb(255, 255, 255)" dominant-baseline="auto" text-anchor="start" clip-path="url(#clip-leaf-0)">25</text>
           </g>
           <g class="treemapNode treemapLeafGroup section-0">
-            <rect x="343.21428571428567" y="70" width="193.92857142857144" height="281" class="treemapLeaf section-0" stroke-width="3" stroke="hsl(240, 100%, 76.2745098039%)" fill="hsl(240, 100%, 76.2745098039%)" fill-opacity="0.3"/>
+            <rect x="343.21428571428567" y="70" width="193.92857142857144" height="281" class="treemapLeaf section-0" fill-opacity="0.3" fill="hsl(240, 100%, 76.2745098039%)" stroke-width="3" stroke="hsl(240, 100%, 76.2745098039%)"/>
             <clipPath id="clip-leaf-1"><rect x="345.21428571428567" y="72" width="189.92857142857144" height="277"/></clipPath>
-            <text x="351.21428571428567" y="110.3" class="treemapLabel section-0" font-size="38px" fill="#ffffff" clip-path="url(#clip-leaf-1)" dominant-baseline="auto" text-anchor="start">Item B1</text>
-            <text x="351.21428571428567" y="141.25" class="treemapValue section-0" dominant-baseline="auto" font-size="23px" text-anchor="start" clip-path="url(#clip-leaf-1)" fill="rgb(255, 255, 255)">15</text>
+            <text x="351.21428571428567" y="110.3" class="treemapLabel section-0" clip-path="url(#clip-leaf-1)" text-anchor="start" fill="#ffffff" dominant-baseline="auto" font-size="38px">Item B1</text>
+            <text x="351.21428571428567" y="141.25" class="treemapValue section-0" clip-path="url(#clip-leaf-1)" font-size="23px" fill="rgb(255, 255, 255)" dominant-baseline="auto" text-anchor="start">15</text>
           </g>
           <g class="treemapNode treemapLeafGroup section-1">
-            <rect x="557.1428571428571" y="70" width="255.23809523809524" height="281" class="treemapLeaf section-1" fill="hsl(60, 100%, 73.5294117647%)" stroke="hsl(60, 100%, 73.5294117647%)" stroke-width="3" fill-opacity="0.3"/>
+            <rect x="557.1428571428571" y="70" width="255.23809523809524" height="281" class="treemapLeaf section-1" fill="hsl(60, 100%, 73.5294117647%)" fill-opacity="0.3" stroke="hsl(60, 100%, 73.5294117647%)" stroke-width="3"/>
             <clipPath id="clip-leaf-2"><rect x="559.1428571428571" y="72" width="251.23809523809524" height="277"/></clipPath>
-            <text x="565.1428571428571" y="110.3" class="treemapLabel section-1" dominant-baseline="auto" text-anchor="start" fill="#333" font-size="38px" clip-path="url(#clip-leaf-2)">Item A2</text>
+            <text x="565.1428571428571" y="110.3" class="treemapLabel section-1" fill="#333" font-size="38px" clip-path="url(#clip-leaf-2)" text-anchor="start" dominant-baseline="auto">Item A2</text>
             <text x="565.1428571428571" y="141.25" class="treemapValue section-1" fill="#333" text-anchor="start" font-size="23px" dominant-baseline="auto" clip-path="url(#clip-leaf-2)">20</text>
           </g>
           <g class="treemapNode treemapLeafGroup section-1">
-            <rect x="812.3809523809523" y="70" width="127.6190476190477" height="281" class="treemapLeaf section-1" stroke-width="3" fill="hsl(60, 100%, 73.5294117647%)" fill-opacity="0.3" stroke="hsl(60, 100%, 73.5294117647%)"/>
+            <rect x="812.3809523809523" y="70" width="127.6190476190477" height="281" class="treemapLeaf section-1" stroke-width="3" fill="hsl(60, 100%, 73.5294117647%)" stroke="hsl(60, 100%, 73.5294117647%)" fill-opacity="0.3"/>
             <clipPath id="clip-leaf-3"><rect x="814.3809523809523" y="72" width="123.6190476190477" height="277"/></clipPath>
-            <text x="820.3809523809523" y="98.85190999476715" class="treemapLabel section-1" clip-path="url(#clip-leaf-3)" text-anchor="start" dominant-baseline="auto" font-size="24.53165881737312px" fill="#333">Item A1</text>
-            <text x="820.3809523809523" y="118.83230053154868" class="treemapValue section-1" text-anchor="start" clip-path="url(#clip-leaf-3)" font-size="14.84810928419952px" fill="#333" dominant-baseline="auto">10</text>
+            <text x="820.3809523809523" y="98.85190999476715" class="treemapLabel section-1" fill="#333" dominant-baseline="auto" clip-path="url(#clip-leaf-3)" text-anchor="start" font-size="24.53165881737312px">Item A1</text>
+            <text x="820.3809523809523" y="118.83230053154868" class="treemapValue section-1" fill="#333" clip-path="url(#clip-leaf-3)" text-anchor="start" dominant-baseline="auto" font-size="14.84810928419952px">10</text>
           </g>
         </g>
       </g>
