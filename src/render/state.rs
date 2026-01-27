@@ -203,8 +203,8 @@ fn compute_level_layout(
             // Apply width expansion to match mermaid's getBBox() behavior.
             // Mermaid measures the full rendered cluster including internal padding and margins.
             // Leaf composites need more expansion for visual padding balance.
-            // Non-leaf composites need moderate expansion since they inherit child sizes.
-            let expansion_factor = if is_leaf_composite { 1.6 } else { 1.25 };
+            // Non-leaf composites also need significant expansion to match mermaid's wider sizing.
+            let expansion_factor = if is_leaf_composite { 1.6 } else { 1.4 };
             let original_width = inner_layout.width;
             let expanded_width = original_width * expansion_factor;
             let width_offset = (expanded_width - original_width) / 2.0;
@@ -229,12 +229,15 @@ fn compute_level_layout(
     }
 
     // Now create layout graph for this level
+    // Mermaid's state nodes use 10px font (g.stateGroup text) and 24px height.
+    // We use 16px font for better readability, but reduce min dimensions to
+    // get closer to mermaid's overall sizing.
     let config = NodeSizeConfig {
-        font_size: 16.0,
-        padding_horizontal: 8.0,
-        padding_vertical: 8.0,
-        min_width: 40.0,
-        min_height: 26.0,
+        font_size: 16.0,         // Keep readable font size
+        padding_horizontal: 6.0, // Reduced from 8.0 to tighten horizontal spacing
+        padding_vertical: 6.0,   // Reduced from 8.0 to get closer to mermaid's 24px height
+        min_width: 35.0,         // Reduced from 40.0 to allow narrower nodes
+        min_height: 24.0,        // Match mermaid's node height
         max_width: Some(200.0),
     };
 
@@ -479,13 +482,15 @@ impl ToLayoutGraph for StateDb {
     fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph> {
         use std::collections::HashSet;
 
-        // State-specific config: mermaid uses 16px font-size for node labels
+        // Mermaid's state nodes use 10px font (g.stateGroup text) and 24px height.
+        // We use 16px font for better readability, but reduce min dimensions to
+        // get closer to mermaid's overall sizing.
         let config = NodeSizeConfig {
-            font_size: 16.0, // Matches mermaid base font-size
-            padding_horizontal: 8.0,
-            padding_vertical: 8.0,
-            min_width: 40.0,
-            min_height: 26.0,
+            font_size: 16.0,         // Keep readable font size
+            padding_horizontal: 6.0, // Reduced from 8.0 to tighten horizontal spacing
+            padding_vertical: 6.0,   // Reduced from 8.0 to get closer to mermaid's 24px height
+            min_width: 35.0,         // Reduced from 40.0 to allow narrower nodes
+            min_height: 24.0,        // Match mermaid's node height
             max_width: Some(200.0),
         };
         let mut graph = LayoutGraph::new("state");
