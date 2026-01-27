@@ -89,19 +89,6 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
         doc.add_style(&generate_gantt_css(&config.theme));
     }
 
-    // Render title
-    if !db.title.is_empty() {
-        let title_elem = SvgElement::Text {
-            x: total_width / 2.0,
-            y: TITLE_TOP_MARGIN,
-            content: db.title.clone(),
-            attrs: Attrs::new()
-                .with_attr("text-anchor", "middle")
-                .with_class("titleText"),
-        };
-        doc.add_element(title_elem);
-    }
-
     // Collect tasks grouped by section for rendering
     let sections = collect_sections(&tasks);
 
@@ -152,6 +139,19 @@ pub fn render_gantt(db: &mut GanttDb, config: &RenderConfig) -> Result<String> {
         chart_width,
         total_height,
     );
+
+    // Render title LAST (like mermaid.js does) so it appears on top of everything
+    if !db.title.is_empty() {
+        let title_elem = SvgElement::Text {
+            x: total_width / 2.0,
+            y: TITLE_TOP_MARGIN,
+            content: db.title.clone(),
+            attrs: Attrs::new()
+                .with_attr("text-anchor", "middle")
+                .with_class("titleText"),
+        };
+        doc.add_element(title_elem);
+    }
 
     Ok(doc.to_string())
 }
@@ -208,6 +208,8 @@ fn render_section_backgrounds(
 }
 
 /// Render task bars and labels
+/// Note: This function emits all task bar rects FIRST, then all text labels AFTER.
+/// This ensures correct SVG z-order (text appears on top of shapes).
 #[allow(clippy::too_many_arguments)]
 fn render_task_bars(
     doc: &mut SvgDocument,
@@ -224,6 +226,11 @@ fn render_task_bars(
 
     // Calculate pixels per day (time scale)
     let px_per_day = chart_width / days_range;
+
+    // Collect all rect elements first
+    let mut rect_elements: Vec<SvgElement> = Vec::new();
+    // Collect all text elements second (will be emitted after rects for correct z-order)
+    let mut text_elements: Vec<SvgElement> = Vec::new();
 
     for (task_idx, task) in tasks.iter().enumerate() {
         let Some(start) = task.start_time else {
@@ -297,7 +304,7 @@ fn render_task_bars(
                 .with_attr("id", &task.id)
                 .with_attr("transform-origin", &transform_origin),
         };
-        doc.add_element(bar_elem);
+        rect_elements.push(bar_elem);
 
         // Handle text positioning differently for vert markers
         if task.flags.vert {
@@ -312,7 +319,7 @@ fn render_task_bars(
                     .with_attr("font-size", &format!("{}", FONT_SIZE as i32))
                     .with_attr("id", &format!("{}-text", task.id)),
             };
-            doc.add_element(task_label);
+            text_elements.push(task_label);
         } else {
             // Standard task text positioning
             // Estimate text width (approx 0.5 * fontSize per character for typical fonts)
@@ -352,8 +359,18 @@ fn render_task_bars(
                     .with_attr("font-size", &format!("{}", FONT_SIZE as i32))
                     .with_attr("id", &format!("{}-text", task.id)),
             };
-            doc.add_element(task_label);
+            text_elements.push(task_label);
         }
+    }
+
+    // Emit all rect elements first (shapes behind text)
+    for elem in rect_elements {
+        doc.add_element(elem);
+    }
+
+    // Emit all text elements second (text on top of shapes)
+    for elem in text_elements {
+        doc.add_element(elem);
     }
 }
 
@@ -543,27 +560,30 @@ fn render_grid_and_axis(
         let day_offset = (*date - start_date).num_days() as f64;
         let x = day_offset * px_per_day + 0.5;
 
-        // Vertical grid line
-        grid_children.push(SvgElement::Line {
-            x1: x,
+        // Create tick group children (line + text) - positions are relative to tick group transform
+        let mut tick_children = Vec::new();
+
+        // Vertical grid line - x is 0 since group is already translated
+        tick_children.push(SvgElement::Line {
+            x1: 0.0,
             y1: 0.0,
-            x2: x,
+            x2: 0.0,
             y2: -grid_height,
             attrs: Attrs::new().with_attr("stroke", "currentColor"),
         });
 
         // Tick label - rotate if labels would overlap
+        // x is 0 since group is already translated; rotation point is relative
         let label = format!("{:04}-{:02}-{:02}", date.year(), date.month(), date.day());
         let label_attrs = if should_rotate {
-            // Rotate -45 degrees around the label position
-            // Use text-anchor: end so text extends up-left from the anchor point
+            // Rotate -45 degrees around (0, 3) relative to tick group
             Attrs::new()
                 .with_attr("fill", "#000")
                 .with_attr("dy", "0.5em")
                 .with_attr("stroke", "none")
                 .with_attr("font-size", "10")
                 .with_attr("style", "text-anchor: end;")
-                .with_attr("transform", &format!("rotate(-45 {} 3)", x))
+                .with_attr("transform", "rotate(-45 0 3)")
         } else {
             Attrs::new()
                 .with_attr("fill", "#000")
@@ -572,11 +592,20 @@ fn render_grid_and_axis(
                 .with_attr("font-size", "10")
                 .with_attr("style", "text-anchor: middle;")
         };
-        grid_children.push(SvgElement::Text {
-            x,
+        tick_children.push(SvgElement::Text {
+            x: 0.0,
             y: 3.0,
             content: label,
             attrs: label_attrs,
+        });
+
+        // Wrap in tick group (like mermaid/D3) - group is translated to the tick position
+        grid_children.push(SvgElement::Group {
+            children: tick_children,
+            attrs: Attrs::new()
+                .with_class("tick")
+                .with_attr("opacity", "1")
+                .with_attr("transform", &format!("translate({},0)", x)),
         });
     }
 
