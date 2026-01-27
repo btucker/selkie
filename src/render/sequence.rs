@@ -239,9 +239,13 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             current_y,
                             label,
                         );
-                        // Add fragment labels to edge_labels for proper z-order
-                        for element in label_elements {
-                            doc.add_edge_label(element);
+                        // Add shapes to clusters (renders first) for proper z-order
+                        for shape in label_elements.shapes {
+                            doc.add_cluster(shape);
+                        }
+                        // Add text labels to edge_labels (renders after shapes)
+                        for label in label_elements.labels {
+                            doc.add_edge_label(label);
                         }
                     }
                     current_y += message_spacing;
@@ -280,9 +284,13 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             fragment.start_y,
                             &fragment.label,
                         );
-                        // Add fragment labels to edge_labels for proper z-order
-                        for element in label_elements {
-                            doc.add_edge_label(element);
+                        // Add shapes to clusters (renders first) for proper z-order
+                        for shape in label_elements.shapes {
+                            doc.add_cluster(shape);
+                        }
+                        // Add text labels to edge_labels (renders after shapes)
+                        for label in label_elements.labels {
+                            doc.add_edge_label(label);
                         }
                     }
                     // Don't advance current_y after fragment end - content already positioned
@@ -493,6 +501,13 @@ struct FragmentState {
 /// Message elements separated into shapes (lines/paths) and labels (text)
 /// This enables proper SVG z-order: shapes render before labels
 struct MessageElements {
+    shapes: Vec<SvgElement>,
+    labels: Vec<SvgElement>,
+}
+
+/// Fragment label elements separated into shapes (polygons) and labels (text)
+/// This enables proper SVG z-order: shapes in clusters, labels in edge_labels
+struct FragmentLabelElements {
     shapes: Vec<SvgElement>,
     labels: Vec<SvgElement>,
 }
@@ -875,8 +890,9 @@ fn render_fragment_label(
     width: f64,
     y: f64,
     text: &str,
-) -> Vec<SvgElement> {
-    let mut elements = Vec::new();
+) -> FragmentLabelElements {
+    let mut shapes = Vec::new();
+    let mut labels = Vec::new();
     let label_height = 20.0;
     let label_y = y;
 
@@ -917,11 +933,13 @@ fn render_fragment_label(
             },
         ];
 
-        elements.push(SvgElement::Polygon {
+        // Polygon is a shape - goes to clusters for proper z-order
+        shapes.push(SvgElement::Polygon {
             points,
             attrs: Attrs::new().with_class("labelBox"),
         });
-        elements.push(SvgElement::Text {
+        // Text is a label - goes to edge_labels
+        labels.push(SvgElement::Text {
             x: label_x + label_width / 2.0,
             y: label_y + 13.0,
             content: prefix.to_string(),
@@ -940,7 +958,7 @@ fn render_fragment_label(
             } else {
                 format!("[{}]", condition_text)
             };
-            elements.push(SvgElement::Text {
+            labels.push(SvgElement::Text {
                 x: x + width / 2.0,
                 y: label_y + label_height - 2.0,
                 content: wrapped,
@@ -952,7 +970,7 @@ fn render_fragment_label(
         }
     }
 
-    elements
+    FragmentLabelElements { shapes, labels }
 }
 
 fn fragment_prefix(kind: FragmentKind) -> &'static str {

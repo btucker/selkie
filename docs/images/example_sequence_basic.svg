@@ -217,17 +217,17 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="edgePaths">
       <line x1="75" y1="109" x2="295" y2="109" class="message-line" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <line x1="295" y1="153" x2="515" y2="153" class="message-line" stroke-dasharray="3,3" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
-      <line x1="295" y1="197" x2="75" y2="197" class="message-line" marker-end="url(#arrow-cross)" stroke-width="1.5" stroke-dasharray="3,3"/>
-      <line x1="295" y1="241" x2="515" y2="241" class="message-line" marker-end="url(#arrow-cross)" stroke-width="1.5"/>
-      <line x1="295" y1="334" x2="75" y2="334" class="message-line" stroke-width="1.5" stroke-dasharray="3,3"/>
+      <line x1="295" y1="153" x2="515" y2="153" class="message-line" marker-end="url(#arrow-filled)" stroke-width="1.5" stroke-dasharray="3,3"/>
+      <line x1="295" y1="197" x2="75" y2="197" class="message-line" stroke-dasharray="3,3" stroke-width="1.5" marker-end="url(#arrow-cross)"/>
+      <line x1="295" y1="241" x2="515" y2="241" class="message-line" stroke-width="1.5" marker-end="url(#arrow-cross)"/>
+      <line x1="295" y1="334" x2="75" y2="334" class="message-line" stroke-dasharray="3,3" stroke-width="1.5"/>
       <line x1="75" y1="378" x2="515" y2="378" class="message-line" stroke-width="1.5"/>
     </g>
     <g class="edgeLabels">
-      <text x="185" y="99" class="message-label" text-anchor="middle" font-size="16">Hello Bob, how are you?</text>
-      <text x="405" y="143" class="message-label" font-size="16" text-anchor="middle">How about you John?</text>
-      <text x="185" y="187" class="message-label" font-size="16" text-anchor="middle">I am good thanks!</text>
-      <text x="405" y="231" class="message-label" font-size="16" text-anchor="middle">I am good thanks!</text>
+      <text x="185" y="99" class="message-label" font-size="16" text-anchor="middle">Hello Bob, how are you?</text>
+      <text x="405" y="143" class="message-label" text-anchor="middle" font-size="16">How about you John?</text>
+      <text x="185" y="187" class="message-label" text-anchor="middle" font-size="16">I am good thanks!</text>
+      <text x="405" y="231" class="message-label" text-anchor="middle" font-size="16">I am good thanks!</text>
       <text x="185" y="324" class="message-label" font-size="16" text-anchor="middle">Checking with John...</text>
       <text x="295" y="368" class="message-label" text-anchor="middle" font-size="16">Yes... John, how are you?</text>
     </g>
@@ -236,33 +236,33 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="actor">
       <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="75" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Alice</text>
+      <text x="75" y="32.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Alice</text>
     </g>
     <g class="actor">
-      <rect x="220" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="295" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Bob</text>
+      <rect x="220" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
+      <text x="295" y="32.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Bob</text>
     </g>
     <g class="actor">
-      <rect x="440" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <rect x="440" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
       <text x="515" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">John</text>
     </g>
     <g class="note">
-      <rect x="540" y="251" width="150" height="96" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="615" y="256" class="noteText" alignment-baseline="middle" font-size="16" text-anchor="middle" dominant-baseline="middle" dy="1em">Bob thinks a long</text>
-      <text x="615" y="275" class="noteText" dominant-baseline="middle" alignment-baseline="middle" font-size="16" dy="1em" text-anchor="middle">long time, so long</text>
-      <text x="615" y="294" class="noteText" text-anchor="middle" dominant-baseline="middle" font-size="16" dy="1em" alignment-baseline="middle">that the text does</text>
-      <text x="615" y="313" class="noteText" dominant-baseline="middle" font-size="16" text-anchor="middle" alignment-baseline="middle" dy="1em">not fit on a row.</text>
+      <rect x="540" y="251" width="150" height="96" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="615" y="256" class="noteText" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle" font-size="16" dy="1em">Bob thinks a long</text>
+      <text x="615" y="275" class="noteText" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em" font-size="16">long time, so long</text>
+      <text x="615" y="294" class="noteText" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" font-size="16" dy="1em">that the text does</text>
+      <text x="615" y="313" class="noteText" text-anchor="middle" dy="1em" alignment-baseline="middle" dominant-baseline="middle" font-size="16">not fit on a row.</text>
     </g>
     <g class="actor">
-      <rect x="0" y="398" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="75" y="430.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Alice</text>
+      <rect x="0" y="398" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
+      <text x="75" y="430.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Alice</text>
     </g>
     <g class="actor">
-      <rect x="220" y="398" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <rect x="220" y="398" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
       <text x="295" y="430.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Bob</text>
     </g>
     <g class="actor">
-      <rect x="440" y="398" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <rect x="440" y="398" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
       <text x="515" y="430.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">John</text>
     </g>
   </g>
