@@ -79,7 +79,9 @@ pub fn render_radar(db: &RadarDb, config: &RenderConfig) -> Result<String> {
     // Create main group centered on chart
     let mut main_group_children: Vec<SvgElement> = Vec::new();
 
-    // Draw graticule (background grid)
+    // PHASE 1: Draw all shapes first (for correct z-order)
+
+    // Draw graticule (background grid) - shapes
     draw_graticule(
         &mut main_group_children,
         axes.len(),
@@ -88,10 +90,10 @@ pub fn render_radar(db: &RadarDb, config: &RenderConfig) -> Result<String> {
         &options.graticule,
     );
 
-    // Draw axes
-    draw_axes(&mut main_group_children, axes, radius, config);
+    // Draw axis lines - shapes
+    draw_axis_lines(&mut main_group_children, axes, radius);
 
-    // Draw curves
+    // Draw curves (paths/polygons) - shapes
     draw_curves(
         &mut main_group_children,
         axes,
@@ -102,12 +104,22 @@ pub fn render_radar(db: &RadarDb, config: &RenderConfig) -> Result<String> {
         radius,
     );
 
-    // Draw legend if enabled
+    // Draw legend boxes if enabled - shapes
     if options.show_legend {
-        draw_legend(&mut main_group_children, curves, chart_width, chart_height);
+        draw_legend_boxes(&mut main_group_children, curves, chart_width, chart_height);
     }
 
-    // Draw title
+    // PHASE 2: Draw all text after shapes (text appears on top)
+
+    // Draw axis labels - text
+    draw_axis_labels(&mut main_group_children, axes, radius, config);
+
+    // Draw legend labels if enabled - text
+    if options.show_legend {
+        draw_legend_labels(&mut main_group_children, curves, chart_width, chart_height);
+    }
+
+    // Draw title last - text
     if !title.is_empty() {
         let title_elem = SvgElement::Text {
             x: 0.0,
@@ -193,16 +205,15 @@ fn draw_graticule(
     }
 }
 
-/// Draw the radar axes
-fn draw_axes(
+/// Draw the radar axes (lines only - shapes)
+fn draw_axis_lines(
     children: &mut Vec<SvgElement>,
     axes: &[crate::diagrams::radar::RadarAxis],
     radius: f64,
-    config: &RenderConfig,
 ) {
     let num_axes = axes.len();
 
-    for (i, axis) in axes.iter().enumerate() {
+    for (i, _axis) in axes.iter().enumerate() {
         let angle = (2.0 * PI * i as f64) / num_axes as f64 - PI / 2.0;
 
         // Draw axis line
@@ -217,6 +228,20 @@ fn draw_axes(
                 .with_class("radarAxisLine"),
         };
         children.push(line);
+    }
+}
+
+/// Draw the radar axis labels (text only)
+fn draw_axis_labels(
+    children: &mut Vec<SvgElement>,
+    axes: &[crate::diagrams::radar::RadarAxis],
+    radius: f64,
+    config: &RenderConfig,
+) {
+    let num_axes = axes.len();
+
+    for (i, axis) in axes.iter().enumerate() {
+        let angle = (2.0 * PI * i as f64) / num_axes as f64 - PI / 2.0;
 
         // Draw axis label
         let label_x = radius * AXIS_LABEL_FACTOR * angle.cos();
@@ -347,8 +372,8 @@ fn closed_round_curve(points: &[(f64, f64)], tension: f64) -> String {
     d
 }
 
-/// Draw the legend
-fn draw_legend(
+/// Draw legend boxes (shapes only)
+fn draw_legend_boxes(
     children: &mut Vec<SvgElement>,
     curves: &[crate::diagrams::radar::RadarCurve],
     chart_width: f64,
@@ -358,7 +383,7 @@ fn draw_legend(
     let legend_y = -(chart_height / 2.0 + MARGIN_TOP) * 3.0 / 4.0;
     let line_height = 20.0;
 
-    for (index, curve) in curves.iter().enumerate() {
+    for (index, _curve) in curves.iter().enumerate() {
         let item_y = legend_y + (index as f64) * line_height;
         let color = RADAR_COLORS[index % RADAR_COLORS.len()];
 
@@ -375,6 +400,22 @@ fn draw_legend(
                 .with_class(&format!("radarLegendBox-{}", index)),
         };
         children.push(box_elem);
+    }
+}
+
+/// Draw legend labels (text only)
+fn draw_legend_labels(
+    children: &mut Vec<SvgElement>,
+    curves: &[crate::diagrams::radar::RadarCurve],
+    chart_width: f64,
+    chart_height: f64,
+) {
+    let legend_x = (chart_width / 2.0 + MARGIN_RIGHT) * 3.0 / 4.0;
+    let legend_y = -(chart_height / 2.0 + MARGIN_TOP) * 3.0 / 4.0;
+    let line_height = 20.0;
+
+    for (index, curve) in curves.iter().enumerate() {
+        let item_y = legend_y + (index as f64) * line_height;
 
         // Label text
         let text_elem = SvgElement::Text {
