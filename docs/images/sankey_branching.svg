@@ -119,26 +119,26 @@ marker path {
 
     </g>
     <g class="nodes">
-      <g class="node" id="node-1" transform="translate(0,0)" x="0" y="0">
-        <rect x="0" y="0" width="10" height="250" class="sankey-node" style="fill: #4e79a7"/>
+      <g class="node" transform="translate(0,0)" x="0" id="node-1" y="0">
+        <rect x="0" y="0" width="10" height="250" fill="#4e79a7"/>
       </g>
-      <g class="node" id="node-6" x="0" y="275" transform="translate(0,275)">
-        <rect x="0" y="0" width="10" height="125" class="sankey-node" style="fill: #edc949"/>
+      <g class="node" id="node-6" transform="translate(0,275)" y="275" x="0">
+        <rect x="0" y="0" width="10" height="125" fill="#edc949"/>
       </g>
-      <g class="node" transform="translate(147.5,38.54166666666666)" y="38.54166666666666" id="node-2" x="147.5">
-        <rect x="0" y="0" width="10" height="249.99999999999997" class="sankey-node" style="fill: #f28e2c"/>
+      <g class="node" transform="translate(147.5,38.54166666666666)" x="147.5" id="node-2" y="38.54166666666666">
+        <rect x="0" y="0" width="10" height="249.99999999999997" fill="#f28e2c"/>
       </g>
-      <g class="node" transform="translate(295,14.583333333333314)" x="295" id="node-3" y="14.583333333333314">
-        <rect x="0" y="0" width="10" height="375" class="sankey-node" style="fill: #e15759"/>
+      <g class="node" x="295" transform="translate(295,14.583333333333314)" y="14.583333333333314" id="node-3">
+        <rect x="0" y="0" width="10" height="375" fill="#e15759"/>
       </g>
-      <g class="node" id="node-4" transform="translate(442.5,31.25)" x="442.5" y="31.25">
-        <rect x="0" y="0" width="10" height="250" class="sankey-node" style="fill: #76b7b2"/>
+      <g class="node" transform="translate(442.5,31.25)" y="31.25" x="442.5" id="node-4">
+        <rect x="0" y="0" width="10" height="250" fill="#76b7b2"/>
       </g>
-      <g class="node" y="0" id="node-5" x="590" transform="translate(590,0)">
-        <rect x="0" y="0" width="10" height="250" class="sankey-node" style="fill: #59a14f"/>
+      <g class="node" x="590" transform="translate(590,0)" id="node-5" y="0">
+        <rect x="0" y="0" width="10" height="250" fill="#59a14f"/>
       </g>
-      <g class="node" y="275" id="node-7" transform="translate(590,275)" x="590">
-        <rect x="0" y="0" width="10" height="125" class="sankey-node" style="fill: #af7aa1"/>
+      <g class="node" y="275" transform="translate(590,275)" x="590" id="node-7">
+        <rect x="0" y="0" width="10" height="125" fill="#af7aa1"/>
       </g>
     </g>
     <g class="node-labels" font-size="14">
