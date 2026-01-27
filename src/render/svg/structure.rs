@@ -1679,6 +1679,16 @@ fn analyze_colors(doc: &roxmltree::Document) -> ColorAnalysis {
         "rect", "circle", "ellipse", "polygon", "path", "line", "polyline",
     ];
 
+    // First, extract colors from CSS <style> elements
+    // This ensures we capture colors applied via CSS rules like .node rect { fill: #ECECFF }
+    for node in doc.descendants() {
+        if node.tag_name().name() == "style" {
+            if let Some(css_text) = node.text() {
+                extract_css_colors(css_text, &mut fill_colors, &mut stroke_colors);
+            }
+        }
+    }
+
     for node in doc.descendants() {
         let tag = node.tag_name().name();
 
@@ -1742,6 +1752,60 @@ fn analyze_colors(doc: &roxmltree::Document) -> ColorAnalysis {
         fill_count,
         stroke_count,
         text_visibility_issues,
+    }
+}
+
+/// Extract fill and stroke colors from CSS text
+fn extract_css_colors(
+    css_text: &str,
+    fill_colors: &mut std::collections::HashSet<String>,
+    stroke_colors: &mut std::collections::HashSet<String>,
+) {
+    // Parse CSS rules to extract fill and stroke colors
+    // Format: selector { property: value; ... }
+    for rule in css_text.split('}') {
+        let rule = rule.trim();
+        if rule.is_empty() {
+            continue;
+        }
+
+        if let Some(brace_pos) = rule.find('{') {
+            let properties = rule[brace_pos + 1..].trim();
+
+            for prop in properties.split(';') {
+                let prop = prop.trim();
+                if prop.is_empty() {
+                    continue;
+                }
+
+                if let Some(colon_pos) = prop.find(':') {
+                    let name = prop[..colon_pos].trim().to_lowercase();
+                    let value = prop[colon_pos + 1..].trim();
+
+                    // Skip values like "none", "inherit", "transparent", CSS variables, rgba
+                    if value == "none"
+                        || value == "inherit"
+                        || value == "transparent"
+                        || value.starts_with("var(")
+                        || value.starts_with("url(")
+                    {
+                        continue;
+                    }
+
+                    // Extract color value (handle "!important" suffix)
+                    let color_value = value.split('!').next().unwrap_or(value).trim();
+                    if color_value.is_empty() {
+                        continue;
+                    }
+
+                    if name == "fill" {
+                        fill_colors.insert(normalize_color(color_value));
+                    } else if name == "stroke" {
+                        stroke_colors.insert(normalize_color(color_value));
+                    }
+                }
+            }
+        }
     }
 }
 
