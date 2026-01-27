@@ -190,7 +190,9 @@ fn compute_layout(db: &SankeyDb, width: f64, height: f64) -> (Vec<LayoutNode>, V
 
         for node_id in col_nodes {
             let value = node_values.get(node_id).copied().unwrap_or(0.0);
-            let node_height = (value * ky).max(1.0);
+            // Match d3-sankey: no minimum height for nodes
+            // When many nodes exist, heights may become 0 due to space constraints
+            let node_height = value * ky;
 
             node_y_positions.insert(node_id.clone(), current_y);
             node_heights.insert(node_id.clone(), node_height);
@@ -584,6 +586,11 @@ fn render_links(links: &[LayoutLink], config: &RenderConfig) -> SvgElement {
 }
 
 /// Render all nodes
+///
+/// Following mermaid.js/d3-sankey reference: node rects are rendered with height
+/// based on the calculated layout (y1 - y0). For simple diagrams this creates
+/// visible node bars; for complex diagrams with many nodes, heights may be
+/// smaller or even zero due to scaling constraints.
 fn render_nodes(nodes: &[LayoutNode], config: &RenderConfig) -> SvgElement {
     let mut children = Vec::new();
     let colors = &config.theme.sankey_node_colors;
@@ -592,19 +599,16 @@ fn render_nodes(nodes: &[LayoutNode], config: &RenderConfig) -> SvgElement {
         let color = &colors[node.index % colors.len()];
 
         // Rect uses local coordinates (0,0) since group has the transform
-        // Use inline style for fill color instead of presentation attribute
-        // because CSS rules like ".node rect { fill: #ECECFF }" override
-        // presentation attributes but not inline styles
+        // Height comes from layout calculation (matching d3-sankey behavior)
         let rect = SvgElement::Rect {
             x: 0.0,
             y: 0.0,
             width: node.x1 - node.x0,
-            height: node.y1 - node.y0,
+            height: node.y1 - node.y0, // Use calculated height from layout
             rx: None,
             ry: None,
-            attrs: Attrs::new().with_class("sankey-node"),
-        }
-        .with_style(&format!("fill: {}", color));
+            attrs: Attrs::new().with_fill(color),
+        };
 
         // Group has transform for positioning, x/y are data attributes for tests
         let node_group = SvgElement::Group {
@@ -834,33 +838,18 @@ mod tests {
     }
 
     #[test]
-    fn test_node_colors_use_inline_style() {
-        // Node colors must use inline style (style="fill: #color") instead of
-        // presentation attributes (fill="#color") because CSS rules like
-        // ".node rect { fill: #ECECFF }" override presentation attributes but
-        // not inline styles. This ensures sankey node colors are visible.
+    fn test_node_rects_have_fill_color() {
+        // Matching mermaid.js/d3-sankey reference: node rects use fill attribute
         let mut db = SankeyDb::new();
         db.add_link("A", "B", 10.0);
 
         let config = RenderConfig::default();
         let result = render_sankey(&db, &config).unwrap();
 
-        // Sankey nodes should use inline style for fill, not presentation attribute
-        // The default theme colors start with #4e79a7 and #f28e2c
+        // Nodes should have fill color (presentation attribute, matching reference)
         assert!(
-            result.contains(r#"style="fill: #"#),
-            "Sankey nodes should use inline style for fill color. Got: {}",
-            result
-        );
-
-        // Should NOT have presentation attribute fill on rect inside node
-        // (which would be overridden by CSS .node rect rules)
-        // Check that we don't have patterns like: <rect ... fill="#4e79a7" ... class="sankey-node">
-        let has_presentation_fill =
-            result.contains("fill=\"#4e79a7\"") || result.contains("fill=\"#f28e2c\"");
-        assert!(
-            !has_presentation_fill,
-            "Sankey nodes should NOT use presentation attribute fill (gets overridden by CSS)"
+            result.contains("fill=\"#4e79a7\"") || result.contains("fill=\"#f28e2c\""),
+            "Sankey nodes should have fill color"
         );
     }
 }

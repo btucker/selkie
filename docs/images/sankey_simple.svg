@@ -114,11 +114,11 @@ marker path {
 
     </g>
     <g class="nodes">
-      <g class="node" y="0" transform="translate(0,0)" x="0" id="node-1">
-        <rect x="0" y="0" width="10" height="400" class="sankey-node" style="fill: #4e79a7"/>
+      <g class="node" x="0" id="node-1" transform="translate(0,0)" y="0">
+        <rect x="0" y="0" width="10" height="400" fill="#4e79a7"/>
       </g>
-      <g class="node" transform="translate(590,0)" id="node-2" x="590" y="0">
-        <rect x="0" y="0" width="10" height="400" class="sankey-node" style="fill: #f28e2c"/>
+      <g class="node" x="590" transform="translate(590,0)" id="node-2" y="0">
+        <rect x="0" y="0" width="10" height="400" fill="#f28e2c"/>
       </g>
     </g>
     <g class="node-labels" font-size="14">
@@ -127,9 +127,9 @@ marker path {
       <text x="584" y="200" dy="0em" text-anchor="end">targetNode
 10</text>
     </g>
-    <g class="links" stroke-opacity="0.5" fill="none">
+    <g class="links" fill="none" stroke-opacity="0.5">
       <g class="link" style="mix-blend-mode: multiply">
-        <path d="M10,200 C300,200 300,200 590,200" stroke="url(#linearGradient-1)" stroke-width="400"/>
+        <path d="M10,200 C300,200 300,200 590,200" stroke-width="400" stroke="url(#linearGradient-1)"/>
       </g>
     </g>
   </g>
