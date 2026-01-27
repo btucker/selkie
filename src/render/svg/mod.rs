@@ -179,7 +179,7 @@ impl SvgRenderer {
         doc.add_node(services);
 
         let groups = render_architecture_groups(db, graph);
-        doc.add_node(groups);
+        doc.add_cluster(groups);
 
         Ok(doc.to_string())
     }
