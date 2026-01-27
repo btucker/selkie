@@ -236,7 +236,20 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
             .with_class("quadrant-border quadrant-border-horizontal"),
     });
 
-    // Render quadrant labels (part of quadrants group in reference)
+    // Render data point circles FIRST (shapes before text for correct z-order)
+    // This only renders the circles, not the labels
+    render_point_circles(
+        &mut doc,
+        db,
+        config,
+        chart_left,
+        chart_top,
+        chart_width,
+        chart_height,
+    );
+
+    // Now render ALL text elements (after all shapes)
+    // 1. Quadrant labels
     render_quadrant_labels(
         &mut doc,
         db,
@@ -248,8 +261,8 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         has_points,
     );
 
-    // Render data points (before axis labels per mermaid.js reference)
-    render_points(
+    // 2. Point labels
+    render_point_labels(
         &mut doc,
         db,
         config,
@@ -259,7 +272,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         chart_height,
     );
 
-    // Render axis labels (after data points per mermaid.js reference)
+    // 3. Axis labels
     render_axis_labels(
         &mut doc,
         db,
@@ -271,7 +284,7 @@ pub fn render_quadrant(db: &QuadrantDb, config: &RenderConfig) -> Result<String>
         has_points,
     );
 
-    // Render title last (matching mermaid.js reference - title appears on top)
+    // 4. Title last (matching mermaid.js reference - title appears on top)
     if !db.title.is_empty() {
         // Title y position matches mermaid.js: titlePadding (10)
         let title_y = TITLE_PADDING;
@@ -528,8 +541,9 @@ fn render_axis_labels(
     }
 }
 
-/// Render data points
-fn render_points(
+/// Render data point circles only (shapes)
+/// Called early in the render process so circles appear behind text.
+fn render_point_circles(
     doc: &mut SvgDocument,
     db: &QuadrantDb,
     config: &RenderConfig,
@@ -572,6 +586,24 @@ fn render_points(
             r: radius,
             attrs: point_attrs,
         });
+    }
+}
+
+/// Render data point labels only (text)
+/// Called after all shapes so text appears on top.
+fn render_point_labels(
+    doc: &mut SvgDocument,
+    db: &QuadrantDb,
+    config: &RenderConfig,
+    chart_left: f64,
+    chart_top: f64,
+    chart_width: f64,
+    chart_height: f64,
+) {
+    for point in db.get_points() {
+        // Convert normalized coordinates (0-1) to pixel coordinates
+        let px = chart_left + point.x * chart_width;
+        let py = chart_top + (1.0 - point.y) * chart_height;
 
         // Render point label (below the point per mermaid.js reference)
         if !point.text.is_empty() {
