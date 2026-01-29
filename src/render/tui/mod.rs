@@ -1,9 +1,10 @@
 //! TUI (Text User Interface) renderer for diagrams.
 //!
 //! Produces character-art output using box-drawing characters for node shapes
-//! and (in future) braille dots for edge routing. Pipe-friendly, works in
-//! every terminal.
+//! and braille dots for edge routing. Pipe-friendly, works in every terminal.
 
+pub mod canvas;
+pub mod edges;
 pub mod scale;
 pub mod shapes;
 
@@ -17,7 +18,8 @@ use shapes::render_shape;
 /// Render a flowchart as character art.
 ///
 /// Takes the parsed diagram DB and a positioned layout graph (after dagre),
-/// and produces a String of character art with nodes at their correct positions.
+/// and produces a String of character art with nodes at their correct positions
+/// and edges rendered as braille lines with arrow tips.
 pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<String> {
     let scale = CellScale::default();
 
@@ -32,6 +34,8 @@ pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<Str
 
     // Create a canvas (2D grid of characters)
     let mut canvas: Vec<Vec<char>> = vec![vec![' '; canvas_cols]; canvas_rows];
+    // Track which cells are occupied by nodes (for edge compositing)
+    let mut occupied: Vec<Vec<bool>> = vec![vec![false; canvas_cols]; canvas_rows];
 
     // Render each node
     for node in &graph.nodes {
@@ -75,10 +79,23 @@ pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<Str
                 }
                 if ch != ' ' {
                     canvas[canvas_row][canvas_col] = ch;
+                    occupied[canvas_row][canvas_col] = true;
                 }
             }
         }
     }
+
+    // Render edges (braille lines + arrows + labels)
+    edges::render_edges(
+        graph,
+        &scale,
+        canvas_cols,
+        canvas_rows,
+        offset_x,
+        offset_y,
+        &occupied,
+        &mut canvas,
+    );
 
     // Convert canvas to string, trimming trailing empty lines
     let mut result = String::new();
@@ -154,5 +171,34 @@ mod tests {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[X]");
         let output = render_flowchart_tui(&db, &graph).unwrap();
         assert!(!output.trim().is_empty(), "Output should not be empty");
+    }
+
+    #[test]
+    fn edges_produce_braille_chars() {
+        let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] --> B[End]");
+        let output = render_flowchart_tui(&db, &graph).unwrap();
+        // Edge should produce at least some braille characters or arrow tips
+        let has_braille = output
+            .chars()
+            .any(|c| ('\u{2800}'..='\u{28FF}').contains(&c));
+        let has_arrow = output.contains('▼') || output.contains('▶');
+        assert!(
+            has_braille || has_arrow,
+            "Edge should produce braille dots or arrows"
+        );
+    }
+
+    #[test]
+    fn edge_labels_render() {
+        let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] -->|Yes| B[End]");
+        let output = render_flowchart_tui(&db, &graph).unwrap();
+        assert!(output.contains("Yes"), "Edge label 'Yes' should appear");
+    }
+
+    #[test]
+    fn down_arrow_in_td_flow() {
+        let (db, graph) = parse_and_layout("flowchart TD\n    A[Top] --> B[Bottom]");
+        let output = render_flowchart_tui(&db, &graph).unwrap();
+        assert!(output.contains('▼'), "TD flow should have down arrow ▼");
     }
 }
