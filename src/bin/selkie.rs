@@ -186,6 +186,10 @@ struct EvalArgs {
     /// Useful in CI where Playwright/Chromium may not be available.
     #[arg(long)]
     use_repo_svgs: bool,
+
+    /// Evaluate TUI output instead of SVG (only flowchart diagrams)
+    #[arg(long)]
+    tui: bool,
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
@@ -527,6 +531,11 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
+    // Handle --tui: run TUI-specific evaluation
+    if args.tui {
+        return run_eval_tui(args);
+    }
+
     // Build evaluation config
     // Enable visual comparison when png feature is available
     #[cfg(feature = "png")]
@@ -712,6 +721,185 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     // Exit with error code if there are failures
     if result.issue_counts.errors > 0 {
+        process::exit(1);
+    }
+
+    Ok(())
+}
+
+/// Run TUI-specific evaluation: parse → layout → render TUI → parse TUI → check
+#[cfg(feature = "eval")]
+fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use selkie::diagrams::Diagram;
+    use selkie::eval::tui_checks;
+    use selkie::layout::{CharacterSizeEstimator, ToLayoutGraph};
+
+    // Get diagrams to evaluate (reuse same loading logic)
+    let inputs: Vec<DiagramInput> = match &args.target {
+        None => {
+            eprintln!("Using gallery samples (docs/sources/ + embedded)...");
+            samples::all_samples_owned()
+                .into_iter()
+                .map(DiagramInput::from)
+                .collect()
+        }
+        Some(target) => {
+            let path = PathBuf::from(target);
+            if path.is_dir() {
+                load_directory(&path)?
+            } else {
+                let content = fs::read_to_string(&path)
+                    .map_err(|e| format!("Failed to read {}: {}", target, e))?;
+                vec![DiagramInput {
+                    name: path
+                        .file_stem()
+                        .map(|s| s.to_string_lossy().to_string())
+                        .unwrap_or_else(|| "diagram".to_string()),
+                    source: Some(target.clone()),
+                    diagram_type: None,
+                    text: content,
+                }]
+            }
+        }
+    };
+
+    // Filter to flowchart-only (TUI renderer only supports flowcharts)
+    let flowcharts: Vec<_> = inputs
+        .iter()
+        .filter(|i| {
+            if let Some(ref filter) = args.diagram_type {
+                i.diagram_type.as_deref() == Some(filter.as_str())
+            } else {
+                // Default to flowchart only
+                i.diagram_type.as_deref() == Some("flowchart")
+                    || i.text.to_lowercase().starts_with("flowchart")
+                    || i.text.to_lowercase().starts_with("graph ")
+            }
+        })
+        .collect();
+
+    if flowcharts.is_empty() {
+        return Err("No flowchart diagrams to evaluate (TUI only supports flowcharts)".into());
+    }
+
+    eprintln!("Evaluating {} flowcharts in TUI mode...", flowcharts.len());
+
+    let estimator = CharacterSizeEstimator::default();
+    let mut total_issues = 0;
+    let mut total_errors = 0;
+    let mut total_diagrams = 0;
+    let mut total_similarity = 0.0;
+
+    for (i, input) in flowcharts.iter().enumerate() {
+        eprint!(
+            "\rEvaluating {}/{}: {}...",
+            i + 1,
+            flowcharts.len(),
+            input.name
+        );
+
+        total_diagrams += 1;
+
+        // Parse
+        let parsed = match selkie::parse(&input.text) {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!(" PARSE ERROR: {}", e);
+                total_errors += 1;
+                continue;
+            }
+        };
+
+        // Get FlowchartDb
+        let db = match parsed {
+            Diagram::Flowchart(ref db) => db,
+            _ => {
+                eprintln!(" SKIP: not a flowchart");
+                continue;
+            }
+        };
+
+        // Layout
+        let graph = match db.to_layout_graph(&estimator) {
+            Ok(g) => match selkie::layout::layout(g) {
+                Ok(g) => g,
+                Err(e) => {
+                    eprintln!(" LAYOUT ERROR: {}", e);
+                    total_errors += 1;
+                    continue;
+                }
+            },
+            Err(e) => {
+                eprintln!(" LAYOUT ERROR: {}", e);
+                total_errors += 1;
+                continue;
+            }
+        };
+
+        // Render TUI
+        let tui_output = match tui_render::render_flowchart_tui(db, &graph) {
+            Ok(output) => output,
+            Err(e) => {
+                eprintln!(" RENDER ERROR: {}", e);
+                total_errors += 1;
+                continue;
+            }
+        };
+
+        // Parse TUI output
+        let tui_struct = tui_checks::parse_tui(&tui_output);
+
+        // Run checks
+        let issues = tui_checks::check_tui_structure(&tui_struct, &graph);
+        let similarity = tui_checks::calculate_tui_similarity(&tui_struct, &graph);
+        total_similarity += similarity;
+
+        let error_count = issues
+            .iter()
+            .filter(|i| i.level == eval::Level::Error)
+            .count();
+        let warning_count = issues
+            .iter()
+            .filter(|i| i.level == eval::Level::Warning)
+            .count();
+        total_issues += issues.len();
+        total_errors += error_count;
+
+        if args.verbose && !issues.is_empty() {
+            eprintln!();
+            eprintln!(
+                "  {} ({} errors, {} warnings, similarity: {:.1}%):",
+                input.name,
+                error_count,
+                warning_count,
+                similarity * 100.0
+            );
+            for issue in &issues {
+                let level = match issue.level {
+                    eval::Level::Error => "ERROR",
+                    eval::Level::Warning => "WARN",
+                    eval::Level::Info => "INFO",
+                };
+                eprintln!("    [{}] {}: {}", level, issue.check, issue.message);
+            }
+        }
+    }
+    eprintln!();
+
+    // Summary
+    let avg_similarity = if total_diagrams > 0 {
+        total_similarity / total_diagrams as f64
+    } else {
+        0.0
+    };
+
+    eprintln!("TUI Evaluation Summary");
+    eprintln!("======================");
+    eprintln!("Diagrams:   {}", total_diagrams);
+    eprintln!("Issues:     {} ({} errors)", total_issues, total_errors);
+    eprintln!("Similarity: {:.1}% avg", avg_similarity * 100.0);
+
+    if total_errors > 0 {
         process::exit(1);
     }
 
