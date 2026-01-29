@@ -1132,10 +1132,7 @@ fn render_note(
 
     // Note text - render each line as a separate text element (like mermaid.js)
     // Use dy="1em" pattern matching mermaid.js text positioning
-    let normalized = message
-        .replace("<br />", "\n")
-        .replace("<br/>", "\n")
-        .replace("<br>", "\n");
+    let normalized = super::text_utils::normalize_br_tags(message);
     for (idx, line) in normalized.lines().enumerate() {
         // Mermaid.js positions text at top with dy="1em" offset
         let text_y = top_y + 5.0 + (idx as f64 * line_height);
@@ -1160,10 +1157,7 @@ fn render_note(
 }
 
 fn count_text_lines(message: &str) -> usize {
-    let normalized = message
-        .replace("<br />", "\n")
-        .replace("<br/>", "\n")
-        .replace("<br>", "\n");
+    let normalized = super::text_utils::normalize_br_tags(message);
     normalized.lines().count().max(1)
 }
 
