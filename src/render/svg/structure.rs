@@ -451,7 +451,7 @@ fn extract_labels(doc: &roxmltree::Document) -> Vec<String> {
 }
 
 /// Recursively collect all text content from a node and its descendants
-/// Adds spaces between tspan elements to ensure proper word boundaries
+/// Adds spaces between tspan elements and around <br> tags to ensure proper word boundaries
 fn collect_text_content(node: &roxmltree::Node) -> String {
     let mut result = String::new();
 
@@ -2091,6 +2091,38 @@ mod tests {
                 .labels
                 .contains(&"Line one Line two Line three".to_string()),
             "Should combine all tspans into single label. Got: {:?}",
+            structure.labels
+        );
+    }
+
+    #[test]
+    fn test_extract_labels_p_with_br_collects_full_text() {
+        // Mermaid.js mindmap uses foreignObject with <p> containing <br/> for line breaks
+        // The eval should extract the full text, not just the first text child
+        let mermaid_mindmap_svg = r#"<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 100">
+            <g class="node">
+                <foreignObject width="120" height="48">
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <span class="nodeLabel"><p>On effectiveness<br/>and features</p></span>
+                    </div>
+                </foreignObject>
+            </g>
+        </svg>"#;
+
+        let structure = SvgStructure::from_svg(mermaid_mindmap_svg).unwrap();
+
+        // Should extract "On effectiveness and features" as a single label
+        assert!(
+            structure
+                .labels
+                .contains(&"On effectiveness and features".to_string()),
+            "Should extract full text from <p> with <br/> tags. Got: {:?}",
+            structure.labels
+        );
+        // Should NOT have partial text
+        assert!(
+            !structure.labels.iter().any(|l| l == "On effectiveness"),
+            "Should not extract partial text before <br/>. Got: {:?}",
             structure.labels
         );
     }
