@@ -1416,9 +1416,8 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     let view_y = bounds_y - margin - title_offset;
     doc.set_size_with_origin(view_x, view_y, max_width, max_height);
 
-    // Add theme styles
+    // Add state-specific theme styles (no base flowchart CSS - state has its own complete styles)
     if config.embed_css {
-        doc.add_style(&config.theme.generate_css());
         doc.add_style(&generate_state_css(&config.theme));
     }
 
@@ -2339,10 +2338,33 @@ fn render_end_state_bullseye(
 }
 
 fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
+    // Compute stateLabelColor = invert(primaryColor), matching mermaid's theme-default.js:
+    //   this.stateLabelColor = this.stateLabelColor || this.stateBkg || this.primaryTextColor;
+    //   this.primaryTextColor = invert(this.primaryColor);
+    // For the default theme (#ECECFF), invert gives #131300
+    let state_label_color = crate::render::svg::color::Color::parse(&theme.primary_color)
+        .map(|c| crate::render::svg::color::invert(&c).to_hex())
+        .unwrap_or_else(|| theme.primary_text_color.clone());
+
     format!(
         r#"
-.state-title {{
+.statediagram {{
+  font-family: {font_family};
+  font-size: {font_size};
   fill: {text_color};
+}}
+
+.error-icon {{
+  fill: #552222;
+}}
+
+.error-text {{
+  fill: #552222;
+  stroke: #552222;
+}}
+
+.state-title {{
+  fill: {state_label_color};
 }}
 
 .state-box {{
@@ -2351,11 +2373,11 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .state-label {{
-  fill: {text_color};
+  fill: {state_label_color};
 }}
 
 .state-description {{
-  fill: #666666;
+  fill: {text_color};
 }}
 
 .state-start {{
@@ -2405,11 +2427,11 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
 
 .note-box {{
   fill: {note_bkg_color};
-  stroke: {line_color};
+  stroke: {note_border_color};
 }}
 
 .note-text {{
-  fill: {text_color};
+  fill: {note_text_color};
 }}
 
 .state-composite-outer {{
@@ -2424,7 +2446,7 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
 }}
 
 .state-composite-inner-alt {{
-  fill: #f0f0f0;
+  fill: #e0e0e0;
   stroke: none;
 }}
 
@@ -2439,6 +2461,8 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
   fill: none;
 }}
 "#,
+        font_family = theme.font_family,
+        font_size = theme.font_size,
         text_color = theme.primary_text_color,
         primary_color = theme.primary_color,
         primary_border_color = theme.primary_border_color,
@@ -2446,6 +2470,9 @@ fn generate_state_css(theme: &crate::render::svg::Theme) -> String {
         background = theme.background,
         edge_label_background = theme.edge_label_background,
         note_bkg_color = theme.note_bkg_color,
+        note_border_color = theme.note_border_color,
+        note_text_color = theme.note_text_color,
+        state_label_color = state_label_color,
     )
 }
 
@@ -3072,7 +3099,7 @@ Cancelled --> [*]
     #[test]
     fn test_nested_composite_has_alternate_background() {
         // Nested composite states (like Executing inside Processing) should have
-        // gray alternate background (#f0f0f0) instead of white
+        // gray alternate background (#e0e0e0) to match mermaid reference .alt-composit class
         let input = r#"stateDiagram-v2
     state Processing {
         [*] --> Validating
@@ -3093,10 +3120,77 @@ Cancelled --> [*]
             "Nested composite state should use alternate inner class"
         );
 
-        // Verify the CSS includes the alternate background color
+        // Verify the CSS includes the alternate background color (#e0e0e0 matches mermaid .alt-composit)
         assert!(
-            svg.contains("#f0f0f0"),
-            "CSS should include alternate background color #f0f0f0"
+            svg.contains("#e0e0e0"),
+            "CSS should include alternate background color #e0e0e0 (mermaid .alt-composit)"
+        );
+    }
+
+    #[test]
+    fn test_state_fill_colors_match_mermaid_reference() {
+        // Verify that the state diagram CSS uses the correct fill colors
+        // matching the mermaid.js reference implementation.
+        // See reference-implementations/mermaid/packages/mermaid/src/diagrams/state/styles.js
+        let input = r#"stateDiagram-v2
+    [*] --> Idle
+    Idle --> Running : start
+    Running --> Idle : stop
+    Running --> Error : error
+    Error --> Idle : reset
+    Error --> [*]
+"#;
+        let db = parse(input).expect("Should parse");
+        let config = crate::render::RenderConfig::default();
+        let svg = render_state(&db, &config).expect("Should render");
+
+        // note_bkg_color should be #fff5ad (mermaid default), not #FFFFCC
+        assert!(
+            svg.contains("#fff5ad"),
+            "Note background should be #fff5ad (mermaid default theme)"
+        );
+        assert!(
+            !svg.contains("#FFFFCC") && !svg.contains("#ffffcc"),
+            "Should not contain old note background #FFFFCC"
+        );
+
+        // Composite inner should use literal 'white', not '#ffffff'
+        assert!(
+            svg.contains("fill: white"),
+            "Composite inner fill should use literal 'white'"
+        );
+
+        // State title should use #131300 (invert of primaryColor #ECECFF)
+        assert!(
+            svg.contains("#131300"),
+            "State title color should be #131300 (stateLabelColor = invert(primaryColor))"
+        );
+
+        // Note text should use 'black' (mermaid: actorTextColor)
+        assert!(
+            svg.contains("fill: black"),
+            "Note text fill should be 'black'"
+        );
+
+        // Alt-composite should use #e0e0e0 (mermaid .alt-composit hardcoded)
+        assert!(
+            svg.contains("#e0e0e0"),
+            "Alt-composite background should be #e0e0e0"
+        );
+
+        // Error styles should use #552222 (mermaid error-icon/error-text)
+        assert!(svg.contains("#552222"), "Error styles should use #552222");
+
+        // Should NOT contain #666666 (wrong description color)
+        assert!(
+            !svg.contains("#666666"),
+            "Should not use #666666 for state description"
+        );
+
+        // Should NOT contain #ffffde (secondary_color, not used in state diagrams)
+        assert!(
+            !svg.contains("#ffffde"),
+            "Should not contain secondary_color #ffffde in state diagram CSS"
         );
     }
 
