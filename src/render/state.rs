@@ -200,13 +200,15 @@ fn compute_level_layout(
                 .keys()
                 .any(|child_id| level_layouts.contains_key(child_id));
 
-            // Apply width expansion to match mermaid's getBBox() behavior.
-            // Mermaid measures the full rendered cluster including internal padding and margins.
-            // Leaf composites need more expansion for visual padding balance.
-            // Non-leaf composites also need significant expansion to match mermaid's wider sizing.
-            let expansion_factor = if is_leaf_composite { 1.6 } else { 1.4 };
+            // Apply additive width expansion to approximate mermaid's getBBox() behavior.
+            // Mermaid measures rendered SVG clusters using getBBox() which includes font
+            // metrics we can't perfectly replicate. Using additive padding instead of
+            // multiplicative avoids compounding with deeply nested composites.
+            // Leaf composites need more padding since they have fewer children to
+            // establish minimum width.
+            let extra_padding = if is_leaf_composite { 50.0 } else { 20.0 };
             let original_width = inner_layout.width;
-            let expanded_width = original_width * expansion_factor;
+            let expanded_width = original_width + extra_padding;
             let width_offset = (expanded_width - original_width) / 2.0;
 
             // Shift all positions to center content within expanded width
@@ -1651,8 +1653,8 @@ fn render_composite_state(
     let height = max_y - min_y;
 
     // Use the expanded width from level_layouts instead of the computed bounds.
-    // This applies the expansion that was calculated during layout (both for leaf
-    // composites at 1.5x and non-leaf composites at 1.35x).
+    // This applies the additive expansion calculated during layout to approximate
+    // mermaid's getBBox()-based cluster sizing.
     let width = if let Some(layout) = level_layouts.get(composite_id) {
         // The expanded layout width plus padding (which we've already subtracted from bounds)
         let expanded_total = layout.width + 2.0 * padding;
@@ -3494,6 +3496,103 @@ Cancelled --> [*]
             "Running node width ({:.1}px) should be at most 80px for compact layout. \
              Excess width shifts all nodes and edges horizontally.",
             running_node.width
+        );
+    }
+
+    #[test]
+    fn test_complex2_composite_widths_not_too_wide() {
+        // state_complex2: reference Idle=700px, Processing=600px
+        // Previously Idle=1186px (70% too wide), Processing=830px (38% too wide)
+        // The expansion factors compound with nesting, making deeply nested
+        // composites much wider than mermaid's reference.
+        let input = r#"stateDiagram-v2
+[*] --> Idle
+
+state Idle {
+    [*] --> Ready
+    Ready --> Processing: Start Job
+}
+
+state Processing {
+    [*] --> Validating
+    Validating --> Queued: Valid
+    Validating --> Failed: Invalid
+    Queued --> Running: Worker Available
+    Running --> Completed: Success
+    Running --> Failed: Error
+    Running --> Paused: Pause Request
+
+    state Running {
+        [*] --> Initializing
+        Initializing --> Executing
+        Executing --> Finalizing
+        Finalizing --> [*]
+    }
+}
+
+state Paused {
+    [*] --> WaitingResume
+    WaitingResume --> Timeout: 1 hour
+}
+
+Paused --> Running: Resume
+Paused --> Cancelled: Cancel Request
+Timeout --> Cancelled
+
+Completed --> Idle: Reset
+Failed --> Idle: Retry
+Cancelled --> Idle: Reset
+
+Completed --> [*]
+Cancelled --> [*]
+"#;
+        let db = parse(input).expect("Should parse");
+        let config = crate::render::RenderConfig::default();
+        let svg = render_state(&db, &config).expect("Should render");
+
+        // Extract composite widths
+        let idle_re =
+            regex::Regex::new(r#"id="composite-Idle"[^>]*>\s*<rect[^>]*width="([^"]+)""#).unwrap();
+        let processing_re =
+            regex::Regex::new(r#"id="composite-Processing"[^>]*>\s*<rect[^>]*width="([^"]+)""#)
+                .unwrap();
+
+        let idle_width: f64 = idle_re
+            .captures(&svg)
+            .expect("Should find Idle composite rect")[1]
+            .parse()
+            .unwrap();
+        let processing_width: f64 = processing_re
+            .captures(&svg)
+            .expect("Should find Processing composite rect")[1]
+            .parse()
+            .unwrap();
+
+        eprintln!(
+            "Complex2 composite widths: Idle={:.1}, Processing={:.1}",
+            idle_width, processing_width
+        );
+
+        // Reference: Idle=700px, Processing=600px
+        // Allow up to 25% wider (font size differs: we use 16px, mermaid uses 10px)
+        let idle_max = 700.0 * 1.25; // 875px
+        let processing_max = 600.0 * 1.25; // 750px
+
+        assert!(
+            idle_width <= idle_max,
+            "Idle composite width ({:.1}px) should be at most {:.1}px \
+             (within 25% of mermaid reference 700px). \
+             Expansion factors are compounding too aggressively with nesting.",
+            idle_width,
+            idle_max
+        );
+        assert!(
+            processing_width <= processing_max,
+            "Processing composite width ({:.1}px) should be at most {:.1}px \
+             (within 25% of mermaid reference 600px). \
+             Expansion factors are compounding too aggressively with nesting.",
+            processing_width,
+            processing_max
         );
     }
 }
