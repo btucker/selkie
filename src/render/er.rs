@@ -1855,7 +1855,7 @@ mod tests {
 "#;
         let db = parse(input).unwrap();
         let config = RenderConfig::default();
-        let svg = render_er(&db, &config).unwrap();
+        let _svg = render_er(&db, &config).unwrap();
 
         // The relationship label background should NOT use white/background color.
         // It should use the tertiary color (light yellow-green for default theme).
