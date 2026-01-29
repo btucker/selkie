@@ -2414,16 +2414,51 @@ fn test_sequence_loop_scopes_to_single_actor() {
     let svg = render_with_config(&diagram, &RenderConfig::default())
         .expect("Failed to render sequence diagram");
 
+    // Fragment frames use line elements (not rects) matching mermaid.js.
+    // Find the horizontal top line of the loop frame (first loopLine) and compute its width.
     let loop_width = svg
-        .split("<rect")
-        .find_map(|chunk| {
-            if !chunk.contains("class=\"loopLine\"") {
+        .split("<line")
+        .filter_map(|chunk| {
+            if !chunk.contains("loopLine") {
                 return None;
             }
-            let width = chunk.split("width=\"").nth(1)?.split('"').next()?;
-            width.parse::<f64>().ok()
+            let x1 = chunk
+                .split("x1=\"")
+                .nth(1)?
+                .split('"')
+                .next()?
+                .parse::<f64>()
+                .ok()?;
+            let x2 = chunk
+                .split("x2=\"")
+                .nth(1)?
+                .split('"')
+                .next()?
+                .parse::<f64>()
+                .ok()?;
+            let y1 = chunk
+                .split("y1=\"")
+                .nth(1)?
+                .split('"')
+                .next()?
+                .parse::<f64>()
+                .ok()?;
+            let y2 = chunk
+                .split("y2=\"")
+                .nth(1)?
+                .split('"')
+                .next()?
+                .parse::<f64>()
+                .ok()?;
+            // Horizontal line (y1 == y2) indicates top or bottom of frame
+            if (y1 - y2).abs() < 0.1 {
+                Some((x2 - x1).abs())
+            } else {
+                None
+            }
         })
-        .expect("Failed to parse loop frame width");
+        .next()
+        .expect("Failed to find loop frame horizontal line");
 
     assert!(
         loop_width < 300.0,

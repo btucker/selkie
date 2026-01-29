@@ -26,9 +26,9 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let actors = db.get_actors_in_order();
     let messages = db.get_messages();
 
-    // Calculate dynamic actor spacing based on message text widths (mermaid.js style)
-    // Mermaid adjusts spacing to accommodate long message text
-    let actor_spacing = calculate_actor_spacing(
+    // Calculate per-gap actor spacing based on message text widths (mermaid.js style)
+    // Each pair of adjacent actors can have different spacing
+    let gap_spacings = calculate_per_gap_spacing(
         &actors,
         messages,
         base_actor_spacing,
@@ -57,9 +57,8 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         return Ok(doc.to_string());
     }
 
-    // Calculate dimensions (mimicking mermaid.js layout)
-    // mermaid.js uses negative viewBox offset for visual padding
-    let content_width = (actors.len() as f64 - 1.0) * actor_spacing + actor_width;
+    // Calculate content width from per-gap spacings
+    let content_width: f64 = gap_spacings.iter().sum::<f64>() + actor_width;
     // Height will be set later after we know the actual content height
 
     // Add theme styles
@@ -106,22 +105,29 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let actor_y = padding_y + title_offset;
     let lifeline_start_y = actor_y + actor_height;
 
-    // Create actor position map
+    // Create actor position map using cumulative per-gap spacing
     let mut actor_positions: std::collections::HashMap<String, f64> =
         std::collections::HashMap::new();
     let mut actor_centers: Vec<f64> = Vec::with_capacity(actors.len());
     let mut actor_index: std::collections::HashMap<String, usize> =
         std::collections::HashMap::new();
+    // Precompute cumulative x offsets for each actor
+    let mut actor_x_offsets: Vec<f64> = Vec::with_capacity(actors.len());
+    let mut cumulative_x = padding_x;
     for (i, actor) in actors.iter().enumerate() {
-        let center_x = padding_x + (i as f64) * actor_spacing + actor_width / 2.0;
+        actor_x_offsets.push(cumulative_x);
+        let center_x = cumulative_x + actor_width / 2.0;
         actor_positions.insert(actor.name.clone(), center_x);
         actor_centers.push(center_x);
         actor_index.insert(actor.name.clone(), i);
+        if i < gap_spacings.len() {
+            cumulative_x += gap_spacings[i];
+        }
     }
 
     // Render top actors only (bottom actors rendered after we know the final height)
     for (i, actor) in actors.iter().enumerate() {
-        let x = padding_x + (i as f64) * actor_spacing;
+        let x = actor_x_offsets[i];
         let center_x = x + actor_width / 2.0;
 
         // Top actor box/stick figure
@@ -402,7 +408,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
 
     // Render lifelines and bottom actors now that we know the final height
     for (i, actor) in actors.iter().enumerate() {
-        let x = padding_x + (i as f64) * actor_spacing;
+        let x = actor_x_offsets[i];
         let center_x = x + actor_width / 2.0;
 
         // Lifeline (mermaid.js style) - rendered in clusters layer (back)
@@ -739,15 +745,26 @@ fn render_message(
     }
 
     // Message line (shape - rendered first in edge_paths)
+    // Use messageLine0 (solid) or messageLine1 (dotted) classes matching mermaid.js
+    let line_class = if is_dotted {
+        "messageLine1"
+    } else {
+        "messageLine0"
+    };
     let mut line_attrs = Attrs::new()
-        .with_stroke_width(1.5) // Match mermaid.js default
-        .with_class("message-line");
+        .with_stroke_width(2.0) // Match mermaid.js default (stroke-width: 2)
+        .with_class(line_class)
+        .with_attr("stroke", "none") // Stroke comes from CSS class
+        .with_attr(
+            "style",
+            if is_dotted {
+                "stroke-dasharray: 3, 3; fill: none;"
+            } else {
+                "fill: none;"
+            },
+        );
     if let Some(marker_id) = marker_id {
         line_attrs = line_attrs.with_attr("marker-end", &format!("url(#{})", marker_id));
-    }
-
-    if is_dotted {
-        line_attrs = line_attrs.with_stroke_dasharray("3,3");
     }
 
     shapes.push(SvgElement::Line {
@@ -758,17 +775,20 @@ fn render_message(
         attrs: line_attrs,
     });
 
-    // Sequence number circle and text - always at the sender's position (from_x)
+    // Sequence number using zero-length line with marker-start (matching mermaid.js)
     if let Some(num) = sequence_num {
-        // Circle background (shape - rendered first)
-        shapes.push(SvgElement::Circle {
-            cx: from_x,
-            cy: y,
-            r: 11.0, // Slightly larger for better visibility
-            attrs: Attrs::new().with_class("sequenceNumber-circle"),
+        // Zero-length line that triggers the sequencenumber marker
+        shapes.push(SvgElement::Line {
+            x1: from_x,
+            y1: y,
+            x2: from_x,
+            y2: y,
+            attrs: Attrs::new()
+                .with_stroke_width(0.0)
+                .with_attr("marker-start", "url(#sequencenumber)"),
         });
 
-        // Number text (label - rendered after shapes in edge_labels)
+        // Number text label (rendered on top in edge_labels)
         labels.push(SvgElement::Text {
             x: from_x,
             y: y + 4.0,
@@ -813,6 +833,8 @@ fn render_activation(actor_x: f64, start_y: f64, end_y: f64) -> SvgElement {
     }
 }
 
+/// Render a fragment frame as 4 individual lines (top/right/bottom/left) matching mermaid.js.
+/// Returns a group containing the 4 border lines (and optionally a fill rect for rect fragments).
 fn render_fragment_frame(
     x: f64,
     width: f64,
@@ -820,21 +842,58 @@ fn render_fragment_frame(
     end_y: f64,
     fill: Option<&str>,
 ) -> SvgElement {
-    let height = (end_y - start_y).max(1.0);
-    let mut attrs = Attrs::new().with_class("loopLine");
+    let right = x + width;
+    let mut children = Vec::new();
+
+    // If fill color specified (rect fragments), add a background rect
     if let Some(color) = fill {
-        attrs = attrs.with_fill(color);
-    } else {
-        attrs = attrs.with_fill("none");
+        children.push(SvgElement::Rect {
+            x,
+            y: start_y,
+            width,
+            height: (end_y - start_y).max(1.0),
+            rx: None,
+            ry: None,
+            attrs: Attrs::new().with_fill(color).with_stroke("none"),
+        });
     }
-    SvgElement::Rect {
-        x,
-        y: start_y,
-        width,
-        height,
-        rx: Some(3.0),
-        ry: Some(3.0),
-        attrs,
+
+    // Top line
+    children.push(SvgElement::Line {
+        x1: x,
+        y1: start_y,
+        x2: right,
+        y2: start_y,
+        attrs: Attrs::new().with_class("loopLine"),
+    });
+    // Right line
+    children.push(SvgElement::Line {
+        x1: right,
+        y1: start_y,
+        x2: right,
+        y2: end_y,
+        attrs: Attrs::new().with_class("loopLine"),
+    });
+    // Bottom line
+    children.push(SvgElement::Line {
+        x1: x,
+        y1: end_y,
+        x2: right,
+        y2: end_y,
+        attrs: Attrs::new().with_class("loopLine"),
+    });
+    // Left line
+    children.push(SvgElement::Line {
+        x1: x,
+        y1: start_y,
+        x2: x,
+        y2: end_y,
+        attrs: Attrs::new().with_class("loopLine"),
+    });
+
+    SvgElement::Group {
+        children,
+        attrs: Attrs::new(),
     }
 }
 
@@ -1030,17 +1089,18 @@ fn render_self_message(
         attrs: path_attrs,
     });
 
-    // Sequence number circle and text - at the actor's position
+    // Sequence number using zero-length line with marker-start (matching mermaid.js)
     if let Some(num) = sequence_num {
-        // Circle background (shape - rendered first)
-        shapes.push(SvgElement::Circle {
-            cx: x,
-            cy: y,
-            r: 11.0, // Match regular message size
-            attrs: Attrs::new().with_class("sequenceNumber-circle"),
+        shapes.push(SvgElement::Line {
+            x1: x,
+            y1: y,
+            x2: x,
+            y2: y,
+            attrs: Attrs::new()
+                .with_stroke_width(0.0)
+                .with_attr("marker-start", "url(#sequencenumber)"),
         });
 
-        // Number text (label - rendered after shapes in edge_labels)
         labels.push(SvgElement::Text {
             x,
             y: y + 4.0,
@@ -1379,9 +1439,10 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
     )
 }
 
-/// Calculate dynamic actor spacing based on message text widths
-/// Mimics mermaid.js getMaxMessageWidthPerActor and calculateActorMargins logic
-fn calculate_actor_spacing(
+/// Calculate per-gap actor spacing based on message text widths.
+/// Returns a Vec of spacing values, one for each gap between adjacent actors.
+/// This matches mermaid.js behavior where each actor pair can have different spacing.
+fn calculate_per_gap_spacing(
     actors: &[&crate::diagrams::sequence::Actor],
     messages: &[crate::diagrams::sequence::Message],
     base_spacing: f64,
@@ -1389,7 +1450,13 @@ fn calculate_actor_spacing(
     char_width: f64,
     wrap_padding: f64,
     actor_margin: f64,
-) -> f64 {
+) -> Vec<f64> {
+    let num_gaps = if actors.len() > 1 {
+        actors.len() - 1
+    } else {
+        return vec![];
+    };
+
     // Build actor name to index mapping
     let actor_index: std::collections::HashMap<&str, usize> = actors
         .iter()
@@ -1397,11 +1464,10 @@ fn calculate_actor_spacing(
         .map(|(i, a)| (a.name.as_str(), i))
         .collect();
 
-    // Calculate max message width per actor (between adjacent actors)
-    let mut max_width_per_actor: Vec<f64> = vec![0.0; actors.len()];
+    // Track max required width per gap (between adjacent actors i and i+1)
+    let mut max_width_per_gap: Vec<f64> = vec![0.0; num_gaps];
 
     for msg in messages {
-        // Get from and to indices (handling Option<String>)
         let from_idx = msg
             .from
             .as_ref()
@@ -1413,26 +1479,27 @@ fn calculate_actor_spacing(
 
         if let (Some(from), Some(to)) = (from_idx, to_idx) {
             if from != to {
-                // Calculate message text width
                 let text_width =
                     msg.message.chars().count() as f64 * char_width + 2.0 * wrap_padding;
 
-                // Determine which actor to assign the width to (the one with the smaller index)
                 let min_idx = std::cmp::min(from, to);
-                let current_max: f64 = max_width_per_actor[min_idx];
-                max_width_per_actor[min_idx] = current_max.max(text_width);
+
+                // Assign the full text width to the first gap between sender/receiver.
+                max_width_per_gap[min_idx] = max_width_per_gap[min_idx].max(text_width);
             }
         }
     }
 
-    // Calculate required spacing: max of base_spacing or (message_width + actor_margin - actor_width/2)
-    let mut max_required_spacing = base_spacing;
-    for width in max_width_per_actor {
-        if width > 0.0 {
-            let required = width + actor_margin - actor_width / 2.0;
-            max_required_spacing = max_required_spacing.max(required);
-        }
-    }
-
-    max_required_spacing
+    // Convert text widths to spacing values
+    max_width_per_gap
+        .iter()
+        .map(|&width| {
+            if width > 0.0 {
+                let required = width + actor_margin - actor_width / 2.0;
+                base_spacing.max(required)
+            } else {
+                base_spacing
+            }
+        })
+        .collect()
 }
