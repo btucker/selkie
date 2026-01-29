@@ -434,15 +434,14 @@ fn extract_labels(doc: &roxmltree::Document) -> Vec<String> {
             }
         }
         // For tspan directly under text, handled above
-        // For p/span (mermaid.js foreignObject HTML), get direct text content
+        // For p/span (mermaid.js foreignObject HTML), collect ALL text content
+        // including text after <br> elements, matching how we handle <text> with tspans
         else if tag == "p" || tag == "span" {
-            // Only get direct text, not combined content, to avoid duplicates
-            if let Some(text) = node.text() {
-                let text = text.trim();
-                if !text.is_empty() && !seen.contains(text) {
-                    seen.insert(text.to_string());
-                    labels.push(text.to_string());
-                }
+            let combined = collect_text_content(&node);
+            let combined: String = combined.split_whitespace().collect::<Vec<_>>().join(" ");
+            if !combined.is_empty() && !seen.contains(&combined) {
+                seen.insert(combined.clone());
+                labels.push(combined);
             }
         }
     }
@@ -461,14 +460,16 @@ fn collect_text_content(node: &roxmltree::Node) -> String {
             if let Some(text) = child.text() {
                 result.push_str(text);
             }
-        } else if child.tag_name().name() == "tspan" {
-            // Add a space before tspan content if result doesn't already end with space
-            // This ensures proper word boundaries when tspans are concatenated
-            if !result.is_empty() && !result.ends_with(' ') && !result.ends_with('\n') {
+        } else {
+            let tag = child.tag_name().name();
+            // <br>, <tspan>, and other block-like elements act as word boundaries
+            if !result.is_empty()
+                && !result.ends_with(' ')
+                && !result.ends_with('\n')
+                && (tag == "tspan" || tag == "br")
+            {
                 result.push(' ');
             }
-            result.push_str(&collect_text_content(&child));
-        } else {
             result.push_str(&collect_text_content(&child));
         }
     }
@@ -576,6 +577,11 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
 
         // Use inline if present, otherwise CSS, otherwise check if has stroke
         let stroke_width = inline_stroke_width.or(css_stroke_width);
+
+        // Skip elements with stroke explicitly set to "none"
+        if node.attribute("stroke") == Some("none") {
+            continue;
+        }
 
         // Only count if element has a visible stroke
         let has_stroke = node
@@ -2438,5 +2444,42 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn test_extract_labels_from_foreignobject_with_br() {
+        // Mermaid.js uses foreignObject with <p> and <br> for multi-line text.
+        // The label extractor must collect ALL text content from <p> elements,
+        // not just the first text node before a <br/>.
+        let mermaid_html_svg = r#"<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 200">
+            <g class="node">
+                <foreignObject width="200" height="100">
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <span class="nodeLabel"><p>Inner / circle<br/>and some odd <br/>special characters</p></span>
+                    </div>
+                </foreignObject>
+            </g>
+        </svg>"#;
+
+        let structure = SvgStructure::from_svg(mermaid_html_svg).unwrap();
+
+        // Should extract the full multi-line text, not just "Inner / circle"
+        let has_full_text = structure
+            .labels
+            .iter()
+            .any(|l| l.contains("Inner / circle") && l.contains("special characters"));
+        assert!(
+            has_full_text,
+            "Should extract full text from <p> with <br/> tags. Got: {:?}",
+            structure.labels
+        );
+
+        // Should NOT have a partial label like just "Inner / circle"
+        let has_partial = structure.labels.iter().any(|l| l == "Inner / circle");
+        assert!(
+            !has_partial,
+            "Should not extract partial label from first text node only. Got: {:?}",
+            structure.labels
+        );
     }
 }
