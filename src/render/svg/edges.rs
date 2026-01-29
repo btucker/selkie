@@ -75,11 +75,7 @@ pub fn render_edge_parts(
             let char_width_ratio = 0.6;
 
             // Handle multiline text (split by <br> or newlines)
-            let text = flow_edge
-                .text
-                .replace("<br />", "\n")
-                .replace("<br/>", "\n")
-                .replace("<br>", "\n");
+            let text = crate::render::text_utils::normalize_br_tags(&flow_edge.text);
             let lines: Vec<&str> = text.lines().collect();
             let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
             let num_lines = lines.len().max(1);
