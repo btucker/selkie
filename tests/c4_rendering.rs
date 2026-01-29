@@ -722,4 +722,92 @@ Rel_Left(a, d, "Left")"#;
         let svg = render_c4_svg(input).expect("Failed to render directional relationships");
         assert!(svg.contains("<svg"), "Should produce valid SVG");
     }
+
+    #[test]
+    fn render_relationship_stroke_color_matches_reference() {
+        // mermaid.js uses #444444 for relationship stroke color (svgDraw.js default)
+        let input = r#"C4Context
+Person(a, "Alice", "A person")
+System(b, "System B", "A system")
+Rel(a, b, "Uses")"#;
+
+        let svg = render_c4_svg(input).expect("Failed to render");
+        assert!(
+            svg.contains(r##"stroke="#444444""##),
+            "Relationship stroke should be #444444 to match mermaid.js reference"
+        );
+        assert!(
+            !svg.contains(r##"stroke="#666666""##),
+            "Relationship stroke should NOT be #666666"
+        );
+    }
+
+    #[test]
+    fn render_marker_fill_color_matches_reference() {
+        // mermaid.js arrowhead markers use #444444 fill
+        let input = r#"C4Context
+Person(a, "Alice", "A person")
+System(b, "System B", "A system")
+Rel(a, b, "Uses")"#;
+
+        let svg = render_c4_svg(input).expect("Failed to render");
+        assert!(
+            svg.contains(r##"fill="#444444""##),
+            "Arrow marker fill should be #444444 to match mermaid.js reference"
+        );
+    }
+}
+
+mod symbol_tests {
+    use super::*;
+
+    #[test]
+    fn render_c4_includes_symbol_defs() {
+        // mermaid.js C4 includes symbol definitions for computer, database, clock icons
+        let input = r#"C4Context
+Person(a, "Alice", "A person")
+System(b, "System B", "A system")
+Rel(a, b, "Uses")"#;
+
+        let svg = render_c4_svg(input).expect("Failed to render");
+        assert!(
+            svg.contains(r##"<symbol id="computer""##),
+            "Should include computer symbol definition"
+        );
+        assert!(
+            svg.contains(r##"<symbol id="database""##),
+            "Should include database symbol definition"
+        );
+        assert!(
+            svg.contains(r##"<symbol id="clock""##),
+            "Should include clock symbol definition"
+        );
+    }
+
+    #[test]
+    fn render_c4_includes_all_marker_types() {
+        // mermaid.js has 4 marker types: arrowhead, arrowend, crosshead, filled-head
+        let input = r#"C4Context
+Person(a, "Alice", "A person")
+System(b, "System B", "A system")
+Rel(a, b, "Uses")"#;
+
+        let svg = render_c4_svg(input).expect("Failed to render");
+        assert!(
+            svg.contains(r##"id="c4-arrow""##),
+            "Should include forward arrow marker"
+        );
+        assert!(
+            svg.contains(r##"id="c4-arrow-reverse""##),
+            "Should include reverse arrow marker"
+        );
+        assert!(
+            svg.contains(r##"id="c4-crosshead""##),
+            "Should include crosshead marker"
+        );
+        assert!(
+            svg.contains(r##"id="c4-filled-head""##),
+            "Should include filled-head marker"
+        );
+    }
 }
