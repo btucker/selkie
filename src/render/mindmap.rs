@@ -111,6 +111,8 @@ pub fn render_mindmap(db: &MindmapDb, config: &RenderConfig) -> Result<String> {
                 child,
                 0.0, // parent center x
                 0.0, // parent center y
+                root_width,
+                root_height,
                 angle,
                 section,
                 Some("mindmap-root".to_string()),
@@ -202,6 +204,8 @@ fn position_radial_tree(
     node: &MindmapNode,
     parent_cx: f64,
     parent_cy: f64,
+    parent_width: f64,
+    parent_height: f64,
     angle: f64,
     section: i32,
     parent_id: Option<String>,
@@ -234,7 +238,22 @@ fn position_radial_tree(
         RADIAL_DISTANCE * 1.15 // Slightly less for other branches
     };
     // Increase distance with depth to prevent crowding
-    let distance = base_distance * (1.0 + (depth.saturating_sub(1)) as f64 * 0.15);
+    let depth_distance = base_distance * (1.0 + (depth.saturating_sub(1)) as f64 * 0.15);
+
+    // Prevent overlap for non-root children: ensure child nodes with
+    // wide text labels don't extend back past their parent.
+    // Only activates for depth>1 non-right branches where the original
+    // depth-based distance is insufficient for the projected extents.
+    let distance = if depth > 1 && !is_right_branch {
+        let cos_a = angle.cos().abs();
+        let sin_a = angle.sin().abs();
+        let parent_proj = (parent_width / 2.0) * cos_a + (parent_height / 2.0) * sin_a;
+        let child_proj = (width / 2.0) * cos_a + (height / 2.0) * sin_a;
+        let min_clearance = parent_proj + child_proj + 4.0;
+        depth_distance.max(min_clearance)
+    } else {
+        depth_distance
+    };
 
     // Calculate node center position
     let node_cx = parent_cx + distance * angle.cos();
@@ -293,6 +312,8 @@ fn position_radial_tree(
                 child,
                 node_cx,
                 node_cy,
+                width,
+                height,
                 child_angle,
                 section, // Children inherit parent's section
                 Some(id.clone()),
