@@ -22,6 +22,7 @@ mod sankey;
 mod sequence;
 mod state;
 pub mod svg;
+pub(crate) mod text_utils;
 mod timeline;
 mod treemap;
 mod xychart;
