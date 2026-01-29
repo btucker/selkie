@@ -714,38 +714,6 @@ fn center_composite_states(
     composite_offsets
 }
 
-/// Calculate the X bounds of a composite state including all nested children
-/// Calculate x bounds for a composite's content (excluding nested composites for centering)
-/// This is used during centering to find where to center nested composites within
-fn calculate_composite_x_bounds_for_centering(
-    comp_id: &str,
-    db: &StateDb,
-    state_positions: &HashMap<String, (f64, f64, f64, f64)>,
-    composite_ids: &std::collections::HashSet<&str>,
-) -> (f64, f64) {
-    let states = db.get_states();
-    let mut min_x = f64::MAX;
-    let mut max_x = f64::MIN;
-
-    // For centering, we only consider NON-composite direct children
-    // Nested composites will be centered within these bounds, so don't include them
-    for (id, state) in states.iter() {
-        if state.parent.as_deref() == Some(comp_id) {
-            let is_nested_composite = composite_ids.contains(id.as_str());
-
-            if !is_nested_composite {
-                // For non-composite children, use state_positions directly
-                if let Some(&(x, _, w, _)) = state_positions.get(id) {
-                    min_x = min_x.min(x);
-                    max_x = max_x.max(x + w);
-                }
-            }
-        }
-    }
-
-    (min_x, max_x)
-}
-
 fn calculate_composite_x_bounds(
     comp_id: &str,
     db: &StateDb,
@@ -846,57 +814,71 @@ fn center_nested_composites(
         })
         .collect();
 
-    // Sort by depth descending (deepest first) so inner composites are centered
-    // before their parents, ensuring consistent bounds calculations
-    nested_composites.sort_by(|a, b| b.2.cmp(&a.2));
+    // Sort by depth ascending (shallowest first) so outer parents are centered first.
+    // This ensures that when inner composites are centered, they account for the
+    // outer shifts that already happened. Deepest-first would break because outer
+    // shifts would undo inner centering.
+    nested_composites.sort_by(|a, b| a.2.cmp(&b.2));
 
-    // Process from innermost to outermost
-    for (nested_id, parent_id, _depth) in nested_composites {
-        // Calculate the parent's bounds from NON-COMPOSITE children only
-        // This gives us the "anchor" content that the nested composite should be centered with
-        let (parent_non_comp_min_x, parent_non_comp_max_x) =
-            calculate_composite_x_bounds_for_centering(
-                parent_id,
-                db,
-                state_positions,
-                composite_ids,
-            );
+    // Deduplicate by parent: process each parent composite only once.
+    // Track which parents have been processed.
+    let mut processed_parents: std::collections::HashSet<&str> = std::collections::HashSet::new();
 
-        // Calculate nested composite's RENDERED bounds (with padding)
-        let nested_rendered = calculate_composite_bounds_recursive(nested_id, db, state_positions);
+    for (_nested_id, parent_id, _depth) in &nested_composites {
+        if processed_parents.contains(parent_id) {
+            continue;
+        }
+        processed_parents.insert(parent_id);
 
-        let Some((nested_x, _, nested_w, _)) = nested_rendered else {
+        // Get the parent composite's dagre-assigned position and dimensions.
+        let Some(&(parent_x, _, parent_w, _)) = state_positions.get(*parent_id) else {
             continue;
         };
 
-        // If there are non-composite children, center the nested composite with them
-        // Otherwise, the nested composite is the only content and doesn't need centering
-        if parent_non_comp_min_x >= parent_non_comp_max_x {
+        // Calculate the parent's content bounds (from ALL children).
+        // render_composite_state centers the rendered rect on the content center,
+        // so aligning content center with the dagre center ensures proper centering.
+        let parent_content = calculate_composite_bounds_recursive(parent_id, db, state_positions);
+
+        let Some((content_x, _, content_w, _)) = parent_content else {
             continue;
-        }
+        };
 
-        // The non-composite children define the "anchor" center for the parent
-        // The nested composite should be centered around this same center
-        let non_comp_center_x = (parent_non_comp_min_x + parent_non_comp_max_x) / 2.0;
+        let content_center_x = content_x + content_w / 2.0;
+        let parent_center_x = parent_x + parent_w / 2.0;
 
-        // The nested composite's current center
-        let nested_center_x = nested_x + nested_w / 2.0;
+        let offset_x = parent_center_x - content_center_x;
 
-        // Calculate offset to align nested composite's center with non-composite center
-        let offset_x = non_comp_center_x - nested_center_x;
-
-        // Only shift if there's a meaningful offset
         if offset_x.abs() > 0.5 {
-            // Track the offset applied to this nested composite
-            nested_offsets.insert(nested_id.to_string(), offset_x);
-
-            // Shift the nested composite itself
-            if let Some((x, y, w, h)) = state_positions.get(nested_id).copied() {
-                state_positions.insert(nested_id.to_string(), (x + offset_x, y, w, h));
+            // Track the offset per nested composite within this parent (for edge adjustment)
+            for (nid, pid, _) in &nested_composites {
+                if *pid == *parent_id {
+                    nested_offsets.insert(nid.to_string(), offset_x);
+                }
             }
 
-            // Shift all children of the nested composite
-            shift_composite_and_children(nested_id, offset_x, db, state_positions, composite_ids);
+            // Shift ALL direct children of the parent (and their subtrees)
+            // so the content center aligns with the parent's dagre center.
+            let child_ids: Vec<String> = states
+                .iter()
+                .filter(|(_, s)| s.parent.as_deref() == Some(*parent_id))
+                .map(|(id, _)| id.clone())
+                .collect();
+
+            for child_id in &child_ids {
+                if let Some((x, y, w, h)) = state_positions.get(child_id.as_str()).copied() {
+                    state_positions.insert(child_id.clone(), (x + offset_x, y, w, h));
+                }
+                if composite_ids.contains(child_id.as_str()) {
+                    shift_composite_and_children(
+                        child_id,
+                        offset_x,
+                        db,
+                        state_positions,
+                        composite_ids,
+                    );
+                }
+            }
         }
     }
 
@@ -1032,15 +1014,15 @@ pub fn render_state(db: &StateDb, config: &RenderConfig) -> Result<String> {
     // Merge nested offsets into composite_offsets for edge bend point adjustment
     // Note: nested offsets need to include parent's offset for correct edge positioning
     let nested_offsets = center_nested_composites(db, &mut state_positions, &composite_ids);
-    for (id, nested_offset) in nested_offsets {
+    for (id, nested_offset) in &nested_offsets {
         // Get the parent's total offset (if any) and add to this nested offset
         let parent_offset = states
-            .get(&id)
+            .get(id)
             .and_then(|s| s.parent.as_ref())
-            .and_then(|parent| composite_offsets.get(parent))
+            .and_then(|parent| composite_offsets.get(parent.as_str()))
             .copied()
             .unwrap_or(0.0);
-        composite_offsets.insert(id, parent_offset + nested_offset);
+        composite_offsets.insert(id.clone(), parent_offset + nested_offset);
     }
 
     // Post-process: Center start nodes above the composite states they connect to

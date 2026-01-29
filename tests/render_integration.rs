@@ -3657,3 +3657,81 @@ fn test_sequence_notes_have_inline_fill() {
         &svg[..svg.len().min(2000)]
     );
 }
+
+#[test]
+fn test_state_nested_composite_centered_in_parent_with_siblings() {
+    // Reproduces eval issue: state_complex2 "Nested composite Processing not centered in Idle: -137px offset (reference: 30px)"
+    // When a parent composite has both non-composite children and a nested composite,
+    // the nested composite should be horizontally centered within the parent's full width,
+    // not relative to just the non-composite siblings.
+    let input = std::fs::read_to_string("docs/sources/state_complex2.mmd")
+        .expect("Failed to read state_complex2.mmd");
+
+    let diagram = parse(&input).expect("Failed to parse");
+    let svg = render(&diagram).expect("Failed to render");
+
+    // Extract outer rect bounds for both composites
+    let extract_composite_bounds = |svg: &str, name: &str| -> Option<(f64, f64, f64)> {
+        let composite_marker = format!("id=\"composite-{}\"", name);
+        let composite_start = svg.find(&composite_marker)?;
+        let relevant_section = &svg[composite_start..composite_start.saturating_add(600)];
+
+        let x_pattern = regex::Regex::new(r#"x="([0-9.]+)""#).ok()?;
+        let w_pattern = regex::Regex::new(r#"width="([0-9.]+)""#).ok()?;
+
+        for line in relevant_section.lines() {
+            if line.contains("state-composite-outer") {
+                if let (Some(x_caps), Some(w_caps)) =
+                    (x_pattern.captures(line), w_pattern.captures(line))
+                {
+                    let x: f64 = x_caps.get(1)?.as_str().parse().ok()?;
+                    let w: f64 = w_caps.get(1)?.as_str().parse().ok()?;
+                    let center = x + w / 2.0;
+                    return Some((x, w, center));
+                }
+            }
+        }
+        None
+    };
+
+    let idle_bounds = extract_composite_bounds(&svg, "Idle");
+    let processing_bounds = extract_composite_bounds(&svg, "Processing");
+
+    eprintln!("Composite bounds:");
+    eprintln!("  Idle: {:?}", idle_bounds);
+    eprintln!("  Processing: {:?}", processing_bounds);
+
+    if let (Some((idle_x, idle_w, idle_center)), Some((_proc_x, _proc_w, proc_center))) =
+        (idle_bounds, processing_bounds)
+    {
+        // Processing should be centered within Idle
+        let offset = proc_center - idle_center;
+        eprintln!("  Offset of Processing center from Idle center: {}", offset);
+
+        // The offset should be small (within ~50px), not -137px
+        assert!(
+            offset.abs() < 50.0,
+            "Processing should be approximately centered in Idle: offset={} (should be near 0)",
+            offset
+        );
+
+        // Processing should be fully contained within Idle (with some padding)
+        assert!(
+            _proc_x >= idle_x,
+            "Processing should not extend left of Idle: proc_x={}, idle_x={}",
+            _proc_x,
+            idle_x
+        );
+        assert!(
+            _proc_x + _proc_w <= idle_x + idle_w + 1.0, // 1px tolerance
+            "Processing should not extend right of Idle: proc_right={}, idle_right={}",
+            _proc_x + _proc_w,
+            idle_x + idle_w
+        );
+    } else {
+        panic!(
+            "Could not extract composite bounds from SVG.\nIdle: {:?}\nProcessing: {:?}",
+            idle_bounds, processing_bounds
+        );
+    }
+}
