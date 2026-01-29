@@ -460,14 +460,16 @@ fn collect_text_content(node: &roxmltree::Node) -> String {
             if let Some(text) = child.text() {
                 result.push_str(text);
             }
-        } else if child.tag_name().name() == "tspan" {
-            // Add a space before tspan content if result doesn't already end with space
-            // This ensures proper word boundaries when tspans are concatenated
-            if !result.is_empty() && !result.ends_with(' ') && !result.ends_with('\n') {
+        } else {
+            let tag = child.tag_name().name();
+            // <br>, <tspan>, and other block-like elements act as word boundaries
+            if !result.is_empty()
+                && !result.ends_with(' ')
+                && !result.ends_with('\n')
+                && (tag == "tspan" || tag == "br")
+            {
                 result.push(' ');
             }
-            result.push_str(&collect_text_content(&child));
-        } else {
             result.push_str(&collect_text_content(&child));
         }
     }
