@@ -51,10 +51,7 @@ impl SizeEstimator for CharacterSizeEstimator {
         }
 
         // Normalize <br> variants to newlines for proper line counting
-        let normalized = text
-            .replace("<br />", "\n")
-            .replace("<br/>", "\n")
-            .replace("<br>", "\n");
+        let normalized = crate::render::text_utils::normalize_br_tags(text);
 
         let lines: Vec<&str> = normalized.lines().collect();
         let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
@@ -234,10 +231,7 @@ impl SizeEstimator for FontdueSizeEstimator {
         }
 
         // Normalize <br> variants to newlines for proper line counting
-        let normalized = text
-            .replace("<br />", "\n")
-            .replace("<br/>", "\n")
-            .replace("<br>", "\n");
+        let normalized = crate::render::text_utils::normalize_br_tags(text);
 
         let lines: Vec<&str> = normalized.lines().collect();
         let num_lines = lines.len().max(1);

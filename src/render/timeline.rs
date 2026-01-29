@@ -217,39 +217,14 @@ fn estimate_node_height(text: &str, max_width: f64) -> f64 {
 
 /// Estimate node height with a custom minimum height
 fn estimate_node_height_with_min(text: &str, max_width: f64, min_height: f64) -> f64 {
-    // Split on <br> tags and whitespace to simulate wrap_text
-    let text = text
-        .replace("<br>", "\n")
-        .replace("<br/>", "\n")
-        .replace("<br />", "\n");
-    let words: Vec<&str> = text.split_whitespace().collect();
+    let text = super::text_utils::normalize_br_tags(text);
+    let lines = super::text_utils::wrap_text_by_width(&text, max_width, FONT_SIZE);
 
-    if words.is_empty() {
+    if lines.len() == 1 && lines[0].is_empty() {
         return min_height;
     }
 
-    // Count lines using same algorithm as wrap_text
-    let mut line_count = 0;
-    let mut current_line = String::new();
-
-    for word in words {
-        if current_line.is_empty() {
-            current_line = word.to_string();
-        } else {
-            let potential_line = format!("{} {}", current_line, word);
-            let estimated_width = estimate_text_width(&potential_line);
-
-            if estimated_width <= max_width {
-                current_line = potential_line;
-            } else {
-                line_count += 1;
-                current_line = word.to_string();
-            }
-        }
-    }
-    if !current_line.is_empty() {
-        line_count += 1;
-    }
+    let line_count = lines.len();
 
     // Mermaid's height formula: bbox.height + fontSize * 1.1 * 0.5 + padding
     // bbox.height = line_count * lineHeight (where lineHeight ≈ fontSize * 1.1)
@@ -616,13 +591,10 @@ fn render_timeline_line(doc: &mut SvgDocument, layout: &TimelineLayout) {
 /// Create wrapped text element
 fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
     // Split text on <br> and whitespace
-    let text = text
-        .replace("<br>", "\n")
-        .replace("<br/>", "\n")
-        .replace("<br />", "\n");
-    let words: Vec<&str> = text.split_whitespace().collect();
+    let text = super::text_utils::normalize_br_tags(text);
+    let lines = super::text_utils::wrap_text_by_width(&text, max_width, FONT_SIZE);
 
-    if words.is_empty() {
+    if lines.len() == 1 && lines[0].is_empty() {
         return SvgElement::Text {
             x: cx,
             y: cy,
@@ -632,31 +604,6 @@ fn wrap_text(text: &str, cx: f64, cy: f64, max_width: f64) -> SvgElement {
                 .with_attr("dominant-baseline", "middle")
                 .with_attr("alignment-baseline", "middle"),
         };
-    }
-
-    // Build lines using weighted width estimation
-    // Instead of character count, estimate actual pixel width
-    let mut lines: Vec<String> = Vec::new();
-    let mut current_line = String::new();
-
-    for word in words {
-        if current_line.is_empty() {
-            current_line = word.to_string();
-        } else {
-            // Estimate width of current line + space + new word
-            let potential_line = format!("{} {}", current_line, word);
-            let estimated_width = estimate_text_width(&potential_line);
-
-            if estimated_width <= max_width {
-                current_line = potential_line;
-            } else {
-                lines.push(current_line);
-                current_line = word.to_string();
-            }
-        }
-    }
-    if !current_line.is_empty() {
-        lines.push(current_line);
     }
 
     if lines.len() == 1 {
@@ -719,40 +666,6 @@ fn escape_xml(s: &str) -> String {
         .replace('>', "&gt;")
         .replace('"', "&quot;")
         .replace('\'', "&apos;")
-}
-
-/// Estimate text width in pixels using weighted character widths
-/// This approximates browser text rendering for proportional fonts
-fn estimate_text_width(text: &str) -> f64 {
-    let mut total_width = 0.0;
-
-    for c in text.chars() {
-        // Approximate relative widths for proportional fonts like Trebuchet MS
-        let char_width = match c {
-            // Narrow characters (~0.3 of average)
-            'i' | 'l' | 'I' | '!' | '|' | '\'' | '.' | ',' | ':' | ';' | 'j' | 'f' | 't' | 'r' => {
-                FONT_SIZE * 0.35
-            }
-            // Wide characters (~1.5 of average)
-            'M' | 'W' | 'm' | 'w' | '@' => FONT_SIZE * 0.9,
-            // Semi-wide characters (~1.2 of average)
-            'N' | 'O' | 'Q' | 'G' | 'D' | 'H' | 'U' | 'A' | 'V' | 'X' | 'Y' | 'Z' | 'K' | 'R'
-            | 'B' | 'P' => FONT_SIZE * 0.65,
-            // Space
-            ' ' => FONT_SIZE * 0.35,
-            // Regular lowercase characters (~0.5 of em)
-            'a'..='z' => FONT_SIZE * 0.5,
-            // Regular uppercase characters (~0.6 of em)
-            'A'..='Z' => FONT_SIZE * 0.6,
-            // Numbers (~0.5 of em)
-            '0'..='9' => FONT_SIZE * 0.55,
-            // Default for other characters
-            _ => FONT_SIZE * 0.5,
-        };
-        total_width += char_width;
-    }
-
-    total_width
 }
 
 /// Generate timeline-specific CSS using mermaid.js-compatible HSL colors
