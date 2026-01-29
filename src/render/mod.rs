@@ -25,6 +25,7 @@ pub mod svg;
 pub(crate) mod text_utils;
 mod timeline;
 mod treemap;
+pub mod tui;
 mod xychart;
 
 use crate::diagrams::{detect_init, detect_type, parse, remove_directives, Diagram};

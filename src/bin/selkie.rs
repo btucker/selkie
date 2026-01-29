@@ -23,6 +23,7 @@ use uuid::Uuid;
 
 #[cfg(feature = "eval")]
 use selkie::eval::{self, runner::DiagramInput, samples};
+use selkie::render::tui as tui_render;
 use selkie::render::{RenderConfig, Theme};
 use selkie::{parse, render_with_config};
 
@@ -206,6 +207,8 @@ enum OutputFormat {
     Png,
     #[cfg(feature = "pdf")]
     Pdf,
+    /// Character-art output for terminals
+    Tui,
 }
 
 impl OutputFormat {
@@ -372,6 +375,34 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("Parsed diagram successfully");
     }
 
+    // Check if TUI format is requested — uses a separate render path
+    let format_hint = args.output_format.unwrap_or_else(|| {
+        args.output
+            .as_deref()
+            .and_then(|p| {
+                if p == "-" {
+                    None
+                } else {
+                    OutputFormat::from_extension(p)
+                }
+            })
+            .unwrap_or(OutputFormat::Svg)
+    });
+
+    if format_hint == OutputFormat::Tui {
+        let output_str = render_tui(&diagram)?;
+        if args.verbose {
+            eprintln!("Rendered {} bytes of TUI output", output_str.len());
+        }
+        write_output(&args.output, output_str.as_bytes())?;
+        if !args.quiet && args.output.as_deref() != Some("-") {
+            if let Some(ref output) = args.output {
+                eprintln!("Created {}", output);
+            }
+        }
+        return Ok(());
+    }
+
     // Render to SVG
     let svg = render_with_config(&diagram, &config).map_err(|e| format!("Render error: {}", e))?;
 
@@ -411,6 +442,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
                         let pdf_data = svg_to_pdf(&svg)?;
                         write_binary_output(&Some(output.clone()), &pdf_data)?;
                     }
+                    OutputFormat::Tui => unreachable!("TUI format handled above"),
                 }
                 if !args.quiet {
                     eprintln!("Created {}", output);
@@ -450,6 +482,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
             let pdf_data = svg_to_pdf(&svg)?;
             write_binary_output(&args.output, &pdf_data)?;
         }
+        OutputFormat::Tui => unreachable!("TUI format handled above"),
     }
 
     if !args.quiet && args.output.as_deref() != Some("-") {
@@ -861,4 +894,20 @@ fn svg_to_pdf(svg: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     .map_err(|e| format!("Failed to convert to PDF: {}", e))?;
 
     Ok(pdf_data)
+}
+
+/// Render a diagram to TUI character art
+fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std::error::Error>> {
+    use selkie::layout::{self, CharacterSizeEstimator, ToLayoutGraph};
+
+    match diagram {
+        selkie::diagrams::Diagram::Flowchart(db) => {
+            let estimator = CharacterSizeEstimator::default();
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            let output = tui_render::render_flowchart_tui(db, &graph)?;
+            Ok(output)
+        }
+        _ => Err("TUI format currently only supports flowchart diagrams".into()),
+    }
 }
