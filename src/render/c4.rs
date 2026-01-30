@@ -31,7 +31,7 @@ const COLOR_COMPONENT_EXT: &str = "#cccccc";
 const COLOR_BOUNDARY: &str = "#444444";
 const COLOR_TEXT_LIGHT: &str = "#ffffff";
 const COLOR_TEXT_DARK: &str = "#333333";
-const COLOR_REL: &str = "#666666";
+const COLOR_REL: &str = "#444444";
 
 /// Render a C4 diagram to SVG
 pub fn render_c4(db: &C4Db, config: &RenderConfig) -> Result<String> {
@@ -852,17 +852,17 @@ fn element_colors(shape_type: &C4ShapeType) -> (&'static str, &'static str, &'st
         C4ShapeType::Person => (COLOR_PERSON, "#073b6f", COLOR_TEXT_LIGHT),
         C4ShapeType::PersonExt => (COLOR_PERSON_EXT, "#4e5b63", COLOR_TEXT_LIGHT),
         C4ShapeType::System | C4ShapeType::SystemDb | C4ShapeType::SystemQueue => {
-            (COLOR_SYSTEM, "#0e5a9d", COLOR_TEXT_LIGHT)
+            (COLOR_SYSTEM, "#0e5ea8", COLOR_TEXT_LIGHT)
         }
         C4ShapeType::SystemExt | C4ShapeType::SystemDbExt | C4ShapeType::SystemQueueExt => {
-            (COLOR_SYSTEM_EXT, "#7a7a7a", COLOR_TEXT_LIGHT)
+            (COLOR_SYSTEM_EXT, "#8a8a8a", COLOR_TEXT_LIGHT)
         }
         C4ShapeType::Container | C4ShapeType::ContainerDb | C4ShapeType::ContainerQueue => {
-            (COLOR_CONTAINER, "#3879b8", COLOR_TEXT_LIGHT)
+            (COLOR_CONTAINER, "#3c7fc0", COLOR_TEXT_LIGHT)
         }
         C4ShapeType::ContainerExt
         | C4ShapeType::ContainerDbExt
-        | C4ShapeType::ContainerQueueExt => (COLOR_CONTAINER_EXT, "#7a7a7a", COLOR_TEXT_LIGHT),
+        | C4ShapeType::ContainerQueueExt => (COLOR_CONTAINER_EXT, "#8a8a8a", COLOR_TEXT_LIGHT),
         C4ShapeType::Component | C4ShapeType::ComponentDb | C4ShapeType::ComponentQueue => {
             (COLOR_COMPONENT, "#6fa8dc", COLOR_TEXT_DARK)
         }
@@ -904,20 +904,45 @@ fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
     lines
 }
 
-/// Create arrow markers for relationships
+/// Create arrow markers and symbol definitions for C4 diagrams (matching mermaid.js)
 fn create_c4_markers() -> Vec<SvgElement> {
     vec![
-        // Forward arrow (arrowhead)
+        // Symbol definitions (matching mermaid.js C4 icons)
+        SvgElement::Raw {
+            content: r##"<symbol id="computer" width="24" height="24"><path transform="scale(.5)" d="M2 2v13h20v-13h-20zm18 11h-16v-9h16v9zm-10.228 6l.466-1h3.524l.467 1h-4.457zm14.228 3h-24l2-6h2.104l-1.33 4h18.45l-1.297-4h2.073l2 6zm-5-10h-14v-7h14v7z"/></symbol>"##.to_string(),
+        },
+        SvgElement::Raw {
+            content: r##"<symbol id="database" fill-rule="evenodd" clip-rule="evenodd"><path transform="scale(.5)" d="M12.258.001l.256.004.255.005.253.008.251.01.249.012.247.015.246.016.242.019.241.02.239.023.236.024.233.027.231.028.229.031.225.032.223.034.22.036.217.038.214.04.211.041.208.043.205.045.201.046.198.048.194.05.191.051.187.053.183.054.18.056.175.057.172.059.168.06.163.061.16.063.155.064.15.066.074.033.073.033.071.034.07.034.069.035.068.035.067.035.066.035.064.036.064.036.062.036.06.036.06.037.058.037.058.037.055.038.055.038.053.038.052.038.051.039.05.039.048.039.047.039.045.04.044.04.043.04.041.04.04.041.039.041.037.041.036.041.034.041.033.042.032.042.03.042.029.042.027.042.026.043.024.043.023.043.021.043.02.043.018.044.017.043.015.044.013.044.012.044.011.045.009.044.007.045.006.045.004.045.002.045.001.045v17l-.001.045-.002.045-.004.045-.006.045-.007.045-.009.044-.011.045-.012.044-.013.044-.015.044-.017.043-.018.044-.02.043-.021.043-.023.043-.024.043-.026.043-.027.042-.029.042-.03.042-.032.042-.033.042-.034.041-.036.041-.037.041-.039.041-.04.041-.041.04-.043.04-.044.04-.045.04-.047.039-.048.039-.05.039-.051.039-.052.038-.053.038-.055.038-.055.038-.058.037-.058.037-.06.037-.06.036-.062.036-.064.036-.064.036-.066.035-.067.035-.068.035-.069.035-.07.034-.071.034-.073.033-.074.033-.15.066-.155.064-.16.063-.163.061-.168.06-.172.059-.175.057-.18.056-.183.054-.187.053-.191.051-.194.05-.198.048-.201.046-.205.045-.208.043-.211.041-.214.04-.217.038-.22.036-.223.034-.225.032-.229.031-.231.028-.233.027-.236.024-.239.023-.241.02-.242.019-.246.016-.247.015-.249.012-.251.01-.253.008-.255.005-.256.004-.258.001-.258-.001-.256-.004-.255-.005-.253-.008-.251-.01-.249-.012-.247-.015-.245-.016-.243-.019-.241-.02-.238-.023-.236-.024-.234-.027-.231-.028-.228-.031-.226-.032-.223-.034-.22-.036-.217-.038-.214-.04-.211-.041-.208-.043-.204-.045-.201-.046-.198-.048-.195-.05-.19-.051-.187-.053-.184-.054-.179-.056-.176-.057-.172-.059-.167-.06-.164-.061-.159-.063-.155-.064-.151-.066-.074-.033-.072-.033-.072-.034-.07-.034-.069-.035-.068-.035-.067-.035-.066-.035-.064-.036-.063-.036-.062-.036-.061-.036-.06-.037-.058-.037-.057-.037-.056-.038-.055-.038-.053-.038-.052-.038-.051-.039-.049-.039-.049-.039-.046-.039-.046-.04-.044-.04-.043-.04-.041-.04-.04-.041-.039-.041-.037-.041-.036-.041-.034-.041-.033-.042-.032-.042-.03-.042-.029-.042-.027-.042-.026-.043-.024-.043-.023-.043-.021-.043-.02-.043-.018-.044-.017-.043-.015-.044-.013-.044-.012-.044-.011-.045-.009-.044-.007-.045-.006-.045-.004-.045-.002-.045-.001-.045v-17l.001-.045.002-.045.004-.045.006-.045.007-.045.009-.044.011-.045.012-.044.013-.044.015-.044.017-.043.018-.044.02-.043.021-.043.023-.043.024-.043.026-.043.027-.042.029-.042.03-.042.032-.042.033-.042.034-.041.036-.041.037-.041.039-.041.04-.041.041-.04.043-.04.044-.04.046-.04.046-.039.049-.039.049-.039.051-.039.052-.038.053-.038.055-.038.056-.038.057-.037.058-.037.06-.037.061-.036.062-.036.063-.036.064-.036.066-.035.067-.035.068-.035.069-.035.07-.034.072-.034.072-.033.074-.033.151-.066.155-.064.159-.063.164-.061.167-.06.172-.059.176-.057.179-.056.184-.054.187-.053.19-.051.195-.05.198-.048.201-.046.204-.045.208-.043.211-.041.214-.04.217-.038.22-.036.223-.034.226-.032.228-.031.231-.028.234-.027.236-.024.238-.023.241-.02.243-.019.245-.016.247-.015.249-.012.251-.01.253-.008.255-.005.256-.004.258-.001.258.001z"/></symbol>"##.to_string(),
+        },
+        SvgElement::Raw {
+            content: r##"<symbol id="clock" width="24" height="24"><path transform="scale(.5)" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.848 12.459c.202.038.202.333.001.372-1.907.361-6.045 1.111-6.547 1.111-.719 0-1.301-.582-1.301-1.301 0-.512.77-5.447 1.125-7.445.034-.192.312-.181.343.014l.985 6.238 5.394 1.011z"/></symbol>"##.to_string(),
+        },
+        // Forward arrow (arrowhead) - matching mermaid.js
         SvgElement::Raw {
             content: r##"<marker id="c4-arrow" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
-    <path d="M 0 0 L 10 5 L 0 10 z" fill="#666666"/>
+    <path d="M 0 0 L 10 5 L 0 10 z"/>
 </marker>"##
                 .to_string(),
         },
         // Reverse arrow (arrowend) for BiRel
         SvgElement::Raw {
             content: r##"<marker id="c4-arrow-reverse" refX="1" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
-    <path d="M 10 0 L 0 5 L 10 10 z" fill="#666666"/>
+    <path d="M 10 0 L 0 5 L 10 10 z"/>
+</marker>"##
+                .to_string(),
+        },
+        // Crosshead marker (matching mermaid.js)
+        SvgElement::Raw {
+            content: r##"<marker id="c4-crosshead" markerWidth="15" markerHeight="8" orient="auto" refX="16" refY="4">
+    <path fill="black" stroke="#000000" stroke-width="1px" d="M 9,2 V 6 L16,4 Z" style="stroke-dasharray: 0, 0;"/>
+    <path fill="none" stroke="#000000" stroke-width="1px" d="M 0,1 L 6,7 M 6,1 L 0,7" style="stroke-dasharray: 0, 0;"/>
+</marker>"##
+                .to_string(),
+        },
+        // Filled-head marker (matching mermaid.js)
+        SvgElement::Raw {
+            content: r##"<marker id="c4-filled-head" refX="18" refY="7" markerWidth="20" markerHeight="28" orient="auto">
+    <path d="M 18,7 L9,13 L14,7 L9,1 Z"/>
 </marker>"##
                 .to_string(),
         },
