@@ -49,11 +49,16 @@ pub fn render_sequence_tui(db: &SequenceDb) -> Result<String> {
             ) {
                 if fi != ti {
                     let min_idx = fi.min(ti);
+                    let max_idx = fi.max(ti);
                     let needed = msg.message.chars().count() + 4; // label + padding
                     let actor_half = actor_widths[fi] / 2 + actor_widths[ti] / 2;
-                    let gap_needed = needed.saturating_sub(actor_half).max(4);
-                    if min_idx < gap_widths.len() {
-                        gap_widths[min_idx] = gap_widths[min_idx].max(gap_needed);
+                    let total_gap_needed = needed.saturating_sub(actor_half).max(4);
+                    let num_gaps = max_idx - min_idx;
+                    let per_gap = total_gap_needed.div_ceil(num_gaps);
+                    for g in min_idx..max_idx {
+                        if g < gap_widths.len() {
+                            gap_widths[g] = gap_widths[g].max(per_gap);
+                        }
                     }
                 }
             }
@@ -471,10 +476,24 @@ fn draw_self_message(
         canvas[row + 1][right] = '│';
     }
 
-    // Bottom line (use next row if available - but we stay in current MESSAGE_ROW_SPACING)
-    // For simplicity in the 2-row spacing, put the return on the same row conceptually
+    // Bottom return line: <──┘
+    if row + 2 < canvas.len() {
+        if col < total_width {
+            canvas[row + 2][col] = '<';
+        }
+        for cell in canvas[row + 2]
+            .iter_mut()
+            .take(right.min(total_width))
+            .skip(col + 1)
+        {
+            *cell = '─';
+        }
+        if right < total_width {
+            canvas[row + 2][right] = '┘';
+        }
+    }
 
-    // Place label to the right
+    // Place label to the right of the top line
     if !label.is_empty() {
         let label_start = right + 2;
         for (j, ch) in label.chars().enumerate() {
@@ -621,6 +640,27 @@ mod tests {
         assert!(output.contains("C"), "Should contain participant C");
         assert!(output.contains("msg1"));
         assert!(output.contains("msg2"));
+    }
+
+    #[test]
+    fn self_message_has_return_arrow() {
+        let db = parse_sequence("sequenceDiagram\n    A->>A: Think");
+        let output = render_sequence_tui(&db).unwrap();
+        assert!(
+            output.contains('┐'),
+            "Self-message should have top-right corner ┐\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains('┘'),
+            "Self-message should have bottom-right corner ┘\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains('<'),
+            "Self-message should have return arrow <\nOutput:\n{}",
+            output
+        );
     }
 
     #[test]
