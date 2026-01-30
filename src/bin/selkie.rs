@@ -770,6 +770,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         "er",
         "architecture",
         "requirement",
+        "pie",
     ];
 
     // Filter to TUI-supported types, or a specific type if requested
@@ -822,6 +823,53 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
                 continue;
             }
         };
+
+        // Pie charts don't use LayoutGraph — handle with dedicated eval path
+        if let selkie::diagrams::Diagram::Pie(ref db) = parsed {
+            let tui_output = match tui_render::pie::render_pie_tui(db) {
+                Ok(output) => output,
+                Err(e) => {
+                    eprintln!(" RENDER ERROR: {}", e);
+                    total_errors += 1;
+                    continue;
+                }
+            };
+
+            let issues = tui_checks::check_tui_pie_structure(&tui_output, db);
+            let similarity = tui_checks::calculate_tui_pie_similarity(&tui_output, db);
+            total_similarity += similarity;
+
+            let error_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Error)
+                .count();
+            let warning_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Warning)
+                .count();
+            total_issues += issues.len();
+            total_errors += error_count;
+
+            if args.verbose && !issues.is_empty() {
+                eprintln!();
+                eprintln!(
+                    "  {} ({} errors, {} warnings, similarity: {:.1}%):",
+                    input.name,
+                    error_count,
+                    warning_count,
+                    similarity * 100.0
+                );
+                for issue in &issues {
+                    let level = match issue.level {
+                        eval::Level::Error => "ERROR",
+                        eval::Level::Warning => "WARN",
+                        eval::Level::Info => "INFO",
+                    };
+                    eprintln!("    [{}] {}: {}", level, issue.check, issue.message);
+                }
+            }
+            continue;
+        }
 
         // Layout — use ToLayoutGraph trait to get a layout graph for any supported type
         let graph = match layout_diagram(&parsed, &estimator) {
@@ -1180,6 +1228,11 @@ fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
             Ok(tui_render::render_graph_tui(&graph)?)
+        }
+        // Pie charts use a dedicated bar-chart renderer (no layout graph needed)
+        selkie::diagrams::Diagram::Pie(db) => {
+            let output = tui_render::pie::render_pie_tui(db)?;
+            Ok(output)
         }
         _ => Err("TUI format not yet supported for this diagram type".into()),
     }

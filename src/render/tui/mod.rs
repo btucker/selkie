@@ -7,6 +7,7 @@
 
 pub mod canvas;
 pub mod edges;
+pub mod pie;
 pub mod scale;
 pub mod shapes;
 

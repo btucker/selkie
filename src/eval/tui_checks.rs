@@ -531,6 +531,146 @@ pub fn calculate_tui_similarity(tui: &TuiStructure, graph: &LayoutGraph) -> f64 
     }
 }
 
+// --- Pie chart-specific TUI evaluation ---
+
+/// Check TUI pie chart output against the PieDb ground truth.
+///
+/// Since pie charts don't use LayoutGraph, we compare directly against PieDb:
+/// - All section labels must appear in the output
+/// - Percentage values should be present
+/// - Title should appear if set
+pub fn check_tui_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb) -> Vec<Issue> {
+    let mut issues = Vec::new();
+    let sections = db.get_sections();
+    let total: f64 = sections.iter().map(|(_, v)| *v).sum();
+
+    // Check title
+    if let Some(title) = db.get_diagram_title() {
+        if !output.contains(title) {
+            issues.push(Issue::error(
+                "tui_pie_missing_title",
+                format!("TUI pie output missing title: '{}'", title),
+            ));
+        }
+    }
+
+    if total <= 0.0 || sections.is_empty() {
+        return issues;
+    }
+
+    // Check section labels
+    for (label, _) in sections {
+        if !output.contains(label.as_str()) {
+            issues.push(Issue::error(
+                "tui_pie_missing_label",
+                format!("TUI pie output missing section label: '{}'", label),
+            ));
+        }
+    }
+
+    // Check percentages appear
+    for (label, value) in sections {
+        let pct = value / total * 100.0;
+        let pct_str = format!("{:.1}%", pct);
+        if !output.contains(&pct_str) {
+            issues.push(Issue::warning(
+                "tui_pie_missing_percentage",
+                format!(
+                    "TUI pie output missing percentage for '{}': expected {}",
+                    label, pct_str
+                ),
+            ));
+        }
+    }
+
+    // Check showData values appear
+    if db.get_show_data() {
+        for (label, value) in sections {
+            let value_str = if value.fract() == 0.0 {
+                format!("[{}]", *value as i64)
+            } else {
+                format!("[{}]", value)
+            };
+            if !output.contains(&value_str) {
+                issues.push(Issue::warning(
+                    "tui_pie_missing_data_value",
+                    format!(
+                        "TUI pie output missing data value for '{}': expected {}",
+                        label, value_str
+                    ),
+                ));
+            }
+        }
+    }
+
+    // Check bar characters are present (at least one █ or ▌)
+    let has_bars = output.contains('█') || output.contains('▌');
+    if !has_bars {
+        issues.push(Issue::error(
+            "tui_pie_no_bars",
+            "TUI pie output has no bar characters (█/▌)".to_string(),
+        ));
+    }
+
+    issues
+}
+
+/// Calculate a similarity score (0.0–1.0) for TUI pie chart output.
+///
+/// Factors:
+/// - Section label presence (50%)
+/// - Percentage value presence (30%)
+/// - Title presence (10%)
+/// - Bar character presence (10%)
+pub fn calculate_tui_pie_similarity(output: &str, db: &crate::diagrams::pie::PieDb) -> f64 {
+    let sections = db.get_sections();
+    let total: f64 = sections.iter().map(|(_, v)| *v).sum();
+
+    if sections.is_empty() || total <= 0.0 {
+        // Empty chart — if output says "empty" or "no data", that's correct
+        if output.contains("empty") || output.contains("no data") {
+            return 1.0;
+        }
+        return 0.0;
+    }
+
+    let mut score = 0.0;
+
+    // Label presence (50% weight)
+    let label_count = sections
+        .iter()
+        .filter(|(label, _)| output.contains(label.as_str()))
+        .count();
+    score += 0.5 * (label_count as f64 / sections.len() as f64);
+
+    // Percentage presence (30% weight)
+    let pct_count = sections
+        .iter()
+        .filter(|(_, value)| {
+            let pct = value / total * 100.0;
+            let pct_str = format!("{:.1}%", pct);
+            output.contains(&pct_str)
+        })
+        .count();
+    score += 0.3 * (pct_count as f64 / sections.len() as f64);
+
+    // Title presence (10% weight)
+    if let Some(title) = db.get_diagram_title() {
+        if output.contains(title) {
+            score += 0.1;
+        }
+    } else {
+        score += 0.1; // No title expected, full credit
+    }
+
+    // Bar characters (10% weight)
+    if output.contains('█') || output.contains('▌') {
+        score += 0.1;
+    }
+
+    score
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
