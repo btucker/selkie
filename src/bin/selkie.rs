@@ -771,6 +771,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         "er",
         "architecture",
         "requirement",
+        "mindmap",
         "pie",
         "gantt",
     ];
@@ -935,6 +936,53 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 
             let issues = tui_checks::check_tui_gantt_structure(&tui_output, &mut db_clone);
             let similarity = tui_checks::calculate_tui_gantt_similarity(&tui_output, &mut db_clone);
+            total_similarity += similarity;
+
+            let error_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Error)
+                .count();
+            let warning_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Warning)
+                .count();
+            total_issues += issues.len();
+            total_errors += error_count;
+
+            if args.verbose && !issues.is_empty() {
+                eprintln!();
+                eprintln!(
+                    "  {} ({} errors, {} warnings, similarity: {:.1}%):",
+                    input.name,
+                    error_count,
+                    warning_count,
+                    similarity * 100.0
+                );
+                for issue in &issues {
+                    let level = match issue.level {
+                        eval::Level::Error => "ERROR",
+                        eval::Level::Warning => "WARN",
+                        eval::Level::Info => "INFO",
+                    };
+                    eprintln!("    [{}] {}: {}", level, issue.check, issue.message);
+                }
+            }
+            continue;
+        }
+
+        // Mindmap doesn't use LayoutGraph — handle with dedicated eval path
+        if let selkie::diagrams::Diagram::Mindmap(ref db) = parsed {
+            let tui_output = match tui_render::mindmap::render_mindmap_tui(db) {
+                Ok(output) => output,
+                Err(e) => {
+                    eprintln!(" RENDER ERROR: {}", e);
+                    total_errors += 1;
+                    continue;
+                }
+            };
+
+            let issues = tui_checks::check_tui_mindmap_structure(&tui_output, db);
+            let similarity = tui_checks::calculate_tui_mindmap_similarity(&tui_output, db);
             total_similarity += similarity;
 
             let error_count = issues
@@ -1342,6 +1390,11 @@ fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std
         selkie::diagrams::Diagram::Gantt(db) => {
             let mut db_clone = db.clone();
             let output = tui_render::gantt::render_gantt_tui(&mut db_clone)?;
+            Ok(output)
+        }
+        // Mindmap uses a dedicated tree renderer (no layout graph needed)
+        selkie::diagrams::Diagram::Mindmap(db) => {
+            let output = tui_render::mindmap::render_mindmap_tui(db)?;
             Ok(output)
         }
         _ => Err("TUI format not yet supported for this diagram type".into()),

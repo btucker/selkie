@@ -1295,6 +1295,105 @@ pub fn calculate_tui_gantt_similarity(
     score
 }
 
+// --- Mindmap-specific TUI evaluation ---
+
+/// Check TUI mindmap output against the MindmapDb ground truth.
+///
+/// Since mindmaps don't use LayoutGraph, we compare directly against MindmapDb:
+/// - All node labels must appear in the output
+/// - Tree structure connectors (├── └── │) should be present
+pub fn check_tui_mindmap_structure(
+    output: &str,
+    db: &crate::diagrams::mindmap::MindmapDb,
+) -> Vec<Issue> {
+    let mut issues = Vec::new();
+
+    let root = match db.get_mindmap() {
+        Some(node) => node,
+        None => return issues,
+    };
+
+    // Collect all labels
+    let labels = crate::render::tui::mindmap::collect_labels(root);
+
+    // Check all labels appear
+    for label in &labels {
+        if !output.contains(label.as_str()) {
+            issues.push(Issue::error(
+                "tui_mindmap_missing_label",
+                format!("TUI mindmap output missing node label: '{}'", label),
+            ));
+        }
+    }
+
+    // Check tree connectors are present (if there are children)
+    let has_children = !root.children.is_empty();
+    if has_children {
+        let has_connectors = output.contains("├──") || output.contains("└──");
+        if !has_connectors {
+            issues.push(Issue::warning(
+                "tui_mindmap_no_connectors",
+                "TUI mindmap output has children but no tree connectors (├──/└──)".to_string(),
+            ));
+        }
+    }
+
+    issues
+}
+
+/// Calculate a similarity score (0.0–1.0) for TUI mindmap output.
+///
+/// Factors:
+/// - Node label presence (70%)
+/// - Tree connector presence (20%)
+/// - Root node presence (10%)
+pub fn calculate_tui_mindmap_similarity(
+    output: &str,
+    db: &crate::diagrams::mindmap::MindmapDb,
+) -> f64 {
+    let root = match db.get_mindmap() {
+        Some(node) => node,
+        None => {
+            if output.contains("empty") {
+                return 1.0;
+            }
+            return 0.0;
+        }
+    };
+
+    let labels = crate::render::tui::mindmap::collect_labels(root);
+    let mut score = 0.0;
+
+    // Label presence (70%)
+    if !labels.is_empty() {
+        let found = labels
+            .iter()
+            .filter(|l| output.contains(l.as_str()))
+            .count();
+        score += 0.7 * (found as f64 / labels.len() as f64);
+    } else {
+        score += 0.7;
+    }
+
+    // Tree connectors (20%)
+    if !root.children.is_empty() {
+        if output.contains("├──") || output.contains("└──") {
+            score += 0.2;
+        }
+    } else {
+        score += 0.2;
+    }
+
+    // Root node (10%)
+    let root_text = root.descr.replace("<br/>", " ").replace("<br>", " ");
+    let root_text = root_text.split_whitespace().collect::<Vec<_>>().join(" ");
+    if output.contains(&root_text) {
+        score += 0.1;
+    }
+
+    score
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

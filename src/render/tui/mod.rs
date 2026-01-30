@@ -8,6 +8,7 @@
 pub mod canvas;
 pub mod edges;
 pub mod gantt;
+pub mod mindmap;
 pub mod pie;
 pub mod scale;
 pub mod sequence;
