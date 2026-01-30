@@ -182,7 +182,9 @@ impl ToLayoutGraph for RequirementDb {
         };
 
         // Match mermaid's dagre configuration for requirement diagrams
-        // Using longest-path ranker - produces better visual parity for this diagram type
+        // Note: mermaid uses network-simplex which produces correct ranking but
+        // our ordering phase doesn't match mermaid's dagre column ordering yet.
+        // Using longest-path for now as it produces better visual parity overall.
         graph.options = LayoutOptions {
             direction,
             node_spacing: 50.0,
@@ -836,7 +838,14 @@ fn render_relationship_line(
 
 /// Generate CSS for requirement diagrams
 /// Colors match mermaid.js default theme for requirement diagrams
+/// Reference: mermaid's styles.js for requirementDiagram
 fn generate_requirement_css(theme: &Theme) -> String {
+    // Mermaid uses specific colors for requirement diagrams:
+    // - .reqTitle, .reqLabel { fill: #131300 } (dark label color)
+    // - .relationshipLabel { fill: black }
+    // - .relationshipLine { stroke-width: 1 }
+    // - .error-icon, .error-text { fill: #552222 }
+    let label_color = "#131300"; // mermaid's reqTitle/reqLabel fill
     format!(
         r#"
 .requirement-box {{
@@ -850,12 +859,12 @@ fn generate_requirement_css(theme: &Theme) -> String {
 }}
 
 .requirement-type {{
-  fill: {text_color};
+  fill: {label_color};
   font-weight: bold;
 }}
 
 .requirement-name {{
-  fill: {text_color};
+  fill: {label_color};
 }}
 
 .requirement-attr {{
@@ -873,12 +882,12 @@ fn generate_requirement_css(theme: &Theme) -> String {
 }}
 
 .element-type {{
-  fill: {text_color};
+  fill: {label_color};
   font-weight: bold;
 }}
 
 .element-name {{
-  fill: {text_color};
+  fill: {label_color};
 }}
 
 .element-attr {{
@@ -892,11 +901,11 @@ fn generate_requirement_css(theme: &Theme) -> String {
 .relationship-line {{
   fill: none;
   stroke: {line_color};
-  stroke-width: 1.5;
+  stroke-width: 1;
 }}
 
 .relationship-label {{
-  fill: {text_color};
+  fill: black;
 }}
 
 .relationship-label-bg {{
@@ -908,11 +917,25 @@ fn generate_requirement_css(theme: &Theme) -> String {
   fill: {line_color};
   stroke: none;
 }}
+
+.error-icon {{
+  fill: #552222;
+}}
+
+.error-text {{
+  fill: #552222;
+  stroke: #552222;
+}}
+
+.label {{
+  fill: #333;
+}}
 "#,
         primary_color = theme.primary_color,
         border_color = theme.primary_border_color,
         text_color = theme.primary_text_color,
         line_color = theme.line_color,
+        label_color = label_color,
     )
 }
 
@@ -977,20 +1000,7 @@ fn generate_requirement_markers() -> Vec<SvgElement> {
                 attrs: Attrs::new(),
             }],
         },
-        // Contains end marker (diamond) - for backwards compatibility
-        SvgElement::Marker {
-            id: "requirement-contains".to_string(),
-            view_box: "0 0 20 20".to_string(),
-            ref_x: 18.0,
-            ref_y: 10.0,
-            marker_width: 10.0,
-            marker_height: 10.0,
-            orient: "auto".to_string(),
-            marker_units: None,
-            children: vec![SvgElement::Path {
-                d: "M0,10 L10,0 L20,10 L10,20 z".to_string(),
-                attrs: Attrs::new().with_class("marker"),
-            }],
-        },
+        // Note: mermaid reference only defines 2 markers (arrow + contains-start)
+        // The diamond "contains" marker is not used - removed for parity
     ]
 }

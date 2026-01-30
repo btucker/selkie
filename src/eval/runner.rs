@@ -26,6 +26,10 @@ pub struct EvalConfig {
     pub diagram_type_filter: Option<String>,
     /// Whether to skip visual comparison (SSIM)
     pub skip_visual: bool,
+    /// Use pre-committed SVGs from docs/images/reference/ instead of rendering with mmdc.
+    /// Falls back to unverified repo cache reads (no hash check). Useful in CI where
+    /// mmdc/Playwright may not be available.
+    pub use_repo_svgs: bool,
     /// Structural check configuration
     pub check_config: CheckConfig,
 }
@@ -114,13 +118,31 @@ impl EvalRunner {
             })
             .collect();
 
-        // Pre-render all reference SVGs in batch (uses cache for already-rendered diagrams)
-        // Pass both names and texts for named caching (saves to docs/images/reference/)
-        let named_diagrams: Vec<(&str, &str)> = filtered
-            .iter()
-            .map(|i| (i.name.as_str(), i.text.as_str()))
-            .collect();
-        let reference_svgs = self.cache.render_batch_named(&named_diagrams);
+        // Get reference SVGs: either from repo cache (pre-committed) or by rendering with mmdc
+        let reference_svgs = if self.config.use_repo_svgs {
+            // Use pre-committed SVGs from docs/images/reference/ without hash verification.
+            // This avoids needing mmdc/Playwright (useful in CI).
+            eprintln!("Using pre-committed reference SVGs from repo cache...");
+            filtered
+                .iter()
+                .map(|i| {
+                    self.cache.get_unverified_by_name(&i.name).ok_or_else(|| {
+                        format!(
+                            "No pre-committed reference SVG found for '{}' in repo cache",
+                            i.name
+                        )
+                    })
+                })
+                .collect()
+        } else {
+            // Pre-render all reference SVGs in batch (uses cache for already-rendered diagrams)
+            // Pass both names and texts for named caching (saves to docs/images/reference/)
+            let named_diagrams: Vec<(&str, &str)> = filtered
+                .iter()
+                .map(|i| (i.name.as_str(), i.text.as_str()))
+                .collect();
+            self.cache.render_batch_named(&named_diagrams)
+        };
 
         // Evaluate each diagram with pre-rendered reference
         for (i, input) in filtered.iter().enumerate() {
@@ -393,5 +415,104 @@ mod tests {
         let input: DiagramInput = sample.into();
         assert_eq!(input.name, "test");
         assert_eq!(input.diagram_type, Some("flowchart".to_string()));
+    }
+
+    #[test]
+    fn test_use_repo_svgs_reads_from_cache() {
+        use std::env::temp_dir;
+        use std::fs;
+
+        // Set up a fake repo cache with a pre-committed SVG
+        let repo_cache_dir = temp_dir().join("selkie_test_use_repo_svgs");
+        let _ = fs::remove_dir_all(&repo_cache_dir);
+        fs::create_dir_all(&repo_cache_dir).unwrap();
+
+        let svg_content = r#"<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100"/></svg>"#;
+        fs::write(repo_cache_dir.join("test_diagram.svg"), svg_content).unwrap();
+
+        let cache = super::super::cache::ReferenceCache::new(
+            temp_dir().join("selkie_test_use_repo_svgs_hash"),
+        )
+        .with_repo_cache(&repo_cache_dir);
+
+        let config = EvalConfig {
+            use_repo_svgs: true,
+            skip_visual: true,
+            ..Default::default()
+        };
+
+        let runner = EvalRunner::new(config, cache);
+
+        let inputs = vec![DiagramInput {
+            name: "test_diagram".to_string(),
+            source: None,
+            diagram_type: Some("flowchart".to_string()),
+            text: "flowchart LR\n    A --> B".to_string(),
+        }];
+
+        let result = runner.evaluate(&inputs);
+
+        // The reference SVG should have been loaded from the repo cache
+        assert_eq!(result.diagrams.len(), 1);
+        assert!(
+            result.diagrams[0].reference_svg.is_some(),
+            "Reference SVG should be loaded from repo cache"
+        );
+        assert!(
+            result.diagrams[0]
+                .reference_svg
+                .as_ref()
+                .unwrap()
+                .contains("<svg"),
+            "Reference SVG should contain valid SVG content"
+        );
+
+        // Clean up
+        let _ = fs::remove_dir_all(&repo_cache_dir);
+        let _ = fs::remove_dir_all(temp_dir().join("selkie_test_use_repo_svgs_hash"));
+    }
+
+    #[test]
+    fn test_use_repo_svgs_missing_svg_returns_error() {
+        use std::env::temp_dir;
+        use std::fs;
+
+        // Set up an empty repo cache
+        let repo_cache_dir = temp_dir().join("selkie_test_use_repo_svgs_missing");
+        let _ = fs::remove_dir_all(&repo_cache_dir);
+        fs::create_dir_all(&repo_cache_dir).unwrap();
+
+        let cache = super::super::cache::ReferenceCache::new(
+            temp_dir().join("selkie_test_use_repo_svgs_missing_hash"),
+        )
+        .with_repo_cache(&repo_cache_dir);
+
+        let config = EvalConfig {
+            use_repo_svgs: true,
+            skip_visual: true,
+            ..Default::default()
+        };
+
+        let runner = EvalRunner::new(config, cache);
+
+        let inputs = vec![DiagramInput {
+            name: "nonexistent_diagram".to_string(),
+            source: None,
+            diagram_type: Some("flowchart".to_string()),
+            text: "flowchart LR\n    A --> B".to_string(),
+        }];
+
+        let result = runner.evaluate(&inputs);
+
+        // The reference SVG should be None since it's not in the repo cache
+        assert_eq!(result.diagrams.len(), 1);
+        assert!(
+            result.diagrams[0].reference_svg.is_none(),
+            "Reference SVG should be None when not found in repo cache"
+        );
+
+        // Clean up
+        let _ = fs::remove_dir_all(&repo_cache_dir);
+        let _ = fs::remove_dir_all(temp_dir().join("selkie_test_use_repo_svgs_missing_hash"));
     }
 }

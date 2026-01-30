@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="490" height="202" viewBox="-5 -5 490 202" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="734" height="178" viewBox="-5 -5 734 178" class="mermaid">
   <style>
 
 .block-node {
@@ -12,7 +12,7 @@
 .node-bkg {
   fill: #ECECFF;
   stroke: #9370DB;
-  stroke-width: 2px;
+  stroke-width: 1px;
 }
 .node-bkg-inner {
   stroke: #9370DB;
@@ -52,7 +52,7 @@
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -63,14 +63,22 @@
   </defs>
   <g class="root">
     <g class="clusters">
-
+      <g class="block-nodes">
+        <g class="node block-node block-composite" transform="translate(0, 60)" id="block-container">
+          <rect x="0" y="0" width="236" height="60" class="block-composite"/>
+          <g class="label">
+            <rect x="0" y="0" width="0" height="0"/>
+            <text x="118" y="30" class="block-label" text-anchor="middle" dominant-baseline="middle" font-size="14px"></text>
+          </g>
+        </g>
+      </g>
     </g>
     <g class="edgePaths">
       <g class="block-edges">
-        <path d="M 54 152 Q 54 102 54 52" class="block-edge" stroke-width="1" fill="none" marker-end="url(#arrowhead)"/>
-        <path d="M 300 26 Q 310 26 320 26" class="block-edge" fill="none" marker-end="url(#arrowhead)" stroke-width="1"/>
-        <path d="M 114 102 Q 124 102 134 102" class="block-edge" stroke-width="1" fill="none" marker-end="url(#arrowhead)"/>
-        <text x="124" y="92" class="edge-label" text-anchor="middle" dominant-baseline="middle" font-size="12px">labeled</text>
+        <path d="M 118 128 Q 118 90 118 52" class="block-edge" stroke-width="1" fill="none" marker-end="url(#arrowhead)"/>
+        <path d="M 480 26 Q 484 26 488 26" class="block-edge" marker-end="url(#arrowhead)" stroke-width="1" fill="none"/>
+        <path d="M 114 90 Q 118 90 122 90" class="block-edge" fill="none" stroke-width="1" marker-end="url(#arrowhead)"/>
+        <text x="118" y="80" class="edge-label" dominant-baseline="middle" font-size="12px" text-anchor="middle">labeled</text>
       </g>
     </g>
     <g class="edgeLabels">
@@ -79,36 +87,53 @@
     <g class="nodes">
       <g class="block-nodes">
         <g class="node block-node block-square blue" id="block-A" transform="translate(0, 0)">
-          <rect x="0" y="0" width="136" height="52" class="node-bkg"/>
-          <text x="68" y="26" class="block-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">Square Block</text>
+          <rect x="0" y="0" width="236" height="52" class="node-bkg"/>
+          <g class="label">
+            <rect x="0" y="0" width="0" height="0"/>
+            <text x="118" y="26" class="block-label" font-size="14px" dominant-baseline="middle" text-anchor="middle">Square Block</text>
+          </g>
         </g>
-        <g class="node block-node block-round" transform="translate(156, 0)" id="block-B">
-          <rect x="0" y="0" width="144" height="52" rx="10" ry="10" class="node-bkg" style="fill:#f9F;stroke:#333;stroke-width:4px"/>
-          <text x="72" y="26" class="block-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Rounded Block</text>
+        <g class="node block-node block-round" transform="translate(244, 0)" id="block-B">
+          <rect x="0" y="0" width="236" height="52" rx="10" ry="10" class="node-bkg" style="fill:#f9F;stroke:#333;stroke-width:4px"/>
+          <g class="label">
+            <rect x="0" y="0" width="0" height="0"/>
+            <text x="118" y="26" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Rounded Block</text>
+          </g>
         </g>
-        <g class="node block-node block-diamond" id="block-C" transform="translate(320, 0)">
-          <polygon points="62.400000000000006,0 124.80000000000001,26 62.400000000000006,52 0,26" class="node-bkg"/>
-          <text x="62.400000000000006" y="26" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Diamond</text>
+        <g class="node block-node block-diamond" id="block-C" transform="translate(488, 0)">
+          <polygon points="118,0 236,26 118,52 0,26" class="node-bkg"/>
+          <g class="label">
+            <rect x="0" y="0" width="0" height="0"/>
+            <text x="118" y="26" class="block-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Diamond</text>
+          </g>
         </g>
-        <g class="node block-node block-composite" id="block-container" transform="translate(0, 72)">
-          <rect x="0" y="0" width="248" height="60" class="block-composite"/>
-          <text x="124" y="30" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px"></text>
-        </g>
-        <g class="node block-node block-square" transform="translate(8, 80)" id="block-D">
+        <g class="node block-node block-square" transform="translate(8, 68)" id="block-D">
           <rect x="0" y="0" width="106" height="44" class="node-bkg"/>
-          <text x="53" y="22" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">Nested 1</text>
+          <g class="label">
+            <rect x="0" y="0" width="0" height="0"/>
+            <text x="53" y="22" class="block-label" font-size="14px" dominant-baseline="middle" text-anchor="middle">Nested 1</text>
+          </g>
         </g>
-        <g class="node block-node block-square" id="block-E" transform="translate(134, 80)">
+        <g class="node block-node block-square" id="block-E" transform="translate(122, 68)">
           <rect x="0" y="0" width="106" height="44" class="node-bkg"/>
-          <text x="53" y="22" class="block-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">Nested 2</text>
+          <g class="label">
+            <rect x="0" y="0" width="0" height="0"/>
+            <text x="53" y="22" class="block-label" text-anchor="middle" dominant-baseline="middle" font-size="14px">Nested 2</text>
+          </g>
         </g>
-        <g class="node block-node block-stadium" transform="translate(384, 72)" id="block-F">
-          <rect x="0" y="0" width="96" height="60" rx="30" ry="30" class="node-bkg"/>
-          <text x="48" y="30" class="block-label" dominant-baseline="middle" font-size="14px" text-anchor="middle">Stadium</text>
+        <g class="node block-node block-stadium" id="block-F" transform="translate(488, 60)">
+          <rect x="0" y="0" width="236" height="60" rx="30" ry="30" class="node-bkg"/>
+          <g class="label">
+            <rect x="0" y="0" width="0" height="0"/>
+            <text x="118" y="30" class="block-label" font-size="14px" text-anchor="middle" dominant-baseline="middle">Stadium</text>
+          </g>
         </g>
-        <g class="node block-node block-square" id="block-G" transform="translate(0, 152)">
-          <rect x="0" y="0" width="80" height="40" class="node-bkg"/>
-          <text x="40" y="20" class="block-label" dominant-baseline="middle" font-size="14px" text-anchor="middle">G</text>
+        <g class="node block-node block-square" id="block-G" transform="translate(0, 128)">
+          <rect x="0" y="0" width="236" height="40" class="node-bkg"/>
+          <g class="label">
+            <rect x="0" y="0" width="0" height="0"/>
+            <text x="118" y="20" class="block-label" dominant-baseline="middle" text-anchor="middle" font-size="14px">G</text>
+          </g>
         </g>
       </g>
     </g>

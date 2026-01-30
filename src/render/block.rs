@@ -12,8 +12,8 @@ use std::collections::HashMap;
 /// Padding around blocks
 const BLOCK_PADDING: f64 = 10.0;
 
-/// Spacing between blocks
-const BLOCK_SPACING: f64 = 20.0;
+/// Spacing between blocks (matches mermaid's 8px column gap)
+const BLOCK_SPACING: f64 = 8.0;
 
 /// Minimum block width
 const MIN_BLOCK_WIDTH: f64 = 80.0;
@@ -136,8 +136,19 @@ pub fn render_block(db: &BlockDb, config: &RenderConfig) -> Result<String> {
         doc.add_edge_path(edges_group);
     }
 
-    // Render blocks
-    let blocks_group = render_blocks(&positioned_blocks, config);
+    // Separate composite blocks (clusters) from regular nodes
+    let (composites, regular): (Vec<_>, Vec<_>) = positioned_blocks
+        .iter()
+        .partition(|b| b.block_type == BlockType::Composite);
+
+    // Render composite blocks in clusters group (behind everything)
+    if !composites.is_empty() {
+        let clusters_group = render_blocks(&composites, config);
+        doc.add_cluster(clusters_group);
+    }
+
+    // Render regular blocks in nodes group (on top)
+    let blocks_group = render_blocks(&regular, config);
     doc.add_node(blocks_group);
 
     Ok(doc.to_string())
@@ -236,6 +247,31 @@ fn layout_blocks(
 
     // First pass: determine row assignments and max heights per row
     let mut row_info = calculate_row_info(&root_blocks, &effective_sizes, columns);
+
+    // Normalize column widths - find the max single-column width and apply uniformly
+    // This matches mermaid's behavior where all columns have equal width
+    let max_single_col_width = row_info
+        .iter()
+        .flat_map(|row| {
+            row.iter().map(|(_, block, w, _)| {
+                let span = block.width_in_columns.unwrap_or(1);
+                if span == 1 {
+                    *w
+                } else {
+                    // For multi-column blocks, derive single-column width
+                    (*w - (span - 1) as f64 * BLOCK_SPACING) / span as f64
+                }
+            })
+        })
+        .fold(0.0_f64, f64::max);
+
+    // Apply uniform column widths
+    for row in &mut row_info {
+        for item in row.iter_mut() {
+            let span = item.1.width_in_columns.unwrap_or(1);
+            item.2 = max_single_col_width * span as f64 + (span - 1) as f64 * BLOCK_SPACING;
+        }
+    }
 
     // Normalize heights - all blocks in same row get same height
     for row in &mut row_info {
@@ -631,7 +667,7 @@ fn render_edges(edges: &[PositionedEdge], _config: &RenderConfig) -> SvgElement 
 }
 
 /// Render all blocks
-fn render_blocks(blocks: &[PositionedBlock], config: &RenderConfig) -> SvgElement {
+fn render_blocks(blocks: &[&PositionedBlock], config: &RenderConfig) -> SvgElement {
     let mut children = Vec::new();
 
     for block in blocks {
@@ -927,9 +963,21 @@ fn render_block_shape(block: &PositionedBlock) -> SvgElement {
     }
 }
 
-/// Render block text label
+/// Render block text label wrapped in a label group with background rect
+/// This matches mermaid's structure: <g class="label"><rect/><text/></g>
 fn render_block_text(block: &PositionedBlock) -> SvgElement {
-    SvgElement::Text {
+    // Label background rect (matches mermaid's inner rect in label group)
+    let label_bg = SvgElement::Rect {
+        x: 0.0,
+        y: 0.0,
+        width: 0.0,
+        height: 0.0,
+        rx: None,
+        ry: None,
+        attrs: Attrs::new(),
+    };
+
+    let text = SvgElement::Text {
         x: block.width / 2.0,
         y: block.height / 2.0,
         content: block.label.clone(),
@@ -938,6 +986,11 @@ fn render_block_text(block: &PositionedBlock) -> SvgElement {
             .with_attr("text-anchor", "middle")
             .with_attr("dominant-baseline", "middle")
             .with_attr("font-size", &format!("{}px", FONT_SIZE)),
+    };
+
+    SvgElement::Group {
+        children: vec![label_bg, text],
+        attrs: Attrs::new().with_class("label"),
     }
 }
 
@@ -971,7 +1024,7 @@ fn generate_block_css(
 .node-bkg {{
   fill: {node_fill};
   stroke: {node_border};
-  stroke-width: 2px;
+  stroke-width: 1px;
 }}
 .node-bkg-inner {{
   stroke: {node_border};

@@ -180,6 +180,11 @@ struct EvalArgs {
     /// Open HTML report in default browser after evaluation
     #[arg(long)]
     open_report: bool,
+
+    /// Use pre-committed SVGs from docs/images/reference/ instead of rendering with mmdc.
+    /// Useful in CI where Playwright/Chromium may not be available.
+    #[arg(long)]
+    use_repo_svgs: bool,
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
@@ -498,7 +503,8 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     let eval_config = eval::runner::EvalConfig {
         diagram_type_filter: args.diagram_type.clone(),
-        skip_visual,
+        skip_visual: skip_visual || args.use_repo_svgs,
+        use_repo_svgs: args.use_repo_svgs,
         ..Default::default()
     };
     let runner = eval::runner::EvalRunner::new(eval_config, cache);

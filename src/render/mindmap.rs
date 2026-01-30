@@ -539,8 +539,11 @@ fn render_node(node: &PositionedNode, _config: &RenderConfig) -> SvgElement {
         format!("section-{}", node.section % (MAX_SECTIONS as i32 - 1))
     };
 
-    // Build node class
+    // Build node class - root nodes get both section-root and section--1 (matching mermaid.js)
     let mut classes = vec!["mindmap-node".to_string(), section_class.clone()];
+    if node.section < 0 {
+        classes.push("section--1".to_string());
+    }
     if let Some(ref class) = node.class {
         classes.push(class.clone());
     }
@@ -803,8 +806,25 @@ fn generate_mindmap_css(config: &RenderConfig) -> String {
     // Root section uses a distinctive blue (matching mermaid.js exactly)
     // mermaid uses hsl(240, 100%, 46.2745098039%) for section-root fill
     // and hsl(240, 100%, 76.2745098039%) for section--1 shapes
+    // section--1 is used alongside section-root in the reference
     section_css.push_str(
         r#"
+.section--1 rect, .section--1 path, .section--1 circle, .section--1 polygon {
+  fill: hsl(240, 100%, 76.2745098039%);
+}
+.section--1 text {
+  fill: #ffffff;
+}
+.section-edge--1 {
+  stroke: hsl(240, 100%, 76.2745098039%);
+}
+.edge-depth--1 {
+  stroke-width: 17;
+}
+.section--1 line {
+  stroke: hsl(60, 100%, 86.2745098039%);
+  stroke-width: 3;
+}
 .section-root rect, .section-root path, .section-root circle, .section-root polygon {
   fill: hsl(240, 100%, 46.2745098039%);
 }
@@ -910,6 +930,19 @@ fn generate_mindmap_css(config: &RenderConfig) -> String {
         r#"
 .mindmap-node {{
   cursor: pointer;
+}}
+.error-icon {{
+  fill: #552222;
+}}
+.error-text {{
+  fill: #552222;
+  stroke: #552222;
+}}
+.disabled, .disabled circle, .disabled text {{
+  fill: lightgray;
+}}
+.disabled text {{
+  fill: #efefef;
 }}
 .mindmap-node-label {{
   font-family: {font_family};
