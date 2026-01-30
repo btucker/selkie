@@ -26,7 +26,8 @@ struct EdgeContext<'a> {
 /// Render all edges onto the canvas using braille sub-pixel lines.
 ///
 /// `occupied` is a grid of booleans where `true` means a node occupies that cell.
-/// Braille characters are only composited onto unoccupied cells.
+/// Braille characters and arrow tips are only composited onto unoccupied cells
+/// to avoid corrupting node box-drawing characters.
 #[allow(clippy::too_many_arguments)]
 pub fn render_edges(
     graph: &LayoutGraph,
@@ -68,7 +69,7 @@ pub fn render_edges(
         }
     }
 
-    // Render arrow tips and edge labels on top
+    // Render arrow tips and edge labels, respecting occupied cells
     for edge in &graph.edges {
         render_arrow_tip(edge, &ctx, occupied, canvas);
         render_edge_label(edge, &ctx, occupied, canvas);

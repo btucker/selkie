@@ -1355,13 +1355,14 @@ fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std
             let output = tui_render::render_sequence_tui(db)?;
             Ok(output)
         }
-        // Graph-based diagram types use the generic renderer
-        selkie::diagrams::Diagram::State(db) => {
+        // Class diagrams use specialized renderer with multi-section boxes
+        selkie::diagrams::Diagram::Class(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(tui_render::render_graph_tui(&graph)?)
+            Ok(tui_render::render_class_tui(db, &graph)?)
         }
-        selkie::diagrams::Diagram::Class(db) => {
+        // Graph-based diagram types use the generic renderer
+        selkie::diagrams::Diagram::State(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
             Ok(tui_render::render_graph_tui(&graph)?)

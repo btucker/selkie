@@ -16,6 +16,7 @@ pub mod shapes;
 
 use std::collections::{HashMap, HashSet};
 
+use crate::diagrams::class::ClassDb;
 use crate::diagrams::er::ErDb;
 use crate::diagrams::flowchart::FlowchartDb;
 use crate::error::Result;
@@ -24,7 +25,7 @@ use crate::layout::LayoutGraph;
 pub use sequence::render_sequence_tui;
 
 use scale::CellScale;
-use shapes::render_shape;
+use shapes::{render_class_box, render_shape};
 
 /// Render any laid-out graph as character art.
 ///
@@ -559,6 +560,128 @@ fn flowchart_node_label(db: &FlowchartDb, node: &crate::layout::LayoutNode) -> S
 fn clean_html_label(raw: &str) -> String {
     let cleaned = raw.replace("<br/>", " ").replace("<br>", " ");
     cleaned.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+/// Render a class diagram as character art.
+///
+/// Each class becomes a multi-section box with optional annotations,
+/// a class name header, attributes, and methods separated by horizontal
+/// dividers (├─┤). Relations are rendered as braille edges with arrow tips.
+pub fn render_class_tui(db: &ClassDb, graph: &LayoutGraph) -> Result<String> {
+    let scale = CellScale::default();
+
+    let graph_width = graph.width.unwrap_or(400.0);
+    let graph_height = graph.height.unwrap_or(300.0);
+    let offset_x = graph.bounds_x.unwrap_or(0.0);
+    let offset_y = graph.bounds_y.unwrap_or(0.0);
+
+    let canvas_cols = scale.to_col(graph_width) + 4;
+    let canvas_rows = scale.to_row(graph_height) + 2;
+
+    let mut canvas: Vec<Vec<char>> = vec![vec![' '; canvas_cols]; canvas_rows];
+    let mut occupied: Vec<Vec<bool>> = vec![vec![false; canvas_cols]; canvas_rows];
+
+    // Render each class node
+    for node in &graph.nodes {
+        if node.is_dummy {
+            continue;
+        }
+
+        let (nx, ny) = match (node.x, node.y) {
+            (Some(x), Some(y)) => (x - offset_x, y - offset_y),
+            _ => continue,
+        };
+
+        // Look up the ClassNode for sections
+        let class_node = db.classes.get(&node.id);
+
+        let label = class_node
+            .map(|c| {
+                if !c.label.is_empty() {
+                    c.label.as_str()
+                } else {
+                    c.id.as_str()
+                }
+            })
+            .or(node.label.as_deref())
+            .unwrap_or(&node.id);
+
+        let cell_w = scale.to_cell_width(node.width);
+        let cell_h = scale.to_cell_height(node.height);
+
+        let rendered = if let Some(cn) = class_node {
+            let annotations: Vec<&str> = cn.annotations.iter().map(|a| a.as_str()).collect();
+            let members: Vec<String> = cn
+                .members
+                .iter()
+                .map(|m| m.get_display_details().display_text)
+                .collect();
+            let methods: Vec<String> = cn
+                .methods
+                .iter()
+                .map(|m| m.get_display_details().display_text)
+                .collect();
+            render_class_box(
+                label,
+                &annotations,
+                &members.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+                &methods.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+                cell_w,
+                cell_h,
+            )
+        } else {
+            render_shape(&node.shape, label, cell_w, cell_h)
+        };
+
+        let col_start = scale.to_col(nx).saturating_sub(rendered.width / 2);
+        let row_start = scale.to_row(ny).saturating_sub(rendered.height / 2);
+
+        for (r, line) in rendered.lines.iter().enumerate() {
+            let canvas_row = row_start + r;
+            if canvas_row >= canvas_rows {
+                break;
+            }
+            for (c, ch) in line.chars().enumerate() {
+                let canvas_col = col_start + c;
+                if canvas_col >= canvas_cols {
+                    break;
+                }
+                if ch != ' ' {
+                    canvas[canvas_row][canvas_col] = ch;
+                    occupied[canvas_row][canvas_col] = true;
+                }
+            }
+        }
+    }
+
+    // Render edges (braille lines + arrows + labels)
+    edges::render_edges(
+        graph,
+        &scale,
+        canvas_cols,
+        canvas_rows,
+        offset_x,
+        offset_y,
+        &occupied,
+        &mut canvas,
+    );
+
+    // Convert canvas to string, trimming trailing empty lines
+    let mut result = String::new();
+    let mut last_non_empty = 0;
+    for (i, row) in canvas.iter().enumerate() {
+        if row.iter().any(|&c| c != ' ') {
+            last_non_empty = i;
+        }
+    }
+
+    for row in &canvas[..=last_non_empty] {
+        let line: String = row.iter().collect();
+        result.push_str(line.trim_end());
+        result.push('\n');
+    }
+
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -1167,5 +1290,91 @@ mod tests {
                 output
             );
         }
+    }
+
+    // --- Class diagram specialized TUI tests ---
+
+    fn parse_and_layout_class(input: &str) -> (ClassDb, LayoutGraph) {
+        let diagram = crate::parse(input).unwrap();
+        let db = match diagram {
+            crate::diagrams::Diagram::Class(db) => db,
+            other => panic!(
+                "Expected class diagram, got {:?}",
+                std::mem::discriminant(&other)
+            ),
+        };
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+        let graph = crate::layout::layout(graph).unwrap();
+        (db, graph)
+    }
+
+    #[test]
+    fn class_single_renders() {
+        let input =
+            "classDiagram\n    class Animal {\n        +int age\n        +isMammal()\n    }";
+        let (db, graph) = parse_and_layout_class(input);
+        let output = render_class_tui(&db, &graph).unwrap();
+        assert!(
+            output.contains("Animal"),
+            "Should contain class name 'Animal'"
+        );
+        assert!(output.contains('┌'), "Should have box-drawing chars");
+        assert!(output.contains('├'), "Should have section dividers");
+    }
+
+    #[test]
+    fn class_two_with_relation_renders() {
+        let input = "classDiagram\n    Animal <|-- Duck\n    Animal : +int age\n    Duck : +swim()";
+        let (db, graph) = parse_and_layout_class(input);
+        let output = render_class_tui(&db, &graph).unwrap();
+        assert!(output.contains("Animal"), "Should contain 'Animal'");
+        assert!(output.contains("Duck"), "Should contain 'Duck'");
+    }
+
+    #[test]
+    fn class_output_is_nonempty() {
+        let input = "classDiagram\n    class Foo";
+        let (db, graph) = parse_and_layout_class(input);
+        let output = render_class_tui(&db, &graph).unwrap();
+        assert!(!output.trim().is_empty(), "Output should not be empty");
+    }
+
+    #[cfg(feature = "eval")]
+    #[test]
+    fn class_tui_labels_detected_by_eval() {
+        let input = "classDiagram\n    Animal <|-- Duck\n    Animal <|-- Fish\n    Animal <|-- Zebra\n    Animal : +int age\n    Animal : +String gender\n    Animal: +isMammal()\n    Animal: +mate()\n    class Duck{\n        +String beakColor\n        +swim()\n        +quack()\n    }";
+        let (db, graph) = parse_and_layout_class(input);
+        let output = render_class_tui(&db, &graph).unwrap();
+
+        let tui = crate::eval::tui_checks::parse_tui(&output);
+
+        // All class names should be found
+        for name in ["Animal", "Duck", "Fish", "Zebra"] {
+            assert!(
+                tui.labels.iter().any(|l: &String| l.contains(name)),
+                "Should find class '{}' in labels {:?}",
+                name,
+                tui.labels
+            );
+        }
+    }
+
+    #[test]
+    fn class_edges_produce_visual() {
+        let input = "classDiagram\n    Animal <|-- Duck\n    Animal <|-- Fish";
+        let (db, graph) = parse_and_layout_class(input);
+        let output = render_class_tui(&db, &graph).unwrap();
+        let has_braille = output
+            .chars()
+            .any(|c| ('\u{2800}'..='\u{28FF}').contains(&c));
+        let has_arrow = output.contains('▼')
+            || output.contains('▶')
+            || output.contains('▲')
+            || output.contains('◀');
+        assert!(
+            has_braille || has_arrow,
+            "Edges should produce braille dots or arrows"
+        );
     }
 }

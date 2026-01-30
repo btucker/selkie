@@ -143,11 +143,17 @@ fn extract_node_labels(grid: &[Vec<char>]) -> Vec<String> {
     labels
 }
 
+/// Characters that indicate horizontal section dividers (├ or ┤).
+const BOX_DIVIDERS: &[char] = &['├', '┤'];
+
 /// Check if a row segment is inside a box by verifying that the segment
 /// is bounded by │ characters on the same row (already the case when called
 /// from `extract_node_labels`), and that there are horizontal borders
 /// directly above and below without gaps (i.e., every row between the text
 /// and the border also has │ at the boundary columns).
+///
+/// The search range is generous (up to 12 rows) to handle class diagram boxes
+/// which can be tall with many sections (annotations, name, members, methods).
 fn is_inside_box(grid: &[Vec<char>], row: usize, col_start: usize, col_end: usize) -> bool {
     // col_start is the char after the opening │, col_end is the closing │
     // Check that the opening and closing │ exist on this row
@@ -163,26 +169,27 @@ fn is_inside_box(grid: &[Vec<char>], row: usize, col_start: usize, col_end: usiz
         return false;
     }
 
-    // Look for horizontal border directly above (within 3 rows)
+    let is_border_char = |ch: char| {
+        BOX_CORNERS.contains(&ch) || BOX_HORIZONTAL.contains(&ch) || BOX_DIVIDERS.contains(&ch)
+    };
+
+    // Look for horizontal border above (within 12 rows for tall class boxes)
     let has_top = if row > 0 {
-        let search_start = row.saturating_sub(3);
-        grid[search_start..row].iter().rev().any(|r| {
-            left_border < r.len()
-                && (BOX_CORNERS.contains(&r[left_border])
-                    || BOX_HORIZONTAL.contains(&r[left_border]))
-        })
+        let search_start = row.saturating_sub(12);
+        grid[search_start..row]
+            .iter()
+            .rev()
+            .any(|r| left_border < r.len() && is_border_char(r[left_border]))
     } else {
         false
     };
 
-    // Look for horizontal border directly below (within 3 rows)
+    // Look for horizontal border below (within 12 rows)
     let has_bottom = if row + 1 < grid.len() {
-        let search_end = (row + 4).min(grid.len());
-        grid[row + 1..search_end].iter().any(|r| {
-            left_border < r.len()
-                && (BOX_CORNERS.contains(&r[left_border])
-                    || BOX_HORIZONTAL.contains(&r[left_border]))
-        })
+        let search_end = (row + 13).min(grid.len());
+        grid[row + 1..search_end]
+            .iter()
+            .any(|r| left_border < r.len() && is_border_char(r[left_border]))
     } else {
         false
     };
@@ -381,6 +388,11 @@ pub fn check_er_tui_structure(tui: &TuiStructure, db: &crate::diagrams::er::ErDb
 
 /// Check that TUI output has the correct number of nodes.
 /// Counts nodes whose labels appear anywhere in the TUI output (boxes, free text, etc.).
+///
+/// For class diagrams, each class box has multiple text rows (name, members,
+/// methods), so the raw label count may exceed the node count. We check that
+/// at least the expected number of node labels are present and flag an error
+/// only if fewer labels exist than expected nodes.
 fn check_tui_node_count(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
     let expected = graph.nodes.iter().filter(|n| !n.is_dummy).count();
     // Count nodes found: either in box labels or in the raw output
@@ -400,12 +412,12 @@ fn check_tui_node_count(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Ve
         }
     }
 
-    if found != expected {
+    if found < expected {
         issues.push(
             Issue::error(
                 "tui_node_count",
                 format!(
-                    "TUI node count mismatch: expected {}, found {}",
+                    "TUI node count too low: expected at least {}, found {}",
                     expected, found
                 ),
             )

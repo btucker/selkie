@@ -177,6 +177,110 @@ fn render_circle(label: &str, w: usize, h: usize, double: bool) -> RenderedShape
     }
 }
 
+/// Render a class diagram box with sections: annotations, name, members, methods.
+///
+/// The box uses ├─┤ dividers between sections. Empty sections (no members or
+/// no methods) are omitted, but the divider between members and methods is
+/// always drawn when both exist.
+pub fn render_class_box(
+    name: &str,
+    annotations: &[&str],
+    members: &[&str],
+    methods: &[&str],
+    cell_w: usize,
+    cell_h: usize,
+) -> RenderedShape {
+    // Compute minimum width from content
+    let mut max_content = name.len();
+    for a in annotations {
+        let text = format!("«{}»", a);
+        max_content = max_content.max(text.len());
+    }
+    for m in members {
+        max_content = max_content.max(m.len());
+    }
+    for m in methods {
+        max_content = max_content.max(m.len());
+    }
+
+    let w = cell_w.max(max_content + 4).max(5);
+    let inner_w = w.saturating_sub(2);
+
+    let mut lines: Vec<String> = Vec::new();
+
+    // Top border
+    lines.push(format!("┌{}┐", "─".repeat(inner_w)));
+
+    // Annotations (e.g., «interface»)
+    for a in annotations {
+        let text = format!("«{}»", a);
+        lines.push(center_in_box(&text, inner_w));
+    }
+
+    // Class name
+    lines.push(center_in_box(name, inner_w));
+
+    // Members section
+    let has_members = !members.is_empty();
+    let has_methods = !methods.is_empty();
+
+    if has_members || has_methods {
+        // Divider before members
+        lines.push(format!("├{}┤", "─".repeat(inner_w)));
+    }
+
+    for m in members {
+        lines.push(left_align_in_box(m, inner_w));
+    }
+
+    if has_members && has_methods {
+        // Divider between members and methods
+        lines.push(format!("├{}┤", "─".repeat(inner_w)));
+    }
+
+    for m in methods {
+        lines.push(left_align_in_box(m, inner_w));
+    }
+
+    // Bottom border
+    lines.push(format!("└{}┘", "─".repeat(inner_w)));
+
+    // Pad to desired height if needed
+    let _ = cell_h; // class boxes are sized by content, not forced height
+
+    RenderedShape {
+        width: w,
+        height: lines.len(),
+        lines,
+    }
+}
+
+fn center_in_box(text: &str, inner_w: usize) -> String {
+    let display = if text.len() > inner_w {
+        &text[..inner_w]
+    } else {
+        text
+    };
+    let pad_total = inner_w.saturating_sub(display.len());
+    let pad_left = pad_total / 2;
+    let pad_right = pad_total - pad_left;
+    format!(
+        "│{}{}{}│",
+        " ".repeat(pad_left),
+        display,
+        " ".repeat(pad_right)
+    )
+}
+
+fn left_align_in_box(text: &str, inner_w: usize) -> String {
+    let display = if text.len() > inner_w.saturating_sub(1) {
+        &text[..inner_w.saturating_sub(1)]
+    } else {
+        text
+    };
+    let pad = inner_w.saturating_sub(display.len() + 1);
+    format!("│ {}{}│", display, " ".repeat(pad))
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -275,5 +379,57 @@ mod tests {
         // Rows 1 and 3 should be blank interior
         assert_eq!(shape.lines[1], "│   │");
         assert_eq!(shape.lines[3], "│   │");
+    }
+
+    #[test]
+    fn class_box_name_only() {
+        let shape = render_class_box("Animal", &[], &[], &[], 10, 5);
+        assert!(shape.lines[0].starts_with('┌'));
+        assert!(shape.lines.iter().any(|l| l.contains("Animal")));
+        assert!(shape.lines.last().unwrap().starts_with('└'));
+    }
+
+    #[test]
+    fn class_box_with_members_and_methods() {
+        let shape = render_class_box(
+            "Duck",
+            &[],
+            &["+String beakColor"],
+            &["+swim()", "+quack()"],
+            20,
+            10,
+        );
+        let text = shape.lines.join("\n");
+        assert!(text.contains("Duck"), "Should contain class name");
+        assert!(text.contains("+String beakColor"), "Should contain member");
+        assert!(text.contains("+swim()"), "Should contain method");
+        // Should have dividers (├─┤)
+        let dividers = shape.lines.iter().filter(|l| l.contains('├')).count();
+        assert!(
+            dividers >= 2,
+            "Should have dividers between sections, got {}",
+            dividers
+        );
+    }
+
+    #[test]
+    fn class_box_with_annotation() {
+        let shape = render_class_box("Flyable", &["interface"], &[], &["+fly()"], 15, 5);
+        let text = shape.lines.join("\n");
+        assert!(text.contains("«interface»"), "Should contain annotation");
+        assert!(text.contains("Flyable"), "Should contain name");
+        assert!(text.contains("+fly()"), "Should contain method");
+    }
+
+    #[test]
+    fn class_box_members_only() {
+        let shape = render_class_box("Config", &[], &["+host", "+port"], &[], 12, 5);
+        let text = shape.lines.join("\n");
+        assert!(text.contains("Config"));
+        assert!(text.contains("+host"));
+        assert!(text.contains("+port"));
+        // Only one divider (before members)
+        let dividers = shape.lines.iter().filter(|l| l.contains('├')).count();
+        assert_eq!(dividers, 1, "Should have one divider before members");
     }
 }
