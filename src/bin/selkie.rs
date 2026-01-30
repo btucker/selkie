@@ -801,7 +801,7 @@ fn run_eval_ascii(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
                     ascii_supported_types.contains(&dt.as_str())
                 } else {
                     let detected = detect_diagram_type(&i.text);
-                    detected.map_or(false, |t| ascii_supported_types.contains(&t))
+                    detected.is_some_and(|t| ascii_supported_types.contains(&t))
                 }
             }
         })

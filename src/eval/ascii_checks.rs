@@ -1435,6 +1435,8 @@ pub fn check_ascii_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
             check: format!("ascii_{}_output", diagram_type),
             message: "ASCII output is empty".to_string(),
             level: super::Level::Error,
+            expected: None,
+            actual: None,
         });
         return issues;
     }
@@ -1445,6 +1447,8 @@ pub fn check_ascii_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
             check: format!("ascii_{}_content", diagram_type),
             message: "ASCII output has fewer than 2 lines".to_string(),
             level: super::Level::Warning,
+            expected: None,
+            actual: None,
         });
     }
 
@@ -1454,6 +1458,8 @@ pub fn check_ascii_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
             check: format!("ascii_{}_empty", diagram_type),
             message: "ASCII output contains empty placeholder".to_string(),
             level: super::Level::Warning,
+            expected: None,
+            actual: None,
         });
     }
 
@@ -1503,11 +1509,9 @@ pub fn calculate_ascii_text_similarity(output: &str) -> f64 {
                 | '◉'
                 | '★'
                 | '§'
-                | '◆'
                 | '▶'
                 | '▼'
                 | '◀'
-                | '▲'
                 | '→'
         )
     });
