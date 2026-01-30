@@ -190,17 +190,17 @@ pub fn render_class_box(
     cell_w: usize,
     cell_h: usize,
 ) -> RenderedShape {
-    // Compute minimum width from content
-    let mut max_content = name.len();
+    // Compute minimum width from content (use char count for UTF-8 safety)
+    let mut max_content = name.chars().count();
     for a in annotations {
         let text = format!("«{}»", a);
-        max_content = max_content.max(text.len());
+        max_content = max_content.max(text.chars().count());
     }
     for m in members {
-        max_content = max_content.max(m.len());
+        max_content = max_content.max(m.chars().count());
     }
     for m in methods {
-        max_content = max_content.max(m.len());
+        max_content = max_content.max(m.chars().count());
     }
 
     let w = cell_w.max(max_content + 4).max(5);
@@ -256,12 +256,14 @@ pub fn render_class_box(
 }
 
 fn center_in_box(text: &str, inner_w: usize) -> String {
-    let display = if text.len() > inner_w {
-        &text[..inner_w]
+    let char_count = text.chars().count();
+    let display: String = if char_count > inner_w {
+        text.chars().take(inner_w).collect()
     } else {
-        text
+        text.to_string()
     };
-    let pad_total = inner_w.saturating_sub(display.len());
+    let display_len = display.chars().count();
+    let pad_total = inner_w.saturating_sub(display_len);
     let pad_left = pad_total / 2;
     let pad_right = pad_total - pad_left;
     format!(
@@ -273,12 +275,14 @@ fn center_in_box(text: &str, inner_w: usize) -> String {
 }
 
 fn left_align_in_box(text: &str, inner_w: usize) -> String {
-    let display = if text.len() > inner_w.saturating_sub(1) {
-        &text[..inner_w.saturating_sub(1)]
+    let char_count = text.chars().count();
+    let display: String = if char_count > inner_w.saturating_sub(1) {
+        text.chars().take(inner_w.saturating_sub(1)).collect()
     } else {
-        text
+        text.to_string()
     };
-    let pad = inner_w.saturating_sub(display.len() + 1);
+    let display_len = display.chars().count();
+    let pad = inner_w.saturating_sub(display_len + 1);
     format!("│ {}{}│", display, " ".repeat(pad))
 }
 #[cfg(test)]
