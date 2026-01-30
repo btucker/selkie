@@ -175,11 +175,13 @@ impl SvgRenderer {
         let edges = render_architecture_edges(db, graph);
         doc.add_edge_path(edges);
 
+        // Services render before groups so groups (dashed borders) appear on top.
+        // Use edge_label slot (position 3) for services, nodes slot (position 4) for groups.
         let services = render_architecture_services(db, graph);
-        doc.add_node(services);
+        doc.add_edge_label(services);
 
         let groups = render_architecture_groups(db, graph);
-        doc.add_cluster(groups);
+        doc.add_node(groups);
 
         Ok(doc.to_string())
     }

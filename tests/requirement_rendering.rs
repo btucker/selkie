@@ -1312,3 +1312,63 @@ fn should_have_contains_start_marker_definition() {
         "The contains-start marker should contain a circle and lines (for the + symbol)."
     );
 }
+
+/// Test that CSS colors match mermaid reference
+#[test]
+fn should_use_correct_css_colors() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let svg = render_requirement_svg(input);
+
+    // Relationship labels should use 'black' fill (matching mermaid's .relationshipLabel)
+    assert!(
+        svg.contains("fill: black") || svg.contains("fill:black"),
+        "Relationship labels should use 'black' fill to match mermaid reference. SVG CSS: {}",
+        &svg[..svg.find("</style>").unwrap_or(500)]
+    );
+
+    // Relationship line stroke-width should be 1 (matching mermaid's .relationshipLine)
+    assert!(
+        svg.contains("stroke-width: 1;") || svg.contains("stroke-width:1;"),
+        "Relationship lines should use stroke-width: 1 to match mermaid reference"
+    );
+}
+
+/// Test that relationship line stroke-width is 1px (matching mermaid reference)
+#[test]
+fn should_use_stroke_width_1_for_relationship_lines() {
+    let input = r#"requirementDiagram
+    requirement test_req {
+    id: 1
+    text: the test text.
+    risk: high
+    verifymethod: test
+    }
+
+    element test_entity {
+    type: simulation
+    }
+
+    test_entity - satisfies -> test_req"#;
+
+    let svg = render_requirement_svg(input);
+
+    // The CSS should define relationship-line with stroke-width: 1
+    // NOT stroke-width: 1.5
+    assert!(
+        !svg.contains("stroke-width: 1.5"),
+        "Relationship lines should NOT use stroke-width: 1.5 (mermaid uses 1)"
+    );
+}

@@ -398,11 +398,12 @@ impl ToLayoutGraph for ErDb {
         let mut graph = LayoutGraph::new("er");
 
         // Set layout options from diagram direction
-        // Spacing tuned to match mermaid.js visual output
+        // Spacing matches mermaid.js ER config:
+        //   nodeSpacing = 140, rankSpacing = 80
         graph.options = LayoutOptions {
             direction: self.preferred_direction(),
-            node_spacing: 75.0,
-            layer_spacing: 70.0,
+            node_spacing: 140.0,
+            layer_spacing: 80.0,
             padding: Padding::uniform(20.0),
             ..Default::default()
         };
@@ -1280,6 +1281,11 @@ fn calculate_connection_points(
 }
 
 fn generate_er_css(theme: &Theme) -> String {
+    // Compute the ER-specific tertiary color from primary, matching mermaid.js:
+    //   this.tertiaryColor = adjust(this.primaryColor, { h: -160 })
+    // This is used for relationship label backgrounds.
+    let tertiary_color = compute_er_tertiary_color(theme);
+
     format!(
         r#"
 .er-title {{
@@ -1312,11 +1318,12 @@ fn generate_er_css(theme: &Theme) -> String {
 }}
 
 .relationship-label {{
-  fill: {text_color};
+  fill: {border_color};
+  font-size: 14px;
 }}
 
 .relationship-label-background {{
-  fill: {background};
+  fill: {tertiary_color};
   opacity: 0.7;
 }}
 
@@ -1347,7 +1354,25 @@ fn generate_er_css(theme: &Theme) -> String {
         border_color = theme.primary_border_color,
         line_color = theme.line_color,
         background = theme.background,
+        tertiary_color = tertiary_color,
     )
+}
+
+/// Compute the ER-specific tertiary color from the theme.
+/// Mermaid.js derives tertiaryColor as adjust(primaryColor, { h: -160 }),
+/// i.e., hue-shift the primary color by -160 degrees.
+/// For the default primary #ECECFF (hsl(240, 100%, 96.27%)), this yields
+/// hsl(80, 100%, 96.27%) - a light yellow-green.
+fn compute_er_tertiary_color(theme: &Theme) -> String {
+    use crate::render::svg::color::{adjust, Color};
+
+    if let Some(primary) = Color::parse(&theme.primary_color) {
+        let tertiary = adjust(&primary, -160.0, 0.0, 0.0);
+        tertiary.to_hex()
+    } else {
+        // Fallback: use theme's tertiary_color as-is
+        theme.tertiary_color.clone()
+    }
 }
 
 /// Generate SVG marker definitions for ER diagram cardinality symbols
@@ -1817,6 +1842,60 @@ mod tests {
             "End Y should be offset above top edge: expected {}, got {}",
             expected_end_y,
             end_y
+        );
+    }
+
+    #[test]
+    fn test_er_css_uses_tertiary_color_for_label_background() {
+        // Mermaid.js uses tertiaryColor for .relationshipLabelBox fill,
+        // not the background color. The tertiary color is derived from
+        // primary by hue-shifting -160 degrees.
+        let input = r#"erDiagram
+    CUSTOMER ||--o{ ORDER : places
+"#;
+        let db = parse(input).unwrap();
+        let config = RenderConfig::default();
+        let _svg = render_er(&db, &config).unwrap();
+
+        // The relationship label background should NOT use white/background color.
+        // It should use the tertiary color (light yellow-green for default theme).
+        // Mermaid uses: .relationshipLabelBox { fill: tertiaryColor; opacity: 0.7; }
+        // With default theme: tertiaryColor = adjust(#ECECFF, { h: -160 })
+        //   = hsl(80, 100%, 96.27%) ≈ a light yellow-green
+        // We don't need exact color match, but the CSS should reference
+        // the tertiary_color, not background.
+        let css = generate_er_css(&config.theme);
+        assert!(
+            !css.contains(".relationship-label-background {\n  fill: #ffffff")
+                && !css.contains(".relationship-label-background {\n  fill: white"),
+            "Label background should NOT use white/background. Got CSS: {}",
+            css
+        );
+    }
+
+    #[test]
+    fn test_er_css_marker_uses_important() {
+        // Mermaid.js marker CSS uses !important to ensure markers
+        // are not overridden by other styles
+        let css = generate_er_css(&RenderConfig::default().theme);
+        // The marker fill should be "none" to match mermaid's fill: none !important
+        assert!(
+            css.contains("fill: none"),
+            "Marker should have fill: none. CSS: {}",
+            css
+        );
+    }
+
+    #[test]
+    fn test_er_relationship_label_uses_border_color() {
+        // Mermaid uses nodeBorder color for edge label text,
+        // not textColor. From styles.ts: .edgeLabel .label { fill: ${options.nodeBorder} }
+        let css = generate_er_css(&RenderConfig::default().theme);
+        // The relationship label fill should use border color (#9370DB), not text color
+        assert!(
+            css.contains(".relationship-label {\n  fill: #9370DB"),
+            "Relationship label should use border color for fill. CSS: {}",
+            css
         );
     }
 

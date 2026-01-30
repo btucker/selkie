@@ -2414,16 +2414,51 @@ fn test_sequence_loop_scopes_to_single_actor() {
     let svg = render_with_config(&diagram, &RenderConfig::default())
         .expect("Failed to render sequence diagram");
 
+    // Fragment frames use line elements (not rects) matching mermaid.js.
+    // Find the horizontal top line of the loop frame (first loopLine) and compute its width.
     let loop_width = svg
-        .split("<rect")
-        .find_map(|chunk| {
-            if !chunk.contains("class=\"loopLine\"") {
+        .split("<line")
+        .filter_map(|chunk| {
+            if !chunk.contains("loopLine") {
                 return None;
             }
-            let width = chunk.split("width=\"").nth(1)?.split('"').next()?;
-            width.parse::<f64>().ok()
+            let x1 = chunk
+                .split("x1=\"")
+                .nth(1)?
+                .split('"')
+                .next()?
+                .parse::<f64>()
+                .ok()?;
+            let x2 = chunk
+                .split("x2=\"")
+                .nth(1)?
+                .split('"')
+                .next()?
+                .parse::<f64>()
+                .ok()?;
+            let y1 = chunk
+                .split("y1=\"")
+                .nth(1)?
+                .split('"')
+                .next()?
+                .parse::<f64>()
+                .ok()?;
+            let y2 = chunk
+                .split("y2=\"")
+                .nth(1)?
+                .split('"')
+                .next()?
+                .parse::<f64>()
+                .ok()?;
+            // Horizontal line (y1 == y2) indicates top or bottom of frame
+            if (y1 - y2).abs() < 0.1 {
+                Some((x2 - x1).abs())
+            } else {
+                None
+            }
         })
-        .expect("Failed to parse loop frame width");
+        .next()
+        .expect("Failed to find loop frame horizontal line");
 
     assert!(
         loop_width < 300.0,
@@ -3656,4 +3691,82 @@ fn test_sequence_notes_have_inline_fill() {
         "Notes should have inline fill for mermaid visual parity.\nSVG snippet: {}",
         &svg[..svg.len().min(2000)]
     );
+}
+
+#[test]
+fn test_state_nested_composite_centered_in_parent_with_siblings() {
+    // Reproduces eval issue: state_complex2 "Nested composite Processing not centered in Idle: -137px offset (reference: 30px)"
+    // When a parent composite has both non-composite children and a nested composite,
+    // the nested composite should be horizontally centered within the parent's full width,
+    // not relative to just the non-composite siblings.
+    let input = std::fs::read_to_string("docs/sources/state_complex2.mmd")
+        .expect("Failed to read state_complex2.mmd");
+
+    let diagram = parse(&input).expect("Failed to parse");
+    let svg = render(&diagram).expect("Failed to render");
+
+    // Extract outer rect bounds for both composites
+    let extract_composite_bounds = |svg: &str, name: &str| -> Option<(f64, f64, f64)> {
+        let composite_marker = format!("id=\"composite-{}\"", name);
+        let composite_start = svg.find(&composite_marker)?;
+        let relevant_section = &svg[composite_start..composite_start.saturating_add(600)];
+
+        let x_pattern = regex::Regex::new(r#"x="([0-9.]+)""#).ok()?;
+        let w_pattern = regex::Regex::new(r#"width="([0-9.]+)""#).ok()?;
+
+        for line in relevant_section.lines() {
+            if line.contains("state-composite-outer") {
+                if let (Some(x_caps), Some(w_caps)) =
+                    (x_pattern.captures(line), w_pattern.captures(line))
+                {
+                    let x: f64 = x_caps.get(1)?.as_str().parse().ok()?;
+                    let w: f64 = w_caps.get(1)?.as_str().parse().ok()?;
+                    let center = x + w / 2.0;
+                    return Some((x, w, center));
+                }
+            }
+        }
+        None
+    };
+
+    let idle_bounds = extract_composite_bounds(&svg, "Idle");
+    let processing_bounds = extract_composite_bounds(&svg, "Processing");
+
+    eprintln!("Composite bounds:");
+    eprintln!("  Idle: {:?}", idle_bounds);
+    eprintln!("  Processing: {:?}", processing_bounds);
+
+    if let (Some((idle_x, idle_w, idle_center)), Some((_proc_x, _proc_w, proc_center))) =
+        (idle_bounds, processing_bounds)
+    {
+        // Processing should be centered within Idle
+        let offset = proc_center - idle_center;
+        eprintln!("  Offset of Processing center from Idle center: {}", offset);
+
+        // The offset should be small (within ~50px), not -137px
+        assert!(
+            offset.abs() < 50.0,
+            "Processing should be approximately centered in Idle: offset={} (should be near 0)",
+            offset
+        );
+
+        // Processing should be fully contained within Idle (with some padding)
+        assert!(
+            _proc_x >= idle_x,
+            "Processing should not extend left of Idle: proc_x={}, idle_x={}",
+            _proc_x,
+            idle_x
+        );
+        assert!(
+            _proc_x + _proc_w <= idle_x + idle_w + 1.0, // 1px tolerance
+            "Processing should not extend right of Idle: proc_right={}, idle_right={}",
+            _proc_x + _proc_w,
+            idle_x + idle_w
+        );
+    } else {
+        panic!(
+            "Could not extract composite bounds from SVG.\nIdle: {:?}\nProcessing: {:?}",
+            idle_bounds, processing_bounds
+        );
+    }
 }

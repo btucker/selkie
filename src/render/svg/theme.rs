@@ -280,7 +280,7 @@ impl Default for Theme {
             tertiary_color: "#fafafa".to_string(),
             cluster_border_color: "#aaaa33".to_string(),
             line_color: "#333333".to_string(),
-            background: "#ffffff".to_string(),
+            background: "white".to_string(),
             edge_label_background: "rgba(232, 232, 232, 0.8)".to_string(),
             font_family: "trebuchet ms, verdana, arial, sans-serif".to_string(),
             font_size: "16px".to_string(),
@@ -298,9 +298,9 @@ impl Default for Theme {
             actor_line_color: "#999999".to_string(),
             signal_color: "#333333".to_string(),
             signal_text_color: "#333333".to_string(),
-            note_bkg_color: "#FFFFCC".to_string(),
+            note_bkg_color: "#fff5ad".to_string(),
             note_border_color: "#aaaa33".to_string(),
-            note_text_color: "#333333".to_string(),
+            note_text_color: "black".to_string(),
             activation_bkg_color: "#f4f4f4".to_string(),
             activation_border_color: "#666666".to_string(),
             label_box_bkg_color: "#fff5ad".to_string(),
@@ -1796,7 +1796,7 @@ mod tests {
         assert_eq!(theme.primary_color, "#ff0000");
         assert_eq!(theme.secondary_color, "#00ff00");
         // Other colors should remain default
-        assert_eq!(theme.background, "#ffffff");
+        assert_eq!(theme.background, "white");
     }
 
     #[test]
@@ -1849,7 +1849,7 @@ mod tests {
         let theme = Theme::default();
 
         assert_eq!(theme.get_variable("primaryColor"), Some("#ECECFF"));
-        assert_eq!(theme.get_variable("background"), Some("#ffffff"));
+        assert_eq!(theme.get_variable("background"), Some("white"));
         assert_eq!(theme.get_variable("unknownVar"), None);
 
         // Aliases should work
@@ -1924,7 +1924,7 @@ mod tests {
         assert_eq!(theme.primary_color, "#ff0000");
         assert_eq!(theme.line_color, "#00ff00");
         // Other values should remain default
-        assert_eq!(theme.background, "#ffffff");
+        assert_eq!(theme.background, "white");
     }
 
     #[test]

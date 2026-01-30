@@ -142,39 +142,7 @@ fn estimate_text_height(text: &str, max_width: f64) -> f64 {
 
 /// Wrap text into lines based on max width
 fn wrap_text_lines(text: &str, max_width: f64) -> Vec<String> {
-    let words: Vec<&str> = text.split_whitespace().collect();
-    if words.is_empty() {
-        return vec![String::new()];
-    }
-
-    let mut lines = Vec::new();
-    let mut current_line = String::new();
-
-    for word in words {
-        if current_line.is_empty() {
-            current_line = word.to_string();
-        } else {
-            let potential = format!("{} {}", current_line, word);
-            let estimated_width = estimate_text_width(&potential);
-            if estimated_width <= max_width {
-                current_line = potential;
-            } else {
-                lines.push(current_line);
-                current_line = word.to_string();
-            }
-        }
-    }
-    if !current_line.is_empty() {
-        lines.push(current_line);
-    }
-
-    lines
-}
-
-/// Estimate text width in pixels
-fn estimate_text_width(text: &str) -> f64 {
-    // Approximate character width for proportional font
-    text.chars().count() as f64 * FONT_SIZE * 0.55
+    super::text_utils::wrap_text_by_width(text, max_width, FONT_SIZE)
 }
 
 /// Render section columns

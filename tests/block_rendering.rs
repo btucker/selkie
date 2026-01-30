@@ -581,6 +581,95 @@ fn test_with_forest_theme() {
 }
 
 // ============================================================================
+// Rect Count and Z-Order Tests (matching mermaid reference structure)
+// ============================================================================
+
+/// Helper to count occurrences of a pattern in a string
+fn count_occurrences(haystack: &str, needle: &str) -> usize {
+    haystack.matches(needle).count()
+}
+
+#[test]
+fn test_label_background_rect_per_node() {
+    // Each node should have 2 rects: shape rect + label background rect
+    // This matches mermaid's structure where each node has a label-container rect
+    // and an inner label background rect
+    let input = r#"block-beta
+  columns 2
+  block
+    id2["I am a wide one"]
+    id1
+  end
+  id["Next row"]"#;
+
+    let diagram = parse(input).expect("Failed to parse");
+    let svg = render(&diagram).expect("Failed to render");
+
+    assert_valid_svg(&svg);
+
+    // 4 nodes (composite + id2 + id1 + "Next row"), each should have 2 rects = 8 total
+    let rect_count = count_occurrences(&svg, "<rect ");
+    assert!(
+        rect_count >= 8,
+        "Expected at least 8 rects (2 per node for 4 nodes), got {}",
+        rect_count
+    );
+}
+
+#[test]
+fn test_composite_in_clusters_group() {
+    // Composite blocks should be rendered in the clusters group for proper z-order
+    let input = r#"block-beta
+  columns 2
+  block
+    id2["I am a wide one"]
+    id1
+  end
+  id["Next row"]"#;
+
+    let diagram = parse(input).expect("Failed to parse");
+    let svg = render(&diagram).expect("Failed to render");
+
+    assert_valid_svg(&svg);
+
+    // The clusters group should contain the composite block, not be empty
+    // Extract the content between clusters group tags
+    let clusters_marker = r#"class="clusters">"#;
+    let clusters_pos = svg
+        .find(clusters_marker)
+        .expect("Should have clusters group");
+    let after_open = &svg[clusters_pos + clusters_marker.len()..];
+    let close_pos = after_open.find("</g>").expect("Should have closing tag");
+    let clusters_content = after_open[..close_pos].trim();
+    assert!(
+        !clusters_content.is_empty(),
+        "Clusters group should contain composite blocks, got empty content"
+    );
+}
+
+#[test]
+fn test_node_stroke_width_1px() {
+    // Node stroke-width should be 1px to match mermaid reference
+    let input = r#"block
+    A["Block A"]"#;
+
+    let diagram = parse(input).expect("Failed to parse");
+    let svg = render(&diagram).expect("Failed to render");
+
+    assert_valid_svg(&svg);
+
+    // CSS should have stroke-width: 1px for node-bkg
+    assert!(
+        svg.contains("stroke-width: 1px") || svg.contains("stroke-width:1px"),
+        "Node stroke-width should be 1px, not 2px"
+    );
+    assert!(
+        !svg.contains(".node-bkg") || !svg.contains("stroke-width: 2px"),
+        "node-bkg should not have stroke-width: 2px"
+    );
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 

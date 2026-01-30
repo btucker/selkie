@@ -507,10 +507,7 @@ impl SvgElement {
                 content,
                 attrs,
             } => {
-                let normalized = content
-                    .replace("<br />", "\n")
-                    .replace("<br/>", "\n")
-                    .replace("<br>", "\n");
+                let normalized = crate::render::text_utils::normalize_br_tags(content);
                 if normalized.contains('\n') {
                     let lines: Vec<&str> = normalized.split('\n').collect();
                     let num_lines = lines.len();
