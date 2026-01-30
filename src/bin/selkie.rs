@@ -730,9 +730,8 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 /// Run TUI-specific evaluation: parse → layout → render TUI → parse TUI → check
 #[cfg(feature = "eval")]
 fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
-    use selkie::diagrams::Diagram;
     use selkie::eval::tui_checks;
-    use selkie::layout::{CharacterSizeEstimator, ToLayoutGraph};
+    use selkie::layout::CharacterSizeEstimator;
 
     // Get diagrams to evaluate (reuse same loading logic)
     let inputs: Vec<DiagramInput> = match &args.target {
@@ -763,26 +762,40 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    // Filter to flowchart-only (TUI renderer only supports flowcharts)
-    let flowcharts: Vec<_> = inputs
+    // TUI-supported diagram types (those with ToLayoutGraph implementations)
+    let tui_supported_types = [
+        "flowchart",
+        "state",
+        "class",
+        "er",
+        "architecture",
+        "requirement",
+    ];
+
+    // Filter to TUI-supported types, or a specific type if requested
+    let tui_diagrams: Vec<_> = inputs
         .iter()
         .filter(|i| {
             if let Some(ref filter) = args.diagram_type {
                 i.diagram_type.as_deref() == Some(filter.as_str())
+                    || detect_diagram_type(&i.text) == Some(filter.as_str())
             } else {
-                // Default to flowchart only
-                i.diagram_type.as_deref() == Some("flowchart")
-                    || i.text.to_lowercase().starts_with("flowchart")
-                    || i.text.to_lowercase().starts_with("graph ")
+                // Default to all TUI-supported types
+                if let Some(ref dt) = i.diagram_type {
+                    tui_supported_types.contains(&dt.as_str())
+                } else {
+                    let detected = detect_diagram_type(&i.text);
+                    detected.map_or(false, |t| tui_supported_types.contains(&t))
+                }
             }
         })
         .collect();
 
-    if flowcharts.is_empty() {
-        return Err("No flowchart diagrams to evaluate (TUI only supports flowcharts)".into());
+    if tui_diagrams.is_empty() {
+        return Err("No TUI-supported diagrams to evaluate".into());
     }
 
-    eprintln!("Evaluating {} flowcharts in TUI mode...", flowcharts.len());
+    eprintln!("Evaluating {} diagrams in TUI mode...", tui_diagrams.len());
 
     let estimator = CharacterSizeEstimator::default();
     let mut total_issues = 0;
@@ -790,11 +803,11 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     let mut total_diagrams = 0;
     let mut total_similarity = 0.0;
 
-    for (i, input) in flowcharts.iter().enumerate() {
+    for (i, input) in tui_diagrams.iter().enumerate() {
         eprint!(
             "\rEvaluating {}/{}: {}...",
             i + 1,
-            flowcharts.len(),
+            tui_diagrams.len(),
             input.name
         );
 
@@ -810,17 +823,8 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             }
         };
 
-        // Get FlowchartDb
-        let db = match parsed {
-            Diagram::Flowchart(ref db) => db,
-            _ => {
-                eprintln!(" SKIP: not a flowchart");
-                continue;
-            }
-        };
-
-        // Layout
-        let graph = match db.to_layout_graph(&estimator) {
+        // Layout — use ToLayoutGraph trait to get a layout graph for any supported type
+        let graph = match layout_diagram(&parsed, &estimator) {
             Ok(g) => match selkie::layout::layout(g) {
                 Ok(g) => g,
                 Err(e) => {
@@ -836,8 +840,8 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             }
         };
 
-        // Render TUI
-        let tui_output = match tui_render::render_flowchart_tui(db, &graph) {
+        // Render TUI using the appropriate renderer
+        let tui_output = match render_tui(&parsed) {
             Ok(output) => output,
             Err(e) => {
                 eprintln!(" RENDER ERROR: {}", e);
@@ -1084,18 +1088,99 @@ fn svg_to_pdf(svg: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     Ok(pdf_data)
 }
 
-/// Render a diagram to TUI character art
+/// Detect diagram type from raw mermaid text.
+#[cfg(feature = "eval")]
+fn detect_diagram_type(text: &str) -> Option<&str> {
+    let lower = text.trim().to_lowercase();
+    if lower.starts_with("flowchart") || lower.starts_with("graph ") {
+        Some("flowchart")
+    } else if lower.starts_with("statediagram") {
+        Some("state")
+    } else if lower.starts_with("classdiagram") || lower.starts_with("class") {
+        Some("class")
+    } else if lower.starts_with("erdiagram") {
+        Some("er")
+    } else if lower.starts_with("architecture") {
+        Some("architecture")
+    } else if lower.starts_with("requirement") {
+        Some("requirement")
+    } else if lower.starts_with("sequencediagram") || lower.starts_with("sequence") {
+        Some("sequence")
+    } else if lower.starts_with("gantt") {
+        Some("gantt")
+    } else if lower.starts_with("mindmap") {
+        Some("mindmap")
+    } else if lower.starts_with("pie") {
+        Some("pie")
+    } else {
+        None
+    }
+}
+
+/// Get a LayoutGraph from any diagram type that implements ToLayoutGraph.
+#[cfg(feature = "eval")]
+fn layout_diagram(
+    diagram: &selkie::diagrams::Diagram,
+    estimator: &selkie::layout::CharacterSizeEstimator,
+) -> selkie::error::Result<selkie::layout::LayoutGraph> {
+    use selkie::layout::ToLayoutGraph;
+
+    match diagram {
+        selkie::diagrams::Diagram::Flowchart(db) => db.to_layout_graph(estimator),
+        selkie::diagrams::Diagram::State(db) => db.to_layout_graph(estimator),
+        selkie::diagrams::Diagram::Class(db) => db.to_layout_graph(estimator),
+        selkie::diagrams::Diagram::Er(db) => db.to_layout_graph(estimator),
+        selkie::diagrams::Diagram::Architecture(db) => db.to_layout_graph(estimator),
+        selkie::diagrams::Diagram::Requirement(db) => db.to_layout_graph(estimator),
+        _ => Err(selkie::error::MermaidError::RenderError(
+            "Diagram type does not support layout graph".to_string(),
+        )),
+    }
+}
+
+/// Render a diagram to TUI character art.
+///
+/// Supports all diagram types that implement `ToLayoutGraph`:
+/// flowchart, state, class, ER, architecture, requirement.
 fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std::error::Error>> {
     use selkie::layout::{self, CharacterSizeEstimator, ToLayoutGraph};
 
+    let estimator = CharacterSizeEstimator::default();
+
     match diagram {
+        // Flowchart uses specialized renderer with FlowchartDb label lookup
         selkie::diagrams::Diagram::Flowchart(db) => {
-            let estimator = CharacterSizeEstimator::default();
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
             let output = tui_render::render_flowchart_tui(db, &graph)?;
             Ok(output)
         }
-        _ => Err("TUI format currently only supports flowchart diagrams".into()),
+        // Graph-based diagram types use the generic renderer
+        selkie::diagrams::Diagram::State(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(tui_render::render_graph_tui(&graph)?)
+        }
+        selkie::diagrams::Diagram::Class(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(tui_render::render_graph_tui(&graph)?)
+        }
+        selkie::diagrams::Diagram::Er(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(tui_render::render_graph_tui(&graph)?)
+        }
+        selkie::diagrams::Diagram::Architecture(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(tui_render::render_graph_tui(&graph)?)
+        }
+        selkie::diagrams::Diagram::Requirement(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(tui_render::render_graph_tui(&graph)?)
+        }
+        _ => Err("TUI format not yet supported for this diagram type".into()),
     }
 }

@@ -2,6 +2,8 @@
 //!
 //! Produces character-art output using box-drawing characters for node shapes
 //! and braille dots for edge routing. Pipe-friendly, works in every terminal.
+//!
+//! Supports any diagram type that implements `ToLayoutGraph`, not just flowcharts.
 
 pub mod canvas;
 pub mod edges;
@@ -17,12 +19,28 @@ use crate::layout::LayoutGraph;
 use scale::CellScale;
 use shapes::render_shape;
 
+/// Render any laid-out graph as character art.
+///
+/// This is the generic entry point for TUI rendering. It works with any diagram
+/// type that produces a `LayoutGraph` via `ToLayoutGraph`. Node labels are taken
+/// from `node.label` (falling back to `node.id`), with HTML tags cleaned.
+pub fn render_graph_tui(graph: &LayoutGraph) -> Result<String> {
+    render_tui_impl(graph, &|node| generic_node_label(node))
+}
+
 /// Render a flowchart as character art.
 ///
-/// Takes the parsed diagram DB and a positioned layout graph (after dagre),
-/// and produces a String of character art with nodes at their correct positions
-/// and edges rendered as braille lines with arrow tips.
+/// Uses `FlowchartDb` for richer label lookup (vertex text), falling back to
+/// the layout node label. For non-flowchart diagrams, use `render_graph_tui`.
 pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<String> {
+    render_tui_impl(graph, &|node| flowchart_node_label(db, node))
+}
+
+/// Core TUI renderer implementation, parameterized by a label lookup function.
+fn render_tui_impl(
+    graph: &LayoutGraph,
+    label_fn: &dyn Fn(&crate::layout::LayoutNode) -> String,
+) -> Result<String> {
     let scale = CellScale::default();
 
     // Determine canvas dimensions from graph bounds
@@ -39,11 +57,26 @@ pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<Str
     // Track which cells are occupied by nodes (for edge compositing)
     let mut occupied: Vec<Vec<bool>> = vec![vec![false; canvas_cols]; canvas_rows];
 
-    // Collect subgraph IDs — these are container nodes whose bounding box
+    // Collect container node IDs — these are compound nodes whose bounding box
     // encompasses their children. We render them as just a label, not a full box.
-    let subgraph_ids: HashSet<&str> = db.subgraphs().iter().map(|sg| sg.id.as_str()).collect();
+    // For flowcharts these are subgraphs; for other diagram types they may be
+    // composite states, packages, etc.
+    //
+    // Detection: a node is a container if it has children OR if any other node
+    // has parent_id pointing to it.
+    let parent_ids: HashSet<&str> = graph
+        .nodes
+        .iter()
+        .filter_map(|n| n.parent_id.as_deref())
+        .collect();
+    let container_ids: HashSet<&str> = graph
+        .nodes
+        .iter()
+        .filter(|n| !n.children.is_empty() || parent_ids.contains(n.id.as_str()))
+        .map(|n| n.id.as_str())
+        .collect();
 
-    // Render subgraph nodes first (background layer — just a label).
+    // Render container nodes first (background layer — just a label).
     // Collect positions so we can re-stamp them after regular nodes (pass 2).
     struct SubgraphLabel {
         row: usize,
@@ -53,7 +86,7 @@ pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<Str
     let mut subgraph_labels: Vec<SubgraphLabel> = Vec::new();
 
     for node in &graph.nodes {
-        if node.is_dummy || !subgraph_ids.contains(node.id.as_str()) {
+        if node.is_dummy || !container_ids.contains(node.id.as_str()) {
             continue;
         }
 
@@ -62,7 +95,7 @@ pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<Str
             _ => continue,
         };
 
-        let label = node_label(db, node);
+        let label = label_fn(node);
 
         // For subgraphs, render label at top-center of the bounding box
         let col_center = scale.to_col(nx + node.width / 2.0);
@@ -92,7 +125,7 @@ pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<Str
     let mut regular_nodes: Vec<&crate::layout::LayoutNode> = graph
         .nodes
         .iter()
-        .filter(|n| !n.is_dummy && !subgraph_ids.contains(n.id.as_str()))
+        .filter(|n| !n.is_dummy && !container_ids.contains(n.id.as_str()))
         .collect();
     // Sort by area ascending so smaller nodes render first. The blit logic
     // protects existing label text from being overwritten by border characters,
@@ -122,7 +155,7 @@ pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<Str
             _ => continue,
         };
 
-        let label = node_label(db, node);
+        let label = label_fn(node);
 
         let cell_w = scale.to_cell_width(node.width);
         let cell_h = scale.to_cell_height(node.height);
@@ -237,8 +270,14 @@ pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<Str
     Ok(result)
 }
 
-/// Get the display label for a node, cleaning HTML tags like `<br/>`.
-fn node_label(db: &FlowchartDb, node: &crate::layout::LayoutNode) -> String {
+/// Get the display label for a generic layout node, cleaning HTML tags.
+fn generic_node_label(node: &crate::layout::LayoutNode) -> String {
+    let raw = node.label.as_deref().unwrap_or(&node.id);
+    clean_html_label(raw)
+}
+
+/// Get the display label for a flowchart node, preferring vertex text from the DB.
+fn flowchart_node_label(db: &FlowchartDb, node: &crate::layout::LayoutNode) -> String {
     let raw = db
         .vertices()
         .iter()
@@ -246,7 +285,11 @@ fn node_label(db: &FlowchartDb, node: &crate::layout::LayoutNode) -> String {
         .and_then(|(_, v)| v.text.as_deref())
         .or(node.label.as_deref())
         .unwrap_or(&node.id);
-    // Clean HTML line breaks and normalize whitespace for TUI display
+    clean_html_label(raw)
+}
+
+/// Clean HTML line breaks and normalize whitespace for TUI display.
+fn clean_html_label(raw: &str) -> String {
     let cleaned = raw.replace("<br/>", " ").replace("<br>", " ");
     cleaned.split_whitespace().collect::<Vec<_>>().join(" ")
 }
@@ -473,5 +516,155 @@ mod tests {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[Top] --> B[Bottom]");
         let output = render_flowchart_tui(&db, &graph).unwrap();
         assert!(output.contains('▼'), "TD flow should have down arrow ▼");
+    }
+
+    // --- Generic renderer tests for non-flowchart diagram types ---
+
+    /// Parse any diagram type and produce a layout graph for TUI rendering.
+    fn parse_and_layout_generic(input: &str) -> crate::layout::LayoutGraph {
+        let diagram = crate::parse(input).unwrap();
+        let estimator = CharacterSizeEstimator::default();
+        let graph = match diagram {
+            crate::diagrams::Diagram::State(ref db) => db.to_layout_graph(&estimator).unwrap(),
+            crate::diagrams::Diagram::Class(ref db) => db.to_layout_graph(&estimator).unwrap(),
+            crate::diagrams::Diagram::Er(ref db) => db.to_layout_graph(&estimator).unwrap(),
+            crate::diagrams::Diagram::Architecture(ref db) => {
+                db.to_layout_graph(&estimator).unwrap()
+            }
+            crate::diagrams::Diagram::Requirement(ref db) => {
+                db.to_layout_graph(&estimator).unwrap()
+            }
+            _ => panic!("Unsupported diagram type for generic TUI test"),
+        };
+        crate::layout::layout(graph).unwrap()
+    }
+
+    #[test]
+    fn state_diagram_renders_tui() {
+        let input = "stateDiagram-v2\n    [*] --> Idle\n    Idle --> Running : start\n    Running --> Idle : stop";
+        let graph = parse_and_layout_generic(input);
+        let output = render_graph_tui(&graph).unwrap();
+        assert!(
+            !output.trim().is_empty(),
+            "State diagram TUI output should not be empty"
+        );
+        assert!(
+            output.contains("Idle"),
+            "State diagram should contain 'Idle' label\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Running"),
+            "State diagram should contain 'Running' label\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn class_diagram_renders_tui() {
+        let input =
+            "classDiagram\n    Animal <|-- Duck\n    Animal <|-- Fish\n    Animal : +int age";
+        let graph = parse_and_layout_generic(input);
+        let output = render_graph_tui(&graph).unwrap();
+        assert!(
+            !output.trim().is_empty(),
+            "Class diagram TUI output should not be empty"
+        );
+        assert!(
+            output.contains("Animal"),
+            "Class diagram should contain 'Animal' label\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Duck"),
+            "Class diagram should contain 'Duck' label\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn er_diagram_renders_tui() {
+        let input =
+            "erDiagram\n    CUSTOMER ||--o{ ORDER : places\n    ORDER ||--|{ LINE-ITEM : contains";
+        let graph = parse_and_layout_generic(input);
+        let output = render_graph_tui(&graph).unwrap();
+        assert!(
+            !output.trim().is_empty(),
+            "ER diagram TUI output should not be empty"
+        );
+        assert!(
+            output.contains("CUSTOMER"),
+            "ER diagram should contain 'CUSTOMER' label\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("ORDER"),
+            "ER diagram should contain 'ORDER' label\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn state_diagram_from_file() {
+        let input = std::fs::read_to_string("docs/sources/state.mmd").unwrap();
+        let graph = parse_and_layout_generic(&input);
+        let output = render_graph_tui(&graph).unwrap();
+        for label in &["Idle", "Running", "Error"] {
+            assert!(
+                output.contains(label),
+                "State diagram should contain '{}'\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+    }
+
+    #[test]
+    fn class_diagram_from_file() {
+        let input = std::fs::read_to_string("docs/sources/class.mmd").unwrap();
+        let graph = parse_and_layout_generic(&input);
+        let output = render_graph_tui(&graph).unwrap();
+        for label in &["Animal", "Duck", "Fish", "Zebra"] {
+            assert!(
+                output.contains(label),
+                "Class diagram should contain '{}'\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+    }
+
+    #[test]
+    fn er_diagram_from_file() {
+        let input = std::fs::read_to_string("docs/sources/er.mmd").unwrap();
+        let graph = parse_and_layout_generic(&input);
+        let output = render_graph_tui(&graph).unwrap();
+        for label in &["CUSTOMER", "ORDER", "PRODUCT"] {
+            assert!(
+                output.contains(label),
+                "ER diagram should contain '{}'\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+    }
+
+    #[test]
+    fn state_diagram_has_edges() {
+        let input = "stateDiagram-v2\n    [*] --> Idle\n    Idle --> Running : start";
+        let graph = parse_and_layout_generic(input);
+        let output = render_graph_tui(&graph).unwrap();
+        let has_braille = output
+            .chars()
+            .any(|c| ('\u{2800}'..='\u{28FF}').contains(&c));
+        let has_arrow = output.contains('▼')
+            || output.contains('▶')
+            || output.contains('◀')
+            || output.contains('▲');
+        assert!(
+            has_braille || has_arrow,
+            "State diagram should have edges rendered\nOutput:\n{}",
+            output
+        );
     }
 }
