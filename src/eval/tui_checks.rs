@@ -8,7 +8,7 @@
 //! graph, since there is no mermaid.js TUI reference.
 
 use super::Issue;
-use crate::layout::LayoutGraph;
+use crate::layout::{LayoutGraph, NodeShape};
 
 /// Structure extracted from TUI character-art output.
 #[derive(Debug, Clone)]
@@ -303,6 +303,11 @@ fn check_tui_node_count(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Ve
         if node.is_dummy {
             continue;
         }
+        if is_symbol_node(node) {
+            // Circle/DoubleCircle nodes render as ●/◉ symbols, not text labels
+            found += 1;
+            continue;
+        }
         let label = clean_label(node.label.as_deref().unwrap_or(&node.id));
         if tui.labels.contains(&label) || tui.raw_output.contains(&label) {
             found += 1;
@@ -321,6 +326,13 @@ fn check_tui_node_count(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Ve
             .with_values(expected.to_string(), found.to_string()),
         );
     }
+}
+
+/// Check if a node renders as a symbol (●/◉) rather than a text label.
+/// Circle and DoubleCircle nodes with empty or no label are start/end markers.
+fn is_symbol_node(node: &crate::layout::LayoutNode) -> bool {
+    matches!(node.shape, NodeShape::Circle | NodeShape::DoubleCircle)
+        && node.label.as_deref().is_none_or(|l| l.is_empty())
 }
 
 /// Clean HTML line breaks from labels (matches TUI renderer behavior).
@@ -348,6 +360,25 @@ fn check_tui_labels(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Is
 
     for node in &graph.nodes {
         if node.is_dummy {
+            continue;
+        }
+        // Circle/DoubleCircle nodes render as symbols (●/◉), not text labels.
+        // We verify their symbols exist in the raw output instead of checking by ID.
+        if is_symbol_node(node) {
+            let symbol = if node.shape == NodeShape::DoubleCircle {
+                '◉'
+            } else {
+                '●'
+            };
+            if !tui.raw_output.contains(symbol) {
+                issues.push(Issue::error(
+                    "tui_missing_label",
+                    format!(
+                        "TUI output missing {} symbol for node '{}'",
+                        symbol, node.id
+                    ),
+                ));
+            }
             continue;
         }
         let raw_label = node.label.as_deref().unwrap_or(&node.id);
@@ -471,6 +502,11 @@ pub fn calculate_tui_similarity(tui: &TuiStructure, graph: &LayoutGraph) -> f64 
         let mut found = 0;
         for node in &graph.nodes {
             if node.is_dummy {
+                continue;
+            }
+            if is_symbol_node(node) {
+                // Circle/DoubleCircle nodes render as symbols, always counted as found
+                found += 1;
                 continue;
             }
             let label = clean_label(node.label.as_deref().unwrap_or(&node.id));

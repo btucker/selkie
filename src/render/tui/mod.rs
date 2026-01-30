@@ -271,7 +271,18 @@ fn render_tui_impl(
 }
 
 /// Get the display label for a generic layout node, cleaning HTML tags.
+///
+/// Circle and DoubleCircle nodes with no label are start/end markers in state
+/// diagrams — their IDs (e.g. `root_start`) should not be displayed.
 fn generic_node_label(node: &crate::layout::LayoutNode) -> String {
+    use crate::layout::NodeShape;
+    // Start/end circle nodes have no meaningful label — return empty string
+    // so the shape renderer produces just the ●/◉ symbol.
+    if matches!(node.shape, NodeShape::Circle | NodeShape::DoubleCircle)
+        && node.label.as_deref().is_none_or(|l| l.is_empty())
+    {
+        return String::new();
+    }
     let raw = node.label.as_deref().unwrap_or(&node.id);
     clean_html_label(raw)
 }
@@ -647,6 +658,60 @@ mod tests {
                 output
             );
         }
+    }
+
+    #[test]
+    fn state_diagram_start_end_rendered_as_symbols() {
+        let input = "stateDiagram-v2\n    [*] --> Idle\n    Idle --> [*]";
+        let graph = parse_and_layout_generic(input);
+        let output = render_graph_tui(&graph).unwrap();
+        // Start/end nodes should render as ● or ◉ symbols, not rectangles with ID labels
+        let has_start = output.contains('●');
+        let has_end = output.contains('◉');
+        assert!(
+            has_start,
+            "Start node should render as ● (filled circle)\nOutput:\n{}",
+            output
+        );
+        assert!(
+            has_end,
+            "End node should render as ◉ (bullseye)\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn state_complex2_has_all_expected_labels() {
+        let input = std::fs::read_to_string("docs/sources/state_complex2.mmd").unwrap();
+        let graph = parse_and_layout_generic(&input);
+        let output = render_graph_tui(&graph).unwrap();
+        // Core state labels must appear
+        for label in &[
+            "Idle",
+            "Ready",
+            "Validating",
+            "Queued",
+            "Running",
+            "Completed",
+            "Failed",
+            "Paused",
+            "Cancelled",
+            "Timeout",
+            "WaitingResume",
+        ] {
+            assert!(
+                output.contains(label),
+                "State diagram should contain '{}'\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+        // Start/end symbols should be present (not ID text like "Idle_start")
+        assert!(
+            output.contains('●') || output.contains('◉'),
+            "Start/end nodes should use circle symbols\nOutput:\n{}",
+            output
+        );
     }
 
     #[test]

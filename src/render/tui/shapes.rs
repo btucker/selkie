@@ -38,6 +38,8 @@ pub fn render_shape(shape: &NodeShape, label: &str, cell_w: usize, cell_h: usize
             render_rect(label, w, h, true)
         }
         NodeShape::Diamond => render_diamond(label, w, h),
+        NodeShape::Circle => render_circle(label, w, h, false),
+        NodeShape::DoubleCircle => render_circle(label, w, h, true),
         _ => render_rect(label, w, h, false),
     }
 }
@@ -155,6 +157,26 @@ fn render_diamond(label: &str, _w: usize, _h: usize) -> RenderedShape {
     }
 }
 
+/// Render a circle (start) or double-circle (end) node.
+///
+/// When no label is provided (state diagram start/end markers), renders as a
+/// single `●` or `◉` symbol. When a label is provided (e.g., flowchart
+/// `((...))` nodes), renders as a rounded rectangle — matching the visual
+/// convention of elliptical shapes in TUI.
+fn render_circle(label: &str, w: usize, h: usize, double: bool) -> RenderedShape {
+    if label.is_empty() {
+        let symbol = if double { '◉' } else { '●' };
+        RenderedShape {
+            lines: vec![format!(" {} ", symbol)],
+            width: 3,
+            height: 1,
+        }
+    } else {
+        // Labelled circles use rounded rectangle (same as Ellipse/Stadium)
+        render_rect(label, w, h, true)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -220,6 +242,28 @@ mod tests {
         // Hexagon falls back to rectangle
         let shape = render_shape(&NodeShape::Hexagon, "hex", 7, 3);
         assert_eq!(shape.lines[0], "┌─────┐");
+    }
+
+    #[test]
+    fn circle_renders_filled_dot() {
+        let shape = render_shape(&NodeShape::Circle, "", 3, 3);
+        let all_text: String = shape.lines.iter().flat_map(|l| l.chars()).collect();
+        assert!(
+            all_text.contains('●'),
+            "Circle should render as ● (filled circle)\nLines: {:?}",
+            shape.lines
+        );
+    }
+
+    #[test]
+    fn double_circle_renders_bullseye() {
+        let shape = render_shape(&NodeShape::DoubleCircle, "", 3, 3);
+        let all_text: String = shape.lines.iter().flat_map(|l| l.chars()).collect();
+        assert!(
+            all_text.contains('◉'),
+            "DoubleCircle should render as ◉ (bullseye)\nLines: {:?}",
+            shape.lines
+        );
     }
 
     #[test]
