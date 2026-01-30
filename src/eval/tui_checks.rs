@@ -455,29 +455,30 @@ fn check_tui_spatial_order(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut
 }
 
 /// Calculate a similarity score (0.0–1.0) between TUI output and layout graph.
+///
+/// Uses a multi-factor approach:
+/// - Node presence: how many expected labels appear in the TUI output (via box
+///   extraction or raw text substring matching)
+/// - Edge presence: whether edges are rendered (arrows and/or braille)
 pub fn calculate_tui_similarity(tui: &TuiStructure, graph: &LayoutGraph) -> f64 {
     let mut parts: Vec<f64> = Vec::new();
 
-    // Node count similarity
+    // Node label presence: count how many graph labels appear in TUI output.
+    // Uses both structured extraction (tui.labels) and raw substring matching
+    // to handle diagram types where labels may not be inside standard │text│ boxes.
     let expected_nodes = graph.nodes.iter().filter(|n| !n.is_dummy).count();
-    if expected_nodes > 0 || !tui.labels.is_empty() {
-        let min = tui.labels.len().min(expected_nodes) as f64;
-        let max = tui.labels.len().max(expected_nodes) as f64;
-        parts.push(if max > 0.0 { min / max } else { 1.0 });
-    }
-
-    // Label match ratio
-    let tui_labels: std::collections::HashSet<String> = tui.labels.iter().cloned().collect();
-    let graph_labels: std::collections::HashSet<String> = graph
-        .nodes
-        .iter()
-        .filter(|n| !n.is_dummy)
-        .map(|n| clean_label(n.label.as_deref().unwrap_or(&n.id)))
-        .collect();
-    let common = tui_labels.intersection(&graph_labels).count() as f64;
-    let total = tui_labels.len().max(graph_labels.len()) as f64;
-    if total > 0.0 {
-        parts.push(common / total);
+    if expected_nodes > 0 {
+        let mut found = 0;
+        for node in &graph.nodes {
+            if node.is_dummy {
+                continue;
+            }
+            let label = clean_label(node.label.as_deref().unwrap_or(&node.id));
+            if tui.labels.contains(&label) || tui.raw_output.contains(&label) {
+                found += 1;
+            }
+        }
+        parts.push(found as f64 / expected_nodes as f64);
     }
 
     // Edge presence (binary: edges exist or not)
