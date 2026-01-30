@@ -71,7 +71,7 @@ pub fn render_edges(
     // Render arrow tips and edge labels on top
     for edge in &graph.edges {
         render_arrow_tip(edge, &ctx, occupied, canvas);
-        render_edge_label(edge, &ctx, canvas);
+        render_edge_label(edge, &ctx, occupied, canvas);
     }
 }
 
@@ -160,7 +160,12 @@ fn render_arrow_tip(
 }
 
 /// Render an edge label at its midpoint position.
-fn render_edge_label(edge: &LayoutEdge, ctx: &EdgeContext, canvas: &mut [Vec<char>]) {
+fn render_edge_label(
+    edge: &LayoutEdge,
+    ctx: &EdgeContext,
+    occupied: &[Vec<bool>],
+    canvas: &mut [Vec<char>],
+) {
     let raw_label = match &edge.label {
         Some(l) if !l.is_empty() => l.as_str(),
         _ => return,
@@ -189,7 +194,7 @@ fn render_edge_label(edge: &LayoutEdge, ctx: &EdgeContext, canvas: &mut [Vec<cha
     if row < ctx.canvas_rows {
         for (i, ch) in label.chars().enumerate() {
             let c = start_col + i;
-            if c < ctx.canvas_cols {
+            if c < ctx.canvas_cols && !occupied[row][c] {
                 canvas[row][c] = ch;
             }
         }

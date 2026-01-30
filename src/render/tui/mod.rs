@@ -12,8 +12,9 @@ pub mod scale;
 pub mod sequence;
 pub mod shapes;
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
+use crate::diagrams::er::ErDb;
 use crate::diagrams::flowchart::FlowchartDb;
 use crate::error::Result;
 use crate::layout::LayoutGraph;
@@ -38,6 +39,255 @@ pub fn render_graph_tui(graph: &LayoutGraph) -> Result<String> {
 /// the layout node label. For non-flowchart diagrams, use `render_graph_tui`.
 pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<String> {
     render_tui_impl(graph, &|node| flowchart_node_label(db, node))
+}
+
+/// Render an ER diagram as character art.
+///
+/// Uses `ErDb` to render entity boxes with attribute tables (type, name, keys
+/// columns), matching the SVG renderer's table-style layout. Relationship
+/// edges are rendered using the standard braille edge router.
+pub fn render_er_tui(db: &ErDb, graph: &LayoutGraph) -> Result<String> {
+    let scale = CellScale::default();
+
+    // Determine canvas dimensions from graph bounds
+    let graph_width = graph.width.unwrap_or(400.0);
+    let graph_height = graph.height.unwrap_or(300.0);
+    let offset_x = graph.bounds_x.unwrap_or(0.0);
+    let offset_y = graph.bounds_y.unwrap_or(0.0);
+
+    let canvas_cols = scale.to_col(graph_width) + 8;
+    let canvas_rows = scale.to_row(graph_height) + 4;
+
+    let mut canvas: Vec<Vec<char>> = vec![vec![' '; canvas_cols]; canvas_rows];
+    let mut occupied: Vec<Vec<bool>> = vec![vec![false; canvas_cols]; canvas_rows];
+
+    // Build entity name lookup: entity_id → entity name
+    let entities = db.get_entities();
+    let id_to_name: HashMap<&str, &str> = entities
+        .iter()
+        .map(|(name, entity)| (entity.id.as_str(), name.as_str()))
+        .collect();
+
+    // Render each entity node as a table box
+    for node in &graph.nodes {
+        if node.is_dummy {
+            continue;
+        }
+        let (nx, ny) = match (node.x, node.y) {
+            (Some(x), Some(y)) => (x - offset_x, y - offset_y),
+            _ => continue,
+        };
+
+        let entity_name = id_to_name.get(node.id.as_str()).copied();
+        let entity = entity_name.and_then(|n| entities.get(n));
+
+        // Calculate cell position (center-based)
+        let cell_w = scale.to_cell_width(node.width);
+        let cell_h = scale.to_cell_height(node.height);
+        let col_center = scale.to_col(nx);
+        let row_center = scale.to_row(ny);
+        let col_start = col_center.saturating_sub(cell_w / 2);
+        let row_start = row_center.saturating_sub(cell_h / 2);
+
+        // Get display name
+        let display_name = entity
+            .map(|e| {
+                if !e.alias.is_empty() {
+                    e.alias.as_str()
+                } else {
+                    e.label.as_str()
+                }
+            })
+            .or(node.label.as_deref())
+            .unwrap_or(&node.id);
+
+        let rendered_lines = if let Some(entity) = entity {
+            render_er_entity_box(display_name, &entity.attributes, cell_w)
+        } else {
+            // Fallback: simple box with label
+            let shape = render_shape(&node.shape, display_name, cell_w, cell_h);
+            shape.lines
+        };
+
+        // Blit onto canvas
+        for (r, line) in rendered_lines.iter().enumerate() {
+            let canvas_row = row_start + r;
+            if canvas_row >= canvas_rows {
+                break;
+            }
+            for (c, ch) in line.chars().enumerate() {
+                let canvas_col = col_start + c;
+                if canvas_col >= canvas_cols {
+                    break;
+                }
+                if ch != ' ' {
+                    canvas[canvas_row][canvas_col] = ch;
+                }
+                occupied[canvas_row][canvas_col] = true;
+            }
+        }
+    }
+
+    // Render edges
+    edges::render_edges(
+        graph,
+        &scale,
+        canvas_cols,
+        canvas_rows,
+        offset_x,
+        offset_y,
+        &occupied,
+        &mut canvas,
+    );
+
+    // Convert canvas to string
+    let mut result = String::new();
+    let mut last_non_empty = 0;
+    for (i, row) in canvas.iter().enumerate() {
+        if row.iter().any(|&c| c != ' ') {
+            last_non_empty = i;
+        }
+    }
+
+    for row in &canvas[..=last_non_empty] {
+        let line: String = row.iter().collect();
+        result.push_str(line.trim_end());
+        result.push('\n');
+    }
+
+    Ok(result)
+}
+
+/// Render an ER entity as a box with attribute table rows.
+///
+/// Layout:
+/// ```text
+/// ┌──────────────────────┐
+/// │      CUSTOMER        │
+/// ├──────┬───────┬───────┤
+/// │string│ name  │       │
+/// │string│ email │  PK   │
+/// └──────┴───────┴───────┘
+/// ```
+fn render_er_entity_box(
+    name: &str,
+    attributes: &[crate::diagrams::er::Attribute],
+    min_width: usize,
+) -> Vec<String> {
+    if attributes.is_empty() {
+        // Simple box for entities without attributes
+        let name_len = name.chars().count();
+        let inner_w = (name_len + 2).max(min_width.saturating_sub(2));
+        let width = inner_w + 2; // +2 for borders
+
+        let mut lines = Vec::new();
+        lines.push(format!("┌{}┐", "─".repeat(inner_w)));
+        // Center the name
+        let pad_total = inner_w.saturating_sub(name_len);
+        let pad_left = pad_total / 2;
+        let pad_right = pad_total - pad_left;
+        lines.push(format!(
+            "│{}{}{}│",
+            " ".repeat(pad_left),
+            name,
+            " ".repeat(pad_right)
+        ));
+        lines.push(format!("└{}┘", "─".repeat(inner_w)));
+        let _ = width; // used for consistency check
+        return lines;
+    }
+
+    // Calculate column widths from content
+    let mut max_type_w = 0usize;
+    let mut max_name_w = 0usize;
+    let mut max_keys_w = 0usize;
+
+    for attr in attributes {
+        max_type_w = max_type_w.max(attr.attr_type.chars().count());
+        max_name_w = max_name_w.max(attr.name.chars().count());
+        let keys_str: String = attr
+            .keys
+            .iter()
+            .map(|k| k.as_str())
+            .collect::<Vec<_>>()
+            .join(",");
+        max_keys_w = max_keys_w.max(keys_str.chars().count());
+    }
+
+    // Add padding (1 char each side)
+    let type_col = max_type_w + 2;
+    let name_col = max_name_w + 2;
+    let keys_col = max_keys_w.max(1) + 2; // at least 3 wide
+
+    let inner_w = type_col + 1 + name_col + 1 + keys_col; // +1 for each │ divider
+    let name_len = name.chars().count();
+    // Ensure header can fit entity name
+    let inner_w = inner_w.max(name_len + 2);
+
+    // Recalculate keys column to absorb any extra width
+    let keys_col_adjusted = inner_w - type_col - 1 - name_col - 1;
+
+    let mut lines = Vec::new();
+
+    // Top border
+    lines.push(format!("┌{}┐", "─".repeat(inner_w)));
+
+    // Header row (entity name centered)
+    let pad_total = inner_w.saturating_sub(name_len);
+    let pad_left = pad_total / 2;
+    let pad_right = pad_total - pad_left;
+    lines.push(format!(
+        "│{}{}{}│",
+        " ".repeat(pad_left),
+        name,
+        " ".repeat(pad_right)
+    ));
+
+    // Divider between header and attributes
+    lines.push(format!(
+        "├{}┬{}┬{}┤",
+        "─".repeat(type_col),
+        "─".repeat(name_col),
+        "─".repeat(keys_col_adjusted)
+    ));
+
+    // Attribute rows
+    for attr in attributes {
+        let keys_str: String = attr
+            .keys
+            .iter()
+            .map(|k| k.as_str())
+            .collect::<Vec<_>>()
+            .join(",");
+
+        let type_str = format_cell(&attr.attr_type, type_col);
+        let name_str = format_cell(&attr.name, name_col);
+        let keys_str = format_cell(&keys_str, keys_col_adjusted);
+        lines.push(format!("│{}│{}│{}│", type_str, name_str, keys_str));
+    }
+
+    // Bottom border
+    lines.push(format!(
+        "└{}┴{}┴{}┘",
+        "─".repeat(type_col),
+        "─".repeat(name_col),
+        "─".repeat(keys_col_adjusted)
+    ));
+
+    lines
+}
+
+/// Format a string into a fixed-width cell, left-aligned with padding.
+fn format_cell(text: &str, width: usize) -> String {
+    let text_len = text.chars().count();
+    if text_len >= width {
+        text.chars().take(width).collect()
+    } else {
+        // 1 char left padding, rest right
+        let content_w = width - 1;
+        let pad_right = content_w.saturating_sub(text_len);
+        format!(" {}{}", text, " ".repeat(pad_right))
+    }
 }
 
 /// Core TUI renderer implementation, parameterized by a label lookup function.
@@ -736,5 +986,184 @@ mod tests {
             "State diagram should have edges rendered\nOutput:\n{}",
             output
         );
+    }
+
+    // --- ER diagram TUI renderer tests ---
+
+    fn parse_er_and_layout(input: &str) -> (crate::diagrams::er::ErDb, crate::layout::LayoutGraph) {
+        let diagram = crate::parse(input).unwrap();
+        let db = match diagram {
+            crate::diagrams::Diagram::Er(db) => db,
+            _ => panic!("Expected ER diagram"),
+        };
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+        let graph = crate::layout::layout(graph).unwrap();
+        (db, graph)
+    }
+
+    #[test]
+    fn er_tui_renders_entity_names() {
+        let input = "erDiagram\n    CUSTOMER ||--o{ ORDER : places";
+        let (db, graph) = parse_er_and_layout(input);
+        let output = render_er_tui(&db, &graph).unwrap();
+        assert!(
+            output.contains("CUSTOMER"),
+            "ER TUI should contain 'CUSTOMER'\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("ORDER"),
+            "ER TUI should contain 'ORDER'\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn er_tui_renders_attributes() {
+        let input = r#"erDiagram
+    CUSTOMER {
+        string name
+        string email PK
+        int id
+    }
+"#;
+        let (db, graph) = parse_er_and_layout(input);
+        let output = render_er_tui(&db, &graph).unwrap();
+        // Entity name
+        assert!(
+            output.contains("CUSTOMER"),
+            "Should contain entity name\nOutput:\n{}",
+            output
+        );
+        // Attribute types
+        assert!(
+            output.contains("string"),
+            "Should contain attribute type 'string'\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("int"),
+            "Should contain attribute type 'int'\nOutput:\n{}",
+            output
+        );
+        // Attribute names
+        assert!(
+            output.contains("name"),
+            "Should contain attribute name 'name'\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("email"),
+            "Should contain attribute name 'email'\nOutput:\n{}",
+            output
+        );
+        // Key markers
+        assert!(
+            output.contains("PK"),
+            "Should contain key marker 'PK'\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn er_tui_has_table_dividers() {
+        let input = r#"erDiagram
+    CUSTOMER {
+        string name
+        string email PK
+    }
+"#;
+        let (db, graph) = parse_er_and_layout(input);
+        let output = render_er_tui(&db, &graph).unwrap();
+        // Should have table structure with ├ ┤ ┬ ┴ dividers
+        assert!(
+            output.contains('├'),
+            "Should have ├ for header divider\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains('┬'),
+            "Should have ┬ for column separators\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains('┴'),
+            "Should have ┴ for bottom column separators\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn er_tui_entity_without_attributes() {
+        let input = "erDiagram\n    CUSTOMER ||--o{ ORDER : places";
+        let (db, graph) = parse_er_and_layout(input);
+        let output = render_er_tui(&db, &graph).unwrap();
+        // Entities without attributes should be simple boxes
+        assert!(
+            output.contains('┌'),
+            "Should have box corners\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains('┘'),
+            "Should have box corners\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn er_tui_from_file_has_all_entities() {
+        let input = std::fs::read_to_string("docs/sources/er.mmd").unwrap();
+        let (db, graph) = parse_er_and_layout(&input);
+        let output = render_er_tui(&db, &graph).unwrap();
+        for label in &["CUSTOMER", "ORDER", "PRODUCT", "LINE-ITEM"] {
+            assert!(
+                output.contains(label),
+                "ER TUI should contain '{}'\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+        // Should have attributes rendered
+        assert!(
+            output.contains("string"),
+            "Should have attribute types\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn er_tui_has_edges() {
+        let input = "erDiagram\n    CUSTOMER ||--o{ ORDER : places";
+        let (db, graph) = parse_er_and_layout(input);
+        let output = render_er_tui(&db, &graph).unwrap();
+        let has_braille = output
+            .chars()
+            .any(|c| ('\u{2800}'..='\u{28FF}').contains(&c));
+        let has_arrow = output.contains('▼')
+            || output.contains('▶')
+            || output.contains('◀')
+            || output.contains('▲');
+        assert!(
+            has_braille || has_arrow,
+            "ER diagram should have edges rendered\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn er_tui_complex_from_file() {
+        let input = std::fs::read_to_string("docs/sources/er_complex.mmd").unwrap();
+        let (db, graph) = parse_er_and_layout(&input);
+        let output = render_er_tui(&db, &graph).unwrap();
+        for label in &["CUSTOMER", "ORDER", "PRODUCT", "CATEGORY", "PAYMENT"] {
+            assert!(
+                output.contains(label),
+                "Complex ER TUI should contain '{}'\nOutput:\n{}",
+                label,
+                output
+            );
+        }
     }
 }

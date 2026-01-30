@@ -293,6 +293,92 @@ pub fn check_tui_structure(tui: &TuiStructure, graph: &LayoutGraph) -> Vec<Issue
     issues
 }
 
+/// Run ER-specific TUI checks comparing output against the ER database.
+///
+/// Checks that entity attributes (type, name, keys) are present in the TUI
+/// output and that table-structure characters (├ ┬ ┴) are used for entities
+/// with attributes.
+pub fn check_er_tui_structure(tui: &TuiStructure, db: &crate::diagrams::er::ErDb) -> Vec<Issue> {
+    let mut issues = Vec::new();
+
+    let entities = db.get_entities();
+
+    for (name, entity) in entities {
+        // Check entity name is present
+        if !tui.raw_output.contains(name.as_str()) {
+            issues.push(Issue::error(
+                "er_tui_missing_entity",
+                format!("ER TUI output missing entity: '{}'", name),
+            ));
+            continue;
+        }
+
+        // Check attributes are rendered
+        for attr in &entity.attributes {
+            if !tui.raw_output.contains(&attr.attr_type) {
+                issues.push(Issue::warning(
+                    "er_tui_missing_attr_type",
+                    format!(
+                        "ER TUI output missing attribute type '{}' for entity '{}'",
+                        attr.attr_type, name
+                    ),
+                ));
+            }
+            if !tui.raw_output.contains(&attr.name) {
+                issues.push(Issue::warning(
+                    "er_tui_missing_attr_name",
+                    format!(
+                        "ER TUI output missing attribute name '{}' for entity '{}'",
+                        attr.name, name
+                    ),
+                ));
+            }
+            for key in &attr.keys {
+                if !tui.raw_output.contains(key.as_str()) {
+                    issues.push(Issue::warning(
+                        "er_tui_missing_attr_key",
+                        format!(
+                            "ER TUI output missing key '{}' for {}.{}",
+                            key.as_str(),
+                            name,
+                            attr.name
+                        ),
+                    ));
+                }
+            }
+        }
+
+        // Check table structure for entities with attributes
+        if !entity.attributes.is_empty() {
+            if !tui.raw_output.contains('├') {
+                issues.push(Issue::warning(
+                    "er_tui_no_table_divider",
+                    "ER TUI output missing table divider '├' for entities with attributes"
+                        .to_string(),
+                ));
+            }
+            if !tui.raw_output.contains('┬') {
+                issues.push(Issue::warning(
+                    "er_tui_no_column_separator",
+                    "ER TUI output missing column separator '┬' for attribute tables".to_string(),
+                ));
+            }
+        }
+    }
+
+    // Check relationship labels
+    for rel in db.get_relationships() {
+        if !rel.role_a.is_empty() && !tui.raw_output.contains(&rel.role_a) {
+            issues.push(Issue::warning(
+                "er_tui_missing_rel_label",
+                format!("ER TUI output missing relationship label: '{}'", rel.role_a),
+            ));
+        }
+    }
+
+    issues
+}
+
 /// Check that TUI output has the correct number of nodes.
 /// Counts nodes whose labels appear anywhere in the TUI output (boxes, free text, etc.).
 fn check_tui_node_count(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {

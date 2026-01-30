@@ -947,7 +947,13 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         };
 
         let tui_struct = tui_checks::parse_tui(&tui_output);
-        let issues = tui_checks::check_tui_structure(&tui_struct, &graph);
+
+        // Run checks (generic + diagram-type-specific)
+        let mut issues = tui_checks::check_tui_structure(&tui_struct, &graph);
+        // ER-specific checks: verify attributes and table structure
+        if let selkie::diagrams::Diagram::Er(ref db) = parsed {
+            issues.extend(tui_checks::check_er_tui_structure(&tui_struct, db));
+        }
         let similarity = tui_checks::calculate_tui_similarity(&tui_struct, &graph);
         total_similarity += similarity;
 
@@ -1266,7 +1272,7 @@ fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std
         selkie::diagrams::Diagram::Er(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(tui_render::render_graph_tui(&graph)?)
+            Ok(tui_render::render_er_tui(db, &graph)?)
         }
         selkie::diagrams::Diagram::Architecture(db) => {
             let graph = db.to_layout_graph(&estimator)?;
