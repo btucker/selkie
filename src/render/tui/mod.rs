@@ -5,14 +5,26 @@
 //!
 //! Supports any diagram type that implements `ToLayoutGraph`, not just flowcharts.
 
+pub mod block;
+pub mod c4;
 pub mod canvas;
 pub mod edges;
 pub mod gantt;
+pub mod gitgraph;
+pub mod journey;
+pub mod kanban;
 pub mod mindmap;
+pub mod packet;
 pub mod pie;
+pub mod quadrant;
+pub mod radar;
+pub mod sankey;
 pub mod scale;
 pub mod sequence;
 pub mod shapes;
+pub mod timeline;
+pub mod treemap;
+pub mod xychart;
 
 use std::collections::{HashMap, HashSet};
 

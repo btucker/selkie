@@ -762,7 +762,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    // TUI-supported diagram types (those with ToLayoutGraph implementations + sequence)
+    // TUI-supported diagram types (all diagram types now have TUI renderers)
     let tui_supported_types = [
         "flowchart",
         "sequence",
@@ -774,6 +774,18 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         "mindmap",
         "pie",
         "gantt",
+        "journey",
+        "timeline",
+        "kanban",
+        "packet",
+        "xychart",
+        "quadrant",
+        "radar",
+        "git",
+        "sankey",
+        "block",
+        "c4",
+        "treemap",
     ];
 
     // Filter to TUI-supported types, or a specific type if requested
@@ -985,6 +997,141 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             let similarity = tui_checks::calculate_tui_mindmap_similarity(&tui_output, db);
             total_similarity += similarity;
 
+            let error_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Error)
+                .count();
+            let warning_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Warning)
+                .count();
+            total_issues += issues.len();
+            total_errors += error_count;
+
+            if args.verbose && !issues.is_empty() {
+                eprintln!();
+                eprintln!(
+                    "  {} ({} errors, {} warnings, similarity: {:.1}%):",
+                    input.name,
+                    error_count,
+                    warning_count,
+                    similarity * 100.0
+                );
+                for issue in &issues {
+                    let level = match issue.level {
+                        eval::Level::Error => "ERROR",
+                        eval::Level::Warning => "WARN",
+                        eval::Level::Info => "INFO",
+                    };
+                    eprintln!("    [{}] {}: {}", level, issue.check, issue.message);
+                }
+            }
+            continue;
+        }
+
+        // Non-graph diagram types: render and compute simple text-based similarity
+        let simple_eval_result = match &parsed {
+            selkie::diagrams::Diagram::Journey(db) => {
+                let output = tui_render::journey::render_journey_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "journey");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::Timeline(db) => {
+                let output = tui_render::timeline::render_timeline_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "timeline");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::Kanban(db) => {
+                let output = tui_render::kanban::render_kanban_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "kanban");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::Packet(db) => {
+                let output = tui_render::packet::render_packet_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "packet");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::XyChart(db) => {
+                let output = tui_render::xychart::render_xychart_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "xychart");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::Quadrant(db) => {
+                let output = tui_render::quadrant::render_quadrant_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "quadrant");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::Radar(db) => {
+                let output = tui_render::radar::render_radar_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "radar");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::Git(db) => {
+                let output = tui_render::gitgraph::render_gitgraph_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "git");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::Sankey(db) => {
+                let output = tui_render::sankey::render_sankey_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "sankey");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::Block(db) => {
+                let output = tui_render::block::render_block_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "block");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::C4(db) => {
+                let output = tui_render::c4::render_c4_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "c4");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            selkie::diagrams::Diagram::Treemap(db) => {
+                let output = tui_render::treemap::render_treemap_tui(db).ok();
+                output.map(|o| {
+                    let issues = tui_checks::check_tui_text_output(&o, "treemap");
+                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    (issues, similarity)
+                })
+            }
+            _ => None,
+        };
+
+        if let Some((issues, similarity)) = simple_eval_result {
+            total_similarity += similarity;
             let error_count = issues
                 .iter()
                 .filter(|i| i.level == eval::Level::Error)
@@ -1396,6 +1543,66 @@ fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std
         // Mindmap uses a dedicated tree renderer (no layout graph needed)
         selkie::diagrams::Diagram::Mindmap(db) => {
             let output = tui_render::mindmap::render_mindmap_tui(db)?;
+            Ok(output)
+        }
+        // Journey uses a dedicated section+task renderer
+        selkie::diagrams::Diagram::Journey(db) => {
+            let output = tui_render::journey::render_journey_tui(db)?;
+            Ok(output)
+        }
+        // Timeline uses a dedicated period+event renderer
+        selkie::diagrams::Diagram::Timeline(db) => {
+            let output = tui_render::timeline::render_timeline_tui(db)?;
+            Ok(output)
+        }
+        // Kanban uses a dedicated column+card renderer
+        selkie::diagrams::Diagram::Kanban(db) => {
+            let output = tui_render::kanban::render_kanban_tui(db)?;
+            Ok(output)
+        }
+        // Packet uses a dedicated bit-field renderer
+        selkie::diagrams::Diagram::Packet(db) => {
+            let output = tui_render::packet::render_packet_tui(db)?;
+            Ok(output)
+        }
+        // XY Chart uses a dedicated bar/line chart renderer
+        selkie::diagrams::Diagram::XyChart(db) => {
+            let output = tui_render::xychart::render_xychart_tui(db)?;
+            Ok(output)
+        }
+        // Quadrant uses a dedicated 2x2 grid renderer
+        selkie::diagrams::Diagram::Quadrant(db) => {
+            let output = tui_render::quadrant::render_quadrant_tui(db)?;
+            Ok(output)
+        }
+        // Radar uses a dedicated comparison table renderer
+        selkie::diagrams::Diagram::Radar(db) => {
+            let output = tui_render::radar::render_radar_tui(db)?;
+            Ok(output)
+        }
+        // Git graph uses a dedicated branch visualization renderer
+        selkie::diagrams::Diagram::Git(db) => {
+            let output = tui_render::gitgraph::render_gitgraph_tui(db)?;
+            Ok(output)
+        }
+        // Sankey uses a dedicated flow table renderer
+        selkie::diagrams::Diagram::Sankey(db) => {
+            let output = tui_render::sankey::render_sankey_tui(db)?;
+            Ok(output)
+        }
+        // Block uses a dedicated grid layout renderer
+        selkie::diagrams::Diagram::Block(db) => {
+            let output = tui_render::block::render_block_tui(db)?;
+            Ok(output)
+        }
+        // C4 uses a dedicated architecture diagram renderer
+        selkie::diagrams::Diagram::C4(db) => {
+            let output = tui_render::c4::render_c4_tui(db)?;
+            Ok(output)
+        }
+        // Treemap uses a dedicated hierarchical tree renderer
+        selkie::diagrams::Diagram::Treemap(db) => {
+            let output = tui_render::treemap::render_treemap_tui(db)?;
             Ok(output)
         }
         _ => Err("TUI format not yet supported for this diagram type".into()),

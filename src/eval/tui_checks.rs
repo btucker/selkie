@@ -1406,6 +1406,111 @@ pub fn calculate_tui_mindmap_similarity(
     score
 }
 
+// ─────────────────────────────────────────────────────────────
+// Generic text-based TUI checks for diagram types without LayoutGraph
+// ─────────────────────────────────────────────────────────────
+
+/// Check a text-based TUI output for basic structural quality.
+///
+/// Used for diagram types that don't have a LayoutGraph (journey, timeline,
+/// kanban, packet, xychart, quadrant, radar, git, sankey, block, c4, treemap).
+pub fn check_tui_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
+    let mut issues = Vec::new();
+
+    // Check output is non-empty
+    if output.trim().is_empty() {
+        issues.push(Issue {
+            check: format!("tui_{}_output", diagram_type),
+            message: "TUI output is empty".to_string(),
+            level: super::Level::Error,
+        });
+        return issues;
+    }
+
+    // Check output has reasonable length (not just a placeholder)
+    if output.trim().lines().count() < 2 {
+        issues.push(Issue {
+            check: format!("tui_{}_content", diagram_type),
+            message: "TUI output has fewer than 2 lines".to_string(),
+            level: super::Level::Warning,
+        });
+    }
+
+    // Check for "empty" placeholder (acceptable for empty diagrams, but flagged)
+    if output.contains("(empty") {
+        issues.push(Issue {
+            check: format!("tui_{}_empty", diagram_type),
+            message: "TUI output contains empty placeholder".to_string(),
+            level: super::Level::Warning,
+        });
+    }
+
+    issues
+}
+
+/// Calculate a simple text-based similarity score for diagram types
+/// without a LayoutGraph.
+///
+/// Returns 1.0 for non-empty output with structure, 0.0 for empty.
+pub fn calculate_tui_text_similarity(output: &str) -> f64 {
+    if output.trim().is_empty() {
+        return 0.0;
+    }
+
+    let mut score = 0.0;
+
+    // Non-empty output (40%)
+    score += 0.4;
+
+    // Multi-line output (20%)
+    if output.trim().lines().count() >= 3 {
+        score += 0.2;
+    }
+
+    // Has structural characters like box drawing, bullets, or bars (20%)
+    let has_structure = output.chars().any(|c| {
+        matches!(
+            c,
+            '┌' | '┐'
+                | '└'
+                | '┘'
+                | '│'
+                | '─'
+                | '├'
+                | '┤'
+                | '┬'
+                | '┴'
+                | '┼'
+                | '█'
+                | '▌'
+                | '░'
+                | '●'
+                | '◆'
+                | '■'
+                | '▲'
+                | '◉'
+                | '★'
+                | '§'
+                | '◆'
+                | '▶'
+                | '▼'
+                | '◀'
+                | '▲'
+                | '→'
+        )
+    });
+    if has_structure {
+        score += 0.2;
+    }
+
+    // Doesn't contain error/empty placeholders (20%)
+    if !output.contains("(empty") && !output.contains("(no data") {
+        score += 0.2;
+    }
+
+    score
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
