@@ -70,7 +70,7 @@ pub fn render_edges(
 
     // Render arrow tips and edge labels on top
     for edge in &graph.edges {
-        render_arrow_tip(edge, &ctx, canvas);
+        render_arrow_tip(edge, &ctx, occupied, canvas);
         render_edge_label(edge, &ctx, canvas);
     }
 }
@@ -104,8 +104,14 @@ fn to_braille_coords(px: f64, py: f64, scale: &CellScale) -> (isize, isize) {
     (bx, by)
 }
 
-/// Render an arrow tip at the edge's endpoint.
-fn render_arrow_tip(edge: &LayoutEdge, ctx: &EdgeContext, canvas: &mut [Vec<char>]) {
+/// Render an arrow tip at the edge's endpoint, avoiding occupied cells.
+/// Walks backward along the edge direction to find an unoccupied cell.
+fn render_arrow_tip(
+    edge: &LayoutEdge,
+    ctx: &EdgeContext,
+    occupied: &[Vec<bool>],
+    canvas: &mut [Vec<char>],
+) {
     if edge.bend_points.len() < 2 {
         return;
     }
@@ -123,17 +129,45 @@ fn render_arrow_tip(edge: &LayoutEdge, ctx: &EdgeContext, canvas: &mut [Vec<char
     let col = ctx.scale.to_col(last.x - ctx.offset_x);
     let row = ctx.scale.to_row(last.y - ctx.offset_y);
 
-    if row < ctx.canvas_rows && col < ctx.canvas_cols {
-        canvas[row][col] = arrow;
+    // Walk backward from the endpoint to find the first unoccupied cell
+    let step_col: isize = if dx.abs() > dy.abs() {
+        if dx > 0.0 {
+            -1
+        } else {
+            1
+        }
+    } else {
+        0
+    };
+    let step_row: isize = if dy.abs() >= dx.abs() {
+        if dy > 0.0 {
+            -1
+        } else {
+            1
+        }
+    } else {
+        0
+    };
+
+    for step in 0..5 {
+        let try_row = (row as isize + step_row * step) as usize;
+        let try_col = (col as isize + step_col * step) as usize;
+        if try_row < ctx.canvas_rows && try_col < ctx.canvas_cols && !occupied[try_row][try_col] {
+            canvas[try_row][try_col] = arrow;
+            return;
+        }
     }
 }
 
 /// Render an edge label at its midpoint position.
 fn render_edge_label(edge: &LayoutEdge, ctx: &EdgeContext, canvas: &mut [Vec<char>]) {
-    let label = match &edge.label {
-        Some(l) if !l.is_empty() => l,
+    let raw_label = match &edge.label {
+        Some(l) if !l.is_empty() => l.as_str(),
         _ => return,
     };
+    // Clean HTML line breaks and normalize whitespace for TUI display
+    let cleaned = raw_label.replace("<br/>", " ").replace("<br>", " ");
+    let label = cleaned.split_whitespace().collect::<Vec<_>>().join(" ");
 
     // Use label_position if available, otherwise midpoint of bend_points
     let (lx, ly) = if let Some(ref pos) = edge.label_position {

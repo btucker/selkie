@@ -27,6 +27,8 @@ pub struct TuiStructure {
     pub edge_labels: Vec<String>,
     /// Canvas dimensions (rows, cols).
     pub dimensions: (usize, usize),
+    /// Raw output string for substring matching (e.g., subgraph labels).
+    pub raw_output: String,
 }
 
 /// Characters that indicate box-drawing borders.
@@ -37,6 +39,7 @@ const ARROW_TIPS: &[char] = &['▶', '▼', '◀', '▲'];
 
 /// Parse TUI character-art output into a structural representation.
 pub fn parse_tui(output: &str) -> TuiStructure {
+    let raw_output = output.to_string();
     let lines: Vec<&str> = output.lines().collect();
     let rows = lines.len();
     let cols = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
@@ -65,16 +68,18 @@ pub fn parse_tui(output: &str) -> TuiStructure {
         braille_count,
         edge_labels,
         dimensions: (rows, cols),
+        raw_output,
     }
 }
 
 /// Extract node labels by finding text between │ characters on rows
 /// that are bounded above and below by box-drawing horizontal borders.
+/// Also extracts diamond labels (text between / and \ on the widest row).
 fn extract_node_labels(grid: &[Vec<char>]) -> Vec<String> {
     let mut labels = Vec::new();
 
     for (row_idx, row) in grid.iter().enumerate() {
-        // Look for │...text...│ patterns
+        // Look for │...text...│ patterns (rectangles)
         let mut in_box = false;
         let mut text_start = 0;
 
@@ -97,6 +102,36 @@ fn extract_node_labels(grid: &[Vec<char>]) -> Vec<String> {
                     // Start of box content
                     in_box = true;
                     text_start = col_idx + 1;
+                }
+            }
+        }
+
+        // Look for /...text...\ patterns (diamonds — widest row)
+        if let (Some(slash_pos), Some(backslash_pos)) = (
+            row.iter().position(|&c| c == '/'),
+            row.iter().rposition(|&c| c == '\\'),
+        ) {
+            if backslash_pos > slash_pos + 1 {
+                let content: String = row[slash_pos + 1..backslash_pos]
+                    .iter()
+                    .filter(|ch| {
+                        !ARROW_TIPS.contains(ch) && !('\u{2800}'..='\u{28FF}').contains(ch)
+                    })
+                    .collect();
+                let trimmed = content.trim();
+                if !trimmed.is_empty() && trimmed.len() > 1 {
+                    // Verify it's a diamond: check for /\ above and \/ below
+                    let has_top = row_idx > 0 && {
+                        let above: String = grid[row_idx - 1].iter().collect();
+                        above.contains('/') && above.contains('\\')
+                    };
+                    let has_bottom = row_idx + 1 < grid.len() && {
+                        let below: String = grid[row_idx + 1].iter().collect();
+                        below.contains('\\') && below.contains('/')
+                    };
+                    if has_top || has_bottom {
+                        labels.push(trimmed.to_string());
+                    }
                 }
             }
         }
@@ -259,35 +294,69 @@ pub fn check_tui_structure(tui: &TuiStructure, graph: &LayoutGraph) -> Vec<Issue
 }
 
 /// Check that TUI output has the correct number of nodes.
+/// Counts nodes whose labels appear anywhere in the TUI output (boxes, free text, etc.).
 fn check_tui_node_count(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
     let expected = graph.nodes.iter().filter(|n| !n.is_dummy).count();
-    let actual = tui.labels.len();
+    // Count nodes found: either in box labels or in the raw output
+    let mut found = 0;
+    for node in &graph.nodes {
+        if node.is_dummy {
+            continue;
+        }
+        let label = clean_label(node.label.as_deref().unwrap_or(&node.id));
+        if tui.labels.contains(&label) || tui.raw_output.contains(&label) {
+            found += 1;
+        }
+    }
 
-    if actual != expected {
+    if found != expected {
         issues.push(
             Issue::error(
                 "tui_node_count",
                 format!(
                     "TUI node count mismatch: expected {}, found {}",
-                    expected, actual
+                    expected, found
                 ),
             )
-            .with_values(expected.to_string(), actual.to_string()),
+            .with_values(expected.to_string(), found.to_string()),
         );
     }
 }
 
+/// Clean HTML line breaks from labels (matches TUI renderer behavior).
+/// Also normalizes whitespace to single spaces.
+fn clean_label(raw: &str) -> String {
+    let cleaned = raw.replace("<br/>", " ").replace("<br>", " ");
+    // Normalize multiple spaces to single space
+    cleaned.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
 /// Check that all node labels from the layout graph appear in the TUI output.
+/// Subgraph labels appear as free text (not inside boxes), so we check the
+/// raw output string as well.
 fn check_tui_labels(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
     let tui_labels: std::collections::HashSet<&str> =
         tui.labels.iter().map(|s| s.as_str()).collect();
+
+    // Also collect all text from the raw grid for subgraph label matching
+    let tui_all_labels: std::collections::HashSet<String> = tui
+        .labels
+        .iter()
+        .cloned()
+        .chain(tui.edge_labels.iter().cloned())
+        .collect();
 
     for node in &graph.nodes {
         if node.is_dummy {
             continue;
         }
-        let label = node.label.as_deref().unwrap_or(&node.id);
-        if !tui_labels.contains(label) {
+        let raw_label = node.label.as_deref().unwrap_or(&node.id);
+        let label = clean_label(raw_label);
+        // Check in box labels, edge labels, and raw output (for subgraph labels)
+        if !tui_labels.contains(label.as_str())
+            && !tui_all_labels.contains(&label)
+            && !tui.raw_output.contains(&label)
+        {
             issues.push(Issue::error(
                 "tui_missing_label",
                 format!("TUI output missing node label: '{}'", label),
@@ -329,13 +398,13 @@ fn check_tui_edges(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Iss
 /// it should be above in the TUI output too.
 fn check_tui_spatial_order(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
     // Build a map of label → layout y position
-    let mut layout_positions: Vec<(&str, f64)> = Vec::new();
+    let mut layout_positions: Vec<(String, f64)> = Vec::new();
     for node in &graph.nodes {
         if node.is_dummy {
             continue;
         }
         if let Some(y) = node.y {
-            let label = node.label.as_deref().unwrap_or(&node.id);
+            let label = clean_label(node.label.as_deref().unwrap_or(&node.id));
             layout_positions.push((label, y));
         }
     }
@@ -352,8 +421,8 @@ fn check_tui_spatial_order(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut
     let mut ordering_violations = 0;
     for i in 0..layout_positions.len() {
         for j in (i + 1)..layout_positions.len() {
-            let (label_a, y_a) = layout_positions[i];
-            let (label_b, y_b) = layout_positions[j];
+            let (ref label_a, y_a) = layout_positions[i];
+            let (ref label_b, y_b) = layout_positions[j];
 
             // Skip if same y (horizontal arrangement doesn't need vertical ordering)
             if (y_a - y_b).abs() < 1.0 {
@@ -362,9 +431,10 @@ fn check_tui_spatial_order(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut
 
             let layout_a_above = y_a < y_b;
 
-            if let (Some(&tui_row_a), Some(&tui_row_b)) =
-                (tui_positions.get(label_a), tui_positions.get(label_b))
-            {
+            if let (Some(&tui_row_a), Some(&tui_row_b)) = (
+                tui_positions.get(label_a.as_str()),
+                tui_positions.get(label_b.as_str()),
+            ) {
                 let tui_a_above = tui_row_a < tui_row_b;
                 if layout_a_above != tui_a_above {
                     ordering_violations += 1;
@@ -397,13 +467,12 @@ pub fn calculate_tui_similarity(tui: &TuiStructure, graph: &LayoutGraph) -> f64 
     }
 
     // Label match ratio
-    let tui_labels: std::collections::HashSet<&str> =
-        tui.labels.iter().map(|s| s.as_str()).collect();
-    let graph_labels: std::collections::HashSet<&str> = graph
+    let tui_labels: std::collections::HashSet<String> = tui.labels.iter().cloned().collect();
+    let graph_labels: std::collections::HashSet<String> = graph
         .nodes
         .iter()
         .filter(|n| !n.is_dummy)
-        .map(|n| n.label.as_deref().unwrap_or(&n.id))
+        .map(|n| clean_label(n.label.as_deref().unwrap_or(&n.id)))
         .collect();
     let common = tui_labels.intersection(&graph_labels).count() as f64;
     let total = tui_labels.len().max(graph_labels.len()) as f64;

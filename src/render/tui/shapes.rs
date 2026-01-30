@@ -26,8 +26,10 @@ pub struct RenderedShape {
 /// `cell_w` and `cell_h` are the allocated cell dimensions (from layout scaling).
 /// The shape is rendered to fill those dimensions, with the label centered.
 pub fn render_shape(shape: &NodeShape, label: &str, cell_w: usize, cell_h: usize) -> RenderedShape {
+    // Use character count (not byte length) for proper Unicode label sizing
+    let label_chars = label.chars().count();
     // Ensure minimum dimensions for the shape
-    let w = cell_w.max(label.len() + 4).max(5);
+    let w = cell_w.max(label_chars + 4).max(5);
     let h = cell_h.max(3);
 
     match shape {
@@ -59,19 +61,16 @@ fn render_rect(label: &str, w: usize, h: usize, rounded: bool) -> RenderedShape 
     for row in 1..h.saturating_sub(1) {
         let mid_row = h / 2;
         if row == mid_row {
-            // Label row — center the label
-            let label_display = if label.len() > inner_w {
-                &label[..inner_w]
-            } else {
-                label
-            };
-            let pad_total = inner_w.saturating_sub(label_display.len());
+            // Label row — center the label (use char count for Unicode safety)
+            let label_chars: String = label.chars().take(inner_w).collect();
+            let label_char_count = label_chars.chars().count();
+            let pad_total = inner_w.saturating_sub(label_char_count);
             let pad_left = pad_total / 2;
             let pad_right = pad_total - pad_left;
             let line = format!(
                 "│{}{}{}│",
                 " ".repeat(pad_left),
-                label_display,
+                label_chars,
                 " ".repeat(pad_right)
             );
             lines.push(line);
@@ -96,7 +95,7 @@ fn render_diamond(label: &str, _w: usize, _h: usize) -> RenderedShape {
     // Diamond needs to be wide enough for the label at its widest point.
     // The widest row (middle) has the form: /  label  \
     // So the total width = label.len() + 4 (for / \ and spacing), rounded up to odd.
-    let inner_w = label.len() + 2; // space on each side of label
+    let inner_w = label.chars().count() + 2; // space on each side of label
     let half = inner_w.div_ceil(2) + 1; // half-height
     let full_w = half * 2; // total width (even is fine)
     let full_h = half * 2 + 1; // total height (odd for symmetry)
@@ -116,12 +115,9 @@ fn render_diamond(label: &str, _w: usize, _h: usize) -> RenderedShape {
         } else if row == mid {
             // Widest row with label
             let content_w = full_w.saturating_sub(2);
-            let label_display = if label.len() > content_w {
-                &label[..content_w]
-            } else {
-                label
-            };
-            let pad_total = content_w.saturating_sub(label_display.len());
+            let label_display: String = label.chars().take(content_w).collect();
+            let label_char_count = label_display.chars().count();
+            let pad_total = content_w.saturating_sub(label_char_count);
             let pl = pad_total / 2;
             let pr = pad_total - pl;
             lines.push(format!(
@@ -143,10 +139,10 @@ fn render_diamond(label: &str, _w: usize, _h: usize) -> RenderedShape {
         }
     }
 
-    // Pad all lines to the same width
-    let max_w = lines.iter().map(|l| l.len()).max().unwrap_or(0);
+    // Pad all lines to the same width (use char count for Unicode safety)
+    let max_w = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
     for line in &mut lines {
-        let cur = line.len();
+        let cur = line.chars().count();
         if cur < max_w {
             line.push_str(&" ".repeat(max_w - cur));
         }
