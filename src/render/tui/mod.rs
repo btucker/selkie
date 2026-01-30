@@ -9,6 +9,7 @@ pub mod canvas;
 pub mod edges;
 pub mod pie;
 pub mod scale;
+pub mod sequence;
 pub mod shapes;
 
 use std::collections::HashSet;
@@ -16,6 +17,8 @@ use std::collections::HashSet;
 use crate::diagrams::flowchart::FlowchartDb;
 use crate::error::Result;
 use crate::layout::LayoutGraph;
+
+pub use sequence::render_sequence_tui;
 
 use scale::CellScale;
 use shapes::render_shape;

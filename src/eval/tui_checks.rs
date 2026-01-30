@@ -615,6 +615,193 @@ pub fn check_tui_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb) -
     issues
 }
 
+// ── Sequence diagram TUI checks ──────────────────────────────────────────────
+
+/// Structure extracted from TUI sequence diagram output.
+#[derive(Debug, Clone)]
+pub struct TuiSequenceStructure {
+    /// Participant labels found in box-drawing rectangles.
+    pub participant_labels: Vec<String>,
+    /// Message labels found (text not in participant boxes).
+    pub message_labels: Vec<String>,
+    /// Number of arrow characters found (> or <).
+    pub arrow_count: usize,
+    /// Number of lifeline characters found (│ not part of boxes).
+    pub lifeline_count: usize,
+    /// Fragment markers found (e.g., [loop], [alt], [end]).
+    pub fragment_labels: Vec<String>,
+    /// Canvas dimensions (rows, cols).
+    pub dimensions: (usize, usize),
+}
+
+/// Parse TUI sequence diagram output into a structural representation.
+pub fn parse_tui_sequence(output: &str) -> TuiSequenceStructure {
+    let lines: Vec<&str> = output.lines().collect();
+    let rows = lines.len();
+    let cols = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
+
+    let grid: Vec<Vec<char>> = lines
+        .iter()
+        .map(|line| {
+            let mut chars: Vec<char> = line.chars().collect();
+            chars.resize(cols, ' ');
+            chars
+        })
+        .collect();
+
+    let participant_labels = extract_node_labels(&grid);
+    let message_labels = extract_sequence_message_labels(&grid, &participant_labels);
+    let arrow_count = count_sequence_arrows(&grid);
+    let lifeline_count = count_lifelines(&grid);
+    let fragment_labels = extract_fragment_labels(&grid);
+
+    TuiSequenceStructure {
+        participant_labels,
+        message_labels,
+        arrow_count,
+        lifeline_count,
+        fragment_labels,
+        dimensions: (rows, cols),
+    }
+}
+
+/// Count arrow characters (> and <) that indicate message direction.
+fn count_sequence_arrows(grid: &[Vec<char>]) -> usize {
+    grid.iter()
+        .flat_map(|row| row.iter())
+        .filter(|&&ch| ch == '>' || ch == '<')
+        .count()
+}
+
+/// Count lifeline │ characters not adjacent to box corners.
+fn count_lifelines(grid: &[Vec<char>]) -> usize {
+    let mut count = 0;
+    for (row_idx, row) in grid.iter().enumerate() {
+        for (col_idx, &ch) in row.iter().enumerate() {
+            if ch == '│' {
+                // Check if this is a lifeline (not adjacent to box corners on same row)
+                let left_is_border = col_idx > 0
+                    && (BOX_HORIZONTAL.contains(&row[col_idx - 1])
+                        || BOX_CORNERS.contains(&row[col_idx - 1]));
+                let right_is_border = col_idx + 1 < row.len()
+                    && (BOX_HORIZONTAL.contains(&row[col_idx + 1])
+                        || BOX_CORNERS.contains(&row[col_idx + 1]));
+                // Also check if it's a box side (has horizontal border above or below at same col)
+                let is_box_side = is_inside_box(
+                    grid,
+                    row_idx,
+                    col_idx.saturating_sub(1),
+                    (col_idx + 2).min(row.len()),
+                );
+
+                if !left_is_border && !right_is_border && !is_box_side {
+                    count += 1;
+                }
+            }
+        }
+    }
+    count
+}
+
+/// Extract message labels from sequence TUI output.
+/// These are text runs that appear on rows with arrow characters or near them,
+/// and are not participant box labels.
+fn extract_sequence_message_labels(
+    grid: &[Vec<char>],
+    participant_labels: &[String],
+) -> Vec<String> {
+    let mut labels = Vec::new();
+    let participant_set: std::collections::HashSet<&str> =
+        participant_labels.iter().map(|s| s.as_str()).collect();
+
+    for row in grid {
+        // Find contiguous text runs
+        let mut run_start = None;
+        for (col_idx, &ch) in row.iter().enumerate() {
+            let is_structure = BOX_HORIZONTAL.contains(&ch)
+                || BOX_VERTICAL.contains(&ch)
+                || BOX_CORNERS.contains(&ch)
+                || ch == '>'
+                || ch == '<'
+                || ch == '─'
+                || ch == '·'
+                || ch == '┐'
+                || ch == '┘';
+            // Text is anything that's not a structural character and not a braille dot
+            let is_text = !is_structure && !('\u{2800}'..='\u{28FF}').contains(&ch) && ch != '\0';
+
+            if is_text {
+                if run_start.is_none() {
+                    run_start = Some(col_idx);
+                }
+            } else if let Some(start) = run_start {
+                let text: String = row[start..col_idx].iter().collect();
+                let trimmed = text.trim().to_string();
+                if !trimmed.is_empty() && !participant_set.contains(trimmed.as_str()) {
+                    labels.push(trimmed);
+                }
+                run_start = None;
+            }
+        }
+        if let Some(start) = run_start {
+            let text: String = row[start..].iter().collect();
+            let trimmed = text.trim().to_string();
+            if !trimmed.is_empty() && !participant_set.contains(trimmed.as_str()) {
+                labels.push(trimmed);
+            }
+        }
+    }
+
+    // Deduplicate
+    labels.sort();
+    labels.dedup();
+    labels
+}
+
+/// Extract fragment labels like [loop], [alt], [end] from the output.
+fn extract_fragment_labels(grid: &[Vec<char>]) -> Vec<String> {
+    let mut labels = Vec::new();
+    for row in grid {
+        let line: String = row.iter().collect();
+        // Match patterns like [loop ...], [alt ...], [end]
+        let mut i = 0;
+        let chars: Vec<char> = line.chars().collect();
+        while i < chars.len() {
+            if chars[i] == '[' {
+                let start = i;
+                i += 1;
+                while i < chars.len() && chars[i] != ']' {
+                    i += 1;
+                }
+                if i < chars.len() {
+                    let content: String = chars[start + 1..i].iter().collect();
+                    let trimmed = content.trim().to_string();
+                    if !trimmed.is_empty() {
+                        labels.push(trimmed);
+                    }
+                }
+            }
+            i += 1;
+        }
+    }
+    labels
+}
+
+/// Run TUI-specific structural checks for sequence diagrams.
+pub fn check_tui_sequence_structure(
+    tui: &TuiSequenceStructure,
+    db: &crate::diagrams::sequence::SequenceDb,
+) -> Vec<Issue> {
+    let mut issues = Vec::new();
+
+    check_tui_sequence_participants(tui, db, &mut issues);
+    check_tui_sequence_messages(tui, db, &mut issues);
+    check_tui_sequence_arrows(tui, db, &mut issues);
+    check_tui_sequence_lifelines(tui, db, &mut issues);
+
+    issues
+}
+
 /// Calculate a similarity score (0.0–1.0) for TUI pie chart output.
 ///
 /// Factors:
@@ -669,6 +856,172 @@ pub fn calculate_tui_pie_similarity(output: &str, db: &crate::diagrams::pie::Pie
     }
 
     score
+}
+
+/// Check that all participant labels appear in the TUI output.
+fn check_tui_sequence_participants(
+    tui: &TuiSequenceStructure,
+    db: &crate::diagrams::sequence::SequenceDb,
+    issues: &mut Vec<Issue>,
+) {
+    let actors = db.get_actors_in_order();
+    let expected = actors.len();
+    // Each participant appears twice (top + bottom), but dedup means unique count
+    let actual = tui.participant_labels.len();
+
+    if actual != expected {
+        issues.push(
+            Issue::error(
+                "tui_seq_participant_count",
+                format!(
+                    "TUI participant count mismatch: expected {}, found {}",
+                    expected, actual
+                ),
+            )
+            .with_values(expected.to_string(), actual.to_string()),
+        );
+    }
+
+    let tui_labels: std::collections::HashSet<&str> =
+        tui.participant_labels.iter().map(|s| s.as_str()).collect();
+
+    for actor in &actors {
+        if !tui_labels.contains(actor.description.as_str()) {
+            issues.push(Issue::error(
+                "tui_seq_missing_participant",
+                format!(
+                    "TUI output missing participant label: '{}'",
+                    actor.description
+                ),
+            ));
+        }
+    }
+}
+
+/// Check that message labels appear in the TUI output.
+fn check_tui_sequence_messages(
+    tui: &TuiSequenceStructure,
+    db: &crate::diagrams::sequence::SequenceDb,
+    issues: &mut Vec<Issue>,
+) {
+    let messages = db.get_messages();
+    let tui_msg_set: std::collections::HashSet<&str> =
+        tui.message_labels.iter().map(|s| s.as_str()).collect();
+
+    for msg in messages {
+        // Skip control structure messages
+        if msg.from.is_none() || msg.to.is_none() {
+            continue;
+        }
+        if msg.message.is_empty() {
+            continue;
+        }
+        if !tui_msg_set.contains(msg.message.as_str()) {
+            issues.push(Issue::warning(
+                "tui_seq_missing_message",
+                format!("TUI output missing message label: '{}'", msg.message),
+            ));
+        }
+    }
+}
+
+/// Check that arrows are present for messages.
+fn check_tui_sequence_arrows(
+    tui: &TuiSequenceStructure,
+    db: &crate::diagrams::sequence::SequenceDb,
+    issues: &mut Vec<Issue>,
+) {
+    // Count actual messages (not control structures)
+    let expected_messages = db
+        .get_messages()
+        .iter()
+        .filter(|m| m.from.is_some() && m.to.is_some())
+        .count();
+
+    if expected_messages > 0 && tui.arrow_count == 0 {
+        issues.push(Issue::error(
+            "tui_seq_no_arrows",
+            format!(
+                "TUI output has no arrows (expected {} messages)",
+                expected_messages
+            ),
+        ));
+    }
+}
+
+/// Check that lifelines are present.
+fn check_tui_sequence_lifelines(
+    tui: &TuiSequenceStructure,
+    db: &crate::diagrams::sequence::SequenceDb,
+    issues: &mut Vec<Issue>,
+) {
+    let actors = db.get_actors_in_order();
+    if !actors.is_empty() && tui.lifeline_count == 0 {
+        issues.push(Issue::warning(
+            "tui_seq_no_lifelines",
+            "TUI output has no lifeline characters".to_string(),
+        ));
+    }
+}
+
+/// Calculate a similarity score (0.0–1.0) for sequence diagram TUI output.
+pub fn calculate_tui_sequence_similarity(
+    tui: &TuiSequenceStructure,
+    db: &crate::diagrams::sequence::SequenceDb,
+) -> f64 {
+    let mut parts: Vec<f64> = Vec::new();
+
+    // Participant match ratio
+    let actors = db.get_actors_in_order();
+    let expected_participants = actors.len();
+    if expected_participants > 0 || !tui.participant_labels.is_empty() {
+        let tui_set: std::collections::HashSet<&str> =
+            tui.participant_labels.iter().map(|s| s.as_str()).collect();
+        let db_set: std::collections::HashSet<&str> =
+            actors.iter().map(|a| a.description.as_str()).collect();
+        let common = tui_set.intersection(&db_set).count() as f64;
+        let total = tui_set.len().max(db_set.len()) as f64;
+        if total > 0.0 {
+            parts.push(common / total);
+        }
+    }
+
+    // Message label match ratio
+    let messages = db.get_messages();
+    let expected_msgs: Vec<&str> = messages
+        .iter()
+        .filter(|m| m.from.is_some() && m.to.is_some() && !m.message.is_empty())
+        .map(|m| m.message.as_str())
+        .collect();
+    if !expected_msgs.is_empty() {
+        let tui_msg_set: std::collections::HashSet<&str> =
+            tui.message_labels.iter().map(|s| s.as_str()).collect();
+        let found = expected_msgs
+            .iter()
+            .filter(|m| tui_msg_set.contains(*m))
+            .count() as f64;
+        parts.push(found / expected_msgs.len() as f64);
+    }
+
+    // Arrow presence
+    let expected_message_count = messages
+        .iter()
+        .filter(|m| m.from.is_some() && m.to.is_some())
+        .count();
+    if expected_message_count > 0 {
+        parts.push(if tui.arrow_count > 0 { 1.0 } else { 0.0 });
+    }
+
+    // Lifeline presence
+    if !actors.is_empty() {
+        parts.push(if tui.lifeline_count > 0 { 1.0 } else { 0.0 });
+    }
+
+    if parts.is_empty() {
+        1.0
+    } else {
+        parts.iter().sum::<f64>() / parts.len() as f64
+    }
 }
 
 #[cfg(test)]

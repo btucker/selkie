@@ -762,9 +762,10 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    // TUI-supported diagram types (those with ToLayoutGraph implementations)
+    // TUI-supported diagram types (those with ToLayoutGraph implementations + sequence)
     let tui_supported_types = [
         "flowchart",
+        "sequence",
         "state",
         "class",
         "er",
@@ -871,7 +872,55 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             continue;
         }
 
-        // Layout — use ToLayoutGraph trait to get a layout graph for any supported type
+        // Sequence diagrams use their own renderer and eval checks (no LayoutGraph)
+        if let selkie::diagrams::Diagram::Sequence(db) = &parsed {
+            let tui_output = match tui_render::render_sequence_tui(db) {
+                Ok(output) => output,
+                Err(e) => {
+                    eprintln!(" RENDER ERROR: {}", e);
+                    total_errors += 1;
+                    continue;
+                }
+            };
+
+            let tui_struct = tui_checks::parse_tui_sequence(&tui_output);
+            let issues = tui_checks::check_tui_sequence_structure(&tui_struct, db);
+            let similarity = tui_checks::calculate_tui_sequence_similarity(&tui_struct, db);
+            total_similarity += similarity;
+
+            let error_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Error)
+                .count();
+            let warning_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Warning)
+                .count();
+            total_issues += issues.len();
+            total_errors += error_count;
+
+            if args.verbose && !issues.is_empty() {
+                eprintln!();
+                eprintln!(
+                    "  {} ({} errors, {} warnings, similarity: {:.1}%):",
+                    input.name,
+                    error_count,
+                    warning_count,
+                    similarity * 100.0
+                );
+                for issue in &issues {
+                    let level = match issue.level {
+                        eval::Level::Error => "ERROR",
+                        eval::Level::Warning => "WARN",
+                        eval::Level::Info => "INFO",
+                    };
+                    eprintln!("    [{}] {}: {}", level, issue.check, issue.message);
+                }
+            }
+            continue;
+        }
+
+        // All other diagram types use ToLayoutGraph + generic TUI renderer
         let graph = match layout_diagram(&parsed, &estimator) {
             Ok(g) => match selkie::layout::layout(g) {
                 Ok(g) => g,
@@ -888,7 +937,6 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             }
         };
 
-        // Render TUI using the appropriate renderer
         let tui_output = match render_tui(&parsed) {
             Ok(output) => output,
             Err(e) => {
@@ -898,10 +946,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             }
         };
 
-        // Parse TUI output
         let tui_struct = tui_checks::parse_tui(&tui_output);
-
-        // Run checks
         let issues = tui_checks::check_tui_structure(&tui_struct, &graph);
         let similarity = tui_checks::calculate_tui_similarity(&tui_struct, &graph);
         total_similarity += similarity;
@@ -1201,6 +1246,10 @@ fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
             let output = tui_render::render_flowchart_tui(db, &graph)?;
+            Ok(output)
+        }
+        selkie::diagrams::Diagram::Sequence(db) => {
+            let output = tui_render::render_sequence_tui(db)?;
             Ok(output)
         }
         // Graph-based diagram types use the generic renderer
