@@ -743,17 +743,28 @@ Rel(a, b, "Uses")"#;
     }
 
     #[test]
-    fn render_marker_fill_color_matches_reference() {
-        // mermaid.js arrowhead markers use #444444 fill
+    fn render_relationship_label_fill_matches_reference() {
+        // Relationship labels use #444444 fill (COLOR_REL), matching mermaid.js
         let input = r#"C4Context
 Person(a, "Alice", "A person")
 System(b, "System B", "A system")
-Rel(a, b, "Uses")"#;
+Rel(a, b, "Uses", "HTTP")"#;
 
         let svg = render_c4_svg(input).expect("Failed to render");
+        // Relationship label text should use #444444 fill
         assert!(
             svg.contains(r##"fill="#444444""##),
-            "Arrow marker fill should be #444444 to match mermaid.js reference"
+            "Relationship label fill should be #444444 to match mermaid.js reference"
+        );
+        // Arrow marker paths should NOT have explicit fill (inherit black per mermaid.js)
+        let marker_section = svg
+            .split(r#"<marker id="c4-arrow""#)
+            .nth(1)
+            .and_then(|s| s.split("</marker>").next())
+            .unwrap_or("");
+        assert!(
+            !marker_section.contains("fill=\"#"),
+            "Arrow marker path should not have explicit fill color — inherits black per mermaid.js"
         );
     }
 }
