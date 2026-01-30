@@ -1,0 +1,44 @@
+Analytics and Business Intelligence Platforms
+──────────────────────────────────────────────
+  ▲ y-axis-2
+  │                    │
+  │                    │
+  │                    │
+  │                    │
+  │                    │
+  │ Challengers        │ Leade●s●
+  │                    │          ●
+  │                    │      ●
+  │                  ● │●      ●
+  │                    │●   ●
+  │──────────●─────────●──●────────────────
+  │              ●     ●
+  │            ●       │
+  │        ●           │
+  │                    │
+  │ Niche Players      │ Visionaries
+  │                    │
+  │                    │
+  │                    │
+  │                    │
+  └────────────────────────────────────────▶
+   Completeness of Vision          x-axis-2
+  ▼ Ability to Execute
+
+  Points:
+    ● Microsoft (0.75, 0.75)
+    ● Salesforce (0.55, 0.60)
+    ● SAP (0.70, 0.65)
+    ● IBM (0.51, 0.40)
+    ● Oracle (0.65, 0.55)
+    ● Qlik (0.60, 0.45)
+    ● Tableau (0.68, 0.72)
+    ● SAS (0.45, 0.58)
+    ● MicroStrategy (0.50, 0.50)
+    ● Alteryx (0.35, 0.42)
+    ● Sisense (0.30, 0.35)
+    ● ThoughtSpot (0.25, 0.45)
+    ● Domo (0.20, 0.30)
+    ● Looker (0.55, 0.52)
+    ● Amazon (0.80, 0.68)
+    ● Google (0.72, 0.60)

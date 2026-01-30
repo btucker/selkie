@@ -1,0 +1,24 @@
+Container diagram for Internet Banking System
+═════════════════════════════════════════════
+
+┌─ Internet Banking [container] ─┐
+    [Container] Single-Page App (JavaScript, Angular)
+        Provides all the Internet banking functionality
+    [Container] API Application (Java, Spring MVC)
+        Provides banking functionality via JSON/HTTPS API
+    [Container] Database (Oracle)
+        Stores user data, accounts, transactions
+    [Container] Message Broker (RabbitMQ)
+        Handles async messaging
+└────────────┘
+  [System] E-Mail System [ext]
+      The internal Microsoft Exchange system
+  [Person] Customer
+      A customer of the bank, with personal bank accounts
+
+  Relationships:
+    customer → "Uses" [HTTPS] spa
+    spa → "Makes API calls to" [JSON/HTTPS] api
+    api → "Reads from and writes to" [JDBC] db
+    api → "Sends messages to" queue
+    email_system → "Sends e-mails to" customer

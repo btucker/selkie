@@ -1,0 +1,34 @@
+Reach and Engagement
+──────────────────────────────────────────────
+  ▲ High Engagement
+  │                    │
+  │                    │
+  │                    │
+  │                    │
+  │              ●     │
+  │ Need to promote    │ We should expand
+  │                    │ ●
+  │                    │
+  │            ●       │
+  │                    │
+  │────────────────────┼───────────────────
+  │                    │
+  │                    │
+  │                ●   │         ●
+  │                    │
+  │ Re-evaluate      ● │ May be improved
+  │                    │
+  │                    │
+  │                    │
+  │                    │
+  └────────────────────────────────────────▶
+   Low Reach                     High Reach
+  ▼ Low Engagement
+
+  Points:
+    ● Campaign A (0.30, 0.60)
+    ● Campaign B (0.45, 0.23)
+    ● Campaign C (0.57, 0.69)
+    ● Campaign D (0.78, 0.34)
+    ● Campaign E (0.40, 0.34)
+    ● Campaign F (0.35, 0.78)

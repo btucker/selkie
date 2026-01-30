@@ -1,0 +1,9 @@
+((mindmap))
+├── Origins
+│   └── Long history
+├── Research
+│   ├── On effectiveness
+│   └── On Automatic creation
+└── Tools
+    ├── Pen and paper
+    └── Mermaid

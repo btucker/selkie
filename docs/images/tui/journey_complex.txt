@@ -1,0 +1,28 @@
+E-Commerce User Journey
+────────────────────────────────────────
+
+  § Discovery
+  ───────────
+    Visit homepage        │█████ 5/5 (Customer)
+    Search for product    │████░ 4/5 (Customer)
+    Browse categories     │███░░ 3/5 (Customer)
+
+  § Selection
+  ───────────
+    View product details  │█████ 5/5 (Customer)
+    Read reviews          │████░ 4/5 (Customer)
+    Compare prices        │███░░ 3/5 (Customer)
+    Add to cart           │█████ 5/5 (Customer)
+
+  § Checkout
+  ──────────
+    Review cart           │████░ 4/5 (Customer)
+    Enter shipping info   │███░░ 3/5 (Customer, System)
+    Select payment method │████░ 4/5 (Customer)
+    Complete purchase     │█████ 5/5 (Customer, System)
+
+  § Post-Purchase
+  ───────────────
+    Receive confirmation  │█████ 5/5 (System)
+    Track shipment        │████░ 4/5 (Customer)
+    Receive delivery      │█████ 5/5 (Customer)

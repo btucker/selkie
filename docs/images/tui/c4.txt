@@ -1,0 +1,15 @@
+System Context diagram for Internet Banking System
+══════════════════════════════════════════════════
+
+┌─ BankBoundary [enterprise] ─┐
+    [Person] Banking Customer
+        A customer of the bank
+    [System] Internet Banking System
+        Allows customers to view accounts
+└────────────┘
+  [System] E-mail System [ext]
+      External e-mail system
+
+  Relationships:
+    customer → "Uses" banking
+    banking → "Sends e-mails" [SMTP] email

@@ -1,0 +1,9 @@
+  ● │A
+  ● │B
+  │ ◆C (feature)
+  ● │D
+  ● │4-607a0 (main)
+
+  Branches:
+    ● main
+    ◆ feature
