@@ -1024,6 +1024,191 @@ pub fn calculate_tui_sequence_similarity(
     }
 }
 
+// --- Gantt chart-specific TUI evaluation ---
+
+/// Check TUI gantt chart output against the GanttDb ground truth.
+///
+/// Since gantt charts don't use LayoutGraph, we compare directly against GanttDb:
+/// - All task names must appear in the output
+/// - Section names should appear
+/// - Title should appear if set
+/// - Status indicators should be present for flagged tasks
+pub fn check_tui_gantt_structure(
+    output: &str,
+    db: &mut crate::diagrams::gantt::GanttDb,
+) -> Vec<Issue> {
+    let mut issues = Vec::new();
+    let tasks = db.get_tasks();
+
+    // Check title
+    let title = db.get_diagram_title();
+    if !title.is_empty() && !output.contains(title) {
+        issues.push(Issue::error(
+            "tui_gantt_missing_title",
+            format!("TUI gantt output missing title: '{}'", title),
+        ));
+    }
+
+    if tasks.is_empty() {
+        return issues;
+    }
+
+    // Check task names (skip vert markers)
+    for task in &tasks {
+        if task.flags.vert {
+            continue;
+        }
+        if !output.contains(&task.task) {
+            issues.push(Issue::error(
+                "tui_gantt_missing_task",
+                format!("TUI gantt output missing task: '{}'", task.task),
+            ));
+        }
+    }
+
+    // Check section names
+    for section in db.get_sections() {
+        if !output.contains(section.as_str()) {
+            issues.push(Issue::warning(
+                "tui_gantt_missing_section",
+                format!("TUI gantt output missing section: '{}'", section),
+            ));
+        }
+    }
+
+    // Check status indicators
+    let has_done = tasks.iter().any(|t| t.flags.done && !t.flags.vert);
+    let has_active = tasks.iter().any(|t| t.flags.active && !t.flags.vert);
+    let has_milestone = tasks.iter().any(|t| t.flags.milestone && !t.flags.vert);
+
+    if has_done && !output.contains('✓') && !output.contains('░') {
+        issues.push(Issue::warning(
+            "tui_gantt_no_done_indicator",
+            "TUI gantt output has done tasks but no done indicator (✓/░)".to_string(),
+        ));
+    }
+    if has_active && !output.contains('►') {
+        issues.push(Issue::warning(
+            "tui_gantt_no_active_indicator",
+            "TUI gantt output has active tasks but no active indicator (►)".to_string(),
+        ));
+    }
+    if has_milestone && !output.contains('◆') {
+        issues.push(Issue::warning(
+            "tui_gantt_no_milestone_indicator",
+            "TUI gantt output has milestones but no milestone indicator (◆)".to_string(),
+        ));
+    }
+
+    // Check bar characters are present
+    let has_bars = output.contains('█') || output.contains('░');
+    if !has_bars {
+        issues.push(Issue::error(
+            "tui_gantt_no_bars",
+            "TUI gantt output has no bar characters (█/░)".to_string(),
+        ));
+    }
+
+    issues
+}
+
+/// Calculate a similarity score (0.0–1.0) for TUI gantt chart output.
+///
+/// Factors:
+/// - Task name presence (40%)
+/// - Section name presence (20%)
+/// - Title presence (15%)
+/// - Status indicator presence (15%)
+/// - Bar character presence (10%)
+pub fn calculate_tui_gantt_similarity(
+    output: &str,
+    db: &mut crate::diagrams::gantt::GanttDb,
+) -> f64 {
+    let tasks = db.get_tasks();
+    let sections = db.get_sections();
+
+    if tasks.is_empty() {
+        if output.contains("empty") || output.contains("no data") || output.contains("no resolved")
+        {
+            return 1.0;
+        }
+        return 0.0;
+    }
+
+    let mut score = 0.0;
+
+    // Task name presence (40% weight)
+    let non_vert_tasks: Vec<_> = tasks.iter().filter(|t| !t.flags.vert).collect();
+    if !non_vert_tasks.is_empty() {
+        let found = non_vert_tasks
+            .iter()
+            .filter(|t| output.contains(&t.task))
+            .count();
+        score += 0.4 * (found as f64 / non_vert_tasks.len() as f64);
+    } else {
+        score += 0.4;
+    }
+
+    // Section name presence (20% weight)
+    if !sections.is_empty() {
+        let found = sections
+            .iter()
+            .filter(|s| output.contains(s.as_str()))
+            .count();
+        score += 0.2 * (found as f64 / sections.len() as f64);
+    } else {
+        score += 0.2;
+    }
+
+    // Title presence (15% weight)
+    let title = db.get_diagram_title();
+    if !title.is_empty() {
+        if output.contains(title) {
+            score += 0.15;
+        }
+    } else {
+        score += 0.15;
+    }
+
+    // Status indicators (15% weight)
+    let mut status_checks = 0;
+    let mut status_found = 0;
+    let has_done = non_vert_tasks.iter().any(|t| t.flags.done);
+    let has_active = non_vert_tasks.iter().any(|t| t.flags.active);
+    let has_milestone = non_vert_tasks.iter().any(|t| t.flags.milestone);
+
+    if has_done {
+        status_checks += 1;
+        if output.contains('✓') || output.contains('░') {
+            status_found += 1;
+        }
+    }
+    if has_active {
+        status_checks += 1;
+        if output.contains('►') {
+            status_found += 1;
+        }
+    }
+    if has_milestone {
+        status_checks += 1;
+        if output.contains('◆') {
+            status_found += 1;
+        }
+    }
+    if status_checks > 0 {
+        score += 0.15 * (status_found as f64 / status_checks as f64);
+    } else {
+        score += 0.15;
+    }
+
+    // Bar characters (10% weight)
+    if output.contains('█') || output.contains('░') {
+        score += 0.1;
+    }
+
+    score
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -772,6 +772,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         "architecture",
         "requirement",
         "pie",
+        "gantt",
     ];
 
     // Filter to TUI-supported types, or a specific type if requested
@@ -886,6 +887,54 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             let tui_struct = tui_checks::parse_tui_sequence(&tui_output);
             let issues = tui_checks::check_tui_sequence_structure(&tui_struct, db);
             let similarity = tui_checks::calculate_tui_sequence_similarity(&tui_struct, db);
+            total_similarity += similarity;
+
+            let error_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Error)
+                .count();
+            let warning_count = issues
+                .iter()
+                .filter(|i| i.level == eval::Level::Warning)
+                .count();
+            total_issues += issues.len();
+            total_errors += error_count;
+
+            if args.verbose && !issues.is_empty() {
+                eprintln!();
+                eprintln!(
+                    "  {} ({} errors, {} warnings, similarity: {:.1}%):",
+                    input.name,
+                    error_count,
+                    warning_count,
+                    similarity * 100.0
+                );
+                for issue in &issues {
+                    let level = match issue.level {
+                        eval::Level::Error => "ERROR",
+                        eval::Level::Warning => "WARN",
+                        eval::Level::Info => "INFO",
+                    };
+                    eprintln!("    [{}] {}: {}", level, issue.check, issue.message);
+                }
+            }
+            continue;
+        }
+
+        // Gantt charts don't use LayoutGraph — handle with dedicated eval path
+        if let selkie::diagrams::Diagram::Gantt(ref db) = parsed {
+            let mut db_clone = db.clone();
+            let tui_output = match tui_render::gantt::render_gantt_tui(&mut db_clone) {
+                Ok(output) => output,
+                Err(e) => {
+                    eprintln!(" RENDER ERROR: {}", e);
+                    total_errors += 1;
+                    continue;
+                }
+            };
+
+            let issues = tui_checks::check_tui_gantt_structure(&tui_output, &mut db_clone);
+            let similarity = tui_checks::calculate_tui_gantt_similarity(&tui_output, &mut db_clone);
             total_similarity += similarity;
 
             let error_count = issues
@@ -1281,6 +1330,12 @@ fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std
         // Pie charts use a dedicated bar-chart renderer (no layout graph needed)
         selkie::diagrams::Diagram::Pie(db) => {
             let output = tui_render::pie::render_pie_tui(db)?;
+            Ok(output)
+        }
+        // Gantt charts use a dedicated timeline renderer (no layout graph needed)
+        selkie::diagrams::Diagram::Gantt(db) => {
+            let mut db_clone = db.clone();
+            let output = tui_render::gantt::render_gantt_tui(&mut db_clone)?;
             Ok(output)
         }
         _ => Err("TUI format not yet supported for this diagram type".into()),
