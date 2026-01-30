@@ -1,4 +1,4 @@
-//! TUI (Text User Interface) renderer for diagrams.
+//! ASCII (Text User Interface) renderer for diagrams.
 //!
 //! Produces character-art output using box-drawing characters for node shapes
 //! and braille dots for edge routing. Pipe-friendly, works in every terminal.
@@ -34,26 +34,26 @@ use crate::diagrams::flowchart::FlowchartDb;
 use crate::error::Result;
 use crate::layout::LayoutGraph;
 
-pub use sequence::render_sequence_tui;
+pub use sequence::render_sequence_ascii;
 
 use scale::CellScale;
 use shapes::{render_class_box, render_shape};
 
 /// Render any laid-out graph as character art.
 ///
-/// This is the generic entry point for TUI rendering. It works with any diagram
+/// This is the generic entry point for ASCII rendering. It works with any diagram
 /// type that produces a `LayoutGraph` via `ToLayoutGraph`. Node labels are taken
 /// from `node.label` (falling back to `node.id`), with HTML tags cleaned.
-pub fn render_graph_tui(graph: &LayoutGraph) -> Result<String> {
-    render_tui_impl(graph, &|node| generic_node_label(node))
+pub fn render_graph_ascii(graph: &LayoutGraph) -> Result<String> {
+    render_ascii_impl(graph, &|node| generic_node_label(node))
 }
 
 /// Render a flowchart as character art.
 ///
 /// Uses `FlowchartDb` for richer label lookup (vertex text), falling back to
-/// the layout node label. For non-flowchart diagrams, use `render_graph_tui`.
-pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<String> {
-    render_tui_impl(graph, &|node| flowchart_node_label(db, node))
+/// the layout node label. For non-flowchart diagrams, use `render_graph_ascii`.
+pub fn render_flowchart_ascii(db: &FlowchartDb, graph: &LayoutGraph) -> Result<String> {
+    render_ascii_impl(graph, &|node| flowchart_node_label(db, node))
 }
 
 /// Render an ER diagram as character art.
@@ -61,7 +61,7 @@ pub fn render_flowchart_tui(db: &FlowchartDb, graph: &LayoutGraph) -> Result<Str
 /// Uses `ErDb` to render entity boxes with attribute tables (type, name, keys
 /// columns), matching the SVG renderer's table-style layout. Relationship
 /// edges are rendered using the standard braille edge router.
-pub fn render_er_tui(db: &ErDb, graph: &LayoutGraph) -> Result<String> {
+pub fn render_er_ascii(db: &ErDb, graph: &LayoutGraph) -> Result<String> {
     let scale = CellScale::default();
 
     // Determine canvas dimensions from graph bounds
@@ -305,8 +305,8 @@ fn format_cell(text: &str, width: usize) -> String {
     }
 }
 
-/// Core TUI renderer implementation, parameterized by a label lookup function.
-fn render_tui_impl(
+/// Core ASCII renderer implementation, parameterized by a label lookup function.
+fn render_ascii_impl(
     graph: &LayoutGraph,
     label_fn: &dyn Fn(&crate::layout::LayoutNode) -> String,
 ) -> Result<String> {
@@ -568,7 +568,7 @@ fn flowchart_node_label(db: &FlowchartDb, node: &crate::layout::LayoutNode) -> S
     clean_html_label(raw)
 }
 
-/// Clean HTML line breaks and normalize whitespace for TUI display.
+/// Clean HTML line breaks and normalize whitespace for ASCII display.
 fn clean_html_label(raw: &str) -> String {
     let cleaned = raw.replace("<br/>", " ").replace("<br>", " ");
     cleaned.split_whitespace().collect::<Vec<_>>().join(" ")
@@ -579,7 +579,7 @@ fn clean_html_label(raw: &str) -> String {
 /// Each class becomes a multi-section box with optional annotations,
 /// a class name header, attributes, and methods separated by horizontal
 /// dividers (├─┤). Relations are rendered as braille edges with arrow tips.
-pub fn render_class_tui(db: &ClassDb, graph: &LayoutGraph) -> Result<String> {
+pub fn render_class_ascii(db: &ClassDb, graph: &LayoutGraph) -> Result<String> {
     let scale = CellScale::default();
 
     let graph_width = graph.width.unwrap_or(400.0);
@@ -718,7 +718,7 @@ mod tests {
         let (db, graph) = parse_and_layout(
             &std::fs::read_to_string("docs/sources/flowchart_complex.mmd").unwrap(),
         );
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
 
         // Check that key labels appear in the output
         for label in &[
@@ -745,7 +745,7 @@ mod tests {
     #[test]
     fn arrow_tip_not_inside_node() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] --> B[End]");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         // Arrow tips must not appear inside node labels
         // "End" should appear as-is, not "E▼d" or similar
         assert!(
@@ -766,7 +766,7 @@ mod tests {
         let (db, graph) = parse_and_layout(
             "flowchart TD\n    subgraph sg[My Group]\n        A[NodeA]\n        B[NodeB]\n    end",
         );
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         // All node labels must be present and intact
         assert!(
             output.contains("NodeA"),
@@ -790,7 +790,7 @@ mod tests {
         let (db, graph) = parse_and_layout(
             "flowchart TD\n    A[Start] --> B{Decision}\n    B --> C[Action 1]\n    B --> D[End]",
         );
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(
             output.contains("Decision"),
             "Diamond label must be readable\nOutput:\n{}",
@@ -812,7 +812,7 @@ mod tests {
     fn cyrillic_label_renders() {
         let (db, graph) =
             parse_and_layout("graph TB\n    cyr[Cyrillic]-->cyr2((Circle shape Начало))");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(
             output.contains("Начало"),
             "Cyrillic label must be visible\nOutput:\n{}",
@@ -843,7 +843,7 @@ mod tests {
      class sq,e green
      class di orange"#;
         let (db, graph) = parse_and_layout(input);
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(
             output.contains("Circle shape Начало"),
             "Cyrillic circle label must be visible\nOutput:\n{}",
@@ -854,7 +854,7 @@ mod tests {
     #[test]
     fn single_node_renders() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[Hello]");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(output.contains("Hello"), "Output should contain the label");
         assert!(
             output.contains('┌') || output.contains('╭'),
@@ -865,7 +865,7 @@ mod tests {
     #[test]
     fn two_nodes_render() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] --> B[End]");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(output.contains("Start"), "Should contain Start label");
         assert!(output.contains("End"), "Should contain End label");
     }
@@ -873,7 +873,7 @@ mod tests {
     #[test]
     fn round_node_uses_rounded_corners() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A(Round)");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(output.contains('╭'), "Round node should use ╭");
         assert!(output.contains('╯'), "Round node should use ╯");
     }
@@ -881,21 +881,21 @@ mod tests {
     #[test]
     fn diamond_node_renders() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A{Decision}");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(output.contains("Decision"), "Diamond should contain label");
     }
 
     #[test]
     fn output_is_nonempty() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[X]");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(!output.trim().is_empty(), "Output should not be empty");
     }
 
     #[test]
     fn edges_produce_braille_chars() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] --> B[End]");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         // Edge should produce at least some braille characters or arrow tips
         let has_braille = output
             .chars()
@@ -910,20 +910,20 @@ mod tests {
     #[test]
     fn edge_labels_render() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] -->|Yes| B[End]");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(output.contains("Yes"), "Edge label 'Yes' should appear");
     }
 
     #[test]
     fn down_arrow_in_td_flow() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[Top] --> B[Bottom]");
-        let output = render_flowchart_tui(&db, &graph).unwrap();
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
         assert!(output.contains('▼'), "TD flow should have down arrow ▼");
     }
 
     // --- Generic renderer tests for non-flowchart diagram types ---
 
-    /// Parse any diagram type and produce a layout graph for TUI rendering.
+    /// Parse any diagram type and produce a layout graph for ASCII rendering.
     fn parse_and_layout_generic(input: &str) -> crate::layout::LayoutGraph {
         let diagram = crate::parse(input).unwrap();
         let estimator = CharacterSizeEstimator::default();
@@ -937,19 +937,19 @@ mod tests {
             crate::diagrams::Diagram::Requirement(ref db) => {
                 db.to_layout_graph(&estimator).unwrap()
             }
-            _ => panic!("Unsupported diagram type for generic TUI test"),
+            _ => panic!("Unsupported diagram type for generic ASCII test"),
         };
         crate::layout::layout(graph).unwrap()
     }
 
     #[test]
-    fn state_diagram_renders_tui() {
+    fn state_diagram_renders_ascii() {
         let input = "stateDiagram-v2\n    [*] --> Idle\n    Idle --> Running : start\n    Running --> Idle : stop";
         let graph = parse_and_layout_generic(input);
-        let output = render_graph_tui(&graph).unwrap();
+        let output = render_graph_ascii(&graph).unwrap();
         assert!(
             !output.trim().is_empty(),
-            "State diagram TUI output should not be empty"
+            "State diagram ASCII output should not be empty"
         );
         assert!(
             output.contains("Idle"),
@@ -964,14 +964,14 @@ mod tests {
     }
 
     #[test]
-    fn class_diagram_renders_tui() {
+    fn class_diagram_renders_ascii() {
         let input =
             "classDiagram\n    Animal <|-- Duck\n    Animal <|-- Fish\n    Animal : +int age";
         let graph = parse_and_layout_generic(input);
-        let output = render_graph_tui(&graph).unwrap();
+        let output = render_graph_ascii(&graph).unwrap();
         assert!(
             !output.trim().is_empty(),
-            "Class diagram TUI output should not be empty"
+            "Class diagram ASCII output should not be empty"
         );
         assert!(
             output.contains("Animal"),
@@ -986,14 +986,14 @@ mod tests {
     }
 
     #[test]
-    fn er_diagram_renders_tui() {
+    fn er_diagram_renders_ascii() {
         let input =
             "erDiagram\n    CUSTOMER ||--o{ ORDER : places\n    ORDER ||--|{ LINE-ITEM : contains";
         let graph = parse_and_layout_generic(input);
-        let output = render_graph_tui(&graph).unwrap();
+        let output = render_graph_ascii(&graph).unwrap();
         assert!(
             !output.trim().is_empty(),
-            "ER diagram TUI output should not be empty"
+            "ER diagram ASCII output should not be empty"
         );
         assert!(
             output.contains("CUSTOMER"),
@@ -1011,7 +1011,7 @@ mod tests {
     fn state_diagram_from_file() {
         let input = std::fs::read_to_string("docs/sources/state.mmd").unwrap();
         let graph = parse_and_layout_generic(&input);
-        let output = render_graph_tui(&graph).unwrap();
+        let output = render_graph_ascii(&graph).unwrap();
         for label in &["Idle", "Running", "Error"] {
             assert!(
                 output.contains(label),
@@ -1026,7 +1026,7 @@ mod tests {
     fn class_diagram_from_file() {
         let input = std::fs::read_to_string("docs/sources/class.mmd").unwrap();
         let graph = parse_and_layout_generic(&input);
-        let output = render_graph_tui(&graph).unwrap();
+        let output = render_graph_ascii(&graph).unwrap();
         for label in &["Animal", "Duck", "Fish", "Zebra"] {
             assert!(
                 output.contains(label),
@@ -1041,7 +1041,7 @@ mod tests {
     fn er_diagram_from_file() {
         let input = std::fs::read_to_string("docs/sources/er.mmd").unwrap();
         let graph = parse_and_layout_generic(&input);
-        let output = render_graph_tui(&graph).unwrap();
+        let output = render_graph_ascii(&graph).unwrap();
         for label in &["CUSTOMER", "ORDER", "PRODUCT"] {
             assert!(
                 output.contains(label),
@@ -1056,7 +1056,7 @@ mod tests {
     fn state_diagram_start_end_rendered_as_symbols() {
         let input = "stateDiagram-v2\n    [*] --> Idle\n    Idle --> [*]";
         let graph = parse_and_layout_generic(input);
-        let output = render_graph_tui(&graph).unwrap();
+        let output = render_graph_ascii(&graph).unwrap();
         // Start/end nodes should render as ● or ◉ symbols, not rectangles with ID labels
         let has_start = output.contains('●');
         let has_end = output.contains('◉');
@@ -1076,7 +1076,7 @@ mod tests {
     fn state_complex2_has_all_expected_labels() {
         let input = std::fs::read_to_string("docs/sources/state_complex2.mmd").unwrap();
         let graph = parse_and_layout_generic(&input);
-        let output = render_graph_tui(&graph).unwrap();
+        let output = render_graph_ascii(&graph).unwrap();
         // Core state labels must appear
         for label in &[
             "Idle",
@@ -1110,7 +1110,7 @@ mod tests {
     fn state_diagram_has_edges() {
         let input = "stateDiagram-v2\n    [*] --> Idle\n    Idle --> Running : start";
         let graph = parse_and_layout_generic(input);
-        let output = render_graph_tui(&graph).unwrap();
+        let output = render_graph_ascii(&graph).unwrap();
         let has_braille = output
             .chars()
             .any(|c| ('\u{2800}'..='\u{28FF}').contains(&c));
@@ -1125,7 +1125,7 @@ mod tests {
         );
     }
 
-    // --- ER diagram TUI renderer tests ---
+    // --- ER diagram ASCII renderer tests ---
 
     fn parse_er_and_layout(input: &str) -> (crate::diagrams::er::ErDb, crate::layout::LayoutGraph) {
         let diagram = crate::parse(input).unwrap();
@@ -1140,24 +1140,24 @@ mod tests {
     }
 
     #[test]
-    fn er_tui_renders_entity_names() {
+    fn er_ascii_renders_entity_names() {
         let input = "erDiagram\n    CUSTOMER ||--o{ ORDER : places";
         let (db, graph) = parse_er_and_layout(input);
-        let output = render_er_tui(&db, &graph).unwrap();
+        let output = render_er_ascii(&db, &graph).unwrap();
         assert!(
             output.contains("CUSTOMER"),
-            "ER TUI should contain 'CUSTOMER'\nOutput:\n{}",
+            "ER ASCII should contain 'CUSTOMER'\nOutput:\n{}",
             output
         );
         assert!(
             output.contains("ORDER"),
-            "ER TUI should contain 'ORDER'\nOutput:\n{}",
+            "ER ASCII should contain 'ORDER'\nOutput:\n{}",
             output
         );
     }
 
     #[test]
-    fn er_tui_renders_attributes() {
+    fn er_ascii_renders_attributes() {
         let input = r#"erDiagram
     CUSTOMER {
         string name
@@ -1166,7 +1166,7 @@ mod tests {
     }
 "#;
         let (db, graph) = parse_er_and_layout(input);
-        let output = render_er_tui(&db, &graph).unwrap();
+        let output = render_er_ascii(&db, &graph).unwrap();
         // Entity name
         assert!(
             output.contains("CUSTOMER"),
@@ -1204,7 +1204,7 @@ mod tests {
     }
 
     #[test]
-    fn er_tui_has_table_dividers() {
+    fn er_ascii_has_table_dividers() {
         let input = r#"erDiagram
     CUSTOMER {
         string name
@@ -1212,7 +1212,7 @@ mod tests {
     }
 "#;
         let (db, graph) = parse_er_and_layout(input);
-        let output = render_er_tui(&db, &graph).unwrap();
+        let output = render_er_ascii(&db, &graph).unwrap();
         // Should have table structure with ├ ┤ ┬ ┴ dividers
         assert!(
             output.contains('├'),
@@ -1232,10 +1232,10 @@ mod tests {
     }
 
     #[test]
-    fn er_tui_entity_without_attributes() {
+    fn er_ascii_entity_without_attributes() {
         let input = "erDiagram\n    CUSTOMER ||--o{ ORDER : places";
         let (db, graph) = parse_er_and_layout(input);
-        let output = render_er_tui(&db, &graph).unwrap();
+        let output = render_er_ascii(&db, &graph).unwrap();
         // Entities without attributes should be simple boxes
         assert!(
             output.contains('┌'),
@@ -1250,14 +1250,14 @@ mod tests {
     }
 
     #[test]
-    fn er_tui_from_file_has_all_entities() {
+    fn er_ascii_from_file_has_all_entities() {
         let input = std::fs::read_to_string("docs/sources/er.mmd").unwrap();
         let (db, graph) = parse_er_and_layout(&input);
-        let output = render_er_tui(&db, &graph).unwrap();
+        let output = render_er_ascii(&db, &graph).unwrap();
         for label in &["CUSTOMER", "ORDER", "PRODUCT", "LINE-ITEM"] {
             assert!(
                 output.contains(label),
-                "ER TUI should contain '{}'\nOutput:\n{}",
+                "ER ASCII should contain '{}'\nOutput:\n{}",
                 label,
                 output
             );
@@ -1271,10 +1271,10 @@ mod tests {
     }
 
     #[test]
-    fn er_tui_has_edges() {
+    fn er_ascii_has_edges() {
         let input = "erDiagram\n    CUSTOMER ||--o{ ORDER : places";
         let (db, graph) = parse_er_and_layout(input);
-        let output = render_er_tui(&db, &graph).unwrap();
+        let output = render_er_ascii(&db, &graph).unwrap();
         let has_braille = output
             .chars()
             .any(|c| ('\u{2800}'..='\u{28FF}').contains(&c));
@@ -1290,21 +1290,21 @@ mod tests {
     }
 
     #[test]
-    fn er_tui_complex_from_file() {
+    fn er_ascii_complex_from_file() {
         let input = std::fs::read_to_string("docs/sources/er_complex.mmd").unwrap();
         let (db, graph) = parse_er_and_layout(&input);
-        let output = render_er_tui(&db, &graph).unwrap();
+        let output = render_er_ascii(&db, &graph).unwrap();
         for label in &["CUSTOMER", "ORDER", "PRODUCT", "CATEGORY", "PAYMENT"] {
             assert!(
                 output.contains(label),
-                "Complex ER TUI should contain '{}'\nOutput:\n{}",
+                "Complex ER ASCII should contain '{}'\nOutput:\n{}",
                 label,
                 output
             );
         }
     }
 
-    // --- Class diagram specialized TUI tests ---
+    // --- Class diagram specialized ASCII tests ---
 
     fn parse_and_layout_class(input: &str) -> (ClassDb, LayoutGraph) {
         let diagram = crate::parse(input).unwrap();
@@ -1326,7 +1326,7 @@ mod tests {
         let input =
             "classDiagram\n    class Animal {\n        +int age\n        +isMammal()\n    }";
         let (db, graph) = parse_and_layout_class(input);
-        let output = render_class_tui(&db, &graph).unwrap();
+        let output = render_class_ascii(&db, &graph).unwrap();
         assert!(
             output.contains("Animal"),
             "Should contain class name 'Animal'"
@@ -1339,7 +1339,7 @@ mod tests {
     fn class_two_with_relation_renders() {
         let input = "classDiagram\n    Animal <|-- Duck\n    Animal : +int age\n    Duck : +swim()";
         let (db, graph) = parse_and_layout_class(input);
-        let output = render_class_tui(&db, &graph).unwrap();
+        let output = render_class_ascii(&db, &graph).unwrap();
         assert!(output.contains("Animal"), "Should contain 'Animal'");
         assert!(output.contains("Duck"), "Should contain 'Duck'");
     }
@@ -1348,26 +1348,26 @@ mod tests {
     fn class_output_is_nonempty() {
         let input = "classDiagram\n    class Foo";
         let (db, graph) = parse_and_layout_class(input);
-        let output = render_class_tui(&db, &graph).unwrap();
+        let output = render_class_ascii(&db, &graph).unwrap();
         assert!(!output.trim().is_empty(), "Output should not be empty");
     }
 
     #[cfg(feature = "eval")]
     #[test]
-    fn class_tui_labels_detected_by_eval() {
+    fn class_ascii_labels_detected_by_eval() {
         let input = "classDiagram\n    Animal <|-- Duck\n    Animal <|-- Fish\n    Animal <|-- Zebra\n    Animal : +int age\n    Animal : +String gender\n    Animal: +isMammal()\n    Animal: +mate()\n    class Duck{\n        +String beakColor\n        +swim()\n        +quack()\n    }";
         let (db, graph) = parse_and_layout_class(input);
-        let output = render_class_tui(&db, &graph).unwrap();
+        let output = render_class_ascii(&db, &graph).unwrap();
 
-        let tui = crate::eval::tui_checks::parse_tui(&output);
+        let ascii_out = crate::eval::ascii_checks::parse_ascii(&output);
 
         // All class names should be found
         for name in ["Animal", "Duck", "Fish", "Zebra"] {
             assert!(
-                tui.labels.iter().any(|l: &String| l.contains(name)),
+                ascii_out.labels.iter().any(|l: &String| l.contains(name)),
                 "Should find class '{}' in labels {:?}",
                 name,
-                tui.labels
+                ascii_out.labels
             );
         }
     }
@@ -1376,7 +1376,7 @@ mod tests {
     fn class_edges_produce_visual() {
         let input = "classDiagram\n    Animal <|-- Duck\n    Animal <|-- Fish";
         let (db, graph) = parse_and_layout_class(input);
-        let output = render_class_tui(&db, &graph).unwrap();
+        let output = render_class_ascii(&db, &graph).unwrap();
         let has_braille = output
             .chars()
             .any(|c| ('\u{2800}'..='\u{28FF}').contains(&c));

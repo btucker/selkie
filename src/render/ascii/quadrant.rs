@@ -1,4 +1,4 @@
-//! TUI renderer for quadrant chart diagrams.
+//! ASCII renderer for quadrant chart diagrams.
 //!
 //! Renders a 2x2 grid with quadrant labels, axis labels, and data points
 //! positioned by their x,y coordinates.
@@ -10,7 +10,7 @@ const GRID_WIDTH: usize = 40;
 const GRID_HEIGHT: usize = 20;
 
 /// Render a quadrant chart as character art.
-pub fn render_quadrant_tui(db: &QuadrantDb) -> Result<String> {
+pub fn render_quadrant_ascii(db: &QuadrantDb) -> Result<String> {
     let mut lines: Vec<String> = Vec::new();
 
     // Title
@@ -119,7 +119,7 @@ mod tests {
     #[test]
     fn empty_quadrant() {
         let db = QuadrantDb::new();
-        let output = render_quadrant_tui(&db).unwrap();
+        let output = render_quadrant_ascii(&db).unwrap();
         assert!(!output.trim().is_empty());
     }
 
@@ -131,7 +131,7 @@ mod tests {
             crate::diagrams::Diagram::Quadrant(db) => db,
             _ => panic!("Expected quadrant"),
         };
-        let output = render_quadrant_tui(&db).unwrap();
+        let output = render_quadrant_ascii(&db).unwrap();
         assert!(
             output.contains("Reach and Engagement"),
             "Output:\n{}",
@@ -149,7 +149,7 @@ mod tests {
             crate::diagrams::Diagram::Quadrant(db) => db,
             _ => panic!("Expected quadrant"),
         };
-        let output = render_quadrant_tui(&db).unwrap();
+        let output = render_quadrant_ascii(&db).unwrap();
         assert!(output.contains("We should expand"), "Output:\n{}", output);
         assert!(output.contains("Re-evaluate"), "Output:\n{}", output);
     }
@@ -162,7 +162,7 @@ mod tests {
             crate::diagrams::Diagram::Quadrant(db) => db,
             _ => panic!("Expected quadrant"),
         };
-        let output = render_quadrant_tui(&db).unwrap();
+        let output = render_quadrant_ascii(&db).unwrap();
         assert!(
             output.contains('┼'),
             "Should have center cross\nOutput:\n{}",

@@ -1,4 +1,4 @@
-//! TUI renderer for Gantt charts.
+//! ASCII renderer for Gantt charts.
 //!
 //! Renders gantt charts as horizontal timeline bars in character art.
 //! Each task gets a row with its name, status indicators, and a proportional
@@ -17,7 +17,7 @@ const FULL_BLOCK: char = '█';
 const LIGHT_BLOCK: char = '░';
 
 /// Render a Gantt chart as character art.
-pub fn render_gantt_tui(db: &mut GanttDb) -> Result<String> {
+pub fn render_gantt_ascii(db: &mut GanttDb) -> Result<String> {
     let tasks = db.get_tasks();
 
     if tasks.is_empty() {
@@ -211,7 +211,7 @@ mod tests {
     #[test]
     fn empty_gantt_chart() {
         let mut db = GanttDb::new();
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains("empty gantt chart"),
             "Should indicate empty\nOutput:\n{}",
@@ -224,7 +224,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Dev\n    Task1 :a1, 2024-01-01, 5d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains("Task1"),
             "Should contain task name\nOutput:\n{}",
@@ -242,7 +242,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Planning\n    Task1 :a1, 2024-01-01, 5d\n    section Dev\n    Task2 :a2, after a1, 3d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains("[Planning]"),
             "Should show Planning section\nOutput:\n{}",
@@ -260,7 +260,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    title My Project\n    dateFormat YYYY-MM-DD\n    section Dev\n    Task1 :a1, 2024-01-01, 5d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains("My Project"),
             "Should show title\nOutput:\n{}",
@@ -273,7 +273,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Dev\n    Task1 :done, a1, 2024-01-01, 5d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains('✓'),
             "Done task should show ✓\nOutput:\n{}",
@@ -291,7 +291,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Dev\n    Task1 :active, a1, 2024-01-01, 5d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains('►'),
             "Active task should show ►\nOutput:\n{}",
@@ -304,7 +304,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Dev\n    Task1 :crit, a1, 2024-01-01, 5d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains('!'),
             "Critical task should show !\nOutput:\n{}",
@@ -317,7 +317,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Dev\n    Task1 :a1, 2024-01-01, 5d\n    Release :milestone, m1, after a1, 1d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains('◆'),
             "Milestone should show ◆\nOutput:\n{}",
@@ -330,7 +330,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Dev\n    Task1 :a1, 2024-01-01, 5d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains("2024-01-01"),
             "Should show start date\nOutput:\n{}",
@@ -348,7 +348,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Dev\n    Task1 :a1, 2024-01-01, 10d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains("10d"),
             "Should show duration in days\nOutput:\n{}",
@@ -360,7 +360,7 @@ mod tests {
     fn gallery_gantt_renders() {
         let input = std::fs::read_to_string("docs/sources/gantt.mmd").unwrap();
         let mut db = make_gantt(&input);
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains("Project Timeline"),
             "Should show title\nOutput:\n{}",
@@ -392,7 +392,7 @@ mod tests {
     fn gallery_gantt_complex_renders() {
         let input = std::fs::read_to_string("docs/sources/gantt_complex.mmd").unwrap();
         let mut db = make_gantt(&input);
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         assert!(
             output.contains("Product Launch Timeline"),
             "Should show title\nOutput:\n{}",
@@ -421,7 +421,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Dev\n    Short :a1, 2024-01-01, 2d\n    Long  :a2, 2024-01-01, 20d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         let lines: Vec<&str> = output.lines().collect();
 
         let count_blocks = |line: &str| -> usize {
@@ -445,7 +445,7 @@ mod tests {
         let mut db = make_gantt(
             "gantt\n    dateFormat YYYY-MM-DD\n    section Dev\n    Short :a1, 2024-01-01, 5d\n    Much Longer Name :a2, after a1, 3d",
         );
-        let output = render_gantt_tui(&mut db).unwrap();
+        let output = render_gantt_ascii(&mut db).unwrap();
         let lines: Vec<&str> = output.lines().collect();
         let bar_lines: Vec<&str> = lines
             .iter()

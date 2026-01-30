@@ -1,4 +1,4 @@
-//! TUI renderer for XY chart diagrams.
+//! ASCII renderer for XY chart diagrams.
 //!
 //! Renders bar charts as horizontal bars (like pie) and line charts
 //! as sparkline-style output, with axis labels and data values.
@@ -11,7 +11,7 @@ const FULL_BLOCK: char = '█';
 const HALF_BLOCK: char = '▌';
 
 /// Render an XY chart as character art.
-pub fn render_xychart_tui(db: &XYChartDb) -> Result<String> {
+pub fn render_xychart_ascii(db: &XYChartDb) -> Result<String> {
     let plots = db.get_plots();
     if plots.is_empty() {
         let title = &db.title;
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn empty_chart() {
         let db = XYChartDb::new();
-        let output = render_xychart_tui(&db).unwrap();
+        let output = render_xychart_ascii(&db).unwrap();
         assert!(output.contains("empty chart"));
     }
 
@@ -157,7 +157,7 @@ mod tests {
             crate::diagrams::Diagram::XyChart(db) => db,
             _ => panic!("Expected xychart"),
         };
-        let output = render_xychart_tui(&db).unwrap();
+        let output = render_xychart_ascii(&db).unwrap();
         assert!(output.contains("Monthly Sales"), "Output:\n{}", output);
         assert!(output.contains("Jan"), "Output:\n{}", output);
         assert!(output.contains("Jun"), "Output:\n{}", output);
@@ -171,7 +171,7 @@ mod tests {
             crate::diagrams::Diagram::XyChart(db) => db,
             _ => panic!("Expected xychart"),
         };
-        let output = render_xychart_tui(&db).unwrap();
+        let output = render_xychart_ascii(&db).unwrap();
         assert!(
             output.contains(FULL_BLOCK),
             "Should have bar blocks\nOutput:\n{}",

@@ -1,4 +1,4 @@
-//! TUI renderer for git graph diagrams.
+//! ASCII renderer for git graph diagrams.
 //!
 //! Renders git history as a text-based commit graph with branch lines,
 //! commit markers, and labels. Uses box-drawing and bullet characters
@@ -11,7 +11,7 @@ use crate::error::Result;
 const BRANCH_CHARS: &[char] = &['●', '◆', '■', '▲', '◉', '★'];
 
 /// Render a git graph as character art.
-pub fn render_gitgraph_tui(db: &GitGraphDb) -> Result<String> {
+pub fn render_gitgraph_ascii(db: &GitGraphDb) -> Result<String> {
     let commits = db.get_commits();
     if commits.is_empty() {
         return Ok("(empty git graph)\n".to_string());
@@ -127,7 +127,7 @@ mod tests {
     #[test]
     fn empty_gitgraph() {
         let db = GitGraphDb::new();
-        let output = render_gitgraph_tui(&db).unwrap();
+        let output = render_gitgraph_ascii(&db).unwrap();
         assert!(output.contains("empty git graph"));
     }
 
@@ -139,7 +139,7 @@ mod tests {
             crate::diagrams::Diagram::Git(db) => db,
             _ => panic!("Expected git graph"),
         };
-        let output = render_gitgraph_tui(&db).unwrap();
+        let output = render_gitgraph_ascii(&db).unwrap();
         // Should have commit markers
         assert!(
             output.contains('●'),
@@ -162,7 +162,7 @@ mod tests {
             crate::diagrams::Diagram::Git(db) => db,
             _ => panic!("Expected git graph"),
         };
-        let output = render_gitgraph_tui(&db).unwrap();
+        let output = render_gitgraph_ascii(&db).unwrap();
         // Custom IDs from the sample: A, B, C, D
         for id in &["A", "B", "C", "D"] {
             assert!(
@@ -182,7 +182,7 @@ mod tests {
             crate::diagrams::Diagram::Git(db) => db,
             _ => panic!("Expected git graph"),
         };
-        let output = render_gitgraph_tui(&db).unwrap();
+        let output = render_gitgraph_ascii(&db).unwrap();
         assert!(
             output.contains("Branches:"),
             "Should have legend\nOutput:\n{}",

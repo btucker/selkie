@@ -23,7 +23,7 @@ use uuid::Uuid;
 
 #[cfg(feature = "eval")]
 use selkie::eval::{self, runner::DiagramInput, samples};
-use selkie::render::tui as tui_render;
+use selkie::render::ascii as ascii_render;
 use selkie::render::{RenderConfig, Theme};
 use selkie::{parse, render_with_config};
 
@@ -187,9 +187,9 @@ struct EvalArgs {
     #[arg(long)]
     use_repo_svgs: bool,
 
-    /// Evaluate TUI output instead of SVG (only flowchart diagrams)
+    /// Evaluate ASCII output instead of SVG (only flowchart diagrams)
     #[arg(long)]
-    tui: bool,
+    ascii: bool,
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
@@ -211,8 +211,8 @@ enum OutputFormat {
     Png,
     #[cfg(feature = "pdf")]
     Pdf,
-    /// Character-art output for terminals
-    Tui,
+    /// Character-art ASCII output
+    Ascii,
 }
 
 impl OutputFormat {
@@ -379,7 +379,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("Parsed diagram successfully");
     }
 
-    // Check if TUI format is requested — uses a separate render path
+    // Check if ASCII format is requested — uses a separate render path
     let format_hint = args.output_format.unwrap_or_else(|| {
         args.output
             .as_deref()
@@ -393,10 +393,10 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
             .unwrap_or(OutputFormat::Svg)
     });
 
-    if format_hint == OutputFormat::Tui {
-        let output_str = render_tui(&diagram)?;
+    if format_hint == OutputFormat::Ascii {
+        let output_str = render_ascii(&diagram)?;
         if args.verbose {
-            eprintln!("Rendered {} bytes of TUI output", output_str.len());
+            eprintln!("Rendered {} bytes of ASCII output", output_str.len());
         }
         write_output(&args.output, output_str.as_bytes())?;
         if !args.quiet && args.output.as_deref() != Some("-") {
@@ -446,7 +446,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
                         let pdf_data = svg_to_pdf(&svg)?;
                         write_binary_output(&Some(output.clone()), &pdf_data)?;
                     }
-                    OutputFormat::Tui => unreachable!("TUI format handled above"),
+                    OutputFormat::Ascii => unreachable!("ASCII format handled above"),
                 }
                 if !args.quiet {
                     eprintln!("Created {}", output);
@@ -486,7 +486,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
             let pdf_data = svg_to_pdf(&svg)?;
             write_binary_output(&args.output, &pdf_data)?;
         }
-        OutputFormat::Tui => unreachable!("TUI format handled above"),
+        OutputFormat::Ascii => unreachable!("ASCII format handled above"),
     }
 
     if !args.quiet && args.output.as_deref() != Some("-") {
@@ -531,9 +531,9 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    // Handle --tui: run TUI-specific evaluation
-    if args.tui {
-        return run_eval_tui(args);
+    // Handle --ascii: run ASCII-specific evaluation
+    if args.ascii {
+        return run_eval_ascii(args);
     }
 
     // Build evaluation config
@@ -727,10 +727,10 @@ fn run_eval(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// Run TUI-specific evaluation: parse → layout → render TUI → parse TUI → check
+/// Run ASCII-specific evaluation: parse → layout → render ASCII → parse ASCII → check
 #[cfg(feature = "eval")]
-fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
-    use selkie::eval::tui_checks;
+fn run_eval_ascii(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use selkie::eval::ascii_checks;
     use selkie::layout::CharacterSizeEstimator;
 
     // Get diagrams to evaluate (reuse same loading logic)
@@ -762,8 +762,8 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    // TUI-supported diagram types (all diagram types now have TUI renderers)
-    let tui_supported_types = [
+    // ASCII-supported diagram types (all diagram types now have ASCII renderers)
+    let ascii_supported_types = [
         "flowchart",
         "sequence",
         "state",
@@ -788,30 +788,33 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         "treemap",
     ];
 
-    // Filter to TUI-supported types, or a specific type if requested
-    let tui_diagrams: Vec<_> = inputs
+    // Filter to ASCII-supported types, or a specific type if requested
+    let ascii_diagrams: Vec<_> = inputs
         .iter()
         .filter(|i| {
             if let Some(ref filter) = args.diagram_type {
                 i.diagram_type.as_deref() == Some(filter.as_str())
                     || detect_diagram_type(&i.text) == Some(filter.as_str())
             } else {
-                // Default to all TUI-supported types
+                // Default to all ASCII-supported types
                 if let Some(ref dt) = i.diagram_type {
-                    tui_supported_types.contains(&dt.as_str())
+                    ascii_supported_types.contains(&dt.as_str())
                 } else {
                     let detected = detect_diagram_type(&i.text);
-                    detected.map_or(false, |t| tui_supported_types.contains(&t))
+                    detected.map_or(false, |t| ascii_supported_types.contains(&t))
                 }
             }
         })
         .collect();
 
-    if tui_diagrams.is_empty() {
-        return Err("No TUI-supported diagrams to evaluate".into());
+    if ascii_diagrams.is_empty() {
+        return Err("No ASCII-supported diagrams to evaluate".into());
     }
 
-    eprintln!("Evaluating {} diagrams in TUI mode...", tui_diagrams.len());
+    eprintln!(
+        "Evaluating {} diagrams in ASCII mode...",
+        ascii_diagrams.len()
+    );
 
     let estimator = CharacterSizeEstimator::default();
     let mut total_issues = 0;
@@ -819,11 +822,11 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
     let mut total_diagrams = 0;
     let mut total_similarity = 0.0;
 
-    for (i, input) in tui_diagrams.iter().enumerate() {
+    for (i, input) in ascii_diagrams.iter().enumerate() {
         eprint!(
             "\rEvaluating {}/{}: {}...",
             i + 1,
-            tui_diagrams.len(),
+            ascii_diagrams.len(),
             input.name
         );
 
@@ -841,7 +844,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 
         // Pie charts don't use LayoutGraph — handle with dedicated eval path
         if let selkie::diagrams::Diagram::Pie(ref db) = parsed {
-            let tui_output = match tui_render::pie::render_pie_tui(db) {
+            let ascii_output = match ascii_render::pie::render_pie_ascii(db) {
                 Ok(output) => output,
                 Err(e) => {
                     eprintln!(" RENDER ERROR: {}", e);
@@ -850,8 +853,8 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            let issues = tui_checks::check_tui_pie_structure(&tui_output, db);
-            let similarity = tui_checks::calculate_tui_pie_similarity(&tui_output, db);
+            let issues = ascii_checks::check_ascii_pie_structure(&ascii_output, db);
+            let similarity = ascii_checks::calculate_ascii_pie_similarity(&ascii_output, db);
             total_similarity += similarity;
 
             let error_count = issues
@@ -888,7 +891,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 
         // Sequence diagrams use their own renderer and eval checks (no LayoutGraph)
         if let selkie::diagrams::Diagram::Sequence(db) = &parsed {
-            let tui_output = match tui_render::render_sequence_tui(db) {
+            let ascii_output = match ascii_render::render_sequence_ascii(db) {
                 Ok(output) => output,
                 Err(e) => {
                     eprintln!(" RENDER ERROR: {}", e);
@@ -897,9 +900,9 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            let tui_struct = tui_checks::parse_tui_sequence(&tui_output);
-            let issues = tui_checks::check_tui_sequence_structure(&tui_struct, db);
-            let similarity = tui_checks::calculate_tui_sequence_similarity(&tui_struct, db);
+            let ascii_struct = ascii_checks::parse_ascii_sequence(&ascii_output);
+            let issues = ascii_checks::check_ascii_sequence_structure(&ascii_struct, db);
+            let similarity = ascii_checks::calculate_ascii_sequence_similarity(&ascii_struct, db);
             total_similarity += similarity;
 
             let error_count = issues
@@ -937,7 +940,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         // Gantt charts don't use LayoutGraph — handle with dedicated eval path
         if let selkie::diagrams::Diagram::Gantt(ref db) = parsed {
             let mut db_clone = db.clone();
-            let tui_output = match tui_render::gantt::render_gantt_tui(&mut db_clone) {
+            let ascii_output = match ascii_render::gantt::render_gantt_ascii(&mut db_clone) {
                 Ok(output) => output,
                 Err(e) => {
                     eprintln!(" RENDER ERROR: {}", e);
@@ -946,8 +949,9 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            let issues = tui_checks::check_tui_gantt_structure(&tui_output, &mut db_clone);
-            let similarity = tui_checks::calculate_tui_gantt_similarity(&tui_output, &mut db_clone);
+            let issues = ascii_checks::check_ascii_gantt_structure(&ascii_output, &mut db_clone);
+            let similarity =
+                ascii_checks::calculate_ascii_gantt_similarity(&ascii_output, &mut db_clone);
             total_similarity += similarity;
 
             let error_count = issues
@@ -984,7 +988,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
 
         // Mindmap doesn't use LayoutGraph — handle with dedicated eval path
         if let selkie::diagrams::Diagram::Mindmap(ref db) = parsed {
-            let tui_output = match tui_render::mindmap::render_mindmap_tui(db) {
+            let ascii_output = match ascii_render::mindmap::render_mindmap_ascii(db) {
                 Ok(output) => output,
                 Err(e) => {
                     eprintln!(" RENDER ERROR: {}", e);
@@ -993,8 +997,8 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            let issues = tui_checks::check_tui_mindmap_structure(&tui_output, db);
-            let similarity = tui_checks::calculate_tui_mindmap_similarity(&tui_output, db);
+            let issues = ascii_checks::check_ascii_mindmap_structure(&ascii_output, db);
+            let similarity = ascii_checks::calculate_ascii_mindmap_similarity(&ascii_output, db);
             total_similarity += similarity;
 
             let error_count = issues
@@ -1032,98 +1036,98 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         // Non-graph diagram types: render and compute simple text-based similarity
         let simple_eval_result = match &parsed {
             selkie::diagrams::Diagram::Journey(db) => {
-                let output = tui_render::journey::render_journey_tui(db).ok();
+                let output = ascii_render::journey::render_journey_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "journey");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "journey");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::Timeline(db) => {
-                let output = tui_render::timeline::render_timeline_tui(db).ok();
+                let output = ascii_render::timeline::render_timeline_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "timeline");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "timeline");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::Kanban(db) => {
-                let output = tui_render::kanban::render_kanban_tui(db).ok();
+                let output = ascii_render::kanban::render_kanban_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "kanban");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "kanban");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::Packet(db) => {
-                let output = tui_render::packet::render_packet_tui(db).ok();
+                let output = ascii_render::packet::render_packet_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "packet");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "packet");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::XyChart(db) => {
-                let output = tui_render::xychart::render_xychart_tui(db).ok();
+                let output = ascii_render::xychart::render_xychart_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "xychart");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "xychart");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::Quadrant(db) => {
-                let output = tui_render::quadrant::render_quadrant_tui(db).ok();
+                let output = ascii_render::quadrant::render_quadrant_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "quadrant");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "quadrant");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::Radar(db) => {
-                let output = tui_render::radar::render_radar_tui(db).ok();
+                let output = ascii_render::radar::render_radar_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "radar");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "radar");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::Git(db) => {
-                let output = tui_render::gitgraph::render_gitgraph_tui(db).ok();
+                let output = ascii_render::gitgraph::render_gitgraph_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "git");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "git");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::Sankey(db) => {
-                let output = tui_render::sankey::render_sankey_tui(db).ok();
+                let output = ascii_render::sankey::render_sankey_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "sankey");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "sankey");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::Block(db) => {
-                let output = tui_render::block::render_block_tui(db).ok();
+                let output = ascii_render::block::render_block_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "block");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "block");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::C4(db) => {
-                let output = tui_render::c4::render_c4_tui(db).ok();
+                let output = ascii_render::c4::render_c4_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "c4");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "c4");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
             selkie::diagrams::Diagram::Treemap(db) => {
-                let output = tui_render::treemap::render_treemap_tui(db).ok();
+                let output = ascii_render::treemap::render_treemap_ascii(db).ok();
                 output.map(|o| {
-                    let issues = tui_checks::check_tui_text_output(&o, "treemap");
-                    let similarity = tui_checks::calculate_tui_text_similarity(&o);
+                    let issues = ascii_checks::check_ascii_text_output(&o, "treemap");
+                    let similarity = ascii_checks::calculate_ascii_text_similarity(&o);
                     (issues, similarity)
                 })
             }
@@ -1164,7 +1168,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             continue;
         }
 
-        // All other diagram types use ToLayoutGraph + generic TUI renderer
+        // All other diagram types use ToLayoutGraph + generic ASCII renderer
         let graph = match layout_diagram(&parsed, &estimator) {
             Ok(g) => match selkie::layout::layout(g) {
                 Ok(g) => g,
@@ -1181,7 +1185,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             }
         };
 
-        let tui_output = match render_tui(&parsed) {
+        let ascii_output = match render_ascii(&parsed) {
             Ok(output) => output,
             Err(e) => {
                 eprintln!(" RENDER ERROR: {}", e);
@@ -1190,15 +1194,15 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             }
         };
 
-        let tui_struct = tui_checks::parse_tui(&tui_output);
+        let ascii_struct = ascii_checks::parse_ascii(&ascii_output);
 
         // Run checks (generic + diagram-type-specific)
-        let mut issues = tui_checks::check_tui_structure(&tui_struct, &graph);
+        let mut issues = ascii_checks::check_ascii_structure(&ascii_struct, &graph);
         // ER-specific checks: verify attributes and table structure
         if let selkie::diagrams::Diagram::Er(ref db) = parsed {
-            issues.extend(tui_checks::check_er_tui_structure(&tui_struct, db));
+            issues.extend(ascii_checks::check_er_ascii_structure(&ascii_struct, db));
         }
-        let similarity = tui_checks::calculate_tui_similarity(&tui_struct, &graph);
+        let similarity = ascii_checks::calculate_ascii_similarity(&ascii_struct, &graph);
         total_similarity += similarity;
 
         let error_count = issues
@@ -1240,7 +1244,7 @@ fn run_eval_tui(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         0.0
     };
 
-    eprintln!("TUI Evaluation Summary");
+    eprintln!("ASCII Evaluation Summary");
     eprintln!("======================");
     eprintln!("Diagrams:   {}", total_diagrams);
     eprintln!("Issues:     {} ({} errors)", total_issues, total_errors);
@@ -1481,11 +1485,11 @@ fn layout_diagram(
     }
 }
 
-/// Render a diagram to TUI character art.
+/// Render a diagram to ASCII character art.
 ///
 /// Supports all diagram types that implement `ToLayoutGraph`:
 /// flowchart, state, class, ER, architecture, requirement.
-fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std::error::Error>> {
+fn render_ascii(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std::error::Error>> {
     use selkie::layout::{self, CharacterSizeEstimator, ToLayoutGraph};
 
     let estimator = CharacterSizeEstimator::default();
@@ -1495,116 +1499,116 @@ fn render_tui(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std
         selkie::diagrams::Diagram::Flowchart(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            let output = tui_render::render_flowchart_tui(db, &graph)?;
+            let output = ascii_render::render_flowchart_ascii(db, &graph)?;
             Ok(output)
         }
         selkie::diagrams::Diagram::Sequence(db) => {
-            let output = tui_render::render_sequence_tui(db)?;
+            let output = ascii_render::render_sequence_ascii(db)?;
             Ok(output)
         }
         // Class diagrams use specialized renderer with multi-section boxes
         selkie::diagrams::Diagram::Class(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(tui_render::render_class_tui(db, &graph)?)
+            Ok(ascii_render::render_class_ascii(db, &graph)?)
         }
         // Graph-based diagram types use the generic renderer
         selkie::diagrams::Diagram::State(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(tui_render::render_graph_tui(&graph)?)
+            Ok(ascii_render::render_graph_ascii(&graph)?)
         }
         selkie::diagrams::Diagram::Er(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(tui_render::render_er_tui(db, &graph)?)
+            Ok(ascii_render::render_er_ascii(db, &graph)?)
         }
         selkie::diagrams::Diagram::Architecture(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(tui_render::render_graph_tui(&graph)?)
+            Ok(ascii_render::render_graph_ascii(&graph)?)
         }
         selkie::diagrams::Diagram::Requirement(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(tui_render::render_graph_tui(&graph)?)
+            Ok(ascii_render::render_graph_ascii(&graph)?)
         }
         // Pie charts use a dedicated bar-chart renderer (no layout graph needed)
         selkie::diagrams::Diagram::Pie(db) => {
-            let output = tui_render::pie::render_pie_tui(db)?;
+            let output = ascii_render::pie::render_pie_ascii(db)?;
             Ok(output)
         }
         // Gantt charts use a dedicated timeline renderer (no layout graph needed)
         selkie::diagrams::Diagram::Gantt(db) => {
             let mut db_clone = db.clone();
-            let output = tui_render::gantt::render_gantt_tui(&mut db_clone)?;
+            let output = ascii_render::gantt::render_gantt_ascii(&mut db_clone)?;
             Ok(output)
         }
         // Mindmap uses a dedicated tree renderer (no layout graph needed)
         selkie::diagrams::Diagram::Mindmap(db) => {
-            let output = tui_render::mindmap::render_mindmap_tui(db)?;
+            let output = ascii_render::mindmap::render_mindmap_ascii(db)?;
             Ok(output)
         }
         // Journey uses a dedicated section+task renderer
         selkie::diagrams::Diagram::Journey(db) => {
-            let output = tui_render::journey::render_journey_tui(db)?;
+            let output = ascii_render::journey::render_journey_ascii(db)?;
             Ok(output)
         }
         // Timeline uses a dedicated period+event renderer
         selkie::diagrams::Diagram::Timeline(db) => {
-            let output = tui_render::timeline::render_timeline_tui(db)?;
+            let output = ascii_render::timeline::render_timeline_ascii(db)?;
             Ok(output)
         }
         // Kanban uses a dedicated column+card renderer
         selkie::diagrams::Diagram::Kanban(db) => {
-            let output = tui_render::kanban::render_kanban_tui(db)?;
+            let output = ascii_render::kanban::render_kanban_ascii(db)?;
             Ok(output)
         }
         // Packet uses a dedicated bit-field renderer
         selkie::diagrams::Diagram::Packet(db) => {
-            let output = tui_render::packet::render_packet_tui(db)?;
+            let output = ascii_render::packet::render_packet_ascii(db)?;
             Ok(output)
         }
         // XY Chart uses a dedicated bar/line chart renderer
         selkie::diagrams::Diagram::XyChart(db) => {
-            let output = tui_render::xychart::render_xychart_tui(db)?;
+            let output = ascii_render::xychart::render_xychart_ascii(db)?;
             Ok(output)
         }
         // Quadrant uses a dedicated 2x2 grid renderer
         selkie::diagrams::Diagram::Quadrant(db) => {
-            let output = tui_render::quadrant::render_quadrant_tui(db)?;
+            let output = ascii_render::quadrant::render_quadrant_ascii(db)?;
             Ok(output)
         }
         // Radar uses a dedicated comparison table renderer
         selkie::diagrams::Diagram::Radar(db) => {
-            let output = tui_render::radar::render_radar_tui(db)?;
+            let output = ascii_render::radar::render_radar_ascii(db)?;
             Ok(output)
         }
         // Git graph uses a dedicated branch visualization renderer
         selkie::diagrams::Diagram::Git(db) => {
-            let output = tui_render::gitgraph::render_gitgraph_tui(db)?;
+            let output = ascii_render::gitgraph::render_gitgraph_ascii(db)?;
             Ok(output)
         }
         // Sankey uses a dedicated flow table renderer
         selkie::diagrams::Diagram::Sankey(db) => {
-            let output = tui_render::sankey::render_sankey_tui(db)?;
+            let output = ascii_render::sankey::render_sankey_ascii(db)?;
             Ok(output)
         }
         // Block uses a dedicated grid layout renderer
         selkie::diagrams::Diagram::Block(db) => {
-            let output = tui_render::block::render_block_tui(db)?;
+            let output = ascii_render::block::render_block_ascii(db)?;
             Ok(output)
         }
         // C4 uses a dedicated architecture diagram renderer
         selkie::diagrams::Diagram::C4(db) => {
-            let output = tui_render::c4::render_c4_tui(db)?;
+            let output = ascii_render::c4::render_c4_ascii(db)?;
             Ok(output)
         }
         // Treemap uses a dedicated hierarchical tree renderer
         selkie::diagrams::Diagram::Treemap(db) => {
-            let output = tui_render::treemap::render_treemap_tui(db)?;
+            let output = ascii_render::treemap::render_treemap_ascii(db)?;
             Ok(output)
         }
-        _ => Err("TUI format not yet supported for this diagram type".into()),
+        _ => Err("ASCII format not yet supported for this diagram type".into()),
     }
 }

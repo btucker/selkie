@@ -1,4 +1,4 @@
-//! TUI renderer for block diagrams.
+//! ASCII renderer for block diagrams.
 //!
 //! Renders blocks in a grid layout with edges shown as flow connections.
 //! Uses box-drawing characters for block borders and arrows for connections.
@@ -7,7 +7,7 @@ use crate::diagrams::block::BlockDb;
 use crate::error::Result;
 
 /// Render a block diagram as character art.
-pub fn render_block_tui(db: &BlockDb) -> Result<String> {
+pub fn render_block_ascii(db: &BlockDb) -> Result<String> {
     let blocks = db.get_blocks_flat();
     let edges = db.get_edges();
 
@@ -112,7 +112,7 @@ mod tests {
     #[test]
     fn empty_block() {
         let db = BlockDb::new();
-        let output = render_block_tui(&db).unwrap();
+        let output = render_block_ascii(&db).unwrap();
         assert!(output.contains("empty block"));
     }
 
@@ -124,7 +124,7 @@ mod tests {
             crate::diagrams::Diagram::Block(db) => db,
             _ => panic!("Expected block"),
         };
-        let output = render_block_tui(&db).unwrap();
+        let output = render_block_ascii(&db).unwrap();
         assert!(!output.trim().is_empty(), "Output should not be empty");
         // Should have box-drawing characters
         assert!(
@@ -142,7 +142,7 @@ mod tests {
             crate::diagrams::Diagram::Block(db) => db,
             _ => panic!("Expected block"),
         };
-        let output = render_block_tui(&db).unwrap();
+        let output = render_block_ascii(&db).unwrap();
         assert!(output.contains('┌'), "Output:\n{}", output);
         assert!(output.contains('┘'), "Output:\n{}", output);
         assert!(output.contains('│'), "Output:\n{}", output);

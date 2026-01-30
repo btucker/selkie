@@ -1,4 +1,4 @@
-//! Edge rendering for TUI output.
+//! Edge rendering for ASCII output.
 //!
 //! Renders edges as braille lines between nodes, with Unicode arrow tips
 //! (▶▼◀▲) and text labels at midpoints.
@@ -171,7 +171,7 @@ fn render_edge_label(
         Some(l) if !l.is_empty() => l.as_str(),
         _ => return,
     };
-    // Clean HTML line breaks and normalize whitespace for TUI display
+    // Clean HTML line breaks and normalize whitespace for ASCII display
     let cleaned = raw_label.replace("<br/>", " ").replace("<br>", " ");
     let label = cleaned.split_whitespace().collect::<Vec<_>>().join(" ");
 

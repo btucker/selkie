@@ -1,4 +1,4 @@
-//! TUI renderer for mindmap diagrams.
+//! ASCII renderer for mindmap diagrams.
 //!
 //! Renders mindmaps as indented tree structures with branch connectors,
 //! similar to the `tree` command output. Node shapes are indicated by
@@ -8,7 +8,7 @@ use crate::diagrams::mindmap::{MindmapDb, MindmapNode, NodeType};
 use crate::error::Result;
 
 /// Render a mindmap as an indented tree in character art.
-pub fn render_mindmap_tui(db: &MindmapDb) -> Result<String> {
+pub fn render_mindmap_ascii(db: &MindmapDb) -> Result<String> {
     let root = match db.get_mindmap() {
         Some(node) => node,
         None => return Ok("(empty mindmap)\n".to_string()),
@@ -85,7 +85,7 @@ mod tests {
     #[test]
     fn empty_mindmap() {
         let db = MindmapDb::new();
-        let output = render_mindmap_tui(&db).unwrap();
+        let output = render_mindmap_ascii(&db).unwrap();
         assert!(
             output.contains("empty mindmap"),
             "Should indicate empty\nOutput:\n{}",
@@ -96,7 +96,7 @@ mod tests {
     #[test]
     fn root_only() {
         let db = make_mindmap("mindmap\n  root((Main Topic))");
-        let output = render_mindmap_tui(&db).unwrap();
+        let output = render_mindmap_ascii(&db).unwrap();
         assert!(
             output.contains("((Main Topic))"),
             "Root should show circle shape\nOutput:\n{}",
@@ -107,7 +107,7 @@ mod tests {
     #[test]
     fn simple_tree_structure() {
         let db = make_mindmap("mindmap\n  root\n    Child1\n    Child2");
-        let output = render_mindmap_tui(&db).unwrap();
+        let output = render_mindmap_ascii(&db).unwrap();
         assert!(output.contains("root"), "Should contain root");
         assert!(
             output.contains("Child1"),
@@ -124,7 +124,7 @@ mod tests {
     #[test]
     fn tree_connectors_present() {
         let db = make_mindmap("mindmap\n  root\n    Child1\n    Child2");
-        let output = render_mindmap_tui(&db).unwrap();
+        let output = render_mindmap_ascii(&db).unwrap();
         assert!(
             output.contains("├──"),
             "Should have branch connector\nOutput:\n{}",
@@ -142,7 +142,7 @@ mod tests {
         let db = make_mindmap(
             "mindmap\n  root\n    Parent\n      GrandChild1\n      GrandChild2\n    Sibling",
         );
-        let output = render_mindmap_tui(&db).unwrap();
+        let output = render_mindmap_ascii(&db).unwrap();
         assert!(
             output.contains("GrandChild1"),
             "Should contain nested child\nOutput:\n{}",
@@ -160,7 +160,7 @@ mod tests {
         let db = make_mindmap(
             "mindmap\n  root((Circle))\n    [Rectangle]\n    (Rounded)\n    )Cloud(\n    ))Bang((",
         );
-        let output = render_mindmap_tui(&db).unwrap();
+        let output = render_mindmap_ascii(&db).unwrap();
         assert!(
             output.contains("((Circle))"),
             "Circle shape\nOutput:\n{}",
@@ -192,7 +192,7 @@ mod tests {
     fn gallery_mindmap_renders() {
         let input = std::fs::read_to_string("docs/sources/mindmap.mmd").unwrap();
         let db = make_mindmap(&input);
-        let output = render_mindmap_tui(&db).unwrap();
+        let output = render_mindmap_ascii(&db).unwrap();
         assert!(
             output.contains("mindmap"),
             "Should contain root label\nOutput:\n{}",
@@ -224,7 +224,7 @@ mod tests {
     fn gallery_mindmap_complex_renders() {
         let input = std::fs::read_to_string("docs/sources/mindmap_complex.mmd").unwrap();
         let db = make_mindmap(&input);
-        let output = render_mindmap_tui(&db).unwrap();
+        let output = render_mindmap_ascii(&db).unwrap();
         assert!(
             output.contains("mindmap"),
             "Should contain root\nOutput:\n{}",
@@ -261,7 +261,7 @@ mod tests {
     #[test]
     fn last_child_uses_corner_connector() {
         let db = make_mindmap("mindmap\n  root\n    OnlyChild");
-        let output = render_mindmap_tui(&db).unwrap();
+        let output = render_mindmap_ascii(&db).unwrap();
         // Single child should use └── (last-child connector)
         assert!(
             output.contains("└── OnlyChild"),

@@ -6,6 +6,7 @@
 //! - Report generation (text, JSON, HTML, PNG)
 //! - Reference SVG caching
 
+pub mod ascii_checks;
 pub mod cache;
 pub mod checks;
 pub mod png;
@@ -13,7 +14,6 @@ pub mod report;
 pub mod runner;
 pub mod samples;
 pub mod ssim;
-pub mod tui_checks;
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

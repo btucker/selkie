@@ -1,4 +1,4 @@
-//! TUI renderer for radar/spider chart diagrams.
+//! ASCII renderer for radar/spider chart diagrams.
 //!
 //! Since radial charts don't render well in character art, radar charts
 //! are displayed as a comparison table with bar indicators for each axis value.
@@ -11,7 +11,7 @@ const FULL_BLOCK: char = '█';
 const EMPTY_BLOCK: char = '░';
 
 /// Render a radar chart as character art.
-pub fn render_radar_tui(db: &RadarDb) -> Result<String> {
+pub fn render_radar_ascii(db: &RadarDb) -> Result<String> {
     let axes = db.get_axes();
     let curves = db.get_curves();
     let options = db.get_options();
@@ -120,7 +120,7 @@ mod tests {
     #[test]
     fn empty_radar() {
         let db = RadarDb::new();
-        let output = render_radar_tui(&db).unwrap();
+        let output = render_radar_ascii(&db).unwrap();
         assert!(output.contains("empty radar"));
     }
 
@@ -132,7 +132,7 @@ mod tests {
             crate::diagrams::Diagram::Radar(db) => db,
             _ => panic!("Expected radar"),
         };
-        let output = render_radar_tui(&db).unwrap();
+        let output = render_radar_ascii(&db).unwrap();
         assert!(output.contains("Skills Assessment"), "Output:\n{}", output);
         assert!(output.contains("Coding"), "Output:\n{}", output);
         assert!(output.contains("Testing"), "Output:\n{}", output);
@@ -146,7 +146,7 @@ mod tests {
             crate::diagrams::Diagram::Radar(db) => db,
             _ => panic!("Expected radar"),
         };
-        let output = render_radar_tui(&db).unwrap();
+        let output = render_radar_ascii(&db).unwrap();
         assert!(output.contains("Team Alpha"), "Output:\n{}", output);
         assert!(output.contains("Team Beta"), "Output:\n{}", output);
     }
@@ -159,7 +159,7 @@ mod tests {
             crate::diagrams::Diagram::Radar(db) => db,
             _ => panic!("Expected radar"),
         };
-        let output = render_radar_tui(&db).unwrap();
+        let output = render_radar_ascii(&db).unwrap();
         assert!(output.contains(FULL_BLOCK), "Output:\n{}", output);
     }
 }

@@ -1,4 +1,4 @@
-//! TUI renderer for user journey diagrams.
+//! ASCII renderer for user journey diagrams.
 //!
 //! Renders journey tasks grouped by section, with score bars and actor info.
 //! Each task shows its score as a filled bar (1-5 scale) and involved actors.
@@ -11,7 +11,7 @@ const BAR_CHAR: char = '█';
 const EMPTY_CHAR: char = '░';
 
 /// Render a user journey diagram as character art.
-pub fn render_journey_tui(db: &JourneyDb) -> Result<String> {
+pub fn render_journey_ascii(db: &JourneyDb) -> Result<String> {
     let tasks = db.get_tasks();
     if tasks.is_empty() {
         if !db.title.is_empty() {
@@ -101,7 +101,7 @@ mod tests {
     #[test]
     fn empty_journey() {
         let db = JourneyDb::new();
-        let output = render_journey_tui(&db).unwrap();
+        let output = render_journey_ascii(&db).unwrap();
         assert!(output.contains("empty journey"));
     }
 
@@ -111,7 +111,7 @@ mod tests {
             "My working day",
             &[("Go to work", &[("Make tea", 5, &["Me"])])],
         );
-        let output = render_journey_tui(&db).unwrap();
+        let output = render_journey_ascii(&db).unwrap();
         assert!(output.contains("My working day"));
     }
 
@@ -124,7 +124,7 @@ mod tests {
                 ("Evening", &[("Sleep", 5, &["Me"])]),
             ],
         );
-        let output = render_journey_tui(&db).unwrap();
+        let output = render_journey_ascii(&db).unwrap();
         assert!(output.contains("Morning"), "Output:\n{}", output);
         assert!(output.contains("Evening"), "Output:\n{}", output);
     }
@@ -135,7 +135,7 @@ mod tests {
             "Day",
             &[("Work", &[("Code", 4, &["Dev"]), ("Review", 2, &["Dev"])])],
         );
-        let output = render_journey_tui(&db).unwrap();
+        let output = render_journey_ascii(&db).unwrap();
         assert!(output.contains("Code"), "Output:\n{}", output);
         assert!(output.contains("Review"), "Output:\n{}", output);
         assert!(output.contains("4/5"), "Output:\n{}", output);
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn actors_appear() {
         let db = make_journey("Day", &[("Work", &[("Pair", 5, &["Alice", "Bob"])])]);
-        let output = render_journey_tui(&db).unwrap();
+        let output = render_journey_ascii(&db).unwrap();
         assert!(output.contains("Alice"), "Output:\n{}", output);
         assert!(output.contains("Bob"), "Output:\n{}", output);
     }
@@ -156,7 +156,7 @@ mod tests {
             "Day",
             &[("Work", &[("Great", 5, &["Me"]), ("Bad", 1, &["Me"])])],
         );
-        let output = render_journey_tui(&db).unwrap();
+        let output = render_journey_ascii(&db).unwrap();
         let great_line = output.lines().find(|l| l.contains("Great")).unwrap();
         let bad_line = output.lines().find(|l| l.contains("Bad")).unwrap();
         let count_filled = |line: &str| line.chars().filter(|&c| c == BAR_CHAR).count();
@@ -171,7 +171,7 @@ mod tests {
             crate::diagrams::Diagram::Journey(db) => db,
             _ => panic!("Expected journey diagram"),
         };
-        let output = render_journey_tui(&db).unwrap();
+        let output = render_journey_ascii(&db).unwrap();
         assert!(output.contains("Make tea"), "Output:\n{}", output);
         assert!(output.contains("Go upstairs"), "Output:\n{}", output);
     }

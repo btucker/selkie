@@ -1,4 +1,4 @@
-//! TUI renderer for kanban board diagrams.
+//! ASCII renderer for kanban board diagrams.
 //!
 //! Renders kanban columns with their cards in a vertical layout,
 //! using box-drawing characters for column headers and card borders.
@@ -7,7 +7,7 @@ use crate::diagrams::kanban::KanbanDb;
 use crate::error::Result;
 
 /// Render a kanban board as character art.
-pub fn render_kanban_tui(db: &KanbanDb) -> Result<String> {
+pub fn render_kanban_ascii(db: &KanbanDb) -> Result<String> {
     let sections = db.get_sections();
     if sections.is_empty() {
         return Ok("(empty kanban board)\n".to_string());
@@ -63,7 +63,7 @@ mod tests {
     #[test]
     fn empty_kanban() {
         let db = KanbanDb::new();
-        let output = render_kanban_tui(&db).unwrap();
+        let output = render_kanban_ascii(&db).unwrap();
         assert!(output.contains("empty kanban"));
     }
 
@@ -75,7 +75,7 @@ mod tests {
             crate::diagrams::Diagram::Kanban(db) => db,
             _ => panic!("Expected kanban"),
         };
-        let output = render_kanban_tui(&db).unwrap();
+        let output = render_kanban_ascii(&db).unwrap();
         assert!(output.contains("Todo"), "Output:\n{}", output);
         assert!(
             output.contains("Create Documentation"),
@@ -93,7 +93,7 @@ mod tests {
             crate::diagrams::Diagram::Kanban(db) => db,
             _ => panic!("Expected kanban"),
         };
-        let output = render_kanban_tui(&db).unwrap();
+        let output = render_kanban_ascii(&db).unwrap();
         assert!(output.contains('┌'), "Output:\n{}", output);
         assert!(output.contains('┘'), "Output:\n{}", output);
         assert!(output.contains('├'), "Output:\n{}", output);

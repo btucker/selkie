@@ -1,18 +1,18 @@
-//! TUI output evaluation checks.
+//! ASCII output evaluation checks.
 //!
-//! Parses TUI character-art output to extract structural and spatial
+//! Parses ASCII character-art output to extract structural and spatial
 //! information, then compares it against the layout graph (ground truth).
 //!
 //! Unlike SVG eval (which compares selkie SVG vs mermaid.js reference SVG),
-//! TUI eval compares the rendered TUI output against the positioned layout
-//! graph, since there is no mermaid.js TUI reference.
+//! ASCII eval compares the rendered ASCII output against the positioned layout
+//! graph, since there is no mermaid.js ASCII reference.
 
 use super::Issue;
 use crate::layout::{LayoutGraph, NodeShape};
 
-/// Structure extracted from TUI character-art output.
+/// Structure extracted from ASCII character-art output.
 #[derive(Debug, Clone)]
-pub struct TuiStructure {
+pub struct AsciiStructure {
     /// Node labels found (text inside box-drawing rectangles).
     pub labels: Vec<String>,
     /// Approximate row position of each label's center.
@@ -37,8 +37,8 @@ const BOX_VERTICAL: &[char] = &['│'];
 const BOX_CORNERS: &[char] = &['┌', '┐', '└', '┘', '╭', '╮', '╰', '╯'];
 const ARROW_TIPS: &[char] = &['▶', '▼', '◀', '▲'];
 
-/// Parse TUI character-art output into a structural representation.
-pub fn parse_tui(output: &str) -> TuiStructure {
+/// Parse ASCII character-art output into a structural representation.
+pub fn parse_ascii(output: &str) -> AsciiStructure {
     let raw_output = output.to_string();
     let lines: Vec<&str> = output.lines().collect();
     let rows = lines.len();
@@ -60,7 +60,7 @@ pub fn parse_tui(output: &str) -> TuiStructure {
     let (has_braille, braille_count) = count_braille(&grid);
     let edge_labels = extract_edge_labels(&grid, &labels);
 
-    TuiStructure {
+    AsciiStructure {
         labels,
         label_positions,
         arrow_count,
@@ -288,64 +288,67 @@ fn extract_edge_labels(grid: &[Vec<char>], node_labels: &[String]) -> Vec<String
     edge_labels
 }
 
-/// Run TUI-specific structural checks comparing TUI output against the layout graph.
-pub fn check_tui_structure(tui: &TuiStructure, graph: &LayoutGraph) -> Vec<Issue> {
+/// Run ASCII-specific structural checks comparing ASCII output against the layout graph.
+pub fn check_ascii_structure(ascii: &AsciiStructure, graph: &LayoutGraph) -> Vec<Issue> {
     let mut issues = Vec::new();
 
-    check_tui_node_count(tui, graph, &mut issues);
-    check_tui_labels(tui, graph, &mut issues);
-    check_tui_edges(tui, graph, &mut issues);
-    check_tui_spatial_order(tui, graph, &mut issues);
+    check_ascii_node_count(ascii, graph, &mut issues);
+    check_ascii_labels(ascii, graph, &mut issues);
+    check_ascii_edges(ascii, graph, &mut issues);
+    check_ascii_spatial_order(ascii, graph, &mut issues);
 
     issues
 }
 
-/// Run ER-specific TUI checks comparing output against the ER database.
+/// Run ER-specific ASCII checks comparing output against the ER database.
 ///
-/// Checks that entity attributes (type, name, keys) are present in the TUI
+/// Checks that entity attributes (type, name, keys) are present in the ASCII
 /// output and that table-structure characters (├ ┬ ┴) are used for entities
 /// with attributes.
-pub fn check_er_tui_structure(tui: &TuiStructure, db: &crate::diagrams::er::ErDb) -> Vec<Issue> {
+pub fn check_er_ascii_structure(
+    ascii: &AsciiStructure,
+    db: &crate::diagrams::er::ErDb,
+) -> Vec<Issue> {
     let mut issues = Vec::new();
 
     let entities = db.get_entities();
 
     for (name, entity) in entities {
         // Check entity name is present
-        if !tui.raw_output.contains(name.as_str()) {
+        if !ascii.raw_output.contains(name.as_str()) {
             issues.push(Issue::error(
-                "er_tui_missing_entity",
-                format!("ER TUI output missing entity: '{}'", name),
+                "er_ascii_missing_entity",
+                format!("ER ASCII output missing entity: '{}'", name),
             ));
             continue;
         }
 
         // Check attributes are rendered
         for attr in &entity.attributes {
-            if !tui.raw_output.contains(&attr.attr_type) {
+            if !ascii.raw_output.contains(&attr.attr_type) {
                 issues.push(Issue::warning(
-                    "er_tui_missing_attr_type",
+                    "er_ascii_missing_attr_type",
                     format!(
-                        "ER TUI output missing attribute type '{}' for entity '{}'",
+                        "ER ASCII output missing attribute type '{}' for entity '{}'",
                         attr.attr_type, name
                     ),
                 ));
             }
-            if !tui.raw_output.contains(&attr.name) {
+            if !ascii.raw_output.contains(&attr.name) {
                 issues.push(Issue::warning(
-                    "er_tui_missing_attr_name",
+                    "er_ascii_missing_attr_name",
                     format!(
-                        "ER TUI output missing attribute name '{}' for entity '{}'",
+                        "ER ASCII output missing attribute name '{}' for entity '{}'",
                         attr.name, name
                     ),
                 ));
             }
             for key in &attr.keys {
-                if !tui.raw_output.contains(key.as_str()) {
+                if !ascii.raw_output.contains(key.as_str()) {
                     issues.push(Issue::warning(
-                        "er_tui_missing_attr_key",
+                        "er_ascii_missing_attr_key",
                         format!(
-                            "ER TUI output missing key '{}' for {}.{}",
+                            "ER ASCII output missing key '{}' for {}.{}",
                             key.as_str(),
                             name,
                             attr.name
@@ -357,17 +360,17 @@ pub fn check_er_tui_structure(tui: &TuiStructure, db: &crate::diagrams::er::ErDb
 
         // Check table structure for entities with attributes
         if !entity.attributes.is_empty() {
-            if !tui.raw_output.contains('├') {
+            if !ascii.raw_output.contains('├') {
                 issues.push(Issue::warning(
-                    "er_tui_no_table_divider",
-                    "ER TUI output missing table divider '├' for entities with attributes"
+                    "er_ascii_no_table_divider",
+                    "ER ASCII output missing table divider '├' for entities with attributes"
                         .to_string(),
                 ));
             }
-            if !tui.raw_output.contains('┬') {
+            if !ascii.raw_output.contains('┬') {
                 issues.push(Issue::warning(
-                    "er_tui_no_column_separator",
-                    "ER TUI output missing column separator '┬' for attribute tables".to_string(),
+                    "er_ascii_no_column_separator",
+                    "ER ASCII output missing column separator '┬' for attribute tables".to_string(),
                 ));
             }
         }
@@ -375,10 +378,13 @@ pub fn check_er_tui_structure(tui: &TuiStructure, db: &crate::diagrams::er::ErDb
 
     // Check relationship labels
     for rel in db.get_relationships() {
-        if !rel.role_a.is_empty() && !tui.raw_output.contains(&rel.role_a) {
+        if !rel.role_a.is_empty() && !ascii.raw_output.contains(&rel.role_a) {
             issues.push(Issue::warning(
-                "er_tui_missing_rel_label",
-                format!("ER TUI output missing relationship label: '{}'", rel.role_a),
+                "er_ascii_missing_rel_label",
+                format!(
+                    "ER ASCII output missing relationship label: '{}'",
+                    rel.role_a
+                ),
             ));
         }
     }
@@ -386,14 +392,14 @@ pub fn check_er_tui_structure(tui: &TuiStructure, db: &crate::diagrams::er::ErDb
     issues
 }
 
-/// Check that TUI output has the correct number of nodes.
-/// Counts nodes whose labels appear anywhere in the TUI output (boxes, free text, etc.).
+/// Check that ASCII output has the correct number of nodes.
+/// Counts nodes whose labels appear anywhere in the ASCII output (boxes, free text, etc.).
 ///
 /// For class diagrams, each class box has multiple text rows (name, members,
 /// methods), so the raw label count may exceed the node count. We check that
 /// at least the expected number of node labels are present and flag an error
 /// only if fewer labels exist than expected nodes.
-fn check_tui_node_count(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
+fn check_ascii_node_count(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
     let expected = graph.nodes.iter().filter(|n| !n.is_dummy).count();
     // Count nodes found: either in box labels or in the raw output
     let mut found = 0;
@@ -407,7 +413,7 @@ fn check_tui_node_count(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Ve
             continue;
         }
         let label = clean_label(node.label.as_deref().unwrap_or(&node.id));
-        if tui.labels.contains(&label) || tui.raw_output.contains(&label) {
+        if ascii.labels.contains(&label) || ascii.raw_output.contains(&label) {
             found += 1;
         }
     }
@@ -415,9 +421,9 @@ fn check_tui_node_count(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Ve
     if found < expected {
         issues.push(
             Issue::error(
-                "tui_node_count",
+                "ascii_node_count",
                 format!(
-                    "TUI node count too low: expected at least {}, found {}",
+                    "ASCII node count too low: expected at least {}, found {}",
                     expected, found
                 ),
             )
@@ -433,7 +439,7 @@ fn is_symbol_node(node: &crate::layout::LayoutNode) -> bool {
         && node.label.as_deref().is_none_or(|l| l.is_empty())
 }
 
-/// Clean HTML line breaks from labels (matches TUI renderer behavior).
+/// Clean HTML line breaks from labels (matches ASCII renderer behavior).
 /// Also normalizes whitespace to single spaces.
 fn clean_label(raw: &str) -> String {
     let cleaned = raw.replace("<br/>", " ").replace("<br>", " ");
@@ -441,19 +447,19 @@ fn clean_label(raw: &str) -> String {
     cleaned.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-/// Check that all node labels from the layout graph appear in the TUI output.
+/// Check that all node labels from the layout graph appear in the ASCII output.
 /// Subgraph labels appear as free text (not inside boxes), so we check the
 /// raw output string as well.
-fn check_tui_labels(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
-    let tui_labels: std::collections::HashSet<&str> =
-        tui.labels.iter().map(|s| s.as_str()).collect();
+fn check_ascii_labels(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
+    let ascii_labels: std::collections::HashSet<&str> =
+        ascii.labels.iter().map(|s| s.as_str()).collect();
 
     // Also collect all text from the raw grid for subgraph label matching
-    let tui_all_labels: std::collections::HashSet<String> = tui
+    let ascii_all_labels: std::collections::HashSet<String> = ascii
         .labels
         .iter()
         .cloned()
-        .chain(tui.edge_labels.iter().cloned())
+        .chain(ascii.edge_labels.iter().cloned())
         .collect();
 
     for node in &graph.nodes {
@@ -468,11 +474,11 @@ fn check_tui_labels(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Is
             } else {
                 '●'
             };
-            if !tui.raw_output.contains(symbol) {
+            if !ascii.raw_output.contains(symbol) {
                 issues.push(Issue::error(
-                    "tui_missing_label",
+                    "ascii_missing_label",
                     format!(
-                        "TUI output missing {} symbol for node '{}'",
+                        "ASCII output missing {} symbol for node '{}'",
                         symbol, node.id
                     ),
                 ));
@@ -482,50 +488,50 @@ fn check_tui_labels(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Is
         let raw_label = node.label.as_deref().unwrap_or(&node.id);
         let label = clean_label(raw_label);
         // Check in box labels, edge labels, and raw output (for subgraph labels)
-        if !tui_labels.contains(label.as_str())
-            && !tui_all_labels.contains(&label)
-            && !tui.raw_output.contains(&label)
+        if !ascii_labels.contains(label.as_str())
+            && !ascii_all_labels.contains(&label)
+            && !ascii.raw_output.contains(&label)
         {
             issues.push(Issue::error(
-                "tui_missing_label",
-                format!("TUI output missing node label: '{}'", label),
+                "ascii_missing_label",
+                format!("ASCII output missing node label: '{}'", label),
             ));
         }
     }
 }
 
 /// Check that edges are rendered (arrows and/or braille dots present).
-fn check_tui_edges(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
+fn check_ascii_edges(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
     let expected_edges = graph.edges.len();
 
-    if expected_edges > 0 && tui.arrow_count == 0 && !tui.has_braille {
+    if expected_edges > 0 && ascii.arrow_count == 0 && !ascii.has_braille {
         issues.push(Issue::error(
-            "tui_no_edges",
+            "ascii_no_edges",
             format!(
-                "TUI output has no edges rendered (expected {} edges, found 0 arrows and 0 braille chars)",
+                "ASCII output has no edges rendered (expected {} edges, found 0 arrows and 0 braille chars)",
                 expected_edges
             ),
         ));
     }
 
     // Arrow count should roughly match edge count (each edge has one arrow tip)
-    if expected_edges > 0 && tui.arrow_count > 0 && tui.arrow_count != expected_edges {
+    if expected_edges > 0 && ascii.arrow_count > 0 && ascii.arrow_count != expected_edges {
         issues.push(
             Issue::warning(
-                "tui_arrow_count",
+                "ascii_arrow_count",
                 format!(
-                    "TUI arrow count differs from edge count: expected {}, found {}",
-                    expected_edges, tui.arrow_count
+                    "ASCII arrow count differs from edge count: expected {}, found {}",
+                    expected_edges, ascii.arrow_count
                 ),
             )
-            .with_values(expected_edges.to_string(), tui.arrow_count.to_string()),
+            .with_values(expected_edges.to_string(), ascii.arrow_count.to_string()),
         );
     }
 }
 
 /// Check spatial ordering: if node A is above node B in the layout,
-/// it should be above in the TUI output too.
-fn check_tui_spatial_order(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
+/// it should be above in the ASCII output too.
+fn check_ascii_spatial_order(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
     // Build a map of label → layout y position
     let mut layout_positions: Vec<(String, f64)> = Vec::new();
     for node in &graph.nodes {
@@ -538,11 +544,11 @@ fn check_tui_spatial_order(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut
         }
     }
 
-    // Build a map of label → TUI row position
-    let tui_positions: std::collections::HashMap<&str, usize> = tui
+    // Build a map of label → ASCII row position
+    let ascii_positions: std::collections::HashMap<&str, usize> = ascii
         .labels
         .iter()
-        .zip(tui.label_positions.iter())
+        .zip(ascii.label_positions.iter())
         .map(|(label, &(row, _col))| (label.as_str(), row))
         .collect();
 
@@ -560,12 +566,12 @@ fn check_tui_spatial_order(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut
 
             let layout_a_above = y_a < y_b;
 
-            if let (Some(&tui_row_a), Some(&tui_row_b)) = (
-                tui_positions.get(label_a.as_str()),
-                tui_positions.get(label_b.as_str()),
+            if let (Some(&ascii_row_a), Some(&ascii_row_b)) = (
+                ascii_positions.get(label_a.as_str()),
+                ascii_positions.get(label_b.as_str()),
             ) {
-                let tui_a_above = tui_row_a < tui_row_b;
-                if layout_a_above != tui_a_above {
+                let ascii_a_above = ascii_row_a < ascii_row_b;
+                if layout_a_above != ascii_a_above {
                     ordering_violations += 1;
                 }
             }
@@ -574,26 +580,26 @@ fn check_tui_spatial_order(tui: &TuiStructure, graph: &LayoutGraph, issues: &mut
 
     if ordering_violations > 0 {
         issues.push(Issue::warning(
-            "tui_spatial_order",
+            "ascii_spatial_order",
             format!(
-                "TUI spatial ordering has {} violations (nodes in wrong relative position)",
+                "ASCII spatial ordering has {} violations (nodes in wrong relative position)",
                 ordering_violations
             ),
         ));
     }
 }
 
-/// Calculate a similarity score (0.0–1.0) between TUI output and layout graph.
+/// Calculate a similarity score (0.0–1.0) between ASCII output and layout graph.
 ///
 /// Uses a multi-factor approach:
-/// - Node presence: how many expected labels appear in the TUI output (via box
+/// - Node presence: how many expected labels appear in the ASCII output (via box
 ///   extraction or raw text substring matching)
 /// - Edge presence: whether edges are rendered (arrows and/or braille)
-pub fn calculate_tui_similarity(tui: &TuiStructure, graph: &LayoutGraph) -> f64 {
+pub fn calculate_ascii_similarity(ascii: &AsciiStructure, graph: &LayoutGraph) -> f64 {
     let mut parts: Vec<f64> = Vec::new();
 
-    // Node label presence: count how many graph labels appear in TUI output.
-    // Uses both structured extraction (tui.labels) and raw substring matching
+    // Node label presence: count how many graph labels appear in ASCII output.
+    // Uses both structured extraction (ascii.labels) and raw substring matching
     // to handle diagram types where labels may not be inside standard │text│ boxes.
     let expected_nodes = graph.nodes.iter().filter(|n| !n.is_dummy).count();
     if expected_nodes > 0 {
@@ -608,7 +614,7 @@ pub fn calculate_tui_similarity(tui: &TuiStructure, graph: &LayoutGraph) -> f64 
                 continue;
             }
             let label = clean_label(node.label.as_deref().unwrap_or(&node.id));
-            if tui.labels.contains(&label) || tui.raw_output.contains(&label) {
+            if ascii.labels.contains(&label) || ascii.raw_output.contains(&label) {
                 found += 1;
             }
         }
@@ -618,7 +624,7 @@ pub fn calculate_tui_similarity(tui: &TuiStructure, graph: &LayoutGraph) -> f64 
     // Edge presence (binary: edges exist or not)
     let expected_edges = graph.edges.len();
     if expected_edges > 0 {
-        let has_edges = tui.arrow_count > 0 || tui.has_braille;
+        let has_edges = ascii.arrow_count > 0 || ascii.has_braille;
         parts.push(if has_edges { 1.0 } else { 0.0 });
     }
 
@@ -629,15 +635,15 @@ pub fn calculate_tui_similarity(tui: &TuiStructure, graph: &LayoutGraph) -> f64 
     }
 }
 
-// --- Pie chart-specific TUI evaluation ---
+// --- Pie chart-specific ASCII evaluation ---
 
-/// Check TUI pie chart output against the PieDb ground truth.
+/// Check ASCII pie chart output against the PieDb ground truth.
 ///
 /// Since pie charts don't use LayoutGraph, we compare directly against PieDb:
 /// - All section labels must appear in the output
 /// - Percentage values should be present
 /// - Title should appear if set
-pub fn check_tui_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb) -> Vec<Issue> {
+pub fn check_ascii_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb) -> Vec<Issue> {
     let mut issues = Vec::new();
     let sections = db.get_sections();
     let total: f64 = sections.iter().map(|(_, v)| *v).sum();
@@ -646,8 +652,8 @@ pub fn check_tui_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb) -
     if let Some(title) = db.get_diagram_title() {
         if !output.contains(title) {
             issues.push(Issue::error(
-                "tui_pie_missing_title",
-                format!("TUI pie output missing title: '{}'", title),
+                "ascii_pie_missing_title",
+                format!("ASCII pie output missing title: '{}'", title),
             ));
         }
     }
@@ -660,8 +666,8 @@ pub fn check_tui_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb) -
     for (label, _) in sections {
         if !output.contains(label.as_str()) {
             issues.push(Issue::error(
-                "tui_pie_missing_label",
-                format!("TUI pie output missing section label: '{}'", label),
+                "ascii_pie_missing_label",
+                format!("ASCII pie output missing section label: '{}'", label),
             ));
         }
     }
@@ -672,9 +678,9 @@ pub fn check_tui_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb) -
         let pct_str = format!("{:.1}%", pct);
         if !output.contains(&pct_str) {
             issues.push(Issue::warning(
-                "tui_pie_missing_percentage",
+                "ascii_pie_missing_percentage",
                 format!(
-                    "TUI pie output missing percentage for '{}': expected {}",
+                    "ASCII pie output missing percentage for '{}': expected {}",
                     label, pct_str
                 ),
             ));
@@ -691,9 +697,9 @@ pub fn check_tui_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb) -
             };
             if !output.contains(&value_str) {
                 issues.push(Issue::warning(
-                    "tui_pie_missing_data_value",
+                    "ascii_pie_missing_data_value",
                     format!(
-                        "TUI pie output missing data value for '{}': expected {}",
+                        "ASCII pie output missing data value for '{}': expected {}",
                         label, value_str
                     ),
                 ));
@@ -705,19 +711,19 @@ pub fn check_tui_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb) -
     let has_bars = output.contains('█') || output.contains('▌');
     if !has_bars {
         issues.push(Issue::error(
-            "tui_pie_no_bars",
-            "TUI pie output has no bar characters (█/▌)".to_string(),
+            "ascii_pie_no_bars",
+            "ASCII pie output has no bar characters (█/▌)".to_string(),
         ));
     }
 
     issues
 }
 
-// ── Sequence diagram TUI checks ──────────────────────────────────────────────
+// ── Sequence diagram ASCII checks ──────────────────────────────────────────────
 
-/// Structure extracted from TUI sequence diagram output.
+/// Structure extracted from ASCII sequence diagram output.
 #[derive(Debug, Clone)]
-pub struct TuiSequenceStructure {
+pub struct AsciiSequenceStructure {
     /// Participant labels found in box-drawing rectangles.
     pub participant_labels: Vec<String>,
     /// Message labels found (text not in participant boxes).
@@ -732,8 +738,8 @@ pub struct TuiSequenceStructure {
     pub dimensions: (usize, usize),
 }
 
-/// Parse TUI sequence diagram output into a structural representation.
-pub fn parse_tui_sequence(output: &str) -> TuiSequenceStructure {
+/// Parse ASCII sequence diagram output into a structural representation.
+pub fn parse_ascii_sequence(output: &str) -> AsciiSequenceStructure {
     let lines: Vec<&str> = output.lines().collect();
     let rows = lines.len();
     let cols = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
@@ -753,7 +759,7 @@ pub fn parse_tui_sequence(output: &str) -> TuiSequenceStructure {
     let lifeline_count = count_lifelines(&grid);
     let fragment_labels = extract_fragment_labels(&grid);
 
-    TuiSequenceStructure {
+    AsciiSequenceStructure {
         participant_labels,
         message_labels,
         arrow_count,
@@ -801,7 +807,7 @@ fn count_lifelines(grid: &[Vec<char>]) -> usize {
     count
 }
 
-/// Extract message labels from sequence TUI output.
+/// Extract message labels from sequence ASCII output.
 /// These are text runs that appear on rows with arrow characters or near them,
 /// and are not participant box labels.
 fn extract_sequence_message_labels(
@@ -885,29 +891,29 @@ fn extract_fragment_labels(grid: &[Vec<char>]) -> Vec<String> {
     labels
 }
 
-/// Run TUI-specific structural checks for sequence diagrams.
-pub fn check_tui_sequence_structure(
-    tui: &TuiSequenceStructure,
+/// Run ASCII-specific structural checks for sequence diagrams.
+pub fn check_ascii_sequence_structure(
+    ascii: &AsciiSequenceStructure,
     db: &crate::diagrams::sequence::SequenceDb,
 ) -> Vec<Issue> {
     let mut issues = Vec::new();
 
-    check_tui_sequence_participants(tui, db, &mut issues);
-    check_tui_sequence_messages(tui, db, &mut issues);
-    check_tui_sequence_arrows(tui, db, &mut issues);
-    check_tui_sequence_lifelines(tui, db, &mut issues);
+    check_ascii_sequence_participants(ascii, db, &mut issues);
+    check_ascii_sequence_messages(ascii, db, &mut issues);
+    check_ascii_sequence_arrows(ascii, db, &mut issues);
+    check_ascii_sequence_lifelines(ascii, db, &mut issues);
 
     issues
 }
 
-/// Calculate a similarity score (0.0–1.0) for TUI pie chart output.
+/// Calculate a similarity score (0.0–1.0) for ASCII pie chart output.
 ///
 /// Factors:
 /// - Section label presence (50%)
 /// - Percentage value presence (30%)
 /// - Title presence (10%)
 /// - Bar character presence (10%)
-pub fn calculate_tui_pie_similarity(output: &str, db: &crate::diagrams::pie::PieDb) -> f64 {
+pub fn calculate_ascii_pie_similarity(output: &str, db: &crate::diagrams::pie::PieDb) -> f64 {
     let sections = db.get_sections();
     let total: f64 = sections.iter().map(|(_, v)| *v).sum();
 
@@ -956,23 +962,23 @@ pub fn calculate_tui_pie_similarity(output: &str, db: &crate::diagrams::pie::Pie
     score
 }
 
-/// Check that all participant labels appear in the TUI output.
-fn check_tui_sequence_participants(
-    tui: &TuiSequenceStructure,
+/// Check that all participant labels appear in the ASCII output.
+fn check_ascii_sequence_participants(
+    ascii: &AsciiSequenceStructure,
     db: &crate::diagrams::sequence::SequenceDb,
     issues: &mut Vec<Issue>,
 ) {
     let actors = db.get_actors_in_order();
     let expected = actors.len();
     // Each participant appears twice (top + bottom), but dedup means unique count
-    let actual = tui.participant_labels.len();
+    let actual = ascii.participant_labels.len();
 
     if actual != expected {
         issues.push(
             Issue::error(
-                "tui_seq_participant_count",
+                "ascii_seq_participant_count",
                 format!(
-                    "TUI participant count mismatch: expected {}, found {}",
+                    "ASCII participant count mismatch: expected {}, found {}",
                     expected, actual
                 ),
             )
@@ -980,15 +986,18 @@ fn check_tui_sequence_participants(
         );
     }
 
-    let tui_labels: std::collections::HashSet<&str> =
-        tui.participant_labels.iter().map(|s| s.as_str()).collect();
+    let ascii_labels: std::collections::HashSet<&str> = ascii
+        .participant_labels
+        .iter()
+        .map(|s| s.as_str())
+        .collect();
 
     for actor in &actors {
-        if !tui_labels.contains(actor.description.as_str()) {
+        if !ascii_labels.contains(actor.description.as_str()) {
             issues.push(Issue::error(
-                "tui_seq_missing_participant",
+                "ascii_seq_missing_participant",
                 format!(
-                    "TUI output missing participant label: '{}'",
+                    "ASCII output missing participant label: '{}'",
                     actor.description
                 ),
             ));
@@ -996,15 +1005,15 @@ fn check_tui_sequence_participants(
     }
 }
 
-/// Check that message labels appear in the TUI output.
-fn check_tui_sequence_messages(
-    tui: &TuiSequenceStructure,
+/// Check that message labels appear in the ASCII output.
+fn check_ascii_sequence_messages(
+    ascii: &AsciiSequenceStructure,
     db: &crate::diagrams::sequence::SequenceDb,
     issues: &mut Vec<Issue>,
 ) {
     let messages = db.get_messages();
-    let tui_msg_set: std::collections::HashSet<&str> =
-        tui.message_labels.iter().map(|s| s.as_str()).collect();
+    let ascii_msg_set: std::collections::HashSet<&str> =
+        ascii.message_labels.iter().map(|s| s.as_str()).collect();
 
     for msg in messages {
         // Skip control structure messages
@@ -1014,18 +1023,18 @@ fn check_tui_sequence_messages(
         if msg.message.is_empty() {
             continue;
         }
-        if !tui_msg_set.contains(msg.message.as_str()) {
+        if !ascii_msg_set.contains(msg.message.as_str()) {
             issues.push(Issue::warning(
-                "tui_seq_missing_message",
-                format!("TUI output missing message label: '{}'", msg.message),
+                "ascii_seq_missing_message",
+                format!("ASCII output missing message label: '{}'", msg.message),
             ));
         }
     }
 }
 
 /// Check that arrows are present for messages.
-fn check_tui_sequence_arrows(
-    tui: &TuiSequenceStructure,
+fn check_ascii_sequence_arrows(
+    ascii: &AsciiSequenceStructure,
     db: &crate::diagrams::sequence::SequenceDb,
     issues: &mut Vec<Issue>,
 ) {
@@ -1036,11 +1045,11 @@ fn check_tui_sequence_arrows(
         .filter(|m| m.from.is_some() && m.to.is_some())
         .count();
 
-    if expected_messages > 0 && tui.arrow_count == 0 {
+    if expected_messages > 0 && ascii.arrow_count == 0 {
         issues.push(Issue::error(
-            "tui_seq_no_arrows",
+            "ascii_seq_no_arrows",
             format!(
-                "TUI output has no arrows (expected {} messages)",
+                "ASCII output has no arrows (expected {} messages)",
                 expected_messages
             ),
         ));
@@ -1048,23 +1057,23 @@ fn check_tui_sequence_arrows(
 }
 
 /// Check that lifelines are present.
-fn check_tui_sequence_lifelines(
-    tui: &TuiSequenceStructure,
+fn check_ascii_sequence_lifelines(
+    ascii: &AsciiSequenceStructure,
     db: &crate::diagrams::sequence::SequenceDb,
     issues: &mut Vec<Issue>,
 ) {
     let actors = db.get_actors_in_order();
-    if !actors.is_empty() && tui.lifeline_count == 0 {
+    if !actors.is_empty() && ascii.lifeline_count == 0 {
         issues.push(Issue::warning(
-            "tui_seq_no_lifelines",
-            "TUI output has no lifeline characters".to_string(),
+            "ascii_seq_no_lifelines",
+            "ASCII output has no lifeline characters".to_string(),
         ));
     }
 }
 
-/// Calculate a similarity score (0.0–1.0) for sequence diagram TUI output.
-pub fn calculate_tui_sequence_similarity(
-    tui: &TuiSequenceStructure,
+/// Calculate a similarity score (0.0–1.0) for sequence diagram ASCII output.
+pub fn calculate_ascii_sequence_similarity(
+    ascii: &AsciiSequenceStructure,
     db: &crate::diagrams::sequence::SequenceDb,
 ) -> f64 {
     let mut parts: Vec<f64> = Vec::new();
@@ -1072,13 +1081,16 @@ pub fn calculate_tui_sequence_similarity(
     // Participant match ratio
     let actors = db.get_actors_in_order();
     let expected_participants = actors.len();
-    if expected_participants > 0 || !tui.participant_labels.is_empty() {
-        let tui_set: std::collections::HashSet<&str> =
-            tui.participant_labels.iter().map(|s| s.as_str()).collect();
+    if expected_participants > 0 || !ascii.participant_labels.is_empty() {
+        let ascii_set: std::collections::HashSet<&str> = ascii
+            .participant_labels
+            .iter()
+            .map(|s| s.as_str())
+            .collect();
         let db_set: std::collections::HashSet<&str> =
             actors.iter().map(|a| a.description.as_str()).collect();
-        let common = tui_set.intersection(&db_set).count() as f64;
-        let total = tui_set.len().max(db_set.len()) as f64;
+        let common = ascii_set.intersection(&db_set).count() as f64;
+        let total = ascii_set.len().max(db_set.len()) as f64;
         if total > 0.0 {
             parts.push(common / total);
         }
@@ -1092,11 +1104,11 @@ pub fn calculate_tui_sequence_similarity(
         .map(|m| m.message.as_str())
         .collect();
     if !expected_msgs.is_empty() {
-        let tui_msg_set: std::collections::HashSet<&str> =
-            tui.message_labels.iter().map(|s| s.as_str()).collect();
+        let ascii_msg_set: std::collections::HashSet<&str> =
+            ascii.message_labels.iter().map(|s| s.as_str()).collect();
         let found = expected_msgs
             .iter()
-            .filter(|m| tui_msg_set.contains(*m))
+            .filter(|m| ascii_msg_set.contains(*m))
             .count() as f64;
         parts.push(found / expected_msgs.len() as f64);
     }
@@ -1107,12 +1119,12 @@ pub fn calculate_tui_sequence_similarity(
         .filter(|m| m.from.is_some() && m.to.is_some())
         .count();
     if expected_message_count > 0 {
-        parts.push(if tui.arrow_count > 0 { 1.0 } else { 0.0 });
+        parts.push(if ascii.arrow_count > 0 { 1.0 } else { 0.0 });
     }
 
     // Lifeline presence
     if !actors.is_empty() {
-        parts.push(if tui.lifeline_count > 0 { 1.0 } else { 0.0 });
+        parts.push(if ascii.lifeline_count > 0 { 1.0 } else { 0.0 });
     }
 
     if parts.is_empty() {
@@ -1122,16 +1134,16 @@ pub fn calculate_tui_sequence_similarity(
     }
 }
 
-// --- Gantt chart-specific TUI evaluation ---
+// --- Gantt chart-specific ASCII evaluation ---
 
-/// Check TUI gantt chart output against the GanttDb ground truth.
+/// Check ASCII gantt chart output against the GanttDb ground truth.
 ///
 /// Since gantt charts don't use LayoutGraph, we compare directly against GanttDb:
 /// - All task names must appear in the output
 /// - Section names should appear
 /// - Title should appear if set
 /// - Status indicators should be present for flagged tasks
-pub fn check_tui_gantt_structure(
+pub fn check_ascii_gantt_structure(
     output: &str,
     db: &mut crate::diagrams::gantt::GanttDb,
 ) -> Vec<Issue> {
@@ -1142,8 +1154,8 @@ pub fn check_tui_gantt_structure(
     let title = db.get_diagram_title();
     if !title.is_empty() && !output.contains(title) {
         issues.push(Issue::error(
-            "tui_gantt_missing_title",
-            format!("TUI gantt output missing title: '{}'", title),
+            "ascii_gantt_missing_title",
+            format!("ASCII gantt output missing title: '{}'", title),
         ));
     }
 
@@ -1158,8 +1170,8 @@ pub fn check_tui_gantt_structure(
         }
         if !output.contains(&task.task) {
             issues.push(Issue::error(
-                "tui_gantt_missing_task",
-                format!("TUI gantt output missing task: '{}'", task.task),
+                "ascii_gantt_missing_task",
+                format!("ASCII gantt output missing task: '{}'", task.task),
             ));
         }
     }
@@ -1168,8 +1180,8 @@ pub fn check_tui_gantt_structure(
     for section in db.get_sections() {
         if !output.contains(section.as_str()) {
             issues.push(Issue::warning(
-                "tui_gantt_missing_section",
-                format!("TUI gantt output missing section: '{}'", section),
+                "ascii_gantt_missing_section",
+                format!("ASCII gantt output missing section: '{}'", section),
             ));
         }
     }
@@ -1181,20 +1193,20 @@ pub fn check_tui_gantt_structure(
 
     if has_done && !output.contains('✓') && !output.contains('░') {
         issues.push(Issue::warning(
-            "tui_gantt_no_done_indicator",
-            "TUI gantt output has done tasks but no done indicator (✓/░)".to_string(),
+            "ascii_gantt_no_done_indicator",
+            "ASCII gantt output has done tasks but no done indicator (✓/░)".to_string(),
         ));
     }
     if has_active && !output.contains('►') {
         issues.push(Issue::warning(
-            "tui_gantt_no_active_indicator",
-            "TUI gantt output has active tasks but no active indicator (►)".to_string(),
+            "ascii_gantt_no_active_indicator",
+            "ASCII gantt output has active tasks but no active indicator (►)".to_string(),
         ));
     }
     if has_milestone && !output.contains('◆') {
         issues.push(Issue::warning(
-            "tui_gantt_no_milestone_indicator",
-            "TUI gantt output has milestones but no milestone indicator (◆)".to_string(),
+            "ascii_gantt_no_milestone_indicator",
+            "ASCII gantt output has milestones but no milestone indicator (◆)".to_string(),
         ));
     }
 
@@ -1202,15 +1214,15 @@ pub fn check_tui_gantt_structure(
     let has_bars = output.contains('█') || output.contains('░');
     if !has_bars {
         issues.push(Issue::error(
-            "tui_gantt_no_bars",
-            "TUI gantt output has no bar characters (█/░)".to_string(),
+            "ascii_gantt_no_bars",
+            "ASCII gantt output has no bar characters (█/░)".to_string(),
         ));
     }
 
     issues
 }
 
-/// Calculate a similarity score (0.0–1.0) for TUI gantt chart output.
+/// Calculate a similarity score (0.0–1.0) for ASCII gantt chart output.
 ///
 /// Factors:
 /// - Task name presence (40%)
@@ -1218,7 +1230,7 @@ pub fn check_tui_gantt_structure(
 /// - Title presence (15%)
 /// - Status indicator presence (15%)
 /// - Bar character presence (10%)
-pub fn calculate_tui_gantt_similarity(
+pub fn calculate_ascii_gantt_similarity(
     output: &str,
     db: &mut crate::diagrams::gantt::GanttDb,
 ) -> f64 {
@@ -1307,14 +1319,14 @@ pub fn calculate_tui_gantt_similarity(
     score
 }
 
-// --- Mindmap-specific TUI evaluation ---
+// --- Mindmap-specific ASCII evaluation ---
 
-/// Check TUI mindmap output against the MindmapDb ground truth.
+/// Check ASCII mindmap output against the MindmapDb ground truth.
 ///
 /// Since mindmaps don't use LayoutGraph, we compare directly against MindmapDb:
 /// - All node labels must appear in the output
 /// - Tree structure connectors (├── └── │) should be present
-pub fn check_tui_mindmap_structure(
+pub fn check_ascii_mindmap_structure(
     output: &str,
     db: &crate::diagrams::mindmap::MindmapDb,
 ) -> Vec<Issue> {
@@ -1326,14 +1338,14 @@ pub fn check_tui_mindmap_structure(
     };
 
     // Collect all labels
-    let labels = crate::render::tui::mindmap::collect_labels(root);
+    let labels = crate::render::ascii::mindmap::collect_labels(root);
 
     // Check all labels appear
     for label in &labels {
         if !output.contains(label.as_str()) {
             issues.push(Issue::error(
-                "tui_mindmap_missing_label",
-                format!("TUI mindmap output missing node label: '{}'", label),
+                "ascii_mindmap_missing_label",
+                format!("ASCII mindmap output missing node label: '{}'", label),
             ));
         }
     }
@@ -1344,8 +1356,8 @@ pub fn check_tui_mindmap_structure(
         let has_connectors = output.contains("├──") || output.contains("└──");
         if !has_connectors {
             issues.push(Issue::warning(
-                "tui_mindmap_no_connectors",
-                "TUI mindmap output has children but no tree connectors (├──/└──)".to_string(),
+                "ascii_mindmap_no_connectors",
+                "ASCII mindmap output has children but no tree connectors (├──/└──)".to_string(),
             ));
         }
     }
@@ -1353,13 +1365,13 @@ pub fn check_tui_mindmap_structure(
     issues
 }
 
-/// Calculate a similarity score (0.0–1.0) for TUI mindmap output.
+/// Calculate a similarity score (0.0–1.0) for ASCII mindmap output.
 ///
 /// Factors:
 /// - Node label presence (70%)
 /// - Tree connector presence (20%)
 /// - Root node presence (10%)
-pub fn calculate_tui_mindmap_similarity(
+pub fn calculate_ascii_mindmap_similarity(
     output: &str,
     db: &crate::diagrams::mindmap::MindmapDb,
 ) -> f64 {
@@ -1373,7 +1385,7 @@ pub fn calculate_tui_mindmap_similarity(
         }
     };
 
-    let labels = crate::render::tui::mindmap::collect_labels(root);
+    let labels = crate::render::ascii::mindmap::collect_labels(root);
     let mut score = 0.0;
 
     // Label presence (70%)
@@ -1407,21 +1419,21 @@ pub fn calculate_tui_mindmap_similarity(
 }
 
 // ─────────────────────────────────────────────────────────────
-// Generic text-based TUI checks for diagram types without LayoutGraph
+// Generic text-based ASCII checks for diagram types without LayoutGraph
 // ─────────────────────────────────────────────────────────────
 
-/// Check a text-based TUI output for basic structural quality.
+/// Check a text-based ASCII output for basic structural quality.
 ///
 /// Used for diagram types that don't have a LayoutGraph (journey, timeline,
 /// kanban, packet, xychart, quadrant, radar, git, sankey, block, c4, treemap).
-pub fn check_tui_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
+pub fn check_ascii_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
     let mut issues = Vec::new();
 
     // Check output is non-empty
     if output.trim().is_empty() {
         issues.push(Issue {
-            check: format!("tui_{}_output", diagram_type),
-            message: "TUI output is empty".to_string(),
+            check: format!("ascii_{}_output", diagram_type),
+            message: "ASCII output is empty".to_string(),
             level: super::Level::Error,
         });
         return issues;
@@ -1430,8 +1442,8 @@ pub fn check_tui_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
     // Check output has reasonable length (not just a placeholder)
     if output.trim().lines().count() < 2 {
         issues.push(Issue {
-            check: format!("tui_{}_content", diagram_type),
-            message: "TUI output has fewer than 2 lines".to_string(),
+            check: format!("ascii_{}_content", diagram_type),
+            message: "ASCII output has fewer than 2 lines".to_string(),
             level: super::Level::Warning,
         });
     }
@@ -1439,8 +1451,8 @@ pub fn check_tui_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
     // Check for "empty" placeholder (acceptable for empty diagrams, but flagged)
     if output.contains("(empty") {
         issues.push(Issue {
-            check: format!("tui_{}_empty", diagram_type),
-            message: "TUI output contains empty placeholder".to_string(),
+            check: format!("ascii_{}_empty", diagram_type),
+            message: "ASCII output contains empty placeholder".to_string(),
             level: super::Level::Warning,
         });
     }
@@ -1452,7 +1464,7 @@ pub fn check_tui_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
 /// without a LayoutGraph.
 ///
 /// Returns 1.0 for non-empty output with structure, 0.0 for empty.
-pub fn calculate_tui_text_similarity(output: &str) -> f64 {
+pub fn calculate_ascii_text_similarity(output: &str) -> f64 {
     if output.trim().is_empty() {
         return 0.0;
     }
@@ -1515,8 +1527,8 @@ pub fn calculate_tui_text_similarity(output: &str) -> f64 {
 mod tests {
     use super::*;
 
-    // Helper to create a simple TUI output string with two boxed nodes
-    fn simple_two_node_tui() -> String {
+    // Helper to create a simple ASCII output string with two boxed nodes
+    fn simple_two_node_ascii() -> String {
         [
             "┌───────┐",
             "│ Start │",
@@ -1531,11 +1543,11 @@ mod tests {
         .join("\n")
     }
 
-    fn single_node_tui() -> String {
+    fn single_node_ascii() -> String {
         ["┌───────┐", "│ Hello │", "└───────┘"].join("\n")
     }
 
-    fn diamond_tui() -> String {
+    fn diamond_ascii() -> String {
         [
             "    /\\    ",
             "   /  \\   ",
@@ -1549,85 +1561,85 @@ mod tests {
 
     #[test]
     fn parse_single_node_finds_label() {
-        let tui = parse_tui(&single_node_tui());
-        assert_eq!(tui.labels, vec!["Hello"]);
+        let ascii_out = parse_ascii(&single_node_ascii());
+        assert_eq!(ascii.labels, vec!["Hello"]);
     }
 
     #[test]
     fn parse_two_nodes_finds_labels() {
-        let tui = parse_tui(&simple_two_node_tui());
+        let ascii_out = parse_ascii(&simple_two_node_ascii());
         assert!(
-            tui.labels.contains(&"Start".to_string()),
+            ascii.labels.contains(&"Start".to_string()),
             "Should find Start label, got: {:?}",
-            tui.labels
+            ascii.labels
         );
         assert!(
-            tui.labels.contains(&"End".to_string()),
+            ascii.labels.contains(&"End".to_string()),
             "Should find End label, got: {:?}",
-            tui.labels
+            ascii.labels
         );
     }
 
     #[test]
     fn parse_detects_arrows() {
-        let tui = parse_tui(&simple_two_node_tui());
-        assert_eq!(tui.arrow_count, 1, "Should find one arrow tip");
+        let ascii_out = parse_ascii(&simple_two_node_ascii());
+        assert_eq!(ascii.arrow_count, 1, "Should find one arrow tip");
     }
 
     #[test]
     fn parse_detects_braille() {
-        let tui = parse_tui(&simple_two_node_tui());
-        assert!(tui.has_braille, "Should detect braille characters");
-        assert!(tui.braille_count > 0);
+        let ascii_out = parse_ascii(&simple_two_node_ascii());
+        assert!(ascii.has_braille, "Should detect braille characters");
+        assert!(ascii_out.braille_count > 0);
     }
 
     #[test]
     fn parse_dimensions() {
-        let tui = parse_tui(&single_node_tui());
-        assert_eq!(tui.dimensions.0, 3, "Should have 3 rows");
-        assert_eq!(tui.dimensions.1, 9, "Should have 9 cols");
+        let ascii_out = parse_ascii(&single_node_ascii());
+        assert_eq!(ascii_out.dimensions.0, 3, "Should have 3 rows");
+        assert_eq!(ascii_out.dimensions.1, 9, "Should have 9 cols");
     }
 
     #[test]
     fn parse_empty_output() {
-        let tui = parse_tui("");
-        assert!(tui.labels.is_empty());
-        assert_eq!(tui.arrow_count, 0);
-        assert!(!tui.has_braille);
-        assert_eq!(tui.dimensions, (0, 0));
+        let ascii_out = parse_ascii("");
+        assert!(ascii.labels.is_empty());
+        assert_eq!(ascii.arrow_count, 0);
+        assert!(!ascii.has_braille);
+        assert_eq!(ascii_out.dimensions, (0, 0));
     }
 
     #[test]
     fn spatial_order_start_above_end() {
-        let tui = parse_tui(&simple_two_node_tui());
+        let ascii_out = parse_ascii(&simple_two_node_ascii());
         // Start should be at a lower row index than End
-        let start_pos = tui
+        let start_pos = ascii_out
             .labels
             .iter()
-            .zip(tui.label_positions.iter())
+            .zip(ascii.label_positions.iter())
             .find(|(l, _)| *l == "Start")
             .map(|(_, p)| p);
-        let end_pos = tui
+        let end_pos = ascii_out
             .labels
             .iter()
-            .zip(tui.label_positions.iter())
+            .zip(ascii.label_positions.iter())
             .find(|(l, _)| *l == "End")
             .map(|(_, p)| p);
 
         assert!(
             start_pos.unwrap().0 < end_pos.unwrap().0,
-            "Start should be above End in TUI output"
+            "Start should be above End in ASCII output"
         );
     }
 
     #[test]
     fn diamond_does_not_extract_labels() {
         // Diamond uses /\ characters not │, so no box labels extracted
-        let tui = parse_tui(&diamond_tui());
+        let ascii_out = parse_ascii(&diamond_ascii());
         // Diamond text ("Ok") is between / and \, not │ — so it won't be extracted as a node label
         // This is expected behavior for now; diamond parsing can be enhanced later
         assert!(
-            tui.labels.is_empty() || tui.labels.contains(&"Ok".to_string()),
+            ascii.labels.is_empty() || ascii.labels.contains(&"Ok".to_string()),
             "Diamond label extraction is best-effort"
         );
     }
@@ -1645,11 +1657,11 @@ mod tests {
             "└───────┘",
         ]
         .join("\n");
-        let tui = parse_tui(&output);
+        let ascii_out = parse_ascii(&output);
         assert!(
-            tui.edge_labels.contains(&"Yes".to_string()),
+            ascii.edge_labels.contains(&"Yes".to_string()),
             "Should find edge label 'Yes', got: {:?}",
-            tui.edge_labels
+            ascii.edge_labels
         );
     }
 
@@ -1678,8 +1690,8 @@ mod tests {
     #[test]
     fn similarity_perfect_match() {
         let graph = make_two_node_graph();
-        let tui = parse_tui(&simple_two_node_tui());
-        let sim = calculate_tui_similarity(&tui, &graph);
+        let ascii_out = parse_ascii(&simple_two_node_ascii());
+        let sim = calculate_ascii_similarity(&ascii_out, &graph);
         assert!(
             sim > 0.5,
             "Similarity should be high for matching graph, got {}",
@@ -1688,10 +1700,10 @@ mod tests {
     }
 
     #[test]
-    fn check_tui_structure_no_issues_on_match() {
+    fn check_ascii_structure_no_issues_on_match() {
         let graph = make_two_node_graph();
-        let tui = parse_tui(&simple_two_node_tui());
-        let issues = check_tui_structure(&tui, &graph);
+        let ascii_out = parse_ascii(&simple_two_node_ascii());
+        let issues = check_ascii_structure(&ascii_out, &graph);
         let errors: Vec<_> = issues
             .iter()
             .filter(|i| i.level == crate::eval::Level::Error)
@@ -1704,7 +1716,7 @@ mod tests {
     }
 
     #[test]
-    fn check_tui_structure_detects_missing_node() {
+    fn check_ascii_structure_detects_missing_node() {
         use crate::layout::LayoutNode;
 
         let mut graph = make_two_node_graph();
@@ -1712,17 +1724,17 @@ mod tests {
         node_c.label = Some("Missing".to_string());
         graph.nodes.push(node_c);
 
-        let tui = parse_tui(&simple_two_node_tui());
-        let issues = check_tui_structure(&tui, &graph);
+        let ascii_out = parse_ascii(&simple_two_node_ascii());
+        let issues = check_ascii_structure(&ascii_out, &graph);
         let has_missing = issues.iter().any(|i| i.message.contains("Missing"));
         assert!(has_missing, "Should detect missing node 'Missing'");
     }
 
-    // --- Integration tests: full parse → layout → TUI render → TUI eval pipeline ---
+    // --- Integration tests: full parse → layout → ASCII render → ASCII eval pipeline ---
 
-    fn parse_layout_render_tui(input: &str) -> (String, LayoutGraph) {
+    fn parse_layout_render_ascii(input: &str) -> (String, LayoutGraph) {
         use crate::layout::{CharacterSizeEstimator, ToLayoutGraph};
-        use crate::render::tui::render_flowchart_tui;
+        use crate::render::ascii::render_flowchart_ascii;
 
         let diagram = crate::parse(input).unwrap();
         let db = match diagram {
@@ -1732,21 +1744,21 @@ mod tests {
         let estimator = CharacterSizeEstimator::default();
         let graph = db.to_layout_graph(&estimator).unwrap();
         let graph = crate::layout::layout(graph).unwrap();
-        let tui_output = render_flowchart_tui(&db, &graph).unwrap();
-        (tui_output, graph)
+        let ascii_output = render_flowchart_ascii(&db, &graph).unwrap();
+        (ascii_output, graph)
     }
 
     #[test]
     fn integration_single_node() {
-        let (output, graph) = parse_layout_render_tui("flowchart TD\n    A[Hello]");
-        let tui = parse_tui(&output);
+        let (output, graph) = parse_layout_render_ascii("flowchart TD\n    A[Hello]");
+        let ascii_out = parse_ascii(&output);
         assert!(
-            tui.labels.contains(&"Hello".to_string()),
-            "Should find label 'Hello' in TUI output, got: {:?}\nOutput:\n{}",
-            tui.labels,
+            ascii.labels.contains(&"Hello".to_string()),
+            "Should find label 'Hello' in ASCII output, got: {:?}\nOutput:\n{}",
+            ascii.labels,
             output
         );
-        let issues = check_tui_structure(&tui, &graph);
+        let issues = check_ascii_structure(&ascii_out, &graph);
         let errors: Vec<_> = issues
             .iter()
             .filter(|i| i.level == crate::eval::Level::Error)
@@ -1760,70 +1772,70 @@ mod tests {
 
     #[test]
     fn integration_two_nodes_with_edge() {
-        let (output, graph) = parse_layout_render_tui("flowchart TD\n    A[Start] --> B[End]");
-        let tui = parse_tui(&output);
+        let (output, graph) = parse_layout_render_ascii("flowchart TD\n    A[Start] --> B[End]");
+        let ascii_out = parse_ascii(&output);
 
         assert!(
-            tui.labels.contains(&"Start".to_string()),
+            ascii.labels.contains(&"Start".to_string()),
             "Should find 'Start', got: {:?}\nOutput:\n{}",
-            tui.labels,
+            ascii.labels,
             output
         );
         assert!(
-            tui.labels.contains(&"End".to_string()),
+            ascii.labels.contains(&"End".to_string()),
             "Should find 'End', got: {:?}",
-            tui.labels
+            ascii.labels
         );
         assert!(
-            tui.arrow_count > 0 || tui.has_braille,
+            ascii.arrow_count > 0 || ascii.has_braille,
             "Should have edges rendered"
         );
 
-        let sim = calculate_tui_similarity(&tui, &graph);
+        let sim = calculate_ascii_similarity(&ascii_out, &graph);
         assert!(sim > 0.5, "Similarity should be reasonable, got {}", sim);
     }
 
     #[test]
     fn integration_three_nodes_chain() {
         let (output, graph) =
-            parse_layout_render_tui("flowchart TD\n    A[First] --> B[Second] --> C[Third]");
-        let tui = parse_tui(&output);
+            parse_layout_render_ascii("flowchart TD\n    A[First] --> B[Second] --> C[Third]");
+        let ascii_out = parse_ascii(&output);
 
         assert!(
-            tui.labels.len() >= 3,
+            ascii.labels.len() >= 3,
             "Should find 3 labels, got: {:?}",
-            tui.labels
+            ascii.labels
         );
         assert!(
-            tui.arrow_count >= 2,
+            ascii.arrow_count >= 2,
             "Should have at least 2 arrows for 2 edges, got {}",
-            tui.arrow_count
+            ascii.arrow_count
         );
     }
 
     #[test]
     fn integration_edge_labels() {
         let (output, _graph) =
-            parse_layout_render_tui("flowchart TD\n    A[Start] -->|Yes| B[End]");
-        let _tui = parse_tui(&output);
+            parse_layout_render_ascii("flowchart TD\n    A[Start] -->|Yes| B[End]");
+        let _ascii = parse_ascii(&output);
 
         // The edge label "Yes" should appear somewhere in the output
         assert!(
             output.contains("Yes"),
-            "TUI output should contain edge label 'Yes'\nOutput:\n{}",
+            "ASCII output should contain edge label 'Yes'\nOutput:\n{}",
             output
         );
     }
 
     #[test]
     fn integration_spatial_ordering_preserved() {
-        let (output, graph) = parse_layout_render_tui("flowchart TD\n    A[Top] --> B[Bottom]");
-        let tui = parse_tui(&output);
-        let issues = check_tui_structure(&tui, &graph);
+        let (output, graph) = parse_layout_render_ascii("flowchart TD\n    A[Top] --> B[Bottom]");
+        let ascii_out = parse_ascii(&output);
+        let issues = check_ascii_structure(&ascii_out, &graph);
 
         let ordering_issues: Vec<_> = issues
             .iter()
-            .filter(|i| i.check == "tui_spatial_order")
+            .filter(|i| i.check == "ascii_spatial_order")
             .collect();
         assert!(
             ordering_issues.is_empty(),

@@ -1,4 +1,4 @@
-//! TUI renderer for pie charts.
+//! ASCII renderer for pie charts.
 //!
 //! Since circular shapes don't render well in character art, pie charts are
 //! displayed as horizontal bar charts with proportional widths, percentages,
@@ -16,7 +16,7 @@ const FULL_BLOCK: char = '█';
 const HALF_BLOCK: char = '▌';
 
 /// Render a pie chart as a horizontal bar chart in character art.
-pub fn render_pie_tui(db: &PieDb) -> Result<String> {
+pub fn render_pie_ascii(db: &PieDb) -> Result<String> {
     let sections = db.get_sections();
     let show_data = db.get_show_data();
 
@@ -142,7 +142,7 @@ mod tests {
     #[test]
     fn empty_pie_chart() {
         let db = make_pie(None, &[], false);
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         assert!(
             output.contains("empty pie chart"),
             "Empty chart should say so\nOutput:\n{}",
@@ -153,7 +153,7 @@ mod tests {
     #[test]
     fn empty_pie_chart_with_title() {
         let db = make_pie(Some("My Chart"), &[], false);
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         assert!(output.contains("My Chart"), "Should show title");
         assert!(output.contains("empty pie chart"));
     }
@@ -161,7 +161,7 @@ mod tests {
     #[test]
     fn single_section_shows_100_percent() {
         let db = make_pie(None, &[("Only", 10.0)], false);
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         assert!(
             output.contains("100.0%"),
             "Single section should be 100%\nOutput:\n{}",
@@ -173,7 +173,7 @@ mod tests {
     #[test]
     fn two_sections_show_percentages() {
         let db = make_pie(None, &[("A", 75.0), ("B", 25.0)], false);
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         assert!(
             output.contains("75.0%"),
             "Should show 75%\nOutput:\n{}",
@@ -189,7 +189,7 @@ mod tests {
     #[test]
     fn bars_are_proportional() {
         let db = make_pie(None, &[("Big", 75.0), ("Small", 25.0)], false);
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         let lines: Vec<&str> = output.lines().collect();
         // Find the bar lines (contain █)
         let bar_lines: Vec<&str> = lines
@@ -227,7 +227,7 @@ mod tests {
             &[("Dev", 40.0), ("Test", 25.0)],
             false,
         );
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         assert!(
             output.contains("Project Distribution"),
             "Title should appear\nOutput:\n{}",
@@ -238,7 +238,7 @@ mod tests {
     #[test]
     fn show_data_includes_values() {
         let db = make_pie(None, &[("Dev", 40.0), ("Test", 25.0)], true);
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         assert!(
             output.contains("[40]"),
             "Should show data value 40\nOutput:\n{}",
@@ -259,7 +259,7 @@ mod tests {
     #[test]
     fn labels_are_aligned() {
         let db = make_pie(None, &[("Short", 10.0), ("Much Longer Label", 10.0)], false);
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         let lines: Vec<&str> = output.lines().collect();
         let bar_lines: Vec<&str> = lines.iter().filter(|l| l.contains('│')).copied().collect();
         assert_eq!(bar_lines.len(), 2);
@@ -281,7 +281,7 @@ mod tests {
             crate::diagrams::Diagram::Pie(db) => db,
             _ => panic!("Expected pie diagram"),
         };
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         assert!(
             output.contains("Development"),
             "Should contain Development\nOutput:\n{}",
@@ -307,7 +307,7 @@ mod tests {
             crate::diagrams::Diagram::Pie(db) => db,
             _ => panic!("Expected pie diagram"),
         };
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         // Complex pie has showData and 8 slices
         assert!(
             output.contains("Compute"),
@@ -330,7 +330,7 @@ mod tests {
     fn nonzero_section_gets_at_least_one_block() {
         // A very small section should still show at least one block character
         let db = make_pie(None, &[("Huge", 99.0), ("Tiny", 1.0)], false);
-        let output = render_pie_tui(&db).unwrap();
+        let output = render_pie_ascii(&db).unwrap();
         let tiny_line = output.lines().find(|l| l.contains("Tiny")).unwrap();
         let has_block = tiny_line.contains(FULL_BLOCK) || tiny_line.contains(HALF_BLOCK);
         assert!(

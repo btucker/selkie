@@ -1,4 +1,4 @@
-//! TUI renderer for treemap diagrams.
+//! ASCII renderer for treemap diagrams.
 //!
 //! Since proportional area layout is complex in character art, treemaps
 //! are rendered as an indented tree with value bars showing relative sizes.
@@ -11,7 +11,7 @@ const FULL_BLOCK: char = '█';
 const HALF_BLOCK: char = '▌';
 
 /// Render a treemap as character art.
-pub fn render_treemap_tui(db: &TreemapDb) -> Result<String> {
+pub fn render_treemap_ascii(db: &TreemapDb) -> Result<String> {
     let root_nodes = db.get_root_nodes();
     if root_nodes.is_empty() {
         let title = db.get_title();
@@ -125,7 +125,7 @@ mod tests {
     #[test]
     fn empty_treemap() {
         let db = TreemapDb::new();
-        let output = render_treemap_tui(&db).unwrap();
+        let output = render_treemap_ascii(&db).unwrap();
         assert!(output.contains("empty treemap"));
     }
 
@@ -137,7 +137,7 @@ mod tests {
             crate::diagrams::Diagram::Treemap(db) => db,
             _ => panic!("Expected treemap"),
         };
-        let output = render_treemap_tui(&db).unwrap();
+        let output = render_treemap_ascii(&db).unwrap();
         assert!(output.contains("Category A"), "Output:\n{}", output);
         assert!(output.contains("Category B"), "Output:\n{}", output);
         assert!(output.contains("Item A1"), "Output:\n{}", output);
@@ -151,7 +151,7 @@ mod tests {
             crate::diagrams::Diagram::Treemap(db) => db,
             _ => panic!("Expected treemap"),
         };
-        let output = render_treemap_tui(&db).unwrap();
+        let output = render_treemap_ascii(&db).unwrap();
         // Values from the sample: 10, 20, 15, 25
         assert!(output.contains("10"), "Output:\n{}", output);
         assert!(output.contains("25"), "Output:\n{}", output);
@@ -165,7 +165,7 @@ mod tests {
             crate::diagrams::Diagram::Treemap(db) => db,
             _ => panic!("Expected treemap"),
         };
-        let output = render_treemap_tui(&db).unwrap();
+        let output = render_treemap_ascii(&db).unwrap();
         assert!(output.contains('├'), "Output:\n{}", output);
         assert!(
             output.contains(FULL_BLOCK),
@@ -182,7 +182,7 @@ mod tests {
             crate::diagrams::Diagram::Treemap(db) => db,
             _ => panic!("Expected treemap"),
         };
-        let output = render_treemap_tui(&db).unwrap();
+        let output = render_treemap_ascii(&db).unwrap();
         assert!(output.contains("Total: 70"), "Output:\n{}", output);
     }
 }

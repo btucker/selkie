@@ -1,4 +1,4 @@
-//! TUI renderer for timeline diagrams.
+//! ASCII renderer for timeline diagrams.
 //!
 //! Renders timeline periods with their events in a horizontal flow,
 //! using box-drawing characters for structure.
@@ -7,7 +7,7 @@ use crate::diagrams::timeline::TimelineDb;
 use crate::error::Result;
 
 /// Render a timeline diagram as character art.
-pub fn render_timeline_tui(db: &TimelineDb) -> Result<String> {
+pub fn render_timeline_ascii(db: &TimelineDb) -> Result<String> {
     let tasks = db.get_tasks();
     if tasks.is_empty() {
         let title = db.get_title();
@@ -68,7 +68,7 @@ mod tests {
     #[test]
     fn empty_timeline() {
         let db = TimelineDb::new();
-        let output = render_timeline_tui(&db).unwrap();
+        let output = render_timeline_ascii(&db).unwrap();
         assert!(output.contains("empty timeline"));
     }
 
@@ -80,7 +80,7 @@ mod tests {
             crate::diagrams::Diagram::Timeline(db) => db,
             _ => panic!("Expected timeline"),
         };
-        let output = render_timeline_tui(&db).unwrap();
+        let output = render_timeline_ascii(&db).unwrap();
         assert!(output.contains("History"), "Output:\n{}", output);
     }
 
@@ -93,7 +93,7 @@ mod tests {
             crate::diagrams::Diagram::Timeline(db) => db,
             _ => panic!("Expected timeline"),
         };
-        let output = render_timeline_tui(&db).unwrap();
+        let output = render_timeline_ascii(&db).unwrap();
         assert!(output.contains("Period1"), "Output:\n{}", output);
         assert!(output.contains("Event A"), "Output:\n{}", output);
         assert!(output.contains("Event B"), "Output:\n{}", output);
@@ -108,7 +108,7 @@ mod tests {
             crate::diagrams::Diagram::Timeline(db) => db,
             _ => panic!("Expected timeline"),
         };
-        let output = render_timeline_tui(&db).unwrap();
+        let output = render_timeline_ascii(&db).unwrap();
         assert!(output.contains("S1"), "Output:\n{}", output);
         assert!(output.contains("S2"), "Output:\n{}", output);
     }

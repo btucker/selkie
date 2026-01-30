@@ -1,4 +1,4 @@
-//! TUI renderer for Sankey flow diagrams.
+//! ASCII renderer for Sankey flow diagrams.
 //!
 //! Since flow-width proportional rendering is complex in character art,
 //! Sankey diagrams are displayed as a flow table showing source → target
@@ -12,7 +12,7 @@ const FULL_BLOCK: char = '█';
 const HALF_BLOCK: char = '▌';
 
 /// Render a Sankey diagram as character art.
-pub fn render_sankey_tui(db: &SankeyDb) -> Result<String> {
+pub fn render_sankey_ascii(db: &SankeyDb) -> Result<String> {
     let links = db.get_links();
     if links.is_empty() {
         return Ok("(empty sankey diagram)\n".to_string());
@@ -116,7 +116,7 @@ mod tests {
     #[test]
     fn empty_sankey() {
         let db = SankeyDb::new();
-        let output = render_sankey_tui(&db).unwrap();
+        let output = render_sankey_ascii(&db).unwrap();
         assert!(output.contains("empty sankey"));
     }
 
@@ -128,7 +128,7 @@ mod tests {
             crate::diagrams::Diagram::Sankey(db) => db,
             _ => panic!("Expected sankey"),
         };
-        let output = render_sankey_tui(&db).unwrap();
+        let output = render_sankey_ascii(&db).unwrap();
         assert!(output.contains("Revenue"), "Output:\n{}", output);
         assert!(output.contains("Salaries"), "Output:\n{}", output);
         assert!(output.contains("Operations"), "Output:\n{}", output);
@@ -142,7 +142,7 @@ mod tests {
             crate::diagrams::Diagram::Sankey(db) => db,
             _ => panic!("Expected sankey"),
         };
-        let output = render_sankey_tui(&db).unwrap();
+        let output = render_sankey_ascii(&db).unwrap();
         assert!(
             output.contains('→'),
             "Should have flow arrows\nOutput:\n{}",
@@ -158,7 +158,7 @@ mod tests {
             crate::diagrams::Diagram::Sankey(db) => db,
             _ => panic!("Expected sankey"),
         };
-        let output = render_sankey_tui(&db).unwrap();
+        let output = render_sankey_ascii(&db).unwrap();
         // Salaries (40) should have more blocks than Profit (8)
         let salary_line = output.lines().find(|l| l.contains("Salaries")).unwrap();
         let profit_line = output.lines().find(|l| l.contains("Profit")).unwrap();

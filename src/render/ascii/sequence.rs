@@ -1,4 +1,4 @@
-//! TUI renderer for sequence diagrams.
+//! ASCII renderer for sequence diagrams.
 //!
 //! Produces character-art output with:
 //! - Box-drawing participant headers (top and bottom)
@@ -10,13 +10,13 @@
 use crate::diagrams::sequence::{LineType, SequenceDb};
 use crate::error::Result;
 
-/// Layout constants for TUI sequence diagrams.
+/// Layout constants for ASCII sequence diagrams.
 const ACTOR_COL_WIDTH: usize = 20;
 const ACTOR_BOX_PADDING: usize = 2;
 const MESSAGE_ROW_SPACING: usize = 2;
 
 /// Render a sequence diagram as character art.
-pub fn render_sequence_tui(db: &SequenceDb) -> Result<String> {
+pub fn render_sequence_ascii(db: &SequenceDb) -> Result<String> {
     let actors = db.get_actors_in_order();
     if actors.is_empty() {
         return Ok(String::new());
@@ -533,7 +533,7 @@ mod tests {
     #[test]
     fn renders_two_participants() {
         let db = parse_sequence("sequenceDiagram\n    participant A as Alice\n    participant B as Bob\n    A->>B: Hello");
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         assert!(
             output.contains("Alice"),
             "Should contain Alice, got:\n{}",
@@ -549,7 +549,7 @@ mod tests {
     #[test]
     fn renders_message_arrow() {
         let db = parse_sequence("sequenceDiagram\n    A->>B: Hello");
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         // Should have an arrow character
         assert!(
             output.contains('>') || output.contains('─'),
@@ -561,7 +561,7 @@ mod tests {
     #[test]
     fn renders_message_label() {
         let db = parse_sequence("sequenceDiagram\n    A->>B: Hello Bob");
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         assert!(
             output.contains("Hello Bob"),
             "Should contain message label, got:\n{}",
@@ -572,7 +572,7 @@ mod tests {
     #[test]
     fn renders_dotted_message() {
         let db = parse_sequence("sequenceDiagram\n    A-->>B: Response");
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         assert!(
             output.contains("Response"),
             "Should contain dotted message label, got:\n{}",
@@ -588,7 +588,7 @@ mod tests {
     #[test]
     fn renders_lifelines() {
         let db = parse_sequence("sequenceDiagram\n    A->>B: Hello\n    B->>A: Hi");
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         // Lifelines use │
         let pipe_count = output.chars().filter(|&c| c == '│').count();
         assert!(
@@ -602,7 +602,7 @@ mod tests {
     #[test]
     fn renders_box_drawing_headers() {
         let db = parse_sequence("sequenceDiagram\n    participant A as Alice\n    A->>A: Think");
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         assert!(output.contains('┌'), "Should have box top-left corner");
         assert!(output.contains('┘'), "Should have box bottom-right corner");
     }
@@ -610,7 +610,7 @@ mod tests {
     #[test]
     fn empty_diagram() {
         let db = SequenceDb::new();
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         assert!(
             output.is_empty(),
             "Empty diagram should produce empty output"
@@ -622,7 +622,7 @@ mod tests {
         let db = parse_sequence(
             "sequenceDiagram\n    A->>B: First\n    B->>A: Second\n    A->>B: Third",
         );
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         assert!(output.contains("First"), "Should contain First");
         assert!(output.contains("Second"), "Should contain Second");
         assert!(output.contains("Third"), "Should contain Third");
@@ -633,7 +633,7 @@ mod tests {
         let db = parse_sequence(
             "sequenceDiagram\n    participant A\n    participant B\n    participant C\n    A->>B: msg1\n    B->>C: msg2",
         );
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         // All three participant lifelines should appear
         assert!(output.contains("A"), "Should contain participant A");
         assert!(output.contains("B"), "Should contain participant B");
@@ -645,7 +645,7 @@ mod tests {
     #[test]
     fn self_message_has_return_arrow() {
         let db = parse_sequence("sequenceDiagram\n    A->>A: Think");
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         assert!(
             output.contains('┐'),
             "Self-message should have top-right corner ┐\nOutput:\n{}",
@@ -668,7 +668,7 @@ mod tests {
         let db = parse_sequence(
             "sequenceDiagram\n    participant A as Alice\n    participant B as Bob\n    A->>B: Hello",
         );
-        let output = render_sequence_tui(&db).unwrap();
+        let output = render_sequence_ascii(&db).unwrap();
         let alice_pos = output.find("Alice").expect("Alice should appear");
         let bob_pos = output.find("Bob").expect("Bob should appear");
         // Alice should appear before Bob (left-to-right) in the first line where they appear

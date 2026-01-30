@@ -1,4 +1,4 @@
-//! TUI renderer for C4 architecture diagrams.
+//! ASCII renderer for C4 architecture diagrams.
 //!
 //! Renders C4 elements (Person, System, Container, Component) as labeled
 //! boxes with technology and description info. Boundaries are shown as
@@ -8,7 +8,7 @@ use crate::diagrams::c4::{C4Db, C4ShapeType};
 use crate::error::Result;
 
 /// Render a C4 diagram as character art.
-pub fn render_c4_tui(db: &C4Db) -> Result<String> {
+pub fn render_c4_ascii(db: &C4Db) -> Result<String> {
     let elements = db.get_elements();
     let boundaries = db.get_boundaries();
     let relationships = db.get_relationships();
@@ -140,7 +140,7 @@ mod tests {
     #[test]
     fn empty_c4() {
         let db = C4Db::new();
-        let output = render_c4_tui(&db).unwrap();
+        let output = render_c4_ascii(&db).unwrap();
         assert!(output.contains("empty C4"));
     }
 
@@ -152,7 +152,7 @@ mod tests {
             crate::diagrams::Diagram::C4(db) => db,
             _ => panic!("Expected C4"),
         };
-        let output = render_c4_tui(&db).unwrap();
+        let output = render_c4_ascii(&db).unwrap();
         assert!(!output.trim().is_empty(), "Output should not be empty");
     }
 
@@ -164,7 +164,7 @@ mod tests {
             crate::diagrams::Diagram::C4(db) => db,
             _ => panic!("Expected C4"),
         };
-        let output = render_c4_tui(&db).unwrap();
+        let output = render_c4_ascii(&db).unwrap();
         // C4 diagrams typically have relationships shown with arrows
         if !db.get_relationships().is_empty() {
             assert!(

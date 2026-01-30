@@ -1,4 +1,4 @@
-//! TUI renderer for packet/bit-field diagrams.
+//! ASCII renderer for packet/bit-field diagrams.
 //!
 //! Renders packet words as rows of labeled bit fields with bit-position
 //! markers, using box-drawing characters for field boundaries.
@@ -10,7 +10,7 @@ use crate::error::Result;
 const CHARS_PER_BIT: usize = 3;
 
 /// Render a packet diagram as character art.
-pub fn render_packet_tui(db: &PacketDb) -> Result<String> {
+pub fn render_packet_ascii(db: &PacketDb) -> Result<String> {
     let packet = db.get_packet();
     if packet.is_empty() {
         let title = db.get_title();
@@ -126,7 +126,7 @@ mod tests {
     #[test]
     fn empty_packet() {
         let db = PacketDb::new();
-        let output = render_packet_tui(&db).unwrap();
+        let output = render_packet_ascii(&db).unwrap();
         assert!(output.contains("empty packet"));
     }
 
@@ -138,7 +138,7 @@ mod tests {
             crate::diagrams::Diagram::Packet(db) => db,
             _ => panic!("Expected packet"),
         };
-        let output = render_packet_tui(&db).unwrap();
+        let output = render_packet_ascii(&db).unwrap();
         assert!(output.contains("Header"), "Output:\n{}", output);
         assert!(output.contains("Length"), "Output:\n{}", output);
         assert!(output.contains("Data"), "Output:\n{}", output);
@@ -152,7 +152,7 @@ mod tests {
             crate::diagrams::Diagram::Packet(db) => db,
             _ => panic!("Expected packet"),
         };
-        let output = render_packet_tui(&db).unwrap();
+        let output = render_packet_ascii(&db).unwrap();
         assert!(output.contains('┌'), "Output:\n{}", output);
         assert!(output.contains('┘'), "Output:\n{}", output);
     }
@@ -165,7 +165,7 @@ mod tests {
             crate::diagrams::Diagram::Packet(db) => db,
             _ => panic!("Expected packet"),
         };
-        let output = render_packet_tui(&db).unwrap();
+        let output = render_packet_ascii(&db).unwrap();
         assert!(output.contains("Test Packet"), "Output:\n{}", output);
     }
 }

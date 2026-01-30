@@ -1,6 +1,6 @@
 //! Coordinate scaling: pixel-space → cell-space
 //!
-//! Dagre layout produces pixel coordinates. The TUI renderer needs to map
+//! Dagre layout produces pixel coordinates. The ASCII renderer needs to map
 //! these into character-cell coordinates. Each cell has a configurable
 //! pixel width and height (default 8×16, matching a typical monospace font
 //! aspect ratio).

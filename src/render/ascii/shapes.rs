@@ -162,7 +162,7 @@ fn render_diamond(label: &str, _w: usize, _h: usize) -> RenderedShape {
 /// When no label is provided (state diagram start/end markers), renders as a
 /// single `●` or `◉` symbol. When a label is provided (e.g., flowchart
 /// `((...))` nodes), renders as a rounded rectangle — matching the visual
-/// convention of elliptical shapes in TUI.
+/// convention of elliptical shapes in ASCII.
 fn render_circle(label: &str, w: usize, h: usize, double: bool) -> RenderedShape {
     if label.is_empty() {
         let symbol = if double { '◉' } else { '●' };
