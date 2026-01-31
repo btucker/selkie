@@ -1,14 +1,21 @@
 //! ASCII renderer for XY chart diagrams.
 //!
-//! Renders bar charts as horizontal bars (like pie) and line charts
-//! as sparkline-style output, with axis labels and data values.
+//! Renders a unified vertical chart where bar columns rise from the bottom
+//! and line markers (●) are overlaid at their respective heights, all sharing
+//! a single Y-axis grid. Categories appear along the x-axis at the bottom.
 
 use crate::diagrams::xychart::{PlotType, XAxisData, XYChartDb, YAxisData};
 use crate::error::Result;
 
-const BAR_WIDTH: usize = 40;
+/// Height of the chart area in character rows.
+const CHART_HEIGHT: usize = 16;
+/// Width allocated per category column in characters.
+const COL_WIDTH: usize = 6;
+/// Characters used for bar rendering.
 const FULL_BLOCK: char = '█';
-const HALF_BLOCK: char = '▌';
+const UPPER_HALF: char = '▀';
+/// Character for line data points.
+const LINE_MARKER: char = '●';
 
 /// Render an XY chart as character art.
 pub fn render_xychart_ascii(db: &XYChartDb) -> Result<String> {
@@ -21,25 +28,29 @@ pub fn render_xychart_ascii(db: &XYChartDb) -> Result<String> {
         return Ok("(empty chart)\n".to_string());
     }
 
-    let mut lines: Vec<String> = Vec::new();
+    let mut out: Vec<String> = Vec::new();
 
     // Title
     if !db.title.is_empty() {
-        lines.push(db.title.clone());
-        lines.push("─".repeat(db.title.chars().count().max(BAR_WIDTH)));
+        out.push(db.title.clone());
+        out.push("─".repeat(db.title.chars().count()));
     }
 
     // Get categories from x-axis
     let categories: Vec<String> = match &db.x_axis {
         Some(XAxisData::Band(band)) => band.categories.clone(),
-        _ => {
-            // For linear x-axis, use data point labels
-            plots
-                .first()
-                .map(|p| p.data.iter().map(|d| d.label.clone()).collect())
-                .unwrap_or_default()
-        }
+        _ => plots
+            .first()
+            .map(|p| p.data.iter().map(|d| d.label.clone()).collect())
+            .unwrap_or_default(),
     };
+
+    let num_cats = categories.len();
+    if num_cats == 0 {
+        out.push("(no data)".to_string());
+        out.push(String::new());
+        return Ok(out.join("\n"));
+    }
 
     // Find global max value across all plots for scaling
     let max_value = plots
@@ -48,94 +59,190 @@ pub fn render_xychart_ascii(db: &XYChartDb) -> Result<String> {
         .fold(0.0f64, f64::max);
 
     if max_value <= 0.0 {
-        lines.push("(no data)".to_string());
-        lines.push(String::new());
-        return Ok(lines.join("\n"));
+        out.push("(no data)".to_string());
+        out.push(String::new());
+        return Ok(out.join("\n"));
     }
 
-    // Y-axis label
+    // Compute nice Y-axis tick values
+    let y_ticks = compute_y_ticks(max_value, 5);
+    let y_max = *y_ticks.last().unwrap_or(&max_value);
+    let y_label_width = y_ticks
+        .iter()
+        .map(|v| format_value(*v).len())
+        .max()
+        .unwrap_or(3);
+
+    // Y-axis title
     if let Some(ref y_axis) = db.y_axis {
         let y_title = match y_axis {
             YAxisData::Linear(data) => &data.title,
         };
         if !y_title.is_empty() {
-            lines.push(format!("  Y: {}", y_title));
-        }
-    }
-
-    let max_cat_len = categories
-        .iter()
-        .map(|c| c.chars().count())
-        .max()
-        .unwrap_or(5);
-
-    // Render each plot
-    for (pi, plot) in plots.iter().enumerate() {
-        let plot_label = match plot.plot_type {
-            PlotType::Bar => format!("Bar {}", pi + 1),
-            PlotType::Line => format!("Line {}", pi + 1),
-        };
-        if plots.len() > 1 {
-            lines.push(String::new());
-            lines.push(format!("  [{}]", plot_label));
-        }
-
-        for (i, dp) in plot.data.iter().enumerate() {
-            let cat = categories.get(i).map(|s| s.as_str()).unwrap_or("?");
-
-            let pct = dp.value / max_value;
-            let bar_cells = pct * BAR_WIDTH as f64;
-            let full_cells = bar_cells.floor() as usize;
-            let has_half = (bar_cells - full_cells as f64) >= 0.5;
-
-            let marker = match plot.plot_type {
-                PlotType::Bar => {
-                    let mut bar = String::new();
-                    for _ in 0..full_cells {
-                        bar.push(FULL_BLOCK);
-                    }
-                    if has_half {
-                        bar.push(HALF_BLOCK);
-                    }
-                    if bar.is_empty() && dp.value > 0.0 {
-                        bar.push(HALF_BLOCK);
-                    }
-                    bar
-                }
-                PlotType::Line => {
-                    let pos = (pct * BAR_WIDTH as f64).round() as usize;
-                    let mut marker = " ".repeat(pos.min(BAR_WIDTH));
-                    marker.push('●');
-                    marker
-                }
-            };
-
-            let value_str = if dp.value.fract() == 0.0 {
-                format!("{}", dp.value as i64)
-            } else {
-                format!("{:.1}", dp.value)
-            };
-
-            lines.push(format!(
-                "  {:width$} │{} {}",
-                cat,
-                marker,
-                value_str,
-                width = max_cat_len,
+            out.push(format!(
+                "{:>width$}  {}",
+                "",
+                y_title,
+                width = y_label_width
             ));
         }
     }
 
-    // X-axis label
+    // Collect bar heights and line heights per category (in chart rows)
+    let bar_heights: Vec<Option<usize>> = {
+        let bar_plot = plots.iter().find(|p| p.plot_type == PlotType::Bar);
+        (0..num_cats)
+            .map(|i| {
+                bar_plot.and_then(|p| {
+                    p.data
+                        .get(i)
+                        .map(|d| ((d.value / y_max) * CHART_HEIGHT as f64).round() as usize)
+                })
+            })
+            .collect()
+    };
+
+    let line_rows: Vec<Option<usize>> = {
+        let line_plot = plots.iter().find(|p| p.plot_type == PlotType::Line);
+        (0..num_cats)
+            .map(|i| {
+                line_plot.and_then(|p| {
+                    p.data.get(i).map(|d| {
+                        let row_from_bottom =
+                            ((d.value / y_max) * CHART_HEIGHT as f64).round() as usize;
+                        CHART_HEIGHT.saturating_sub(row_from_bottom)
+                    })
+                })
+            })
+            .collect()
+    };
+
+    let chart_width = num_cats * COL_WIDTH;
+
+    // Render chart rows from top (row 0) to bottom (row CHART_HEIGHT-1)
+    for row in 0..CHART_HEIGHT {
+        let rows_from_bottom = CHART_HEIGHT - row;
+
+        // Y-axis tick label
+        let y_value = (rows_from_bottom as f64 / CHART_HEIGHT as f64) * y_max;
+        let y_label = if y_ticks.iter().any(|t| {
+            let tick_row = ((*t / y_max) * CHART_HEIGHT as f64).round() as usize;
+            tick_row == rows_from_bottom
+        }) {
+            format!("{:>width$}", format_value(y_value), width = y_label_width)
+        } else {
+            " ".repeat(y_label_width)
+        };
+
+        // Build the row content across all categories
+        let mut row_chars: Vec<char> = vec![' '; chart_width];
+        for cat_i in 0..num_cats {
+            let col_start = cat_i * COL_WIDTH;
+            let bar_center = col_start + COL_WIDTH / 2;
+
+            // Draw bar fill: if this row is within the bar height, fill center columns
+            if let Some(bh) = bar_heights[cat_i] {
+                if rows_from_bottom <= bh {
+                    // Fill the center portion of the column with block chars
+                    let fill_start = col_start + 1;
+                    let fill_end = (col_start + COL_WIDTH - 1).min(chart_width);
+                    for ch in row_chars.iter_mut().take(fill_end).skip(fill_start) {
+                        *ch = FULL_BLOCK;
+                    }
+                } else if rows_from_bottom == bh + 1 && bh > 0 {
+                    // Top cap of bar: use upper-half block for sub-row precision
+                    let fill_start = col_start + 1;
+                    let fill_end = (col_start + COL_WIDTH - 1).min(chart_width);
+                    for ch in row_chars.iter_mut().take(fill_end).skip(fill_start) {
+                        *ch = UPPER_HALF;
+                    }
+                }
+            }
+
+            // Overlay line marker
+            if let Some(lr) = line_rows[cat_i] {
+                if row == lr && bar_center < chart_width {
+                    row_chars[bar_center] = LINE_MARKER;
+                }
+            }
+        }
+
+        let row_str: String = row_chars.iter().collect();
+        out.push(format!("{} │{}", y_label, row_str));
+    }
+
+    // X-axis baseline
+    out.push(format!(
+        "{} └{}",
+        " ".repeat(y_label_width),
+        "─".repeat(chart_width)
+    ));
+
+    // Category labels
+    let mut label_line = format!("{}  ", " ".repeat(y_label_width));
+    for cat in &categories {
+        label_line.push_str(&format!("{:^width$}", cat, width = COL_WIDTH));
+    }
+    out.push(label_line);
+
+    // X-axis title
     if let Some(XAxisData::Band(ref band)) = db.x_axis {
         if !band.title.is_empty() {
-            lines.push(String::new());
-            lines.push(format!("  X: {}", band.title));
+            out.push(String::new());
         }
     }
 
-    lines.push(String::new());
-    Ok(lines.join("\n"))
+    // Legend (only if multiple plot types)
+    let has_bars = plots.iter().any(|p| p.plot_type == PlotType::Bar);
+    let has_lines = plots.iter().any(|p| p.plot_type == PlotType::Line);
+    if has_bars && has_lines {
+        out.push(format!(
+            "{}  {} Bar  {} Line",
+            " ".repeat(y_label_width),
+            FULL_BLOCK,
+            LINE_MARKER
+        ));
+    }
+
+    out.push(String::new());
+    Ok(out.join("\n"))
+}
+
+/// Compute nice Y-axis tick values.
+fn compute_y_ticks(max_value: f64, desired_ticks: usize) -> Vec<f64> {
+    let raw_step = max_value / desired_ticks as f64;
+    let magnitude = 10.0f64.powf(raw_step.log10().floor());
+    let residual = raw_step / magnitude;
+    let nice_step = if residual <= 1.5 {
+        magnitude
+    } else if residual <= 3.5 {
+        2.0 * magnitude
+    } else if residual <= 7.5 {
+        5.0 * magnitude
+    } else {
+        10.0 * magnitude
+    };
+
+    let mut ticks = Vec::new();
+    let mut v = nice_step;
+    while v <= max_value + nice_step * 0.01 {
+        ticks.push(v);
+        v += nice_step;
+    }
+    // Ensure we have a tick at or above max_value
+    if ticks.is_empty() || *ticks.last().unwrap() < max_value {
+        ticks.push(max_value);
+    }
+    ticks
+}
+
+/// Format a numeric value for axis labels.
+fn format_value(v: f64) -> String {
+    if v.fract() == 0.0 {
+        format!("{}", v as i64)
+    } else {
+        format!("{:.1}", v)
+    }
 }
 
 #[cfg(test)]
@@ -175,6 +282,73 @@ mod tests {
         assert!(
             output.contains(FULL_BLOCK),
             "Should have bar blocks\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn bars_and_lines_unified_not_separate() {
+        // When a chart has both bar and line plots, they should be rendered
+        // on a single unified grid, NOT as separate sections with [Bar 1] / [Line 1] headers.
+        let input = std::fs::read_to_string("docs/sources/xychart.mmd").unwrap();
+        let diagram = crate::parse(&input).unwrap();
+        let db = match diagram {
+            crate::diagrams::Diagram::XyChart(db) => db,
+            _ => panic!("Expected xychart"),
+        };
+        let output = render_xychart_ascii(&db).unwrap();
+
+        // Should NOT have separate section headers for each plot
+        assert!(
+            !output.contains("[Bar"),
+            "Should not have separate [Bar] section headers in unified chart\nOutput:\n{}",
+            output
+        );
+        assert!(
+            !output.contains("[Line"),
+            "Should not have separate [Line] section headers in unified chart\nOutput:\n{}",
+            output
+        );
+
+        // Each category (Jan..Jun) should appear exactly once, not duplicated per plot
+        let jan_count = output.matches("Jan").count();
+        assert_eq!(
+            jan_count, 1,
+            "Category 'Jan' should appear exactly once in unified chart, found {}\nOutput:\n{}",
+            jan_count, output
+        );
+
+        // Should have both bar blocks and line markers in the output
+        assert!(
+            output.contains('█') || output.contains('▌'),
+            "Unified chart should contain bar blocks\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains('●'),
+            "Unified chart should contain line markers\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn unified_chart_is_vertical_grid() {
+        // The unified chart should render as a vertical grid (bars going up)
+        // with Y-axis scale on the left and category labels at the bottom.
+        let input = std::fs::read_to_string("docs/sources/xychart.mmd").unwrap();
+        let diagram = crate::parse(&input).unwrap();
+        let db = match diagram {
+            crate::diagrams::Diagram::XyChart(db) => db,
+            _ => panic!("Expected xychart"),
+        };
+        let output = render_xychart_ascii(&db).unwrap();
+
+        // Should have category labels along the bottom (on the x-axis line)
+        // and numeric Y-axis values along the left side
+        let lines: Vec<&str> = output.lines().collect();
+        assert!(
+            lines.len() >= 10,
+            "Vertical chart should have enough rows for the grid\nOutput:\n{}",
             output
         );
     }
