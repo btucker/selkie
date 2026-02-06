@@ -32,7 +32,9 @@ use crate::diagrams::class::ClassDb;
 use crate::diagrams::er::ErDb;
 use crate::diagrams::flowchart::FlowchartDb;
 use crate::error::Result;
-use crate::layout::LayoutGraph;
+use crate::layout::{LayoutGraph, ToLayoutGraph};
+
+use shapes::RenderedShape;
 
 pub use sequence::render_sequence_ascii;
 
@@ -665,14 +667,84 @@ fn clean_html_label(raw: &str) -> String {
     cleaned.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
+/// Pre-render a class node to its ASCII box, returning the `RenderedShape`.
+fn render_class_node(db: &ClassDb, node_id: &str, label: &str) -> RenderedShape {
+    if let Some(cn) = db.classes.get(node_id) {
+        let annotations: Vec<&str> = cn.annotations.iter().map(|a| a.as_str()).collect();
+        let members: Vec<String> = cn
+            .members
+            .iter()
+            .map(|m| m.get_display_details().display_text)
+            .collect();
+        let methods: Vec<String> = cn
+            .methods
+            .iter()
+            .map(|m| m.get_display_details().display_text)
+            .collect();
+        // Pass cell_w=0, cell_h=0 so the box sizes itself purely from content
+        render_class_box(
+            label,
+            &annotations,
+            &members.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+            &methods.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+            0,
+            0,
+        )
+    } else {
+        // Fallback for nodes not in the ClassDb (shouldn't happen, but safe)
+        render_shape(
+            &crate::layout::NodeShape::Rectangle,
+            label,
+            label.chars().count() + 4,
+            3,
+        )
+    }
+}
+
 /// Render a class diagram as character art.
 ///
 /// Each class becomes a multi-section box with optional annotations,
 /// a class name header, attributes, and methods separated by horizontal
 /// dividers (├─┤). Relations are rendered as braille edges with arrow tips.
-pub fn render_class_ascii(db: &ClassDb, graph: &LayoutGraph) -> Result<String> {
+///
+/// This function re-computes layout internally using the actual ASCII cell
+/// dimensions of each class box, ensuring that dagre positions nodes with
+/// correct sizes so boxes never overlap.
+pub fn render_class_ascii(db: &ClassDb, _graph: &LayoutGraph) -> Result<String> {
     let scale = CellScale::default();
 
+    // Phase 1: Pre-render every class box to learn its actual cell dimensions.
+    let mut rendered_shapes: HashMap<String, RenderedShape> = HashMap::new();
+    for (id, class) in &db.classes {
+        let label = if !class.label.is_empty() {
+            &class.label
+        } else {
+            &class.id
+        };
+        rendered_shapes.insert(id.clone(), render_class_node(db, id, label));
+    }
+
+    // Phase 2: Build a new layout graph with node sizes matching the actual
+    // ASCII cell dimensions (converted back to pixel-space for dagre).
+    let estimator = crate::layout::CharacterSizeEstimator::default();
+    let mut layout_graph = db.to_layout_graph(&estimator)?;
+
+    for node in &mut layout_graph.nodes {
+        if let Some(shape) = rendered_shapes.get(&node.id) {
+            // Convert cell dimensions to pixel-space so dagre allocates
+            // exactly the right amount of room.
+            node.width = shape.width as f64 * scale.cell_width;
+            node.height = shape.height as f64 * scale.cell_height;
+        }
+    }
+
+    // Increase spacing for ASCII clarity (wider gaps between boxes).
+    layout_graph.options.node_spacing = 80.0;
+    layout_graph.options.layer_spacing = 48.0;
+
+    let graph = crate::layout::layout(layout_graph)?;
+
+    // Phase 3: Render onto canvas using the corrected layout positions.
     let graph_width = graph.width.unwrap_or(400.0);
     let graph_height = graph.height.unwrap_or(300.0);
     let offset_x = graph.bounds_x.unwrap_or(0.0);
@@ -684,7 +756,6 @@ pub fn render_class_ascii(db: &ClassDb, graph: &LayoutGraph) -> Result<String> {
     let mut canvas: Vec<Vec<char>> = vec![vec![' '; canvas_cols]; canvas_rows];
     let mut occupied: Vec<Vec<bool>> = vec![vec![false; canvas_cols]; canvas_rows];
 
-    // Render each class node
     for node in &graph.nodes {
         if node.is_dummy {
             continue;
@@ -695,49 +766,19 @@ pub fn render_class_ascii(db: &ClassDb, graph: &LayoutGraph) -> Result<String> {
             _ => continue,
         };
 
-        // Look up the ClassNode for sections
-        let class_node = db.classes.get(&node.id);
-
-        let label = class_node
-            .map(|c| {
-                if !c.label.is_empty() {
-                    c.label.as_str()
-                } else {
-                    c.id.as_str()
-                }
-            })
-            .or(node.label.as_deref())
-            .unwrap_or(&node.id);
-
-        let cell_w = scale.to_cell_width(node.width);
-        let cell_h = scale.to_cell_height(node.height);
-
-        let rendered = if let Some(cn) = class_node {
-            let annotations: Vec<&str> = cn.annotations.iter().map(|a| a.as_str()).collect();
-            let members: Vec<String> = cn
-                .members
-                .iter()
-                .map(|m| m.get_display_details().display_text)
-                .collect();
-            let methods: Vec<String> = cn
-                .methods
-                .iter()
-                .map(|m| m.get_display_details().display_text)
-                .collect();
-            render_class_box(
-                label,
-                &annotations,
-                &members.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
-                &methods.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
-                cell_w,
-                cell_h,
-            )
+        // Use the pre-rendered shape (already correctly sized).
+        let rendered = if let Some(shape) = rendered_shapes.get(&node.id) {
+            shape.clone()
         } else {
+            // Fallback for nodes not in the pre-render map
+            let label = node.label.as_deref().unwrap_or(&node.id);
+            let cell_w = scale.to_cell_width(node.width);
+            let cell_h = scale.to_cell_height(node.height);
             render_shape(&node.shape, label, cell_w, cell_h)
         };
 
-        // Position: node x,y is top-left (dagre center coords are converted
-        // to top-left in apply_results_recursive)
+        // node.x/y are top-left coordinates (dagre center coords converted
+        // by apply_results_recursive), so use them directly as cell start.
         let col_start = scale.to_col(nx);
         let row_start = scale.to_row(ny);
 
@@ -761,7 +802,7 @@ pub fn render_class_ascii(db: &ClassDb, graph: &LayoutGraph) -> Result<String> {
 
     // Render edges (braille lines + arrows + labels)
     edges::render_edges(
-        graph,
+        &graph,
         &scale,
         canvas_cols,
         canvas_rows,
@@ -1553,6 +1594,77 @@ mod tests {
                 ascii_out.labels
             );
         }
+    }
+
+    /// Check that a horizontal box-drawing span (┌→┐, ├→┤, └→┘) is properly
+    /// closed before another box's border character appears.
+    fn assert_no_box_overlap(output: &str) {
+        let left_chars = ['┌', '├', '└'];
+        let right_chars = ['┐', '┤', '┘'];
+        let lines: Vec<&str> = output.lines().collect();
+        for (row_idx, line) in lines.iter().enumerate() {
+            let chars: Vec<char> = line.chars().collect();
+            // Find all left-border positions (starts of box horizontal spans)
+            let lefts: Vec<(usize, char)> = chars
+                .iter()
+                .enumerate()
+                .filter(|(_, &c)| left_chars.contains(&c))
+                .map(|(i, &c)| (i, c))
+                .collect();
+            for &(col, lc) in &lefts {
+                // Expected matching right border
+                let expected_right = match lc {
+                    '┌' => '┐',
+                    '├' => '┤',
+                    '└' => '┘',
+                    _ => unreachable!(),
+                };
+                let rest = &chars[col + 1..];
+                let mut found_match = false;
+                for (j, &c) in rest.iter().enumerate() {
+                    if c == expected_right {
+                        found_match = true;
+                        break;
+                    }
+                    // Any other box border character before the expected match = overlap
+                    if left_chars.contains(&c) || right_chars.contains(&c) {
+                        panic!(
+                            "Box overlap at row {}: '{}' at col {} found '{}' at col {} before matching '{}'\nLine: {}",
+                            row_idx,
+                            lc,
+                            col,
+                            c,
+                            col + 1 + j,
+                            expected_right,
+                            line
+                        );
+                    }
+                }
+                assert!(
+                    found_match,
+                    "Unclosed box border '{}' at row {}, col {}\nLine: {}",
+                    lc, row_idx, col, line
+                );
+            }
+        }
+    }
+
+    /// Verify that class boxes do not overlap each other in the ASCII output.
+    #[test]
+    fn class_boxes_do_not_overlap() {
+        let input = std::fs::read_to_string("docs/sources/class.mmd").unwrap();
+        let (db, graph) = parse_and_layout_class(&input);
+        let output = render_class_ascii(&db, &graph).unwrap();
+        assert_no_box_overlap(&output);
+    }
+
+    /// Verify that class_complex.mmd renders without box overlap.
+    #[test]
+    fn class_complex_boxes_do_not_overlap() {
+        let input = std::fs::read_to_string("docs/sources/class_complex.mmd").unwrap();
+        let (db, graph) = parse_and_layout_class(&input);
+        let output = render_class_ascii(&db, &graph).unwrap();
+        assert_no_box_overlap(&output);
     }
 
     #[test]
