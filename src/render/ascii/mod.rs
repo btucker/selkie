@@ -345,8 +345,10 @@ fn render_ascii_impl(
         .map(|n| n.id.as_str())
         .collect();
 
-    // Render container nodes first (background layer — just a label).
-    // Collect positions so we can re-stamp them after regular nodes (pass 2).
+    // Render container nodes first (background layer — boundary box + label).
+    // Subgraphs get a dashed-style boundary (┏┓┗┛┃╌) to distinguish them
+    // from regular node boxes (┌┐└┘│─).
+    // Collect label positions so we can re-stamp them after regular nodes (pass 2).
     struct SubgraphLabel {
         row: usize,
         col_start: usize,
@@ -366,25 +368,109 @@ fn render_ascii_impl(
 
         let label = label_fn(node);
 
-        // For subgraphs, render label at top-center of the bounding box
-        let col_center = scale.to_col(nx + node.width / 2.0);
+        // Compute bounding box in cell coordinates (node x,y is top-left)
+        let col_left = scale.to_col(nx);
+        let col_right = scale.to_col(nx + node.width);
         let row_top = scale.to_row(ny);
+        let row_bottom = scale.to_row(ny + node.height);
+
+        // Ensure minimum size
+        let col_right = col_right.max(col_left + label.chars().count() + 4);
+        let row_bottom = row_bottom.max(row_top + 2);
+
+        // Draw boundary box using dashed-style characters
+        // Top border: ┏╌╌ label ╌╌┓
         let label_char_count = label.chars().count();
-        let label_start = col_center.saturating_sub(label_char_count / 2);
+        let border_width = col_right.saturating_sub(col_left + 1);
+        let label_offset = border_width.saturating_sub(label_char_count + 2) / 2;
+        let label_start = col_left + 1 + label_offset;
 
         if row_top < canvas_rows {
+            // Top-left corner
+            if col_left < canvas_cols {
+                canvas[row_top][col_left] = '┏';
+            }
+            // Top-right corner
+            if col_right < canvas_cols {
+                canvas[row_top][col_right] = '┓';
+            }
+            // Top horizontal dashes
+            for cell in canvas[row_top]
+                .iter_mut()
+                .take(col_right.min(canvas_cols))
+                .skip(col_left + 1)
+            {
+                *cell = '╌';
+            }
+            // Overlay label centered in top border
+            // Space before label
+            if label_start > 0 && label_start < canvas_cols {
+                canvas[row_top][label_start] = ' ';
+            }
             for (i, ch) in label.chars().enumerate() {
-                let c = label_start + i;
+                let c = label_start + 1 + i;
                 if c < canvas_cols {
                     canvas[row_top][c] = ch;
-                    occupied[row_top][c] = true;
                 }
+            }
+            // Space after label
+            let after_label = label_start + 1 + label_char_count;
+            if after_label < canvas_cols {
+                canvas[row_top][after_label] = ' ';
+            }
+            // Mark top border row (label area) as occupied to protect from edges
+            for cell in occupied[row_top]
+                .iter_mut()
+                .take(col_right.min(canvas_cols.saturating_sub(1)) + 1)
+                .skip(col_left)
+            {
+                *cell = true;
+            }
+        }
+
+        // Bottom border: ┗╌╌╌╌╌╌╌╌╌┛
+        if row_bottom < canvas_rows {
+            if col_left < canvas_cols {
+                canvas[row_bottom][col_left] = '┗';
+            }
+            if col_right < canvas_cols {
+                canvas[row_bottom][col_right] = '┛';
+            }
+            for cell in canvas[row_bottom]
+                .iter_mut()
+                .take(col_right.min(canvas_cols))
+                .skip(col_left + 1)
+            {
+                *cell = '╌';
+            }
+            // Mark bottom border as occupied
+            for cell in occupied[row_bottom]
+                .iter_mut()
+                .take(col_right.min(canvas_cols.saturating_sub(1)) + 1)
+                .skip(col_left)
+            {
+                *cell = true;
+            }
+        }
+
+        // Side borders: ┃ on left and right
+        // Not marked as occupied — regular nodes can overwrite them
+        for row in canvas
+            .iter_mut()
+            .take(row_bottom.min(canvas_rows))
+            .skip(row_top + 1)
+        {
+            if col_left < canvas_cols {
+                row[col_left] = '┃';
+            }
+            if col_right < canvas_cols {
+                row[col_right] = '┃';
             }
         }
 
         subgraph_labels.push(SubgraphLabel {
             row: row_top,
-            col_start: label_start,
+            col_start: label_start + 1,
             label,
         });
     }
@@ -446,7 +532,12 @@ fn render_ascii_impl(
                 if canvas_col >= canvas_cols {
                     break;
                 }
-                if ch != ' ' {
+                // Overwrite if non-space, OR if existing cell is a subgraph side
+                // border ┃ (so node boxes cleanly cover boundary lines).
+                // Do NOT clear horizontal border ╌ with spaces — those are the
+                // top/bottom borders of subgraph boundaries and should persist.
+                let existing = canvas[canvas_row][canvas_col];
+                if ch != ' ' || existing == '┃' {
                     canvas[canvas_row][canvas_col] = ch;
                 }
             }
@@ -781,6 +872,96 @@ mod tests {
         assert!(
             output.contains("My Group"),
             "Subgraph label must be visible\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn subgraph_has_boundary_box() {
+        let (db, graph) = parse_and_layout(
+            "flowchart TD\n    subgraph sg[My Group]\n        A[NodeA]\n        B[NodeB]\n    end",
+        );
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
+
+        // Subgraph must have box-drawing boundary characters
+        // The boundary uses dashed lines: ┏ ┓ ┗ ┛ ┃ ╌
+        assert!(
+            output.contains('┏') || output.contains('┌'),
+            "Subgraph boundary must have top-left corner\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains('┛') || output.contains('┘'),
+            "Subgraph boundary must have bottom-right corner\nOutput:\n{}",
+            output
+        );
+
+        // The label should still be visible
+        assert!(
+            output.contains("My Group"),
+            "Subgraph label must be visible\nOutput:\n{}",
+            output
+        );
+
+        // Child nodes must be inside the boundary
+        assert!(
+            output.contains("NodeA"),
+            "NodeA must be visible inside boundary\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("NodeB"),
+            "NodeB must be visible inside boundary\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn complex_flowchart_has_subgraph_boundaries() {
+        let (db, graph) = parse_and_layout(
+            &std::fs::read_to_string("docs/sources/flowchart_complex.mmd").unwrap(),
+        );
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
+
+        // All four subgraphs should have boundary boxes
+        for label in &[
+            "Frontend Layer",
+            "API Gateway",
+            "Microservices",
+            "Data Layer",
+        ] {
+            assert!(
+                output.contains(label),
+                "Subgraph label '{}' must be visible\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+
+        // All Microservices nodes must be present
+        for label in &[
+            "User Service",
+            "Order Service",
+            "Payment Service",
+            "Notification Service",
+        ] {
+            assert!(
+                output.contains(label),
+                "Node '{}' must be visible\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+
+        // Subgraph boundaries must exist (dashed box characters)
+        let boundary_chars = output
+            .chars()
+            .filter(|c| matches!(c, '┏' | '┓' | '┗' | '┛'))
+            .count();
+        assert!(
+            boundary_chars >= 8, // At least 4 subgraphs × 2 corners visible
+            "Expected at least 8 subgraph boundary corners, found {}\nOutput:\n{}",
+            boundary_chars,
             output
         );
     }
