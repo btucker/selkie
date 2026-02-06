@@ -96,13 +96,12 @@ pub fn render_er_ascii(db: &ErDb, graph: &LayoutGraph) -> Result<String> {
         let entity_name = id_to_name.get(node.id.as_str()).copied();
         let entity = entity_name.and_then(|n| entities.get(n));
 
-        // Calculate cell position (center-based)
+        // Calculate cell position (top-left based: dagre center coords are
+        // converted to top-left in apply_results_recursive)
         let cell_w = scale.to_cell_width(node.width);
         let cell_h = scale.to_cell_height(node.height);
-        let col_center = scale.to_col(nx);
-        let row_center = scale.to_row(ny);
-        let col_start = col_center.saturating_sub(cell_w / 2);
-        let row_start = row_center.saturating_sub(cell_h / 2);
+        let col_start = scale.to_col(nx);
+        let row_start = scale.to_row(ny);
 
         // Get display name
         let display_name = entity
@@ -517,9 +516,10 @@ fn render_ascii_impl(
 
         let rendered = render_shape(&node.shape, &label, cell_w, cell_h);
 
-        // Position: node x,y is center, so offset by half the rendered size
-        let col_start = scale.to_col(nx).saturating_sub(rendered.width / 2);
-        let row_start = scale.to_row(ny).saturating_sub(rendered.height / 2);
+        // Position: node x,y is top-left (dagre center coords are converted
+        // to top-left in apply_results_recursive)
+        let col_start = scale.to_col(nx);
+        let row_start = scale.to_row(ny);
 
         // Pass 1: Blit shape (borders can overwrite each other)
         for (r, line) in rendered.lines.iter().enumerate() {
@@ -736,8 +736,10 @@ pub fn render_class_ascii(db: &ClassDb, graph: &LayoutGraph) -> Result<String> {
             render_shape(&node.shape, label, cell_w, cell_h)
         };
 
-        let col_start = scale.to_col(nx).saturating_sub(rendered.width / 2);
-        let row_start = scale.to_row(ny).saturating_sub(rendered.height / 2);
+        // Position: node x,y is top-left (dagre center coords are converted
+        // to top-left in apply_results_recursive)
+        let col_start = scale.to_col(nx);
+        let row_start = scale.to_row(ny);
 
         for (r, line) in rendered.lines.iter().enumerate() {
             let canvas_row = row_start + r;
@@ -1568,6 +1570,123 @@ mod tests {
         assert!(
             has_braille || has_arrow,
             "Edges should produce braille dots or arrows"
+        );
+    }
+
+    // --- Requirement diagram ASCII tests ---
+
+    fn parse_and_layout_requirement(input: &str) -> crate::layout::LayoutGraph {
+        let diagram = crate::parse(input).unwrap();
+        let db = match &diagram {
+            crate::diagrams::Diagram::Requirement(db) => db,
+            _ => panic!("Expected requirement diagram"),
+        };
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+        crate::layout::layout(graph).unwrap()
+    }
+
+    #[test]
+    fn requirement_ascii_boxes_dont_overlap() {
+        let input = std::fs::read_to_string("docs/sources/requirement.mmd").unwrap();
+        let graph = parse_and_layout_requirement(&input);
+        let output = render_graph_ascii(&graph).unwrap();
+
+        // No line should have a box corner character immediately starting another box
+        // This pattern indicates overlapping boxes
+        for (i, line) in output.lines().enumerate() {
+            // Check for overlapping top-left corners: ┌───...┌
+            let chars: Vec<char> = line.chars().collect();
+            let mut corner_positions: Vec<usize> = Vec::new();
+            for (j, &ch) in chars.iter().enumerate() {
+                if ch == '┌' || ch == '└' {
+                    corner_positions.push(j);
+                }
+            }
+            // Two box-drawing corners should not be within a line without a closing corner between them
+            if corner_positions.len() >= 2 {
+                for window in corner_positions.windows(2) {
+                    let between = &chars[window[0]..=window[1]];
+                    let has_closing = between.iter().any(|&c| c == '┐' || c == '┘');
+                    assert!(
+                        has_closing,
+                        "Boxes overlap on line {}: two corners at positions {} and {} without closing corner between\nLine: {}\nFull output:\n{}",
+                        i, window[0], window[1], line, output
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn requirement_ascii_edge_labels_not_truncated() {
+        let input = std::fs::read_to_string("docs/sources/requirement.mmd").unwrap();
+        let graph = parse_and_layout_requirement(&input);
+        let output = render_graph_ascii(&graph).unwrap();
+
+        // All relationship labels should appear in full
+        assert!(
+            output.contains("<<contains>>"),
+            "Edge label '<<contains>>' should not be truncated\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("<<verifies>>"),
+            "Edge label '<<verifies>>' should not be truncated\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("<<satisfies>>"),
+            "Edge label '<<satisfies>>' should not be truncated\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn requirement_complex_ascii_boxes_dont_overlap() {
+        let input = std::fs::read_to_string("docs/sources/requirement_complex.mmd").unwrap();
+        let graph = parse_and_layout_requirement(&input);
+        let output = render_graph_ascii(&graph).unwrap();
+
+        // No line should have overlapping box corners
+        for (i, line) in output.lines().enumerate() {
+            let chars: Vec<char> = line.chars().collect();
+            let mut corner_positions: Vec<usize> = Vec::new();
+            for (j, &ch) in chars.iter().enumerate() {
+                if ch == '┌' || ch == '└' {
+                    corner_positions.push(j);
+                }
+            }
+            if corner_positions.len() >= 2 {
+                for window in corner_positions.windows(2) {
+                    let between = &chars[window[0]..=window[1]];
+                    let has_closing = between.iter().any(|&c| c == '┐' || c == '┘');
+                    assert!(
+                        has_closing,
+                        "Boxes overlap on line {}: corners at {} and {} without closing between\nLine: {}\nFull output:\n{}",
+                        i, window[0], window[1], line, output
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn requirement_complex_ascii_edge_labels_not_truncated() {
+        let input = std::fs::read_to_string("docs/sources/requirement_complex.mmd").unwrap();
+        let graph = parse_and_layout_requirement(&input);
+        let output = render_graph_ascii(&graph).unwrap();
+
+        // Key relationship labels should appear in full
+        assert!(
+            output.contains("<<contains>>"),
+            "Edge label '<<contains>>' should not be truncated\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("<<verifies>>"),
+            "Edge label '<<verifies>>' should not be truncated\nOutput:\n{}",
+            output
         );
     }
 }
