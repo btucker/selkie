@@ -267,6 +267,19 @@ impl BlockDb {
     pub fn get_columns(&self) -> Option<usize> {
         self.root_block.columns
     }
+
+    /// Get child block IDs for a given parent, in insertion order
+    pub fn get_children(&self, parent_id: &str) -> Vec<&str> {
+        self.block_order
+            .iter()
+            .filter(|id| {
+                self.blocks
+                    .get(id.as_str())
+                    .is_some_and(|b| b.parent_id.as_deref() == Some(parent_id))
+            })
+            .map(|s| s.as_str())
+            .collect()
+    }
 }
 
 #[cfg(test)]
