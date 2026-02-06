@@ -376,13 +376,13 @@ pub fn check_er_ascii_structure(
         }
     }
 
-    // Check relationship labels
+    // Check relationship labels are present and not truncated
     for rel in db.get_relationships() {
         if !rel.role_a.is_empty() && !ascii.raw_output.contains(&rel.role_a) {
-            issues.push(Issue::warning(
+            issues.push(Issue::error(
                 "er_ascii_missing_rel_label",
                 format!(
-                    "ER ASCII output missing relationship label: '{}'",
+                    "ER ASCII output missing relationship label: '{}' (may be truncated by overlap with entity box)",
                     rel.role_a
                 ),
             ));

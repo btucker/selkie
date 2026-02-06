@@ -1514,6 +1514,71 @@ mod tests {
         }
     }
 
+    #[test]
+    fn er_ascii_relationship_labels_not_truncated() {
+        let input = r#"erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    PRODUCT ||--o{ LINE-ITEM : includes
+    CUSTOMER {
+        string name
+        string email PK
+        string address
+    }
+    ORDER {
+        int orderNumber PK
+        date orderDate
+        string status
+    }
+    PRODUCT {
+        int id PK
+        string name
+        float price
+    }
+"#;
+        let (db, graph) = parse_er_and_layout(input);
+        let output = render_er_ascii(&db, &graph).unwrap();
+        // Relationship labels must appear in full, not truncated
+        assert!(
+            output.contains("places"),
+            "Relationship label 'places' should appear in full\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("contains"),
+            "Relationship label 'contains' should appear in full (not truncated to 'conta')\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("includes"),
+            "Relationship label 'includes' should appear in full\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn er_ascii_complex_relationship_labels_not_truncated() {
+        let input = std::fs::read_to_string("docs/sources/er_complex.mmd").unwrap();
+        let (db, graph) = parse_er_and_layout(&input);
+        let output = render_er_ascii(&db, &graph).unwrap();
+        for label in &[
+            "places",
+            "contains",
+            "references",
+            "belongs_to",
+            "has",
+            "ships_to",
+            "paid_by",
+        ] {
+            assert!(
+                output.contains(label),
+                "Relationship label '{}' should appear in full\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+    }
+
     // --- Class diagram specialized ASCII tests ---
 
     fn parse_and_layout_class(input: &str) -> (ClassDb, LayoutGraph) {

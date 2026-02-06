@@ -276,6 +276,10 @@ fn find_clear_label_position(
         }
     }
 
+<<<<<<< HEAD
+=======
+    // No clear position found — skip this label rather than overwrite boxes
+>>>>>>> 5f6ad01d (fix(ascii): prevent ER relationship label truncation)
     None
 }
 
