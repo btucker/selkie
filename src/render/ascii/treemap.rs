@@ -524,7 +524,9 @@ mod tests {
         let input = std::fs::read_to_string("docs/sources/treemap.mmd").unwrap();
         let db = parse_treemap(&input);
         let output = render_treemap_ascii(&db).unwrap();
-        let reference = std::fs::read_to_string("docs/images/ascii/treemap.txt").unwrap();
+        let reference = std::fs::read_to_string("docs/images/ascii/treemap.txt")
+            .unwrap()
+            .replace("\r\n", "\n");
         assert_eq!(
             output, reference,
             "Treemap ASCII output differs from reference file.\n\
@@ -538,7 +540,9 @@ mod tests {
         let input = std::fs::read_to_string("docs/sources/treemap_complex.mmd").unwrap();
         let db = parse_treemap(&input);
         let output = render_treemap_ascii(&db).unwrap();
-        let reference = std::fs::read_to_string("docs/images/ascii/treemap_complex.txt").unwrap();
+        let reference = std::fs::read_to_string("docs/images/ascii/treemap_complex.txt")
+            .unwrap()
+            .replace("\r\n", "\n");
         assert_eq!(
             output, reference,
             "Complex treemap ASCII output differs from reference file.\n\
