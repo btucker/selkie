@@ -128,7 +128,7 @@ marker path {
       <circle cx="0" cy="0" r="186" class="pieOuterCircle"/>
       <path d="M0.000,-185.000A185,185,0,1,1,-108.740,-149.668L0,0Z" class="pieCircle" fill="#ececff"/>
       <path d="M-108.740,-149.668A185,185,0,0,1,-0.000,-185.000L0,0Z" class="pieCircle" fill="#ffffde"/>
-      <text x="0" y="0" class="slice" style="text-anchor: middle;" transform="translate(42.876,131.959)">90%</text>
+      <text x="0" y="0" class="slice" transform="translate(42.876,131.959)" style="text-anchor: middle;">90%</text>
       <text x="0" y="0" class="slice" transform="translate(-42.876,-131.959)" style="text-anchor: middle;">10%</text>
       <text x="0" y="-200" class="pieTitleText">NETFLIX</text>
       <g class="legend" transform="translate(216,-22)">

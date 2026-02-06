@@ -1,27 +1,27 @@
 //! ASCII renderer for pie charts.
 //!
-//! Since circular shapes don't render well in character art, pie charts are
-//! displayed as horizontal bar charts with proportional widths, percentages,
-//! and section labels. This preserves the key information while being readable
-//! in any terminal.
+//! Renders pie charts as circular ASCII art using Unicode block characters
+//! to fill pie slices, with a legend showing labels and percentages.
+//! Uses polar coordinate math (same as the SVG renderer) to determine
+//! slice boundaries.
+
+use std::f64::consts::PI;
 
 use crate::diagrams::pie::PieDb;
 use crate::error::Result;
 
-/// Maximum width for the bar portion of the chart.
-const BAR_WIDTH: usize = 40;
+/// Radius of the pie circle in character cells.
+const PIE_RADIUS: usize = 8;
 
-/// Block characters for filled bars.
-const FULL_BLOCK: char = '█';
-const HALF_BLOCK: char = '▌';
+/// Fill characters for different slices — visually distinct density patterns.
+const SLICE_CHARS: &[char] = &['█', '▓', '▒', '░', '◆', '●', '■', '▲'];
 
-/// Render a pie chart as a horizontal bar chart in character art.
+/// Render a pie chart as a circular ASCII pie with legend.
 pub fn render_pie_ascii(db: &PieDb) -> Result<String> {
     let sections = db.get_sections();
     let show_data = db.get_show_data();
 
     if sections.is_empty() {
-        // Empty chart — just show title if present
         if let Some(title) = db.get_diagram_title() {
             return Ok(format!("{}\n\n(empty pie chart)\n", title));
         }
@@ -41,10 +41,62 @@ pub fn render_pie_ascii(db: &PieDb) -> Result<String> {
     // Title
     if let Some(title) = db.get_diagram_title() {
         lines.push(title.to_string());
-        lines.push("─".repeat(title.chars().count().max(BAR_WIDTH)));
     }
 
-    // Calculate percentages and find longest label for alignment
+    // Build slice angle ranges: each slice spans [start_angle, end_angle)
+    // Start at -π/2 (12 o'clock), sweep clockwise like the SVG renderer.
+    let mut slices: Vec<(f64, f64, usize)> = Vec::new(); // (start, end, index)
+    let mut angle = -PI / 2.0;
+    for (i, (_label, value)) in sections.iter().enumerate() {
+        let sweep = (*value / total) * 2.0 * PI;
+        slices.push((angle, angle + sweep, i));
+        angle += sweep;
+    }
+
+    // Render the circle row by row.
+    // Character cells are taller than wide (~2:1), so we scale x by 2 to
+    // compensate, making the circle appear round in a monospace terminal.
+    let r = PIE_RADIUS as f64;
+    let diameter = PIE_RADIUS * 2 + 1;
+
+    for row in 0..diameter {
+        let dy = row as f64 - r; // vertical offset from center (-r..+r)
+        let mut line = String::new();
+
+        // Add left padding for centering (match legend width roughly)
+        line.push_str("  ");
+
+        for col in 0..(diameter * 2) {
+            let dx = (col as f64 - r * 2.0) / 2.0; // horizontal offset, scaled
+
+            let dist = (dx * dx + dy * dy).sqrt();
+            if dist > r + 0.5 {
+                line.push(' ');
+                continue;
+            }
+
+            // Determine which slice this pixel belongs to
+            let mut theta = dy.atan2(dx);
+            // Normalize to same range as slices (-π/2 .. 3π/2)
+            if theta < -PI / 2.0 {
+                theta += 2.0 * PI;
+            }
+
+            let slice_idx = slices
+                .iter()
+                .find(|(start, end, _)| theta >= *start && theta < *end)
+                .map(|(_, _, idx)| *idx)
+                .unwrap_or(slices.last().map(|(_, _, idx)| *idx).unwrap_or(0));
+
+            let ch = SLICE_CHARS[slice_idx % SLICE_CHARS.len()];
+            line.push(ch);
+        }
+
+        lines.push(line.trim_end().to_string());
+    }
+
+    // Legend
+    lines.push(String::new());
     let entries: Vec<(&str, f64, f64)> = sections
         .iter()
         .map(|(label, value)| {
@@ -53,54 +105,19 @@ pub fn render_pie_ascii(db: &PieDb) -> Result<String> {
         })
         .collect();
 
-    let max_label_len = entries
-        .iter()
-        .map(|(label, value, _)| {
-            if show_data {
-                format_label_with_data(label, *value).chars().count()
-            } else {
-                label.chars().count()
-            }
-        })
-        .max()
-        .unwrap_or(0);
-
-    // Render each section as a bar
-    for (label, value, pct) in &entries {
+    for (i, (label, value, pct)) in entries.iter().enumerate() {
+        let marker = SLICE_CHARS[i % SLICE_CHARS.len()];
         let display_label = if show_data {
             format_label_with_data(label, *value)
         } else {
             label.to_string()
         };
-
-        // Pad label to align bars
-        let padded_label = format!("{:width$}", display_label, width = max_label_len);
-
-        // Calculate bar width proportional to percentage
-        let bar_cells = (*pct / 100.0) * BAR_WIDTH as f64;
-        let full_cells = bar_cells.floor() as usize;
-        let has_half = (bar_cells - full_cells as f64) >= 0.5;
-
-        let mut bar = String::new();
-        for _ in 0..full_cells {
-            bar.push(FULL_BLOCK);
-        }
-        if has_half {
-            bar.push(HALF_BLOCK);
-        }
-
-        // Ensure at least one block for non-zero values
-        if bar.is_empty() && *pct > 0.0 {
-            bar.push(HALF_BLOCK);
-        }
-
-        let pct_str = format!("{:.1}%", pct);
-        lines.push(format!("  {} │{} {}", padded_label, bar, pct_str));
+        lines.push(format!("  {} {}: {:.1}%", marker, display_label, pct));
     }
 
-    // Add a total line
-    lines.push(String::new());
+    // Total line for showData
     if show_data {
+        lines.push(String::new());
         let total_str = if total.fract() == 0.0 {
             format!("{}", total as i64)
         } else {
@@ -187,36 +204,23 @@ mod tests {
     }
 
     #[test]
-    fn bars_are_proportional() {
+    fn slices_are_proportional_in_circle() {
         let db = make_pie(None, &[("Big", 75.0), ("Small", 25.0)], false);
         let output = render_pie_ascii(&db).unwrap();
-        let lines: Vec<&str> = output.lines().collect();
-        // Find the bar lines (contain █)
-        let bar_lines: Vec<&str> = lines
-            .iter()
-            .filter(|l| l.contains(FULL_BLOCK) || l.contains(HALF_BLOCK))
-            .copied()
-            .collect();
-        assert_eq!(
-            bar_lines.len(),
-            2,
-            "Should have 2 bar lines\nOutput:\n{}",
-            output
-        );
 
-        // Count block chars in each bar
-        let count_blocks = |line: &str| -> usize {
-            line.chars()
-                .filter(|&c| c == FULL_BLOCK || c == HALF_BLOCK)
-                .count()
-        };
-        let big_blocks = count_blocks(bar_lines[0]);
-        let small_blocks = count_blocks(bar_lines[1]);
+        // Count fill characters for each slice in the circle body
+        let big_char = SLICE_CHARS[0];
+        let small_char = SLICE_CHARS[1];
+
+        let big_count: usize = output.chars().filter(|&c| c == big_char).count();
+        let small_count: usize = output.chars().filter(|&c| c == small_char).count();
+
         assert!(
-            big_blocks > small_blocks,
-            "Big section ({}) should have more blocks than Small ({})",
-            big_blocks,
-            small_blocks
+            big_count > small_count,
+            "Big slice ({} chars) should have more fill than Small ({} chars)\nOutput:\n{}",
+            big_count,
+            small_count,
+            output
         );
     }
 
@@ -257,18 +261,17 @@ mod tests {
     }
 
     #[test]
-    fn labels_are_aligned() {
+    fn legend_contains_all_labels() {
         let db = make_pie(None, &[("Short", 10.0), ("Much Longer Label", 10.0)], false);
         let output = render_pie_ascii(&db).unwrap();
-        let lines: Vec<&str> = output.lines().collect();
-        let bar_lines: Vec<&str> = lines.iter().filter(|l| l.contains('│')).copied().collect();
-        assert_eq!(bar_lines.len(), 2);
-        // The │ separator should be at the same column position
-        let pipe_pos = |line: &str| line.find('│').unwrap();
-        assert_eq!(
-            pipe_pos(bar_lines[0]),
-            pipe_pos(bar_lines[1]),
-            "Bars should be aligned\nOutput:\n{}",
+        assert!(
+            output.contains("Short"),
+            "Legend should contain Short\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Much Longer Label"),
+            "Legend should contain Much Longer Label\nOutput:\n{}",
             output
         );
     }
@@ -327,16 +330,59 @@ mod tests {
     }
 
     #[test]
-    fn nonzero_section_gets_at_least_one_block() {
-        // A very small section should still show at least one block character
+    fn small_section_appears_in_legend() {
+        // Even a very small section should appear in the legend
         let db = make_pie(None, &[("Huge", 99.0), ("Tiny", 1.0)], false);
         let output = render_pie_ascii(&db).unwrap();
-        let tiny_line = output.lines().find(|l| l.contains("Tiny")).unwrap();
-        let has_block = tiny_line.contains(FULL_BLOCK) || tiny_line.contains(HALF_BLOCK);
         assert!(
-            has_block,
-            "Even 1% should show at least one block\nLine: {}",
-            tiny_line
+            output.contains("Tiny"),
+            "Small section should appear in legend\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("1.0%"),
+            "Small section should show percentage\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn renders_as_circular_pie_not_bar_chart() {
+        // The pie chart should render as a circular shape, not as horizontal bars.
+        let db = make_pie(
+            Some("Test Chart"),
+            &[("A", 60.0), ("B", 30.0), ("C", 10.0)],
+            false,
+        );
+        let output = render_pie_ascii(&db).unwrap();
+
+        // A bar chart has lines matching "label │████ XX.X%" pattern.
+        // A circular pie chart should NOT have this pattern.
+        let bar_chart_lines = output.lines().filter(|l| l.contains('│')).count();
+        assert_eq!(
+            bar_chart_lines, 0,
+            "Pie chart should render as a circle, not as bars with │ separators\nOutput:\n{}",
+            output
+        );
+
+        // The output should still contain all labels and percentages in the legend
+        assert!(output.contains("A"), "Missing label A\nOutput:\n{}", output);
+        assert!(output.contains("B"), "Missing label B\nOutput:\n{}", output);
+        assert!(output.contains("C"), "Missing label C\nOutput:\n{}", output);
+        assert!(
+            output.contains("60.0%"),
+            "Missing percentage 60.0%\nOutput:\n{}",
+            output
+        );
+
+        // The output should have many rows (circle body + legend), not just
+        // one row per section like a bar chart.
+        let non_empty_lines: Vec<&str> = output.lines().filter(|l| !l.trim().is_empty()).collect();
+        assert!(
+            non_empty_lines.len() > 10,
+            "Circular pie should have many lines (got {}), not just a few bar lines\nOutput:\n{}",
+            non_empty_lines.len(),
+            output
         );
     }
 }
