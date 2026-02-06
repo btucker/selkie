@@ -9,6 +9,45 @@ use crate::error::Result;
 const GRID_WIDTH: usize = 40;
 const GRID_HEIGHT: usize = 20;
 
+/// Find the nearest free cell for placing a point, starting from (x, y).
+/// A cell is free if it contains only a space character.
+/// Searches in a spiral pattern outward from the ideal position.
+fn find_free_cell(grid: &[Vec<char>], x: usize, y: usize) -> Option<(usize, usize)> {
+    let height = grid.len();
+    let width = if height > 0 {
+        grid[0].len()
+    } else {
+        return None;
+    };
+
+    if grid[y][x] == ' ' {
+        return Some((x, y));
+    }
+
+    // Spiral search up to radius 10
+    for r in 1..=10i32 {
+        for dy in -r..=r {
+            for dx in -r..=r {
+                // Only check cells on the perimeter of this radius
+                if dy.abs() != r && dx.abs() != r {
+                    continue;
+                }
+                let nx = x as i32 + dx;
+                let ny = y as i32 + dy;
+                if nx >= 0
+                    && ny >= 0
+                    && (nx as usize) < width
+                    && (ny as usize) < height
+                    && grid[ny as usize][nx as usize] == ' '
+                {
+                    return Some((nx as usize, ny as usize));
+                }
+            }
+        }
+    }
+    None
+}
+
 /// Render a quadrant chart as character art.
 pub fn render_quadrant_ascii(db: &QuadrantDb) -> Result<String> {
     let mut lines: Vec<String> = Vec::new();
@@ -64,13 +103,16 @@ pub fn render_quadrant_ascii(db: &QuadrantDb) -> Result<String> {
         place_label(&mut grid, &db.quadrant4, q_row_bot, mid_x + 2);
     }
 
-    // Place data points
+    // Place data points with collision avoidance
     for point in db.get_points() {
         let px = (point.x * (GRID_WIDTH - 1) as f64).round() as usize;
         let py = ((1.0 - point.y) * (GRID_HEIGHT - 1) as f64).round() as usize;
         let px = px.min(GRID_WIDTH - 1);
         let py = py.min(GRID_HEIGHT - 1);
-        grid[py][px] = '●';
+
+        if let Some((fx, fy)) = find_free_cell(&grid, px, py) {
+            grid[fy][fx] = '●';
+        }
     }
 
     // Render grid with left border
@@ -171,6 +213,88 @@ mod tests {
         assert!(
             output.contains('●'),
             "Should have data points\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn points_do_not_overwrite_quadrant_labels() {
+        let input = std::fs::read_to_string("docs/sources/quadrant_complex.mmd").unwrap();
+        let diagram = crate::parse(&input).unwrap();
+        let db = match diagram {
+            crate::diagrams::Diagram::Quadrant(db) => db,
+            _ => panic!("Expected quadrant"),
+        };
+        let output = render_quadrant_ascii(&db).unwrap();
+        // All four quadrant labels must appear intact
+        assert!(
+            output.contains("Leaders"),
+            "Leaders label corrupted by points\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Challengers"),
+            "Challengers label corrupted\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Niche Players"),
+            "Niche Players label corrupted\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Visionaries"),
+            "Visionaries label corrupted\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn points_do_not_overlap_axis_lines() {
+        let input = std::fs::read_to_string("docs/sources/quadrant_complex.mmd").unwrap();
+        let diagram = crate::parse(&input).unwrap();
+        let db = match diagram {
+            crate::diagrams::Diagram::Quadrant(db) => db,
+            _ => panic!("Expected quadrant"),
+        };
+        let output = render_quadrant_ascii(&db).unwrap();
+        // No line should have ● directly adjacent to ─ (point on horizontal axis)
+        // and no line should have ● replacing │ on the vertical axis
+        for line in output.lines() {
+            let trimmed = line.trim_start();
+            if trimmed.starts_with('│') {
+                // Grid rows: the horizontal axis row uses ─ chars
+                // Check that ● doesn't appear embedded in the axis line itself
+                let content = trimmed.trim_start_matches('│');
+                if content.contains('─') && content.contains('●') {
+                    // This is the horizontal axis row - points should not be on it
+                    panic!(
+                        "Point rendered on horizontal axis line:\n{}\nFull output:\n{}",
+                        line, output
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn nearby_points_do_not_share_cells() {
+        // Create points that map very close together in the grid
+        let mut db = QuadrantDb::new();
+        db.set_quadrant1_text("Q1");
+        db.add_point("A", "", "0.50", "0.50", &[]);
+        db.add_point("B", "", "0.51", "0.50", &[]);
+        let output = render_quadrant_ascii(&db).unwrap();
+        // Count ● chars in grid (not legend). Legend always has them, so count
+        // from the grid portion only (lines starting with "  │")
+        let grid_bullets: usize = output
+            .lines()
+            .filter(|l| l.starts_with("  │"))
+            .map(|l| l.chars().filter(|&c| c == '●').count())
+            .sum();
+        assert!(
+            grid_bullets >= 2,
+            "Two close points should both appear as ● in grid\nOutput:\n{}",
             output
         );
     }
