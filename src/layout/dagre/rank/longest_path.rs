@@ -25,13 +25,15 @@ pub fn run(g: &mut DagreGraph) {
     // Get all node keys first
     let nodes: Vec<String> = g.nodes().into_iter().cloned().collect();
 
-    // Initialize source nodes with rank 0
+    // Collect source nodes (no predecessors)
+    let mut sources = Vec::new();
     for v in &nodes {
         if g.in_edges(v).is_empty() {
             if let Some(label) = g.node_mut(v) {
                 label.rank = Some(0);
             }
             visited.insert(v.clone());
+            sources.push(v.clone());
         }
     }
 
@@ -88,6 +90,32 @@ pub fn run(g: &mut DagreGraph) {
                         label.rank = Some(rank);
                     }
                 }
+            }
+        }
+    }
+
+    // Tighten sources: push source nodes with out-edges closer to their
+    // successors. Without this, disconnected sources (e.g., test_entity3 ->
+    // test_req5) sit at rank 0, adding width to that rank. By moving them
+    // to min(successor_rank) - minlen, we reduce the number of nodes at
+    // rank 0 and produce narrower layouts.
+    for v in &sources {
+        let out_edges = g.out_edges(v);
+        if out_edges.is_empty() {
+            continue; // Isolated nodes stay at rank 0
+        }
+        let mut min_successor_rank = i32::MAX;
+        for edge_key in &out_edges {
+            if let Some(succ_label) = g.node(&edge_key.w) {
+                if let Some(succ_rank) = succ_label.rank {
+                    let minlen = g.edge_by_key(edge_key).map(|e| e.minlen).unwrap_or(1);
+                    min_successor_rank = min_successor_rank.min(succ_rank - minlen);
+                }
+            }
+        }
+        if min_successor_rank > 0 {
+            if let Some(label) = g.node_mut(v) {
+                label.rank = Some(min_successor_rank);
             }
         }
     }
@@ -150,5 +178,37 @@ mod tests {
 
         assert_eq!(g.node("a").unwrap().rank, Some(0));
         assert_eq!(g.node("b").unwrap().rank, Some(3));
+    }
+
+    #[test]
+    fn test_tighten_sources_pushes_disconnected_source_down() {
+        // Models the requirement diagram scenario:
+        // test_entity -> test_req2 (rank 1)
+        // test_req -> test_req2 (rank 1), test_req -> test_req3 -> test_req4 -> test_req5
+        // test_entity3 -> test_req5 (rank 4)
+        //
+        // Without tightening: test_entity, test_req, test_entity3 all at rank 0 (3 sources)
+        // With tightening: test_entity3 should move to rank 3 (one before test_req5)
+        let mut g = DagreGraph::new();
+
+        // Main chain: a -> b -> c -> d -> e (ranks 0-4)
+        g.set_path(&["a", "b", "c", "d", "e"]);
+        // Another source connecting to b: f -> b
+        g.set_edge("f", "b", EdgeLabel::default());
+        // Disconnected source connecting deep: x -> e
+        g.set_edge("x", "e", EdgeLabel::default());
+
+        run(&mut g);
+
+        // a and f must stay at rank 0 (they connect to b at rank 1)
+        assert_eq!(g.node("a").unwrap().rank, Some(0), "a stays at rank 0");
+        assert_eq!(g.node("f").unwrap().rank, Some(0), "f stays at rank 0");
+        // x should be tightened: its only successor e is at rank 4,
+        // so x should be at rank 3 (= 4 - minlen(1))
+        assert_eq!(
+            g.node("x").unwrap().rank,
+            Some(3),
+            "x should be tightened to rank 3 (one before e at rank 4)"
+        );
     }
 }

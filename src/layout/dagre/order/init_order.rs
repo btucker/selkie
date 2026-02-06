@@ -48,9 +48,28 @@ pub fn init_order(g: &DagreGraph) -> Vec<Vec<String>> {
         }
     }
 
-    // Get all nodes sorted by rank
+    // Get all nodes sorted by rank, with connected nodes before disconnected.
+    // dagre.js iterates nodes in insertion order, which typically places connected
+    // nodes first. Our graph returns nodes alphabetically, so we approximate
+    // insertion order by sorting: (rank, disconnected, name). This prevents
+    // disconnected nodes from appearing between connected ones at the same rank,
+    // which would force unnecessary width in the final layout.
     let mut nodes: Vec<&String> = g.nodes();
-    nodes.sort_by_key(|v| g.node(v).and_then(|n| n.rank).unwrap_or(i32::MAX));
+    nodes.sort_by(|a, b| {
+        let rank_a = g.node(a).and_then(|n| n.rank).unwrap_or(i32::MAX);
+        let rank_b = g.node(b).and_then(|n| n.rank).unwrap_or(i32::MAX);
+        let disc_a = if g.in_edges(a).is_empty() && g.out_edges(a).is_empty() {
+            1
+        } else {
+            0
+        };
+        let disc_b = if g.in_edges(b).is_empty() && g.out_edges(b).is_empty() {
+            1
+        } else {
+            0
+        };
+        rank_a.cmp(&rank_b).then(disc_a.cmp(&disc_b)).then(a.cmp(b))
+    });
 
     // Perform DFS from each node
     for v in nodes {

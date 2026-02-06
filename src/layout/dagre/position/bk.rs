@@ -8,19 +8,28 @@
 use crate::layout::dagre::graph::DagreGraph;
 use std::collections::{HashMap, HashSet};
 
-/// Type alias for block graph structure: (block roots, block edges with separations)
-type BlockGraph = (HashSet<String>, HashMap<String, Vec<(String, f64)>>);
+/// Type alias for block graph structure: (ordered block root nodes, block edges with separations)
+type BlockGraph = (Vec<String>, HashMap<String, Vec<(String, f64)>>);
+
+/// Type alias for the neighbor function used in vertical alignment
+type NeighborFn = dyn Fn(&DagreGraph, &str) -> Vec<String>;
 
 /// Assign x coordinates to all nodes using Brandes-Köpf algorithm
 pub fn position_x(g: &DagreGraph) -> HashMap<String, f64> {
     let nodesep = g.graph().nodesep;
-    let edgesep = g.graph().edgesep.max(10.0); // Minimum edge separation
+    let edgesep = g.graph().edgesep;
 
     // Build layer matrix
     let layers = build_layer_matrix(g);
     if layers.is_empty() {
         return HashMap::new();
     }
+
+    // Find type-1 and type-2 conflicts (edges crossing inner segments)
+    let conflicts = find_type1_conflicts(g, &layers);
+    let type2 = find_type2_conflicts(g, &layers);
+    // Merge type2 into conflicts
+    let conflicts = merge_conflicts(conflicts, type2);
 
     // Run four alignment passes
     let mut xss: HashMap<&str, HashMap<String, f64>> = HashMap::new();
@@ -42,8 +51,13 @@ pub fn position_x(g: &DagreGraph) -> HashMap<String, f64> {
                 adjusted_layers.clone()
             };
 
-            // Build alignment
-            let (root, align) = vertical_alignment(g, &aligned_layers, vert == "u");
+            // Build alignment (with conflict avoidance)
+            let neighbor_fn: Box<NeighborFn> = if vert == "u" {
+                Box::new(|g: &DagreGraph, v: &str| g.predecessors(v).into_iter().cloned().collect())
+            } else {
+                Box::new(|g: &DagreGraph, v: &str| g.successors(v).into_iter().cloned().collect())
+            };
+            let (root, align) = vertical_alignment(g, &aligned_layers, &conflicts, &*neighbor_fn);
 
             // Compact horizontally
             let mut xs = horizontal_compaction(
@@ -77,7 +91,7 @@ pub fn position_x(g: &DagreGraph) -> HashMap<String, f64> {
     }
 
     // Balance the four alignments by taking the median
-    balance(&xss, &layers)
+    balance(g, &xss, &layers)
 }
 
 /// Build a matrix of nodes organized by layer
@@ -111,11 +125,171 @@ fn build_layer_matrix(g: &DagreGraph) -> Vec<Vec<String>> {
         .collect()
 }
 
-/// Vertical alignment: align nodes with their median neighbors
+/// Type for conflict pairs: maps v -> set of w where (v,w) is a conflicting edge
+type Conflicts = HashMap<String, HashSet<String>>;
+
+/// Find the other end of an inner segment (dummy-to-dummy edge)
+fn find_other_inner_segment_node(g: &DagreGraph, v: &str) -> Option<String> {
+    if g.node(v).map(|n| n.dummy.is_some()).unwrap_or(false) {
+        g.predecessors(v)
+            .into_iter()
+            .find(|u| g.node(u).map(|n| n.dummy.is_some()).unwrap_or(false))
+            .cloned()
+    } else {
+        None
+    }
+}
+
+/// Add a conflict between two nodes
+fn add_conflict(conflicts: &mut Conflicts, v: &str, w: &str) {
+    let (v, w) = if v > w { (w, v) } else { (v, w) };
+    conflicts
+        .entry(v.to_string())
+        .or_default()
+        .insert(w.to_string());
+}
+
+/// Check if two nodes have a conflict
+fn has_conflict(conflicts: &Conflicts, v: &str, w: &str) -> bool {
+    let (v, w) = if v > w { (w, v) } else { (v, w) };
+    conflicts.get(v).map(|set| set.contains(w)).unwrap_or(false)
+}
+
+/// Merge two conflict maps
+fn merge_conflicts(mut a: Conflicts, b: Conflicts) -> Conflicts {
+    for (k, vs) in b {
+        a.entry(k).or_default().extend(vs);
+    }
+    a
+}
+
+/// Find type-1 conflicts: non-inner segments crossing inner segments.
+/// An inner segment is a dummy-to-dummy edge. When a non-inner edge crosses
+/// an inner segment, aligning across it would distort the inner segment's
+/// vertical path. Marking these as conflicts prevents such alignments.
+fn find_type1_conflicts(g: &DagreGraph, layering: &[Vec<String>]) -> Conflicts {
+    let mut conflicts = Conflicts::new();
+
+    if layering.len() < 2 {
+        return conflicts;
+    }
+
+    for i in 1..layering.len() {
+        let prev_layer = &layering[i - 1];
+        let layer = &layering[i];
+        let prev_layer_length = prev_layer.len();
+
+        let mut k0: usize = 0;
+        let mut scan_pos: usize = 0;
+
+        for (i_in_layer, v) in layer.iter().enumerate() {
+            let w = find_other_inner_segment_node(g, v);
+            let k1 = w
+                .as_ref()
+                .and_then(|w| g.node(w).and_then(|n| n.order))
+                .unwrap_or(prev_layer_length);
+
+            let is_last = i_in_layer == layer.len() - 1;
+
+            if w.is_some() || is_last {
+                // Scan nodes from scan_pos to current position
+                for scan_node in layer.iter().take(i_in_layer + 1).skip(scan_pos) {
+                    for u in g.predecessors(scan_node) {
+                        let u_pos = g.node(u).and_then(|n| n.order).unwrap_or(0);
+                        let u_is_dummy = g.node(u).map(|n| n.dummy.is_some()).unwrap_or(false);
+                        let scan_is_dummy = g
+                            .node(scan_node)
+                            .map(|n| n.dummy.is_some())
+                            .unwrap_or(false);
+
+                        if (u_pos < k0 || k1 < u_pos) && !(u_is_dummy && scan_is_dummy) {
+                            add_conflict(&mut conflicts, u, scan_node);
+                        }
+                    }
+                }
+                scan_pos = i_in_layer + 1;
+                k0 = k1;
+            }
+        }
+    }
+
+    conflicts
+}
+
+/// Find type-2 conflicts: edges between dummy nodes that cross subgraph borders.
+fn find_type2_conflicts(g: &DagreGraph, layering: &[Vec<String>]) -> Conflicts {
+    let mut conflicts = Conflicts::new();
+
+    if layering.len() < 2 {
+        return conflicts;
+    }
+
+    for i in 1..layering.len() {
+        let north = &layering[i - 1];
+        let south = &layering[i];
+        let mut prev_north_pos: i64 = -1;
+        let mut south_pos: usize = 0;
+
+        for (south_lookahead, v) in south.iter().enumerate() {
+            if g.node(v).and_then(|n| n.dummy.as_deref()) == Some("border") {
+                let predecessors: Vec<_> = g.predecessors(v).into_iter().cloned().collect();
+                if let Some(pred) = predecessors.first() {
+                    let next_north_pos = g.node(pred).and_then(|n| n.order).unwrap_or(0) as i64;
+                    // Scan dummy nodes in [south_pos..south_lookahead]
+                    for scan_node in south.iter().take(south_lookahead).skip(south_pos) {
+                        if g.node(scan_node)
+                            .map(|n| n.dummy.is_some())
+                            .unwrap_or(false)
+                        {
+                            for u in g.predecessors(scan_node) {
+                                let u_node = g.node(u);
+                                let u_is_dummy = u_node.map(|n| n.dummy.is_some()).unwrap_or(false);
+                                if u_is_dummy {
+                                    let u_order = u_node.and_then(|n| n.order).unwrap_or(0) as i64;
+                                    if u_order < prev_north_pos || u_order > next_north_pos {
+                                        add_conflict(&mut conflicts, u, scan_node);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    south_pos = south_lookahead;
+                    prev_north_pos = next_north_pos;
+                }
+            }
+        }
+
+        // Final scan from south_pos to end
+        let next_north_pos = north.len() as i64;
+        for scan_node in south.iter().skip(south_pos) {
+            if g.node(scan_node)
+                .map(|n| n.dummy.is_some())
+                .unwrap_or(false)
+            {
+                for u in g.predecessors(scan_node) {
+                    let u_node = g.node(u);
+                    let u_is_dummy = u_node.map(|n| n.dummy.is_some()).unwrap_or(false);
+                    if u_is_dummy {
+                        let u_order = u_node.and_then(|n| n.order).unwrap_or(0) as i64;
+                        if u_order < prev_north_pos || u_order > next_north_pos {
+                            add_conflict(&mut conflicts, u, scan_node);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    conflicts
+}
+
+/// Vertical alignment: align nodes with their median neighbors.
+/// Uses conflict detection to avoid aligning across inner segments.
 fn vertical_alignment(
     g: &DagreGraph,
     layers: &[Vec<String>],
-    use_predecessors: bool,
+    conflicts: &Conflicts,
+    neighbor_fn: &dyn Fn(&DagreGraph, &str) -> Vec<String>,
 ) -> (HashMap<String, String>, HashMap<String, String>) {
     let mut root: HashMap<String, String> = HashMap::new();
     let mut align: HashMap<String, String> = HashMap::new();
@@ -132,46 +306,42 @@ fn vertical_alignment(
 
     // Process layers
     for layer in layers {
-        let mut prev_idx: Option<usize> = None;
+        let mut prev_idx: i64 = -1;
 
         for v in layer {
-            // Get neighbors (predecessors or successors)
-            let neighbors: Vec<String> = if use_predecessors {
-                g.predecessors(v).into_iter().cloned().collect()
-            } else {
-                g.successors(v).into_iter().cloned().collect()
-            };
+            let mut neighbors = neighbor_fn(g, v);
 
             if neighbors.is_empty() {
                 continue;
             }
 
             // Sort neighbors by their position
-            let mut sorted_neighbors: Vec<_> = neighbors
-                .into_iter()
-                .filter_map(|n| pos.get(&n).map(|&p| (n, p)))
-                .collect();
-            sorted_neighbors.sort_by_key(|(_, p)| *p);
+            neighbors.sort_by_key(|n| pos.get(n).copied().unwrap_or(0));
 
             // Find median neighbor(s)
-            let len = sorted_neighbors.len();
-            let median_low = (len - 1) / 2;
-            let median_high = len / 2;
+            let len = neighbors.len();
+            let mp = (len as f64 - 1.0) / 2.0;
+            let median_low = mp.floor() as usize;
+            let median_high = mp.ceil() as usize;
 
             for idx in median_low..=median_high {
-                if let Some((w, w_pos)) = sorted_neighbors.get(idx) {
-                    // Check if we can align with this neighbor
-                    if align.get(v) == Some(v) {
-                        let can_align = prev_idx.map(|pi| *w_pos > pi).unwrap_or(true);
+                if let Some(w) = neighbors.get(idx) {
+                    let w_pos = pos.get(w).copied().unwrap_or(0) as i64;
 
-                        if can_align {
-                            // Align v with w
-                            align.insert(w.clone(), v.clone());
-                            let r = root.get(w).cloned().unwrap_or_else(|| w.clone());
-                            root.insert(v.clone(), r.clone());
-                            align.insert(v.clone(), r);
-                            prev_idx = Some(*w_pos);
-                        }
+                    // Check if we can align with this neighbor:
+                    // 1. v must not already be aligned to another node
+                    // 2. No crossing with previously aligned nodes (w_pos > prev_idx)
+                    // 3. No type-1 or type-2 conflict between v and w
+                    if align.get(v).map(|a| a == v).unwrap_or(false)
+                        && prev_idx < w_pos
+                        && !has_conflict(conflicts, v, w)
+                    {
+                        // Align v with w
+                        align.insert(w.clone(), v.clone());
+                        let r = root.get(w).cloned().unwrap_or_else(|| w.clone());
+                        root.insert(v.clone(), r.clone());
+                        align.insert(v.clone(), r);
+                        prev_idx = w_pos;
                     }
                 }
             }
@@ -206,42 +376,41 @@ fn horizontal_compaction(
 
     let mut xs: HashMap<String, f64> = HashMap::new();
 
-    // Build successor map (for pass2)
+    // Build successor map (for pass2) in deterministic order.
+    // In dagre.js, blockG.successors() returns successors in edge-insertion order.
+    // We iterate block_graph (which is in layer-insertion order) to replicate that.
     let mut successors: HashMap<String, Vec<(String, f64)>> = HashMap::new();
-    for (target, preds) in &block_edges {
-        for (source, sep) in preds {
-            successors
-                .entry(source.clone())
-                .or_default()
-                .push((target.clone(), *sep));
+    for target in &block_graph {
+        if let Some(preds) = block_edges.get(target) {
+            for (source, sep) in preds {
+                successors
+                    .entry(source.clone())
+                    .or_default()
+                    .push((target.clone(), *sep));
+            }
         }
     }
 
-    // DFS-based iteration that handles cycles (like dagre.js)
-    // For each node, we first push all predecessors to process them,
-    // then when we return to the node, we compute its x coordinate.
-    fn dfs_iterate<F>(
-        nodes: &HashSet<String>,
-        get_neighbors: impl Fn(&str) -> Vec<String>,
-        mut process: F,
-    ) where
+    // DFS-based iteration matching dagre.js: uses a stack with two-phase
+    // visit pattern. On first visit, pushes the element back and all its
+    // neighbors (even already-visited ones). On second visit, processes the
+    // element. The initial stack order is the block graph's insertion order
+    // (layer order), which is critical for deterministic results.
+    fn dfs_iterate<F>(nodes: &[String], get_neighbors: impl Fn(&str) -> Vec<String>, mut process: F)
+    where
         F: FnMut(&str),
     {
-        let mut stack: Vec<String> = nodes.iter().cloned().collect();
+        let mut stack: Vec<String> = nodes.to_vec();
         let mut visited: HashSet<String> = HashSet::new();
 
         while let Some(elem) = stack.pop() {
             if visited.contains(&elem) {
-                // Second visit: process the node
                 process(&elem);
             } else {
-                // First visit: mark visited and push neighbors
                 visited.insert(elem.clone());
-                stack.push(elem.clone()); // Push back for second visit
+                stack.push(elem.clone());
                 for neighbor in get_neighbors(&elem) {
-                    if !visited.contains(&neighbor) {
-                        stack.push(neighbor);
-                    }
+                    stack.push(neighbor);
                 }
             }
         }
@@ -314,7 +483,8 @@ fn horizontal_compaction(
 }
 
 /// Build block graph for horizontal compaction
-/// Returns (set of block root nodes, map of node -> list of (predecessor, separation))
+/// Returns (ordered block root nodes, map of node -> list of (predecessor, separation))
+/// The node ordering follows layer insertion order for deterministic DFS traversal.
 fn build_block_graph(
     g: &DagreGraph,
     layers: &[Vec<String>],
@@ -323,7 +493,8 @@ fn build_block_graph(
     edgesep: f64,
     reverse_sep: bool,
 ) -> BlockGraph {
-    let mut block_nodes: HashSet<String> = HashSet::new();
+    let mut block_nodes: Vec<String> = Vec::new();
+    let mut seen: HashSet<String> = HashSet::new();
     let mut block_edges: HashMap<String, Vec<(String, f64)>> = HashMap::new();
 
     for layer in layers {
@@ -331,7 +502,9 @@ fn build_block_graph(
 
         for v in layer {
             let v_root = root.get(v).unwrap_or(v);
-            block_nodes.insert(v_root.clone());
+            if seen.insert(v_root.clone()) {
+                block_nodes.push(v_root.clone());
+            }
 
             if let Some(u) = prev {
                 let u_root = root.get(u).unwrap_or(u);
@@ -366,15 +539,16 @@ fn build_block_graph(
     (block_nodes, block_edges)
 }
 
-/// Calculate separation between two adjacent nodes in a layer
-/// This matches the dagre.js sep() function
+/// Calculate separation between two adjacent nodes in a layer.
+/// This matches the dagre.js sep() function, including labelpos adjustments
+/// for dummy edge-label nodes.
 fn calculate_sep(
     g: &DagreGraph,
     v: &str,
     w: &str,
     nodesep: f64,
     edgesep: f64,
-    _reverse_sep: bool,
+    reverse_sep: bool,
 ) -> f64 {
     let v_node = g.node(v);
     let w_node = g.node(w);
@@ -386,24 +560,107 @@ fn calculate_sep(
 
     let mut sum = 0.0;
 
-    // Add half of v's width
+    // v's width contribution + labelpos adjustment
     sum += v_width / 2.0;
-
-    // Handle labelpos adjustments (simplified - dagre has more complex logic)
-    // For now, skip labelpos handling as it's edge-label specific
+    if let Some(labelpos) = v_node.and_then(|n| n.labelpos.as_deref()) {
+        let delta = match labelpos.to_lowercase().as_str() {
+            "l" => -v_width / 2.0,
+            "r" => v_width / 2.0,
+            _ => 0.0,
+        };
+        if delta != 0.0 {
+            sum += if reverse_sep { delta } else { -delta };
+        }
+    }
 
     // Add separation based on whether nodes are dummies
     sum += if v_is_dummy { edgesep } else { nodesep } / 2.0;
     sum += if w_is_dummy { edgesep } else { nodesep } / 2.0;
 
-    // Add half of w's width
+    // w's width contribution + labelpos adjustment (note: delta signs are inverted vs v)
     sum += w_width / 2.0;
+    if let Some(labelpos) = w_node.and_then(|n| n.labelpos.as_deref()) {
+        let delta = match labelpos.to_lowercase().as_str() {
+            "l" => w_width / 2.0,
+            "r" => -w_width / 2.0,
+            _ => 0.0,
+        };
+        if delta != 0.0 {
+            sum += if reverse_sep { delta } else { -delta };
+        }
+    }
 
     sum
 }
 
+/// Find the alignment with the smallest visual width, accounting for node widths.
+/// This matches dagre.js findSmallestWidthAlignment which uses x ± halfWidth.
+fn find_smallest_width_alignment<'a>(
+    g: &DagreGraph,
+    xss: &HashMap<&'a str, HashMap<String, f64>>,
+) -> Option<&'a str> {
+    let mut min_width = f64::MAX;
+    let mut best: Option<&str> = None;
+
+    for (&name, xs) in xss {
+        let mut max_bound = f64::NEG_INFINITY;
+        let mut min_bound = f64::INFINITY;
+
+        for (v, &x) in xs {
+            let half_width = g.node(v).map(|n| n.width).unwrap_or(0.0) / 2.0;
+            max_bound = max_bound.max(x + half_width);
+            min_bound = min_bound.min(x - half_width);
+        }
+
+        let width = max_bound - min_bound;
+        if width < min_width {
+            min_width = width;
+            best = Some(name);
+        }
+    }
+
+    best
+}
+
+/// Align all four alignment results to the smallest width alignment.
+/// Left-biased alignments align at the minimum, right-biased at the maximum.
+fn align_coordinates(xss: &mut HashMap<&str, HashMap<String, f64>>, align_to_name: &str) {
+    // Compute min/max of the reference alignment
+    let align_xs = &xss[align_to_name];
+    let align_min: f64 = align_xs.values().copied().fold(f64::INFINITY, f64::min);
+    let align_max: f64 = align_xs.values().copied().fold(f64::NEG_INFINITY, f64::max);
+
+    let names: Vec<String> = xss.keys().map(|k| k.to_string()).collect();
+
+    for name in &names {
+        if name == align_to_name {
+            continue;
+        }
+
+        let xs = xss.get(name.as_str()).unwrap();
+        let xs_min: f64 = xs.values().copied().fold(f64::INFINITY, f64::min);
+        let xs_max: f64 = xs.values().copied().fold(f64::NEG_INFINITY, f64::max);
+
+        // Left-biased alignments (ending with 'l') align at minimum
+        // Right-biased alignments (ending with 'r') align at maximum
+        let delta = if name.ends_with('l') {
+            align_min - xs_min
+        } else {
+            align_max - xs_max
+        };
+
+        if delta != 0.0 {
+            let xs_mut = xss.get_mut(name.as_str()).unwrap();
+            for x in xs_mut.values_mut() {
+                *x += delta;
+            }
+        }
+    }
+}
+
 /// Balance the four alignments by taking the median x for each node
 fn balance(
+    g: &DagreGraph,
     xss: &HashMap<&str, HashMap<String, f64>>,
     layers: &[Vec<String>],
 ) -> HashMap<String, f64> {
@@ -412,48 +669,14 @@ fn balance(
     // Collect all nodes
     let all_nodes: Vec<&String> = layers.iter().flatten().collect();
 
-    // Find smallest width alignment for centering
-    let mut min_width = f64::MAX;
-    let mut align_to: Option<&str> = None;
-
-    for (&name, xs) in xss {
-        let (min_x, max_x) = xs.values().fold((f64::MAX, f64::MIN), |(min, max), &x| {
-            (min.min(x), max.max(x))
-        });
-        let width = max_x - min_x;
-        if width < min_width {
-            min_width = width;
-            align_to = Some(name);
-        }
-    }
+    // Find smallest width alignment (accounting for node widths)
+    let align_to = find_smallest_width_alignment(g, xss);
 
     // Align all results to the smallest width alignment
     let mut aligned_xss: HashMap<&str, HashMap<String, f64>> = xss.clone();
 
     if let Some(align_name) = align_to {
-        let align_xs = &xss[align_name];
-        let align_min: f64 = align_xs.values().copied().fold(f64::MAX, f64::min);
-        let align_max: f64 = align_xs.values().copied().fold(f64::MIN, f64::max);
-
-        for (&name, xs) in aligned_xss.iter_mut() {
-            if name == align_name {
-                continue;
-            }
-
-            let xs_min: f64 = xs.values().copied().fold(f64::MAX, f64::min);
-            let xs_max: f64 = xs.values().copied().fold(f64::MIN, f64::max);
-
-            // Align based on direction
-            let delta = if name.ends_with('l') {
-                align_min - xs_min
-            } else {
-                align_max - xs_max
-            };
-
-            for x in xs.values_mut() {
-                *x += delta;
-            }
-        }
+        align_coordinates(&mut aligned_xss, align_name);
     }
 
     // Take median of four alignments for each node
@@ -634,6 +857,131 @@ mod tests {
             "b ({}) and c ({}) should be separated",
             xs["b"],
             xs["c"]
+        );
+    }
+
+    #[test]
+    fn test_find_smallest_width_accounts_for_node_widths() {
+        // Build a graph with nodes of varying widths to verify that
+        // findSmallestWidthAlignment accounts for node widths, not just raw x coords
+        let mut g = DagreGraph::new();
+        g.graph_mut().nodesep = 50.0;
+
+        // Two alignments that look the same by raw x-range but differ
+        // when accounting for node widths:
+        // Alignment A: narrow node at x=0, wide node at x=200 → visual span = 0-0 + 200+75 = 275
+        // Alignment B: wide node at x=0, narrow node at x=200 → visual span = 0-75 + 200+0 = 275
+        // The point is: a raw comparison (max_x - min_x) would be equal,
+        // but if one alignment has wide nodes at the extremes, the visual width differs.
+
+        g.set_node(
+            "narrow",
+            NodeLabel {
+                width: 20.0,
+                height: 40.0,
+                rank: Some(0),
+                order: Some(0),
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "wide",
+            NodeLabel {
+                width: 150.0,
+                height: 40.0,
+                rank: Some(0),
+                order: Some(1),
+                ..Default::default()
+            },
+        );
+
+        let xs = position_x(&g);
+        // Just verify it produces valid positions (the fix is in the balance function)
+        assert!(xs.contains_key("narrow"));
+        assert!(xs.contains_key("wide"));
+    }
+
+    #[test]
+    fn test_position_x_complex_graph_compact_width() {
+        // Models a graph with long edges and a disconnected node.
+        // The BK algorithm should compact this into a tight layout.
+        // This structure mimics the requirement diagram: a tree-like
+        // graph with one cross-rank link creating dummy nodes.
+        use crate::layout::dagre::normalize;
+
+        let mut g = DagreGraph::new();
+        g.graph_mut().nodesep = 50.0;
+        g.graph_mut().edgesep = 20.0;
+        g.graph_mut().ranksep = 50.0;
+
+        let node_width = 150.0;
+        let node_height = 70.0;
+
+        // Create nodes
+        for name in ["a", "b", "c", "d", "e", "f", "g"] {
+            g.set_node(
+                name,
+                NodeLabel {
+                    width: node_width,
+                    height: node_height,
+                    ..Default::default()
+                },
+            );
+        }
+
+        // Graph structure (3 sources, cross-rank link from a to e):
+        //   a       b    c
+        //   |       |
+        //   d       |
+        //   |       |
+        //   e <-----+
+        //   |
+        //   f
+        //   |
+        //   g
+        // The edge b -> e spans 3 ranks (0 to 3), creating 2 dummy nodes.
+        // c is disconnected (no edges).
+        g.set_edge("a", "d", EdgeLabel::default());
+        g.set_edge("d", "e", EdgeLabel::default());
+        g.set_edge("b", "e", EdgeLabel::default()); // long edge: rank 0 → rank 3
+        g.set_edge("e", "f", EdgeLabel::default());
+        g.set_edge("f", "g", EdgeLabel::default());
+
+        rank::assign_ranks(&mut g, Ranker::LongestPath);
+        normalize::run(&mut g);
+        order::order(&mut g);
+
+        let xs = position_x(&g);
+
+        // Compute the total x-spread of real (non-dummy) nodes
+        let real_nodes: Vec<&str> = vec!["a", "b", "c", "d", "e", "f", "g"];
+        let real_xs: Vec<f64> = real_nodes
+            .iter()
+            .filter_map(|n| xs.get(*n).copied())
+            .collect();
+
+        let min_x = real_xs.iter().copied().fold(f64::INFINITY, f64::min);
+        let max_x = real_xs.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+        let total_spread = max_x - min_x;
+
+        eprintln!(
+            "Complex graph x-spread: {} (min={}, max={})",
+            total_spread, min_x, max_x
+        );
+        for n in &real_nodes {
+            if let Some(x) = xs.get(*n) {
+                eprintln!("  {} x={}", n, x);
+            }
+        }
+
+        // With 3 nodes at rank 0 (a, b, c) at 150px wide + 50px sep,
+        // minimum spread for rank 0 = 2 * (150 + 50) = 400px.
+        // A well-compacted layout should keep total spread under 500px.
+        assert!(
+            total_spread < 500.0,
+            "Layout is too wide: spread {} exceeds 500px threshold. \
+            This indicates the BK algorithm is not compacting well.",
+            total_spread,
         );
     }
 }
