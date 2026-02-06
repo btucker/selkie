@@ -635,6 +635,117 @@ pub fn calculate_ascii_similarity(ascii: &AsciiStructure, graph: &LayoutGraph) -
     }
 }
 
+// --- State diagram-specific ASCII evaluation ---
+
+/// Check ASCII state diagram output for fork/join bars and composite containers.
+///
+/// Verifies that:
+/// - Fork/Join nodes (HorizontalBar shape) render as solid `█` bar characters
+/// - Composite states (nodes with children) render as bordered containers
+///   with rounded-corner box-drawing characters (`╭╮╰╯│─`)
+pub fn check_ascii_state_structure(ascii: &AsciiStructure, graph: &LayoutGraph) -> Vec<Issue> {
+    let mut issues = Vec::new();
+
+    check_ascii_fork_join_bars(ascii, graph, &mut issues);
+    check_ascii_composite_containers(ascii, graph, &mut issues);
+
+    issues
+}
+
+/// Check that fork/join nodes render as solid `█` bar characters.
+fn check_ascii_fork_join_bars(
+    ascii: &AsciiStructure,
+    graph: &LayoutGraph,
+    issues: &mut Vec<Issue>,
+) {
+    let bar_nodes: Vec<&str> = graph
+        .nodes
+        .iter()
+        .filter(|n| !n.is_dummy && n.shape == NodeShape::HorizontalBar)
+        .map(|n| n.id.as_str())
+        .collect();
+
+    if bar_nodes.is_empty() {
+        return;
+    }
+
+    let bar_count = ascii.raw_output.chars().filter(|&c| c == '█').count();
+    if bar_count == 0 {
+        issues.push(
+            Issue::warning(
+                "state_ascii_missing_fork_join_bar",
+                format!(
+                    "State diagram has {} fork/join node(s) but no █ bar characters in ASCII output",
+                    bar_nodes.len()
+                ),
+            )
+            .with_values(
+                format!("≥{} █ characters", bar_nodes.len()),
+                "0".to_string(),
+            ),
+        );
+    }
+}
+
+/// Check that composite states render as bordered containers with rounded corners.
+fn check_ascii_composite_containers(
+    ascii: &AsciiStructure,
+    graph: &LayoutGraph,
+    issues: &mut Vec<Issue>,
+) {
+    // Find container nodes: nodes that have children or are referenced as parent_id
+    let parent_ids: std::collections::HashSet<&str> = graph
+        .nodes
+        .iter()
+        .filter_map(|n| n.parent_id.as_deref())
+        .collect();
+
+    let container_labels: Vec<&str> = graph
+        .nodes
+        .iter()
+        .filter(|n| {
+            !n.is_dummy
+                && (parent_ids.contains(n.id.as_str()) || !n.children.is_empty())
+                && n.shape != NodeShape::HorizontalBar
+        })
+        .filter_map(|n| n.label.as_deref())
+        .filter(|l| !l.is_empty())
+        .collect();
+
+    if container_labels.is_empty() {
+        return;
+    }
+
+    // Check for rounded-corner container border characters
+    let has_container_borders = ascii.raw_output.contains('╭')
+        && ascii.raw_output.contains('╮')
+        && ascii.raw_output.contains('╰')
+        && ascii.raw_output.contains('╯');
+
+    if !has_container_borders {
+        issues.push(Issue::warning(
+            "state_ascii_missing_composite_borders",
+            format!(
+                "State diagram has {} composite state(s) but no rounded container borders (╭╮╰╯) in ASCII output",
+                container_labels.len()
+            ),
+        ));
+    }
+
+    // Check that composite state labels appear in the output
+    for label in &container_labels {
+        if !ascii.raw_output.contains(label) {
+            issues.push(Issue::warning(
+                "state_ascii_missing_composite_label",
+                format!(
+                    "Composite state label '{}' not found in ASCII output",
+                    label
+                ),
+            ));
+        }
+    }
+}
+
 // --- Pie chart-specific ASCII evaluation ---
 
 /// Check ASCII pie chart output against the PieDb ground truth.
@@ -1941,5 +2052,179 @@ mod tests {
                 score_plain
             );
         }
+    }
+
+    // --- State diagram ASCII check tests ---
+
+    #[test]
+    fn state_check_detects_missing_fork_join_bars() {
+        use crate::layout::LayoutNode;
+
+        // Graph with a HorizontalBar (fork) node
+        let mut fork_node = LayoutNode::new("fork1", 70.0, 10.0);
+        fork_node.shape = NodeShape::HorizontalBar;
+        fork_node.x = Some(50.0);
+        fork_node.y = Some(50.0);
+
+        let mut graph = LayoutGraph::new("test");
+        graph.nodes.push(fork_node);
+
+        // ASCII output without any █ characters
+        let output = "┌───────┐\n│ Start │\n└───────┘";
+        let ascii = parse_ascii(output);
+
+        let issues = check_ascii_state_structure(&ascii, &graph);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "state_ascii_missing_fork_join_bar"),
+            "Should detect missing fork/join bar, got: {:?}",
+            issues
+        );
+    }
+
+    #[test]
+    fn state_check_passes_with_fork_join_bars() {
+        use crate::layout::LayoutNode;
+
+        let mut fork_node = LayoutNode::new("fork1", 70.0, 10.0);
+        fork_node.shape = NodeShape::HorizontalBar;
+        fork_node.x = Some(50.0);
+        fork_node.y = Some(50.0);
+
+        let mut graph = LayoutGraph::new("test");
+        graph.nodes.push(fork_node);
+
+        // ASCII output with █ bar characters
+        let output = "████████████";
+        let ascii = parse_ascii(output);
+
+        let issues = check_ascii_state_structure(&ascii, &graph);
+        let bar_issues: Vec<_> = issues
+            .iter()
+            .filter(|i| i.check == "state_ascii_missing_fork_join_bar")
+            .collect();
+        assert!(
+            bar_issues.is_empty(),
+            "Should not flag when bars are present, got: {:?}",
+            bar_issues
+        );
+    }
+
+    #[test]
+    fn state_check_detects_missing_composite_borders() {
+        use crate::layout::LayoutNode;
+
+        let mut parent = LayoutNode::new("composite1", 200.0, 150.0);
+        parent.label = Some("MyState".to_string());
+        parent.x = Some(100.0);
+        parent.y = Some(75.0);
+
+        let mut child = LayoutNode::new("child1", 80.0, 32.0);
+        child.label = Some("Inner".to_string());
+        child.parent_id = Some("composite1".to_string());
+        child.x = Some(100.0);
+        child.y = Some(75.0);
+
+        let mut graph = LayoutGraph::new("test");
+        graph.nodes.push(parent);
+        graph.nodes.push(child);
+
+        // ASCII output without container border characters
+        let output = "┌───────┐\n│ Inner │\n└───────┘";
+        let ascii = parse_ascii(output);
+
+        let issues = check_ascii_state_structure(&ascii, &graph);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "state_ascii_missing_composite_borders"),
+            "Should detect missing composite borders, got: {:?}",
+            issues
+        );
+    }
+
+    #[test]
+    fn state_check_passes_with_composite_borders() {
+        use crate::layout::LayoutNode;
+
+        let mut parent = LayoutNode::new("composite1", 200.0, 150.0);
+        parent.label = Some("MyState".to_string());
+        parent.x = Some(100.0);
+        parent.y = Some(75.0);
+
+        let mut child = LayoutNode::new("child1", 80.0, 32.0);
+        child.label = Some("Inner".to_string());
+        child.parent_id = Some("composite1".to_string());
+        child.x = Some(100.0);
+        child.y = Some(75.0);
+
+        let mut graph = LayoutGraph::new("test");
+        graph.nodes.push(parent);
+        graph.nodes.push(child);
+
+        // ASCII output with rounded container borders and label
+        let output =
+            "╭─MyState──────╮\n│ ┌───────┐   │\n│ │ Inner │   │\n│ └───────┘   │\n╰──────────────╯";
+        let ascii = parse_ascii(output);
+
+        let issues = check_ascii_state_structure(&ascii, &graph);
+        let border_issues: Vec<_> = issues
+            .iter()
+            .filter(|i| i.check == "state_ascii_missing_composite_borders")
+            .collect();
+        assert!(
+            border_issues.is_empty(),
+            "Should not flag when borders are present, got: {:?}",
+            border_issues
+        );
+    }
+
+    #[test]
+    fn state_check_detects_missing_composite_label() {
+        use crate::layout::LayoutNode;
+
+        let mut parent = LayoutNode::new("composite1", 200.0, 150.0);
+        parent.label = Some("MyState".to_string());
+        parent.x = Some(100.0);
+        parent.y = Some(75.0);
+
+        let mut child = LayoutNode::new("child1", 80.0, 32.0);
+        child.label = Some("Inner".to_string());
+        child.parent_id = Some("composite1".to_string());
+        child.x = Some(100.0);
+        child.y = Some(75.0);
+
+        let mut graph = LayoutGraph::new("test");
+        graph.nodes.push(parent);
+        graph.nodes.push(child);
+
+        // ASCII output with borders but missing the composite label "MyState"
+        let output =
+            "╭──────────────╮\n│ ┌───────┐   │\n│ │ Inner │   │\n│ └───────┘   │\n╰──────────────╯";
+        let ascii = parse_ascii(output);
+
+        let issues = check_ascii_state_structure(&ascii, &graph);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "state_ascii_missing_composite_label"),
+            "Should detect missing composite label 'MyState', got: {:?}",
+            issues
+        );
+    }
+
+    #[test]
+    fn state_check_no_issues_without_special_nodes() {
+        // Graph with only regular rectangle nodes — no fork/join or composites
+        let graph = make_two_node_graph();
+        let ascii = parse_ascii(&simple_two_node_ascii());
+
+        let issues = check_ascii_state_structure(&ascii, &graph);
+        assert!(
+            issues.is_empty(),
+            "Should have no state-specific issues for simple graph, got: {:?}",
+            issues
+        );
     }
 }

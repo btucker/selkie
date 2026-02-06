@@ -1203,6 +1203,13 @@ fn run_eval_ascii(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
         if let selkie::diagrams::Diagram::Er(ref db) = parsed {
             issues.extend(ascii_checks::check_er_ascii_structure(&ascii_struct, db));
         }
+        // State-specific checks: verify fork/join bars and composite containers
+        if matches!(parsed, selkie::diagrams::Diagram::State(_)) {
+            issues.extend(ascii_checks::check_ascii_state_structure(
+                &ascii_struct,
+                &graph,
+            ));
+        }
         let similarity = ascii_checks::calculate_ascii_similarity(&ascii_struct, &graph);
         total_similarity += similarity;
 
