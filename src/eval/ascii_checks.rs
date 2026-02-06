@@ -1513,6 +1513,7 @@ pub fn calculate_ascii_text_similarity(output: &str) -> f64 {
                 | '★'
                 | '§'
                 | '▶'
+                | '◈'
                 | '▼'
                 | '◀'
                 | '→'
@@ -1864,5 +1865,27 @@ mod tests {
             score_diamond,
             score_plain
         );
+    }
+
+    #[test]
+    fn structural_chars_include_all_curve_markers() {
+        // All CURVE_MARKERS from radar.rs must be recognized as structural characters.
+        // Regression: ◈ (U+25C8) was missing, causing lower eval scores for 8+ curve radars.
+        // Use each marker as the ONLY structural char to verify it's individually recognized.
+        let markers = ['●', '◆', '■', '▲', '★', '◉', '▶', '◈'];
+        let plain_text = "hello\nworld\nfoo";
+        let score_plain = calculate_ascii_text_similarity(plain_text);
+        for marker in markers {
+            let input = format!("  {marker}\nLabel\n  {marker}");
+            let score = calculate_ascii_text_similarity(&input);
+            assert!(
+                score > score_plain,
+                "Marker '{}' (U+{:04X}) should be recognized as structural, got score {} vs plain {}",
+                marker,
+                marker as u32,
+                score,
+                score_plain,
+            );
+        }
     }
 }
