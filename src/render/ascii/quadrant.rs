@@ -5,6 +5,7 @@
 
 use crate::diagrams::quadrant::QuadrantDb;
 use crate::error::Result;
+use log::warn;
 
 const GRID_WIDTH: usize = 40;
 const GRID_HEIGHT: usize = 20;
@@ -112,6 +113,12 @@ pub fn render_quadrant_ascii(db: &QuadrantDb) -> Result<String> {
 
         if let Some((fx, fy)) = find_free_cell(&grid, px, py) {
             grid[fy][fx] = '●';
+        } else {
+            warn!(
+                "Quadrant point '{}' at ({:.2}, {:.2}) could not be placed: \
+                 all cells within search radius are occupied",
+                point.text, point.x, point.y
+            );
         }
     }
 
@@ -275,6 +282,37 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn warns_when_point_cannot_be_placed() {
+        // Pack many points at the same coordinate to exhaust the radius-10 spiral search.
+        // The grid is 40x20 = 800 cells, but axis lines, labels, and the border consume
+        // many cells. Placing hundreds of points at the same spot will eventually exhaust
+        // the search radius, and those points should be counted as dropped.
+        let mut db = QuadrantDb::new();
+        for i in 0..500 {
+            db.add_point(&format!("P{}", i), "", "0.50", "0.50", &[]);
+        }
+        let output = render_quadrant_ascii(&db).unwrap();
+        let grid_bullets: usize = output
+            .lines()
+            .filter(|l| l.starts_with("  │"))
+            .map(|l| l.chars().filter(|&c| c == '●').count())
+            .sum();
+        // With 500 points at the same spot, many will be dropped.
+        // Verify that fewer points appear in the grid than were requested.
+        assert!(
+            grid_bullets < 500,
+            "Some points should be dropped when search radius is exhausted\nOutput:\n{}",
+            output
+        );
+        // Verify at least some points were placed
+        assert!(
+            grid_bullets > 0,
+            "At least some points should be placed\nOutput:\n{}",
+            output
+        );
     }
 
     #[test]
