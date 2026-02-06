@@ -188,7 +188,7 @@ pub fn render_xychart_ascii(db: &XYChartDb) -> Result<String> {
     // X-axis title
     if let Some(XAxisData::Band(ref band)) = db.x_axis {
         if !band.title.is_empty() {
-            out.push(String::new());
+            out.push(format!("{}  {}", " ".repeat(y_label_width), band.title));
         }
     }
 
@@ -327,6 +327,31 @@ mod tests {
         assert!(
             output.contains('●'),
             "Unified chart should contain line markers\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn x_axis_title_rendered() {
+        use crate::diagrams::xychart::DataPoint;
+        // When the x-axis has a title, it should appear in the output.
+        let mut db = XYChartDb::new();
+        db.title = "Test Chart".to_string();
+        db.set_x_axis_band("Months", vec!["A".to_string(), "B".to_string()]);
+        db.add_bar_plot(vec![
+            DataPoint {
+                label: "A".to_string(),
+                value: 10.0,
+            },
+            DataPoint {
+                label: "B".to_string(),
+                value: 20.0,
+            },
+        ]);
+        let output = render_xychart_ascii(&db).unwrap();
+        assert!(
+            output.contains("Months"),
+            "X-axis title 'Months' should appear in chart output\nOutput:\n{}",
             output
         );
     }
