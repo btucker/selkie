@@ -102,20 +102,26 @@ pub fn render_xychart_ascii(db: &XYChartDb) -> Result<String> {
             .collect()
     };
 
-    let line_rows: Vec<Option<usize>> = {
-        let line_plot = plots.iter().find(|p| p.plot_type == PlotType::Line);
-        (0..num_cats)
-            .map(|i| {
-                line_plot.and_then(|p| {
+    // Collect line marker rows for ALL line plots per category.
+    // Each category gets a vec of rows (one per line plot).
+    let line_plots: Vec<_> = plots
+        .iter()
+        .filter(|p| p.plot_type == PlotType::Line)
+        .collect();
+    let line_rows_per_cat: Vec<Vec<usize>> = (0..num_cats)
+        .map(|i| {
+            line_plots
+                .iter()
+                .filter_map(|p| {
                     p.data.get(i).map(|d| {
                         let row_from_bottom =
                             ((d.value / y_max) * CHART_HEIGHT as f64).round() as usize;
                         CHART_HEIGHT.saturating_sub(row_from_bottom)
                     })
                 })
-            })
-            .collect()
-    };
+                .collect()
+        })
+        .collect();
 
     let chart_width = num_cats * COL_WIDTH;
 
@@ -159,8 +165,8 @@ pub fn render_xychart_ascii(db: &XYChartDb) -> Result<String> {
                 }
             }
 
-            // Overlay line marker
-            if let Some(lr) = line_rows[cat_i] {
+            // Overlay line markers for all line plots at this category
+            for &lr in &line_rows_per_cat[cat_i] {
                 if row == lr && bar_center < chart_width {
                     row_chars[bar_center] = LINE_MARKER;
                 }
@@ -352,6 +358,90 @@ mod tests {
         assert!(
             output.contains("Months"),
             "X-axis title 'Months' should appear in chart output\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn multiple_line_plots_all_rendered() {
+        // When a chart has multiple line plots, all should have markers in the output.
+        use crate::diagrams::xychart::DataPoint;
+        let mut db = XYChartDb::new();
+        db.title = "Multi-Line".to_string();
+        db.set_x_axis_band("", vec!["A".to_string(), "B".to_string(), "C".to_string()]);
+        db.add_bar_plot(vec![
+            DataPoint {
+                label: "A".to_string(),
+                value: 30.0,
+            },
+            DataPoint {
+                label: "B".to_string(),
+                value: 50.0,
+            },
+            DataPoint {
+                label: "C".to_string(),
+                value: 40.0,
+            },
+        ]);
+        // Line 1: high values
+        db.add_line_plot(vec![
+            DataPoint {
+                label: "A".to_string(),
+                value: 45.0,
+            },
+            DataPoint {
+                label: "B".to_string(),
+                value: 50.0,
+            },
+            DataPoint {
+                label: "C".to_string(),
+                value: 48.0,
+            },
+        ]);
+        // Line 2: low values
+        db.add_line_plot(vec![
+            DataPoint {
+                label: "A".to_string(),
+                value: 10.0,
+            },
+            DataPoint {
+                label: "B".to_string(),
+                value: 15.0,
+            },
+            DataPoint {
+                label: "C".to_string(),
+                value: 12.0,
+            },
+        ]);
+        let output = render_xychart_ascii(&db).unwrap();
+
+        // Count line markers — should have at least 6 (3 categories x 2 lines)
+        let marker_count = output.matches(LINE_MARKER).count();
+        assert!(
+            marker_count >= 6,
+            "Expected at least 6 line markers for 2 lines x 3 categories, got {}\nOutput:\n{}",
+            marker_count,
+            output
+        );
+    }
+
+    #[test]
+    fn complex_xychart_renders_all_lines() {
+        // The complex xychart has 1 bar + 2 lines; all should appear.
+        let input = std::fs::read_to_string("docs/sources/xychart_complex.mmd").unwrap();
+        let diagram = crate::parse(&input).unwrap();
+        let db = match diagram {
+            crate::diagrams::Diagram::XyChart(db) => db,
+            _ => panic!("Expected xychart"),
+        };
+        let output = render_xychart_ascii(&db).unwrap();
+
+        // 7 categories, 2 lines = at least 14 markers
+        let marker_count = output.matches(LINE_MARKER).count();
+        assert!(
+            marker_count >= 14,
+            "Expected at least 14 line markers for 2 lines x 7 categories, got {}\nOutput:\n{}",
+            marker_count,
             output
         );
     }
