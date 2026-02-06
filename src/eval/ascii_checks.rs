@@ -1506,6 +1506,7 @@ pub fn calculate_ascii_text_similarity(output: &str) -> f64 {
                 | '░'
                 | '●'
                 | '◆'
+                | '◇'
                 | '■'
                 | '▲'
                 | '◉'
@@ -1568,34 +1569,34 @@ mod tests {
     #[test]
     fn parse_single_node_finds_label() {
         let ascii_out = parse_ascii(&single_node_ascii());
-        assert_eq!(ascii.labels, vec!["Hello"]);
+        assert_eq!(ascii_out.labels, vec!["Hello"]);
     }
 
     #[test]
     fn parse_two_nodes_finds_labels() {
         let ascii_out = parse_ascii(&simple_two_node_ascii());
         assert!(
-            ascii.labels.contains(&"Start".to_string()),
+            ascii_out.labels.contains(&"Start".to_string()),
             "Should find Start label, got: {:?}",
-            ascii.labels
+            ascii_out.labels
         );
         assert!(
-            ascii.labels.contains(&"End".to_string()),
+            ascii_out.labels.contains(&"End".to_string()),
             "Should find End label, got: {:?}",
-            ascii.labels
+            ascii_out.labels
         );
     }
 
     #[test]
     fn parse_detects_arrows() {
         let ascii_out = parse_ascii(&simple_two_node_ascii());
-        assert_eq!(ascii.arrow_count, 1, "Should find one arrow tip");
+        assert_eq!(ascii_out.arrow_count, 1, "Should find one arrow tip");
     }
 
     #[test]
     fn parse_detects_braille() {
         let ascii_out = parse_ascii(&simple_two_node_ascii());
-        assert!(ascii.has_braille, "Should detect braille characters");
+        assert!(ascii_out.has_braille, "Should detect braille characters");
         assert!(ascii_out.braille_count > 0);
     }
 
@@ -1609,9 +1610,9 @@ mod tests {
     #[test]
     fn parse_empty_output() {
         let ascii_out = parse_ascii("");
-        assert!(ascii.labels.is_empty());
-        assert_eq!(ascii.arrow_count, 0);
-        assert!(!ascii.has_braille);
+        assert!(ascii_out.labels.is_empty());
+        assert_eq!(ascii_out.arrow_count, 0);
+        assert!(!ascii_out.has_braille);
         assert_eq!(ascii_out.dimensions, (0, 0));
     }
 
@@ -1622,13 +1623,13 @@ mod tests {
         let start_pos = ascii_out
             .labels
             .iter()
-            .zip(ascii.label_positions.iter())
+            .zip(ascii_out.label_positions.iter())
             .find(|(l, _)| *l == "Start")
             .map(|(_, p)| p);
         let end_pos = ascii_out
             .labels
             .iter()
-            .zip(ascii.label_positions.iter())
+            .zip(ascii_out.label_positions.iter())
             .find(|(l, _)| *l == "End")
             .map(|(_, p)| p);
 
@@ -1645,7 +1646,7 @@ mod tests {
         // Diamond text ("Ok") is between / and \, not │ — so it won't be extracted as a node label
         // This is expected behavior for now; diamond parsing can be enhanced later
         assert!(
-            ascii.labels.is_empty() || ascii.labels.contains(&"Ok".to_string()),
+            ascii_out.labels.is_empty() || ascii_out.labels.contains(&"Ok".to_string()),
             "Diamond label extraction is best-effort"
         );
     }
@@ -1665,9 +1666,9 @@ mod tests {
         .join("\n");
         let ascii_out = parse_ascii(&output);
         assert!(
-            ascii.edge_labels.contains(&"Yes".to_string()),
+            ascii_out.edge_labels.contains(&"Yes".to_string()),
             "Should find edge label 'Yes', got: {:?}",
-            ascii.edge_labels
+            ascii_out.edge_labels
         );
     }
 
@@ -1759,9 +1760,9 @@ mod tests {
         let (output, graph) = parse_layout_render_ascii("flowchart TD\n    A[Hello]");
         let ascii_out = parse_ascii(&output);
         assert!(
-            ascii.labels.contains(&"Hello".to_string()),
+            ascii_out.labels.contains(&"Hello".to_string()),
             "Should find label 'Hello' in ASCII output, got: {:?}\nOutput:\n{}",
-            ascii.labels,
+            ascii_out.labels,
             output
         );
         let issues = check_ascii_structure(&ascii_out, &graph);
@@ -1782,18 +1783,18 @@ mod tests {
         let ascii_out = parse_ascii(&output);
 
         assert!(
-            ascii.labels.contains(&"Start".to_string()),
+            ascii_out.labels.contains(&"Start".to_string()),
             "Should find 'Start', got: {:?}\nOutput:\n{}",
-            ascii.labels,
+            ascii_out.labels,
             output
         );
         assert!(
-            ascii.labels.contains(&"End".to_string()),
+            ascii_out.labels.contains(&"End".to_string()),
             "Should find 'End', got: {:?}",
-            ascii.labels
+            ascii_out.labels
         );
         assert!(
-            ascii.arrow_count > 0 || ascii.has_braille,
+            ascii_out.arrow_count > 0 || ascii_out.has_braille,
             "Should have edges rendered"
         );
 
@@ -1808,14 +1809,14 @@ mod tests {
         let ascii_out = parse_ascii(&output);
 
         assert!(
-            ascii.labels.len() >= 3,
+            ascii_out.labels.len() >= 3,
             "Should find 3 labels, got: {:?}",
-            ascii.labels
+            ascii_out.labels
         );
         assert!(
-            ascii.arrow_count >= 2,
+            ascii_out.arrow_count >= 2,
             "Should have at least 2 arrows for 2 edges, got {}",
-            ascii.arrow_count
+            ascii_out.arrow_count
         );
     }
 
@@ -1847,6 +1848,21 @@ mod tests {
             ordering_issues.is_empty(),
             "TD flow should preserve top→bottom ordering, got: {:?}",
             ordering_issues
+        );
+    }
+
+    #[test]
+    fn similarity_recognizes_white_diamond() {
+        // Use ◇ as the ONLY structural character to verify it's in the match pattern
+        let with_diamond = "  ◇\nDiamond\n  ◇";
+        let plain_text = "hello\nworld\nfoo";
+        let score_diamond = calculate_ascii_text_similarity(with_diamond);
+        let score_plain = calculate_ascii_text_similarity(plain_text);
+        assert!(
+            score_diamond > score_plain,
+            "Text with ◇ should score higher than plain text: {} vs {}",
+            score_diamond,
+            score_plain
         );
     }
 }

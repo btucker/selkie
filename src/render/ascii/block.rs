@@ -123,12 +123,10 @@ fn render_simple_row(
                 top.push_str(&format!("╭{}╮ ", "─".repeat(cell_width)));
             }
             BlockType::Diamond => {
-                let half = cell_width / 2;
-                top.push_str(&format!(
-                    "{}◇{} ",
-                    " ".repeat(half),
-                    " ".repeat(cell_width - half)
-                ));
+                let total_pad = cell_width + 1;
+                let left = total_pad / 2;
+                let right = total_pad - left;
+                top.push_str(&format!("{}◇{} ", " ".repeat(left), " ".repeat(right)));
             }
             BlockType::Stadium => {
                 top.push_str(&format!("╭{}╮ ", "─".repeat(cell_width)));
@@ -204,12 +202,10 @@ fn render_simple_row(
                 bottom.push_str(&format!("╰{}╯ ", "─".repeat(cell_width)));
             }
             BlockType::Diamond => {
-                let half = cell_width / 2;
-                bottom.push_str(&format!(
-                    "{}◇{} ",
-                    " ".repeat(half),
-                    " ".repeat(cell_width - half)
-                ));
+                let total_pad = cell_width + 1;
+                let left = total_pad / 2;
+                let right = total_pad - left;
+                bottom.push_str(&format!("{}◇{} ", " ".repeat(left), " ".repeat(right)));
             }
             BlockType::Stadium => {
                 bottom.push_str(&format!("╰{}╯ ", "─".repeat(cell_width)));
@@ -540,6 +536,40 @@ mod tests {
             !output.contains("space_"),
             "Space rendered as visible block\nOutput:\n{}",
             output
+        );
+    }
+
+    #[test]
+    fn diamond_and_square_same_row_width() {
+        // With 3 columns and a diamond in the middle, all three lines of the row
+        // must have equal character widths. If the diamond cell is narrower,
+        // the top/bottom lines will be shorter than the label line.
+        let input = "block-beta\n  columns 3\n  A[\"Left\"]\n  B{\"Mid\"}\n  C[\"Right\"]";
+        let diagram = crate::parse(input).unwrap();
+        let db = match diagram {
+            crate::diagrams::Diagram::Block(db) => db,
+            _ => panic!("Expected block"),
+        };
+        let output = render_block_ascii(&db).unwrap();
+        let lines: Vec<&str> = output.lines().collect();
+        assert!(
+            lines.len() >= 3,
+            "Need at least 3 lines\nOutput:\n{}",
+            output
+        );
+
+        let top_chars = lines[0].chars().count();
+        let label_chars = lines[1].chars().count();
+        let bottom_chars = lines[2].chars().count();
+        assert_eq!(
+            top_chars, label_chars,
+            "Top border ({}) and label ({}) char widths must match\nOutput:\n{}",
+            top_chars, label_chars, output
+        );
+        assert_eq!(
+            label_chars, bottom_chars,
+            "Label ({}) and bottom border ({}) char widths must match\nOutput:\n{}",
+            label_chars, bottom_chars, output
         );
     }
 }
