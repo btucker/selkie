@@ -2,7 +2,7 @@
 //!
 //! Renders mindmaps as indented tree structures with branch connectors,
 //! similar to the `tree` command output. Node shapes are indicated by
-//! bracket style matching the mermaid syntax.
+//! visual Unicode symbols (e.g. `☁` for cloud, `⬡` for hexagon).
 
 use crate::diagrams::mindmap::{MindmapDb, MindmapNode, NodeType};
 use crate::error::Result;
