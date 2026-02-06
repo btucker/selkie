@@ -26,17 +26,20 @@ pub fn render_mindmap_ascii(db: &MindmapDb) -> Result<String> {
     Ok(lines.join("\n"))
 }
 
-/// Format a node label with shape indicators matching mermaid syntax.
+/// Format a node label with visual ASCII shape indicators.
+///
+/// Each shape type uses a distinctive bracket/border style so the
+/// node type is visually apparent without echoing raw Mermaid syntax.
 fn format_node(node: &MindmapNode) -> String {
     let text = clean_text(&node.descr);
     match node.node_type {
         NodeType::Default => text,
-        NodeType::Rect => format!("[{}]", text),
-        NodeType::RoundedRect => format!("({})", text),
-        NodeType::Circle => format!("(({}))", text),
-        NodeType::Cloud => format!("){}(", text),
-        NodeType::Bang => format!(")){}((", text),
-        NodeType::Hexagon => format!("{{{{{}}}}}", text),
+        NodeType::Rect => format!("[ {} ]", text),
+        NodeType::RoundedRect => format!("( {} )", text),
+        NodeType::Circle => format!("o {} o", text),
+        NodeType::Cloud => format!("☁ {} ☁", text),
+        NodeType::Bang => format!("⚡ {} ⚡", text),
+        NodeType::Hexagon => format!("⬡ {} ⬡", text),
     }
 }
 
@@ -98,7 +101,7 @@ mod tests {
         let db = make_mindmap("mindmap\n  root((Main Topic))");
         let output = render_mindmap_ascii(&db).unwrap();
         assert!(
-            output.contains("((Main Topic))"),
+            output.contains("o Main Topic o"),
             "Root should show circle shape\nOutput:\n{}",
             output
         );
@@ -162,27 +165,27 @@ mod tests {
         );
         let output = render_mindmap_ascii(&db).unwrap();
         assert!(
-            output.contains("((Circle))"),
+            output.contains("o Circle o"),
             "Circle shape\nOutput:\n{}",
             output
         );
         assert!(
-            output.contains("[Rectangle]"),
+            output.contains("[ Rectangle ]"),
             "Rect shape\nOutput:\n{}",
             output
         );
         assert!(
-            output.contains("(Rounded)"),
+            output.contains("( Rounded )"),
             "Rounded shape\nOutput:\n{}",
             output
         );
         assert!(
-            output.contains(")Cloud("),
+            output.contains("☁ Cloud ☁"),
             "Cloud shape\nOutput:\n{}",
             output
         );
         assert!(
-            output.contains("))Bang(("),
+            output.contains("⚡ Bang ⚡"),
             "Bang shape\nOutput:\n{}",
             output
         );
@@ -236,13 +239,112 @@ mod tests {
             output
         );
         assert!(
-            output.contains(")I am a cloud("),
+            output.contains("☁ I am a cloud ☁"),
             "Should show cloud shape\nOutput:\n{}",
             output
         );
         assert!(
-            output.contains("))I am a bang(("),
+            output.contains("⚡ I am a bang ⚡"),
             "Should show bang shape\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn shapes_show_text_not_raw_syntax() {
+        let db = make_mindmap(
+            "mindmap\n  root((Circle))\n    )Cloud(\n    ))Bang((\n    {{Hexagon}}\n    [Rect]\n    (Rounded)",
+        );
+        let output = render_mindmap_ascii(&db).unwrap();
+        // Text content must appear
+        assert!(
+            output.contains("Circle"),
+            "Should contain Circle text\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Cloud"),
+            "Should contain Cloud text\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Bang"),
+            "Should contain Bang text\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Hexagon"),
+            "Should contain Hexagon text\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Rect"),
+            "Should contain Rect text\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("Rounded"),
+            "Should contain Rounded text\nOutput:\n{}",
+            output
+        );
+        // Raw syntax must NOT appear
+        assert!(
+            !output.contains("((Circle))"),
+            "Should NOT show raw circle syntax\nOutput:\n{}",
+            output
+        );
+        assert!(
+            !output.contains(")Cloud("),
+            "Should NOT show raw cloud syntax\nOutput:\n{}",
+            output
+        );
+        assert!(
+            !output.contains("))Bang(("),
+            "Should NOT show raw bang syntax\nOutput:\n{}",
+            output
+        );
+        assert!(
+            !output.contains("{{Hexagon}}"),
+            "Should NOT show raw hexagon syntax\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn complex_mindmap_no_raw_syntax() {
+        let input = std::fs::read_to_string("docs/sources/mindmap_complex.mmd").unwrap();
+        let db = make_mindmap(&input);
+        let output = render_mindmap_ascii(&db).unwrap();
+        // Text content should appear
+        assert!(
+            output.contains("mindmap"),
+            "Should contain root label\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("I am a cloud"),
+            "Should contain cloud text\nOutput:\n{}",
+            output
+        );
+        assert!(
+            output.contains("I am a bang"),
+            "Should contain bang text\nOutput:\n{}",
+            output
+        );
+        // Raw syntax must NOT appear
+        assert!(
+            !output.contains("((mindmap))"),
+            "Should NOT show raw circle syntax\nOutput:\n{}",
+            output
+        );
+        assert!(
+            !output.contains(")I am a cloud("),
+            "Should NOT show raw cloud syntax\nOutput:\n{}",
+            output
+        );
+        assert!(
+            !output.contains("))I am a bang(("),
+            "Should NOT show raw bang syntax\nOutput:\n{}",
             output
         );
     }
