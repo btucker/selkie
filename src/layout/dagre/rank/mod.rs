@@ -232,6 +232,26 @@ mod tests {
     }
 
     #[test]
+    fn test_pull_sources_multi_outgoing() {
+        // Source with multiple outgoing edges should be pulled to the
+        // tightest constraint (minimum of target_rank - minlen).
+        let mut g = DagreGraph::new();
+        g.set_path(&["a", "b", "c", "d", "e"]); // a(0)->b(1)->c(2)->d(3)->e(4)
+        g.set_edge("src", "d", EdgeLabel::default()); // src -> d (rank 3)
+        g.set_edge("src", "e", EdgeLabel::default()); // src -> e (rank 4)
+
+        assign_ranks(&mut g, Ranker::LongestPath);
+
+        // src should be pulled to rank 2 = min(3-1, 4-1) = min(2, 3) = 2
+        // The tighter constraint (d at rank 3) limits how far src can move.
+        assert_eq!(
+            g.node("src").unwrap().rank,
+            Some(2),
+            "source with multiple targets should respect the tightest constraint"
+        );
+    }
+
+    #[test]
     fn test_pull_sources_disconnected_node() {
         // Disconnected nodes (no edges) should stay at rank 0
         let mut g = DagreGraph::new();

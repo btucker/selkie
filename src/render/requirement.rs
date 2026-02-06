@@ -184,7 +184,7 @@ impl ToLayoutGraph for RequirementDb {
         // Match mermaid's dagre configuration for requirement diagrams.
         // Use longest-path ranking which produces better column ordering,
         // combined with post-processing to pull source-only nodes down
-        // (see pull_sources_toward_targets below).
+        // (see pull_sources_toward_targets in layout/dagre/rank/mod.rs).
         graph.options = LayoutOptions {
             direction,
             node_spacing: 50.0,
