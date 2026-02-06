@@ -5,7 +5,7 @@
 //! connecting them. Each flow band occupies a number of rows proportional
 //! to the link value, using block characters for visual density.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
 use crate::diagrams::sankey::SankeyDb;
 use crate::error::Result;
@@ -362,9 +362,10 @@ fn compute_columns(
         .map(|n| n.id.clone())
         .collect();
 
-    let mut queue: Vec<(String, usize)> = source_nodes.iter().map(|id| (id.clone(), 0)).collect();
+    let mut queue: VecDeque<(String, usize)> =
+        source_nodes.iter().map(|id| (id.clone(), 0)).collect();
 
-    while let Some((node_id, col)) = queue.pop() {
+    while let Some((node_id, col)) = queue.pop_front() {
         let current_col = columns.entry(node_id.clone()).or_insert(0);
         if col > *current_col {
             *current_col = col;
@@ -372,7 +373,7 @@ fn compute_columns(
 
         if let Some(edges) = outgoing.get(&node_id) {
             for (target, _) in edges {
-                queue.push((target.clone(), col + 1));
+                queue.push_back((target.clone(), col + 1));
             }
         }
     }
