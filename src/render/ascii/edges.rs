@@ -161,6 +161,10 @@ fn render_arrow_tip(
 }
 
 /// Render an edge label at its midpoint position.
+///
+/// If the ideal position overlaps occupied cells (node boxes, diamonds), the
+/// label is shifted to nearby rows/columns to find a fully clear placement.
+/// This prevents label truncation (e.g., "Invalid" appearing as "Inv").
 fn render_edge_label(
     edge: &LayoutEdge,
     ctx: &EdgeContext,
@@ -174,6 +178,7 @@ fn render_edge_label(
     // Clean HTML line breaks and normalize whitespace for ASCII display
     let cleaned = raw_label.replace("<br/>", " ").replace("<br>", " ");
     let label = cleaned.split_whitespace().collect::<Vec<_>>().join(" ");
+    let label_len = label.chars().count();
 
     // Use label_position if available, otherwise midpoint of bend_points
     let (lx, ly) = if let Some(ref pos) = edge.label_position {
@@ -186,20 +191,92 @@ fn render_edge_label(
         return;
     };
 
-    let col = ctx.scale.to_col(lx);
-    let row = ctx.scale.to_row(ly);
+    let ideal_col = ctx.scale.to_col(lx);
+    let ideal_row = ctx.scale.to_row(ly);
+    let ideal_start = ideal_col.saturating_sub(label_len / 2);
 
-    // Center the label text
-    let start_col = col.saturating_sub(label.len() / 2);
-
-    if row < ctx.canvas_rows {
+    // Try to place the label at a position where all characters fit
+    // without overlapping occupied cells. Search nearby rows/cols.
+    if let Some((place_row, place_col)) =
+        find_clear_label_position(ideal_row, ideal_start, label_len, ctx, occupied)
+    {
         for (i, ch) in label.chars().enumerate() {
-            let c = start_col + i;
-            if c < ctx.canvas_cols && !occupied[row][c] {
-                canvas[row][c] = ch;
+            let c = place_col + i;
+            if c < ctx.canvas_cols && !occupied[place_row][c] {
+                canvas[place_row][c] = ch;
             }
         }
     }
+}
+
+/// Find a (row, start_col) where the entire label fits without overlapping
+/// occupied cells. Searches outward from the ideal position.
+fn find_clear_label_position(
+    ideal_row: usize,
+    ideal_col: usize,
+    label_len: usize,
+    ctx: &EdgeContext,
+    occupied: &[Vec<bool>],
+) -> Option<(usize, usize)> {
+    let max_row_offset: isize = 5;
+    let max_col_offset: isize = 10;
+
+    // Check if a label placement is entirely clear of occupied cells
+    let is_clear = |row: usize, start_col: usize| -> bool {
+        if row >= ctx.canvas_rows || start_col + label_len > ctx.canvas_cols {
+            return false;
+        }
+        (start_col..start_col + label_len).all(|c| !occupied[row][c])
+    };
+
+    // First try: exact ideal position
+    if is_clear(ideal_row, ideal_col) {
+        return Some((ideal_row, ideal_col));
+    }
+
+    // Spiral outward: try nearby rows first, then shift columns
+    for dist in 1..=(max_row_offset.max(max_col_offset)) {
+        // Try row offsets at ideal column
+        if dist <= max_row_offset {
+            for &dir in &[-1isize, 1] {
+                let try_row = ideal_row as isize + dist * dir;
+                if try_row >= 0
+                    && (try_row as usize) < ctx.canvas_rows
+                    && is_clear(try_row as usize, ideal_col)
+                {
+                    return Some((try_row as usize, ideal_col));
+                }
+            }
+        }
+
+        // Try column offsets at rows near ideal
+        if dist <= max_col_offset {
+            for &col_dir in &[-1isize, 1] {
+                let try_col = ideal_col as isize + dist * col_dir;
+                if try_col < 0 {
+                    continue;
+                }
+                let c = try_col as usize;
+                // Check ideal row and nearby rows
+                for row_off in 0..=max_row_offset.min(dist) {
+                    for &row_dir in &[-1isize, 1] {
+                        let try_row = ideal_row as isize + row_off * row_dir;
+                        if try_row >= 0
+                            && (try_row as usize) < ctx.canvas_rows
+                            && is_clear(try_row as usize, c)
+                        {
+                            return Some((try_row as usize, c));
+                        }
+                        if row_off == 0 {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    None
 }
 
 /// Determine the cardinal direction of an arrow from a segment.

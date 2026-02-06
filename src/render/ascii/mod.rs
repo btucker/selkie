@@ -1885,4 +1885,19 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn flowchart_edge_label_invalid_not_truncated() {
+        let input = std::fs::read_to_string("docs/sources/flowchart_complex.mmd").unwrap();
+        let (db, graph) = parse_and_layout(&input);
+        let output = render_flowchart_ascii(&db, &graph).unwrap();
+
+        // The "Invalid" label on the Auth -> Reject edge must render in full,
+        // not be truncated to "Inv" by the nearby Authentication diamond.
+        assert!(
+            output.contains("Invalid"),
+            "Flowchart edge label 'Invalid' should not be truncated near diamond shape\nOutput:\n{}",
+            output
+        );
+    }
 }
