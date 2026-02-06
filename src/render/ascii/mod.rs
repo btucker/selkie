@@ -1689,4 +1689,102 @@ mod tests {
             output
         );
     }
+
+    // --- ER diagram ASCII overlap regression tests ---
+
+    #[test]
+    fn er_ascii_boxes_dont_overlap() {
+        let input = std::fs::read_to_string("docs/sources/er.mmd").unwrap();
+        let (db, graph) = parse_er_and_layout(&input);
+        let output = render_er_ascii(&db, &graph).unwrap();
+
+        // No line should have overlapping box corners (same check as requirement tests)
+        for (i, line) in output.lines().enumerate() {
+            let chars: Vec<char> = line.chars().collect();
+            let mut corner_positions: Vec<usize> = Vec::new();
+            for (j, &ch) in chars.iter().enumerate() {
+                if ch == '┌' || ch == '└' {
+                    corner_positions.push(j);
+                }
+            }
+            if corner_positions.len() >= 2 {
+                for window in corner_positions.windows(2) {
+                    let between = &chars[window[0]..=window[1]];
+                    let has_closing = between
+                        .iter()
+                        .any(|&c| c == '┐' || c == '┘' || c == '┤' || c == '┴');
+                    assert!(
+                        has_closing,
+                        "ER boxes overlap on line {}: corners at {} and {} without closing between\nLine: {}\nFull output:\n{}",
+                        i, window[0], window[1], line, output
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn er_ascii_edge_labels_visible() {
+        let input = std::fs::read_to_string("docs/sources/er.mmd").unwrap();
+        let (db, graph) = parse_er_and_layout(&input);
+        let output = render_er_ascii(&db, &graph).unwrap();
+
+        // Edge labels (relationship roles) should appear in the output
+        // The er.mmd file has roles like "places", "contains"
+        assert!(
+            output.contains("places") || output.contains("contains"),
+            "ER edge labels should be visible\nOutput:\n{}",
+            output
+        );
+    }
+
+    // --- Class diagram ASCII overlap regression tests ---
+
+    #[test]
+    fn class_ascii_boxes_dont_overlap() {
+        let input = std::fs::read_to_string("docs/sources/class.mmd").unwrap();
+        let (db, graph) = parse_and_layout_class(&input);
+        let output = render_class_ascii(&db, &graph).unwrap();
+
+        // No line should have overlapping box corners
+        for (i, line) in output.lines().enumerate() {
+            let chars: Vec<char> = line.chars().collect();
+            let mut corner_positions: Vec<usize> = Vec::new();
+            for (j, &ch) in chars.iter().enumerate() {
+                if ch == '┌' || ch == '└' {
+                    corner_positions.push(j);
+                }
+            }
+            if corner_positions.len() >= 2 {
+                for window in corner_positions.windows(2) {
+                    let between = &chars[window[0]..=window[1]];
+                    let has_closing = between
+                        .iter()
+                        .any(|&c| c == '┐' || c == '┘' || c == '┤' || c == '┴');
+                    assert!(
+                        has_closing,
+                        "Class boxes overlap on line {}: corners at {} and {} without closing between\nLine: {}\nFull output:\n{}",
+                        i, window[0], window[1], line, output
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn class_ascii_all_labels_visible() {
+        let input = std::fs::read_to_string("docs/sources/class.mmd").unwrap();
+        let (db, graph) = parse_and_layout_class(&input);
+        let output = render_class_ascii(&db, &graph).unwrap();
+
+        // All class names should be visible
+        for label in &["Animal", "Duck", "Fish", "Zebra"] {
+            assert!(
+                output.contains(label),
+                "Class diagram should contain '{}' after coordinate fix\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+    }
 }
