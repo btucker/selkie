@@ -187,8 +187,8 @@ pub fn render_er_ascii(db: &ErDb, graph: &LayoutGraph) -> Result<String> {
         let entity_name = id_to_name.get(node.id.as_str()).copied();
         let entity = entity_name.and_then(|n| entities.get(n));
 
-        // Calculate cell position (top-left based: dagre center coords are
-        // converted to top-left in apply_results_recursive)
+        // node.x/y are top-left coordinates (dagre center coords converted
+        // by apply_results_recursive), so use them directly as cell start.
         let cell_w = scale.to_cell_width(node.width);
         let cell_h = scale.to_cell_height(node.height);
         let col_start = scale.to_col(nx);
@@ -604,10 +604,14 @@ fn render_ascii_impl(
 
         let rendered = render_shape(&node.shape, &label, cell_w, cell_h);
 
-        // Position: node x,y is top-left (dagre center coords are converted
-        // to top-left in apply_results_recursive)
-        let col_start = scale.to_col(nx);
-        let row_start = scale.to_row(ny);
+        // node.x/y are top-left coordinates (dagre center was converted by
+        // apply_results_recursive). Compute the true center, then center the
+        // rendered shape on it — shapes can be wider/taller than the layout
+        // allocation when the label is longer than the size estimate.
+        let center_col = scale.to_col(nx + node.width / 2.0);
+        let center_row = scale.to_row(ny + node.height / 2.0);
+        let col_start = center_col.saturating_sub(rendered.width / 2);
+        let row_start = center_row.saturating_sub(rendered.height / 2);
 
         // Pass 1: Blit shape (borders can overwrite each other)
         for (r, line) in rendered.lines.iter().enumerate() {
