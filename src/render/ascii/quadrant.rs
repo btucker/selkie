@@ -285,11 +285,11 @@ mod tests {
     }
 
     #[test]
-    fn warns_when_point_cannot_be_placed() {
+    fn drops_points_when_placement_exhausted() {
         // Pack many points at the same coordinate to exhaust the radius-10 spiral search.
         // The grid is 40x20 = 800 cells, but axis lines, labels, and the border consume
         // many cells. Placing hundreds of points at the same spot will eventually exhaust
-        // the search radius, and those points should be counted as dropped.
+        // the search radius, and those unplaceable points are dropped (with a log warning).
         let mut db = QuadrantDb::new();
         for i in 0..500 {
             db.add_point(&format!("P{}", i), "", "0.50", "0.50", &[]);
