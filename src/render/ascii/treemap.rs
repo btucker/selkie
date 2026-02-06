@@ -518,4 +518,32 @@ mod tests {
         let output = render_treemap_ascii(&db).unwrap();
         assert!(output.contains("My Title"), "Output:\n{}", output);
     }
+
+    #[test]
+    fn matches_ascii_reference_treemap() {
+        let input = std::fs::read_to_string("docs/sources/treemap.mmd").unwrap();
+        let db = parse_treemap(&input);
+        let output = render_treemap_ascii(&db).unwrap();
+        let reference = std::fs::read_to_string("docs/images/ascii/treemap.txt").unwrap();
+        assert_eq!(
+            output, reference,
+            "Treemap ASCII output differs from reference file.\n\
+             If the renderer changed intentionally, update docs/images/ascii/treemap.txt:\n\
+             cargo run --features all-formats --bin selkie -- docs/sources/treemap.mmd --output-format ascii > docs/images/ascii/treemap.txt"
+        );
+    }
+
+    #[test]
+    fn matches_ascii_reference_treemap_complex() {
+        let input = std::fs::read_to_string("docs/sources/treemap_complex.mmd").unwrap();
+        let db = parse_treemap(&input);
+        let output = render_treemap_ascii(&db).unwrap();
+        let reference = std::fs::read_to_string("docs/images/ascii/treemap_complex.txt").unwrap();
+        assert_eq!(
+            output, reference,
+            "Complex treemap ASCII output differs from reference file.\n\
+             If the renderer changed intentionally, update docs/images/ascii/treemap_complex.txt:\n\
+             cargo run --features all-formats --bin selkie -- docs/sources/treemap_complex.mmd --output-format ascii > docs/images/ascii/treemap_complex.txt"
+        );
+    }
 }
