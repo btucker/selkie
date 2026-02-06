@@ -196,36 +196,36 @@ marker path {
 
     </g>
     <g transform="translate(350, 350)">
-      <circle cx="0" cy="0" r="60" class="radarGraticule" stroke="#DEDEDE" stroke-width="1" fill-opacity="0.3" fill="#DEDEDE"/>
-      <circle cx="0" cy="0" r="120" class="radarGraticule" fill="#DEDEDE" stroke="#DEDEDE" fill-opacity="0.3" stroke-width="1"/>
-      <circle cx="0" cy="0" r="180" class="radarGraticule" stroke="#DEDEDE" stroke-width="1" fill="#DEDEDE" fill-opacity="0.3"/>
-      <circle cx="0" cy="0" r="240" class="radarGraticule" fill-opacity="0.3" stroke-width="1" fill="#DEDEDE" stroke="#DEDEDE"/>
-      <circle cx="0" cy="0" r="300" class="radarGraticule" fill-opacity="0.3" fill="#DEDEDE" stroke="#DEDEDE" stroke-width="1"/>
+      <circle cx="0" cy="0" r="60" class="radarGraticule" stroke="#DEDEDE" stroke-width="1" fill="#DEDEDE" fill-opacity="0.3"/>
+      <circle cx="0" cy="0" r="120" class="radarGraticule" stroke="#DEDEDE" stroke-width="1" fill="#DEDEDE" fill-opacity="0.3"/>
+      <circle cx="0" cy="0" r="180" class="radarGraticule" stroke="#DEDEDE" fill-opacity="0.3" fill="#DEDEDE" stroke-width="1"/>
+      <circle cx="0" cy="0" r="240" class="radarGraticule" fill-opacity="0.3" fill="#DEDEDE" stroke="#DEDEDE" stroke-width="1"/>
+      <circle cx="0" cy="0" r="300" class="radarGraticule" fill-opacity="0.3" fill="#DEDEDE" stroke-width="1" stroke="#DEDEDE"/>
       <line x1="0" y1="0" x2="0.000000000000018369701987210297" y2="-300" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
-      <text x="0.000000000000019288187086570814" y="-315" class="radarAxisLabel" text-anchor="middle" font-size="12" dominant-baseline="middle" fill="#333333">Performance</text>
-      <line x1="0" y1="0" x2="259.8076211353316" y2="-150" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
-      <text x="272.7980021920982" y="-157.5" class="radarAxisLabel" font-size="12" dominant-baseline="middle" text-anchor="middle" fill="#333333">Ecosystem</text>
+      <line x1="0" y1="0" x2="259.8076211353316" y2="-150" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
       <line x1="0" y1="0" x2="259.8076211353316" y2="149.99999999999994" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
-      <text x="272.7980021920982" y="157.49999999999994" class="radarAxisLabel" dominant-baseline="middle" font-size="12" fill="#333333" text-anchor="middle">Safety</text>
-      <line x1="0" y1="0" x2="0.000000000000018369701987210297" y2="300" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
-      <text x="0.000000000000019288187086570814" y="315" class="radarAxisLabel" fill="#333333" text-anchor="middle" dominant-baseline="middle" font-size="12">Learning Curve</text>
-      <line x1="0" y1="0" x2="-259.80762113533154" y2="150.0000000000001" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
-      <text x="-272.7980021920981" y="157.5000000000001" class="radarAxisLabel" dominant-baseline="middle" fill="#333333" font-size="12" text-anchor="middle">Tooling</text>
+      <line x1="0" y1="0" x2="0.000000000000018369701987210297" y2="300" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
+      <line x1="0" y1="0" x2="-259.80762113533154" y2="150.0000000000001" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
       <line x1="0" y1="0" x2="-259.8076211353316" y2="-150.00000000000003" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
-      <text x="-272.7980021920982" y="-157.50000000000003" class="radarAxisLabel" font-size="12" dominant-baseline="middle" fill="#333333" text-anchor="middle">Community</text>
       <path d="M0.000000000000018369701987210297,-300 C69.42059636736062,-300 164.45822417866486,-195.14999999999998 207.84609690826525,-120 C251.23396963786564,-44.85000000000001 294.5179193190119,109.91999999999993 259.8076211353316,149.99999999999994 C225.0973229516513,190.07999999999996 86.77574545920078,119.99999999999997 0.00000000000000734788079488412,120 C-86.77574545920075,120.00000000000003 -225.09732295165125,190.08000000000013 -259.80762113533154,150.0000000000001 C-294.51791931901187,109.9200000000001 -251.2339696378656,-44.85000000000001 -207.84609690826525,-120.00000000000003 C-164.4582241786649,-195.15000000000003 -69.42059636736059,-300 0.000000000000018369701987210297,-300 Z" class="radarCurve-0" stroke="#8686FF" fill="#8686FF"/>
       <path d="M0.00000000000000734788079488412,-120 C86.77574545920078,-120 233.77489749757137,-185.07 259.8076211353316,-150 C285.84034477309183,-114.93 199.27244541079935,14.849999999999966 155.88457268119896,89.99999999999997 C112.49669995159857,165.14999999999998 60.74302182144054,294.99 0.000000000000018369701987210297,300 C-60.7430218214405,305.01 -164.45822417866484,195.1500000000001 -207.84609690826522,120.00000000000009 C-251.2339696378656,44.85000000000008 -294.51791931901187,-109.92000000000002 -259.8076211353316,-150.00000000000003 C-225.0973229516513,-190.08000000000004 -86.77574545920075,-120 0.00000000000000734788079488412,-120 Z" class="radarCurve-1" stroke="#FFFF78" fill="#FFFF78"/>
       <path d="M0.00000000000001469576158976824,-240 C69.42059636736062,-240 173.13579872458496,-180.12 207.84609690826525,-120 C242.55639509194555,-59.88 242.55639509194557,59.87999999999995 207.84609690826528,119.99999999999996 C173.135798724585,180.11999999999995 78.09817091328068,234.98999999999998 0.00000000000001469576158976824,240 C-78.09817091328065,245.01000000000002 -225.09732295165125,210.12000000000012 -259.80762113533154,150.0000000000001 C-294.51791931901187,89.88000000000011 -251.2339696378656,-54.870000000000005 -207.84609690826525,-120.00000000000003 C-164.4582241786649,-185.13000000000005 -69.42059636736059,-240 0.00000000000001469576158976824,-240 Z" class="radarCurve-2" fill="#9FFF9F" stroke="#9FFF9F"/>
-      <path d="M0.000000000000018369701987210297,-300 C78.0981709132807,-305.01 242.45247204349144,-210.12 259.8076211353316,-150 C277.16277022717173,-89.88 147.31092118373303,24.92999999999998 103.92304845413264,59.99999999999998 C60.53517572453226,95.06999999999998 43.38787272960039,54.98999999999999 0.00000000000000367394039744206,60 C-43.387872729600375,65.01000000000002 -121.17427449751864,120.06000000000006 -155.88457268119893,90.00000000000006 C-190.59487086487923,59.940000000000055 -233.87882054602548,-54.87000000000002 -207.84609690826525,-120.00000000000003 C-181.81337327050502,-185.13000000000005 -78.09817091328067,-294.99 0.000000000000018369701987210297,-300 Z" class="radarCurve-3" fill="#C986FF" stroke="#C986FF"/>
+      <path d="M0.000000000000018369701987210297,-300 C78.0981709132807,-305.01 242.45247204349144,-210.12 259.8076211353316,-150 C277.16277022717173,-89.88 147.31092118373303,24.92999999999998 103.92304845413264,59.99999999999998 C60.53517572453226,95.06999999999998 43.38787272960039,54.98999999999999 0.00000000000000367394039744206,60 C-43.387872729600375,65.01000000000002 -121.17427449751864,120.06000000000006 -155.88457268119893,90.00000000000006 C-190.59487086487923,59.940000000000055 -233.87882054602548,-54.87000000000002 -207.84609690826525,-120.00000000000003 C-181.81337327050502,-185.13000000000005 -78.09817091328067,-294.99 0.000000000000018369701987210297,-300 Z" class="radarCurve-3" stroke="#C986FF" fill="#C986FF"/>
       <rect x="262.5" y="-262.5" width="12" height="12" class="radarLegendBox-0" fill="#8686FF"/>
-      <text x="278.5" y="-262.5" class="radarLegendText" dominant-baseline="hanging" font-size="12">Rust</text>
       <rect x="262.5" y="-242.5" width="12" height="12" class="radarLegendBox-1" fill="#FFFF78"/>
-      <text x="278.5" y="-242.5" class="radarLegendText" dominant-baseline="hanging" font-size="12">Python</text>
       <rect x="262.5" y="-222.5" width="12" height="12" class="radarLegendBox-2" fill="#9FFF9F"/>
-      <text x="278.5" y="-222.5" class="radarLegendText" font-size="12" dominant-baseline="hanging">Go</text>
       <rect x="262.5" y="-202.5" width="12" height="12" class="radarLegendBox-3" fill="#C986FF"/>
-      <text x="278.5" y="-202.5" class="radarLegendText" dominant-baseline="hanging" font-size="12">C++</text>
-      <text x="0" y="-350" class="radarTitle" fill="#333333" font-size="16" dominant-baseline="hanging" font-weight="bold" text-anchor="middle">Programming Language Comparison</text>
+      <text x="0.000000000000019288187086570814" y="-315" class="radarAxisLabel" text-anchor="middle" font-size="12" dominant-baseline="middle" fill="#333333">Performance</text>
+      <text x="272.7980021920982" y="-157.5" class="radarAxisLabel" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#333333">Ecosystem</text>
+      <text x="272.7980021920982" y="157.49999999999994" class="radarAxisLabel" text-anchor="middle" font-size="12" fill="#333333" dominant-baseline="middle">Safety</text>
+      <text x="0.000000000000019288187086570814" y="315" class="radarAxisLabel" text-anchor="middle" dominant-baseline="middle" fill="#333333" font-size="12">Learning Curve</text>
+      <text x="-272.7980021920981" y="157.5000000000001" class="radarAxisLabel" fill="#333333" dominant-baseline="middle" font-size="12" text-anchor="middle">Tooling</text>
+      <text x="-272.7980021920982" y="-157.50000000000003" class="radarAxisLabel" text-anchor="middle" fill="#333333" font-size="12" dominant-baseline="middle">Community</text>
+      <text x="278.5" y="-262.5" class="radarLegendText" font-size="12" dominant-baseline="hanging">Rust</text>
+      <text x="278.5" y="-242.5" class="radarLegendText" font-size="12" dominant-baseline="hanging">Python</text>
+      <text x="278.5" y="-222.5" class="radarLegendText" dominant-baseline="hanging" font-size="12">Go</text>
+      <text x="278.5" y="-202.5" class="radarLegendText" font-size="12" dominant-baseline="hanging">C++</text>
+      <text x="0" y="-350" class="radarTitle" font-weight="bold" fill="#333333" dominant-baseline="hanging" text-anchor="middle" font-size="16">Programming Language Comparison</text>
     </g>
   </g>
 </svg>
