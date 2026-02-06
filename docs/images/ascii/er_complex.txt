@@ -1,64 +1,13 @@
-                                ┌───────────────────────────┐
-                                │         CUSTOMER          │
-                                ├─────────┬────────────┬────┤
-                                │ uuid    │ id         │ PK │
-                                │ string  │ email      │ UK │
-                                │ string  │ name       │    │
-                                │ string  │ phone      │    │
-                                │ date    │ created_at │    │
-                                │ boolean │ active     │    │
-                                └─────────┴────────────┴────┘
-
-
-
-                                                                       ⠠⣀
-                                                                         ⠉⠒⠤⣀
-                                                                             ⠉⠒⠤⣀
-               ┌────────────────────────────┐                                    ⠉⠒⢄⡀
-               │           ORDER            │                                       ⠈⠑⠢⢄⡀
-               ├─────────┬─────────────┬────┤                                           ⠈⠑⠢⢄⡀
-               │ uuid    │ id          │ PK │ ⢀                                             ⠈⠑⠢⢄
-               │ uuid    │ customer_id │ FK │⢠⠃                                                 ⠉⠒⠤⣀
-               │ decimal │ total       │    │⠁                                                      ⠉⠒⠤⣀
-               │ string  │ status      │    │                                                           ⠉⠒⠤⡀
-               │ date    │ ordered_at  │    │                                                              ⡇
-               │ date    │ shipped_at  │    │                                                              ⡇
-               └─────────┴─────────────┴────┘                                                              ⡇
-                                        places                                                             ⡇
-                                                                                                           ⡇
-                                                                                                           ⡇
-                                                                                                           ⡇
-                                                                                                           ⡇
-                                                                                                           ⡇
-                                                                                                           ⡇
-                                                                                                           ⡇
-                                                                                                           ⡇
-                                                                                                           ⡇
-                                                                                                          has
-                                                                                                           ⡇
-                                                                                                           ⡇
-                                                         ⡀                                                 ⡇
-                                ┌───────────────────────────┐⡀                                             ⡇
-                                │          ADDRESS          │⠈⠑⠤⣀                                          ⡇
-                           ⢀⠔⠁  ├────────┬─────────────┬────┤    ⠉⠒⠤⡀                                      ⡇
-                         ⡠⠒⠁    │ uuid   │ id          │ PK │       ⠈⠑⠢⢄⡀                                  ⡇
-                       ⡠⠊       │ uuid   │ customer_id │ FK │           ⠈⠑⠤⣀paid_by                        ⡇
-                    ⢀⠤⠊         │ string │ type        │    │              ┌─────────────────────────────┐ ⡇
-                  ⢀⠔⠁           │ string │ street      │    │              │           PAYMENT           │ ⡇
-            contains            │ string │ city        │    │              ├─────────┬──────────────┬────┤ ⡇
-┌───────────────────────────┐   │ string │ state       │    │              │ uuid    │ id           │ PK │ ⡇
-│        ORDER_ITEM         │   │ string │ zip         │    │              │ uuid    │ order_id     │ FK │⠉
-├─────────┬────────────┬────┤   │ string │ country     │    │              │ string  │ method       │    │
-│ uuid    │ id         │ PK │   └────────┴─────────────┴────┘              │ decimal │ amount       │    │
-│ uuid    │ order_id   │ FK │            ships_to                          │ string  │ status       │    │
-│ uuid    │ product_id │ FK │                                              │ date    │ processed_at │    │
-│ int     │ quantity   │    │                                              └─────────┴──────────────┴────┘
-│ decimal │ price      │    │                                                        ⢀⠤⠊⠁      ▼
-└─────────┴────────────┴────┘                                                     ⣀⠔⠊⠁
-                                                                               ⣀⠔⠊
-                                                                            ⣀⠔⠊
-                                                                         ⡠⠔⠉
-                                                                       ⠐◀
+                                             ┌───────────────────────────┐
+                                             │         CUSTOMER          │
+                                             ├─────────┬────────────┬────┤
+                                             │ uuid    │ id         │ PK │
+                                             │ string  │ email      │ UK │
+                                             │ string  │ name       │    │
+                                             │ string  │ phone      │    │
+                                             │ date    │ created_at │    │
+                                             │ boolean │ active     │    │
+                                             └─────────┴────────────┴────┘
 
 
 
@@ -68,47 +17,102 @@
 
 
 
+                                                          ⡀
+                                                       ⢀⠤⠊⡇
+                                                     ⣀⠔⠁  ⡇
+                                                   ⡠⠊     ⡇
+                                                places    ⡇
+                                              ⡠⠒⠁         ⡇
+                                           ⢀⠤⠊            ⡇
+                             ┌────────────────────────────┐
+                             │           ORDER            │
+                             ├─────────┬─────────────┬────┤
+                             │ uuid    │ id          │ PK │
+                             │ uuid    │ customer_id │ FK │
+                             │ decimal │ total       │    │
+                             │ string  │ status      │    │
+                             │ date    │ ordered_at  │    │
+                             │ date    │ shipped_at  │    │
+                             └─────────┴─────────────┴────┘
+                                                         has
+                                                          ⡟⡄
+                                                          ⡇⠈⢆
+                                                          ⡇ ⠈⢆
+                                                          ⡇  ⠈⢢
+                                                          ⡇    ⢣
+                                                          ⡇     ⠣⡀
+                                                          ⡇      ⠱⡀
+                                                          ⡇       ⠱⡀
+                                           ⡀              ⡇        ⠘⡄
+                                        ⣀⠔⠉⠈⠢⢄            ⡇         ⠘⡄
+                                     ⣀⠔⠊      ⠑⢄⡀         ⡇          ⠈⢆
+                                  ⢀⠤⠊           ⠈⠢⡀       ⡇           ⠈⢆
+                               ⢀⡠⠊⠁            ships_to   ⡇            ⠈⢢
+                             ⡠⠒⠁                     ⠑⠢⡀  ⡇           paid_by
+                        contains                       ⠈⠢⢄▼               ⠱⡀
+                       ⣀⠔⠉                   ┌───────────────────────────┐ ⠱⡀
+                    ⢀⠔⠊                      │          ADDRESS          │  ⠑⡄
+                 ⢀⠤⠊⠁                        ├────────┬─────────────┬────┤   ⠘⡄
+              ⢀⡠⠊⠁                           │ uuid   │ id          │ PK │    ⠘⢄         ┌─────────────────────────────┐
+┌───────────────────────────┐                │ uuid   │ customer_id │ FK │     ⠈⢆        │           PAYMENT           │
+│        ORDER_ITEM         │                │ string │ type        │    │      ⠈⢆       ├─────────┬──────────────┬────┤
+├─────────┬────────────┬────┤                │ string │ street      │    │        ⢣      │ uuid    │ id           │ PK │
+│ uuid    │ id         │ PK │                │ string │ city        │    │         ⢣     │ uuid    │ order_id     │ FK │
+│ uuid    │ order_id   │ FK │                │ string │ state       │    │          ⠱⡀   │ string  │ method       │    │
+│ uuid    │ product_id │ FK │                │ string │ zip         │    │           ⠱⡀  │ decimal │ amount       │    │
+│ int     │ quantity   │    │                │ string │ country     │    │            ⠑⡄ │ string  │ status       │    │
+│ decimal │ price      │    │                └────────┴─────────────┴────┘             ⠘⡄│ date    │ processed_at │    │
+└─────────┴────────────┴────┘                                                           ⠘└─────────┴──────────────┴────┘
 
 
+
+
+
+
+
+
+              ⡇
+              ⡇
+              ⡇
+              ⡇
+              ⡇
+         references
+              ⡇
+              ⡇
+              ⡇
+              ▼
 ┌────────────────────────────┐
 │          PRODUCT           │
 ├─────────┬─────────────┬────┤
 │ uuid    │ id          │ PK │
-│ string  │ sku         │ UK │
-│ string  │ name        │    │
-│ text    │ description │    │
-│ decimal │ price       │    │
-│ int     │ stock       │    │  ┌──────────────────────────┐
-│ boolean │ available   │    │  │         CATEGORY         │
-└─────────┴─────────────┴────┘  ├────────┬────────────┬────┤
-         references             │ uuid   │ id         │ PK │
-                                │ string │ name       │ UK │
-                                │ uuid   │ parent_id  │ FK │
-                                │ int    │ sort_order │    │
-                                └────────┴────────────┴────┘
+│ string  │ sku         │ UK │               ┌──────────────────────────┐
+│ string  │ name        │    │               │         CATEGORY         │
+│ text    │ description │    │               ├────────┬────────────┬────┤
+│ decimal │ price       │    │               │ uuid   │ id         │ PK │
+│ int     │ stock       │    │               │ string │ name       │ UK │
+│ boolean │ available   │    │               │ uuid   │ parent_id  │ FK │
+└─────────┴─────────────┴────┘               │ int    │ sort_order │    │
+                                             └────────┴────────────┴────┘
 
 
 
 
 
 
-
-
-
-
-
-
-
-                                                          ⡄
-                                                          ⡇
-                                                          ⡇
-                                                          ⡇
-              ⡄                                           ⡇
-              ⡇                                           ⡇
-         belongs_to                                       ⡇
-┌────────────────────────────┐                           ⢀⡇
-│      PRODUCT_CATEGORY      │                       ⣀⠤⠔⠊⠁
-├──────┬─────────────┬───────┤                  ⣀⡠contains
-│ uuid │ product_id  │ PK,FK │             ⢀⡠⠔⠒⠉
-│ uuid │ category_id │ PK,FK │        ⢀⡠⠤⠒⠉⠁
-└──────┴─────────────┴───────┘      ◀⠊⠁
+                                                         ⣀⠄
+                                                     ⢀⡠⠒⠉
+                                                  ⣀⠤⠊⠁
+                                              ⢀⡠⠔⠉
+              ⢄                            ⣀⠤⠊⠁
+              ⠈⢢                       ⢀⡠⠔⠉
+                ⠱⡀                  contains
+                 ⠘⢄             ⢀⡠⠔⠊
+             belongs_to      ⣀⠤⠒⠁
+                    ⠑⡄    ⡠⠔⠊
+                     ⠈⢆▼⠒⠉
+         ┌────────────────────────────┐
+         │      PRODUCT_CATEGORY      │
+         ├──────┬─────────────┬───────┤
+         │ uuid │ product_id  │ PK,FK │
+         │ uuid │ category_id │ PK,FK │
+         └──────┴─────────────┴───────┘

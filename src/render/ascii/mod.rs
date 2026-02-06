@@ -32,7 +32,7 @@ use crate::diagrams::class::ClassDb;
 use crate::diagrams::er::ErDb;
 use crate::diagrams::flowchart::FlowchartDb;
 use crate::error::Result;
-use crate::layout::{LayoutGraph, ToLayoutGraph};
+use crate::layout::{LayoutGraph, Point, ToLayoutGraph};
 
 use shapes::RenderedShape;
 
@@ -58,6 +58,86 @@ pub fn render_flowchart_ascii(db: &FlowchartDb, graph: &LayoutGraph) -> Result<S
     render_ascii_impl(graph, &|node| flowchart_node_label(db, node))
 }
 
+/// Simplify ER edge routes by replacing dagre's multi-point routing with
+/// direct source→target lines. Dagre inserts dummy nodes for edges that span
+/// multiple layers, which can create routes that swing far beyond entity bounds.
+/// For ASCII ER diagrams, direct lines produce more compact output.
+fn simplify_er_edge_routes(graph: &LayoutGraph) -> LayoutGraph {
+    let mut simplified = graph.clone();
+
+    // Build node position lookup (non-dummy nodes only)
+    let node_positions: HashMap<&str, (f64, f64, f64, f64)> = graph
+        .nodes
+        .iter()
+        .filter(|n| !n.is_dummy)
+        .filter_map(|n| {
+            n.x.zip(n.y)
+                .map(|(x, y)| (n.id.as_str(), (x, y, n.width, n.height)))
+        })
+        .collect();
+
+    for edge in &mut simplified.edges {
+        if edge.bend_points.len() <= 2 {
+            continue;
+        }
+
+        let source_id = edge.sources.first().map(|s| s.as_str());
+        let target_id = edge.targets.first().map(|s| s.as_str());
+
+        let (src_pos, tgt_pos) = match (
+            source_id.and_then(|id| node_positions.get(id)),
+            target_id.and_then(|id| node_positions.get(id)),
+        ) {
+            (Some(s), Some(t)) => (*s, *t),
+            _ => continue,
+        };
+
+        // Compute attachment points on entity boundaries
+        let (src_x, src_y, src_w, src_h) = src_pos;
+        let (tgt_x, tgt_y, tgt_w, tgt_h) = tgt_pos;
+
+        let src_cx = src_x + src_w / 2.0;
+        let src_cy = src_y + src_h / 2.0;
+        let tgt_cx = tgt_x + tgt_w / 2.0;
+        let tgt_cy = tgt_y + tgt_h / 2.0;
+
+        let dx = tgt_cx - src_cx;
+        let dy = tgt_cy - src_cy;
+
+        // Determine start point (on source entity boundary)
+        let start = if dy.abs() > dx.abs() {
+            // Vertical dominant: exit from bottom or top
+            if dy > 0.0 {
+                Point::new(src_cx, src_y + src_h) // bottom
+            } else {
+                Point::new(src_cx, src_y) // top
+            }
+        } else if dx > 0.0 {
+            Point::new(src_x + src_w, src_cy) // right
+        } else {
+            Point::new(src_x, src_cy) // left
+        };
+
+        // Determine end point (on target entity boundary)
+        let end = if dy.abs() > dx.abs() {
+            if dy > 0.0 {
+                Point::new(tgt_cx, tgt_y) // top
+            } else {
+                Point::new(tgt_cx, tgt_y + tgt_h) // bottom
+            }
+        } else if dx > 0.0 {
+            Point::new(tgt_x, tgt_cy) // left
+        } else {
+            Point::new(tgt_x + tgt_w, tgt_cy) // right
+        };
+
+        edge.bend_points = vec![start, end];
+        edge.label_position = Some(Point::new((start.x + end.x) / 2.0, (start.y + end.y) / 2.0));
+    }
+
+    simplified
+}
+
 /// Render an ER diagram as character art.
 ///
 /// Uses `ErDb` to render entity boxes with attribute tables (type, name, keys
@@ -65,6 +145,15 @@ pub fn render_flowchart_ascii(db: &FlowchartDb, graph: &LayoutGraph) -> Result<S
 /// edges are rendered using the standard braille edge router.
 pub fn render_er_ascii(db: &ErDb, graph: &LayoutGraph) -> Result<String> {
     let scale = CellScale::default();
+
+    // Simplify edge routes: replace dagre's complex multi-point routing with
+    // direct source→target lines. Dagre routes long-span edges through dummy
+    // nodes that can extend far beyond entity bounds (e.g., the "has" edge
+    // taking a 30-row vertical detour). Direct lines keep the diagram compact;
+    // braille compositing already skips occupied cells, so edges naturally
+    // "pass behind" any intervening entity boxes.
+    let simplified_graph = simplify_er_edge_routes(graph);
+    let graph = &simplified_graph;
 
     // Determine canvas dimensions from graph bounds
     let graph_width = graph.width.unwrap_or(400.0);
@@ -1577,6 +1666,28 @@ mod tests {
                 output
             );
         }
+    }
+
+    #[test]
+    fn er_ascii_complex_compact_width() {
+        // The complex ER diagram should have a compact width.
+        // Previously, the "has" edge routing created long vertical runs far
+        // to the right, making the diagram unnecessarily wide.
+        let input = std::fs::read_to_string("docs/sources/er_complex.mmd").unwrap();
+        let (db, graph) = parse_er_and_layout(&input);
+        let output = render_er_ascii(&db, &graph).unwrap();
+
+        let max_line_width = output.lines().map(|l| l.chars().count()).max().unwrap_or(0);
+
+        // The diagram has 8 entities. With reasonable layout, width should
+        // stay under 120 chars (roughly two side-by-side entity boxes + edges).
+        assert!(
+            max_line_width <= 120,
+            "ER complex diagram is {} columns wide, expected <= 120. \
+             This suggests edges are routed too far from entities.\nOutput:\n{}",
+            max_line_width,
+            output
+        );
     }
 
     // --- Class diagram specialized ASCII tests ---
