@@ -21,7 +21,8 @@ pub mod wasm;
 pub use config::Config;
 pub use error::{MermaidError, Result};
 pub use render::{
-    render, render_ascii, render_text, render_text_ascii, render_with_config, RenderConfig, Theme,
+    render, render_ascii, render_ascii_with_config, render_text, render_text_ascii,
+    render_text_ascii_with_config, render_with_config, RenderConfig, Theme,
 };
 
 /// Parse a mermaid diagram and return a diagram representation

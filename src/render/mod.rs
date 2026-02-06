@@ -180,15 +180,39 @@ fn render_flowchart(
 /// assert!(ascii.contains("Start"));
 /// ```
 pub fn render_ascii(diagram: &Diagram) -> Result<String> {
+    render_ascii_with_config(diagram, &ascii::AsciiRenderConfig::default())
+}
+
+/// Render a diagram to ASCII character art with configuration.
+///
+/// Like [`render_ascii`], but accepts an [`AsciiRenderConfig`](ascii::AsciiRenderConfig)
+/// to control output constraints such as maximum width.
+///
+/// # Example
+///
+/// ```
+/// use selkie::render::ascii::AsciiRenderConfig;
+///
+/// let diagram = selkie::parse("flowchart TD\n    A[Start] --> B[End]").unwrap();
+/// let config = AsciiRenderConfig { max_width: Some(60), ..Default::default() };
+/// let ascii = selkie::render::render_ascii_with_config(&diagram, &config).unwrap();
+/// assert!(ascii.lines().all(|line| line.len() <= 60));
+/// ```
+pub fn render_ascii_with_config(
+    diagram: &Diagram,
+    config: &ascii::AsciiRenderConfig,
+) -> Result<String> {
     use crate::layout::{self, CharacterSizeEstimator, ToLayoutGraph};
 
     let estimator = CharacterSizeEstimator::default();
 
-    match diagram {
+    let result = match diagram {
         Diagram::Flowchart(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(ascii::render_flowchart_ascii(db, &graph)?)
+            Ok(ascii::render_flowchart_ascii_with_config(
+                db, &graph, config,
+            )?)
         }
         Diagram::Sequence(db) => Ok(ascii::render_sequence_ascii(db)?),
         Diagram::Class(db) => {
@@ -199,7 +223,7 @@ pub fn render_ascii(diagram: &Diagram) -> Result<String> {
         Diagram::State(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(ascii::render_graph_ascii(&graph)?)
+            Ok(ascii::render_graph_ascii_with_config(&graph, config)?)
         }
         Diagram::Er(db) => {
             let graph = db.to_layout_graph(&estimator)?;
@@ -209,12 +233,12 @@ pub fn render_ascii(diagram: &Diagram) -> Result<String> {
         Diagram::Architecture(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(ascii::render_graph_ascii(&graph)?)
+            Ok(ascii::render_graph_ascii_with_config(&graph, config)?)
         }
         Diagram::Requirement(db) => {
             let graph = db.to_layout_graph(&estimator)?;
             let graph = layout::layout(graph)?;
-            Ok(ascii::render_graph_ascii(&graph)?)
+            Ok(ascii::render_graph_ascii_with_config(&graph, config)?)
         }
         Diagram::Pie(db) => Ok(ascii::pie::render_pie_ascii(db)?),
         Diagram::Gantt(db) => {
@@ -237,6 +261,38 @@ pub fn render_ascii(diagram: &Diagram) -> Result<String> {
         _ => Err(MermaidError::RenderError(
             "ASCII format not yet supported for this diagram type".to_string(),
         )),
+    }?;
+
+    // For diagram types that don't yet thread config internally,
+    // apply max_width truncation at the output level.
+    Ok(truncate_ascii_width(&result, config))
+}
+
+/// Truncate each line of ASCII output to the configured max_width.
+fn truncate_ascii_width(output: &str, config: &ascii::AsciiRenderConfig) -> String {
+    match config.max_width {
+        Some(max_w) if max_w > 0 => {
+            let mut result = String::with_capacity(output.len());
+            for line in output.split('\n') {
+                let char_count = line.chars().count();
+                if char_count > max_w {
+                    let truncated: String = line.chars().take(max_w).collect();
+                    result.push_str(&truncated);
+                } else {
+                    result.push_str(line);
+                }
+                result.push('\n');
+            }
+            // Remove trailing extra newline if original didn't end with double newline
+            if !output.ends_with("\n\n") && result.ends_with("\n\n") {
+                result.pop();
+            }
+            if output.is_empty() {
+                result.clear();
+            }
+            result
+        }
+        _ => output.to_string(),
     }
 }
 
@@ -252,10 +308,34 @@ pub fn render_ascii(diagram: &Diagram) -> Result<String> {
 /// assert!(ascii.contains("Start"));
 /// ```
 pub fn render_text_ascii(text: &str) -> Result<String> {
+    render_text_ascii_with_config(text, &ascii::AsciiRenderConfig::default())
+}
+
+/// Render mermaid text directly to ASCII character art with configuration.
+///
+/// Like [`render_text_ascii`], but accepts an [`AsciiRenderConfig`](ascii::AsciiRenderConfig)
+/// for output constraints.
+///
+/// # Example
+///
+/// ```
+/// use selkie::render::ascii::AsciiRenderConfig;
+///
+/// let config = AsciiRenderConfig { max_width: Some(80), ..Default::default() };
+/// let ascii = selkie::render::render_text_ascii_with_config(
+///     "flowchart TD\n    A[Start] --> B[End]",
+///     &config,
+/// ).unwrap();
+/// assert!(ascii.lines().all(|line| line.len() <= 80));
+/// ```
+pub fn render_text_ascii_with_config(
+    text: &str,
+    config: &ascii::AsciiRenderConfig,
+) -> Result<String> {
     let clean_text = remove_directives(text);
     let diagram_type = detect_type(&clean_text)?;
     let diagram = parse(diagram_type, &clean_text)?;
-    render_ascii(&diagram)
+    render_ascii_with_config(&diagram, config)
 }
 
 /// Render an architecture diagram

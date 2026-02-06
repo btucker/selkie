@@ -41,13 +41,44 @@ pub use sequence::render_sequence_ascii;
 use scale::CellScale;
 use shapes::{render_class_box, render_shape};
 
+/// Configuration for ASCII rendering.
+///
+/// Controls output constraints like maximum width. Use `Default::default()` for
+/// unconstrained rendering.
+///
+/// # Example
+///
+/// ```
+/// use selkie::render::ascii::AsciiRenderConfig;
+///
+/// let config = AsciiRenderConfig {
+///     max_width: Some(80),
+///     ..Default::default()
+/// };
+/// ```
+#[derive(Debug, Clone, Default)]
+pub struct AsciiRenderConfig {
+    /// Maximum output width in columns. When set, the renderer adjusts its
+    /// horizontal scale so the diagram fits within this width. Lines that
+    /// still exceed the limit after scaling are hard-truncated.
+    pub max_width: Option<usize>,
+}
+
 /// Render any laid-out graph as character art.
 ///
 /// This is the generic entry point for ASCII rendering. It works with any diagram
 /// type that produces a `LayoutGraph` via `ToLayoutGraph`. Node labels are taken
 /// from `node.label` (falling back to `node.id`), with HTML tags cleaned.
 pub fn render_graph_ascii(graph: &LayoutGraph) -> Result<String> {
-    render_ascii_impl(graph, &|node| generic_node_label(node))
+    render_graph_ascii_with_config(graph, &AsciiRenderConfig::default())
+}
+
+/// Render any laid-out graph as character art with configuration.
+pub fn render_graph_ascii_with_config(
+    graph: &LayoutGraph,
+    config: &AsciiRenderConfig,
+) -> Result<String> {
+    render_ascii_impl(graph, &|node| generic_node_label(node), config)
 }
 
 /// Render a flowchart as character art.
@@ -55,7 +86,16 @@ pub fn render_graph_ascii(graph: &LayoutGraph) -> Result<String> {
 /// Uses `FlowchartDb` for richer label lookup (vertex text), falling back to
 /// the layout node label. For non-flowchart diagrams, use `render_graph_ascii`.
 pub fn render_flowchart_ascii(db: &FlowchartDb, graph: &LayoutGraph) -> Result<String> {
-    render_ascii_impl(graph, &|node| flowchart_node_label(db, node))
+    render_flowchart_ascii_with_config(db, graph, &AsciiRenderConfig::default())
+}
+
+/// Render a flowchart as character art with configuration.
+pub fn render_flowchart_ascii_with_config(
+    db: &FlowchartDb,
+    graph: &LayoutGraph,
+    config: &AsciiRenderConfig,
+) -> Result<String> {
+    render_ascii_impl(graph, &|node| flowchart_node_label(db, node), config)
 }
 
 /// Simplify ER edge routes by replacing dagre's multi-point routing with
@@ -399,8 +439,9 @@ fn format_cell(text: &str, width: usize) -> String {
 fn render_ascii_impl(
     graph: &LayoutGraph,
     label_fn: &dyn Fn(&crate::layout::LayoutNode) -> String,
+    config: &AsciiRenderConfig,
 ) -> Result<String> {
-    let scale = CellScale::default();
+    let mut scale = CellScale::default();
 
     // Determine canvas dimensions from graph bounds
     let graph_width = graph.width.unwrap_or(400.0);
@@ -408,7 +449,24 @@ fn render_ascii_impl(
     let offset_x = graph.bounds_x.unwrap_or(0.0);
     let offset_y = graph.bounds_y.unwrap_or(0.0);
 
-    let canvas_cols = scale.to_col(graph_width) + 8;
+    let padding_cols: usize = 8;
+    let natural_cols = scale.to_col(graph_width) + padding_cols;
+
+    // When max_width is set and the natural width exceeds it, widen the
+    // cell_width so the graph compresses horizontally to fit.
+    if let Some(max_w) = config.max_width {
+        if max_w > 0 && natural_cols > max_w {
+            // Solve: graph_width / new_cell_width + padding_cols = max_w
+            let available = max_w.saturating_sub(padding_cols).max(1);
+            scale.cell_width = graph_width / available as f64;
+        }
+    }
+
+    let canvas_cols = if let Some(max_w) = config.max_width {
+        (scale.to_col(graph_width) + padding_cols).min(max_w)
+    } else {
+        scale.to_col(graph_width) + padding_cols
+    };
     let canvas_rows = scale.to_row(graph_height) + 4;
 
     // Create a canvas (2D grid of characters)
@@ -729,7 +787,15 @@ fn render_ascii_impl(
 
     for row in &canvas[..=last_non_empty] {
         let line: String = row.iter().collect();
-        result.push_str(line.trim_end());
+        let trimmed = line.trim_end();
+        // Hard-truncate to max_width if set (defensive — canvas should
+        // already be sized correctly, but edges can extend slightly).
+        if let Some(max_w) = config.max_width {
+            let truncated: String = trimmed.chars().take(max_w).collect();
+            result.push_str(&truncated);
+        } else {
+            result.push_str(trimmed);
+        }
         result.push('\n');
     }
 
@@ -949,6 +1015,97 @@ mod tests {
         let graph = db.to_layout_graph(&estimator).unwrap();
         let graph = crate::layout::layout(graph).unwrap();
         (db, graph)
+    }
+
+    #[test]
+    fn max_width_constrains_output_columns() {
+        let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] --> B[End]");
+        let config = AsciiRenderConfig {
+            max_width: Some(40),
+            ..Default::default()
+        };
+        let output = render_flowchart_ascii_with_config(&db, &graph, &config).unwrap();
+        for line in output.lines() {
+            assert!(
+                line.chars().count() <= 40,
+                "Line exceeds max_width 40 ({} chars): {:?}",
+                line.chars().count(),
+                line,
+            );
+        }
+        // Should still produce output
+        assert!(!output.trim().is_empty(), "Output should not be empty");
+    }
+
+    #[test]
+    fn max_width_none_is_unconstrained() {
+        let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] --> B[End]");
+        let default_output = render_flowchart_ascii(&db, &graph).unwrap();
+        let config = AsciiRenderConfig {
+            max_width: None,
+            ..Default::default()
+        };
+        let config_output = render_flowchart_ascii_with_config(&db, &graph, &config).unwrap();
+        assert_eq!(
+            default_output, config_output,
+            "Default and None config should produce identical output"
+        );
+    }
+
+    #[test]
+    fn max_width_preserves_labels_when_possible() {
+        let (db, graph) = parse_and_layout("flowchart TD\n    A[Hello] --> B[World]");
+        let config = AsciiRenderConfig {
+            max_width: Some(60),
+            ..Default::default()
+        };
+        let output = render_flowchart_ascii_with_config(&db, &graph, &config).unwrap();
+        // With a reasonable max_width, labels should still be visible
+        assert!(
+            output.contains("Hello"),
+            "Label 'Hello' should be present\nOutput:\n{}",
+            output,
+        );
+        assert!(
+            output.contains("World"),
+            "Label 'World' should be present\nOutput:\n{}",
+            output,
+        );
+    }
+
+    #[test]
+    fn max_width_via_render_graph_ascii() {
+        // Test the generic render_graph_ascii_with_config path (used by state,
+        // architecture, requirement diagrams).
+        let (_, graph) = parse_and_layout("flowchart TD\n    A[Start] --> B[End]");
+        let config = AsciiRenderConfig {
+            max_width: Some(35),
+            ..Default::default()
+        };
+        let output = render_graph_ascii_with_config(&graph, &config).unwrap();
+        for line in output.lines() {
+            assert!(
+                line.chars().count() <= 35,
+                "Line exceeds max_width 35 ({} chars): {:?}",
+                line.chars().count(),
+                line,
+            );
+        }
+    }
+
+    #[test]
+    fn max_width_large_value_no_effect() {
+        let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] --> B[End]");
+        let default_output = render_flowchart_ascii(&db, &graph).unwrap();
+        let config = AsciiRenderConfig {
+            max_width: Some(500),
+            ..Default::default()
+        };
+        let config_output = render_flowchart_ascii_with_config(&db, &graph, &config).unwrap();
+        assert_eq!(
+            default_output, config_output,
+            "Large max_width should not change output"
+        );
     }
 
     #[test]
