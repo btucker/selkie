@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use crate::diagrams::er::{Cardinality, Entity, ErDb, Identification};
+use crate::diagrams::er::{Cardinality, Entity, ErDb, Identification, Relationship};
 use crate::error::Result;
 use crate::layout::{
     layout, CharacterSizeEstimator, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
@@ -137,12 +137,50 @@ fn determine_attachment_sides(
     (side_a, side_b)
 }
 
+/// Compute where a line from a rectangle's center toward a given point
+/// intersects the rectangle boundary.
+///
+/// This is the `intersect-rect` algorithm used by mermaid.js/dagre.
+/// Given the rectangle's top-left (rx, ry), dimensions (w, h), and
+/// an external point (px, py), returns the boundary intersection point.
+fn intersect_rect(rx: f64, ry: f64, w: f64, h: f64, px: f64, py: f64) -> (f64, f64) {
+    let cx = rx + w / 2.0;
+    let cy = ry + h / 2.0;
+    let dx = px - cx;
+    let dy = py - cy;
+
+    if dx.abs() < 0.001 && dy.abs() < 0.001 {
+        return (cx, cy);
+    }
+
+    let hw = w / 2.0;
+    let hh = h / 2.0;
+
+    // Find the parameter t where the ray from center toward (px,py) hits the boundary.
+    // The ray intersects the vertical edges at t = hw/|dx| and horizontal at t = hh/|dy|.
+    // The smaller t is the first boundary crossing.
+    let sx = if dx.abs() > 0.001 {
+        hw / dx.abs()
+    } else {
+        f64::INFINITY
+    };
+    let sy = if dy.abs() > 0.001 {
+        hh / dy.abs()
+    } else {
+        f64::INFINITY
+    };
+    let t = sx.min(sy);
+
+    (cx + t * dx, cy + t * dy)
+}
+
 /// Adjust dagre bend_points to properly intersect entity boundaries
 ///
-/// Dagre computes edge paths between node centers, but we need the edges to
-/// attach to the correct sides of entity boxes based on relative entity positions.
-/// This determines which side each entity should use based on their layout positions,
-/// then calculates intersection points on those specific sides.
+/// Dagre computes edge paths between node centers. We use the direction
+/// of the edge at each endpoint (from the adjacent bend point) to compute
+/// where the edge intersects each entity's boundary via intersect-rect.
+/// This matches how mermaid.js determines attachment sides — from the actual
+/// edge routing direction, not a simple center-to-center heuristic.
 fn adjust_bend_points_for_intersection(
     bend_points: &[Point],
     entity_a_name: &str,
@@ -154,65 +192,188 @@ fn adjust_bend_points_for_intersection(
         return bend_points.to_vec();
     }
 
-    // Get both entities' positions and dimensions
     let a_pos = entity_positions.get(entity_a_name);
     let b_pos = entity_positions.get(entity_b_name);
     let a_dims = entity_dimensions.get(entity_a_name);
     let b_dims = entity_dimensions.get(entity_b_name);
 
-    // Need both entities to calculate attachment sides
     let (Some(&(ax, ay)), Some(&(bx, by)), Some(a_dims), Some(b_dims)) =
         (a_pos, b_pos, a_dims, b_dims)
     else {
         return bend_points.to_vec();
     };
 
-    // Determine which sides each entity should use based on their relative positions
-    let (side_a, side_b) = determine_attachment_sides(
-        ax,
-        ay,
-        a_dims.width,
-        a_dims.height,
-        bx,
-        by,
-        b_dims.width,
-        b_dims.height,
-    );
-
     let mut adjusted = bend_points.to_vec();
+    let last_idx = adjusted.len() - 1;
 
-    // Calculate intersection point on entity A's determined side
+    // For entity A: use the next bend point as the direction target.
+    // This captures which way dagre actually routes the edge out of A.
+    let a_target = if bend_points.len() > 2 {
+        bend_points[1]
+    } else {
+        // Only 2 points: use B's center as target
+        Point {
+            x: bx + b_dims.width / 2.0,
+            y: by + b_dims.height / 2.0,
+        }
+    };
+
     let (start_x, start_y) =
-        calculate_side_intersection(ax, ay, a_dims.width, a_dims.height, side_a);
+        intersect_rect(ax, ay, a_dims.width, a_dims.height, a_target.x, a_target.y);
     adjusted[0] = Point {
         x: start_x,
         y: start_y,
     };
 
-    // Calculate intersection point on entity B's determined side
-    let last_idx = adjusted.len() - 1;
-    let (end_x, end_y) = calculate_side_intersection(bx, by, b_dims.width, b_dims.height, side_b);
+    // For entity B: determine direction the edge approaches from.
+    // For long edges (many bend points), use the adjacent bend point which
+    // captures dagre's local routing direction near B.
+    // For short edges (≤3 points), dagre provides minimal routing so the
+    // adjacent point is near A's center — use the adjusted start point instead,
+    // which is on A's boundary and captures the actual horizontal offset.
+    let b_source = if bend_points.len() > 3 {
+        bend_points[last_idx - 1]
+    } else {
+        // Use the adjusted start point for better direction context
+        Point {
+            x: start_x,
+            y: start_y,
+        }
+    };
+
+    let (end_x, end_y) =
+        intersect_rect(bx, by, b_dims.width, b_dims.height, b_source.x, b_source.y);
     adjusted[last_idx] = Point { x: end_x, y: end_y };
 
     adjusted
 }
 
-/// Calculate the intersection point on a specific side of an entity box
-fn calculate_side_intersection(
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
-    side: AttachmentSide,
-) -> (f64, f64) {
-    let center_x = x + width / 2.0;
-    let center_y = y + height / 2.0;
+/// Determine which side of an entity a point falls on
+fn point_to_side(px: f64, py: f64, ex: f64, ey: f64, ew: f64, eh: f64) -> AttachmentSide {
+    let eps = 1.0;
+    if (py - ey).abs() < eps {
+        AttachmentSide::Top
+    } else if (py - (ey + eh)).abs() < eps {
+        AttachmentSide::Bottom
+    } else if (px - ex).abs() < eps {
+        AttachmentSide::Left
+    } else if (px - (ex + ew)).abs() < eps {
+        AttachmentSide::Right
+    } else {
+        // Fallback: determine by distance to edges
+        let to_top = (py - ey).abs();
+        let to_bottom = (py - (ey + eh)).abs();
+        let to_left = (px - ex).abs();
+        let to_right = (px - (ex + ew)).abs();
+        let min = to_top.min(to_bottom).min(to_left).min(to_right);
+        if (min - to_top).abs() < eps {
+            AttachmentSide::Top
+        } else if (min - to_bottom).abs() < eps {
+            AttachmentSide::Bottom
+        } else if (min - to_left).abs() < eps {
+            AttachmentSide::Left
+        } else {
+            AttachmentSide::Right
+        }
+    }
+}
 
-    match side {
-        AttachmentSide::Top => (center_x, y),
-        AttachmentSide::Bottom => (center_x, y + height),
-        AttachmentSide::Left => (x, center_y),
-        AttachmentSide::Right => (x + width, center_y),
+/// Redistribute edge endpoints that converge on the same side of a target entity.
+///
+/// When multiple edges arrive at the same side of an entity (e.g., two edges both
+/// arriving at the top of LINE-ITEM), redistribute them to left/right sides based
+/// on horizontal offset from the source. This matches mermaid.js behavior for
+/// converging diagonal edges in ER diagrams.
+fn redistribute_converging_endpoints(
+    all_adjusted: &mut HashMap<usize, Vec<Point>>,
+    relationships: &[Relationship],
+    entity_id_to_name: &HashMap<String, String>,
+    entity_positions: &HashMap<String, (f64, f64)>,
+    entity_dimensions: &HashMap<String, EntityDimensions>,
+) {
+    // Group edges by (target entity, target side)
+    let mut target_groups: HashMap<(String, AttachmentSide), Vec<usize>> = HashMap::new();
+
+    for (idx, relationship) in relationships.iter().enumerate() {
+        let Some(adjusted) = all_adjusted.get(&idx) else {
+            continue;
+        };
+        if adjusted.is_empty() {
+            continue;
+        }
+
+        let Some(b_name) = entity_id_to_name.get(&relationship.entity_b) else {
+            continue;
+        };
+        let Some(&(bx, by)) = entity_positions.get(b_name) else {
+            continue;
+        };
+        let Some(b_dims) = entity_dimensions.get(b_name) else {
+            continue;
+        };
+
+        let end_pt = adjusted[adjusted.len() - 1];
+        let side = point_to_side(end_pt.x, end_pt.y, bx, by, b_dims.width, b_dims.height);
+        target_groups
+            .entry((b_name.clone(), side))
+            .or_default()
+            .push(idx);
+    }
+
+    // For groups with 2+ converging edges on top/bottom, redistribute to left/right
+    for ((entity_name, side), edge_indices) in &target_groups {
+        if edge_indices.len() < 2 {
+            continue;
+        }
+        // Only redistribute top/bottom convergence to left/right
+        if !matches!(side, AttachmentSide::Top | AttachmentSide::Bottom) {
+            continue;
+        }
+
+        let Some(&(bx, by)) = entity_positions.get(entity_name) else {
+            continue;
+        };
+        let Some(b_dims) = entity_dimensions.get(entity_name) else {
+            continue;
+        };
+        let b_cy = by + b_dims.height / 2.0;
+
+        // Collect edges with their start x positions
+        let mut sorted_edges: Vec<(usize, f64)> = edge_indices
+            .iter()
+            .filter_map(|&idx| {
+                all_adjusted.get(&idx).map(|pts| (idx, pts[0].x)) // start point x
+            })
+            .collect();
+        sorted_edges.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
+
+        let b_cx = bx + b_dims.width / 2.0;
+        let half_width = b_dims.width / 2.0;
+
+        // Only redistribute edges that are significantly offset from the target center.
+        // If the start point is within 1x the target half-width, the edge approaches
+        // mostly from above/below and should stay on the original side (just offset).
+        // This avoids breaking edges that correctly converge on the same side.
+        for &(idx, start_x) in &sorted_edges {
+            let offset_ratio = (start_x - b_cx).abs() / half_width.max(1.0);
+            if offset_ratio <= 1.0 {
+                continue; // Not significantly offset — keep original side
+            }
+
+            let Some(adjusted) = all_adjusted.get_mut(&idx) else {
+                continue;
+            };
+            let last = adjusted.len() - 1;
+
+            if start_x < b_cx {
+                adjusted[last] = Point { x: bx, y: b_cy };
+            } else {
+                adjusted[last] = Point {
+                    x: bx + b_dims.width,
+                    y: b_cy,
+                };
+            }
+        }
     }
 }
 
@@ -643,34 +804,49 @@ pub fn render_er(db: &ErDb, config: &RenderConfig) -> Result<String> {
         marker_offset,
     );
 
-    // Render relationships FIRST so entity boxes paint on top and clip markers
-    // (SVG renders later elements on top of earlier ones)
+    // First pass: compute adjusted bend points for all edges with dagre routing.
+    // We need all edges to detect and fix converging endpoints on the same entity side.
+    let mut all_adjusted_points: HashMap<usize, Vec<Point>> = HashMap::new();
+
     for (idx, relationship) in relationships.iter().enumerate() {
         let edge_id = format!("relationship-{}", idx);
-
-        // Get entity information for intersection calculation
         let entity_a_name = entity_id_to_name.get(&relationship.entity_a);
         let entity_b_name = entity_id_to_name.get(&relationship.entity_b);
 
-        // Try to use dagre-computed bend points for the edge path
         if let Some(bend_points) = edge_bend_points.get(&edge_id) {
-            // Adjust bend_points endpoints to properly intersect entity boundaries
-            // using the mermaid.js intersect-rect algorithm
-            let adjusted_points =
-                if let (Some(a_name), Some(b_name)) = (entity_a_name, entity_b_name) {
-                    adjust_bend_points_for_intersection(
-                        bend_points,
-                        a_name,
-                        b_name,
-                        &entity_positions,
-                        &entity_dimensions,
-                    )
-                } else {
-                    bend_points.clone()
-                };
+            let adjusted = if let (Some(a_name), Some(b_name)) = (entity_a_name, entity_b_name) {
+                adjust_bend_points_for_intersection(
+                    bend_points,
+                    a_name,
+                    b_name,
+                    &entity_positions,
+                    &entity_dimensions,
+                )
+            } else {
+                bend_points.clone()
+            };
+            all_adjusted_points.insert(idx, adjusted);
+        }
+    }
 
+    // Second pass: redistribute converging edge endpoints.
+    // When multiple edges arrive at the same side of the same entity (e.g., both
+    // hitting the top of LINE-ITEM), redistribute them to left/right sides based
+    // on horizontal offset. This matches how mermaid distributes converging edges.
+    redistribute_converging_endpoints(
+        &mut all_adjusted_points,
+        relationships,
+        &entity_id_to_name,
+        &entity_positions,
+        &entity_dimensions,
+    );
+
+    // Render relationships FIRST so entity boxes paint on top and clip markers
+    // (SVG renders later elements on top of earlier ones)
+    for (idx, relationship) in relationships.iter().enumerate() {
+        if let Some(adjusted_points) = all_adjusted_points.get(&idx) {
             let rel_elem = render_relationship_from_bend_points(
-                &adjusted_points,
+                adjusted_points,
                 &relationship.role_a,
                 relationship.rel_spec.card_a,
                 relationship.rel_spec.card_b,
@@ -1896,6 +2072,149 @@ mod tests {
             css.contains(".relationship-label {\n  fill: #9370DB"),
             "Relationship label should use border color for fill. CSS: {}",
             css
+        );
+    }
+
+    #[test]
+    fn test_adjust_bend_points_respects_dagre_exit_direction() {
+        // When dagre routes an edge to exit rightward from entity A,
+        // the adjusted start point should be on A's right side,
+        // even when entity B is mostly below A (where the center-to-center
+        // heuristic would incorrectly pick bottom).
+        //
+        // This reproduces the eval error:
+        //   Edge 1 start: leaves from bottom in selkie but right in reference
+        use crate::layout::Point;
+
+        let mut entity_positions = HashMap::new();
+        let mut entity_dimensions = HashMap::new();
+
+        // Entity A at (100, 50), 200x150 — center at (200, 125)
+        entity_positions.insert("A".to_string(), (100.0, 50.0));
+        entity_dimensions.insert(
+            "A".to_string(),
+            EntityDimensions {
+                width: 200.0,
+                height: 150.0,
+                col_widths: [70.0, 70.0, 60.0],
+            },
+        );
+
+        // Entity B at (200, 400), 200x150 — center at (300, 475)
+        // dx=100, dy=350 → dy dominates → heuristic says Bottom for A
+        entity_positions.insert("B".to_string(), (200.0, 400.0));
+        entity_dimensions.insert(
+            "B".to_string(),
+            EntityDimensions {
+                width: 200.0,
+                height: 150.0,
+                col_widths: [70.0, 70.0, 60.0],
+            },
+        );
+
+        // Dagre routes the edge rightward from A, then down to B's top
+        let bend_points = vec![
+            Point { x: 200.0, y: 125.0 }, // A center
+            Point { x: 350.0, y: 125.0 }, // Right of A center (dagre says go right)
+            Point { x: 350.0, y: 400.0 }, // Then go down
+            Point { x: 300.0, y: 475.0 }, // B center
+        ];
+
+        let adjusted = adjust_bend_points_for_intersection(
+            &bend_points,
+            "A",
+            "B",
+            &entity_positions,
+            &entity_dimensions,
+        );
+
+        // Start should be on A's RIGHT side (x = 100 + 200 = 300),
+        // not A's BOTTOM, because dagre routes rightward
+        assert!(
+            (adjusted[0].x - 300.0).abs() < 1.0,
+            "Edge should exit from A's right side at x=300, got x={}",
+            adjusted[0].x
+        );
+        assert!(
+            (adjusted[0].y - 125.0).abs() < 1.0,
+            "Edge should exit at A's center y=125, got y={}",
+            adjusted[0].y
+        );
+
+        // End should be on B's TOP (y = 400), because dagre comes from above
+        let last = adjusted.len() - 1;
+        assert!(
+            (adjusted[last].y - 400.0).abs() < 1.0,
+            "Edge should enter B's top at y=400, got y={}",
+            adjusted[last].y
+        );
+    }
+
+    #[test]
+    fn test_adjust_bend_points_respects_dagre_left_exit() {
+        // When dagre routes an edge to exit leftward from entity A,
+        // the adjusted start point should be on A's left side.
+        //
+        // This reproduces the eval error:
+        //   Edge 2 start: leaves from bottom in selkie but left in reference
+        use crate::layout::Point;
+
+        let mut entity_positions = HashMap::new();
+        let mut entity_dimensions = HashMap::new();
+
+        // Entity A at (300, 50), 200x150 — center at (400, 125)
+        entity_positions.insert("A".to_string(), (300.0, 50.0));
+        entity_dimensions.insert(
+            "A".to_string(),
+            EntityDimensions {
+                width: 200.0,
+                height: 150.0,
+                col_widths: [70.0, 70.0, 60.0],
+            },
+        );
+
+        // Entity B at (100, 400), 200x150 — center at (200, 475)
+        // dx=-200, dy=350 → dy dominates → heuristic says Bottom for A
+        entity_positions.insert("B".to_string(), (100.0, 400.0));
+        entity_dimensions.insert(
+            "B".to_string(),
+            EntityDimensions {
+                width: 200.0,
+                height: 150.0,
+                col_widths: [70.0, 70.0, 60.0],
+            },
+        );
+
+        // Dagre routes the edge leftward from A, then down to B's top
+        let bend_points = vec![
+            Point { x: 400.0, y: 125.0 }, // A center
+            Point { x: 250.0, y: 125.0 }, // Left of A center (dagre says go left)
+            Point { x: 200.0, y: 400.0 }, // Toward B
+            Point { x: 200.0, y: 475.0 }, // B center
+        ];
+
+        let adjusted = adjust_bend_points_for_intersection(
+            &bend_points,
+            "A",
+            "B",
+            &entity_positions,
+            &entity_dimensions,
+        );
+
+        // Start should be on A's LEFT side (x = 300),
+        // not A's BOTTOM, because dagre routes leftward
+        assert!(
+            (adjusted[0].x - 300.0).abs() < 1.0,
+            "Edge should exit from A's left side at x=300, got x={}",
+            adjusted[0].x
+        );
+
+        // End should be on B's TOP (y = 400)
+        let last = adjusted.len() - 1;
+        assert!(
+            (adjusted[last].y - 400.0).abs() < 1.0,
+            "Edge should enter B's top at y=400, got y={}",
+            adjusted[last].y
         );
     }
 
