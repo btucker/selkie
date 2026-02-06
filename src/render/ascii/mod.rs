@@ -1175,6 +1175,93 @@ mod tests {
                 !output.trim().is_empty(),
                 "Compressed output should not be empty"
             );
+
+            // Verify labels survive compression (reviewer feedback item #1)
+            for label in &["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Final"] {
+                assert!(
+                    output.contains(label),
+                    "Label '{}' should survive compression\nOutput:\n{}",
+                    label,
+                    output,
+                );
+            }
+
+            // Verify boxes don't overlap: no line should have two ┌ without a ┐ between
+            for (i, line) in output.lines().enumerate() {
+                let chars: Vec<char> = line.chars().collect();
+                let mut corner_positions: Vec<usize> = Vec::new();
+                for (j, &ch) in chars.iter().enumerate() {
+                    if ch == '┌' || ch == '└' {
+                        corner_positions.push(j);
+                    }
+                }
+                if corner_positions.len() >= 2 {
+                    for window in corner_positions.windows(2) {
+                        let between = &chars[window[0]..=window[1]];
+                        let has_closing = between.iter().any(|&c| c == '┐' || c == '┘');
+                        assert!(
+                            has_closing,
+                            "Compressed boxes overlap on line {}: corners at {} and {} without closing between\nLine: {}\nFull output:\n{}",
+                            i, window[0], window[1], line, output
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn max_width_preserves_edge_labels() {
+        // Test that edge labels survive compression without truncation
+        // (reviewer feedback item #1: edge label truncation check)
+        let input = "flowchart LR\n    A[Start] -->|process| B[Middle]\n    B -->|validate| C[End]";
+        let (db, graph) = parse_and_layout(input);
+
+        let unconstrained = render_flowchart_ascii(&db, &graph).unwrap();
+        let max_unconstrained = unconstrained
+            .lines()
+            .map(|l| l.chars().count())
+            .max()
+            .unwrap_or(0);
+
+        let max_w = 50;
+        if max_unconstrained > max_w {
+            let config = AsciiRenderConfig {
+                max_width: Some(max_w),
+                ..Default::default()
+            };
+            let output = render_flowchart_ascii_with_config(&db, &graph, &config).unwrap();
+
+            // Verify width constraint
+            for line in output.lines() {
+                assert!(
+                    line.chars().count() <= max_w,
+                    "Line exceeds max_width {} ({} chars): {:?}",
+                    max_w,
+                    line.chars().count(),
+                    line,
+                );
+            }
+
+            // Verify edge labels are not truncated (reviewer requirement)
+            for edge_label in &["process", "validate"] {
+                assert!(
+                    output.contains(edge_label),
+                    "Edge label '{}' truncated during compression\nOutput:\n{}",
+                    edge_label,
+                    output,
+                );
+            }
+
+            // Verify node labels also survive
+            for node_label in &["Start", "Middle", "End"] {
+                assert!(
+                    output.contains(node_label),
+                    "Node label '{}' missing after compression\nOutput:\n{}",
+                    node_label,
+                    output,
+                );
+            }
         }
     }
 
@@ -1196,6 +1283,60 @@ mod tests {
             );
         }
         assert!(!output.trim().is_empty());
+        // Verify labels survive scale compression (reviewer feedback: scale
+        // mutation after layout must not corrupt coordinates)
+        assert!(
+            output.contains("Idle"),
+            "Label 'Idle' should survive compression\nOutput:\n{}",
+            output,
+        );
+        assert!(
+            output.contains("Running"),
+            "Label 'Running' should survive compression\nOutput:\n{}",
+            output,
+        );
+    }
+
+    #[test]
+    fn max_width_state_diagram_compression_preserves_boxes() {
+        // Wider state diagram that is more likely to trigger scale compression.
+        // Verifies that post-layout scale mutation doesn't cause box overlap
+        // or corrupt node labels (reviewer feedback item #1).
+        let input = "stateDiagram-v2\n    [*] --> Idle\n    Idle --> Validating : validate\n    Validating --> Processing : ok\n    Processing --> Complete : done\n    Complete --> [*]";
+        let graph = parse_and_layout_generic(input);
+
+        let unconstrained = render_graph_ascii(&graph).unwrap();
+        let max_natural = unconstrained
+            .lines()
+            .map(|l| l.chars().count())
+            .max()
+            .unwrap_or(0);
+
+        let max_w = 45;
+        let config = AsciiRenderConfig {
+            max_width: Some(max_w),
+            ..Default::default()
+        };
+        let output = render_graph_ascii_with_config(&graph, &config).unwrap();
+        for line in output.lines() {
+            assert!(
+                line.chars().count() <= max_w,
+                "State line exceeds max_width {} ({} chars): {:?}",
+                max_w,
+                line.chars().count(),
+                line,
+            );
+        }
+        // Labels must survive even when compression is active
+        for label in &["Idle", "Validating", "Processing", "Complete"] {
+            assert!(
+                output.contains(label),
+                "State label '{}' must survive max_width compression (natural width {})\nOutput:\n{}",
+                label,
+                max_natural,
+                output,
+            );
+        }
     }
 
     #[test]
@@ -1226,6 +1367,59 @@ mod tests {
             );
         }
         assert!(!output.trim().is_empty());
+        // Verify labels survive compression
+        assert!(
+            output.contains("test_req") || output.contains("Requirement"),
+            "Requirement node label should survive compression\nOutput:\n{}",
+            output,
+        );
+        assert!(
+            output.contains("test_entity") || output.contains("simulation"),
+            "Element node label should survive compression\nOutput:\n{}",
+            output,
+        );
+    }
+
+    #[test]
+    fn max_width_requirement_compression_preserves_labels() {
+        // Larger requirement diagram where compression is more likely to fire.
+        // Verifies post-layout scale mutation doesn't corrupt labels (reviewer
+        // feedback item #1).
+        let input = std::fs::read_to_string("docs/sources/requirement.mmd").unwrap();
+        let graph = parse_and_layout_requirement(&input);
+
+        let unconstrained = render_graph_ascii(&graph).unwrap();
+        let max_natural = unconstrained
+            .lines()
+            .map(|l| l.chars().count())
+            .max()
+            .unwrap_or(0);
+
+        let max_w = 55;
+        let config = AsciiRenderConfig {
+            max_width: Some(max_w),
+            ..Default::default()
+        };
+        let output = render_graph_ascii_with_config(&graph, &config).unwrap();
+        for line in output.lines() {
+            assert!(
+                line.chars().count() <= max_w,
+                "Requirement line exceeds max_width {} ({} chars): {:?}",
+                max_w,
+                line.chars().count(),
+                line,
+            );
+        }
+        // Edge labels should not be truncated by compression
+        if max_natural > max_w {
+            // Compression was active — verify key labels survived
+            assert!(
+                output.contains("<<satisfies>>") || output.contains("<<verifies>>") || output.contains("<<contains>>"),
+                "At least one edge label should survive compression (natural width {})\nOutput:\n{}",
+                max_natural,
+                output,
+            );
+        }
     }
 
     #[test]
