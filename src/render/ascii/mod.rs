@@ -1094,6 +1094,141 @@ mod tests {
     }
 
     #[test]
+    fn max_width_text_api_constrains_output() {
+        // Test the render_text_ascii_with_config end-to-end path
+        let config = AsciiRenderConfig {
+            max_width: Some(50),
+            ..Default::default()
+        };
+        let output = crate::render::render_text_ascii_with_config(
+            "flowchart TD\n    A[Start] --> B[End]",
+            &config,
+        )
+        .unwrap();
+        for line in output.lines() {
+            assert!(
+                line.chars().count() <= 50,
+                "render_text_ascii_with_config line exceeds 50 ({} chars): {:?}",
+                line.chars().count(),
+                line,
+            );
+        }
+        assert!(!output.trim().is_empty());
+    }
+
+    #[test]
+    fn max_width_truncation_fallback_for_sequence() {
+        // Sequence diagrams don't thread config internally — they use the
+        // truncation fallback in render_ascii_with_config.
+        let config = AsciiRenderConfig {
+            max_width: Some(30),
+            ..Default::default()
+        };
+        let output = crate::render::render_text_ascii_with_config(
+            "sequenceDiagram\n    Alice->>Bob: Hello",
+            &config,
+        )
+        .unwrap();
+        for line in output.lines() {
+            assert!(
+                line.chars().count() <= 30,
+                "Sequence line exceeds max_width 30 ({} chars): {:?}",
+                line.chars().count(),
+                line,
+            );
+        }
+    }
+
+    #[test]
+    fn max_width_wide_flowchart_triggers_compression() {
+        // Wide diagram with many parallel nodes — natural width should exceed
+        // max_width, triggering the scale compression code path.
+        let input = "flowchart LR\n    A[Alpha] --> B[Beta]\n    B --> C[Gamma]\n    C --> D[Delta]\n    D --> E[Epsilon]\n    E --> F[Final]";
+        let (db, graph) = parse_and_layout(input);
+
+        // First check the unconstrained width is wide enough to need compression
+        let unconstrained = render_flowchart_ascii(&db, &graph).unwrap();
+        let max_unconstrained = unconstrained
+            .lines()
+            .map(|l| l.chars().count())
+            .max()
+            .unwrap_or(0);
+
+        let max_w = 60;
+        // Only test compression if the unconstrained output actually exceeds max_w
+        if max_unconstrained > max_w {
+            let config = AsciiRenderConfig {
+                max_width: Some(max_w),
+                ..Default::default()
+            };
+            let output = render_flowchart_ascii_with_config(&db, &graph, &config).unwrap();
+            for line in output.lines() {
+                assert!(
+                    line.chars().count() <= max_w,
+                    "Wide flowchart line exceeds max_width {} ({} chars): {:?}",
+                    max_w,
+                    line.chars().count(),
+                    line,
+                );
+            }
+            assert!(
+                !output.trim().is_empty(),
+                "Compressed output should not be empty"
+            );
+        }
+    }
+
+    #[test]
+    fn max_width_state_diagram() {
+        let input = "stateDiagram-v2\n    [*] --> Idle\n    Idle --> Running : start\n    Running --> Idle : stop";
+        let graph = parse_and_layout_generic(input);
+        let config = AsciiRenderConfig {
+            max_width: Some(40),
+            ..Default::default()
+        };
+        let output = render_graph_ascii_with_config(&graph, &config).unwrap();
+        for line in output.lines() {
+            assert!(
+                line.chars().count() <= 40,
+                "State diagram line exceeds max_width 40 ({} chars): {:?}",
+                line.chars().count(),
+                line,
+            );
+        }
+        assert!(!output.trim().is_empty());
+    }
+
+    #[test]
+    fn max_width_requirement_diagram() {
+        let input = r#"requirementDiagram
+    requirement test_req {
+        id: 1
+        text: the test text
+        risk: high
+        verifymethod: test
+    }
+    element test_entity {
+        type: simulation
+    }
+    test_entity - satisfies -> test_req"#;
+        let graph = parse_and_layout_generic(input);
+        let config = AsciiRenderConfig {
+            max_width: Some(50),
+            ..Default::default()
+        };
+        let output = render_graph_ascii_with_config(&graph, &config).unwrap();
+        for line in output.lines() {
+            assert!(
+                line.chars().count() <= 50,
+                "Requirement diagram line exceeds max_width 50 ({} chars): {:?}",
+                line.chars().count(),
+                line,
+            );
+        }
+        assert!(!output.trim().is_empty());
+    }
+
+    #[test]
     fn max_width_large_value_no_effect() {
         let (db, graph) = parse_and_layout("flowchart TD\n    A[Start] --> B[End]");
         let default_output = render_flowchart_ascii(&db, &graph).unwrap();
