@@ -136,6 +136,8 @@ pub enum NodeShape {
     LeanRight,
     LeanLeft,
     Odd,
+    /// Horizontal bar used for fork/join states
+    HorizontalBar,
 }
 
 /// A node in the layout graph

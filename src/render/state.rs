@@ -272,7 +272,7 @@ fn compute_level_layout(
         let (shape, label) = match state.state_type {
             StateType::Start => (NodeShape::Circle, None),
             StateType::End => (NodeShape::DoubleCircle, None),
-            StateType::Fork | StateType::Join => (NodeShape::Rectangle, None),
+            StateType::Fork | StateType::Join => (NodeShape::HorizontalBar, None),
             StateType::Choice => (NodeShape::Diamond, None),
             StateType::Divider => (NodeShape::Rectangle, None),
             StateType::Default => {
@@ -558,7 +558,7 @@ impl ToLayoutGraph for StateDb {
             let (shape, label) = match state.state_type {
                 StateType::Start => (NodeShape::Circle, None),
                 StateType::End => (NodeShape::DoubleCircle, None),
-                StateType::Fork | StateType::Join => (NodeShape::Rectangle, None),
+                StateType::Fork | StateType::Join => (NodeShape::HorizontalBar, None),
                 StateType::Choice => (NodeShape::Diamond, None),
                 StateType::Divider => (NodeShape::Rectangle, None),
                 StateType::Default => {

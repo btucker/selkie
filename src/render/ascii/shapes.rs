@@ -40,6 +40,7 @@ pub fn render_shape(shape: &NodeShape, label: &str, cell_w: usize, cell_h: usize
         NodeShape::Diamond => render_diamond(label, w, h),
         NodeShape::Circle => render_circle(label, w, h, false),
         NodeShape::DoubleCircle => render_circle(label, w, h, true),
+        NodeShape::HorizontalBar => render_horizontal_bar(cell_w),
         _ => render_rect(label, w, h, false),
     }
 }
@@ -154,6 +155,20 @@ fn render_diamond(label: &str, _w: usize, _h: usize) -> RenderedShape {
         width: max_w,
         height: lines.len(),
         lines,
+    }
+}
+
+/// Render a horizontal bar for fork/join states.
+///
+/// Fork and join nodes in state diagrams are rendered as solid horizontal bars,
+/// matching the UML convention. Uses block characters for a filled appearance.
+fn render_horizontal_bar(cell_w: usize) -> RenderedShape {
+    let w = cell_w.max(8);
+    let bar = "█".repeat(w);
+    RenderedShape {
+        lines: vec![bar],
+        width: w,
+        height: 1,
     }
 }
 
@@ -423,6 +438,27 @@ mod tests {
         assert!(text.contains("«interface»"), "Should contain annotation");
         assert!(text.contains("Flyable"), "Should contain name");
         assert!(text.contains("+fly()"), "Should contain method");
+    }
+
+    #[test]
+    fn horizontal_bar_renders_solid() {
+        let shape = render_shape(&NodeShape::HorizontalBar, "", 10, 1);
+        assert_eq!(shape.height, 1, "Bar should be 1 row tall");
+        assert!(shape.width >= 8, "Bar should be at least 8 chars wide");
+        assert!(
+            shape.lines[0].chars().all(|c| c == '█'),
+            "Bar should be solid block characters, got: {:?}",
+            shape.lines[0]
+        );
+    }
+
+    #[test]
+    fn horizontal_bar_no_label() {
+        let shape = render_shape(&NodeShape::HorizontalBar, "fork_state", 10, 1);
+        assert!(
+            !shape.lines[0].contains("fork"),
+            "Bar should not contain label text"
+        );
     }
 
     #[test]

@@ -130,6 +130,10 @@ impl SizeEstimator for CharacterSizeEstimator {
                 // Odd shape (flag-like) - asymmetric
                 (base_width * 1.1, base_height)
             }
+            NodeShape::HorizontalBar => {
+                // Fork/join bar: fixed dimensions, ignore text
+                (70.0, 10.0)
+            }
             NodeShape::Rectangle | NodeShape::RoundedRect => {
                 // Standard rectangles - no adjustment needed
                 (base_width, base_height)
@@ -284,6 +288,7 @@ impl SizeEstimator for FontdueSizeEstimator {
             NodeShape::LeanRight | NodeShape::LeanLeft => (base_width * 1.2, base_height),
             NodeShape::Subroutine => (base_width + 20.0, base_height),
             NodeShape::Odd => (base_width * 1.1, base_height),
+            NodeShape::HorizontalBar => (70.0, 10.0),
             NodeShape::Rectangle | NodeShape::RoundedRect => (base_width, base_height),
         };
 

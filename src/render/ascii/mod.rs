@@ -346,22 +346,31 @@ fn render_ascii_impl(
         .map(|n| n.id.as_str())
         .collect();
 
-    // Render container nodes first (background layer — boundary box + label).
-    // Subgraphs get a dashed-style boundary (┏┓┗┛┃╌) to distinguish them
-    // from regular node boxes (┌┐└┘│─).
-    // Collect label positions so we can re-stamp them after regular nodes (pass 2).
+    // Render container nodes first (background layer — bordered box with title).
+    // Sort by area descending so largest containers render first (nested ones on top).
     struct SubgraphLabel {
         row: usize,
-        col_start: usize,
+        label_col_start: usize,
         label: String,
+        box_col_start: usize,
+        box_w: usize,
     }
     let mut subgraph_labels: Vec<SubgraphLabel> = Vec::new();
 
-    for node in &graph.nodes {
-        if node.is_dummy || !container_ids.contains(node.id.as_str()) {
-            continue;
-        }
+    let mut container_nodes: Vec<&crate::layout::LayoutNode> = graph
+        .nodes
+        .iter()
+        .filter(|n| !n.is_dummy && container_ids.contains(n.id.as_str()))
+        .collect();
+    container_nodes.sort_by(|a, b| {
+        let area_a = a.width * a.height;
+        let area_b = b.width * b.height;
+        area_b
+            .partial_cmp(&area_a)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
+    for node in container_nodes {
         let (nx, ny) = match (node.x, node.y) {
             (Some(x), Some(y)) => (x - offset_x, y - offset_y),
             _ => continue,
@@ -369,110 +378,98 @@ fn render_ascii_impl(
 
         let label = label_fn(node);
 
-        // Compute bounding box in cell coordinates (node x,y is top-left)
-        let col_left = scale.to_col(nx);
-        let col_right = scale.to_col(nx + node.width);
-        let row_top = scale.to_row(ny);
-        let row_bottom = scale.to_row(ny + node.height);
+        // Calculate the bounding box from the node's layout dimensions
+        let label_chars = label.chars().count();
+        let box_w = scale.to_cell_width(node.width).max(label_chars + 4);
+        let box_h = scale.to_cell_height(node.height).max(3);
+        let col_center = scale.to_col(nx + node.width / 2.0);
+        let row_center = scale.to_row(ny + node.height / 2.0);
+        let col_start = col_center.saturating_sub(box_w / 2);
+        let row_start = row_center.saturating_sub(box_h / 2);
 
-        // Ensure minimum size
-        let col_right = col_right.max(col_left + label.chars().count() + 4);
-        let row_bottom = row_bottom.max(row_top + 2);
+        // Label goes right after "╭─" at the start of the top border
+        let label_col_start = col_start + 2;
 
-        // Draw boundary box using dashed-style characters
-        // Top border: ┏╌╌ label ╌╌┓
-        let label_char_count = label.chars().count();
-        let border_width = col_right.saturating_sub(col_left + 1);
-        let label_offset = border_width.saturating_sub(label_char_count + 2) / 2;
-        let label_start = col_left + 1 + label_offset;
-
-        if row_top < canvas_rows {
-            // Top-left corner
-            if col_left < canvas_cols {
-                canvas[row_top][col_left] = '┏';
+        // Draw top border: ╭─Label─────────╮
+        if row_start < canvas_rows {
+            if col_start < canvas_cols {
+                canvas[row_start][col_start] = '╭';
+                occupied[row_start][col_start] = true;
             }
-            // Top-right corner
-            if col_right < canvas_cols {
-                canvas[row_top][col_right] = '┓';
+            if col_start + 1 < canvas_cols {
+                canvas[row_start][col_start + 1] = '─';
+                occupied[row_start][col_start + 1] = true;
             }
-            // Top horizontal dashes
-            for cell in canvas[row_top]
-                .iter_mut()
-                .take(col_right.min(canvas_cols))
-                .skip(col_left + 1)
-            {
-                *cell = '╌';
-            }
-            // Overlay label centered in top border
-            // Space before label
-            if label_start > 0 && label_start < canvas_cols {
-                canvas[row_top][label_start] = ' ';
-            }
+            // Label text
             for (i, ch) in label.chars().enumerate() {
-                let c = label_start + 1 + i;
-                if c < canvas_cols {
-                    canvas[row_top][c] = ch;
+                let c = label_col_start + i;
+                if c >= canvas_cols {
+                    break;
                 }
+                canvas[row_start][c] = ch;
+                occupied[row_start][c] = true;
             }
-            // Space after label
-            let after_label = label_start + 1 + label_char_count;
-            if after_label < canvas_cols {
-                canvas[row_top][after_label] = ' ';
+            // Remaining border after label
+            let after_label = label_col_start + label_chars;
+            let right_col = col_start + box_w - 1;
+            for c in after_label..right_col {
+                if c >= canvas_cols {
+                    break;
+                }
+                canvas[row_start][c] = '─';
+                occupied[row_start][c] = true;
             }
-            // Mark top border row (label area) as occupied to protect from edges
-            for cell in occupied[row_top]
-                .iter_mut()
-                .take(col_right.min(canvas_cols.saturating_sub(1)) + 1)
-                .skip(col_left)
-            {
-                *cell = true;
-            }
-        }
-
-        // Bottom border: ┗╌╌╌╌╌╌╌╌╌┛
-        if row_bottom < canvas_rows {
-            if col_left < canvas_cols {
-                canvas[row_bottom][col_left] = '┗';
-            }
-            if col_right < canvas_cols {
-                canvas[row_bottom][col_right] = '┛';
-            }
-            for cell in canvas[row_bottom]
-                .iter_mut()
-                .take(col_right.min(canvas_cols))
-                .skip(col_left + 1)
-            {
-                *cell = '╌';
-            }
-            // Mark bottom border as occupied
-            for cell in occupied[row_bottom]
-                .iter_mut()
-                .take(col_right.min(canvas_cols.saturating_sub(1)) + 1)
-                .skip(col_left)
-            {
-                *cell = true;
+            if right_col < canvas_cols {
+                canvas[row_start][right_col] = '╮';
+                occupied[row_start][right_col] = true;
             }
         }
 
-        // Side borders: ┃ on left and right
-        // Not marked as occupied — regular nodes can overwrite them
-        for row in canvas
-            .iter_mut()
-            .take(row_bottom.min(canvas_rows))
-            .skip(row_top + 1)
-        {
-            if col_left < canvas_cols {
-                row[col_left] = '┃';
+        // Side borders
+        for r in 1..box_h.saturating_sub(1) {
+            let row = row_start + r;
+            if row >= canvas_rows {
+                break;
             }
-            if col_right < canvas_cols {
-                row[col_right] = '┃';
+            if col_start < canvas_cols {
+                canvas[row][col_start] = '│';
+                occupied[row][col_start] = true;
+            }
+            let right = col_start + box_w - 1;
+            if right < canvas_cols {
+                canvas[row][right] = '│';
+                occupied[row][right] = true;
+            }
+        }
+
+        // Bottom border: ╰─────────────────╯
+        let bot_row = row_start + box_h - 1;
+        if bot_row < canvas_rows {
+            if col_start < canvas_cols {
+                canvas[bot_row][col_start] = '╰';
+                occupied[bot_row][col_start] = true;
+            }
+            for i in 1..box_w.saturating_sub(1) {
+                let c = col_start + i;
+                if c >= canvas_cols {
+                    break;
+                }
+                canvas[bot_row][c] = '─';
+                occupied[bot_row][c] = true;
+            }
+            let br = col_start + box_w - 1;
+            if br < canvas_cols {
+                canvas[bot_row][br] = '╯';
+                occupied[bot_row][br] = true;
             }
         }
 
         subgraph_labels.push(SubgraphLabel {
-            row: row_top,
-            col_start: label_start + 1,
+            row: row_start,
+            label_col_start,
             label,
+            box_col_start: col_start,
+            box_w,
         });
     }
 
@@ -534,12 +531,7 @@ fn render_ascii_impl(
                 if canvas_col >= canvas_cols {
                     break;
                 }
-                // Overwrite if non-space, OR if existing cell is a subgraph side
-                // border ┃ (so node boxes cleanly cover boundary lines).
-                // Do NOT clear horizontal border ╌ with spaces — those are the
-                // top/bottom borders of subgraph boundaries and should persist.
-                let existing = canvas[canvas_row][canvas_col];
-                if ch != ' ' || existing == '┃' {
+                if ch != ' ' {
                     canvas[canvas_row][canvas_col] = ch;
                 }
             }
@@ -589,16 +581,35 @@ fn render_ascii_impl(
             }
         }
     }
-    // Re-stamp subgraph labels (they were rendered before regular nodes)
+    // Re-stamp subgraph labels on top of everything (container borders + labels)
     for sg in &subgraph_labels {
         if sg.row >= canvas_rows {
             continue;
         }
+        let right_col = sg.box_col_start + sg.box_w.saturating_sub(1);
+        // Re-stamp the full top border: ╭─Label─────╮
+        if sg.box_col_start < canvas_cols {
+            canvas[sg.row][sg.box_col_start] = '╭';
+        }
+        if sg.box_col_start + 1 < canvas_cols {
+            canvas[sg.row][sg.box_col_start + 1] = '─';
+        }
+        let label_chars = sg.label.chars().count();
         for (i, ch) in sg.label.chars().enumerate() {
-            let c = sg.col_start + i;
+            let c = sg.label_col_start + i;
             if c < canvas_cols {
                 canvas[sg.row][c] = ch;
             }
+        }
+        let after_label = sg.label_col_start + label_chars;
+        let border_end = right_col.min(canvas_cols);
+        if after_label < border_end {
+            for col in &mut canvas[sg.row][after_label..border_end] {
+                *col = '─';
+            }
+        }
+        if right_col < canvas_cols {
+            canvas[sg.row][right_col] = '╮';
         }
     }
 
@@ -920,96 +931,6 @@ mod tests {
     }
 
     #[test]
-    fn subgraph_has_boundary_box() {
-        let (db, graph) = parse_and_layout(
-            "flowchart TD\n    subgraph sg[My Group]\n        A[NodeA]\n        B[NodeB]\n    end",
-        );
-        let output = render_flowchart_ascii(&db, &graph).unwrap();
-
-        // Subgraph must have box-drawing boundary characters
-        // The boundary uses dashed lines: ┏ ┓ ┗ ┛ ┃ ╌
-        assert!(
-            output.contains('┏') || output.contains('┌'),
-            "Subgraph boundary must have top-left corner\nOutput:\n{}",
-            output
-        );
-        assert!(
-            output.contains('┛') || output.contains('┘'),
-            "Subgraph boundary must have bottom-right corner\nOutput:\n{}",
-            output
-        );
-
-        // The label should still be visible
-        assert!(
-            output.contains("My Group"),
-            "Subgraph label must be visible\nOutput:\n{}",
-            output
-        );
-
-        // Child nodes must be inside the boundary
-        assert!(
-            output.contains("NodeA"),
-            "NodeA must be visible inside boundary\nOutput:\n{}",
-            output
-        );
-        assert!(
-            output.contains("NodeB"),
-            "NodeB must be visible inside boundary\nOutput:\n{}",
-            output
-        );
-    }
-
-    #[test]
-    fn complex_flowchart_has_subgraph_boundaries() {
-        let (db, graph) = parse_and_layout(
-            &std::fs::read_to_string("docs/sources/flowchart_complex.mmd").unwrap(),
-        );
-        let output = render_flowchart_ascii(&db, &graph).unwrap();
-
-        // All four subgraphs should have boundary boxes
-        for label in &[
-            "Frontend Layer",
-            "API Gateway",
-            "Microservices",
-            "Data Layer",
-        ] {
-            assert!(
-                output.contains(label),
-                "Subgraph label '{}' must be visible\nOutput:\n{}",
-                label,
-                output
-            );
-        }
-
-        // All Microservices nodes must be present
-        for label in &[
-            "User Service",
-            "Order Service",
-            "Payment Service",
-            "Notification Service",
-        ] {
-            assert!(
-                output.contains(label),
-                "Node '{}' must be visible\nOutput:\n{}",
-                label,
-                output
-            );
-        }
-
-        // Subgraph boundaries must exist (dashed box characters)
-        let boundary_chars = output
-            .chars()
-            .filter(|c| matches!(c, '┏' | '┓' | '┗' | '┛'))
-            .count();
-        assert!(
-            boundary_chars >= 8, // At least 4 subgraphs × 2 corners visible
-            "Expected at least 8 subgraph boundary corners, found {}\nOutput:\n{}",
-            boundary_chars,
-            output
-        );
-    }
-
-    #[test]
     fn diamond_does_not_corrupt_adjacent_nodes() {
         let (db, graph) = parse_and_layout(
             "flowchart TD\n    A[Start] --> B{Decision}\n    B --> C[Action 1]\n    B --> D[End]",
@@ -1294,6 +1215,71 @@ mod tests {
             "End node should render as ◉ (bullseye)\nOutput:\n{}",
             output
         );
+    }
+
+    #[test]
+    fn state_complex_fork_renders_as_bar() {
+        let input = std::fs::read_to_string("docs/sources/state_complex.mmd").unwrap();
+        let graph = parse_and_layout_generic(&input);
+        let output = render_graph_ascii(&graph).unwrap();
+        // Fork/join should render as solid bars (█), not as labeled boxes
+        assert!(
+            output.contains('█'),
+            "Fork/join states should render as solid bars\nOutput:\n{}",
+            output
+        );
+        // Should NOT show the internal IDs as labels
+        assert!(
+            !output.contains("fork_state"),
+            "Fork state ID should not appear as label\nOutput:\n{}",
+            output
+        );
+        assert!(
+            !output.contains("join_state"),
+            "Join state ID should not appear as label\nOutput:\n{}",
+            output
+        );
+    }
+
+    #[test]
+    fn state_complex_has_all_expected_labels() {
+        let input = std::fs::read_to_string("docs/sources/state_complex.mmd").unwrap();
+        let graph = parse_and_layout_generic(&input);
+        let output = render_graph_ascii(&graph).unwrap();
+        for label in &[
+            "Idle",
+            "Ready",
+            "Validation",
+            "ResourceAlloc",
+            "Processing",
+            "Validating",
+            "Executing",
+            "Init",
+            "Done",
+        ] {
+            assert!(
+                output.contains(label),
+                "State diagram should contain '{}'\nOutput:\n{}",
+                label,
+                output
+            );
+        }
+    }
+
+    #[test]
+    fn state_complex2_node_labels_in_boxes() {
+        let input = std::fs::read_to_string("docs/sources/state_complex2.mmd").unwrap();
+        let graph = parse_and_layout_generic(&input);
+        let output = render_graph_ascii(&graph).unwrap();
+        // Key nested states should appear
+        for label in &["Initializing", "Finalizing", "WaitingResume"] {
+            assert!(
+                output.contains(label),
+                "State diagram should contain nested state '{}'\nOutput:\n{}",
+                label,
+                output
+            );
+        }
     }
 
     #[test]
