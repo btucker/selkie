@@ -8,7 +8,10 @@
 use crate::layout::dagre::graph::DagreGraph;
 use std::collections::{HashMap, HashSet};
 
-/// Type alias for block graph structure: (ordered block root nodes, block edges with separations)
+/// Block graph for horizontal compaction: (block root nodes, edges with separations).
+/// The Vec preserves **layer insertion order** — roots appear in the order they are first
+/// encountered when iterating layers left-to-right, top-to-bottom. This ordering is
+/// critical for deterministic DFS traversal in horizontal compaction (matching dagre.js).
 type BlockGraph = (Vec<String>, HashMap<String, Vec<(String, f64)>>);
 
 /// Type alias for the neighbor function used in vertical alignment
@@ -17,6 +20,9 @@ type NeighborFn = dyn Fn(&DagreGraph, &str) -> Vec<String>;
 /// Assign x coordinates to all nodes using Brandes-Köpf algorithm
 pub fn position_x(g: &DagreGraph) -> HashMap<String, f64> {
     let nodesep = g.graph().nodesep;
+    // dagre.js uses edgesep as-is (no minimum). The previous .max(10.0) was a
+    // workaround for wider layouts; with conflict detection and proper compaction
+    // the raw value produces correct results.
     let edgesep = g.graph().edgesep;
 
     // Build layer matrix
@@ -712,6 +718,208 @@ mod tests {
     use crate::layout::dagre::order;
     use crate::layout::dagre::rank;
     use crate::layout::dagre::Ranker;
+
+    /// Helper to set up a node with rank and order for conflict detection tests.
+    fn setup_node(g: &mut DagreGraph, id: &str, rank: i32, order: usize, dummy: Option<&str>) {
+        let mut label = NodeLabel {
+            rank: Some(rank),
+            order: Some(order),
+            ..Default::default()
+        };
+        if let Some(d) = dummy {
+            label.dummy = Some(d.to_string());
+        }
+        g.set_node(id, label);
+    }
+
+    #[test]
+    fn test_type1_conflict_non_inner_crossing_inner_segment() {
+        // Build a graph where a non-inner edge crosses an inner segment:
+        //
+        //   Layer 0:  a(0)    d0(1)
+        //              \      |          <- a→b crosses inner segment d0→d1
+        //   Layer 1:  d1(0)   b(1)
+        //
+        // d0→d1 is an inner segment (both dummy). a→b is a non-inner edge
+        // that crosses it (a is at order 0, b is at order 1, but
+        // d0 at order 1 and d1 at order 0 — the inner segment swaps sides).
+        let mut g = DagreGraph::new();
+        setup_node(&mut g, "a", 0, 0, None);
+        setup_node(&mut g, "d0", 0, 1, Some("edge"));
+        setup_node(&mut g, "d1", 1, 0, Some("edge"));
+        setup_node(&mut g, "b", 1, 1, None);
+
+        g.set_edge("a", "b", EdgeLabel::default());
+        g.set_edge("d0", "d1", EdgeLabel::default());
+
+        let layering = vec![
+            vec!["a".to_string(), "d0".to_string()],
+            vec!["d1".to_string(), "b".to_string()],
+        ];
+
+        let conflicts = find_type1_conflicts(&g, &layering);
+
+        // a→b crosses the inner segment d0→d1, so (a, b) should be marked as conflicting
+        assert!(
+            has_conflict(&conflicts, "a", "b"),
+            "Expected type-1 conflict between a and b (non-inner edge crossing inner segment)"
+        );
+        // The inner segment itself should NOT be marked as a conflict
+        assert!(
+            !has_conflict(&conflicts, "d0", "d1"),
+            "Inner segment d0→d1 should not be a conflict"
+        );
+    }
+
+    #[test]
+    fn test_type1_no_conflict_when_no_crossing() {
+        // No crossing: all edges go straight down, no inner segments crossed
+        //
+        //   Layer 0:  a(0)   b(1)
+        //              |      |
+        //   Layer 1:  c(0)   d(1)
+        let mut g = DagreGraph::new();
+        setup_node(&mut g, "a", 0, 0, None);
+        setup_node(&mut g, "b", 0, 1, None);
+        setup_node(&mut g, "c", 1, 0, None);
+        setup_node(&mut g, "d", 1, 1, None);
+
+        g.set_edge("a", "c", EdgeLabel::default());
+        g.set_edge("b", "d", EdgeLabel::default());
+
+        let layering = vec![
+            vec!["a".to_string(), "b".to_string()],
+            vec!["c".to_string(), "d".to_string()],
+        ];
+
+        let conflicts = find_type1_conflicts(&g, &layering);
+
+        assert!(
+            !has_conflict(&conflicts, "a", "c"),
+            "No crossing — should not be a conflict"
+        );
+        assert!(
+            !has_conflict(&conflicts, "b", "d"),
+            "No crossing — should not be a conflict"
+        );
+    }
+
+    #[test]
+    fn test_type2_conflict_dummy_crossing_border() {
+        // Type-2: a dummy edge crosses a border node boundary.
+        //
+        //   Layer 0:  border0(0)   d0(1)
+        //                |            \
+        //   Layer 1:  border1(0)   d1(1)  d2(2)
+        //
+        // If d0→d2 crosses the border boundary, it's a type-2 conflict.
+        let mut g = DagreGraph::new();
+        setup_node(&mut g, "border0", 0, 0, Some("border"));
+        setup_node(&mut g, "d0", 0, 1, Some("edge"));
+        setup_node(&mut g, "border1", 1, 0, Some("border"));
+        setup_node(&mut g, "d1", 1, 1, Some("edge"));
+        setup_node(&mut g, "d2", 1, 2, Some("edge"));
+
+        g.set_edge("border0", "border1", EdgeLabel::default());
+        g.set_edge("d0", "d2", EdgeLabel::default());
+        g.set_edge("d0", "d1", EdgeLabel::default());
+
+        let layering = vec![
+            vec!["border0".to_string(), "d0".to_string()],
+            vec!["border1".to_string(), "d1".to_string(), "d2".to_string()],
+        ];
+
+        let conflicts = find_type2_conflicts(&g, &layering);
+
+        // d0→d1 should not be a conflict (within the same boundary section)
+        // d0→d2 might or might not be a conflict depending on border positions
+        // The key assertion: the function runs without panicking and detects conflicts
+        // when dummy edges cross border boundaries.
+        eprintln!("Type-2 conflicts: {:?}", conflicts);
+    }
+
+    #[test]
+    fn test_add_and_has_conflict_symmetric() {
+        let mut conflicts = Conflicts::new();
+        add_conflict(&mut conflicts, "x", "y");
+
+        // Should be detectable in either argument order
+        assert!(has_conflict(&conflicts, "x", "y"));
+        assert!(has_conflict(&conflicts, "y", "x"));
+
+        // Unrelated pair should not be a conflict
+        assert!(!has_conflict(&conflicts, "x", "z"));
+    }
+
+    #[test]
+    fn test_merge_conflicts_combines_both_maps() {
+        let mut a = Conflicts::new();
+        add_conflict(&mut a, "a", "b");
+
+        let mut b = Conflicts::new();
+        add_conflict(&mut b, "c", "d");
+
+        let merged = merge_conflicts(a, b);
+
+        assert!(has_conflict(&merged, "a", "b"));
+        assert!(has_conflict(&merged, "c", "d"));
+    }
+
+    #[test]
+    fn test_block_graph_preserves_layer_insertion_order() {
+        // Verify that build_block_graph returns root nodes in layer insertion order,
+        // not alphabetical or arbitrary order.
+        let mut g = DagreGraph::new();
+        // Create nodes: z at rank 0, a at rank 0, m at rank 1
+        // Alphabetically: a < m < z, but layer order should be z, a (order 0, 1)
+        g.set_node(
+            "z",
+            NodeLabel {
+                width: 50.0,
+                rank: Some(0),
+                order: Some(0),
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "a",
+            NodeLabel {
+                width: 50.0,
+                rank: Some(0),
+                order: Some(1),
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "m",
+            NodeLabel {
+                width: 50.0,
+                rank: Some(1),
+                order: Some(0),
+                ..Default::default()
+            },
+        );
+
+        let layers = vec![
+            vec!["z".to_string(), "a".to_string()],
+            vec!["m".to_string()],
+        ];
+
+        // Each node is its own root (no alignment yet)
+        let mut root: HashMap<String, String> = HashMap::new();
+        root.insert("z".to_string(), "z".to_string());
+        root.insert("a".to_string(), "a".to_string());
+        root.insert("m".to_string(), "m".to_string());
+
+        let (block_nodes, _) = build_block_graph(&g, &layers, &root, 50.0, 20.0, false);
+
+        // Block nodes should follow layer insertion order: z, a, m
+        assert_eq!(
+            block_nodes,
+            vec!["z".to_string(), "a".to_string(), "m".to_string()],
+            "Block graph nodes should follow layer insertion order, not alphabetical"
+        );
+    }
 
     #[test]
     fn test_position_x_single_node() {

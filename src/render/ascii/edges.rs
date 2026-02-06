@@ -69,9 +69,12 @@ pub fn render_edges(
         }
     }
 
-    // Render arrow tips and edge labels, respecting occupied cells
+    // Render arrow tips first, then labels. Labels are readable text and
+    // should take priority when they overlap with arrow tips.
     for edge in &graph.edges {
         render_arrow_tip(edge, &ctx, occupied, canvas);
+    }
+    for edge in &graph.edges {
         render_edge_label(edge, &ctx, occupied, canvas);
     }
 }
@@ -162,9 +165,10 @@ fn render_arrow_tip(
 
 /// Render an edge label at its midpoint position.
 ///
-/// If the ideal position overlaps occupied cells (node boxes, diamonds), the
-/// label is shifted to nearby rows/columns to find a fully clear placement.
-/// This prevents label truncation (e.g., "Invalid" appearing as "Inv").
+/// Labels can overwrite whitespace in node bounding boxes (the `occupied` grid
+/// marks the entire bounding box, including padding), but not visible box content
+/// like borders. If the ideal position overlaps box-drawing characters, the label
+/// is shifted to nearby rows/columns to find a placement with maximum visibility.
 fn render_edge_label(
     edge: &LayoutEdge,
     ctx: &EdgeContext,
@@ -195,38 +199,86 @@ fn render_edge_label(
     let ideal_row = ctx.scale.to_row(ly);
     let ideal_start = ideal_col.saturating_sub(label_len / 2);
 
-    // Try to place the label at a position where all characters fit
-    // without overlapping occupied cells. Search nearby rows/cols.
-    if let Some((place_row, place_col)) =
-        find_clear_label_position(ideal_row, ideal_start, label_len, ctx, occupied)
-    {
+    // Check if a cell can accept a label character. Edge labels (readable text)
+    // take priority over: whitespace, braille edge lines, and arrow tips.
+    // Only box-drawing characters (borders, corners) from node rendering block labels.
+    let is_box_drawing = |ch: char| -> bool {
+        // Unicode box-drawing block: U+2500–U+257F
+        ('\u{2500}'..='\u{257F}').contains(&ch)
+    };
+
+    // Count how many label characters can be placed at (row, start_col).
+    // A cell is blocked only if it's in a node's bounding box AND contains
+    // a visible box-drawing character (border/corner).
+    let placeable_at = |r: usize, sc: usize| -> usize {
+        if r >= ctx.canvas_rows {
+            return 0;
+        }
+        (0..label_len)
+            .filter(|i| {
+                let c = sc + i;
+                if c >= ctx.canvas_cols {
+                    return false;
+                }
+                !(occupied[r][c] && is_box_drawing(canvas[r][c]))
+            })
+            .count()
+    };
+
+    // Try the ideal position first
+    let mut best_row = ideal_row;
+    let mut best_col = ideal_start;
+    let best_count = placeable_at(ideal_row, ideal_start);
+
+    // If ideal position can't fit the full label, search outward using
+    // a spiral pattern (nearby rows first, then shifted columns).
+    if best_count < label_len {
+        if let Some((r, c)) =
+            find_clear_label_position(ideal_row, ideal_start, label_len, ctx, occupied, canvas)
+        {
+            if placeable_at(r, c) > best_count {
+                best_row = r;
+                best_col = c;
+            }
+        }
+    }
+
+    if best_row < ctx.canvas_rows {
         for (i, ch) in label.chars().enumerate() {
-            let c = place_col + i;
-            if c < ctx.canvas_cols && !occupied[place_row][c] {
-                canvas[place_row][c] = ch;
+            let c = best_col + i;
+            if c < ctx.canvas_cols
+                && !(occupied[best_row][c] && is_box_drawing(canvas[best_row][c]))
+            {
+                canvas[best_row][c] = ch;
             }
         }
     }
 }
 
-/// Find a (row, start_col) where the entire label fits without overlapping
-/// occupied cells. Searches outward from the ideal position.
+/// Find a (row, start_col) where the label fits without overlapping
+/// box-drawing characters in occupied cells. Searches outward from the ideal position.
 fn find_clear_label_position(
     ideal_row: usize,
     ideal_col: usize,
     label_len: usize,
     ctx: &EdgeContext,
     occupied: &[Vec<bool>],
+    canvas: &[Vec<char>],
 ) -> Option<(usize, usize)> {
     let max_row_offset: isize = 5;
     let max_col_offset: isize = 10;
 
-    // Check if a label placement is entirely clear of occupied cells
+    // A cell is "clear" for label placement if it's not an occupied cell with
+    // a box-drawing character. Labels can overwrite whitespace padding, braille,
+    // and arrow symbols.
+    let is_box_drawing = |ch: char| -> bool { ('\u{2500}'..='\u{257F}').contains(&ch) };
+
     let is_clear = |row: usize, start_col: usize| -> bool {
         if row >= ctx.canvas_rows || start_col + label_len > ctx.canvas_cols {
             return false;
         }
-        (start_col..start_col + label_len).all(|c| !occupied[row][c])
+        (start_col..start_col + label_len)
+            .all(|c| !(occupied[row][c] && is_box_drawing(canvas[row][c])))
     };
 
     // First try: exact ideal position
