@@ -707,12 +707,14 @@ pub fn check_ascii_pie_structure(output: &str, db: &crate::diagrams::pie::PieDb)
         }
     }
 
-    // Check bar characters are present (at least one █ or ▌)
-    let has_bars = output.contains('█') || output.contains('▌');
-    if !has_bars {
+    // Check that at least one pie slice fill character is present.
+    // The circular renderer uses these distinct characters for slices.
+    const SLICE_CHARS: &[char] = &['█', '▓', '▒', '░', '◆', '●', '■', '▲'];
+    let has_slices = SLICE_CHARS.iter().any(|&ch| output.contains(ch));
+    if !has_slices {
         issues.push(Issue::error(
-            "ascii_pie_no_bars",
-            "ASCII pie output has no bar characters (█/▌)".to_string(),
+            "ascii_pie_no_slices",
+            "ASCII pie output has no slice fill characters (█▓▒░◆●■▲)".to_string(),
         ));
     }
 

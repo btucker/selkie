@@ -347,6 +347,38 @@ mod tests {
     }
 
     #[test]
+    fn many_slices_uses_all_slice_chars() {
+        // >8 sections forces all SLICE_CHARS to appear (wrapping around)
+        let db = make_pie(
+            Some("Many Slices"),
+            &[
+                ("A", 15.0),
+                ("B", 12.0),
+                ("C", 10.0),
+                ("D", 10.0),
+                ("E", 10.0),
+                ("F", 10.0),
+                ("G", 10.0),
+                ("H", 10.0),
+                ("I", 8.0),
+                ("J", 5.0),
+            ],
+            false,
+        );
+        let output = render_pie_ascii(&db).unwrap();
+
+        // Every one of the 8 distinct slice characters should appear
+        for &ch in SLICE_CHARS {
+            assert!(
+                output.contains(ch),
+                "Output should contain slice char '{}'\nOutput:\n{}",
+                ch,
+                output
+            );
+        }
+    }
+
+    #[test]
     fn renders_as_circular_pie_not_bar_chart() {
         // The pie chart should render as a circular shape, not as horizontal bars.
         let db = make_pie(
