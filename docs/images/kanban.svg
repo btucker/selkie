@@ -156,7 +156,7 @@
         </g>
         <g class="node kanban-item-group" transform="translate(212.5, 25)">
           <rect x="0" y="0" width="185" height="68" rx="5" ry="5" class="kanban-item " style=""/>
-          <text x="92.5" y="10" text-anchor="middle" class="kanban-label"><tspan x="92.5" dy="0.5em">Create renderer for</tspan><tspan x="92.5" dy="1.2em">all cases</tspan></text>
+          <text x="92.5" y="10" text-anchor="middle" class="kanban-label"><tspan x="92.5" dy="0.5em">Create renderer for all</tspan><tspan x="92.5" dy="1.2em">cases</tspan></text>
         </g>
       </g>
     </g>
