@@ -23,6 +23,7 @@ use uuid::Uuid;
 
 #[cfg(feature = "eval")]
 use selkie::eval::{self, runner::DiagramInput, samples};
+#[cfg(feature = "eval")]
 use selkie::render::ascii as ascii_render;
 use selkie::render::{RenderConfig, Theme};
 use selkie::{parse, render_with_config};
@@ -394,7 +395,7 @@ fn run_render(args: RenderArgs) -> Result<(), Box<dyn std::error::Error>> {
     });
 
     if format_hint == OutputFormat::Ascii {
-        let output_str = render_ascii(&diagram)?;
+        let output_str = selkie::render_ascii(&diagram)?;
         if args.verbose {
             eprintln!("Rendered {} bytes of ASCII output", output_str.len());
         }
@@ -1185,7 +1186,7 @@ fn run_eval_ascii(args: EvalArgs) -> Result<(), Box<dyn std::error::Error>> {
             }
         };
 
-        let ascii_output = match render_ascii(&parsed) {
+        let ascii_output = match selkie::render_ascii(&parsed) {
             Ok(output) => output,
             Err(e) => {
                 eprintln!(" RENDER ERROR: {}", e);
@@ -1482,133 +1483,5 @@ fn layout_diagram(
         _ => Err(selkie::error::MermaidError::RenderError(
             "Diagram type does not support layout graph".to_string(),
         )),
-    }
-}
-
-/// Render a diagram to ASCII character art.
-///
-/// Supports all diagram types that implement `ToLayoutGraph`:
-/// flowchart, state, class, ER, architecture, requirement.
-fn render_ascii(diagram: &selkie::diagrams::Diagram) -> Result<String, Box<dyn std::error::Error>> {
-    use selkie::layout::{self, CharacterSizeEstimator, ToLayoutGraph};
-
-    let estimator = CharacterSizeEstimator::default();
-
-    match diagram {
-        // Flowchart uses specialized renderer with FlowchartDb label lookup
-        selkie::diagrams::Diagram::Flowchart(db) => {
-            let graph = db.to_layout_graph(&estimator)?;
-            let graph = layout::layout(graph)?;
-            let output = ascii_render::render_flowchart_ascii(db, &graph)?;
-            Ok(output)
-        }
-        selkie::diagrams::Diagram::Sequence(db) => {
-            let output = ascii_render::render_sequence_ascii(db)?;
-            Ok(output)
-        }
-        // Class diagrams use specialized renderer with multi-section boxes
-        selkie::diagrams::Diagram::Class(db) => {
-            let graph = db.to_layout_graph(&estimator)?;
-            let graph = layout::layout(graph)?;
-            Ok(ascii_render::render_class_ascii(db, &graph)?)
-        }
-        // Graph-based diagram types use the generic renderer
-        selkie::diagrams::Diagram::State(db) => {
-            let graph = db.to_layout_graph(&estimator)?;
-            let graph = layout::layout(graph)?;
-            Ok(ascii_render::render_graph_ascii(&graph)?)
-        }
-        selkie::diagrams::Diagram::Er(db) => {
-            let graph = db.to_layout_graph(&estimator)?;
-            let graph = layout::layout(graph)?;
-            Ok(ascii_render::render_er_ascii(db, &graph)?)
-        }
-        selkie::diagrams::Diagram::Architecture(db) => {
-            let graph = db.to_layout_graph(&estimator)?;
-            let graph = layout::layout(graph)?;
-            Ok(ascii_render::render_graph_ascii(&graph)?)
-        }
-        selkie::diagrams::Diagram::Requirement(db) => {
-            let graph = db.to_layout_graph(&estimator)?;
-            let graph = layout::layout(graph)?;
-            Ok(ascii_render::render_graph_ascii(&graph)?)
-        }
-        // Pie charts use a dedicated bar-chart renderer (no layout graph needed)
-        selkie::diagrams::Diagram::Pie(db) => {
-            let output = ascii_render::pie::render_pie_ascii(db)?;
-            Ok(output)
-        }
-        // Gantt charts use a dedicated timeline renderer (no layout graph needed)
-        selkie::diagrams::Diagram::Gantt(db) => {
-            let mut db_clone = db.clone();
-            let output = ascii_render::gantt::render_gantt_ascii(&mut db_clone)?;
-            Ok(output)
-        }
-        // Mindmap uses a dedicated tree renderer (no layout graph needed)
-        selkie::diagrams::Diagram::Mindmap(db) => {
-            let output = ascii_render::mindmap::render_mindmap_ascii(db)?;
-            Ok(output)
-        }
-        // Journey uses a dedicated section+task renderer
-        selkie::diagrams::Diagram::Journey(db) => {
-            let output = ascii_render::journey::render_journey_ascii(db)?;
-            Ok(output)
-        }
-        // Timeline uses a dedicated period+event renderer
-        selkie::diagrams::Diagram::Timeline(db) => {
-            let output = ascii_render::timeline::render_timeline_ascii(db)?;
-            Ok(output)
-        }
-        // Kanban uses a dedicated column+card renderer
-        selkie::diagrams::Diagram::Kanban(db) => {
-            let output = ascii_render::kanban::render_kanban_ascii(db)?;
-            Ok(output)
-        }
-        // Packet uses a dedicated bit-field renderer
-        selkie::diagrams::Diagram::Packet(db) => {
-            let output = ascii_render::packet::render_packet_ascii(db)?;
-            Ok(output)
-        }
-        // XY Chart uses a dedicated bar/line chart renderer
-        selkie::diagrams::Diagram::XyChart(db) => {
-            let output = ascii_render::xychart::render_xychart_ascii(db)?;
-            Ok(output)
-        }
-        // Quadrant uses a dedicated 2x2 grid renderer
-        selkie::diagrams::Diagram::Quadrant(db) => {
-            let output = ascii_render::quadrant::render_quadrant_ascii(db)?;
-            Ok(output)
-        }
-        // Radar uses a dedicated comparison table renderer
-        selkie::diagrams::Diagram::Radar(db) => {
-            let output = ascii_render::radar::render_radar_ascii(db)?;
-            Ok(output)
-        }
-        // Git graph uses a dedicated branch visualization renderer
-        selkie::diagrams::Diagram::Git(db) => {
-            let output = ascii_render::gitgraph::render_gitgraph_ascii(db)?;
-            Ok(output)
-        }
-        // Sankey uses a dedicated flow table renderer
-        selkie::diagrams::Diagram::Sankey(db) => {
-            let output = ascii_render::sankey::render_sankey_ascii(db)?;
-            Ok(output)
-        }
-        // Block uses a dedicated grid layout renderer
-        selkie::diagrams::Diagram::Block(db) => {
-            let output = ascii_render::block::render_block_ascii(db)?;
-            Ok(output)
-        }
-        // C4 uses a dedicated architecture diagram renderer
-        selkie::diagrams::Diagram::C4(db) => {
-            let output = ascii_render::c4::render_c4_ascii(db)?;
-            Ok(output)
-        }
-        // Treemap uses a dedicated hierarchical tree renderer
-        selkie::diagrams::Diagram::Treemap(db) => {
-            let output = ascii_render::treemap::render_treemap_ascii(db)?;
-            Ok(output)
-        }
-        _ => Err("ASCII format not yet supported for this diagram type".into()),
     }
 }

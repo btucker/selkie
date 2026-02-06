@@ -167,6 +167,97 @@ fn render_flowchart(
     renderer.render_flowchart(db, &graph)
 }
 
+/// Render a diagram to ASCII character art.
+///
+/// This is the primary entry point for ASCII rendering. It accepts any parsed
+/// `Diagram` and dispatches to the appropriate type-specific ASCII renderer.
+///
+/// # Example
+///
+/// ```
+/// let diagram = selkie::parse("flowchart TD\n    A[Start] --> B[End]").unwrap();
+/// let ascii = selkie::render::render_ascii(&diagram).unwrap();
+/// assert!(ascii.contains("Start"));
+/// ```
+pub fn render_ascii(diagram: &Diagram) -> Result<String> {
+    use crate::layout::{self, CharacterSizeEstimator, ToLayoutGraph};
+
+    let estimator = CharacterSizeEstimator::default();
+
+    match diagram {
+        Diagram::Flowchart(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(ascii::render_flowchart_ascii(db, &graph)?)
+        }
+        Diagram::Sequence(db) => Ok(ascii::render_sequence_ascii(db)?),
+        Diagram::Class(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(ascii::render_class_ascii(db, &graph)?)
+        }
+        Diagram::State(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(ascii::render_graph_ascii(&graph)?)
+        }
+        Diagram::Er(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(ascii::render_er_ascii(db, &graph)?)
+        }
+        Diagram::Architecture(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(ascii::render_graph_ascii(&graph)?)
+        }
+        Diagram::Requirement(db) => {
+            let graph = db.to_layout_graph(&estimator)?;
+            let graph = layout::layout(graph)?;
+            Ok(ascii::render_graph_ascii(&graph)?)
+        }
+        Diagram::Pie(db) => Ok(ascii::pie::render_pie_ascii(db)?),
+        Diagram::Gantt(db) => {
+            let mut db_clone = db.clone();
+            Ok(ascii::gantt::render_gantt_ascii(&mut db_clone)?)
+        }
+        Diagram::Mindmap(db) => Ok(ascii::mindmap::render_mindmap_ascii(db)?),
+        Diagram::Journey(db) => Ok(ascii::journey::render_journey_ascii(db)?),
+        Diagram::Timeline(db) => Ok(ascii::timeline::render_timeline_ascii(db)?),
+        Diagram::Kanban(db) => Ok(ascii::kanban::render_kanban_ascii(db)?),
+        Diagram::Packet(db) => Ok(ascii::packet::render_packet_ascii(db)?),
+        Diagram::XyChart(db) => Ok(ascii::xychart::render_xychart_ascii(db)?),
+        Diagram::Quadrant(db) => Ok(ascii::quadrant::render_quadrant_ascii(db)?),
+        Diagram::Radar(db) => Ok(ascii::radar::render_radar_ascii(db)?),
+        Diagram::Git(db) => Ok(ascii::gitgraph::render_gitgraph_ascii(db)?),
+        Diagram::Sankey(db) => Ok(ascii::sankey::render_sankey_ascii(db)?),
+        Diagram::Block(db) => Ok(ascii::block::render_block_ascii(db)?),
+        Diagram::C4(db) => Ok(ascii::c4::render_c4_ascii(db)?),
+        Diagram::Treemap(db) => Ok(ascii::treemap::render_treemap_ascii(db)?),
+        _ => Err(MermaidError::RenderError(
+            "ASCII format not yet supported for this diagram type".to_string(),
+        )),
+    }
+}
+
+/// Render mermaid text directly to ASCII character art.
+///
+/// This is a convenience function that parses the input text and renders it
+/// to ASCII in one step, similar to how [`render_text`] works for SVG.
+///
+/// # Example
+///
+/// ```
+/// let ascii = selkie::render::render_text_ascii("flowchart TD\n    A[Start] --> B[End]").unwrap();
+/// assert!(ascii.contains("Start"));
+/// ```
+pub fn render_text_ascii(text: &str) -> Result<String> {
+    let clean_text = remove_directives(text);
+    let diagram_type = detect_type(&clean_text)?;
+    let diagram = parse(diagram_type, &clean_text)?;
+    render_ascii(&diagram)
+}
+
 /// Render an architecture diagram
 fn render_architecture(
     db: &crate::diagrams::architecture::ArchitectureDb,
