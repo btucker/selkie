@@ -181,10 +181,10 @@ impl ToLayoutGraph for RequirementDb {
             _ => LayoutDirection::TopToBottom,
         };
 
-        // Match mermaid's dagre configuration for requirement diagrams
-        // Note: mermaid uses network-simplex which produces correct ranking but
-        // our ordering phase doesn't match mermaid's dagre column ordering yet.
-        // Using longest-path for now as it produces better visual parity overall.
+        // Match mermaid's dagre configuration for requirement diagrams.
+        // Use longest-path ranking which produces better column ordering,
+        // combined with post-processing to pull source-only nodes down
+        // (see pull_sources_toward_targets below).
         graph.options = LayoutOptions {
             direction,
             node_spacing: 50.0,
@@ -193,12 +193,10 @@ impl ToLayoutGraph for RequirementDb {
             ranker: LayoutRanker::LongestPath,
         };
 
-        // Add nodes in sorted order for consistent layout
-        // This helps match mermaid's dagre behavior which is sensitive to node order
-        let mut req_names: Vec<_> = self.get_requirements().keys().collect();
-        req_names.sort();
-
-        for name in req_names {
+        // Add nodes in declaration order: requirements first, then elements.
+        // This matches mermaid's dagre behavior where node insertion order
+        // affects the initial ordering heuristic for column placement.
+        for name in self.requirement_names_ordered() {
             let req = self.get_requirements().get(name).unwrap();
             let dims = calculate_requirement_dimensions(req);
             let node = LayoutNode::new(name, dims.width, dims.height)
@@ -207,10 +205,7 @@ impl ToLayoutGraph for RequirementDb {
             graph.add_node(node);
         }
 
-        let mut elem_names: Vec<_> = self.get_elements().keys().collect();
-        elem_names.sort();
-
-        for name in elem_names {
+        for name in self.element_names_ordered() {
             let elem = self.get_elements().get(name).unwrap();
             let dims = calculate_element_dimensions(elem);
             let node = LayoutNode::new(name, dims.width, dims.height)

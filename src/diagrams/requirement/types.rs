@@ -118,8 +118,12 @@ pub struct RequirementClass {
 pub struct RequirementDb {
     /// Requirements by name
     requirements: HashMap<String, Requirement>,
+    /// Requirement names in declaration order (matches mermaid's insertion-ordered Map)
+    requirement_order: Vec<String>,
     /// Elements by name
     elements: HashMap<String, Element>,
+    /// Element names in declaration order (matches mermaid's insertion-ordered Map)
+    element_order: Vec<String>,
     /// Relationships
     relations: Vec<Relation>,
     /// Class definitions
@@ -150,6 +154,9 @@ impl RequirementDb {
             _ => RequirementType::Requirement,
         };
         let req = Requirement::new(name.to_string(), rtype);
+        if !self.requirements.contains_key(name) {
+            self.requirement_order.push(name.to_string());
+        }
         self.requirements.insert(name.to_string(), req);
     }
 
@@ -161,12 +168,25 @@ impl RequirementDb {
     /// Add an element
     pub fn add_element(&mut self, name: &str) {
         let elem = Element::new(name.to_string());
+        if !self.elements.contains_key(name) {
+            self.element_order.push(name.to_string());
+        }
         self.elements.insert(name.to_string(), elem);
     }
 
     /// Get all elements
     pub fn get_elements(&self) -> &HashMap<String, Element> {
         &self.elements
+    }
+
+    /// Get requirement names in declaration order
+    pub fn requirement_names_ordered(&self) -> &[String] {
+        &self.requirement_order
+    }
+
+    /// Get element names in declaration order
+    pub fn element_names_ordered(&self) -> &[String] {
+        &self.element_order
     }
 
     /// Add a relationship
