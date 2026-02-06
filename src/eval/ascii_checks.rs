@@ -1479,35 +1479,32 @@ pub fn calculate_ascii_text_similarity(output: &str) -> f64 {
     }
 
     // Has structural characters like box drawing, bullets, or bars (20%)
+    // NOTE: This list must include ALL Unicode characters used by ASCII renderers.
+    // When adding new characters to any renderer in src/render/ascii/, add them here too.
+    // See the similarity_recognizes_all_renderer_unicode_chars test for enforcement.
     let has_structure = output.chars().any(|c| {
         matches!(
             c,
-            '┌' | '┐'
-                | '└'
-                | '┘'
-                | '│'
-                | '─'
-                | '├'
-                | '┤'
-                | '┬'
-                | '┴'
-                | '┼'
-                | '█'
-                | '▌'
-                | '░'
-                | '●'
-                | '◆'
-                | '◇'
-                | '■'
-                | '▲'
-                | '◉'
-                | '★'
-                | '§'
-                | '▶'
-                | '◈'
-                | '▼'
-                | '◀'
-                | '→'
+            // Box-drawing: single-line
+            '┌' | '┐' | '└' | '┘' | '│' | '─' | '├' | '┤' | '┬' | '┴' | '┼'
+            // Box-drawing: rounded corners
+            | '╭' | '╮' | '╰' | '╯'
+            // Box-drawing: heavy (subgraph boundaries)
+            | '┏' | '┓' | '┗' | '┛' | '┃'
+            // Box-drawing: dashed
+            | '╌'
+            // Box-drawing: double
+            | '═'
+            // Block elements
+            | '█' | '▌' | '░' | '▓' | '▀'
+            // Geometric shapes
+            | '●' | '◆' | '◇' | '■' | '▲' | '▼' | '◀' | '▶' | '◉' | '◈'
+            // Special symbols
+            | '★' | '☁' | '⚡' | '⬡'
+            // Arrows
+            | '→'
+            // Misc
+            | '§' | '✓' | '►'
         )
     });
     if has_structure {
@@ -1876,6 +1873,72 @@ mod tests {
                 marker as u32,
                 score,
                 score_plain,
+            );
+        }
+    }
+
+    #[test]
+    fn similarity_recognizes_subgraph_boundary_chars() {
+        // Subgraph boundary characters (┏┓┗┛┃╌) must be recognized as structural
+        let plain_text = "hello\nworld\nfoo";
+        let score_plain = calculate_ascii_text_similarity(plain_text);
+
+        for (ch, name) in [
+            ('┏', "heavy down-right corner"),
+            ('┓', "heavy down-left corner"),
+            ('┗', "heavy up-right corner"),
+            ('┛', "heavy up-left corner"),
+            ('┃', "heavy vertical"),
+            ('╌', "light dashed horizontal"),
+        ] {
+            let with_char = format!("  {}\nLabel\n  {}", ch, ch);
+            let score = calculate_ascii_text_similarity(&with_char);
+            assert!(
+                score > score_plain,
+                "Text with {} ({}) should score higher than plain text: {} vs {}",
+                ch,
+                name,
+                score,
+                score_plain
+            );
+        }
+    }
+
+    #[test]
+    fn similarity_recognizes_all_renderer_unicode_chars() {
+        // Comprehensive check: every Unicode character used by ASCII renderers
+        // must be recognized as structural in calculate_ascii_text_similarity.
+        // This prevents the recurring bug pattern where new renderer chars are
+        // not added to the eval scoring function.
+        let all_structural_chars = [
+            // Box-drawing (single)
+            '┌', '┐', '└', '┘', '│', '─', '├', '┤', '┬', '┴', '┼',
+            // Box-drawing (rounded)
+            '╭', '╮', '╰', '╯', // Box-drawing (heavy / subgraph boundary)
+            '┏', '┓', '┗', '┛', '┃', // Box-drawing (dashed)
+            '╌', // Box-drawing (double)
+            '═', // Block elements
+            '█', '▌', '░', '▓', '▀', // Geometric shapes
+            '●', '◆', '◇', '■', '▲', '▼', '◀', '▶', '◉', '◈',
+            // Special symbols used by renderers
+            '★', '☁', '⚡', '⬡', // Arrows
+            '→', // Misc
+            '§', '✓', '►',
+        ];
+
+        let plain_text = "hello\nworld\nfoo";
+        let score_plain = calculate_ascii_text_similarity(plain_text);
+
+        for &ch in &all_structural_chars {
+            let with_char = format!("  {}\nLabel\n  {}", ch, ch);
+            let score = calculate_ascii_text_similarity(&with_char);
+            assert!(
+                score > score_plain,
+                "Character '{}' (U+{:04X}) should be recognized as structural but isn't: score {} vs plain {}",
+                ch,
+                ch as u32,
+                score,
+                score_plain
             );
         }
     }
