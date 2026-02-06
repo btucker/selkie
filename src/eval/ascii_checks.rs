@@ -1433,36 +1433,27 @@ pub fn check_ascii_text_output(output: &str, diagram_type: &str) -> Vec<Issue> {
 
     // Check output is non-empty
     if output.trim().is_empty() {
-        issues.push(Issue {
-            check: format!("ascii_{}_output", diagram_type),
-            message: "ASCII output is empty".to_string(),
-            level: super::Level::Error,
-            expected: None,
-            actual: None,
-        });
+        issues.push(Issue::error(
+            format!("ascii_{}_output", diagram_type),
+            "ASCII output is empty",
+        ));
         return issues;
     }
 
     // Check output has reasonable length (not just a placeholder)
     if output.trim().lines().count() < 2 {
-        issues.push(Issue {
-            check: format!("ascii_{}_content", diagram_type),
-            message: "ASCII output has fewer than 2 lines".to_string(),
-            level: super::Level::Warning,
-            expected: None,
-            actual: None,
-        });
+        issues.push(Issue::warning(
+            format!("ascii_{}_content", diagram_type),
+            "ASCII output has fewer than 2 lines",
+        ));
     }
 
     // Check for "empty" placeholder (acceptable for empty diagrams, but flagged)
     if output.contains("(empty") {
-        issues.push(Issue {
-            check: format!("ascii_{}_empty", diagram_type),
-            message: "ASCII output contains empty placeholder".to_string(),
-            level: super::Level::Warning,
-            expected: None,
-            actual: None,
-        });
+        issues.push(Issue::warning(
+            format!("ascii_{}_empty", diagram_type),
+            "ASCII output contains empty placeholder",
+        ));
     }
 
     issues
