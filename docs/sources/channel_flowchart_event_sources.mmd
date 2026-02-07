@@ -38,10 +38,10 @@ graph TB
     Snapshot -->|read-only| Dispatch
     Snapshot -->|read-only| Chat
     
-    Health -->|Vec&lt;Effect&gt;| Effects
-    PR -->|Vec&lt;Effect&gt;| Effects
-    Dispatch -->|Vec&lt;Effect&gt;| Effects
-    Chat -->|Vec&lt;Effect&gt;| Effects
+    Health -->|"Vec&lt;Effect&gt;"| Effects
+    PR -->|"Vec&lt;Effect&gt;"| Effects
+    Dispatch -->|"Vec&lt;Effect&gt;"| Effects
+    Chat -->|"Vec&lt;Effect&gt;"| Effects
     
     Effects --> Tmux
     Effects --> Channel

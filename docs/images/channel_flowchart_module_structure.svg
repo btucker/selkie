@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1190.5679770098247" height="482.99999999999994" viewBox="-8 -53 1190.5679770098247 482.99999999999994" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-">
+        <rect x="152.5" y="-45" width="801.7" height="320.79999999999995" class="cluster"/>
+        <text x="553.35" y="-29" class="cluster-label" text-anchor="middle"></text>
+      </g>
+      <g class="subgraph" id="subgraph-">
+        <rect x="475.5" y="-45" width="675.9000000000001" height="339.19999999999993" class="cluster"/>
+        <text x="813.45" y="-29" class="cluster-label" text-anchor="middle"></text>
+      </g>
+      <g class="subgraph" id="subgraph-">
+        <rect x="20" y="-45" width="1131.4" height="462" class="cluster"/>
+        <text x="585.7" y="-29" class="cluster-label" text-anchor="middle"></text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-app_tests-test_helper-0">
+        <path d="M 364.78 89.60 C 385.69 101.27, 406.59 112.93, 417.05 124.60 C 427.50 136.27, 427.50 147.93, 448.64 161.00 C 512.06 188.53, 554.34 203.00, 554.34 203.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-mod_use-test_helper-0">
+        <path d="M 631.50 71.20 C 631.50 89.00, 631.50 106.80, 631.50 121.53 C 631.50 136.27, 631.50 147.93, 631.50 161.00 C 631.50 188.53, 631.50 203.00, 631.50 203.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-test_fn-test_helper-0">
+        <path d="M 948.70 89.60 C 948.70 112.93, 948.70 136.27, 915.83 155.17 C 882.96 174.07, 817.21 188.53, 751.47 203.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-app_tests-mod-0">
+        <path d="M 204.22 89.60 C 183.31 101.27, 162.41 112.93, 155.74 128.77 C 149.07 144.60, 156.64 164.60, 164.21 184.60" class="edge-path" fill="none" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-mod-app-0">
+        <path d="M 204.90 274.20 C 204.90 285.87, 204.90 297.53, 204.90 309.20 C 204.90 320.87, 204.90 332.53, 204.90 344.20" class="edge-path" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)" stroke-width="2"/>
+      </g>
+      <g class="edge" id="edge-L-mod-ui-0">
+        <path d="M 116.89999999999998 229.39999999999998 L 120 229.39999999999998" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-app_tests-test_helper-0">
+        <rect x="407.5854142913813" y="153.00883292910987" width="65.6" height="22" class="edge-label-bg"/>
+        <text x="440.3854142913813" y="164.00883292910987" class="edge-label" dominant-baseline="central" text-anchor="middle">contains</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-mod_use-test_helper-0">
+        <rect x="602.3" y="126.09999999999997" width="58.4" height="22" class="edge-label-bg"/>
+        <text x="631.5" y="137.09999999999997" class="edge-label" dominant-baseline="central" text-anchor="middle">imports</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-test_fn-test_helper-0">
+        <rect x="862.2684409019146" y="162.77819301717008" width="44" height="22" class="edge-label-bg"/>
+        <text x="884.2684409019146" y="173.77819301717008" class="edge-label" dominant-baseline="central" text-anchor="middle">calls</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-app_tests-mod-0">
+        <rect x="30.83202299017543" y="112.8566752824056" width="224" height="22" class="edge-label-bg"/>
+        <text x="142.83202299017543" y="123.8566752824056" class="edge-label" text-anchor="middle" dominant-baseline="central">pub(super) = visible to parent</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-mod-app-0">
+        <rect x="150.49999999999997" y="298.2" width="108.8" height="22" class="edge-label-bg"/>
+        <text x="204.89999999999998" y="309.2" class="edge-label" dominant-baseline="central" text-anchor="middle">parent of both</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-mod-ui-0">
+        <rect x="64.04999999999998" y="218.39999999999998" width="108.8" height="22" class="edge-label-bg"/>
+        <text x="118.44999999999999" y="229.39999999999998" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-app">
+        <rect x="160.09999999999997" y="344.2" width="89.6" height="52.8"/>
+        <text x="204.89999999999998" y="370.59999999999997" class="label" text-anchor="middle" dominant-baseline="central">app.rs</text>
+      </g>
+      <g class="node" id="node-app_code">
+        <rect x="691" y="202.99999999999997" width="243.2" height="52.8"/>
+        <text x="812.6" y="229.39999999999998" class="label" dominant-baseline="central" text-anchor="middle">pub struct App { ... }</text>
+      </g>
+      <g class="node" id="node-app_tests">
+        <rect x="172.5" y="0" width="224" height="89.6" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#fff4e1 !important"/>
+        <text x="284.5" y="44.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="284.5" y="44.8" dy="-0.6em">#[cfg(test)]</tspan><tspan x="284.5" dy="1.2em">pub(super) mod tests</tspan></text>
+      </g>
+      <g class="node" id="node-mod">
+        <rect x="116.89999999999998" y="184.59999999999997" width="176" height="89.6"/>
+        <text x="204.89999999999998" y="229.39999999999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="204.89999999999998" y="229.39999999999998" dy="-0.6em">mod.rs</tspan><tspan x="204.89999999999998" dy="1.2em">(parent module)</tspan></text>
+      </g>
+      <g class="node" id="node-mod_tests">
+        <rect x="984.2000000000002" y="184.59999999999997" width="147.2" height="89.6"/>
+        <text x="1057.8000000000002" y="229.39999999999998" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1057.8000000000002" y="229.39999999999998" dy="-0.6em">#[cfg(test)]</tspan><tspan x="1057.8000000000002" dy="1.2em">mod tests</tspan></text>
+      </g>
+      <g class="node" id="node-mod_use">
+        <rect x="495.5" y="18.4" width="272" height="52.8" style="fill:#e1f5e1 !important"/>
+        <text x="631.5" y="44.8" class="label" text-anchor="middle" dominant-baseline="central">use app::tests::test_app;</text>
+      </g>
+      <g class="node" id="node-test_fn">
+        <rect x="817.5" y="0" width="262.4" height="89.6"/>
+        <text x="948.7" y="44.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="948.7" y="44.8" dy="-0.6em">#[test]</tspan><tspan x="948.7" dy="1.2em">fn test_number_key_...()</tspan></text>
+      </g>
+      <g class="node" id="node-test_helper">
+        <rect x="500.3" y="202.99999999999997" width="262.4" height="52.8" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#e1f5e1 !important"/>
+        <text x="631.5" y="229.39999999999998" class="label" dominant-baseline="central" text-anchor="middle">pub(super) fn test_app()</text>
+      </g>
+      <g class="node" id="node-ui">
+        <rect x="40" y="202.99999999999997" width="80" height="52.8"/>
+        <text x="80" y="229.39999999999998" class="label" text-anchor="middle" dominant-baseline="central">ui.rs</text>
+      </g>
+    </g>
+  </g>
+</svg>

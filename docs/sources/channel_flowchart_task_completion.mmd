@@ -4,7 +4,7 @@ graph TD
     
     A --> D[Effect::ClearBlockedBy]
     D --> E[Scan all tasks]
-    E --> F{Has blockedBy: [42]?}
+    E --> F{"Has blockedBy: [42]?"}
     F -->|Yes| G[Remove 42 from blockedBy array]
     F -->|No| H[Skip task]
     

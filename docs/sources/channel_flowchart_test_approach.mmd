@@ -1,6 +1,6 @@
 flowchart TB
     subgraph "Current Test Approach (Weak)"
-        A1[render_message] --> B1[Vec&lt;Line&gt;]
+        A1[render_message] --> B1["Vec&lt;Line&gt;"]
         B1 --> C1[flat_map spans]
         C1 --> D1[join with \\n]
         D1 --> E1[Single String]
@@ -9,7 +9,7 @@ flowchart TB
     end
     
     subgraph "Improved Test Approach (Precise)"
-        A2[render_message] --> B2[Vec&lt;Line&gt;]
+        A2[render_message] --> B2["Vec&lt;Line&gt;"]
         B2 --> C2[Iterate each Line]
         C2 --> D2[Check Line.spans]
         D2 --> E2[Verify first span<br/>is indent]

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="542" height="1110.8" viewBox="-8 -8 542 1110.8" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-A-B-0">
+        <path d="M 294.00 52.80 C 294.00 64.47, 294.00 76.13, 294.00 87.80 C 294.00 99.47, 294.00 111.13, 294.00 122.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-B-C-0">
+        <path d="M 294.00 175.60 C 294.00 187.27, 294.00 198.93, 294.00 210.60 C 294.00 222.27, 294.00 233.93, 294.00 245.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-C-D-0">
+        <path d="M 294.00 298.40 C 294.00 310.07, 294.00 321.73, 294.00 333.40 C 294.00 345.07, 294.00 356.73, 294.00 368.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-D-E-0">
+        <path d="M 294.00 421.20 C 294.00 432.87, 294.00 444.53, 294.00 456.20 C 294.00 467.87, 294.00 479.53, 294.00 491.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-E-F-0">
+        <path d="M 294.00 544.00 C 294.00 555.67, 294.00 567.33, 294.00 579.00 C 294.00 590.67, 294.00 602.33, 294.00 614.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-F-G-0">
+        <path d="M 236.90 792.10 L 150.00 919.20" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-F-H-0">
+        <path d="M 351.10 792.10 L 438.00 919.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-G-I-0">
+        <path d="M 150.00 972.00 C 150.00 983.67, 150.00 995.33, 150.00 1007.00 C 150.00 1018.67, 150.00 1030.33, 150.00 1042.00" class="edge-path" stroke-width="2" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-A-B-0">
+        <rect x="272" y="76.79999999999998" width="44" height="22" class="edge-label-bg"/>
+        <text x="294" y="87.79999999999998" class="edge-label" text-anchor="middle" dominant-baseline="central">parse</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-B-C-0">
+        <rect x="243.2" y="199.6" width="101.6" height="22" class="edge-label-bg"/>
+        <text x="294" y="210.6" class="edge-label" dominant-baseline="central" text-anchor="middle">ToLayoutGraph</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-C-D-0">
+        <rect x="232.4" y="322.4" width="123.19999999999999" height="22" class="edge-label-bg"/>
+        <text x="294" y="333.4" class="edge-label" text-anchor="middle" dominant-baseline="central">layout algorithm</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-D-E-0">
+        <rect x="218" y="445.2" width="152" height="22" class="edge-label-bg"/>
+        <text x="294" y="456.2" class="edge-label" text-anchor="middle" dominant-baseline="central">render_flowchart_tui</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-E-F-0">
+        <rect x="264.8" y="568" width="58.4" height="22" class="edge-label-bg"/>
+        <text x="294" y="579" class="edge-label" text-anchor="middle" dominant-baseline="central">overlay</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-F-G-0">
+        <rect x="80.2419385590512" y="839.8802789992277" width="202.4" height="22" class="edge-label-bg"/>
+        <text x="181.4419385590512" y="850.8802789992277" class="edge-label" dominant-baseline="central" text-anchor="middle">edge arrow at node boundary</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-F-H-0">
+        <rect x="359.3580614409488" y="839.8802789992277" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="406.5580614409488" y="850.8802789992277" class="edge-label" dominant-baseline="central" text-anchor="middle">no collision</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-G-I-0">
+        <rect x="120.8" y="996" width="58.4" height="22" class="edge-label-bg"/>
+        <text x="150" y="1007" class="edge-label" dominant-baseline="central" text-anchor="middle">example</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-A">
+        <rect x="210.8" y="0" width="166.4" height="52.8"/>
+        <text x="294" y="26.4" class="label" dominant-baseline="central" text-anchor="middle">Mermaid Source</text>
+      </g>
+      <g class="node" id="node-B">
+        <rect x="215.6" y="122.79999999999998" width="156.8" height="52.8"/>
+        <text x="294" y="149.2" class="label" dominant-baseline="central" text-anchor="middle">Flowchart AST</text>
+      </g>
+      <g class="node" id="node-C">
+        <rect x="220.4" y="245.6" width="147.2" height="52.8"/>
+        <text x="294" y="272" class="label" dominant-baseline="central" text-anchor="middle">Layout Graph</text>
+      </g>
+      <g class="node" id="node-D">
+        <rect x="162.8" y="368.4" width="262.4" height="52.8"/>
+        <text x="294" y="394.79999999999995" class="label" dominant-baseline="central" text-anchor="middle">Positioned Nodes &amp; Edges</text>
+      </g>
+      <g class="node" id="node-E">
+        <rect x="210.8" y="491.20000000000005" width="166.4" height="52.8"/>
+        <text x="294" y="517.6" class="label" text-anchor="middle" dominant-baseline="central">Character Grid</text>
+      </g>
+      <g class="node" id="node-F">
+        <polygon points="294,614 411.6,731.6 294,849.2 176.4,731.6"/>
+        <text x="294" y="731.6" class="label" dominant-baseline="central" text-anchor="middle">Collision Detection</text>
+      </g>
+      <g class="node" id="node-G">
+        <rect x="0" y="919.2" width="300" height="52.8" style="fill:#ff6b6b !important"/>
+        <text x="150" y="945.6" class="label" text-anchor="middle" dominant-baseline="central">Arrow Character Replaces Node Text</text>
+      </g>
+      <g class="node" id="node-H">
+        <rect x="350" y="919.2" width="176" height="52.8" style="fill:#51cf66 !important"/>
+        <text x="438" y="945.6" class="label" text-anchor="middle" dominant-baseline="central">Clean Rendering</text>
+      </g>
+      <g class="node" id="node-I">
+        <rect x="71.6" y="1042" width="156.8" height="52.8" style="fill:#ff6b6b !important"/>
+        <text x="150" y="1068.4" class="label" dominant-baseline="central" text-anchor="middle">World → Wor▼d</text>
+      </g>
+    </g>
+  </g>
+</svg>

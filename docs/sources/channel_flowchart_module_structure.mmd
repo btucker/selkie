@@ -21,7 +21,7 @@ graph TD
     mod_use -->|imports| test_helper
     test_fn -->|calls| test_helper
     
-    app_tests -.->|pub(super) = visible to parent| mod
+    app_tests -.->|"pub(super) = visible to parent"| mod
     mod -.->|parent of both| app
     mod -.->|parent of both| ui
     

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="718.8" height="866.0000000000001" viewBox="-8 -27.999999999999993 718.8 866.0000000000001" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-">
+        <rect x="20.00000000000003" y="-19.999999999999993" width="331.20000000000005" height="845.0000000000001" class="cluster"/>
+        <text x="185.60000000000005" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
+      </g>
+      <g class="subgraph" id="subgraph-">
+        <rect x="361.2" y="-19.999999999999993" width="321.59999999999997" height="845.0000000000001" class="cluster"/>
+        <text x="522" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-A1-B1-0">
+        <path d="M 185.60 77.80 C 185.60 86.13, 185.60 94.47, 185.60 102.80 C 185.60 111.13, 185.60 119.47, 185.60 127.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-B1-C1-0">
+        <path d="M 185.60 180.60 C 185.60 188.93, 185.60 197.27, 185.60 205.60 C 185.60 213.93, 185.60 222.27, 185.60 230.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-C1-D1-0">
+        <path d="M 185.60 283.40 C 185.60 291.73, 185.60 300.07, 185.60 308.40 C 185.60 316.73, 185.60 325.07, 185.60 333.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-D1-E1-0">
+        <path d="M 185.60 386.20 C 185.60 394.53, 185.60 402.87, 185.60 414.27 C 185.60 425.67, 185.60 440.13, 185.60 454.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-E1-F1-0">
+        <path d="M 185.60 507.40 C 185.60 521.87, 185.60 536.33, 185.60 547.73 C 185.60 559.13, 185.60 567.47, 185.60 575.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-F1-G1-0">
+        <path d="M 185.60 665.40 C 185.60 673.73, 185.60 682.07, 185.60 690.40 C 185.60 698.73, 185.60 707.07, 185.60 715.40" class="edge-path" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-A2-B2-0">
+        <path d="M 522.00 77.80 C 522.00 86.13, 522.00 94.47, 522.00 102.80 C 522.00 111.13, 522.00 119.47, 522.00 127.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-B2-C2-0">
+        <path d="M 522.00 180.60 C 522.00 188.93, 522.00 197.27, 522.00 205.60 C 522.00 213.93, 522.00 222.27, 522.00 230.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-C2-D2-0">
+        <path d="M 522.00 283.40 C 522.00 291.73, 522.00 300.07, 522.00 308.40 C 522.00 316.73, 522.00 325.07, 522.00 333.40" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-D2-E2-0">
+        <path d="M 522.00 386.20 C 522.00 394.53, 522.00 402.87, 522.00 411.20 C 522.00 419.53, 522.00 427.87, 522.00 436.20" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-E2-F2-0">
+        <path d="M 522.00 525.80 C 522.00 534.13, 522.00 542.47, 522.00 550.80 C 522.00 559.13, 522.00 567.47, 522.00 575.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-F2-G2-0">
+        <path d="M 522.00 665.40 C 522.00 673.73, 522.00 682.07, 522.00 690.40 C 522.00 698.73, 522.00 707.07, 522.00 715.40" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="2" stroke-dasharray="3,3"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-A1">
+        <rect x="102.40000000000002" y="25.000000000000007" width="166.4" height="52.8"/>
+        <text x="185.60000000000002" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">render_message</text>
+      </g>
+      <g class="node" id="node-A2">
+        <rect x="438.8" y="25.000000000000007" width="166.4" height="52.8"/>
+        <text x="522" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">render_message</text>
+      </g>
+      <g class="node" id="node-B1">
+        <rect x="97.60000000000002" y="127.80000000000001" width="176" height="52.8"/>
+        <text x="185.60000000000002" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">Vec&amp;lt;Line&amp;gt;</text>
+      </g>
+      <g class="node" id="node-B2">
+        <rect x="434" y="127.80000000000001" width="176" height="52.8"/>
+        <text x="522" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">Vec&amp;lt;Line&amp;gt;</text>
+      </g>
+      <g class="node" id="node-C1">
+        <rect x="102.40000000000002" y="230.6" width="166.4" height="52.8"/>
+        <text x="185.60000000000002" y="257" class="label" dominant-baseline="central" text-anchor="middle">flat_map spans</text>
+      </g>
+      <g class="node" id="node-C2">
+        <rect x="424.4" y="230.6" width="195.2" height="52.8"/>
+        <text x="522" y="257" class="label" dominant-baseline="central" text-anchor="middle">Iterate each Line</text>
+      </g>
+      <g class="node" id="node-D1">
+        <rect x="107.20000000000002" y="333.40000000000003" width="156.8" height="52.8"/>
+        <text x="185.60000000000002" y="359.8" class="label" text-anchor="middle" dominant-baseline="central">join with \\n</text>
+      </g>
+      <g class="node" id="node-D2">
+        <rect x="429.2" y="333.40000000000003" width="185.6" height="52.8"/>
+        <text x="522" y="359.8" class="label" dominant-baseline="central" text-anchor="middle">Check Line.spans</text>
+      </g>
+      <g class="node" id="node-E1">
+        <rect x="107.20000000000002" y="454.6000000000001" width="156.8" height="52.8"/>
+        <text x="185.60000000000002" y="481.00000000000006" class="label" dominant-baseline="central" text-anchor="middle">Single String</text>
+      </g>
+      <g class="node" id="node-E2">
+        <rect x="424.4" y="436.20000000000005" width="195.2" height="89.6"/>
+        <text x="522" y="481.00000000000006" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="522" y="481.00000000000006" dy="-0.6em">Verify first span</tspan><tspan x="522" dy="1.2em">is indent</tspan></text>
+      </g>
+      <g class="node" id="node-F1">
+        <rect x="92.80000000000003" y="575.8000000000001" width="185.6" height="89.6"/>
+        <text x="185.60000000000002" y="620.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="185.60000000000002" y="620.6" dy="-0.6em">.contains</tspan><tspan x="185.60000000000002" dy="1.2em">indent+separator</tspan></text>
+      </g>
+      <g class="node" id="node-F2">
+        <rect x="424.4" y="575.8000000000001" width="195.2" height="89.6"/>
+        <text x="522" y="620.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="522" y="620.6" dy="-0.6em">Assert indent.len</tspan><tspan x="522" dy="1.2em">== expected_width</tspan></text>
+      </g>
+      <g class="node" id="node-G1">
+        <rect x="40.00000000000003" y="715.4000000000001" width="291.2" height="89.6" style="fill:#faa !important;stroke:#f00 !important"/>
+        <text x="185.60000000000002" y="760.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="185.60000000000002" y="760.2" dy="-0.6em">Problem: Can&apos;t verify</tspan><tspan x="185.60000000000002" dy="1.2em">which line has which indent</tspan></text>
+      </g>
+      <g class="node" id="node-G2">
+        <rect x="381.2" y="715.4000000000001" width="281.6" height="89.6" style="fill:#afa !important;stroke:#0f0 !important"/>
+        <text x="522" y="760.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="522" y="760.2" dy="-0.6em">Catches: separator correct</tspan><tspan x="522" dy="1.2em">but ASCII art wrong indent</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>
