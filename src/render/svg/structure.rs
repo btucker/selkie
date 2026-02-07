@@ -739,7 +739,11 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                 || class.contains("eventWrapper")
                 || class.contains("timeline-node");
 
+            let is_architecture_node =
+                class.contains("architecture-service") || class.contains("architecture-junction");
+
             let is_node_group = is_timeline_node
+                || is_architecture_node
                 || (class.contains("node")
                     && (id.contains("entity")
                         || id.starts_with("block-")
@@ -792,6 +796,60 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                                             } else {
                                                 id.to_string()
                                             },
+                                        });
+                                        found_bounds = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if found_bounds {
+                            continue;
+                        }
+
+                        // Architecture nodes have icon SVGs nested deep;
+                        // detect them via the inner <svg> element's dimensions.
+                        if is_architecture_node {
+                            for desc in node.descendants() {
+                                if desc.tag_name().name() == "svg" {
+                                    let sw = desc
+                                        .attribute("width")
+                                        .and_then(|s| s.parse::<f64>().ok())
+                                        .unwrap_or(0.0);
+                                    let sh = desc
+                                        .attribute("height")
+                                        .and_then(|s| s.parse::<f64>().ok())
+                                        .unwrap_or(0.0);
+                                    if sw >= 80.0 && sh >= 80.0 {
+                                        geometry.node_bounds.push(NodeBounds {
+                                            x: cx,
+                                            y: cy,
+                                            width: sw,
+                                            height: sh,
+                                            id: id.to_string(),
+                                        });
+                                        found_bounds = true;
+                                        break;
+                                    }
+                                }
+                                // architecture-junction uses a rect descendant
+                                if desc.tag_name().name() == "rect" {
+                                    let rw = desc
+                                        .attribute("width")
+                                        .and_then(|s| s.parse::<f64>().ok())
+                                        .unwrap_or(0.0);
+                                    let rh = desc
+                                        .attribute("height")
+                                        .and_then(|s| s.parse::<f64>().ok())
+                                        .unwrap_or(0.0);
+                                    if rw >= 80.0 && rh >= 80.0 {
+                                        geometry.node_bounds.push(NodeBounds {
+                                            x: cx,
+                                            y: cy,
+                                            width: rw,
+                                            height: rh,
+                                            id: id.to_string(),
                                         });
                                         found_bounds = true;
                                         break;
@@ -2182,6 +2240,65 @@ mod tests {
         let structure = SvgStructure::from_svg(svg).unwrap();
         assert_eq!(structure.node_count, 2);
         assert_eq!(structure.edge_count, 1);
+    }
+
+    #[test]
+    fn test_architecture_node_bounds_extraction() {
+        // Architecture services use nested <svg> icons within a translated <g>
+        let svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+            <g class="architecture-edges">
+                <g><path class="edge" d="M 40,0 L 160,0"/></g>
+            </g>
+            <g class="architecture-services">
+                <g class="architecture-service" transform="translate(-40, -40)" id="service-gateway">
+                    <g transform="translate(40, 80)"><text>Gateway</text></g>
+                    <g><g><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80"/></svg></g></g>
+                </g>
+                <g class="architecture-service" transform="translate(160, -40)" id="service-server">
+                    <g transform="translate(40, 80)"><text>Server</text></g>
+                    <g><g><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80"/></svg></g></g>
+                </g>
+                <g class="architecture-junction" transform="translate(360, 160)">
+                    <g><rect x="0" y="0" width="80" height="80" fill-opacity="0" id="node-hub"/></g>
+                </g>
+            </g>
+        </svg>"#;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let bounds = &structure.edge_geometry.node_bounds;
+
+        // Should extract bounds for all 3 architecture nodes
+        assert!(
+            bounds.len() >= 3,
+            "Expected at least 3 node bounds for architecture nodes, got {}",
+            bounds.len()
+        );
+
+        // gateway at translate(-40, -40) with 80x80 icon
+        let gateway = bounds.iter().find(|b| b.id.contains("gateway"));
+        assert!(gateway.is_some(), "Should find gateway bounds");
+        let gw = gateway.unwrap();
+        assert_eq!(gw.x, -40.0);
+        assert_eq!(gw.y, -40.0);
+        assert_eq!(gw.width, 80.0);
+        assert_eq!(gw.height, 80.0);
+
+        // server at translate(160, -40) with 80x80 icon
+        let server = bounds.iter().find(|b| b.id.contains("server"));
+        assert!(server.is_some(), "Should find server bounds");
+        let sv = server.unwrap();
+        assert_eq!(sv.x, 160.0);
+        assert_eq!(sv.y, -40.0);
+
+        // Junction node should also be extracted
+        let junction_bounds: Vec<_> = bounds
+            .iter()
+            .filter(|b| b.x == 360.0 && b.y == 160.0)
+            .collect();
+        assert!(
+            !junction_bounds.is_empty(),
+            "Should find junction bounds at (360, 160)"
+        );
     }
 
     #[test]

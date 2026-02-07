@@ -1483,12 +1483,24 @@ fn point_touches_any_node(x: f64, y: f64, nodes: &[NodeBounds], tolerance: f64) 
     false
 }
 
-/// Check if a point is within tolerance of a node's boundary
+/// Check if a point is within tolerance of a node's boundary or inside it.
+/// Architecture diagrams route edges through invisible junction nodes (to their
+/// center), so we also accept points that are inside the node bounds.
 fn point_touches_node_boundary(x: f64, y: f64, node: &NodeBounds, tolerance: f64) -> bool {
     let left = node.x;
     let right = node.x + node.width;
     let top = node.y;
     let bottom = node.y + node.height;
+
+    // Check if point is inside the node bounds (for junctions and similar)
+    let inside = x >= left - tolerance
+        && x <= right + tolerance
+        && y >= top - tolerance
+        && y <= bottom + tolerance;
+
+    if inside {
+        return true;
+    }
 
     // Check if point is near any of the four sides
     let near_left =
