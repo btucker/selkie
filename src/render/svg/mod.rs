@@ -20,8 +20,8 @@ use crate::diagrams::flowchart::{FlowSubGraph, FlowchartDb};
 use crate::error::Result;
 use crate::layout::{LayoutGraph, LayoutNode, Point};
 use crate::render::architecture::{
-    architecture_edge_points, architecture_node_port, ARCH_EDGE_GROUP_LABEL_SHIFT, ARCH_FONT_SIZE,
-    ARCH_GROUP_ICON_SCALE, ARCH_ICON_SIZE, ARCH_LABEL_HEIGHT, ARCH_PADDING,
+    compute_architecture_edge_route, ArchitectureEdgeSide, ARCH_FONT_SIZE, ARCH_GROUP_ICON_SCALE,
+    ARCH_ICON_SIZE, ARCH_LABEL_HEIGHT, ARCH_PADDING,
 };
 
 /// Configuration for SVG rendering
@@ -585,74 +585,23 @@ fn render_architecture_edge(
     let source_node = graph.get_node(&edge.lhs_id)?;
     let target_node = graph.get_node(&edge.rhs_id)?;
 
-    let mut start = architecture_node_port(source_node, edge.lhs_dir)?;
-    let mut end = architecture_node_port(target_node, edge.rhs_dir)?;
-
-    let group_edge_shift = ARCH_PADDING + 4.0;
-    if edge.lhs_group {
-        if edge.lhs_dir.is_x() {
-            start.x += if edge.lhs_dir == ArchitectureDirection::Left {
-                -group_edge_shift
-            } else {
-                group_edge_shift
-            };
-        } else {
-            start.y += if edge.lhs_dir == ArchitectureDirection::Top {
-                -group_edge_shift
-            } else {
-                group_edge_shift + ARCH_EDGE_GROUP_LABEL_SHIFT
-            };
-        }
-    }
-    if edge.rhs_group {
-        if edge.rhs_dir.is_x() {
-            end.x += if edge.rhs_dir == ArchitectureDirection::Left {
-                -group_edge_shift
-            } else {
-                group_edge_shift
-            };
-        } else {
-            end.y += if edge.rhs_dir == ArchitectureDirection::Top {
-                -group_edge_shift
-            } else {
-                group_edge_shift + ARCH_EDGE_GROUP_LABEL_SHIFT
-            };
-        }
-    }
-
-    let half_icon = ARCH_ICON_SIZE / 2.0;
-    if !edge.lhs_group && is_junction_node(db, source_node, &edge.lhs_id) {
-        if edge.lhs_dir.is_x() {
-            start.x += if edge.lhs_dir == ArchitectureDirection::Left {
-                half_icon
-            } else {
-                -half_icon
-            };
-        } else {
-            start.y += if edge.lhs_dir == ArchitectureDirection::Top {
-                half_icon
-            } else {
-                -half_icon
-            };
-        }
-    }
-    if !edge.rhs_group && is_junction_node(db, target_node, &edge.rhs_id) {
-        if edge.rhs_dir.is_x() {
-            end.x += if edge.rhs_dir == ArchitectureDirection::Left {
-                half_icon
-            } else {
-                -half_icon
-            };
-        } else {
-            end.y += if edge.rhs_dir == ArchitectureDirection::Top {
-                half_icon
-            } else {
-                -half_icon
-            };
-        }
-    }
-
-    let points = architecture_edge_points(start, end, edge.lhs_dir, edge.rhs_dir);
+    let route = compute_architecture_edge_route(
+        source_node,
+        target_node,
+        &ArchitectureEdgeSide {
+            dir: edge.lhs_dir,
+            is_group: edge.lhs_group,
+            is_junction: is_junction_node(db, source_node, &edge.lhs_id),
+        },
+        &ArchitectureEdgeSide {
+            dir: edge.rhs_dir,
+            is_group: edge.rhs_group,
+            is_junction: is_junction_node(db, target_node, &edge.rhs_id),
+        },
+    )?;
+    let start = route.start;
+    let end = route.end;
+    let points = route.points;
     let path_d = build_architecture_path(&points);
 
     let mut edge_children = Vec::new();

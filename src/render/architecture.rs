@@ -217,10 +217,8 @@ fn apply_architecture_layout(db: &ArchitectureDb, graph: &mut LayoutGraph) {
 }
 
 /// Compute bend_points for each architecture edge so the ASCII renderer can
-/// draw braille lines.  Uses the same port / bend logic as the SVG renderer.
+/// draw braille lines.  Uses the shared `compute_architecture_edge_route`.
 fn route_architecture_edges(_db: &ArchitectureDb, graph: &mut LayoutGraph) {
-    // Build a lookup from edge metadata to the original ArchitectureEdge so we
-    // can read lhs_dir / rhs_dir / group flags.
     for layout_edge in &mut graph.edges {
         let lhs_dir_str = layout_edge.metadata.get("lhs_dir").cloned();
         let rhs_dir_str = layout_edge.metadata.get("rhs_dir").cloned();
@@ -260,47 +258,6 @@ fn route_architecture_edges(_db: &ArchitectureDb, graph: &mut LayoutGraph) {
             continue;
         };
 
-        let start = architecture_node_port(source_node, lhs_dir);
-        let end = architecture_node_port(target_node, rhs_dir);
-        let (Some(mut start), Some(mut end)) = (start, end) else {
-            continue;
-        };
-
-        // Shift for group boundary edges
-        let group_edge_shift = ARCH_PADDING + 4.0;
-        if lhs_group {
-            if lhs_dir.is_x() {
-                start.x += if lhs_dir == ArchitectureDirection::Left {
-                    -group_edge_shift
-                } else {
-                    group_edge_shift
-                };
-            } else {
-                start.y += if lhs_dir == ArchitectureDirection::Top {
-                    -group_edge_shift
-                } else {
-                    group_edge_shift + ARCH_EDGE_GROUP_LABEL_SHIFT
-                };
-            }
-        }
-        if rhs_group {
-            if rhs_dir.is_x() {
-                end.x += if rhs_dir == ArchitectureDirection::Left {
-                    -group_edge_shift
-                } else {
-                    group_edge_shift
-                };
-            } else {
-                end.y += if rhs_dir == ArchitectureDirection::Top {
-                    -group_edge_shift
-                } else {
-                    group_edge_shift + ARCH_EDGE_GROUP_LABEL_SHIFT
-                };
-            }
-        }
-
-        // Shrink junction ports inward
-        let half_icon = ARCH_ICON_SIZE / 2.0;
         let is_source_junction = source_node
             .metadata
             .get("node_type")
@@ -311,54 +268,35 @@ fn route_architecture_edges(_db: &ArchitectureDb, graph: &mut LayoutGraph) {
             .get("node_type")
             .map(|v| v == "junction")
             .unwrap_or(false);
-        if !lhs_group && is_source_junction {
-            if lhs_dir.is_x() {
-                start.x += if lhs_dir == ArchitectureDirection::Left {
-                    half_icon
-                } else {
-                    -half_icon
-                };
-            } else {
-                start.y += if lhs_dir == ArchitectureDirection::Top {
-                    half_icon
-                } else {
-                    -half_icon
-                };
-            }
-        }
-        if !rhs_group && is_target_junction {
-            if rhs_dir.is_x() {
-                end.x += if rhs_dir == ArchitectureDirection::Left {
-                    half_icon
-                } else {
-                    -half_icon
-                };
-            } else {
-                end.y += if rhs_dir == ArchitectureDirection::Top {
-                    half_icon
-                } else {
-                    -half_icon
-                };
-            }
-        }
 
-        // Compute bend points using the shared edge-point function
-        let points = architecture_edge_points(start, end, lhs_dir, rhs_dir);
+        let Some(route) = compute_architecture_edge_route(
+            source_node,
+            target_node,
+            &ArchitectureEdgeSide {
+                dir: lhs_dir,
+                is_group: lhs_group,
+                is_junction: is_source_junction,
+            },
+            &ArchitectureEdgeSide {
+                dir: rhs_dir,
+                is_group: rhs_group,
+                is_junction: is_target_junction,
+            },
+        ) else {
+            continue;
+        };
 
         // Set label position at midpoint of path
-        if layout_edge.label.is_some() && points.len() >= 2 {
-            layout_edge.label_position = crate::layout::geometric_midpoint(&points);
+        if layout_edge.label.is_some() && route.points.len() >= 2 {
+            layout_edge.label_position = crate::layout::geometric_midpoint(&route.points);
         }
 
-        layout_edge.bend_points = points;
+        layout_edge.bend_points = route.points;
     }
 }
 
 /// Get the port position on a node for a given direction.
-///
-/// Used by both the SVG and ASCII renderers to determine where edges
-/// attach to a node's bounding box.
-pub fn architecture_node_port(node: &LayoutNode, dir: ArchitectureDirection) -> Option<Point> {
+fn architecture_node_port(node: &LayoutNode, dir: ArchitectureDirection) -> Option<Point> {
     let (x, y) = (node.x?, node.y?);
     let w = node.width;
     let h = node.height;
@@ -374,7 +312,7 @@ pub fn architecture_node_port(node: &LayoutNode, dir: ArchitectureDirection) -> 
 ///
 /// For same-axis connections (both horizontal or both vertical), returns a
 /// straight line. For cross-axis connections, returns an L-shaped bend.
-pub fn architecture_edge_points(
+fn architecture_edge_points(
     start: Point,
     end: Point,
     source_dir: ArchitectureDirection,
@@ -392,6 +330,114 @@ pub fn architecture_edge_points(
     } else {
         vec![start, end]
     }
+}
+
+/// Result of computing an architecture edge route.
+///
+/// Contains the adjusted start/end points (after group boundary shifts and
+/// junction shrinks) plus the full set of bend points for the path.
+pub struct ArchitectureEdgeRoute {
+    pub start: Point,
+    pub end: Point,
+    pub points: Vec<Point>,
+}
+
+/// Parameters describing one side of an architecture edge for routing.
+pub struct ArchitectureEdgeSide {
+    pub dir: ArchitectureDirection,
+    pub is_group: bool,
+    pub is_junction: bool,
+}
+
+/// Compute the full route for an architecture edge.
+///
+/// Applies port computation, group boundary shifts, junction shrinks, and
+/// bend-point generation.  Used by both the SVG and ASCII renderers so that
+/// edge routing logic lives in one place.
+pub fn compute_architecture_edge_route(
+    source_node: &LayoutNode,
+    target_node: &LayoutNode,
+    lhs: &ArchitectureEdgeSide,
+    rhs: &ArchitectureEdgeSide,
+) -> Option<ArchitectureEdgeRoute> {
+    let lhs_dir = lhs.dir;
+    let rhs_dir = rhs.dir;
+    let lhs_group = lhs.is_group;
+    let rhs_group = rhs.is_group;
+    let source_is_junction = lhs.is_junction;
+    let target_is_junction = rhs.is_junction;
+    let mut start = architecture_node_port(source_node, lhs_dir)?;
+    let mut end = architecture_node_port(target_node, rhs_dir)?;
+
+    // Shift for group boundary edges
+    let group_edge_shift = ARCH_PADDING + 4.0;
+    if lhs_group {
+        if lhs_dir.is_x() {
+            start.x += if lhs_dir == ArchitectureDirection::Left {
+                -group_edge_shift
+            } else {
+                group_edge_shift
+            };
+        } else {
+            start.y += if lhs_dir == ArchitectureDirection::Top {
+                -group_edge_shift
+            } else {
+                group_edge_shift + ARCH_EDGE_GROUP_LABEL_SHIFT
+            };
+        }
+    }
+    if rhs_group {
+        if rhs_dir.is_x() {
+            end.x += if rhs_dir == ArchitectureDirection::Left {
+                -group_edge_shift
+            } else {
+                group_edge_shift
+            };
+        } else {
+            end.y += if rhs_dir == ArchitectureDirection::Top {
+                -group_edge_shift
+            } else {
+                group_edge_shift + ARCH_EDGE_GROUP_LABEL_SHIFT
+            };
+        }
+    }
+
+    // Shrink junction ports inward
+    let half_icon = ARCH_ICON_SIZE / 2.0;
+    if !lhs_group && source_is_junction {
+        if lhs_dir.is_x() {
+            start.x += if lhs_dir == ArchitectureDirection::Left {
+                half_icon
+            } else {
+                -half_icon
+            };
+        } else {
+            start.y += if lhs_dir == ArchitectureDirection::Top {
+                half_icon
+            } else {
+                -half_icon
+            };
+        }
+    }
+    if !rhs_group && target_is_junction {
+        if rhs_dir.is_x() {
+            end.x += if rhs_dir == ArchitectureDirection::Left {
+                half_icon
+            } else {
+                -half_icon
+            };
+        } else {
+            end.y += if rhs_dir == ArchitectureDirection::Top {
+                half_icon
+            } else {
+                -half_icon
+            };
+        }
+    }
+
+    let points = architecture_edge_points(start, end, lhs_dir, rhs_dir);
+
+    Some(ArchitectureEdgeRoute { start, end, points })
 }
 
 fn apply_overlap_jitter(
@@ -1769,6 +1815,107 @@ mod tests {
             a_pos, b_pos,
             "Cross-group collision must be resolved: nodeA={:?}, nodeB={:?}",
             a_pos, b_pos
+        );
+    }
+
+    fn side(dir: ArchitectureDirection, is_group: bool, is_junction: bool) -> ArchitectureEdgeSide {
+        ArchitectureEdgeSide {
+            dir,
+            is_group,
+            is_junction,
+        }
+    }
+
+    #[test]
+    fn test_compute_edge_route_straight_line() {
+        // Two nodes side by side, R->L connection = straight line, 2 points
+        let source = LayoutNode::new("a", ARCH_ICON_SIZE, ARCH_ICON_SIZE).with_position(0.0, 0.0);
+        let target = LayoutNode::new("b", ARCH_ICON_SIZE, ARCH_ICON_SIZE).with_position(200.0, 0.0);
+
+        let route = compute_architecture_edge_route(
+            &source,
+            &target,
+            &side(ArchitectureDirection::Right, false, false),
+            &side(ArchitectureDirection::Left, false, false),
+        )
+        .expect("should compute route");
+
+        assert_eq!(route.points.len(), 2, "straight line should have 2 points");
+        assert_eq!(route.start.x, source.width); // right edge
+        assert_eq!(route.end.x, 200.0); // left edge of target
+    }
+
+    #[test]
+    fn test_compute_edge_route_bend() {
+        // Cross-axis: source exits Right, target enters Top = L-shaped bend
+        let source = LayoutNode::new("a", ARCH_ICON_SIZE, ARCH_ICON_SIZE).with_position(0.0, 0.0);
+        let target =
+            LayoutNode::new("b", ARCH_ICON_SIZE, ARCH_ICON_SIZE).with_position(200.0, 200.0);
+
+        let route = compute_architecture_edge_route(
+            &source,
+            &target,
+            &side(ArchitectureDirection::Right, false, false),
+            &side(ArchitectureDirection::Top, false, false),
+        )
+        .expect("should compute route");
+
+        assert_eq!(route.points.len(), 3, "L-bend should have 3 points");
+    }
+
+    #[test]
+    fn test_compute_edge_route_group_shift() {
+        // When lhs_group=true, start point should be shifted outward
+        let source = LayoutNode::new("a", ARCH_ICON_SIZE, ARCH_ICON_SIZE).with_position(0.0, 0.0);
+        let target = LayoutNode::new("b", ARCH_ICON_SIZE, ARCH_ICON_SIZE).with_position(300.0, 0.0);
+
+        let route_no_group = compute_architecture_edge_route(
+            &source,
+            &target,
+            &side(ArchitectureDirection::Right, false, false),
+            &side(ArchitectureDirection::Left, false, false),
+        )
+        .unwrap();
+
+        let route_with_group = compute_architecture_edge_route(
+            &source,
+            &target,
+            &side(ArchitectureDirection::Right, true, false),
+            &side(ArchitectureDirection::Left, false, false),
+        )
+        .unwrap();
+
+        assert!(
+            route_with_group.start.x > route_no_group.start.x,
+            "group shift should push start.x outward for Right direction"
+        );
+    }
+
+    #[test]
+    fn test_compute_edge_route_junction_shrink() {
+        // When source is a junction, the port should be pulled inward
+        let source = LayoutNode::new("a", ARCH_ICON_SIZE, ARCH_ICON_SIZE).with_position(0.0, 0.0);
+        let target = LayoutNode::new("b", ARCH_ICON_SIZE, ARCH_ICON_SIZE).with_position(300.0, 0.0);
+
+        let route_no_junction = compute_architecture_edge_route(
+            &source,
+            &target,
+            &side(ArchitectureDirection::Right, false, false),
+            &side(ArchitectureDirection::Left, false, false),
+        )
+        .unwrap();
+
+        let route_with_junction = compute_architecture_edge_route(
+            &source,
+            &target,
+            &side(ArchitectureDirection::Right, false, true),
+            &side(ArchitectureDirection::Left, false, false),
+        )
+        .unwrap();
+
+        assert!(
+            route_with_junction.start.x < route_no_junction.start.x,
+            "junction shrink should pull start.x inward for Right direction"
         );
     }
 

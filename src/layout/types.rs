@@ -216,6 +216,12 @@ impl LayoutNode {
         self
     }
 
+    pub fn with_position(mut self, x: f64, y: f64) -> Self {
+        self.x = Some(x);
+        self.y = Some(y);
+        self
+    }
+
     /// Set children for compound nodes (subgraphs)
     pub fn with_children(mut self, children: Vec<LayoutNode>) -> Self {
         self.children = children;
