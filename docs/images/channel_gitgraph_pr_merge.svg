@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="589.6823938474073" height="287.99758707970034" viewBox="-201 -19.5 589.6823938474073 287.99758707970034" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="609" height="302.6975870797003" viewBox="-201 -34.2 609 302.6975870797003" class="mermaid">
   <style>
 
 .mermaid {
@@ -179,23 +179,24 @@ marker path {
 
     </g>
     <g class="branches">
-      <line x1="0" y1="0" x2="350" y2="0" class="branch branch0"/>
+      <line x1="0" y1="0" x2="400" y2="0" class="branch branch0"/>
       <rect x="-87.4" y="-11.5" width="56.4" height="23" rx="4" ry="4" class="branchLabelBkg label0"/>
-      <line x1="0" y1="90" x2="350" y2="90" class="branch branch1"/>
+      <line x1="0" y1="90" x2="400" y2="90" class="branch branch1"/>
       <rect x="-183.4" y="78.5" width="152.4" height="23" rx="4" ry="4" class="branchLabelBkg label1"/>
-      <line x1="0" y1="180" x2="350" y2="180" class="branch branch2"/>
+      <line x1="0" y1="180" x2="400" y2="180" class="branch branch2"/>
       <rect x="-193" y="168.5" width="162" height="23" rx="4" ry="4" class="branchLabelBkg label2"/>
       <text x="-59.2" y="0" class="branch-label0" text-anchor="middle" dominant-baseline="middle">main</text>
       <text x="-107.2" y="90" class="branch-label1" text-anchor="middle" dominant-baseline="middle">feature-branch</text>
       <text x="-112" y="180" class="branch-label2" dominant-baseline="middle" text-anchor="middle">feature-rebased</text>
     </g>
     <g class="commit-arrows">
+      <path d="M 160 0 L 210 0" class="arrow arrow0"/>
+      <path d="M 110 0 L 160 0" class="arrow arrow0"/>
+      <path d="M 210 0 L 260 0" class="arrow arrow0"/>
       <path d="M 60 0 L 110 0" class="arrow arrow0"/>
       <path d="M 10 0 L 60 0" class="arrow arrow0"/>
-      <path d="M 160 0 L 210 0" class="arrow arrow0"/>
-      <path d="M 210 0 L 260 0" class="arrow arrow0"/>
+      <path d="M 260 0 L 360 0" class="arrow arrow0"/>
       <path d="M 60 0 L 60 70 A 20 20, 0, 0, 0, 80 90 L 310 90" class="arrow arrow1"/>
-      <path d="M 110 0 L 160 0" class="arrow arrow0"/>
     </g>
     <g class="commits">
       <g class="commit-bullets">
@@ -207,6 +208,11 @@ marker path {
         <rect x="250" y="-10" width="20" height="20" class="commit PR--717--squash-merge- commit-highlight0 commit-highlight-outer"/>
         <rect x="254" y="-6" width="12" height="12" class="commit PR--717--squash-merge- commit0 commit-highlight-inner"/>
         <circle cx="310" cy="90" r="10" class="commit a1e3fa5--tests---new-work- commit1"/>
+        <circle cx="360" cy="0" r="10" class="commit 7-6833dfe3 commit-cherry-pick"/>
+        <circle cx="357" cy="2" r="2.75" class="commit 7-6833dfe3 commit-cherry-pick" fill="#fff"/>
+        <circle cx="363" cy="2" r="2.75" class="commit 7-6833dfe3 commit-cherry-pick" fill="#fff"/>
+        <line x1="363" y1="1" x2="360" y2="-5" class="commit 7-6833dfe3 commit-cherry-pick" stroke="#fff"/>
+        <line x1="357" y1="1" x2="360" y2="-5" class="commit 7-6833dfe3 commit-cherry-pick" stroke="#fff"/>
       </g>
       <g class="commit-labels">
         <rect x="-4" y="13.5" width="28" height="14" class="commit-label-bkg" transform="translate(-20.42, 18.16) rotate(-45, 10, 0)"/>
@@ -218,6 +224,8 @@ marker path {
         <rect x="230" y="103.5" width="160" height="14" class="commit-label-bkg" transform="translate(-70.58, 63.04) rotate(-45, 310, 90)"/>
         <polygon points="296,72.8 296,68.8 294,63.8 326,63.8 326,77.8 294,77.8" class="tag-label-bkg"/>
         <circle cx="300" cy="70.8" r="1.5" class="tag-hole"/>
+        <polygon points="322,-17.2 322,-21.2 320,-26.2 400,-26.2 400,-12.2 320,-12.2" class="tag-label-bkg"/>
+        <circle cx="326" cy="-19.2" r="1.5" class="tag-hole"/>
         <text x="-2" y="25" class="commit-label" transform="translate(-20.42, 18.16) rotate(-45, 10, 0)">base</text>
         <text x="3" y="25" class="commit-label" transform="translate(-54.62, 48.76) rotate(-45, 60, 0)">main (before merge)</text>
         <text x="53" y="25" class="commit-label" transform="translate(-54.62, 48.76) rotate(-45, 110, 0)">commit 1 (squashed)</text>
@@ -226,6 +234,7 @@ marker path {
         <text x="194" y="25" class="commit-label" transform="translate(-61.459999999999994, 54.88) rotate(-45, 260, 0)">PR #717 (squash merge)</text>
         <text x="232" y="115" class="commit-label" transform="translate(-70.58, 63.04) rotate(-45, 310, 90)">a1e3fa5 (tests - new work)</text>
         <text x="298" y="74" class="tag-label">HEAD</text>
+        <text x="324" y="-16" class="tag-label">clean rebase</text>
       </g>
     </g>
   </g>
