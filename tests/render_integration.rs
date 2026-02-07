@@ -3781,17 +3781,18 @@ fn test_flowchart_classdef_dark_fill_gets_legible_text() {
     let diagram = parse(input).expect("Failed to parse flowchart");
     let svg = render(&diagram).expect("Failed to render flowchart");
 
-    // Node A has a very dark fill (#1a1a2e) — its text should have white fill for legibility
+    // Node A has a very dark fill (#1a1a2e) — its text should have white fill via inline style
+    // (inline style beats theme CSS rules like `.node text { fill: ... }`)
     assert!(
-        svg.contains("fill=\"#ffffff\""),
-        "Dark background node should have white text fill for legibility.\nSVG:\n{}",
+        svg.contains("style=\"fill: #ffffff\""),
+        "Dark background node should have white text fill via inline style.\nSVG:\n{}",
         svg
     );
 
-    // Node B has a light fill (#f0f0f0) — its text should have black fill for legibility
+    // Node B has a light fill (#f0f0f0) — its text should have black fill via inline style
     assert!(
-        svg.contains("fill=\"#000000\""),
-        "Light background node should have black text fill for legibility.\nSVG:\n{}",
+        svg.contains("style=\"fill: #000000\""),
+        "Light background node should have black text fill via inline style.\nSVG:\n{}",
         svg
     );
 }
@@ -3805,10 +3806,10 @@ fn test_flowchart_classdef_explicit_color_used() {
     let diagram = parse(input).expect("Failed to parse flowchart");
     let svg = render(&diagram).expect("Failed to render flowchart");
 
-    // The explicit color:#ff6600 should be used as the text fill
+    // The explicit color:#ff6600 should be used as the text fill via inline style
     assert!(
-        svg.contains("fill=\"#ff6600\""),
-        "Explicit color in classDef should be used for text fill.\nSVG:\n{}",
+        svg.contains("style=\"fill: #ff6600\""),
+        "Explicit color in classDef should be used for text fill via inline style.\nSVG:\n{}",
         svg
     );
 }

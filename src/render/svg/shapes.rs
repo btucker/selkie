@@ -271,7 +271,9 @@ pub fn render_shape(
 
     if let Some(s) = style {
         if let Some(text_fill) = text_color_for_styles(s) {
-            label_attrs = label_attrs.with_fill(&text_fill);
+            // Use inline style (not presentation attribute) so it takes
+            // precedence over theme CSS rules like `.node text { fill: ... }`.
+            label_attrs = label_attrs.with_style(&format!("fill: {}", text_fill));
         }
     }
 
@@ -307,10 +309,10 @@ mod tests {
         let shape_element = render_shape(&node, &vertex, &theme, Some(style));
         let svg = shape_element.to_svg(0);
 
-        // The text element should have fill="#ffffff" for legibility
+        // The text element should have inline style fill for legibility
         assert!(
-            svg.contains("fill=\"#ffffff\""),
-            "Dark background node text should have white fill for legibility, got: {}",
+            svg.contains("style=\"fill: #ffffff\""),
+            "Dark background node text should have white fill via inline style, got: {}",
             svg
         );
     }
@@ -332,10 +334,10 @@ mod tests {
         let shape_element = render_shape(&node, &vertex, &theme, Some(style));
         let svg = shape_element.to_svg(0);
 
-        // The text element should have fill="#000000" for legibility
+        // The text element should have inline style fill for legibility
         assert!(
-            svg.contains("fill=\"#000000\""),
-            "Light background node text should have black fill for legibility, got: {}",
+            svg.contains("style=\"fill: #000000\""),
+            "Light background node text should have black fill via inline style, got: {}",
             svg
         );
     }
@@ -357,11 +359,41 @@ mod tests {
         let shape_element = render_shape(&node, &vertex, &theme, Some(style));
         let svg = shape_element.to_svg(0);
 
-        // The text element should use the explicit color value
+        // The text element should use the explicit color value via inline style
         assert!(
-            svg.contains("fill=\"#ff0000\""),
-            "Explicit color should be used for text fill, got: {}",
+            svg.contains("style=\"fill: #ff0000\""),
+            "Explicit color should be used for text fill via inline style, got: {}",
             svg
+        );
+    }
+
+    #[test]
+    fn test_text_color_uses_inline_style_over_presentation_attr() {
+        // Text color must use inline style (style="fill:...") rather than
+        // a presentation attribute (fill="..."), because theme CSS rules
+        // like `.node text { fill: ... }` override presentation attributes.
+        // Inline styles have highest CSS specificity.
+        let mut node = LayoutNode::new("test", 100.0, 60.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.text = Some("Styled Node".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Square);
+
+        let theme = Theme::default();
+        let style = "fill:#333333 !important;stroke:#000 !important";
+        let shape_element = render_shape(&node, &vertex, &theme, Some(style));
+        let svg = shape_element.to_svg(0);
+
+        // The text element should use inline style, NOT a presentation attribute
+        let text_start = svg.find("<text").expect("should have text element");
+        let text_end = svg[text_start..].find('>').unwrap() + text_start;
+        let text_tag = &svg[text_start..=text_end];
+        assert!(
+            text_tag.contains("style=\"fill:"),
+            "Text color should use inline style for CSS specificity, got: {}",
+            text_tag
         );
     }
 
