@@ -1,0 +1,29 @@
+flowchart TD
+    Start["render_message_with_mermaid()"]
+    CheckType{"msg.message_type == Action?"}
+    CalcIndent["extra_indent = 2"]
+    NoIndent["extra_indent = 0"]
+    CalcWidth["indent_width = TIMESTAMP_GUTTER_WIDTH + extra_indent"]
+    Normal["indent_width = 7"]
+    Action["indent_width = 9"]
+    RenderMermaid["Render Mermaid placeholder"]
+    Placeholder["format!('{}[1] Diagram...', ' '.repeat(indent_width))"]
+    ActionLine[" HH:MM * content<br/>(9-char indent)"]
+    NormalLine[" HH:MM content<br/>(7-char indent)"]
+    
+    Start --> CheckType
+    CheckType -->|Yes| CalcIndent
+    CheckType -->|No| NoIndent
+    CalcIndent --> CalcWidth
+    NoIndent --> CalcWidth
+    CalcWidth --> Action
+    CalcWidth --> Normal
+    Action --> RenderMermaid
+    Normal --> RenderMermaid
+    RenderMermaid --> Placeholder
+    Placeholder --> ActionLine
+    Placeholder --> NormalLine
+    
+    style Action fill:#e1f5ff
+    style Normal fill:#fff5e1
+    style Placeholder fill:#d4edda

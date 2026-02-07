@@ -1,0 +1,52 @@
+flowchart TB
+    subgraph "Without sccache"
+        W1[Coworker 1<br/>lexington worktree]
+        W2[Coworker 2<br/>park worktree]
+        W3[Coworker 3<br/>madison worktree]
+        
+        W1 --> B1[cargo build]
+        W2 --> B2[cargo build]
+        W3 --> B3[cargo build]
+        
+        B1 --> D1[Dependencies: 95%<br/>tokio, serde, ratatui,<br/>selkie, resvg, etc.]
+        B1 --> M1[midtown crate: 5%]
+        
+        B2 --> D2[Dependencies: 95%<br/>tokio, serde, ratatui,<br/>selkie, resvg, etc.]
+        B2 --> M2[midtown crate: 5%]
+        
+        B3 --> D3[Dependencies: 95%<br/>tokio, serde, ratatui,<br/>selkie, resvg, etc.]
+        B3 --> M3[midtown crate: 5%]
+        
+        D1 -.->|redundant| D2
+        D2 -.->|redundant| D3
+    end
+    
+    subgraph "With sccache (RUSTC_WRAPPER)"
+        S1[Coworker 1<br/>lexington worktree]
+        S2[Coworker 2<br/>park worktree]
+        S3[Coworker 3<br/>madison worktree]
+        
+        S1 --> SB1[cargo build]
+        S2 --> SB2[cargo build]
+        S3 --> SB3[cargo build]
+        
+        SB1 & SB2 & SB3 --> CACHE[Shared sccache<br/>~/.cache/sccache]
+        
+        CACHE --> SD[Dependencies: 95%<br/>compiled once, cached]
+        SB1 --> SM1[midtown: 5%]
+        SB2 --> SM2[midtown: 5%]
+        SB3 --> SM3[midtown: 5%]
+        
+        SD -.->|cache hit| SB1
+        SD -.->|cache hit| SB2
+        SD -.->|cache hit| SB3
+    end
+    
+    RESULT[Result: 3x coworkers = 1x deps + 3x delta<br/>Same pattern for pnpm, GOMODCACHE, pip cache]
+    
+    style CACHE fill:#90EE90
+    style SD fill:#90EE90
+    style RESULT fill:#FFD700
+    style D1 fill:#FFB6C1
+    style D2 fill:#FFB6C1
+    style D3 fill:#FFB6C1

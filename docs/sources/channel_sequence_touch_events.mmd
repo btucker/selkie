@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant User
+    participant Element
+    participant TouchEvent
+    
+    Note over User,TouchEvent: Touch Start Phase
+    User->>Element: Touch down on element
+    Element->>TouchEvent: touchstart event
+    Note right of TouchEvent: e.target = element<br/>e.touches = [touch1]<br/>e.changedTouches = [touch1]
+    
+    Note over User,TouchEvent: Touch Move Phase (optional)
+    User->>Element: Drag finger (may leave element)
+    Element->>TouchEvent: touchmove event
+    Note right of TouchEvent: e.target = STILL original element<br/>e.touches = [touch1]<br/>e.changedTouches = [touch1]
+    
+    Note over User,TouchEvent: Touch End Phase
+    User->>Element: Lift finger (possibly outside element)
+    Element->>TouchEvent: touchend event
+    Note right of TouchEvent: e.target = STILL original element<br/>e.touches = []<br/>e.changedTouches = [touch1]
+    
+    Note over TouchEvent: For tap-to-dismiss:<br/>Check e.touches.length === 0<br/>AND e.target === container

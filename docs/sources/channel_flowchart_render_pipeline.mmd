@@ -1,0 +1,15 @@
+flowchart TD
+    A[Mermaid Source] -->|parse| B[Flowchart AST]
+    B -->|ToLayoutGraph| C[Layout Graph]
+    C -->|layout algorithm| D[Positioned Nodes & Edges]
+    D -->|render_flowchart_tui| E[Character Grid]
+    
+    E -->|overlay| F{Collision Detection}
+    F -->|edge arrow at node boundary| G[Arrow Character Replaces Node Text]
+    F -->|no collision| H[Clean Rendering]
+    
+    G -.->|example| I["World" → "Wor▼d"]
+    
+    style G fill:#ff6b6b
+    style I fill:#ff6b6b
+    style H fill:#51cf66

@@ -1,0 +1,15 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'14px'}}}%%
+gitGraph
+    commit id: "base"
+    commit id: "main (before merge)"
+    branch feature-branch
+    commit id: "commit 1 (squashed)"
+    commit id: "commit 2 (squashed)"
+    commit id: "commit 3 (squashed)"
+    checkout main
+    commit id: "PR #717 (squash merge)" type: HIGHLIGHT
+    checkout feature-branch
+    commit id: "a1e3fa5 (tests - new work)" tag: "HEAD"
+    checkout main
+    branch feature-rebased
+    cherry-pick id: "a1e3fa5 (tests)" tag: "clean rebase"

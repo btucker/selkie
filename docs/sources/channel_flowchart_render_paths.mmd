@@ -1,0 +1,26 @@
+flowchart TB
+    subgraph current["Current: Kitty Protocol Path"]
+        A1[Mermaid Source] --> A2[parse_content_segments]
+        A2 --> A3[MermaidCache]
+        A3 --> A4[selkie-rs render]
+        A4 --> A5[SVG → PNG conversion]
+        A5 --> A6[InlineImage struct]
+        A6 --> A7{Terminal?}
+        A7 -->|tmux| A8[DCS passthrough wrap]
+        A7 -->|bare| A9[APC escape sequences]
+        A8 --> A10[render_kitty_images]
+        A9 --> A10
+        A10 -.->|Issues| A11[Terminal compatibility<br/>Scrollback breaks<br/>Complex tmux handling]
+    end
+    
+    subgraph proposed["Proposed: ASCII Art Path"]
+        B1[Mermaid Source] --> B2[ASCII art renderer]
+        B2 --> B3[Plain text output]
+        B3 --> B4[ratatui Text widget]
+        B4 -.->|Benefits| B5[Universal compatibility<br/>Natural scrolling<br/>Works everywhere]
+    end
+    
+    style current fill:#2d2d2d,stroke:#666
+    style proposed fill:#1a3a1a,stroke:#4a8
+    style A11 fill:#4a1a1a,stroke:#a44
+    style B5 fill:#1a4a1a,stroke:#4a8

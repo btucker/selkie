@@ -1,0 +1,32 @@
+flowchart TD
+    Start[Message Type Check] --> IsAction{is_action?}
+    
+    IsAction -->|Yes<br/>MessageType::Action| ActionPath[extra_indent = 2]
+    IsAction -->|No<br/>Normal text| NormalPath[extra_indent = 0]
+    
+    ActionPath --> ActionIndent["indent_width = 7 + 2 = 9<br/>(TIMESTAMP_GUTTER_WIDTH + extra_indent)"]
+    NormalPath --> NormalIndent["indent_width = 7 + 0 = 7<br/>(TIMESTAMP_GUTTER_WIDTH only)"]
+    
+    ActionIndent --> ActionFirst["First line:<br/>' HH:MM * content'<br/>(7 chars gutter + 2 for '* ')"]
+    NormalIndent --> NormalFirst["First line:<br/>' HH:MM content'<br/>(7 chars gutter)"]
+    
+    ActionFirst --> ActionCont["Continuation lines:<br/>'         content'<br/>(9 spaces)"]
+    NormalFirst --> NormalCont["Continuation lines:<br/>'       content'<br/>(7 spaces)"]
+    
+    ActionCont --> ActionMermaid["Mermaid placeholder:<br/>'         [1] Diagram: ...'<br/>(9 spaces via indent_width)"]
+    NormalCont --> NormalMermaid["Mermaid placeholder:<br/>'       [1] Diagram: ...'<br/>(7 spaces via indent_width)"]
+    
+    ActionMermaid --> Result[Aligned with '* ' prefix]
+    NormalMermaid --> Result
+    
+    style ActionPath fill:#e1f5ff
+    style ActionIndent fill:#e1f5ff
+    style ActionFirst fill:#e1f5ff
+    style ActionCont fill:#e1f5ff
+    style ActionMermaid fill:#e1f5ff
+    
+    style NormalPath fill:#fff4e1
+    style NormalIndent fill:#fff4e1
+    style NormalFirst fill:#fff4e1
+    style NormalCont fill:#fff4e1
+    style NormalMermaid fill:#fff4e1

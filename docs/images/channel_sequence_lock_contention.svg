@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1549" height="1007" viewBox="-50 -10 1549 1007" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.sequence-title {
+  fill: #333333;
+}
+
+.actor {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+.actor-box {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+/* Actor text - no stroke (avoid outlined appearance) */
+text.actor, text.actor > tspan, text.actor-box, text.actor-label {
+  fill: #333333;
+  stroke: none;
+}
+
+.actor-line {
+  stroke: #999999;
+  stroke-width: 0.5px;
+}
+
+.messageLine0 {
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  stroke: #333333;
+}
+
+.messageLine1 {
+  stroke-width: 1.5;
+  stroke-dasharray: 2, 2;
+  stroke: #333333;
+}
+
+.message-line {
+  stroke: #333333;
+}
+
+.messageText {
+  fill: #333333;
+  stroke: none;
+}
+
+.message-label {
+  fill: #333333;
+  stroke: none;
+}
+
+.note {
+  stroke: #aaaa33;
+  fill: #fff5ad;
+}
+
+.noteText, .noteText > tspan {
+  fill: black;
+  stroke: none;
+}
+
+.note-text, .note-text > tspan {
+  fill: black;
+  stroke: none;
+}
+
+.activation {
+  fill: #f4f4f4;
+  stroke: #666666;
+}
+
+.loopLine {
+  stroke: #9370DB;
+  fill: none;
+  stroke-width: 2px;
+  stroke-dasharray: 2, 2;
+}
+
+.loopText {
+  fill: #333333;
+}
+
+.labelBox {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+.sequence-marker-filled {
+  fill: #333333;
+  stroke: #333333;
+}
+
+.sequence-marker-open {
+  fill: none;
+  stroke: #333333;
+}
+
+.sequence-marker-cross {
+  stroke: #333333;
+}
+
+.sequence-number {
+  fill: #333333;
+}
+
+.sequenceNumber-circle {
+  fill: #333333;
+  stroke: #333333;
+}
+
+.sequenceNumber {
+  fill: white;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow-filled" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="sequence-marker-filled" stroke-width="1"/>
+    </marker>
+    <marker id="arrow-open" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10" class="sequence-marker-open" stroke-width="1"/>
+    </marker>
+    <marker id="arrow-cross" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <line x1="0" y1="0" x2="10" y2="10" class="sequence-marker-cross" stroke-width="2"/>
+      <line x1="10" y1="0" x2="0" y2="10" class="sequence-marker-cross" stroke-width="2"/>
+    </marker>
+    <marker id="sequencenumber" refX="15" refY="15" markerWidth="60" markerHeight="40" orient="auto">
+      <circle cx="15" cy="15" r="6" class="sequence-number"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g>
+        <line x1="552" y1="322" x2="1059" y2="322" class="loopLine"/>
+        <line x1="1059" y1="322" x2="1059" y2="503" class="loopLine"/>
+        <line x1="552" y1="503" x2="1059" y2="503" class="loopLine"/>
+        <line x1="552" y1="322" x2="552" y2="503" class="loopLine"/>
+      </g>
+      <polygon points="562,322 612,322 612,335 604,342 562,342" class="labelBox"/>
+      <line x1="75" y1="65" x2="75" y2="922" class="actor-line" stroke-width="0.5px"/>
+      <line x1="637" y1="65" x2="637" y2="922" class="actor-line" stroke-width="0.5px"/>
+      <line x1="974" y1="65" x2="974" y2="922" class="actor-line" stroke-width="0.5px"/>
+      <line x1="1174" y1="65" x2="1174" y2="922" class="actor-line" stroke-width="0.5px"/>
+      <line x1="1374" y1="65" x2="1374" y2="922" class="actor-line" stroke-width="0.5px"/>
+    </g>
+    <g class="edgePaths">
+      <line x1="75" y1="158" x2="1374" y2="158" class="messageLine0" stroke-width="2" stroke="none" style="fill: none;" marker-end="url(#arrow-filled)"/>
+      <line x1="75" y1="251" x2="974" y2="251" class="messageLine0" marker-end="url(#arrow-filled)" stroke="none" style="fill: none;" stroke-width="2"/>
+      <line x1="637" y1="388" x2="974" y2="388" class="messageLine0" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none" style="fill: none;"/>
+      <line x1="974" y1="481" x2="637" y2="481" class="messageLine1" marker-end="url(#arrow-filled)" stroke="none" stroke-width="2" style="stroke-dasharray: 3, 3; fill: none;"/>
+      <line x1="75" y1="525" x2="974" y2="525" class="messageLine0" marker-end="url(#arrow-filled)" stroke="none" style="fill: none;" stroke-width="2"/>
+      <line x1="637" y1="618" x2="974" y2="618" class="messageLine0" stroke="none" stroke-width="2" marker-end="url(#arrow-filled)" style="fill: none;"/>
+      <line x1="974" y1="760" x2="75" y2="760" class="messageLine1" style="stroke-dasharray: 3, 3; fill: none;" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none"/>
+      <path d="M 75 804 L 115 804 L 115 834 L 75 834" class="message-line" marker-end="url(#arrow-filled)" fill="none" stroke-width="1.5"/>
+    </g>
+    <g class="edgeLabels">
+      <text x="724.5" y="148" class="message-label" font-size="16" text-anchor="middle">try_claim_insight() → create hash file ✓</text>
+      <text x="524.5" y="241" class="message-label" font-size="16" text-anchor="middle">Channel::send() → try_lock_exclusive()</text>
+      <text x="805.5" y="378" class="message-label" font-size="16" text-anchor="middle">Channel::send() → try_lock_exclusive()</text>
+      <text x="805.5" y="471" class="message-label" font-size="16" text-anchor="middle">Lock acquired by T1</text>
+      <text x="587" y="335" class="labelText" font-size="16" text-anchor="middle">par</text>
+      <text x="805.5" y="340" class="loopText" font-size="16" text-anchor="middle">[Concurrent Lock Contention]</text>
+      <text x="524.5" y="515" class="message-label" font-size="16" text-anchor="middle">Retrying... (attempts 1-19)</text>
+      <text x="805.5" y="608" class="message-label" font-size="16" text-anchor="middle">Retrying... (attempts 1-19)</text>
+      <text x="524.5" y="750" class="message-label" text-anchor="middle" font-size="16"><tspan x="524.5" y="750" dy="-0.6em">Error: WouldBlock</tspan><tspan x="524.5" dy="1.2em">&quot;Failed to acquire channel lock after 2s&quot;</tspan></text>
+      <text x="120" y="819" class="message-label" text-anchor="start" font-size="16">post_insight_to_channel() returns false</text>
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="actor">
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
+      <text x="75" y="32.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle"><tspan x="75" y="32.5" dy="-0.6em">Test Thread 1</tspan><tspan x="75" dy="1.2em">(post_insight_to_channel)</tspan></text>
+    </g>
+    <g class="actor">
+      <rect x="562" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="637" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16"><tspan x="637" y="32.5" dy="-0.6em">Test Thread 2</tspan><tspan x="637" dy="1.2em">(concurrent test)</tspan></text>
+    </g>
+    <g class="actor">
+      <rect x="899" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
+      <text x="974" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central"><tspan x="974" y="32.5" dy="-0.6em">Channel File</tspan><tspan x="974" dy="1.2em">Lock</tspan></text>
+    </g>
+    <g class="actor">
+      <rect x="1099" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
+      <text x="1174" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">channel.jsonl</text>
+    </g>
+    <g class="actor">
+      <rect x="1299" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
+      <text x="1374" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central"><tspan x="1374" y="32.5" dy="-0.6em">Insight Claim</tspan><tspan x="1374" dy="1.2em">Files</tspan></text>
+    </g>
+    <g class="note">
+      <rect x="50" y="75" width="612" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="356" y="80" class="noteText" dominant-baseline="middle" text-anchor="middle" font-size="16" dy="1em" alignment-baseline="middle">CI runs tests in parallel with --all-features</text>
+    </g>
+    <g class="note">
+      <rect x="25" y="168" width="100" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="75" y="173" class="noteText" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em" font-size="16">Successfully claims insight hash</text>
+    </g>
+    <g class="note">
+      <rect x="25" y="261" width="100" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="75" y="266" class="noteText" font-size="16" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle" dy="1em">Attempts to acquire exclusive lock</text>
+    </g>
+    <g class="note">
+      <rect x="587" y="398" width="100" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="637" y="403" class="noteText" font-size="16" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">Another test tries to write</text>
+    </g>
+    <g class="note">
+      <rect x="25" y="535" width="100" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="75" y="540" class="noteText" dominant-baseline="middle" dy="1em" font-size="16" alignment-baseline="middle" text-anchor="middle">Backs off 100ms per attempt</text>
+    </g>
+    <g class="note">
+      <rect x="587" y="628" width="100" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="637" y="633" class="noteText" alignment-baseline="middle" dy="1em" dominant-baseline="middle" text-anchor="middle" font-size="16">Both tests retry simultaneously</text>
+    </g>
+    <g class="note">
+      <rect x="50" y="677" width="612" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="356" y="682" class="noteText" dominant-baseline="middle" alignment-baseline="middle" text-anchor="middle" dy="1em" font-size="16">After 20 attempts (2 seconds)</text>
+    </g>
+    <g class="note">
+      <rect x="25" y="814" width="100" height="77" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="75" y="819" class="noteText" dominant-baseline="middle" dy="1em" text-anchor="middle" font-size="16" alignment-baseline="middle">Test assertion FAILS:</text>
+      <text x="75" y="838" class="noteText" dominant-baseline="middle" alignment-baseline="middle" font-size="16" dy="1em" text-anchor="middle">Expected first post to succeed,</text>
+      <text x="75" y="857" class="noteText" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle" font-size="16">but lock contention prevented write</text>
+    </g>
+    <g class="note">
+      <rect x="50" y="863" width="612" height="58" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="356" y="868" class="noteText" font-size="16" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" dy="1em">The atomic claim file exists,</text>
+      <text x="356" y="887" class="noteText" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" dy="1em" font-size="16">but the message never reached the channel</text>
+    </g>
+    <g class="actor">
+      <rect x="0" y="922" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="75" y="954.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle"><tspan x="75" y="954.5" dy="-0.6em">Test Thread 1</tspan><tspan x="75" dy="1.2em">(post_insight_to_channel)</tspan></text>
+    </g>
+    <g class="actor">
+      <rect x="562" y="922" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
+      <text x="637" y="954.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central"><tspan x="637" y="954.5" dy="-0.6em">Test Thread 2</tspan><tspan x="637" dy="1.2em">(concurrent test)</tspan></text>
+    </g>
+    <g class="actor">
+      <rect x="899" y="922" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="974" y="954.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central"><tspan x="974" y="954.5" dy="-0.6em">Channel File</tspan><tspan x="974" dy="1.2em">Lock</tspan></text>
+    </g>
+    <g class="actor">
+      <rect x="1099" y="922" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="1174" y="954.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">channel.jsonl</text>
+    </g>
+    <g class="actor">
+      <rect x="1299" y="922" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="1374" y="954.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16"><tspan x="1374" y="954.5" dy="-0.6em">Insight Claim</tspan><tspan x="1374" dy="1.2em">Files</tspan></text>
+    </g>
+  </g>
+</svg>

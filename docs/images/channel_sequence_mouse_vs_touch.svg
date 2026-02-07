@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="769" height="924" viewBox="-50 -10 769 924" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.sequence-title {
+  fill: #333333;
+}
+
+.actor {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+.actor-box {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+/* Actor text - no stroke (avoid outlined appearance) */
+text.actor, text.actor > tspan, text.actor-box, text.actor-label {
+  fill: #333333;
+  stroke: none;
+}
+
+.actor-line {
+  stroke: #999999;
+  stroke-width: 0.5px;
+}
+
+.messageLine0 {
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  stroke: #333333;
+}
+
+.messageLine1 {
+  stroke-width: 1.5;
+  stroke-dasharray: 2, 2;
+  stroke: #333333;
+}
+
+.message-line {
+  stroke: #333333;
+}
+
+.messageText {
+  fill: #333333;
+  stroke: none;
+}
+
+.message-label {
+  fill: #333333;
+  stroke: none;
+}
+
+.note {
+  stroke: #aaaa33;
+  fill: #fff5ad;
+}
+
+.noteText, .noteText > tspan {
+  fill: black;
+  stroke: none;
+}
+
+.note-text, .note-text > tspan {
+  fill: black;
+  stroke: none;
+}
+
+.activation {
+  fill: #f4f4f4;
+  stroke: #666666;
+}
+
+.loopLine {
+  stroke: #9370DB;
+  fill: none;
+  stroke-width: 2px;
+  stroke-dasharray: 2, 2;
+}
+
+.loopText {
+  fill: #333333;
+}
+
+.labelBox {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+.sequence-marker-filled {
+  fill: #333333;
+  stroke: #333333;
+}
+
+.sequence-marker-open {
+  fill: none;
+  stroke: #333333;
+}
+
+.sequence-marker-cross {
+  stroke: #333333;
+}
+
+.sequence-number {
+  fill: #333333;
+}
+
+.sequenceNumber-circle {
+  fill: #333333;
+  stroke: #333333;
+}
+
+.sequenceNumber {
+  fill: white;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow-filled" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="sequence-marker-filled" stroke-width="1"/>
+    </marker>
+    <marker id="arrow-open" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10" class="sequence-marker-open" stroke-width="1"/>
+    </marker>
+    <marker id="arrow-cross" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <line x1="0" y1="0" x2="10" y2="10" class="sequence-marker-cross" stroke-width="2"/>
+      <line x1="10" y1="0" x2="0" y2="10" class="sequence-marker-cross" stroke-width="2"/>
+    </marker>
+    <marker id="sequencenumber" refX="15" refY="15" markerWidth="60" markerHeight="40" orient="auto">
+      <circle cx="15" cy="15" r="6" class="sequence-number"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <line x1="75" y1="65" x2="75" y2="839" class="actor-line" stroke-width="0.5px"/>
+      <line x1="394" y1="65" x2="394" y2="839" class="actor-line" stroke-width="0.5px"/>
+      <line x1="594" y1="65" x2="594" y2="839" class="actor-line" stroke-width="0.5px"/>
+    </g>
+    <g class="edgePaths">
+      <line x1="75" y1="158" x2="394" y2="158" class="messageLine0" style="fill: none;" marker-end="url(#arrow-filled)" stroke="none" stroke-width="2"/>
+      <line x1="75" y1="251" x2="394" y2="251" class="messageLine0" marker-end="url(#arrow-filled)" stroke="none" style="fill: none;" stroke-width="2"/>
+      <line x1="75" y1="295" x2="594" y2="295" class="messageLine0" stroke-width="2" style="fill: none;" marker-end="url(#arrow-filled)" stroke="none"/>
+      <line x1="75" y1="486" x2="394" y2="486" class="messageLine0" marker-end="url(#arrow-filled)" stroke="none" style="fill: none;" stroke-width="2"/>
+      <line x1="75" y1="579" x2="394" y2="579" class="messageLine0" stroke-width="2" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)"/>
+      <line x1="75" y1="623" x2="594" y2="623" class="messageLine0" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)" stroke-width="2"/>
+    </g>
+    <g class="edgeLabels">
+      <text x="234.5" y="148" class="message-label" text-anchor="middle" font-size="16">mousedown on container</text>
+      <text x="234.5" y="241" class="message-label" font-size="16" text-anchor="middle">mousemove (drag)</text>
+      <text x="334.5" y="285" class="message-label" font-size="16" text-anchor="middle">mouseup on diagram</text>
+      <text x="234.5" y="476" class="message-label" text-anchor="middle" font-size="16">touchstart on container</text>
+      <text x="234.5" y="569" class="message-label" text-anchor="middle" font-size="16">touchmove (drag)</text>
+      <text x="334.5" y="613" class="message-label" text-anchor="middle" font-size="16">touchend (finger lifts over diagram)</text>
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="actor">
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
+      <text x="75" y="32.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">User</text>
+    </g>
+    <g class="actor">
+      <rect x="319" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
+      <text x="394" y="32.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">containerEl</text>
+    </g>
+    <g class="actor">
+      <rect x="519" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="594" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">diagram SVG</text>
+    </g>
+    <g class="note">
+      <rect x="50" y="75" width="569" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="334.5" y="80" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" dy="1em" font-size="16">Mouse Event Model</text>
+    </g>
+    <g class="note">
+      <rect x="419" y="168" width="150" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="494" y="173" class="noteText" dominant-baseline="middle" font-size="16" text-anchor="middle" alignment-baseline="middle" dy="1em">e.target = containerEl</text>
+    </g>
+    <g class="note">
+      <rect x="619" y="305" width="150" height="58" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="694" y="310" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" font-size="16" dy="1em">e.target = diagram</text>
+      <text x="694" y="329" class="noteText" dy="1em" dominant-baseline="middle" text-anchor="middle" font-size="16" alignment-baseline="middle">(where mouse is now)</text>
+    </g>
+    <g class="note">
+      <rect x="369" y="354" width="250" height="58" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="494" y="359" class="noteText" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em" font-size="16">❌ e.target !== containerEl</text>
+      <text x="494" y="378" class="noteText" text-anchor="middle" dy="1em" dominant-baseline="middle" font-size="16" alignment-baseline="middle">Modal stays open</text>
+    </g>
+    <g class="note">
+      <rect x="50" y="403" width="569" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="334.5" y="408" class="noteText" text-anchor="middle" dy="1em" alignment-baseline="middle" font-size="16" dominant-baseline="middle">Touch Event Model</text>
+    </g>
+    <g class="note">
+      <rect x="419" y="496" width="150" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="494" y="501" class="noteText" dy="1em" font-size="16" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle">Touch anchored to containerEl</text>
+    </g>
+    <g class="note">
+      <rect x="419" y="633" width="150" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="494" y="638" class="noteText" font-size="16" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em">e.target = containerEl</text>
+      <text x="494" y="657" class="noteText" font-size="16" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em">(where touch started)</text>
+    </g>
+    <g class="note">
+      <rect x="369" y="682" width="250" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="494" y="687" class="noteText" dy="1em" alignment-baseline="middle" font-size="16" text-anchor="middle" dominant-baseline="middle">✅ e.target === containerEl</text>
+      <text x="494" y="706" class="noteText" dominant-baseline="middle" font-size="16" text-anchor="middle" dy="1em" alignment-baseline="middle">Modal closes</text>
+    </g>
+    <g class="note">
+      <rect x="50" y="731" width="569" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="334.5" y="736" class="noteText" text-anchor="middle" alignment-baseline="middle" dy="1em" font-size="16" dominant-baseline="middle">Key Difference</text>
+    </g>
+    <g class="note">
+      <rect x="-45" y="780" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="5" y="785" class="noteText" text-anchor="middle" alignment-baseline="middle" dy="1em" font-size="16" dominant-baseline="middle">mouseup.target = element under cursor</text>
+      <text x="5" y="804" class="noteText" dy="1em" alignment-baseline="middle" text-anchor="middle" font-size="16" dominant-baseline="middle">touchend.target = element where touch began</text>
+    </g>
+    <g class="actor">
+      <rect x="0" y="839" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="75" y="871.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">User</text>
+    </g>
+    <g class="actor">
+      <rect x="319" y="839" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="394" y="871.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">containerEl</text>
+    </g>
+    <g class="actor">
+      <rect x="519" y="839" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="594" y="871.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">diagram SVG</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,32 @@
+graph TB
+    subgraph "Current State - Two Parallel Paths"
+        TmuxPath["ClaudeLaunchConfig<br/>(tmux.rs)"]
+        HeadlessPath["HeadlessConfig<br/>(headless.rs)"]
+        
+        TmuxPath -->|"to_shell_command()"| ShellCmd["Bash command string<br/>+ env vars<br/>+ temp files<br/>+ shell escaping"]
+        HeadlessPath -->|"HeadlessSession::spawn()"| TokioCmd["tokio::Command<br/>structured args<br/>piped stdin/stdout"]
+        
+        TmuxPath -.->|duplicates| SharedLogic[("Shared Logic:<br/>• System prompt (role → agents.rs)<br/>• Session mode (Fresh/Resume/ResumeSession)<br/>• Task mode (Shared/Isolated)<br/>• Agent teams setup<br/>• Auth profile env var")]
+        HeadlessPath -.->|duplicates| SharedLogic
+    end
+    
+    subgraph "Phase 4 Risk - Unification"
+        NewLaunch["LaunchConfig<br/>(new launch.rs)"]
+        NewLaunch -->|"to_headless_config()"| HeadlessOut["HeadlessConfig<br/>(structured)"]
+        NewLaunch -->|"to_shell_command()"| ShellOut["Shell command<br/>(bash string)"]
+        
+        NewLaunch -->|"single source"| UnifiedLogic[("Unified Logic:<br/>• generate_system_prompt()<br/>• build_session_flags()<br/>• build_task_env()<br/>• build_team_flags()<br/>• build_auth_env()")]
+    end
+    
+    Risk["⚠️ Risk: Two paths to same thing<br/>if shared logic not extracted<br/>into launch.rs"]
+    
+    SharedLogic -.->|"must consolidate into"| UnifiedLogic
+    Risk -.->|"avoided by"| UnifiedLogic
+
+    classDef riskNode fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    classDef sharedNode fill:#ffd43b,stroke:#fab005,color:#000
+    classDef unifiedNode fill:#51cf66,stroke:#2f9e44,color:#000
+    
+    class Risk riskNode
+    class SharedLogic sharedNode
+    class UnifiedLogic unifiedNode

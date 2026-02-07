@@ -1,0 +1,20 @@
+graph TD
+    A[Task #42 Completed] --> B[Effect::CompleteTask]
+    B --> C[Mark task #42 as done]
+    
+    A --> D[Effect::ClearBlockedBy]
+    D --> E[Scan all tasks]
+    E --> F{Has blockedBy: [42]?}
+    F -->|Yes| G[Remove 42 from blockedBy array]
+    F -->|No| H[Skip task]
+    
+    G --> I[Task becomes unblocked]
+    H --> I
+    
+    C --> J[Without ClearBlockedBy:<br/>Dependent tasks stuck forever]
+    
+    style A fill:#e1f5ff
+    style B fill:#fff4e1
+    style D fill:#fff4e1
+    style J fill:#ffe1e1
+    style I fill:#e1ffe1

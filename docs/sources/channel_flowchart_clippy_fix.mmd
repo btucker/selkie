@@ -1,0 +1,24 @@
+flowchart TD
+    subgraph "Current Code (line 612)"
+        A[vec!<br/>Heap allocation] --> B[.iter<br/>Immutable borrow]
+        B --> C[.filter<br/>Read-only]
+        C --> D[.collect<br/>New Vec]
+    end
+    
+    subgraph "Clippy's Concern"
+        E[vec! never mutated] -.->|"Why heap allocate?"| A
+        F[Only used for iteration] -.-> B
+    end
+    
+    subgraph "Fix: Use Array"
+        G["[...]<br/>Stack allocation"] --> H[.iter<br/>Same behavior]
+        H --> I[.filter<br/>Same behavior]
+        I --> J[.collect<br/>Same result]
+    end
+    
+    A -.->|"Replace with"| G
+    
+    style A fill:#ff9999
+    style G fill:#99ff99
+    style E fill:#ffcccc
+    style F fill:#ffcccc

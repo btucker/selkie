@@ -1,0 +1,27 @@
+graph TB
+    subgraph "OLD: Inline Graphics (Problematic)"
+        A1[Message Content] --> B1[Parse Mermaid]
+        B1 --> C1[Render to PNG]
+        C1 --> D1[Calculate Absolute Pixel Coords]
+        D1 --> E1[Kitty Graphics Protocol]
+        E1 --> F1{Inside tmux?}
+        F1 -->|Yes| G1[DCS Passthrough<br/>Double ESC chars]
+        F1 -->|No| H1[Direct APC]
+        I1[User Scrolls] -.Recalc ALL positions.-> D1
+        style G1 fill:#f99,stroke:#f00
+        style I1 fill:#f99,stroke:#f00
+    end
+    
+    subgraph "NEW: Text Placeholders + Fullscreen View"
+        A2[Message Content] --> B2[Parse Segments]
+        B2 --> C2{Segment Type}
+        C2 -->|Text| D2[Normal Ratatui Flow<br/>Cell-based Layout]
+        C2 -->|Mermaid| E2[Text Placeholder<br/>'rendering diagram...']
+        D2 --> F2[Ratatui Buffer]
+        E2 --> F2
+        G2[User Opens Diagram] --> H2[Fullscreen View<br/>Simple Context<br/>No Scroll Tracking]
+        H2 --> I2[Kitty Graphics Protocol]
+        style D2 fill:#9f9,stroke:#0f0
+        style E2 fill:#9f9,stroke:#0f0
+        style H2 fill:#9f9,stroke:#0f0
+    end

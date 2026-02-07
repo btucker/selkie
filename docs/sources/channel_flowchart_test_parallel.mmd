@@ -1,0 +1,33 @@
+flowchart TD
+    Start[Test Suite Runs<br/>cargo test --lib] --> Parallel[Tests Run in Parallel]
+    
+    Parallel --> T1[Test 1:<br/>TempDir::new]
+    Parallel --> T2[Test 2:<br/>TempDir::new]
+    Parallel --> T3[Test 3:<br/>TempDir::new]
+    
+    T1 --> Same1[Channel::for_repo<br/>'midtown']
+    T2 --> Same2[Channel::for_repo<br/>'midtown']
+    T3 --> Same3[Channel::for_repo<br/>'midtown']
+    
+    Same1 --> Lock1[Try to acquire<br/>exclusive lock on<br/>~/.midtown/projects/midtown/channel.jsonl]
+    Same2 --> Lock2[Try to acquire<br/>exclusive lock on<br/>~/.midtown/projects/midtown/channel.jsonl]
+    Same3 --> Lock3[Try to acquire<br/>exclusive lock on<br/>~/.midtown/projects/midtown/channel.jsonl]
+    
+    Lock1 --> FirstWins[Test 1 Acquires Lock]
+    Lock2 --> Starve2[Test 2 Waits<br/>max 2s retry loop]
+    Lock3 --> Starve3[Test 3 Waits<br/>max 2s retry loop]
+    
+    FirstWins --> Works[Test 1 completes]
+    Starve2 --> Timeout2[WouldBlock Error<br/>or TimedOut after 2s]
+    Starve3 --> Timeout3[WouldBlock Error<br/>or TimedOut after 2s]
+    
+    Works --> Pass[✅ PASS]
+    Timeout2 --> Fail2[❌ FLAKY FAIL]
+    Timeout3 --> Fail3[❌ FLAKY FAIL]
+    
+    style Same1 fill:#ff9999
+    style Same2 fill:#ff9999
+    style Same3 fill:#ff9999
+    style Fail2 fill:#cc0000,color:#fff
+    style Fail3 fill:#cc0000,color:#fff
+    style Pass fill:#00cc00

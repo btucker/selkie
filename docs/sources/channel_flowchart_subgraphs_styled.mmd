@@ -1,0 +1,33 @@
+graph TB
+    subgraph "Daemon State (In-Memory)"
+        IH["insight_hashes<br/>Mutex&lt;HashSet&lt;u64&gt;&gt;"]
+        RNT["review_note_tracker<br/>Mutex&lt;HashSet&lt;(String, u64)&gt;&gt;"]
+    end
+    
+    subgraph "Lifecycle"
+        START[Daemon Start] -->|"Empty sets"| IH
+        START -->|"Empty sets"| RNT
+        MERGE[PR Merged to Main] -->|"midtown restart"| RESTART[Daemon Restart]
+        RESTART -->|"Memory cleared"| START
+    end
+    
+    subgraph "Deduplication Flow"
+        EVENT[Event<br/>insight/review] -->|"Generate key"| CHECK{Key in set?}
+        CHECK -->|Yes| DROP[Drop duplicate]
+        CHECK -->|No| INSERT[Insert key]
+        INSERT --> POST[Post to channel]
+    end
+    
+    subgraph "Bounded Growth"
+        MERGE -.->|"Restarts every merge"| WINDOW["Window: Between merges<br/>Growth: Bounded by PR velocity"]
+    end
+    
+    IH -.->|"Check/insert"| CHECK
+    RNT -.->|"Check/insert"| CHECK
+    
+    style IH fill:#e1f5ff
+    style RNT fill:#e1f5ff
+    style RESTART fill:#ffe1e1
+    style POST fill:#e1ffe1
+    style DROP fill:#ffe1e1
+    style WINDOW fill:#fff9e1

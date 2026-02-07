@@ -1,0 +1,46 @@
+flowchart TB
+    subgraph Terminal["Terminal Output Layers"]
+        direction TB
+        Layer1["Ratatui Text Buffer<br/>(Lines, Scroll State, Layout)"]
+        Layer2["Kitty Graphics Layer<br/>(Absolute x,y Coordinates)"]
+        
+        Layer1 -.->|"returns (x,y) positions"| Calc["resolve_image_placement()"]
+        Calc -->|"every redraw"| Layer2
+        
+        style Layer1 fill:#4a5568,stroke:#cbd5e0,color:#fff
+        style Layer2 fill:#e53e3e,stroke:#fc8181,color:#fff
+        style Calc fill:#805ad5,stroke:#b794f4,color:#fff
+    end
+    
+    subgraph Problem["The Fragility"]
+        direction LR
+        P1["Scroll Event"]
+        P2["Text Buffer Redraws<br/>(new line positions)"]
+        P3["Must Recalculate<br/>Image Positions"]
+        P4["Tmux DCS Passthrough<br/>(doubled ESC sequences)"]
+        P5["Re-render All Images<br/>at New Coords"]
+        
+        P1 --> P2 --> P3 --> P4 --> P5
+        
+        style P1 fill:#2d3748,stroke:#4a5568,color:#fff
+        style P2 fill:#2d3748,stroke:#4a5568,color:#fff
+        style P3 fill:#e53e3e,stroke:#fc8181,color:#fff
+        style P4 fill:#e53e3e,stroke:#fc8181,color:#fff
+        style P5 fill:#e53e3e,stroke:#fc8181,color:#fff
+    end
+    
+    subgraph Solution["Select-to-Open Pattern"]
+        direction TB
+        S1["User Sees Placeholder<br/>(text-based reference)"]
+        S2["User Presses 's' + Number"]
+        S3["Open Image Fullscreen<br/>(separate rendering context)"]
+        
+        S1 --> S2 --> S3
+        
+        style S1 fill:#38a169,stroke:#9ae6b4,color:#fff
+        style S2 fill:#38a169,stroke:#9ae6b4,color:#fff
+        style S3 fill:#38a169,stroke:#9ae6b4,color:#fff
+    end
+    
+    Terminal -.->|"current approach"| Problem
+    Terminal -.->|"proposed fix"| Solution

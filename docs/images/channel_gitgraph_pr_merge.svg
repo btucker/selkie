@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="589.6823938474073" height="287.99758707970034" viewBox="-201 -19.5 589.6823938474073 287.99758707970034" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  .commit-id,
+  .commit-msg,
+  .branch-label {
+    fill: lightgrey;
+    color: lightgrey;
+    font-family: var(--mermaid-font-family);
+  }
+
+        .branch-label0 { fill: #ffffff; }
+        .commit0 { stroke: #0000ec; fill: #0000ec; }
+        .commit-highlight0 { stroke: #131300; fill: #131300; }
+        .label0  { fill: #0000ec; }
+        .arrow0 { stroke: #0000ec; }
+
+        .branch-label1 { fill: #000000; }
+        .commit1 { stroke: #dede00; fill: #dede00; }
+        .commit-highlight1 { stroke: #2121ff; fill: #2121ff; }
+        .label1  { fill: #dede00; }
+        .arrow1 { stroke: #dede00; }
+
+        .branch-label2 { fill: #000000; }
+        .commit2 { stroke: #a1ec00; fill: #a1ec00; }
+        .commit-highlight2 { stroke: #5e13ff; fill: #5e13ff; }
+        .label2  { fill: #a1ec00; }
+        .arrow2 { stroke: #a1ec00; }
+
+        .branch-label3 { fill: #ffffff; }
+        .commit3 { stroke: #007cec; fill: #007cec; }
+        .commit-highlight3 { stroke: #ff8313; fill: #ff8313; }
+        .label3  { fill: #007cec; }
+        .arrow3 { stroke: #007cec; }
+
+        .branch-label4 { fill: #000000; }
+        .commit4 { stroke: #00ecec; fill: #00ecec; }
+        .commit-highlight4 { stroke: #ff1313; fill: #ff1313; }
+        .label4  { fill: #00ecec; }
+        .arrow4 { stroke: #00ecec; }
+
+        .branch-label5 { fill: #000000; }
+        .commit5 { stroke: #00ec7c; fill: #00ec7c; }
+        .commit-highlight5 { stroke: #ff1383; fill: #ff1383; }
+        .label5  { fill: #00ec7c; }
+        .arrow5 { stroke: #00ec7c; }
+
+        .branch-label6 { fill: #000000; }
+        .commit6 { stroke: #ec00ec; fill: #ec00ec; }
+        .commit-highlight6 { stroke: #13ff13; fill: #13ff13; }
+        .label6  { fill: #ec00ec; }
+        .arrow6 { stroke: #ec00ec; }
+
+        .branch-label7 { fill: #000000; }
+        .commit7 { stroke: #ec0000; fill: #ec0000; }
+        .commit-highlight7 { stroke: #13ffff; fill: #13ffff; }
+        .label7  { fill: #ec0000; }
+        .arrow7 { stroke: #ec0000; }
+
+  .branch {
+    stroke-width: 1;
+    stroke: #333333;
+    stroke-dasharray: 2;
+  }
+  .commit-label { font-size: 10px; fill: #000021; }
+  .commit-label-bkg { font-size: 10px; fill: #ffffde; opacity: 0.5; }
+  .tag-label { font-size: 10px; fill: #131300; }
+  .tag-label-bkg { fill: #ECECFF; stroke: #c7c7f1; }
+  .tag-hole { fill: #333333; }
+  .commit-merge {
+    stroke: #ECECFF;
+    fill: #ECECFF;
+  }
+  .commit-reverse {
+    stroke: #ECECFF;
+    fill: #ECECFF;
+    stroke-width: 3;
+  }
+  .commit-highlight-inner {
+    stroke: #ECECFF;
+    fill: #ECECFF;
+  }
+  .arrow { stroke-width: 8; stroke-linecap: round; fill: none }
+  .gitTitleText {
+    text-anchor: middle;
+    font-size: 18px;
+    fill: #333333;
+  }
+
+  </style>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="branches">
+      <line x1="0" y1="0" x2="350" y2="0" class="branch branch0"/>
+      <rect x="-87.4" y="-11.5" width="56.4" height="23" rx="4" ry="4" class="branchLabelBkg label0"/>
+      <line x1="0" y1="90" x2="350" y2="90" class="branch branch1"/>
+      <rect x="-183.4" y="78.5" width="152.4" height="23" rx="4" ry="4" class="branchLabelBkg label1"/>
+      <line x1="0" y1="180" x2="350" y2="180" class="branch branch2"/>
+      <rect x="-193" y="168.5" width="162" height="23" rx="4" ry="4" class="branchLabelBkg label2"/>
+      <text x="-59.2" y="0" class="branch-label0" text-anchor="middle" dominant-baseline="middle">main</text>
+      <text x="-107.2" y="90" class="branch-label1" text-anchor="middle" dominant-baseline="middle">feature-branch</text>
+      <text x="-112" y="180" class="branch-label2" dominant-baseline="middle" text-anchor="middle">feature-rebased</text>
+    </g>
+    <g class="commit-arrows">
+      <path d="M 60 0 L 110 0" class="arrow arrow0"/>
+      <path d="M 10 0 L 60 0" class="arrow arrow0"/>
+      <path d="M 160 0 L 210 0" class="arrow arrow0"/>
+      <path d="M 210 0 L 260 0" class="arrow arrow0"/>
+      <path d="M 60 0 L 60 70 A 20 20, 0, 0, 0, 80 90 L 310 90" class="arrow arrow1"/>
+      <path d="M 110 0 L 160 0" class="arrow arrow0"/>
+    </g>
+    <g class="commits">
+      <g class="commit-bullets">
+        <circle cx="10" cy="0" r="10" class="commit base commit0"/>
+        <circle cx="60" cy="0" r="10" class="commit main--before-merge- commit0"/>
+        <circle cx="110" cy="0" r="10" class="commit commit-1--squashed- commit0"/>
+        <circle cx="160" cy="0" r="10" class="commit commit-2--squashed- commit0"/>
+        <circle cx="210" cy="0" r="10" class="commit commit-3--squashed- commit0"/>
+        <rect x="250" y="-10" width="20" height="20" class="commit PR--717--squash-merge- commit-highlight0 commit-highlight-outer"/>
+        <rect x="254" y="-6" width="12" height="12" class="commit PR--717--squash-merge- commit0 commit-highlight-inner"/>
+        <circle cx="310" cy="90" r="10" class="commit a1e3fa5--tests---new-work- commit1"/>
+      </g>
+      <g class="commit-labels">
+        <rect x="-4" y="13.5" width="28" height="14" class="commit-label-bkg" transform="translate(-20.42, 18.16) rotate(-45, 10, 0)"/>
+        <rect x="1" y="13.5" width="118" height="14" class="commit-label-bkg" transform="translate(-54.62, 48.76) rotate(-45, 60, 0)"/>
+        <rect x="51" y="13.5" width="118" height="14" class="commit-label-bkg" transform="translate(-54.62, 48.76) rotate(-45, 110, 0)"/>
+        <rect x="101" y="13.5" width="118" height="14" class="commit-label-bkg" transform="translate(-54.62, 48.76) rotate(-45, 160, 0)"/>
+        <rect x="151" y="13.5" width="118" height="14" class="commit-label-bkg" transform="translate(-54.62, 48.76) rotate(-45, 210, 0)"/>
+        <rect x="192" y="13.5" width="136" height="14" class="commit-label-bkg" transform="translate(-61.459999999999994, 54.88) rotate(-45, 260, 0)"/>
+        <rect x="230" y="103.5" width="160" height="14" class="commit-label-bkg" transform="translate(-70.58, 63.04) rotate(-45, 310, 90)"/>
+        <polygon points="296,72.8 296,68.8 294,63.8 326,63.8 326,77.8 294,77.8" class="tag-label-bkg"/>
+        <circle cx="300" cy="70.8" r="1.5" class="tag-hole"/>
+        <text x="-2" y="25" class="commit-label" transform="translate(-20.42, 18.16) rotate(-45, 10, 0)">base</text>
+        <text x="3" y="25" class="commit-label" transform="translate(-54.62, 48.76) rotate(-45, 60, 0)">main (before merge)</text>
+        <text x="53" y="25" class="commit-label" transform="translate(-54.62, 48.76) rotate(-45, 110, 0)">commit 1 (squashed)</text>
+        <text x="103" y="25" class="commit-label" transform="translate(-54.62, 48.76) rotate(-45, 160, 0)">commit 2 (squashed)</text>
+        <text x="153" y="25" class="commit-label" transform="translate(-54.62, 48.76) rotate(-45, 210, 0)">commit 3 (squashed)</text>
+        <text x="194" y="25" class="commit-label" transform="translate(-61.459999999999994, 54.88) rotate(-45, 260, 0)">PR #717 (squash merge)</text>
+        <text x="232" y="115" class="commit-label" transform="translate(-70.58, 63.04) rotate(-45, 310, 90)">a1e3fa5 (tests - new work)</text>
+        <text x="298" y="74" class="tag-label">HEAD</text>
+      </g>
+    </g>
+  </g>
+</svg>

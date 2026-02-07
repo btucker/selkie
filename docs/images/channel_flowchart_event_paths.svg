@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1085.4" height="497.2000000000001" viewBox="-8 -27.999999999999993 1085.4 497.2000000000001" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-Mouse">
+        <rect x="172.7" y="-19.999999999999993" width="683" height="323.4" class="cluster"/>
+        <text x="514.2" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Mouse Event Path</text>
+      </g>
+      <g class="subgraph" id="subgraph-Touch">
+        <rect x="314.7" y="-19.999999999999993" width="480.2" height="323.4" class="cluster"/>
+        <text x="554.8" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Touch Event Path</text>
+      </g>
+      <g class="subgraph" id="subgraph-Shared">
+        <rect x="232.49999999999994" y="338.40000000000003" width="642.8" height="117.80000000000001" class="cluster"/>
+        <text x="553.8999999999999" y="354.40000000000003" class="cluster-label" text-anchor="middle">Shared Logic</text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-M1-M2-0">
+        <path d="M 659.70 61.09 C 533.37 74.99, 407.03 88.90, 343.87 100.01 C 280.70 111.13, 280.70 119.47, 280.70 127.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-M2-M3-0">
+        <path d="M 280.70 180.60 C 280.70 188.93, 280.70 197.27, 280.70 205.60 C 280.70 213.93, 280.70 222.27, 280.70 230.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-T1-T2-0">
+        <path d="M 520.30 69.79 C 575.83 80.79, 631.37 91.80, 659.13 101.46 C 686.90 111.13, 686.90 119.47, 686.90 127.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-T2-T3-0">
+        <path d="M 669.13 180.60 L 652.30 230.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-M1-S1-0">
+        <path d="M 659.70 64.96 C 577.83 77.57, 495.97 90.19, 454.09 143.26 C 412.22 196.33, 410.34 289.87, 408.46 383.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+      </g>
+      <g class="edge" id="edge-L-M2-S1-0">
+        <path d="M 192.70 180.32 C 164.30 188.74, 135.90 197.17, 121.70 226.85 C 107.50 256.53, 107.50 307.47, 131.67 337.14 C 204.17 375.24, 252.50 383.66, 252.50 383.66" class="edge-path" stroke-dasharray="3,3" fill="none" stroke-width="2" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-M3-S1-0">
+        <path d="M 256.71 283.40 C 249.14 308.40, 241.57 333.40, 251.44 350.07 C 261.32 366.73, 288.64 375.07, 315.96 383.40" class="edge-path" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-T1-S1-0">
+        <path d="M 520.30 63.63 C 619.37 76.69, 718.43 89.74, 767.97 138.87 C 817.50 188.00, 817.50 273.20, 773.33 321.27 C 640.83 380.28, 552.50 391.22, 552.50 391.22" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3" stroke-width="2"/>
+      </g>
+      <g class="edge" id="edge-L-T2-S1-0">
+        <path d="M 608.42 180.60 C 583.65 188.93, 558.87 197.27, 535.82 231.07 C 512.76 264.87, 491.43 324.13, 470.09 383.40" class="edge-path" fill="none" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-T3-S1-0">
+        <path d="M 627.08 283.40 C 619.12 308.40, 611.16 333.40, 590.91 350.07 C 570.66 366.73, 538.12 375.07, 505.58 383.40" class="edge-path" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-M1-S2-0">
+        <path d="M 659.70 65.82 C 584.50 78.15, 509.30 90.47, 471.70 139.24 C 434.10 188.00, 434.10 273.20, 462.17 320.69 C 546.37 377.97, 602.50 387.76, 602.50 387.76" class="edge-path" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2"/>
+      </g>
+      <g class="edge" id="edge-L-M2-S2-0">
+        <path d="M 338.94 180.60 C 357.33 188.93, 375.71 197.27, 384.91 226.90 C 394.10 256.53, 394.10 307.47, 428.83 338.27 C 533.03 379.73, 602.50 390.39, 602.50 390.39" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3" stroke-width="2"/>
+      </g>
+      <g class="edge" id="edge-L-M3-S2-0">
+        <path d="M 304.69 283.40 C 312.26 308.40, 319.83 333.40, 369.46 351.77 C 419.10 370.14, 510.80 381.88, 602.50 393.62" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3" stroke-width="2"/>
+      </g>
+      <g class="edge" id="edge-L-T1-S2-0">
+        <path d="M 520.30 60.30 C 668.10 74.46, 815.90 88.63, 889.80 138.32 C 963.70 188.00, 963.70 273.20, 944.67 319.97 C 887.57 375.07, 849.50 383.40, 849.50 383.40" class="edge-path" fill="none" stroke-width="2" marker-end="url(#arrow_point)" stroke-dasharray="3,3"/>
+      </g>
+      <g class="edge" id="edge-L-T2-S2-0">
+        <path d="M 729.84 180.60 C 743.39 188.93, 756.95 197.27, 760.35 231.07 C 763.76 264.87, 757.01 324.13, 750.27 383.40" class="edge-path" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2"/>
+      </g>
+      <g class="edge" id="edge-L-T3-S2-0">
+        <path d="M 677.52 283.40 L 714.78 383.40" class="edge-path" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none" stroke-width="2"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-M1">
+        <rect x="659.7" y="25.000000000000007" width="176" height="52.8" style="fill:#9cf !important;stroke:#333 !important"/>
+        <text x="747.7" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">handleMouseDown</text>
+      </g>
+      <g class="node" id="node-M2">
+        <rect x="192.7" y="127.80000000000001" width="176" height="52.8" style="fill:#9cf !important;stroke:#333 !important"/>
+        <text x="280.7" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">handleMouseMove</text>
+      </g>
+      <g class="node" id="node-M3">
+        <rect x="202.29999999999998" y="230.6" width="156.8" height="52.8" style="fill:#9cf !important;stroke:#333 !important"/>
+        <text x="280.7" y="257" class="label" text-anchor="middle" dominant-baseline="central">handleMouseUp</text>
+      </g>
+      <g class="node" id="node-S1">
+        <rect x="252.49999999999994" y="383.40000000000003" width="300" height="52.8" style="fill:#f96 !important;stroke:#333 !important;stroke-width:2px !important"/>
+        <text x="402.49999999999994" y="409.8" class="label" dominant-baseline="central" text-anchor="middle">mouseMovedDuringPress tracking</text>
+      </g>
+      <g class="node" id="node-S2">
+        <rect x="602.5" y="383.40000000000003" width="252.79999999999998" height="52.8"/>
+        <text x="728.9" y="409.8" class="label" dominant-baseline="central" text-anchor="middle">Other interaction state</text>
+      </g>
+      <g class="node" id="node-T1">
+        <rect x="334.7" y="25.000000000000007" width="185.6" height="52.8" style="fill:#9f9 !important;stroke:#333 !important"/>
+        <text x="427.5" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">handleTouchStart</text>
+      </g>
+      <g class="node" id="node-T2">
+        <rect x="598.9" y="127.80000000000001" width="176" height="52.8" style="fill:#9f9 !important;stroke:#333 !important"/>
+        <text x="686.9" y="154.20000000000002" class="label" text-anchor="middle" dominant-baseline="central">handleTouchMove</text>
+      </g>
+      <g class="node" id="node-T3">
+        <rect x="569.1" y="230.6" width="166.4" height="52.8" style="fill:#9f9 !important;stroke:#333 !important"/>
+        <text x="652.3000000000001" y="257" class="label" text-anchor="middle" dominant-baseline="central">handleTouchEnd</text>
+      </g>
+    </g>
+  </g>
+</svg>

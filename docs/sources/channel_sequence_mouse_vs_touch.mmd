@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant User
+    participant Container as containerEl
+    participant Diagram as diagram SVG
+    
+    Note over User,Diagram: Mouse Event Model
+    User->>Container: mousedown on container
+    Note right of Container: e.target = containerEl
+    User->>Container: mousemove (drag)
+    User->>Diagram: mouseup on diagram
+    Note right of Diagram: e.target = diagram<br/>(where mouse is now)
+    Note over Container,Diagram: ❌ e.target !== containerEl<br/>Modal stays open
+    
+    Note over User,Diagram: Touch Event Model
+    User->>Container: touchstart on container
+    Note right of Container: Touch anchored to containerEl
+    User->>Container: touchmove (drag)
+    User->>Diagram: touchend (finger lifts over diagram)
+    Note right of Container: e.target = containerEl<br/>(where touch started)
+    Note over Container,Diagram: ✅ e.target === containerEl<br/>Modal closes
+    
+    Note over User,Diagram: Key Difference
+    Note left of User: mouseup.target = element under cursor<br/>touchend.target = element where touch began

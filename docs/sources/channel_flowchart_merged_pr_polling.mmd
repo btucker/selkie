@@ -1,0 +1,20 @@
+flowchart TD
+    A[Merged PR Polling<br/>5min interval] -->|"gh pr list --state merged<br/>→ Vec&lt;u64&gt;"| B[WorldSnapshot<br/>merged_pr_numbers]
+    
+    B --> C{Task Dispatch<br/>evaluate_tick}
+    
+    C -->|Case 1:<br/>Owned tasks| D[decide_task_assignment]
+    D -->|"if pr_number in merged_prs"| E[Effect::CompleteTask]
+    
+    C -->|Case 2:<br/>Unowned tasks| F[decide_unowned_task_cleanup]
+    F -->|"if pr_number in merged_prs"| E
+    
+    E -->|execute_effects| G[midtown task complete]
+    
+    H[Task Subject<br/>e.g. 'Review #123'] -.->|extract_pr_number| D
+    H -.->|extract_pr_number| F
+    
+    style B fill:#e1f5ff
+    style E fill:#d4edda
+    style A fill:#fff3cd
+    style G fill:#d4edda

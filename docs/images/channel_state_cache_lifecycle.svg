@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="267.03210227272723" height="360" viewBox="84.6 -8 267.03210227272723 360" class="mermaid">
+  <style>
+
+.statediagram {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  fill: #333333;
+}
+
+.error-icon {
+  fill: #552222;
+}
+
+.error-text {
+  fill: #552222;
+  stroke: #552222;
+}
+
+.state-title {
+  fill: #131300;
+}
+
+.state-box {
+  fill: #ECECFF;
+  stroke: #9370DB;
+}
+
+.state-label {
+  fill: #131300;
+}
+
+.state-description {
+  fill: #333333;
+}
+
+.state-start {
+  fill: #333333;
+}
+
+.state-end-outer {
+  fill: none;
+  stroke: #9370DB;
+  stroke-width: 2;
+}
+
+.state-end-inner {
+  fill: #9370DB;
+  stroke: #9370DB;
+  stroke-width: 2;
+}
+
+.state-fork-join {
+  fill: #333333;
+}
+
+.state-choice {
+  fill: #ECECFF;
+  stroke: #333333;
+}
+
+.state-divider {
+  stroke: #333333;
+  stroke-dasharray: 5, 5;
+  fill: none;
+}
+
+.transition-path {
+  stroke: #333333;
+  fill: none;
+}
+
+.transition-label {
+  fill: #333333;
+}
+
+.transition-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+  stroke: none;
+}
+
+.note-box {
+  fill: #fff5ad;
+  stroke: #aaaa33;
+}
+
+.note-text {
+  fill: black;
+}
+
+.state-composite-outer {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.state-composite-inner {
+  fill: white;
+  stroke: none;
+}
+
+.state-composite-inner-alt {
+  fill: #e0e0e0;
+  stroke: none;
+}
+
+.state-composite-label {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.state-composite-divider {
+  stroke: #9370DB;
+  stroke-width: 1px;
+  fill: none;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 20 14" refX="19" refY="7" markerWidth="20" markerHeight="14" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 19,7 L9,13 L14,7 L9,1 Z" fill="#333333" stroke="#333333" stroke-width="1"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="state-node" id="state-Cached">
+      <path d="M 189.54183238636364 308 H 246.69026988636364 A 5 5 0 0 1 251.69026988636364 313 V 339 A 5 5 0 0 1 246.69026988636364 344 H 189.54183238636364 A 5 5 0 0 1 184.54183238636364 339 V 313 A 5 5 0 0 1 189.54183238636364 308 Z" class="state-box" stroke="#9370DB" stroke-width="1" fill="#ECECFF"/>
+      <text x="218.11605113636364" y="331" class="state-label" text-anchor="middle" font-size="16">Cached</text>
+      <text x="218.11605113636364" y="344" class="state-description" text-anchor="middle" font-size="10"><tspan x="218.11605113636364" y="344" dy="-0.6em">Image in cache</tspan><tspan x="218.11605113636364" dy="1.2em">Show clickable placeholder</tspan></text>
+    </g>
+    <g class="note">
+      <path d="M 271.69026988636364 308 L 363.69026988636364 308 L 371.69026988636364 316 L 371.69026988636364 348 L 271.69026988636364 348 Z" class="note-box" stroke-width="1"/>
+      <path d="M 363.69026988636364 308 L 363.69026988636364 316 L 371.69026988636364 316" class="note-box" fill="none" stroke-width="1"/>
+      <text x="321.69026988636364" y="332" class="note-text" font-size="16" text-anchor="middle">insert_cached() for tests</text>
+    </g>
+    <g class="state-node" id="state-Pending">
+      <path d="M 187.75667613636364 198 H 248.47542613636364 A 5 5 0 0 1 253.47542613636364 203 V 229 A 5 5 0 0 1 248.47542613636364 234 H 187.75667613636364 A 5 5 0 0 1 182.75667613636364 229 V 203 A 5 5 0 0 1 187.75667613636364 198 Z" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#9370DB"/>
+      <text x="218.11605113636364" y="221" class="state-label" font-size="16" text-anchor="middle">Pending</text>
+      <text x="218.11605113636364" y="234" class="state-description" text-anchor="middle" font-size="10"><tspan x="218.11605113636364" y="234" dy="-0.6em">Hash in pending map</tspan><tspan x="218.11605113636364" dy="1.2em">Show &quot;rendering...&quot; placeholder</tspan></text>
+    </g>
+    <g class="note">
+      <path d="M 273.47542613636364 198 L 365.47542613636364 198 L 373.47542613636364 206 L 373.47542613636364 238 L 273.47542613636364 238 Z" class="note-box" stroke-width="1"/>
+      <path d="M 365.47542613636364 198 L 365.47542613636364 206 L 373.47542613636364 206" class="note-box" fill="none" stroke-width="1"/>
+      <text x="323.47542613636364" y="222" class="note-text" font-size="16" text-anchor="middle">insert_pending() for tests</text>
+    </g>
+    <g class="state-node" id="state-Uncached">
+      <path d="M 181.09261363636364 88 H 255.13948863636364 A 5 5 0 0 1 260.13948863636364 93 V 119 A 5 5 0 0 1 255.13948863636364 124 H 181.09261363636364 A 5 5 0 0 1 176.09261363636364 119 V 93 A 5 5 0 0 1 181.09261363636364 88 Z" class="state-box" stroke-width="1" fill="#ECECFF" stroke="#9370DB"/>
+      <text x="218.11605113636364" y="111" class="state-label" font-size="16" text-anchor="middle">Uncached</text>
+      <text x="218.11605113636364" y="124" class="state-description" text-anchor="middle" font-size="10"><tspan x="218.11605113636364" y="124" dy="-0.6em">No cache entry</tspan><tspan x="218.11605113636364" dy="1.2em">Queue for rendering</tspan></text>
+    </g>
+    <g class="state-node" id="state-root_start">
+      <circle cx="218.11605113636364" cy="7" r="7" class="state-start" fill="#333333"/>
+    </g>
+    <g class="transition">
+      <path d="M 218.12 14.00 C 218.12 26.33, 218.12 38.67, 218.12 51.00 C 218.12 63.33, 218.12 75.67, 218.12 88.00" class="transition-path" fill="none" marker-end="url(#arrow)" stroke-width="0.7"/>
+      <path d="M 118.11605113636364 40.2 H 318.11605113636364 A 2 2 0 0 1 320.11605113636364 42.2 V 59.800000000000004 A 2 2 0 0 1 318.11605113636364 61.800000000000004 H 118.11605113636364 A 2 2 0 0 1 116.11605113636364 59.800000000000004 V 42.2 A 2 2 0 0 1 118.11605113636364 40.2 Z" class="transition-label-bg"/>
+      <text x="218.11605113636364" y="51" class="transition-label" font-size="16" text-anchor="middle" dominant-baseline="central">diagram first encountered</text>
+    </g>
+    <g class="transition">
+      <path d="M 181.79 124.00 C 156.90 136.33, 132.01 148.67, 132.17 161.08 C 132.33 173.49, 157.54 185.99, 182.76 198.48" class="transition-path" marker-end="url(#arrow)" stroke-width="0.7" fill="none"/>
+      <path d="M 19.599999999999994 150.43979448198198 H 195.6 A 2 2 0 0 1 197.6 152.43979448198198 V 170.03979448198197 A 2 2 0 0 1 195.6 172.03979448198197 H 19.599999999999994 A 2 2 0 0 1 17.599999999999994 170.03979448198197 V 152.43979448198198 A 2 2 0 0 1 19.599999999999994 150.43979448198198 Z" class="transition-label-bg"/>
+      <text x="107.6" y="161.239794481982" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">get_or_render() queued</text>
+    </g>
+    <g class="transition">
+      <path d="M 218.12 234.00 C 218.12 246.33, 218.12 258.67, 218.12 271.00 C 218.12 283.33, 218.12 295.67, 218.12 308.00" class="transition-path" marker-end="url(#arrow)" stroke-width="0.7" fill="none"/>
+      <path d="M 110.11605113636364 260.2 H 326.11605113636364 A 2 2 0 0 1 328.11605113636364 262.2 V 279.8 A 2 2 0 0 1 326.11605113636364 281.8 H 110.11605113636364 A 2 2 0 0 1 108.11605113636364 279.8 V 262.2 A 2 2 0 0 1 110.11605113636364 260.2 Z" class="transition-label-bg"/>
+      <text x="218.11605113636364" y="271" class="transition-label" font-size="16" dominant-baseline="central" text-anchor="middle">background thread completes</text>
+    </g>
+    <g class="transition">
+      <path d="M 253.48 198.48 C 278.69 185.99, 303.90 173.49, 304.06 161.08 C 304.23 148.67, 279.33 136.33, 254.44 124.00" class="transition-path" stroke-width="0.7" marker-end="url(#arrow)" fill="none"/>
+      <path d="M 276.63210227272725 150.43979448198195 H 380.63210227272725 A 2 2 0 0 1 382.63210227272725 152.43979448198195 V 170.03979448198194 A 2 2 0 0 1 380.63210227272725 172.03979448198194 H 276.63210227272725 A 2 2 0 0 1 274.63210227272725 170.03979448198194 V 152.43979448198195 A 2 2 0 0 1 276.63210227272725 150.43979448198195 Z" class="transition-label-bg"/>
+      <text x="328.63210227272725" y="161.23979448198196" class="transition-label" dominant-baseline="central" font-size="16" text-anchor="middle">render failed</text>
+    </g>
+  </g>
+</svg>

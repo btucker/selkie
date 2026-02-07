@@ -1,0 +1,56 @@
+flowchart TB
+    subgraph "❌ Broken: Backdrop Click"
+        BC[".modal-backdrop onclick"]
+        ZC[".zoom-container<br/>(width: 100%, height: 100%)"]
+        HBC["handleBackdropClick(e)"]
+        CHK{"e.target === e.currentTarget?"}
+        
+        BC --> HBC
+        HBC --> CHK
+        CHK -->|"✗ Always FALSE<br/>(target is zoom-container)"| NOOP1[No close]
+        CHK -.->|"✓ Never TRUE<br/>(backdrop is covered)"| CLOSE1[onclose]
+        
+        style ZC fill:#ff5555,color:#fff
+        style CHK fill:#ff5555,color:#fff
+        style NOOP1 fill:#ff5555,color:#fff
+    end
+    
+    subgraph "❌ Broken: Empty Area Click"
+        EMP["Click in empty viewport area"]
+        MD["handleMouseDown(e)"]
+        PRV["e.preventDefault()"]
+        DRAG["dragging = true"]
+        
+        EMP --> MD
+        MD --> PRV
+        PRV --> DRAG
+        DRAG --> NOOP2["Starts pan instead of close"]
+        
+        style DRAG fill:#ff5555,color:#fff
+        style NOOP2 fill:#ff5555,color:#fff
+    end
+    
+    subgraph "⚠️ Subtle: Close Button"
+        CB[".close-btn ×"]
+        TINY["0.8rem font<br/>#d0d0d0 on #2a2a2a"]
+        
+        CB --> TINY
+        TINY --> OK[onclose works]
+        
+        style TINY fill:#ffaa00,color:#000
+    end
+    
+    subgraph "✅ Working Mechanisms"
+        ESC["Escape key"] --> KD["handleKeyDown"] --> CLOSE2[onclose]
+        NODRG["Click without drag<br/>on containerEl"] --> MU["handleMouseUp"] --> CHK2{"wasDragging &&<br/>!mouseMovedDuringPress &&<br/>e.target === containerEl"}
+        CHK2 -->|"✓"| CLOSE3[onclose]
+        CHK2 -->|"✗"| NOOP3[No close]
+        
+        style ESC fill:#55ff55,color:#000
+        style NODRG fill:#55ff55,color:#000
+        style CLOSE2 fill:#55ff55,color:#000
+        style CLOSE3 fill:#55ff55,color:#000
+    end
+    
+    style BC fill:#333,color:#fff
+    style EMP fill:#333,color:#fff

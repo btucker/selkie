@@ -1,0 +1,36 @@
+sequenceDiagram
+    participant T1 as Test Thread 1<br/>(post_insight_to_channel)
+    participant T2 as Test Thread 2<br/>(concurrent test)
+    participant Lock as Channel File<br/>Lock
+    participant File as channel.jsonl
+    participant Claim as Insight Claim<br/>Files
+
+    Note over T1,T2: CI runs tests in parallel with --all-features
+
+    T1->>Claim: try_claim_insight() → create hash file ✓
+    Note over T1: Successfully claims insight hash
+    
+    T1->>Lock: Channel::send() → try_lock_exclusive()
+    Note over T1: Attempts to acquire exclusive lock
+    
+    par Concurrent Lock Contention
+        T2->>Lock: Channel::send() → try_lock_exclusive()
+        Note over T2: Another test tries to write
+        Lock-->>T2: Lock acquired by T1
+    end
+    
+    T1->>Lock: Retrying... (attempts 1-19)
+    Note over T1: Backs off 100ms per attempt
+    
+    T2->>Lock: Retrying... (attempts 1-19)
+    Note over T2: Both tests retry simultaneously
+    
+    Note over T1,T2: After 20 attempts (2 seconds)
+    
+    Lock-->>T1: Error: WouldBlock<br/>"Failed to acquire channel lock after 2s"
+    
+    T1->>T1: post_insight_to_channel() returns false
+    
+    Note over T1: Test assertion FAILS:<br/>Expected first post to succeed,<br/>but lock contention prevented write
+
+    Note over T1,T2: The atomic claim file exists,<br/>but the message never reached the channel

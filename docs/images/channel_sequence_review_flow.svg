@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1241" height="811" viewBox="-50 -10 1241 811" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.sequence-title {
+  fill: #333333;
+}
+
+.actor {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+.actor-box {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+/* Actor text - no stroke (avoid outlined appearance) */
+text.actor, text.actor > tspan, text.actor-box, text.actor-label {
+  fill: #333333;
+  stroke: none;
+}
+
+.actor-line {
+  stroke: #999999;
+  stroke-width: 0.5px;
+}
+
+.messageLine0 {
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  stroke: #333333;
+}
+
+.messageLine1 {
+  stroke-width: 1.5;
+  stroke-dasharray: 2, 2;
+  stroke: #333333;
+}
+
+.message-line {
+  stroke: #333333;
+}
+
+.messageText {
+  fill: #333333;
+  stroke: none;
+}
+
+.message-label {
+  fill: #333333;
+  stroke: none;
+}
+
+.note {
+  stroke: #aaaa33;
+  fill: #fff5ad;
+}
+
+.noteText, .noteText > tspan {
+  fill: black;
+  stroke: none;
+}
+
+.note-text, .note-text > tspan {
+  fill: black;
+  stroke: none;
+}
+
+.activation {
+  fill: #f4f4f4;
+  stroke: #666666;
+}
+
+.loopLine {
+  stroke: #9370DB;
+  fill: none;
+  stroke-width: 2px;
+  stroke-dasharray: 2, 2;
+}
+
+.loopText {
+  fill: #333333;
+}
+
+.labelBox {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+.sequence-marker-filled {
+  fill: #333333;
+  stroke: #333333;
+}
+
+.sequence-marker-open {
+  fill: none;
+  stroke: #333333;
+}
+
+.sequence-marker-cross {
+  stroke: #333333;
+}
+
+.sequence-number {
+  fill: #333333;
+}
+
+.sequenceNumber-circle {
+  fill: #333333;
+  stroke: #333333;
+}
+
+.sequenceNumber {
+  fill: white;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow-filled" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="sequence-marker-filled" stroke-width="1"/>
+    </marker>
+    <marker id="arrow-open" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10" class="sequence-marker-open" stroke-width="1"/>
+    </marker>
+    <marker id="arrow-cross" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <line x1="0" y1="0" x2="10" y2="10" class="sequence-marker-cross" stroke-width="2"/>
+      <line x1="10" y1="0" x2="0" y2="10" class="sequence-marker-cross" stroke-width="2"/>
+    </marker>
+    <marker id="sequencenumber" refX="15" refY="15" markerWidth="60" markerHeight="40" orient="auto">
+      <circle cx="15" cy="15" r="6" class="sequence-number"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <line x1="75" y1="65" x2="75" y2="726" class="actor-line" stroke-width="0.5px"/>
+      <line x1="592" y1="65" x2="592" y2="726" class="actor-line" stroke-width="0.5px"/>
+      <line x1="866" y1="65" x2="866" y2="726" class="actor-line" stroke-width="0.5px"/>
+      <line x1="1066" y1="65" x2="1066" y2="726" class="actor-line" stroke-width="0.5px"/>
+    </g>
+    <g class="edgePaths">
+      <line x1="75" y1="207" x2="592" y2="207" class="messageLine0" marker-end="url(#arrow-filled)" stroke-width="2" style="fill: none;" stroke="none"/>
+      <line x1="592" y1="251" x2="866" y2="251" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
+      <line x1="866" y1="295" x2="592" y2="295" class="messageLine1" stroke-width="2" stroke="none" marker-end="url(#arrow-filled)" style="stroke-dasharray: 3, 3; fill: none;"/>
+      <line x1="592" y1="339" x2="1066" y2="339" class="messageLine0" stroke-width="2" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)"/>
+      <line x1="75" y1="432" x2="592" y2="432" class="messageLine0" marker-end="url(#arrow-filled)" stroke-width="2" style="fill: none;" stroke="none"/>
+      <line x1="592" y1="476" x2="866" y2="476" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
+      <line x1="866" y1="520" x2="592" y2="520" class="messageLine1" style="stroke-dasharray: 3, 3; fill: none;" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none"/>
+      <path d="M 592 564 L 632 564 L 632 594 L 592 594" class="message-line" fill="none" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
+      <line x1="592" y1="608" x2="75" y2="608" class="messageLine1" stroke-width="2" stroke="none" style="stroke-dasharray: 3, 3; fill: none;" marker-end="url(#arrow-filled)"/>
+    </g>
+    <g class="edgeLabels">
+      <text x="333.5" y="197" class="message-label" text-anchor="middle" font-size="16">Post &quot;[Review Note] PR #123: initial feedback&quot;</text>
+      <text x="729" y="241" class="message-label" text-anchor="middle" font-size="16">tracker.insert((reviewer, 123))</text>
+      <text x="729" y="285" class="message-label" text-anchor="middle" font-size="16">true (first note)</text>
+      <text x="829" y="329" class="message-label" font-size="16" text-anchor="middle">✅ Message posted</text>
+      <text x="333.5" y="422" class="message-label" font-size="16" text-anchor="middle">Post &quot;[Review Note] PR #123: correction - ignore previous&quot;</text>
+      <text x="729" y="466" class="message-label" text-anchor="middle" font-size="16">tracker.insert((reviewer, 123))</text>
+      <text x="729" y="510" class="message-label" font-size="16" text-anchor="middle">false (already exists)</text>
+      <text x="637" y="579" class="message-label" text-anchor="start" font-size="16">Suppress duplicate</text>
+      <text x="333.5" y="598" class="message-label" text-anchor="middle" font-size="16">❌ Silently dropped</text>
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="actor">
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="75" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Reviewer Coworker</text>
+    </g>
+    <g class="actor">
+      <rect x="517" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="592" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">RPC Handler</text>
+    </g>
+    <g class="actor">
+      <rect x="791" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="866" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central"><tspan x="866" y="32.5" dy="-0.6em">review_note_tracker</tspan><tspan x="866" dy="1.2em">(HashSet)</tspan></text>
+    </g>
+    <g class="actor">
+      <rect x="991" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
+      <text x="1066" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Channel Log</text>
+    </g>
+    <g class="note">
+      <rect x="816" y="75" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="866" y="80" class="noteText" dominant-baseline="middle" dy="1em" text-anchor="middle" font-size="16" alignment-baseline="middle">Documentation says:</text>
+      <text x="866" y="99" class="noteText" dy="1em" dominant-baseline="middle" alignment-baseline="middle" font-size="16" text-anchor="middle">HashMap with 60s cooldown</text>
+    </g>
+    <g class="note">
+      <rect x="816" y="124" width="100" height="58" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="866" y="129" class="noteText" font-size="16" dominant-baseline="middle" dy="1em" text-anchor="middle" alignment-baseline="middle">Reality:</text>
+      <text x="866" y="148" class="noteText" dominant-baseline="middle" alignment-baseline="middle" text-anchor="middle" dy="1em" font-size="16">HashSet with permanent dedup</text>
+    </g>
+    <g class="note">
+      <rect x="25" y="349" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="75" y="354" class="noteText" alignment-baseline="middle" dy="1em" text-anchor="middle" font-size="16" dominant-baseline="middle">5 minutes later...</text>
+      <text x="75" y="373" class="noteText" text-anchor="middle" dominant-baseline="middle" dy="1em" font-size="16" alignment-baseline="middle">Reviewer discovers error</text>
+    </g>
+    <g class="note">
+      <rect x="1016" y="618" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="1066" y="623" class="noteText" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle" font-size="16">Correction never appears</text>
+      <text x="1066" y="642" class="noteText" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em" font-size="16">Lead sees only the wrong note</text>
+    </g>
+    <g class="note">
+      <rect x="816" y="667" width="100" height="58" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="866" y="672" class="noteText" font-size="16" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">Only way to reset:</text>
+      <text x="866" y="691" class="noteText" font-size="16" dy="1em" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle">daemon restart</text>
+    </g>
+    <g class="actor">
+      <rect x="0" y="726" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="75" y="758.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Reviewer Coworker</text>
+    </g>
+    <g class="actor">
+      <rect x="517" y="726" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="592" y="758.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">RPC Handler</text>
+    </g>
+    <g class="actor">
+      <rect x="791" y="726" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="866" y="758.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central"><tspan x="866" y="758.5" dy="-0.6em">review_note_tracker</tspan><tspan x="866" dy="1.2em">(HashSet)</tspan></text>
+    </g>
+    <g class="actor">
+      <rect x="991" y="726" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
+      <text x="1066" y="758.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Channel Log</text>
+    </g>
+  </g>
+</svg>

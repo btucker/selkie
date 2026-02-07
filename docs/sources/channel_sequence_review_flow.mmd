@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant Reviewer as Reviewer Coworker
+    participant RPC as RPC Handler
+    participant Tracker as review_note_tracker<br/>(HashSet)
+    participant Channel as Channel Log
+
+    Note over Tracker: Documentation says:<br/>HashMap with 60s cooldown
+    Note over Tracker: Reality:<br/>HashSet with permanent dedup
+
+    Reviewer->>RPC: Post "[Review Note] PR #123: initial feedback"
+    RPC->>Tracker: tracker.insert((reviewer, 123))
+    Tracker-->>RPC: true (first note)
+    RPC->>Channel: ✅ Message posted
+
+    Note over Reviewer: 5 minutes later...<br/>Reviewer discovers error
+
+    Reviewer->>RPC: Post "[Review Note] PR #123: correction - ignore previous"
+    RPC->>Tracker: tracker.insert((reviewer, 123))
+    Tracker-->>RPC: false (already exists)
+    RPC->>RPC: Suppress duplicate
+    RPC-->>Reviewer: ❌ Silently dropped
+
+    Note over Channel: Correction never appears<br/>Lead sees only the wrong note
+
+    Note over Tracker: Only way to reset:<br/>daemon restart

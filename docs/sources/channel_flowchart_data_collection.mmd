@@ -1,0 +1,33 @@
+flowchart TB
+    subgraph "Data Collection (snapshot.rs)"
+        A[collect_world_snapshot] --> B[get_coworkers_with_merged_prs]
+        B --> C[coworkers_with_merged_prs: HashSet]
+    end
+    
+    subgraph "Task Dispatch (dispatch.rs)"
+        D[spawn_for_pending_tasks] --> E[iterate pending tasks]
+        E --> F[extract_pr_number_from_task]
+        F -->|PR #709| G{Check in-memory<br/>PR map?}
+        G -->|found| H[Group to existing owner]
+        G -->|not found| I[Check disk for<br/>PR owner]
+        I --> J[Assign/nudge coworker]
+    end
+    
+    subgraph "The Bug"
+        K[❌ Never checks if<br/>PR is in merged set]
+        style K fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    end
+    
+    C -.->|Available but unused| K
+    F -.->|PR number extracted| K
+    K -.->|Should filter here| G
+    
+    subgraph "Fix Location"
+        L[After extracting PR #]
+        L --> M{Is PR in<br/>coworkers_with_merged_prs?}
+        M -->|yes| N[Skip task or<br/>auto-complete it]
+        M -->|no| G
+        style N fill:#51cf66,stroke:#2f9e44,color:#000
+    end
+    
+    F --> L

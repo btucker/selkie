@@ -1,0 +1,39 @@
+flowchart TB
+    subgraph "Tick N: Evaluate"
+        Event[DaemonEvent] --> Snapshot[collect_snapshot]
+        Snapshot --> Rules[evaluate_tick in rules.rs]
+    end
+    
+    subgraph "Within-Tick Deduplication"
+        Rules --> Check{is_busy?}
+        Check -->|Grouped PR task| Bypass[bypass is_busy_from_snapshot]
+        Check -->|Regular task| BlockSnap[block if busy from snapshot]
+        Bypass --> AssignCheck{assigned_this_tick?}
+        BlockSnap --> AssignCheck
+        AssignCheck -->|Yes| Block1[❌ Block duplicate]
+        AssignCheck -->|No| Allow1[✓ Allow assignment]
+    end
+    
+    subgraph "Effect Generation"
+        Allow1 --> Effect1[Effect::AssignAndSpawn]
+        Allow1 --> Effect2[Effect::NudgeCoworkerWithCallbacks<br/>└─ RecordTaskAssignment]
+    end
+    
+    subgraph "Cross-Tick Tracking"
+        Effect1 --> Track1[mark_in_flight_spawns]
+        Effect2 --> Track2[mark_in_flight_spawns<br/>scans sub-effects]
+        Track1 --> InFlight[in_flight_spawns]
+        Track2 --> InFlight
+    end
+    
+    subgraph "Tick N+1: Next Evaluation"
+        InFlight --> NextSnapshot[collect_snapshot<br/>includes in_flight]
+        NextSnapshot --> NextRules[evaluate_tick]
+        NextRules --> Check2{is_busy?}
+        Check2 -->|in_flight tracked| Block2[❌ Block duplicate]
+    end
+    
+    style Block1 fill:#ffcccc
+    style Block2 fill:#ffcccc
+    style Allow1 fill:#ccffcc
+    style InFlight fill:#ffffcc

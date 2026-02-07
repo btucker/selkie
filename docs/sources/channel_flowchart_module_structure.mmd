@@ -1,0 +1,32 @@
+graph TD
+    subgraph "src/bin/midtown/cli/chat/"
+        mod["mod.rs<br/>(parent module)"]
+        app["app.rs"]
+        ui["ui.rs"]
+        
+        subgraph "app.rs"
+            app_code["pub struct App { ... }"]
+            app_tests["#[cfg(test)]<br/>pub(super) mod tests"]
+            test_helper["pub(super) fn test_app()"]
+        end
+        
+        subgraph "mod.rs"
+            mod_tests["#[cfg(test)]<br/>mod tests"]
+            mod_use["use app::tests::test_app;"]
+            test_fn["#[test]<br/>fn test_number_key_...()"]
+        end
+    end
+    
+    app_tests -->|contains| test_helper
+    mod_use -->|imports| test_helper
+    test_fn -->|calls| test_helper
+    
+    app_tests -.->|pub(super) = visible to parent| mod
+    mod -.->|parent of both| app
+    mod -.->|parent of both| ui
+    
+    style test_helper fill:#e1f5e1
+    style app_tests fill:#fff4e1
+    style mod_use fill:#e1f5e1
+    classDef visibility stroke:#666,stroke-width:2px,stroke-dasharray: 5 5
+    class app_tests,test_helper visibility

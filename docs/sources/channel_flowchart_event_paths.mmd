@@ -1,0 +1,43 @@
+flowchart TB
+    subgraph Mouse["Mouse Event Path"]
+        M1[handleMouseDown]
+        M2[handleMouseMove]
+        M3[handleMouseUp]
+        M1 --> M2 --> M3
+    end
+    
+    subgraph Touch["Touch Event Path"]
+        T1[handleTouchStart]
+        T2[handleTouchMove]
+        T3[handleTouchEnd]
+        T1 --> T2 --> T3
+    end
+    
+    subgraph Shared["Shared Logic"]
+        S1[mouseMovedDuringPress tracking]
+        S2[Other interaction state]
+    end
+    
+    M1 -.-> S1
+    M2 -.-> S1
+    M3 -.-> S1
+    
+    T1 -.-> S1
+    T2 -.-> S1
+    T3 -.-> S1
+    
+    M1 -.-> S2
+    M2 -.-> S2
+    M3 -.-> S2
+    
+    T1 -.-> S2
+    T2 -.-> S2
+    T3 -.-> S2
+    
+    style S1 fill:#f96,stroke:#333,stroke-width:2px
+    style M1 fill:#9cf,stroke:#333
+    style M2 fill:#9cf,stroke:#333
+    style M3 fill:#9cf,stroke:#333
+    style T1 fill:#9f9,stroke:#333
+    style T2 fill:#9f9,stroke:#333
+    style T3 fill:#9f9,stroke:#333

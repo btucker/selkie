@@ -1,0 +1,43 @@
+flowchart TB
+    subgraph "Before Refactoring (daemon/mod.rs)"
+        M1[Monolithic daemon module] --> M2[All nudge logic inline]
+        M2 --> M3[Implicit use of active_coworkers]
+        M3 -.assumption.-> M4["All active = have tmux windows"]
+    end
+
+    subgraph "After Refactoring (chat.rs, health.rs)"
+        R1[Extracted route_at_all] --> R2["Uses .list() → active_coworkers"]
+        R3[Extracted maybe_nudge_usage_limit_expiry] --> R4["Uses active_coworkers"]
+        R2 --> R5[Attempts tmux send-keys]
+        R4 --> R5
+        R5 --> R6["❌ Error: Starting/Stopping have no tmux window"]
+    end
+
+    subgraph "Coworker Lifecycle States"
+        S1[Starting] -.no window yet.-> S2[Running]
+        S2 -.has window.-> S3[Stopping]
+        S3 -.window being torn down.-> S4[Stopped]
+        
+        S1 -.included in.-> L1["list() → all statuses"]
+        S2 -.included in.-> L1
+        S3 -.included in.-> L1
+        S4 -.included in.-> L1
+        
+        S2 -.included in.-> L2["list_running() → Running only"]
+        
+        style L1 fill:#fee
+        style L2 fill:#efe
+    end
+
+    subgraph "PR #722 Fix"
+        F1[Replace active_coworkers] --> F2[With running_coworkers]
+        F2 --> F3[Filter by CoworkerStatus::Running]
+        F3 --> F4["✓ Only nudge coworkers with tmux windows"]
+    end
+
+    M3 -.refactoring exposed assumption.-> R2
+    M3 -.refactoring exposed assumption.-> R4
+    R6 -.PR #722 fix.-> F1
+
+    style R6 fill:#fdd
+    style F4 fill:#dfd

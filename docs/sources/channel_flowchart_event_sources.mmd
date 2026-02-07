@@ -1,0 +1,57 @@
+graph TB
+    subgraph "Event Sources"
+        Timer[Timer Ticks]
+        Webhook[GitHub Webhooks]
+        RPC[RPC Calls]
+        Signal[Unix Signals]
+    end
+
+    subgraph "Core State Machine"
+        Events[events.rs<br/>DaemonEvent dispatch]
+        Snapshot[snapshot.rs<br/>WorldSnapshot<br/>immutable state view]
+        
+        subgraph "Pure Decision Logic"
+            Health[health.rs<br/>coworker lifecycle]
+            PR[pr.rs<br/>reviewer spawning]
+            Dispatch[dispatch.rs<br/>task assignment]
+            Chat[chat.rs<br/>@mention routing]
+        end
+        
+        Effects[effects.rs<br/>Effect execution<br/>only side effects here]
+    end
+
+    subgraph "Infrastructure"
+        Tmux[tmux.rs<br/>spawn/nudge/pane capture]
+        Channel[channel.rs<br/>append-only JSONL]
+        Tasks[tasks.rs<br/>~/.claude/tasks/]
+        WebSocket[web.rs<br/>WebSocket broadcast]
+    end
+
+    Timer --> Events
+    Webhook --> Events
+    RPC --> Events
+    Signal --> Events
+    
+    Events -->|collect once| Snapshot
+    Snapshot -->|read-only| Health
+    Snapshot -->|read-only| PR
+    Snapshot -->|read-only| Dispatch
+    Snapshot -->|read-only| Chat
+    
+    Health -->|Vec&lt;Effect&gt;| Effects
+    PR -->|Vec&lt;Effect&gt;| Effects
+    Dispatch -->|Vec&lt;Effect&gt;| Effects
+    Chat -->|Vec&lt;Effect&gt;| Effects
+    
+    Effects --> Tmux
+    Effects --> Channel
+    Effects --> Tasks
+    Effects --> WebSocket
+    
+    classDef pure fill:#e1f5e1,stroke:#4caf50,stroke-width:2px
+    classDef imperative fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    classDef infra fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    
+    class Health,PR,Dispatch,Chat,Snapshot pure
+    class Effects,Events imperative
+    class Tmux,Channel,Tasks,WebSocket infra

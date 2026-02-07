@@ -1,0 +1,35 @@
+flowchart TD
+    subgraph "Chat Event Loop (mod.rs)"
+        ViewMode["ViewMode enum<br/>Chat | DiagramViewer(idx)"]
+        HandleEvent["handle_event()"]
+        KeyPress["KeyPress 1-9"]
+    end
+    
+    subgraph "UI Rendering (ui.rs)"
+        RenderMsg["render_message()"]
+        DiagramNum["diagram_num = len + 1"]
+        CapCheck{"diagram_num <= 9?"}
+        Numbered["[N] Diagram: type<br/>(press N to view)"]
+        Unnumbered["    Diagram: type<br/>(no shortcut)"]
+    end
+    
+    subgraph "Kitty Protocol (kitty.rs)"
+        RenderFull["render_fullscreen_image()"]
+        TmuxCheck["is_inside_tmux()"]
+        Inner["render_fullscreen_image_inner()"]
+    end
+    
+    RenderMsg --> DiagramNum
+    DiagramNum --> CapCheck
+    CapCheck -->|"Yes"| Numbered
+    CapCheck -->|"No"| Unnumbered
+    
+    KeyPress --> HandleEvent
+    HandleEvent -->|"idx < len"| ViewMode
+    ViewMode --> RenderFull
+    RenderFull --> TmuxCheck
+    TmuxCheck --> Inner
+    
+    style CapCheck fill:#f96
+    style TmuxCheck fill:#f96
+    style Inner fill:#9f6

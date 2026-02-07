@@ -1,0 +1,30 @@
+flowchart TD
+    A[gather_orphan_cleanup_data] --> B[cleanup_orphaned_worktrees<br/>limit: Some<b>2</b>]
+    B --> C[unmerged: Vec of 2 worktrees]
+    C --> D[OrphanTracker::prune<b>&unmerged</b>]
+    
+    D --> E{Is worktree #3<br/>in unmerged?}
+    E -->|No| F[Entry for worktree #3<br/>REMOVED from tracker]
+    
+    F --> G[Next tick:<br/>worktree #3 processed]
+    G --> H[Re-tracked with<br/><b>warned_at: None</b>]
+    
+    H --> I[60s grace period expires]
+    I --> J[Warn AGAIN<br/>bypasses 1h cooldown]
+    
+    J --> K[Tick after that:<br/>limit reached again]
+    K --> L[prune removes entry]
+    L --> G
+    
+    style F fill:#f99
+    style H fill:#f99
+    style J fill:#f99
+    
+    subgraph Problem
+    direction TB
+    F
+    H
+    J
+    end
+    
+    classDef problem fill:#f99,stroke:#900,stroke-width:2px

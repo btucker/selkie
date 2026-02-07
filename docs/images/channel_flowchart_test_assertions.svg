@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="713.7" height="2634" viewBox="-8 -8 713.7 2634" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-Start-RenderAction-0">
+        <path d="M 466.50 52.80 C 466.50 61.13, 466.50 69.47, 466.50 77.80 C 466.50 86.13, 466.50 94.47, 466.50 102.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-RenderAction-BuildActionIndent-0">
+        <path d="M 466.50 155.60 C 466.50 163.93, 466.50 172.27, 466.50 180.60 C 466.50 188.93, 466.50 197.27, 466.50 205.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-BuildActionIndent-CollectActionText-0">
+        <path d="M 466.50 295.20 C 466.50 303.53, 466.50 311.87, 466.50 320.20 C 466.50 328.53, 466.50 336.87, 466.50 345.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-CollectActionText-Assert1-0">
+        <path d="M 466.50 398.00 C 466.50 406.33, 466.50 414.67, 466.50 423.00 C 466.50 431.33, 466.50 439.67, 466.50 448.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Assert1-Assert2-0">
+        <path d="M 415.93 722.04 L 374.00 847.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-Assert2-RenderNormal-0">
+        <path d="M 322.18 1191.74 L 281.50 1333.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-RenderNormal-BuildNormalIndent-0">
+        <path d="M 281.50 1386.40 C 281.50 1394.73, 281.50 1403.07, 281.50 1411.40 C 281.50 1419.73, 281.50 1428.07, 281.50 1436.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-BuildNormalIndent-CollectNormalText-0">
+        <path d="M 281.50 1526.00 C 281.50 1537.67, 281.50 1549.33, 281.50 1561.00 C 281.50 1572.67, 281.50 1584.33, 281.50 1596.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-CollectNormalText-Assert3-0">
+        <path d="M 281.50 1648.80 C 281.50 1657.13, 281.50 1665.47, 281.50 1673.80 C 281.50 1682.13, 281.50 1690.47, 281.50 1698.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Assert3-Assert4-0">
+        <path d="M 230.45 1996.21 L 189.00 2127.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Assert4-Success-0">
+        <path d="M 162.11 2462.21 C 158.07 2484.87, 154.04 2507.54, 152.02 2524.70 C 150.00 2541.87, 150.00 2553.53, 150.00 2565.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Assert1-Failure-0">
+        <path d="M 546.89 689.28 C 590.09 730.39, 633.30 771.49, 654.90 1078.31 C 676.50 1385.13, 676.50 1957.67, 661.17 2249.97 C 615.17 2554.34, 584.50 2566.41, 584.50 2566.41" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Assert2-Failure-0">
+        <path d="M 448.08 1160.87 C 480.39 1206.78, 512.69 1252.69, 526.52 1486.75 C 540.34 1720.80, 535.69 2143.00, 531.03 2565.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Assert3-Failure-0">
+        <path d="M 345.10 1981.21 C 367.90 2018.21, 390.70 2055.20, 402.10 2146.70 C 413.50 2238.20, 413.50 2384.20, 423.67 2463.03 C 454.16 2553.53, 474.49 2565.20, 474.49 2565.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Assert4-Failure-0">
+        <path d="M 240.38 2432.18 C 254.25 2464.85, 268.13 2497.53, 304.15 2521.35 C 340.17 2545.17, 398.33 2560.15, 456.50 2575.12" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-Assert1-Assert2-0">
+        <rect x="369.21142184610926" y="772.199328812404" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="387.61142184610924" y="783.199328812404" class="edge-label" text-anchor="middle" dominant-baseline="central">Pass</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Assert2-RenderNormal-0">
+        <rect x="277.2129855431111" y="1250.5248055462055" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="295.61298554311105" y="1261.5248055462055" class="edge-label" dominant-baseline="central" text-anchor="middle">Pass</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Assert3-Assert4-0">
+        <rect x="184.38750633967157" y="2049.2726069409982" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="202.78750633967158" y="2060.2726069409982" class="edge-label" dominant-baseline="central" text-anchor="middle">Pass</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Assert4-Success-0">
+        <rect x="134.5855727954295" y="2502.434860456434" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="152.9855727954295" y="2513.434860456434" class="edge-label" dominant-baseline="central" text-anchor="middle">Pass</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Assert1-Failure-0">
+        <rect x="658.1" y="1620.382287304477" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="676.5" y="1631.382287304477" class="edge-label" text-anchor="middle" dominant-baseline="central">Fail</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Assert2-Failure-0">
+        <rect x="526.6" y="1838.0370140116192" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="545" y="1849.0370140116192" class="edge-label" text-anchor="middle" dominant-baseline="central">Fail</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Assert3-Failure-0">
+        <rect x="395.1" y="2270.176867866398" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="413.5" y="2281.176867866398" class="edge-label" text-anchor="middle" dominant-baseline="central">Fail</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Assert4-Failure-0">
+        <rect x="299.2853020352229" y="2528.386907945336" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="317.6853020352229" y="2539.386907945336" class="edge-label" dominant-baseline="central" text-anchor="middle">Fail</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-Assert1">
+        <polygon points="466.5,447.99999999999994 616.5,612.8 466.5,777.5999999999999 316.5,612.8"/>
+        <text x="466.5" y="612.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="466.5" y="612.8" dy="-0.6em">Assert: all_text contains</tspan><tspan x="466.5" dy="1.2em">&apos;         --- graph ---&apos;</tspan></text>
+      </g>
+      <g class="node" id="node-Assert2">
+        <polygon points="374,847.5999999999999 524,1055.6 374,1263.6 224,1055.6"/>
+        <text x="374" y="1055.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="374" y="1055.6" dy="-0.6em">Assert: all_text contains</tspan><tspan x="374" dy="1.2em">&apos;         --- press 1 to open ---&apos;</tspan></text>
+      </g>
+      <g class="node" id="node-Assert3">
+        <polygon points="281.5,1698.7999999999997 431.5,1877.9999999999998 281.5,2057.2 131.5,1877.9999999999998"/>
+        <text x="281.5" y="1877.9999999999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="281.5" y="1877.9999999999998" dy="-0.6em">Assert: normal_text contains</tspan><tspan x="281.5" dy="1.2em">&apos;       --- graph ---&apos;</tspan></text>
+      </g>
+      <g class="node" id="node-Assert4">
+        <polygon points="189,2127.2 339,2311.2 189,2495.2 39,2311.2" style="fill:#e1f5ff !important"/>
+        <text x="189" y="2311.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="189" y="2311.2" dy="-0.6em">Assert: !normal_text contains</tspan><tspan x="189" dy="1.2em">&apos;         --- graph ---&apos;</tspan></text>
+      </g>
+      <g class="node" id="node-BuildActionIndent">
+        <rect x="316.5" y="205.59999999999997" width="300" height="89.6" style="fill:#fff4e1 !important"/>
+        <text x="466.5" y="250.39999999999998" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="466.5" y="250.39999999999998" dy="-0.6em">action_indent = 9 spaces</tspan><tspan x="466.5" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH + 2)</tspan></text>
+      </g>
+      <g class="node" id="node-BuildNormalIndent">
+        <rect x="150.3" y="1436.3999999999999" width="262.4" height="89.6" style="fill:#fff4e1 !important"/>
+        <text x="281.5" y="1481.1999999999998" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="281.5" y="1481.1999999999998" dy="-0.6em">normal_indent = 7 spaces</tspan><tspan x="281.5" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH)</tspan></text>
+      </g>
+      <g class="node" id="node-CollectActionText">
+        <rect x="316.5" y="345.2" width="300" height="52.8"/>
+        <text x="466.5" y="371.59999999999997" class="label" text-anchor="middle" dominant-baseline="central">Collect all spans into all_text</text>
+      </g>
+      <g class="node" id="node-CollectNormalText">
+        <rect x="131.5" y="1595.9999999999998" width="300" height="52.8"/>
+        <text x="281.5" y="1622.3999999999999" class="label" dominant-baseline="central" text-anchor="middle">Collect all spans into normal_text</text>
+      </g>
+      <g class="node" id="node-Failure">
+        <rect x="456.5" y="2565.2" width="128" height="52.8" style="fill:#ffebee !important"/>
+        <text x="520.5" y="2591.6" class="label" dominant-baseline="central" text-anchor="middle">Test fails</text>
+      </g>
+      <g class="node" id="node-RenderAction">
+        <rect x="316.5" y="102.79999999999998" width="300" height="52.8"/>
+        <text x="466.5" y="129.2" class="label" dominant-baseline="central" text-anchor="middle">Render action message with Mermaid</text>
+      </g>
+      <g class="node" id="node-RenderNormal">
+        <rect x="131.5" y="1333.6" width="300" height="52.8"/>
+        <text x="281.5" y="1360" class="label" dominant-baseline="central" text-anchor="middle">Render normal message with same Mermaid</text>
+      </g>
+      <g class="node" id="node-Start">
+        <rect x="397.7" y="0" width="137.6" height="52.8"/>
+        <text x="466.5" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">Test starts</text>
+      </g>
+      <g class="node" id="node-Success">
+        <rect x="0" y="2565.2" width="300" height="52.8" style="fill:#e8f5e9 !important"/>
+        <text x="150" y="2591.6" class="label" dominant-baseline="central" text-anchor="middle">Test passes: indents are different</text>
+      </g>
+    </g>
+  </g>
+</svg>

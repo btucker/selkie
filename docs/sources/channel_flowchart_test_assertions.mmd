@@ -1,0 +1,26 @@
+flowchart TD
+    Start[Test starts] --> RenderAction[Render action message with Mermaid]
+    RenderAction --> BuildActionIndent["action_indent = 9 spaces<br/>(TIMESTAMP_GUTTER_WIDTH + 2)"]
+    BuildActionIndent --> CollectActionText[Collect all spans into all_text]
+    
+    CollectActionText --> Assert1{Assert: all_text contains<br/>'         --- graph ---'}
+    Assert1 -->|Pass| Assert2{Assert: all_text contains<br/>'         --- press 1 to open ---'}
+    Assert2 -->|Pass| RenderNormal[Render normal message with same Mermaid]
+    
+    RenderNormal --> BuildNormalIndent["normal_indent = 7 spaces<br/>(TIMESTAMP_GUTTER_WIDTH)"]
+    BuildNormalIndent --> CollectNormalText[Collect all spans into normal_text]
+    
+    CollectNormalText --> Assert3{Assert: normal_text contains<br/>'       --- graph ---'}
+    Assert3 -->|Pass| Assert4{Assert: !normal_text contains<br/>'         --- graph ---'}
+    Assert4 -->|Pass| Success[Test passes: indents are different]
+    
+    Assert1 -->|Fail| Failure[Test fails]
+    Assert2 -->|Fail| Failure
+    Assert3 -->|Fail| Failure
+    Assert4 -->|Fail| Failure
+    
+    style Assert4 fill:#e1f5ff
+    style BuildActionIndent fill:#fff4e1
+    style BuildNormalIndent fill:#fff4e1
+    style Success fill:#e8f5e9
+    style Failure fill:#ffebee

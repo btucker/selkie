@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="787" height="777" viewBox="-50 -10 787 777" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+
+.sequence-title {
+  fill: #333333;
+}
+
+.actor {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+.actor-box {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+/* Actor text - no stroke (avoid outlined appearance) */
+text.actor, text.actor > tspan, text.actor-box, text.actor-label {
+  fill: #333333;
+  stroke: none;
+}
+
+.actor-line {
+  stroke: #999999;
+  stroke-width: 0.5px;
+}
+
+.messageLine0 {
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  stroke: #333333;
+}
+
+.messageLine1 {
+  stroke-width: 1.5;
+  stroke-dasharray: 2, 2;
+  stroke: #333333;
+}
+
+.message-line {
+  stroke: #333333;
+}
+
+.messageText {
+  fill: #333333;
+  stroke: none;
+}
+
+.message-label {
+  fill: #333333;
+  stroke: none;
+}
+
+.note {
+  stroke: #aaaa33;
+  fill: #fff5ad;
+}
+
+.noteText, .noteText > tspan {
+  fill: black;
+  stroke: none;
+}
+
+.note-text, .note-text > tspan {
+  fill: black;
+  stroke: none;
+}
+
+.activation {
+  fill: #f4f4f4;
+  stroke: #666666;
+}
+
+.loopLine {
+  stroke: #9370DB;
+  fill: none;
+  stroke-width: 2px;
+  stroke-dasharray: 2, 2;
+}
+
+.loopText {
+  fill: #333333;
+}
+
+.labelBox {
+  stroke: #9370DB;
+  fill: #ECECFF;
+}
+
+.sequence-marker-filled {
+  fill: #333333;
+  stroke: #333333;
+}
+
+.sequence-marker-open {
+  fill: none;
+  stroke: #333333;
+}
+
+.sequence-marker-cross {
+  stroke: #333333;
+}
+
+.sequence-number {
+  fill: #333333;
+}
+
+.sequenceNumber-circle {
+  fill: #333333;
+  stroke: #333333;
+}
+
+.sequenceNumber {
+  fill: white;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow-filled" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="sequence-marker-filled" stroke-width="1"/>
+    </marker>
+    <marker id="arrow-open" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10" class="sequence-marker-open" stroke-width="1"/>
+    </marker>
+    <marker id="arrow-cross" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+      <line x1="0" y1="0" x2="10" y2="10" class="sequence-marker-cross" stroke-width="2"/>
+      <line x1="10" y1="0" x2="0" y2="10" class="sequence-marker-cross" stroke-width="2"/>
+    </marker>
+    <marker id="sequencenumber" refX="15" refY="15" markerWidth="60" markerHeight="40" orient="auto">
+      <circle cx="15" cy="15" r="6" class="sequence-number"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <line x1="75" y1="65" x2="75" y2="692" class="actor-line" stroke-width="0.5px"/>
+      <line x1="412" y1="65" x2="412" y2="692" class="actor-line" stroke-width="0.5px"/>
+      <line x1="612" y1="65" x2="612" y2="692" class="actor-line" stroke-width="0.5px"/>
+    </g>
+    <g class="edgePaths">
+      <line x1="75" y1="158" x2="412" y2="158" class="messageLine0" stroke-width="2" stroke="none" style="fill: none;" marker-end="url(#arrow-filled)"/>
+      <line x1="412" y1="202" x2="612" y2="202" class="messageLine0" stroke-width="2" style="fill: none;" marker-end="url(#arrow-filled)" stroke="none"/>
+      <line x1="75" y1="344" x2="412" y2="344" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
+      <line x1="412" y1="388" x2="612" y2="388" class="messageLine0" stroke-width="2" marker-end="url(#arrow-filled)" style="fill: none;" stroke="none"/>
+      <line x1="75" y1="530" x2="412" y2="530" class="messageLine0" marker-end="url(#arrow-filled)" stroke-width="2" style="fill: none;" stroke="none"/>
+      <line x1="412" y1="574" x2="612" y2="574" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
+    </g>
+    <g class="edgeLabels">
+      <text x="243.5" y="148" class="message-label" font-size="16" text-anchor="middle">Touch down on element</text>
+      <text x="512" y="192" class="message-label" font-size="16" text-anchor="middle">touchstart event</text>
+      <text x="243.5" y="334" class="message-label" text-anchor="middle" font-size="16">Drag finger (may leave element)</text>
+      <text x="512" y="378" class="message-label" font-size="16" text-anchor="middle">touchmove event</text>
+      <text x="243.5" y="520" class="message-label" font-size="16" text-anchor="middle">Lift finger (possibly outside element)</text>
+      <text x="512" y="564" class="message-label" text-anchor="middle" font-size="16">touchend event</text>
+    </g>
+    <g class="nodes">
+
+    </g>
+    <g class="actor">
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="75" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">User</text>
+    </g>
+    <g class="actor">
+      <rect x="337" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="412" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Element</text>
+    </g>
+    <g class="actor">
+      <rect x="537" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
+      <text x="612" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">TouchEvent</text>
+    </g>
+    <g class="note">
+      <rect x="50" y="75" width="587" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="343.5" y="80" class="noteText" font-size="16" dy="1em" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle">Touch Start Phase</text>
+    </g>
+    <g class="note">
+      <rect x="637" y="212" width="150" height="77" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="712" y="217" class="noteText" text-anchor="middle" dy="1em" alignment-baseline="middle" dominant-baseline="middle" font-size="16">e.target = element</text>
+      <text x="712" y="236" class="noteText" alignment-baseline="middle" text-anchor="middle" dy="1em" dominant-baseline="middle" font-size="16">e.touches = [touch1]</text>
+      <text x="712" y="255" class="noteText" dy="1em" dominant-baseline="middle" text-anchor="middle" font-size="16" alignment-baseline="middle">e.changedTouches = [touch1]</text>
+    </g>
+    <g class="note">
+      <rect x="50" y="261" width="587" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="343.5" y="266" class="noteText" dy="1em" dominant-baseline="middle" alignment-baseline="middle" text-anchor="middle" font-size="16">Touch Move Phase (optional)</text>
+    </g>
+    <g class="note">
+      <rect x="637" y="398" width="150" height="77" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="712" y="403" class="noteText" alignment-baseline="middle" dominant-baseline="middle" dy="1em" font-size="16" text-anchor="middle">e.target = STILL original element</text>
+      <text x="712" y="422" class="noteText" dominant-baseline="middle" font-size="16" alignment-baseline="middle" text-anchor="middle" dy="1em">e.touches = [touch1]</text>
+      <text x="712" y="441" class="noteText" alignment-baseline="middle" dy="1em" font-size="16" dominant-baseline="middle" text-anchor="middle">e.changedTouches = [touch1]</text>
+    </g>
+    <g class="note">
+      <rect x="50" y="447" width="587" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="343.5" y="452" class="noteText" font-size="16" text-anchor="middle" dy="1em" alignment-baseline="middle" dominant-baseline="middle">Touch End Phase</text>
+    </g>
+    <g class="note">
+      <rect x="637" y="584" width="150" height="77" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="712" y="589" class="noteText" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle" font-size="16">e.target = STILL original element</text>
+      <text x="712" y="608" class="noteText" text-anchor="middle" alignment-baseline="middle" font-size="16" dy="1em" dominant-baseline="middle">e.touches = []</text>
+      <text x="712" y="627" class="noteText" dominant-baseline="middle" dy="1em" text-anchor="middle" font-size="16" alignment-baseline="middle">e.changedTouches = [touch1]</text>
+    </g>
+    <g class="note">
+      <rect x="562" y="633" width="100" height="77" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="612" y="638" class="noteText" alignment-baseline="middle" text-anchor="middle" dy="1em" dominant-baseline="middle" font-size="16">For tap-to-dismiss:</text>
+      <text x="612" y="657" class="noteText" font-size="16" dominant-baseline="middle" dy="1em" alignment-baseline="middle" text-anchor="middle">Check e.touches.length === 0</text>
+      <text x="612" y="676" class="noteText" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle" font-size="16">AND e.target === container</text>
+    </g>
+    <g class="actor">
+      <rect x="0" y="692" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="75" y="724.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">User</text>
+    </g>
+    <g class="actor">
+      <rect x="337" y="692" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="412" y="724.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Element</text>
+    </g>
+    <g class="actor">
+      <rect x="537" y="692" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="612" y="724.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">TouchEvent</text>
+    </g>
+  </g>
+</svg>

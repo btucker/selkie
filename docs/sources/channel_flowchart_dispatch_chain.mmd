@@ -1,0 +1,39 @@
+flowchart TD
+    Start[Task Dispatch Tick] --> CheckPending{Pending tasks<br/>without owners?}
+    CheckPending -->|No| End[Done]
+    CheckPending -->|Yes| ExtractPR[Extract PR# from<br/>task subject/description]
+    
+    ExtractPR --> HasPR{PR# found?}
+    
+    HasPR -->|Yes| CheckOwner[Check in-memory<br/>pr_coworker_map]
+    HasPR -->|No| AllocateFresh[Allocate fresh<br/>coworker name]
+    
+    CheckOwner --> InMemory{Owner found<br/>this tick?}
+    InMemory -->|Yes| ReuseOwner[Reuse same owner]
+    InMemory -->|No| CheckDisk[find_pr_owner_in_tasks]
+    
+    CheckDisk --> OnDisk{Owner found<br/>on disk?}
+    OnDisk -->|Yes| ReuseOwner
+    OnDisk -->|No| AllocateFresh
+    
+    ReuseOwner --> AssignTask[Assign task to owner]
+    AllocateFresh --> AssignTask
+    
+    AssignTask --> RunningCheck{Coworker<br/>running?}
+    RunningCheck -->|Yes| NudgeClaim[Nudge: claim task]
+    RunningCheck -->|No| SpawnFresh[Spawn fresh with task]
+    
+    NudgeClaim --> End
+    SpawnFresh --> End
+    
+    style CheckDisk fill:#ff9999
+    style OnDisk fill:#ff9999
+    
+    MissingCheck[❌ MISSING CHECK:<br/>Is PR merged?] -.->|Should gate| CheckOwner
+    MissingCheck -.->|Should gate| CheckDisk
+    
+    style MissingCheck fill:#ffcccc,stroke:#ff0000,stroke-width:3px
+    
+    PRCache[(merged_pr_branches<br/>HashSet)] -.->|Data exists| MissingCheck
+    
+    style PRCache fill:#ccffcc

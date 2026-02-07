@@ -1,0 +1,49 @@
+flowchart TB
+    %% Tick 1
+    subgraph Tick1[" Tick 1 - Assignment Generated"]
+        T1_Start[TaskDispatchTick fires] --> T1_Snap[collect_snapshot]
+        T1_Snap --> T1_Eval[evaluate_tick]
+        
+        T1_Eval --> T1_Loop{spawn_for_pending_tasks loop}
+        T1_Loop --> T1_Task1[Task #42: pending, no owner]
+        T1_Task1 --> T1_Assign1[assigned_this_tick: Set]
+        T1_Assign1 --> T1_Effect1[Generate AssignAndSpawn #42]
+        
+        T1_Loop --> T1_Task2[Task #43: same coworker]
+        T1_Task2 --> T1_Check[assigned_this_tick: Contains coworker?]
+        T1_Check -->|YES| T1_Skip[Skip duplicate within tick]
+        
+        T1_Effect1 --> T1_Mark[mark_in_flight_spawns: #42]
+        T1_Mark --> T1_Execute[execute_effects]
+        T1_Execute -->|disk write pending...| T1_End[Tick 1 Complete]
+    end
+    
+    %% Tick 2
+    subgraph Tick2[" Tick 2 - Deduplication Check"]
+        T2_Start[TaskDispatchTick fires<br/>before Tick 1 effect completes] --> T2_Snap[collect_snapshot]
+        T2_Snap --> T2_Still[Task #42 still shows<br/>pending on disk]
+        T2_Still --> T2_Eval[evaluate_tick]
+        
+        T2_Eval --> T2_Check{is_task_spawn_in_flight #42?}
+        T2_Check -->|YES| T2_Skip[Skip cross-tick duplicate]
+        T2_Check -->|NO| T2_Bug[BUG: Generate duplicate effect]
+        
+        T2_Skip --> T2_End[No duplicate effect]
+    end
+    
+    %% Flow between ticks
+    T1_End -.->|race condition| T2_Start
+    
+    %% E2E Test Coverage
+    subgraph Test[" E2E Test Coverage"]
+        TestSetup[Setup: Task #42 pending] --> TestTick1[Simulate Tick 1 iteration]
+        TestTick1 --> TestMark[Verify in_flight_spawns has #42]
+        TestMark --> TestTick2[Simulate Tick 2 iteration]
+        TestTick2 --> TestAssert[Assert: is_task_spawn_in_flight returns true]
+    end
+    
+    style T1_Assign1 fill:#90EE90
+    style T1_Skip fill:#FFB6C1
+    style T2_Skip fill:#90EE90
+    style T2_Bug fill:#FF6B6B
+    style TestAssert fill:#87CEEB

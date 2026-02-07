@@ -1,0 +1,18 @@
+stateDiagram-v2
+    [*] --> Uncached: diagram first encountered
+    
+    Uncached --> Pending: get_or_render() queued
+    Pending --> Cached: background thread completes
+    Pending --> Uncached: render failed
+    
+    Uncached: No cache entry<br/>Queue for rendering
+    Pending: Hash in pending map<br/>Show "rendering..." placeholder
+    Cached: Image in cache<br/>Show clickable placeholder
+    
+    note right of Cached
+        insert_cached() for tests
+    end note
+    
+    note right of Pending
+        insert_pending() for tests
+    end note
