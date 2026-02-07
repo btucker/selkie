@@ -3,6 +3,7 @@
 use crate::diagrams::flowchart::{FlowVertex, FlowVertexType};
 use crate::layout::{LayoutNode, Point};
 
+use super::color::text_color_for_styles;
 use super::elements::{Attrs, SvgElement};
 use super::theme::Theme;
 
@@ -261,14 +262,20 @@ pub fn render_shape(
         shape
     };
 
-    // Create label
+    // Create label with contrasting text color when custom styles are present
     let label_text = vertex.text.as_deref().unwrap_or(&node.id);
-    let label = SvgElement::text(cx, cy, label_text).with_attrs(
-        Attrs::new()
-            .with_class("label")
-            .with_attr("text-anchor", "middle")
-            .with_attr("dominant-baseline", "central"),
-    );
+    let mut label_attrs = Attrs::new()
+        .with_class("label")
+        .with_attr("text-anchor", "middle")
+        .with_attr("dominant-baseline", "central");
+
+    if let Some(s) = style {
+        if let Some(text_fill) = text_color_for_styles(s) {
+            label_attrs = label_attrs.with_fill(&text_fill);
+        }
+    }
+
+    let label = SvgElement::text(cx, cy, label_text).with_attrs(label_attrs);
 
     // Wrap shape and label in a group with class="node"
     // This allows CSS selectors like ".node rect" to work correctly
@@ -282,6 +289,109 @@ pub fn render_shape(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_dark_fill_gets_white_text() {
+        // When a node has a dark custom fill, the text label should
+        // get a contrasting white fill to remain legible.
+        let mut node = LayoutNode::new("test", 100.0, 60.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.text = Some("Dark Node".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Square);
+
+        let theme = Theme::default();
+        let style = "fill:#333333 !important;stroke:#000 !important";
+        let shape_element = render_shape(&node, &vertex, &theme, Some(style));
+        let svg = shape_element.to_svg(0);
+
+        // The text element should have fill="#ffffff" for legibility
+        assert!(
+            svg.contains("fill=\"#ffffff\""),
+            "Dark background node text should have white fill for legibility, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_light_fill_gets_dark_text() {
+        // When a node has a light custom fill, the text label should
+        // get black fill to remain legible.
+        let mut node = LayoutNode::new("test", 100.0, 60.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.text = Some("Light Node".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Square);
+
+        let theme = Theme::default();
+        let style = "fill:#eeeeee !important";
+        let shape_element = render_shape(&node, &vertex, &theme, Some(style));
+        let svg = shape_element.to_svg(0);
+
+        // The text element should have fill="#000000" for legibility
+        assert!(
+            svg.contains("fill=\"#000000\""),
+            "Light background node text should have black fill for legibility, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_explicit_color_respected() {
+        // When a node's style explicitly sets color, that should be
+        // used for text fill regardless of background luminance.
+        let mut node = LayoutNode::new("test", 100.0, 60.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.text = Some("Custom Color".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Square);
+
+        let theme = Theme::default();
+        let style = "fill:#333333 !important;color:#ff0000 !important";
+        let shape_element = render_shape(&node, &vertex, &theme, Some(style));
+        let svg = shape_element.to_svg(0);
+
+        // The text element should use the explicit color value
+        assert!(
+            svg.contains("fill=\"#ff0000\""),
+            "Explicit color should be used for text fill, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_no_style_no_text_fill_override() {
+        // When no custom style is provided, the text label should not
+        // have an inline fill (it should use theme CSS).
+        let mut node = LayoutNode::new("test", 100.0, 60.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.text = Some("Default".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Square);
+
+        let theme = Theme::default();
+        let shape_element = render_shape(&node, &vertex, &theme, None);
+        let svg = shape_element.to_svg(0);
+
+        // The text element should NOT have an inline fill attribute
+        // (it should rely on the theme CSS for text color)
+        let text_start = svg.find("<text").expect("should have text element");
+        let text_end = svg[text_start..].find('>').unwrap() + text_start;
+        let text_tag = &svg[text_start..=text_end];
+        assert!(
+            !text_tag.contains("fill="),
+            "Text without custom style should not have inline fill, got: {}",
+            text_tag
+        );
+    }
 
     #[test]
     fn test_subroutine_uses_css_class_not_hardcoded_stroke() {

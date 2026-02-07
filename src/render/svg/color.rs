@@ -364,6 +364,53 @@ pub fn contrasting_text(background: &Color) -> Color {
     }
 }
 
+/// Extract a CSS property value from an inline style string.
+///
+/// Handles `!important` suffixes and whitespace. For example:
+/// `extract_style_property("fill:#ff5733 !important;stroke:#333", "fill")`
+/// returns `Some("#ff5733")`.
+pub fn extract_style_property<'a>(style: &'a str, property: &str) -> Option<&'a str> {
+    for part in style.split(';') {
+        let part = part.trim();
+        if let Some(rest) = part.strip_prefix(property) {
+            let rest = rest.trim_start();
+            if let Some(value) = rest.strip_prefix(':') {
+                let value = value.trim();
+                // Remove !important suffix if present
+                let value = value.strip_suffix("!important").unwrap_or(value).trim_end();
+                if !value.is_empty() {
+                    return Some(value);
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Compute the appropriate text color for a node with custom styles.
+///
+/// If the style string contains an explicit `color` property, use that.
+/// Otherwise, if `fill` is set, compute a WCAG-contrasting text color.
+/// Returns `None` if no custom text color is needed (i.e., the theme default
+/// should be used).
+pub fn text_color_for_styles(style: &str) -> Option<String> {
+    // Check for explicit color property first
+    if let Some(color_val) = extract_style_property(style, "color") {
+        // User explicitly set text color — return it as a fill value for SVG text
+        return Some(color_val.to_string());
+    }
+
+    // No explicit color — derive from fill if present
+    if let Some(fill_val) = extract_style_property(style, "fill") {
+        if let Some(bg_color) = Color::parse(fill_val) {
+            let text_color = contrasting_text(&bg_color);
+            return Some(text_color.to_hex());
+        }
+    }
+
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -497,6 +544,93 @@ mod tests {
         let light_bg = Color::rgb(200, 200, 200);
         let text = contrasting_text(&light_bg);
         assert_eq!(text, Color::rgb(0, 0, 0));
+    }
+
+    #[test]
+    fn test_extract_style_property() {
+        // Basic extraction
+        assert_eq!(
+            extract_style_property("fill:#ff5733", "fill"),
+            Some("#ff5733")
+        );
+
+        // With !important
+        assert_eq!(
+            extract_style_property("fill:#ff5733 !important", "fill"),
+            Some("#ff5733")
+        );
+
+        // Multiple properties
+        assert_eq!(
+            extract_style_property("fill:#ff5733 !important;stroke:#333 !important", "fill"),
+            Some("#ff5733")
+        );
+        assert_eq!(
+            extract_style_property("fill:#ff5733 !important;stroke:#333 !important", "stroke"),
+            Some("#333")
+        );
+
+        // Color property
+        assert_eq!(
+            extract_style_property("fill:#333;color:#fff !important", "color"),
+            Some("#fff")
+        );
+
+        // Missing property
+        assert_eq!(
+            extract_style_property("fill:#ff5733 !important", "color"),
+            None
+        );
+
+        // Don't confuse fill with background-fill or similar
+        assert_eq!(
+            extract_style_property("background-fill:#aaa;fill:#bbb", "fill"),
+            Some("#bbb")
+        );
+    }
+
+    #[test]
+    fn test_text_color_for_styles_dark_background() {
+        // Dark background should produce white text
+        let style = "fill:#333333 !important;stroke:#000 !important";
+        let text_color = text_color_for_styles(style).unwrap();
+        assert_eq!(text_color, "#ffffff");
+    }
+
+    #[test]
+    fn test_text_color_for_styles_light_background() {
+        // Light background should produce black text
+        let style = "fill:#eeeeee !important";
+        let text_color = text_color_for_styles(style).unwrap();
+        assert_eq!(text_color, "#000000");
+    }
+
+    #[test]
+    fn test_text_color_for_styles_explicit_color() {
+        // Explicit color should be used as-is, regardless of fill
+        let style = "fill:#333333 !important;color:red !important";
+        let text_color = text_color_for_styles(style).unwrap();
+        assert_eq!(text_color, "red");
+    }
+
+    #[test]
+    fn test_text_color_for_styles_no_fill() {
+        // No fill or color → None (use theme default)
+        let style = "stroke:#333 !important";
+        assert!(text_color_for_styles(style).is_none());
+    }
+
+    #[test]
+    fn test_text_color_for_styles_named_colors() {
+        // Named dark color
+        let style = "fill:navy !important";
+        let text_color = text_color_for_styles(style).unwrap();
+        assert_eq!(text_color, "#ffffff");
+
+        // Named light color
+        let style = "fill:yellow !important";
+        let text_color = text_color_for_styles(style).unwrap();
+        assert_eq!(text_color, "#000000");
     }
 
     #[test]
