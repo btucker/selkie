@@ -132,16 +132,16 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
 
 .note {
   stroke: #aaaa33;
-  fill: #FFFFCC;
+  fill: #fff5ad;
 }
 
 .noteText, .noteText > tspan {
-  fill: #333333;
+  fill: black;
   stroke: none;
 }
 
 .note-text, .note-text > tspan {
-  fill: #333333;
+  fill: black;
   stroke: none;
 }
 
@@ -217,19 +217,19 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
       <rect x="470" y="246" width="10" height="44" rx="1" ry="1" class="activation"/>
     </g>
     <g class="edgePaths">
-      <line x1="75" y1="109" x2="275" y2="109" class="messageLine0" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none"/>
-      <line x1="275" y1="153" x2="75" y2="153" class="messageLine1" stroke-width="2" style="stroke-dasharray: 3, 3; fill: none;" stroke="none" marker-end="url(#arrow-filled)"/>
-      <line x1="75" y1="246" x2="475" y2="246" class="messageLine0" stroke-width="2" stroke="none" style="fill: none;" marker-end="url(#arrow-filled)"/>
-      <line x1="475" y1="290" x2="75" y2="290" class="messageLine1" stroke="none" style="stroke-dasharray: 3, 3; fill: none;" marker-end="url(#arrow-filled)" stroke-width="2"/>
-      <line x1="75" y1="334" x2="275" y2="334" class="messageLine0" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none"/>
-      <line x1="275" y1="378" x2="75" y2="378" class="messageLine1" stroke="none" style="stroke-dasharray: 3, 3; fill: none;" marker-end="url(#arrow-filled)" stroke-width="2"/>
+      <line x1="75" y1="109" x2="275" y2="109" class="messageLine0" stroke-width="2" marker-end="url(#arrow-filled)" style="fill: none;" stroke="none"/>
+      <line x1="275" y1="153" x2="75" y2="153" class="messageLine1" stroke="none" style="stroke-dasharray: 3, 3; fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
+      <line x1="75" y1="246" x2="475" y2="246" class="messageLine0" marker-end="url(#arrow-filled)" stroke="none" stroke-width="2" style="fill: none;"/>
+      <line x1="475" y1="290" x2="75" y2="290" class="messageLine1" style="stroke-dasharray: 3, 3; fill: none;" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none"/>
+      <line x1="75" y1="334" x2="275" y2="334" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
+      <line x1="275" y1="378" x2="75" y2="378" class="messageLine1" style="stroke-dasharray: 3, 3; fill: none;" stroke="none" stroke-width="2" marker-end="url(#arrow-filled)"/>
     </g>
     <g class="edgeLabels">
       <text x="175" y="99" class="message-label" text-anchor="middle" font-size="16">Hello Bob!</text>
       <text x="175" y="143" class="message-label" text-anchor="middle" font-size="16">Hi Alice!</text>
-      <text x="275" y="236" class="message-label" font-size="16" text-anchor="middle">Login request</text>
-      <text x="275" y="280" class="message-label" font-size="16" text-anchor="middle">Token</text>
-      <text x="175" y="324" class="message-label" font-size="16" text-anchor="middle">How are you?</text>
+      <text x="275" y="236" class="message-label" text-anchor="middle" font-size="16">Login request</text>
+      <text x="275" y="280" class="message-label" text-anchor="middle" font-size="16">Token</text>
+      <text x="175" y="324" class="message-label" text-anchor="middle" font-size="16">How are you?</text>
       <text x="175" y="368" class="message-label" font-size="16" text-anchor="middle">I&apos;m good, thanks!</text>
     </g>
     <g class="nodes">
@@ -237,34 +237,34 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
     </g>
     <g class="actor">
       <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="75" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Alice</text>
+      <text x="75" y="32.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Alice</text>
     </g>
     <g class="actor">
-      <rect x="200" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="275" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Bob</text>
+      <rect x="200" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="275" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Bob</text>
     </g>
     <g class="actor">
-      <rect x="400" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
+      <rect x="400" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
       <text x="475" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Server</text>
     </g>
     <g class="note">
       <rect x="50" y="163" width="250" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
-      <text x="175" y="168" class="noteText" alignment-baseline="middle" dy="1em" font-size="16" text-anchor="middle" dominant-baseline="middle">Authentication</text>
+      <text x="175" y="168" class="noteText" font-size="16" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em">Authentication</text>
     </g>
     <g class="note">
       <rect x="300" y="388" width="150" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="375" y="393" class="noteText" dominant-baseline="middle" dy="1em" alignment-baseline="middle" font-size="16" text-anchor="middle">Bob thinks</text>
+      <text x="375" y="393" class="noteText" dominant-baseline="middle" font-size="16" dy="1em" alignment-baseline="middle" text-anchor="middle">Bob thinks</text>
     </g>
     <g class="actor">
-      <rect x="0" y="447" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
-      <text x="75" y="479.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Alice</text>
+      <rect x="0" y="447" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="75" y="479.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Alice</text>
     </g>
     <g class="actor">
-      <rect x="200" y="447" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="275" y="479.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Bob</text>
+      <rect x="200" y="447" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="275" y="479.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Bob</text>
     </g>
     <g class="actor">
-      <rect x="400" y="447" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <rect x="400" y="447" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
       <text x="475" y="479.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Server</text>
     </g>
   </g>

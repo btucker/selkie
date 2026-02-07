@@ -252,21 +252,32 @@ marker path {
     <g class="nodes">
 
     </g>
-    <text x="392" y="25" class="titleText" text-anchor="middle">Product Launch Timeline</text>
-    <g class="grid" font-family="sans-serif" transform="translate(75, 530)" font-size="10" text-anchor="middle" fill="none">
+    <g class="grid" font-size="10" font-family="sans-serif" transform="translate(75, 530)" text-anchor="middle" fill="none">
       <path d="M0.5,-495V0.5H635V-495" class="domain" stroke="currentColor"/>
-      <line x1="0.5" y1="0" x2="0.5" y2="-495" stroke="currentColor"/>
-      <text x="0.5" y="3" font-size="10" dy="1em" style="text-anchor: middle;" stroke="none" fill="#000">2024-01-01</text>
-      <line x1="123.33749999999999" y1="0" x2="123.33749999999999" y2="-495" stroke="currentColor"/>
-      <text x="123.33749999999999" y="3" dy="1em" fill="#000" stroke="none" font-size="10" style="text-anchor: middle;">2024-02-01</text>
-      <line x1="238.25" y1="0" x2="238.25" y2="-495" stroke="currentColor"/>
-      <text x="238.25" y="3" dy="1em" style="text-anchor: middle;" font-size="10" fill="#000" stroke="none">2024-03-01</text>
-      <line x1="361.0875" y1="0" x2="361.0875" y2="-495" stroke="currentColor"/>
-      <text x="361.0875" y="3" fill="#000" dy="1em" stroke="none" font-size="10" style="text-anchor: middle;">2024-04-01</text>
-      <line x1="479.9625" y1="0" x2="479.9625" y2="-495" stroke="currentColor"/>
-      <text x="479.9625" y="3" fill="#000" stroke="none" font-size="10" dy="1em" style="text-anchor: middle;">2024-05-01</text>
-      <line x1="602.8" y1="0" x2="602.8" y2="-495" stroke="currentColor"/>
-      <text x="602.8" y="3" stroke="none" fill="#000" font-size="10" style="text-anchor: middle;" dy="1em">2024-06-01</text>
+      <g class="tick" opacity="1" transform="translate(0.5,0)">
+        <line x1="0" y1="0" x2="0" y2="-495" stroke="currentColor"/>
+        <text x="0" y="3" stroke="none" fill="#000" style="text-anchor: middle;" dy="1em" font-size="10">2024-01-01</text>
+      </g>
+      <g class="tick" transform="translate(123.33749999999999,0)" opacity="1">
+        <line x1="0" y1="0" x2="0" y2="-495" stroke="currentColor"/>
+        <text x="0" y="3" fill="#000" font-size="10" dy="1em" stroke="none" style="text-anchor: middle;">2024-02-01</text>
+      </g>
+      <g class="tick" transform="translate(238.25,0)" opacity="1">
+        <line x1="0" y1="0" x2="0" y2="-495" stroke="currentColor"/>
+        <text x="0" y="3" font-size="10" stroke="none" dy="1em" fill="#000" style="text-anchor: middle;">2024-03-01</text>
+      </g>
+      <g class="tick" opacity="1" transform="translate(361.0875,0)">
+        <line x1="0" y1="0" x2="0" y2="-495" stroke="currentColor"/>
+        <text x="0" y="3" font-size="10" style="text-anchor: middle;" fill="#000" stroke="none" dy="1em">2024-04-01</text>
+      </g>
+      <g class="tick" transform="translate(479.9625,0)" opacity="1">
+        <line x1="0" y1="0" x2="0" y2="-495" stroke="currentColor"/>
+        <text x="0" y="3" style="text-anchor: middle;" dy="1em" font-size="10" fill="#000" stroke="none">2024-05-01</text>
+      </g>
+      <g class="tick" opacity="1" transform="translate(602.8,0)">
+        <line x1="0" y1="0" x2="0" y2="-495" stroke="currentColor"/>
+        <text x="0" y="3" font-size="10" fill="#000" dy="1em" stroke="none" style="text-anchor: middle;">2024-06-01</text>
+      </g>
     </g>
     <rect x="0" y="48" width="746.5" height="24" class="section section0"/>
     <rect x="0" y="72" width="746.5" height="24" class="section section0"/>
@@ -288,51 +299,52 @@ marker path {
     <rect x="0" y="456" width="746.5" height="24" class="section section0"/>
     <rect x="0" y="480" width="746.5" height="24" class="section section0"/>
     <rect x="0" y="504" width="746.5" height="24" class="section section1"/>
-    <rect x="75" y="50" width="55.475" height="20" rx="3" ry="3" class="task done0" id="research1" transform-origin="102.7375px 60px"/>
-    <text x="135.475" y="63.5" class="taskTextOutsideRight taskTextOutside0 doneText0" id="research1-text" font-size="11">Market Analysis</text>
+    <rect x="75" y="50" width="55.475" height="20" rx="3" ry="3" class="task done0" transform-origin="102.7375px 60px" id="research1"/>
     <rect x="102.7375" y="74" width="83.21249999999999" height="20" rx="3" ry="3" class="task done0" transform-origin="144.34375px 84px" id="research2"/>
-    <text x="144.34375" y="87.5" class="taskText taskText0 doneText0" font-size="11" id="research2-text">User Interviews</text>
     <rect x="130.475" y="98" width="39.625" height="20" rx="3" ry="3" class="task done0" transform-origin="150.2875px 108px" id="research3"/>
-    <text x="175.1" y="111.5" class="taskTextOutsideRight taskTextOutside0 doneText0" id="research3-text" font-size="11">Competitor Review</text>
-    <rect x="185.95" y="122" width="55.475" height="20" rx="3" ry="3" class="task done1" id="design1" transform-origin="213.6875px 132px"/>
-    <text x="213.6875" y="135.5" class="taskText taskText1 doneText1" font-size="11" id="design1-text">Wireframes</text>
-    <rect x="241.42499999999998" y="146" width="83.21249999999999" height="20" rx="3" ry="3" class="task done1" transform-origin="283.03125px 156px" id="design2"/>
-    <text x="283.03125" y="159.5" class="taskText taskText1 doneText1" id="design2-text" font-size="11">Visual Design</text>
-    <rect x="324.6375" y="170" width="55.475" height="20" rx="3" ry="3" class="task active1" transform-origin="352.375px 180px" id="design3"/>
-    <text x="352.375" y="183.5" class="taskText taskText1 activeText1" font-size="11" id="design3-text">Prototype</text>
-    <rect x="380.1125" y="194" width="39.625" height="20" rx="3" ry="3" class="task task1" transform-origin="399.925px 204px" id="design4"/>
-    <text x="424.7375" y="207.5" class="taskTextOutsideRight taskTextOutside1" font-size="11" id="design4-text">User Testing</text>
-    <rect x="241.42499999999998" y="218" width="166.42499999999998" height="20" rx="3" ry="3" class="task task2" transform-origin="324.6375px 228px" id="dev1"/>
-    <text x="324.6375" y="231.5" class="taskText taskText2" id="dev1-text" font-size="11">Backend API</text>
+    <rect x="185.95" y="122" width="55.475" height="20" rx="3" ry="3" class="task done1" transform-origin="213.6875px 132px" id="design1"/>
+    <rect x="241.42499999999998" y="146" width="83.21249999999999" height="20" rx="3" ry="3" class="task done1" id="design2" transform-origin="283.03125px 156px"/>
+    <rect x="324.6375" y="170" width="55.475" height="20" rx="3" ry="3" class="task active1" id="design3" transform-origin="352.375px 180px"/>
+    <rect x="380.1125" y="194" width="39.625" height="20" rx="3" ry="3" class="task task1" id="design4" transform-origin="399.925px 204px"/>
+    <rect x="241.42499999999998" y="218" width="166.42499999999998" height="20" rx="3" ry="3" class="task task2" id="dev1" transform-origin="324.6375px 228px"/>
     <rect x="324.6375" y="242" width="138.6875" height="20" rx="3" ry="3" class="task task2" id="dev2" transform-origin="393.98125px 252px"/>
-    <text x="393.98125" y="255.5" class="taskText taskText2" font-size="11" id="dev2-text">Frontend MVP</text>
-    <rect x="407.84999999999997" y="266" width="55.475" height="20" rx="3" ry="3" class="task task2" transform-origin="435.5875px 276px" id="dev3"/>
-    <text x="468.325" y="279.5" class="taskTextOutsideRight taskTextOutside2" font-size="11" id="dev3-text">Integration</text>
+    <rect x="407.84999999999997" y="266" width="55.475" height="20" rx="3" ry="3" class="task task2" id="dev3" transform-origin="435.5875px 276px"/>
     <rect x="463.325" y="290" width="27.7375" height="20" rx="3" ry="3" class="task task2" transform-origin="477.19374999999997px 300px" id="dev4"/>
-    <text x="496.0625" y="303.5" class="taskTextOutsideRight taskTextOutside2" id="dev4-text" font-size="11">Performance Tuning</text>
-    <rect x="463.325" y="314" width="55.475" height="20" rx="3" ry="3" class="task task3" id="test1" transform-origin="491.0625px 324px"/>
-    <text x="491.0625" y="327.5" class="taskText taskText3" id="test1-text" font-size="11">Unit Tests</text>
+    <rect x="463.325" y="314" width="55.475" height="20" rx="3" ry="3" class="task task3" transform-origin="491.0625px 324px" id="test1"/>
     <rect x="463.325" y="338" width="39.625" height="20" rx="3" ry="3" class="task task3" transform-origin="483.1375px 348px" id="test2"/>
-    <text x="507.95" y="351.5" class="taskTextOutsideRight taskTextOutside3" font-size="11" id="test2-text">Integration Tests</text>
-    <rect x="502.95" y="362" width="55.475" height="20" rx="3" ry="3" class="task task3" transform-origin="530.6875px 372px" id="test3"/>
-    <text x="530.6875" y="375.5" class="taskText taskText3" id="test3-text" font-size="11">UAT</text>
+    <rect x="502.95" y="362" width="55.475" height="20" rx="3" ry="3" class="task task3" id="test3" transform-origin="530.6875px 372px"/>
     <rect x="558.425" y="386" width="27.7375" height="20" rx="3" ry="3" class="task doneCrit3" id="test4" transform-origin="572.2937499999999px 396px"/>
-    <text x="591.1624999999999" y="399.5" class="taskTextOutsideRight taskTextOutside3 doneCritText3" id="test4-text" font-size="11">Bug Fixes</text>
-    <rect x="550.40625" y="410" width="20" height="20" rx="3" ry="3" class="task task0 milestone " id="launch1" transform-origin="560.40625px 420px"/>
+    <rect x="550.40625" y="410" width="20" height="20" rx="3" ry="3" class="task task0 milestone " transform-origin="560.40625px 420px" id="launch1"/>
+    <rect x="419.7375" y="434" width="83.21249999999999" height="20" rx="3" ry="3" class="task task0" id="launch2" transform-origin="461.34375px 444px"/>
+    <rect x="586.1624999999999" y="458" width="3.9625" height="20" rx="3" ry="3" class="task crit0" transform-origin="588.14375px 468px" id="launch3"/>
+    <rect x="590.125" y="482" width="118.875" height="20" rx="3" ry="3" class="task task0" transform-origin="649.5625px 492px" id="launch4"/>
+    <rect x="435.5875" y="35" width="1.6" height="520" rx="3" ry="3" class="task task1 vert " transform-origin="436.3875px 295px" id="q2start"/>
+    <text x="135.475" y="63.5" class="taskTextOutsideRight taskTextOutside0 doneText0" id="research1-text" font-size="11">Market Analysis</text>
+    <text x="144.34375" y="87.5" class="taskText taskText0 doneText0" font-size="11" id="research2-text">User Interviews</text>
+    <text x="175.1" y="111.5" class="taskTextOutsideRight taskTextOutside0 doneText0" font-size="11" id="research3-text">Competitor Review</text>
+    <text x="213.6875" y="135.5" class="taskText taskText1 doneText1" font-size="11" id="design1-text">Wireframes</text>
+    <text x="283.03125" y="159.5" class="taskText taskText1 doneText1" id="design2-text" font-size="11">Visual Design</text>
+    <text x="352.375" y="183.5" class="taskText taskText1 activeText1" id="design3-text" font-size="11">Prototype</text>
+    <text x="424.7375" y="207.5" class="taskTextOutsideRight taskTextOutside1" font-size="11" id="design4-text">User Testing</text>
+    <text x="324.6375" y="231.5" class="taskText taskText2" id="dev1-text" font-size="11">Backend API</text>
+    <text x="393.98125" y="255.5" class="taskText taskText2" id="dev2-text" font-size="11">Frontend MVP</text>
+    <text x="468.325" y="279.5" class="taskTextOutsideRight taskTextOutside2" id="dev3-text" font-size="11">Integration</text>
+    <text x="496.0625" y="303.5" class="taskTextOutsideRight taskTextOutside2" font-size="11" id="dev4-text">Performance Tuning</text>
+    <text x="491.0625" y="327.5" class="taskText taskText3" id="test1-text" font-size="11">Unit Tests</text>
+    <text x="507.95" y="351.5" class="taskTextOutsideRight taskTextOutside3" id="test2-text" font-size="11">Integration Tests</text>
+    <text x="530.6875" y="375.5" class="taskText taskText3" id="test3-text" font-size="11">UAT</text>
+    <text x="591.1624999999999" y="399.5" class="taskTextOutsideRight taskTextOutside3 doneCritText3" font-size="11" id="test4-text">Bug Fixes</text>
     <text x="575.40625" y="423.5" class="taskTextOutsideRight taskTextOutside0 milestoneText" font-size="11" id="launch1-text">Beta Release</text>
-    <rect x="419.7375" y="434" width="83.21249999999999" height="20" rx="3" ry="3" class="task task0" transform-origin="461.34375px 444px" id="launch2"/>
     <text x="461.34375" y="447.5" class="taskText taskText0" font-size="11" id="launch2-text">Marketing Prep</text>
-    <rect x="586.1624999999999" y="458" width="3.9625" height="20" rx="3" ry="3" class="task crit0" id="launch3" transform-origin="588.14375px 468px"/>
     <text x="595.1249999999999" y="471.5" class="taskTextOutsideRight taskTextOutside0 critText0" id="launch3-text" font-size="11">Public Launch</text>
-    <rect x="590.125" y="482" width="118.875" height="20" rx="3" ry="3" class="task task0" id="launch4" transform-origin="649.5625px 492px"/>
-    <text x="649.5625" y="495.5" class="taskText taskText0" font-size="11" id="launch4-text">Post-Launch Support</text>
-    <rect x="435.5875" y="35" width="1.6" height="520" rx="3" ry="3" class="task task1 vert " id="q2start" transform-origin="436.3875px 295px"/>
-    <text x="436.3875" y="575" class="taskText taskText1 vertText" id="q2start-text" font-size="11">Q2 Start</text>
+    <text x="649.5625" y="495.5" class="taskText taskText0" id="launch4-text" font-size="11">Post-Launch Support</text>
+    <text x="436.3875" y="575" class="taskText taskText1 vertText" font-size="11" id="q2start-text">Q2 Start</text>
     <text x="10" y="86" class="sectionTitle sectionTitle0" font-size="11">Research</text>
     <text x="10" y="170" class="sectionTitle sectionTitle1" font-size="11">Design</text>
     <text x="10" y="266" class="sectionTitle sectionTitle2" font-size="11">Development</text>
     <text x="10" y="362" class="sectionTitle sectionTitle3" font-size="11">Testing</text>
     <text x="10" y="458" class="sectionTitle sectionTitle0" font-size="11">Launch</text>
     <text x="10" y="518" class="sectionTitle sectionTitle1" font-size="11">Markers</text>
+    <text x="392" y="25" class="titleText" text-anchor="middle">Product Launch Timeline</text>
   </g>
 </svg>

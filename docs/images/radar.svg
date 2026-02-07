@@ -196,28 +196,28 @@ marker path {
 
     </g>
     <g transform="translate(350, 350)">
-      <polygon points="0.00000000000000367394039744206,-60 57.06339097770921,-18.541019662496844 35.26711513754839,48.54101966249685 -35.26711513754838,48.54101966249685 -57.06339097770922,-18.541019662496836" class="radarGraticule" stroke="#DEDEDE" stroke-width="1" fill="#DEDEDE" fill-opacity="0.3"/>
-      <polygon points="0.00000000000000734788079488412,-120 114.12678195541842,-37.08203932499369 70.53423027509677,97.0820393249937 -70.53423027509676,97.0820393249937 -114.12678195541844,-37.08203932499367" class="radarGraticule" fill="#DEDEDE" stroke-width="1" fill-opacity="0.3" stroke="#DEDEDE"/>
-      <polygon points="0.000000000000011021821192326179,-180 171.19017293312763,-55.62305898749053 105.80134541264516,145.62305898749054 -105.80134541264515,145.62305898749054 -171.19017293312766,-55.62305898749051" class="radarGraticule" stroke-width="1" fill="#DEDEDE" fill-opacity="0.3" stroke="#DEDEDE"/>
-      <polygon points="0.00000000000001469576158976824,-240 228.25356391083685,-74.16407864998737 141.06846055019355,194.1640786499874 -141.06846055019352,194.1640786499874 -228.25356391083687,-74.16407864998735" class="radarGraticule" fill="#DEDEDE" stroke-width="1" stroke="#DEDEDE" fill-opacity="0.3"/>
-      <polygon points="0.000000000000018369701987210297,-300 285.31695488854604,-92.70509831248422 176.33557568774194,242.70509831248424 -176.3355756877419,242.70509831248424 -285.3169548885461,-92.70509831248418" class="radarGraticule" fill-opacity="0.3" fill="#DEDEDE" stroke="#DEDEDE" stroke-width="1"/>
-      <line x1="0" y1="0" x2="0.000000000000018369701987210297" y2="-300" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
+      <polygon points="0.00000000000000367394039744206,-60 57.06339097770921,-18.541019662496844 35.26711513754839,48.54101966249685 -35.26711513754838,48.54101966249685 -57.06339097770922,-18.541019662496836" class="radarGraticule" stroke="#DEDEDE" fill-opacity="0.3" fill="#DEDEDE" stroke-width="1"/>
+      <polygon points="0.00000000000000734788079488412,-120 114.12678195541842,-37.08203932499369 70.53423027509677,97.0820393249937 -70.53423027509676,97.0820393249937 -114.12678195541844,-37.08203932499367" class="radarGraticule" fill-opacity="0.3" stroke-width="1" fill="#DEDEDE" stroke="#DEDEDE"/>
+      <polygon points="0.000000000000011021821192326179,-180 171.19017293312763,-55.62305898749053 105.80134541264516,145.62305898749054 -105.80134541264515,145.62305898749054 -171.19017293312766,-55.62305898749051" class="radarGraticule" fill-opacity="0.3" stroke-width="1" fill="#DEDEDE" stroke="#DEDEDE"/>
+      <polygon points="0.00000000000001469576158976824,-240 228.25356391083685,-74.16407864998737 141.06846055019355,194.1640786499874 -141.06846055019352,194.1640786499874 -228.25356391083687,-74.16407864998735" class="radarGraticule" fill-opacity="0.3" fill="#DEDEDE" stroke-width="1" stroke="#DEDEDE"/>
+      <polygon points="0.000000000000018369701987210297,-300 285.31695488854604,-92.70509831248422 176.33557568774194,242.70509831248424 -176.3355756877419,242.70509831248424 -285.3169548885461,-92.70509831248418" class="radarGraticule" fill="#DEDEDE" stroke="#DEDEDE" stroke-width="1" fill-opacity="0.3"/>
+      <line x1="0" y1="0" x2="0.000000000000018369701987210297" y2="-300" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
       <line x1="0" y1="0" x2="285.31695488854604" y2="-92.70509831248422" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
-      <line x1="0" y1="0" x2="176.33557568774194" y2="242.70509831248424" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
-      <line x1="0" y1="0" x2="-176.3355756877419" y2="242.70509831248424" class="radarAxisLine" stroke-width="1" stroke="#333333"/>
+      <line x1="0" y1="0" x2="176.33557568774194" y2="242.70509831248424" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
+      <line x1="0" y1="0" x2="-176.3355756877419" y2="242.70509831248424" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
       <line x1="0" y1="0" x2="-285.3169548885461" y2="-92.70509831248418" class="radarAxisLine" stroke="#333333" stroke-width="1"/>
       <polygon points="0.00000000000001469576158976824,-240 171.19017293312763,-55.62305898749053 105.80134541264516,145.62305898749054 -141.06846055019352,194.1640786499874 -114.12678195541844,-37.08203932499367" class="radarCurve-0" fill="#8686FF" stroke="#8686FF"/>
-      <polygon points="0.000000000000011021821192326179,-180 228.25356391083685,-74.16407864998737 141.06846055019355,194.1640786499874 -105.80134541264515,145.62305898749054 -285.3169548885461,-92.70509831248418" class="radarCurve-1" stroke="#FFFF78" fill="#FFFF78"/>
+      <polygon points="0.000000000000011021821192326179,-180 228.25356391083685,-74.16407864998737 141.06846055019355,194.1640786499874 -105.80134541264515,145.62305898749054 -285.3169548885461,-92.70509831248418" class="radarCurve-1" fill="#FFFF78" stroke="#FFFF78"/>
       <rect x="262.5" y="-262.5" width="12" height="12" class="radarLegendBox-0" fill="#8686FF"/>
       <rect x="262.5" y="-242.5" width="12" height="12" class="radarLegendBox-1" fill="#FFFF78"/>
-      <text x="0.000000000000019288187086570814" y="-315" class="radarAxisLabel" dominant-baseline="middle" text-anchor="middle" fill="#333333" font-size="12">Coding</text>
-      <text x="299.58280263297337" y="-97.34035322810843" class="radarAxisLabel" text-anchor="middle" font-size="12" fill="#333333" dominant-baseline="middle">Testing</text>
-      <text x="185.15235447212905" y="254.84035322810846" class="radarAxisLabel" dominant-baseline="middle" fill="#333333" text-anchor="middle" font-size="12">Design</text>
-      <text x="-185.152354472129" y="254.84035322810846" class="radarAxisLabel" font-size="12" fill="#333333" text-anchor="middle" dominant-baseline="middle">Code Review</text>
-      <text x="-299.5828026329734" y="-97.3403532281084" class="radarAxisLabel" fill="#333333" dominant-baseline="middle" font-size="12" text-anchor="middle">Documentation</text>
-      <text x="278.5" y="-262.5" class="radarLegendText" dominant-baseline="hanging" font-size="12">Team Alpha</text>
-      <text x="278.5" y="-242.5" class="radarLegendText" dominant-baseline="hanging" font-size="12">Team Beta</text>
-      <text x="0" y="-350" class="radarTitle" dominant-baseline="hanging" font-size="16" text-anchor="middle" font-weight="bold" fill="#333333">Skills Assessment</text>
+      <text x="0.000000000000019288187086570814" y="-315" class="radarAxisLabel" fill="#333333" font-size="12" text-anchor="middle" dominant-baseline="middle">Coding</text>
+      <text x="299.58280263297337" y="-97.34035322810843" class="radarAxisLabel" fill="#333333" dominant-baseline="middle" text-anchor="middle" font-size="12">Testing</text>
+      <text x="185.15235447212905" y="254.84035322810846" class="radarAxisLabel" font-size="12" fill="#333333" dominant-baseline="middle" text-anchor="middle">Design</text>
+      <text x="-185.152354472129" y="254.84035322810846" class="radarAxisLabel" dominant-baseline="middle" text-anchor="middle" fill="#333333" font-size="12">Code Review</text>
+      <text x="-299.5828026329734" y="-97.3403532281084" class="radarAxisLabel" text-anchor="middle" font-size="12" dominant-baseline="middle" fill="#333333">Documentation</text>
+      <text x="278.5" y="-262.5" class="radarLegendText" font-size="12" dominant-baseline="hanging">Team Alpha</text>
+      <text x="278.5" y="-242.5" class="radarLegendText" font-size="12" dominant-baseline="hanging">Team Beta</text>
+      <text x="0" y="-350" class="radarTitle" font-weight="bold" fill="#333333" text-anchor="middle" font-size="16" dominant-baseline="hanging">Skills Assessment</text>
     </g>
   </g>
 </svg>

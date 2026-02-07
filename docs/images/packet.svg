@@ -117,16 +117,16 @@ marker path {
 
     </g>
     <rect x="1" y="15" width="251" height="32" class="packetBlock"/>
-    <text x="126.5" y="31" class="packetLabel" text-anchor="middle" dominant-baseline="middle">Header</text>
+    <rect x="257" y="15" width="251" height="32" class="packetBlock"/>
+    <rect x="513" y="15" width="507" height="32" class="packetBlock"/>
+    <text x="126.5" y="31" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Header</text>
     <text x="1" y="13" class="packetByte start" dominant-baseline="auto" text-anchor="start">0</text>
     <text x="252" y="13" class="packetByte end" dominant-baseline="auto" text-anchor="end">7</text>
-    <rect x="257" y="15" width="251" height="32" class="packetBlock"/>
     <text x="382.5" y="31" class="packetLabel" text-anchor="middle" dominant-baseline="middle">Length</text>
     <text x="257" y="13" class="packetByte start" text-anchor="start" dominant-baseline="auto">8</text>
-    <text x="508" y="13" class="packetByte end" dominant-baseline="auto" text-anchor="end">15</text>
-    <rect x="513" y="15" width="507" height="32" class="packetBlock"/>
+    <text x="508" y="13" class="packetByte end" text-anchor="end" dominant-baseline="auto">15</text>
     <text x="766.5" y="31" class="packetLabel" dominant-baseline="middle" text-anchor="middle">Data</text>
-    <text x="513" y="13" class="packetByte start" dominant-baseline="auto" text-anchor="start">16</text>
+    <text x="513" y="13" class="packetByte start" text-anchor="start" dominant-baseline="auto">16</text>
     <text x="1020" y="13" class="packetByte end" text-anchor="end" dominant-baseline="auto">31</text>
     <text x="513" y="70.5" class="packetTitle" dominant-baseline="middle" text-anchor="middle">Simple Packet</text>
   </g>

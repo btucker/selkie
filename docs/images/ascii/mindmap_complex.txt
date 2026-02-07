@@ -1,4 +1,4 @@
-((mindmap))
+o mindmap o
 ├── Origins
 │   ├── Long history
 │   └── Popularisation
@@ -13,5 +13,5 @@
 └── Tools
     ├── Pen and paper
     └── Mermaid
-        ├── )I am a cloud(
-        └── ))I am a bang((
+        ├── ☁ I am a cloud ☁
+        └── ⚡ I am a bang ⚡

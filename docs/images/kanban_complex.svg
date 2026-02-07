@@ -138,11 +138,11 @@
       <g class="sections">
         <g class="cluster section-1" id="id1">
           <rect x="0" y="0" width="200" height="152" rx="5" ry="5" class="section section-1 " style=""/>
-          <text x="100" y="22" class="section-label" text-anchor="middle" dominant-baseline="middle">Todo</text>
+          <text x="100" y="22" class="section-label" dominant-baseline="middle" text-anchor="middle">Todo</text>
         </g>
         <g class="cluster section-2" id="id7">
           <rect x="205" y="0" width="200" height="224" rx="5" ry="5" class="section section-2 " style=""/>
-          <text x="305" y="22" class="section-label" text-anchor="middle" dominant-baseline="middle">In progress</text>
+          <text x="305" y="22" class="section-label" dominant-baseline="middle" text-anchor="middle">In progress</text>
         </g>
         <g class="cluster section-3" id="id9">
           <rect x="410" y="0" width="200" height="50" rx="5" ry="5" class="section section-3 " style=""/>
@@ -154,7 +154,7 @@
         </g>
         <g class="cluster section-5" id="id11">
           <rect x="820" y="0" width="200" height="273" rx="5" ry="5" class="section section-5 " style=""/>
-          <text x="920" y="22" class="section-label" text-anchor="middle" dominant-baseline="middle">Done</text>
+          <text x="920" y="22" class="section-label" dominant-baseline="middle" text-anchor="middle">Done</text>
         </g>
         <g class="cluster section-6" id="id12">
           <rect x="1025" y="0" width="200" height="103" rx="5" ry="5" class="section section-6 " style=""/>
@@ -176,19 +176,19 @@
         </g>
         <g class="node kanban-item-group" transform="translate(212.5, 146)">
           <rect x="0" y="0" width="185" height="68" rx="5" ry="5" class="kanban-item " style=""/>
-          <text x="92.5" y="22" class="kanban-label" text-anchor="middle" dominant-baseline="middle">Design grammar</text>
+          <text x="92.5" y="22" class="kanban-label" dominant-baseline="middle" text-anchor="middle">Design grammar</text>
           <text x="175" y="46" class="kanban-assigned" text-anchor="end" font-size="12px">knsv</text>
         </g>
         <g class="node kanban-item-group" transform="translate(622.5, 25)">
           <rect x="0" y="0" width="185" height="68" rx="5" ry="5" class="kanban-item " style=""/>
           <line x1="2" y1="2.5" x2="2" y2="65.5" class="priority-indicator" stroke-width="4" stroke="orange"/>
           <text x="92.5" y="22" class="kanban-label" text-anchor="middle" dominant-baseline="middle">Create parsing tests</text>
-          <text x="10" y="46" class="kanban-ticket" text-anchor="start" font-size="12px">MC-2038</text>
+          <text x="10" y="46" class="kanban-ticket" font-size="12px" text-anchor="start">MC-2038</text>
           <text x="175" y="46" class="kanban-assigned" text-anchor="end" font-size="12px">K.Sveidqvist</text>
         </g>
         <g class="node kanban-item-group" transform="translate(827.5, 25)">
           <rect x="0" y="0" width="185" height="44" rx="5" ry="5" class="kanban-item " style=""/>
-          <text x="92.5" y="22" class="kanban-label" text-anchor="middle" dominant-baseline="middle">define getData</text>
+          <text x="92.5" y="22" class="kanban-label" dominant-baseline="middle" text-anchor="middle">define getData</text>
         </g>
         <g class="node kanban-item-group" transform="translate(827.5, 74)">
           <rect x="0" y="0" width="185" height="116" rx="5" ry="5" class="kanban-item " style=""/>

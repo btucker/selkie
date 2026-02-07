@@ -1,4 +1,4 @@
-((mindmap))
+o mindmap o
 ├── Origins
 │   └── Long history
 ├── Research
