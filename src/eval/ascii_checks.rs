@@ -530,14 +530,27 @@ fn check_ascii_edges(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut V
     }
 
     // Check that edge labels appear in full (not truncated)
+    // Use clean_label() to normalize HTML tags (e.g. <br/>) before comparison,
+    // consistent with how node labels are checked.
+    let node_label_set: std::collections::HashSet<String> = graph
+        .nodes
+        .iter()
+        .filter_map(|n| n.label.as_deref().or(Some(&n.id)))
+        .map(|l| clean_label(l))
+        .collect();
     for edge in &graph.edges {
-        if let Some(ref label) = edge.label {
-            let label = label.trim();
+        if let Some(ref raw_label) = edge.label {
+            let label = clean_label(raw_label);
             if label.is_empty() {
                 continue;
             }
-            if !ascii.edge_labels.contains(&label.to_string()) && !ascii.raw_output.contains(label)
-            {
+            // Skip very short labels (<=2 chars) in the raw_output fallback
+            // since they easily match as substrings of node labels
+            let in_edge_labels = ascii.edge_labels.contains(&label);
+            let in_raw_output = label.len() > 2
+                && !node_label_set.iter().any(|n| n.contains(&label))
+                && ascii.raw_output.contains(label.as_str());
+            if !in_edge_labels && !in_raw_output {
                 issues.push(Issue::warning(
                     "ascii_missing_edge_label",
                     format!(
@@ -1993,10 +2006,7 @@ mod tests {
         let ascii = parse_ascii(&output);
         let issues = check_ascii_structure(&ascii, &graph);
         assert!(
-            issues
-                .iter()
-                .any(|i| i.check == "ascii_edge_label_truncated"
-                    || i.check == "ascii_missing_edge_label"),
+            issues.iter().any(|i| i.check == "ascii_missing_edge_label"),
             "Should detect truncated edge label 'Invalid' (only 'Inv' present), got: {:?}",
             issues
         );
@@ -2040,14 +2050,106 @@ mod tests {
         let issues = check_ascii_structure(&ascii, &graph);
         let label_issues: Vec<_> = issues
             .iter()
-            .filter(|i| {
-                i.check == "ascii_edge_label_truncated" || i.check == "ascii_missing_edge_label"
-            })
+            .filter(|i| i.check == "ascii_missing_edge_label")
             .collect();
         assert!(
             label_issues.is_empty(),
             "Should have no edge label issues when label appears in full, got: {:?}",
             label_issues
+        );
+    }
+
+    #[test]
+    fn check_edge_label_with_br_tag_no_false_positive() {
+        use crate::layout::{LayoutEdge, LayoutNode};
+
+        let mut node_a = LayoutNode::new("A", 80.0, 32.0);
+        node_a.label = Some("Start".to_string());
+        node_a.x = Some(50.0);
+        node_a.y = Some(10.0);
+
+        let mut node_b = LayoutNode::new("B", 80.0, 32.0);
+        node_b.label = Some("End".to_string());
+        node_b.x = Some(50.0);
+        node_b.y = Some(100.0);
+
+        // Edge label contains a <br/> tag
+        let mut edge = LayoutEdge::new("e1", "A", "B");
+        edge.label = Some("line1<br/>line2".to_string());
+
+        let mut graph = LayoutGraph::new("test");
+        graph.nodes.push(node_a);
+        graph.nodes.push(node_b);
+        graph.edges.push(edge);
+
+        // ASCII output contains the label rendered as "line1 line2" (br replaced with space)
+        let output = [
+            "┌───────────┐",
+            "│   Start   │",
+            "└───────────┘",
+            " line1 line2 ",
+            "      ▼      ",
+            "┌───────────┐",
+            "│    End    │",
+            "└───────────┘",
+        ]
+        .join("\n");
+        let ascii = parse_ascii(&output);
+        let issues = check_ascii_structure(&ascii, &graph);
+        let label_issues: Vec<_> = issues
+            .iter()
+            .filter(|i| i.check == "ascii_missing_edge_label")
+            .collect();
+        assert!(
+            label_issues.is_empty(),
+            "Should not flag edge label with <br/> when rendered form is present, got: {:?}",
+            label_issues
+        );
+    }
+
+    #[test]
+    fn check_short_edge_label_not_masked_by_node_substring() {
+        use crate::layout::{LayoutEdge, LayoutNode};
+
+        let mut node_a = LayoutNode::new("A", 80.0, 32.0);
+        node_a.label = Some("Server".to_string());
+        node_a.x = Some(50.0);
+        node_a.y = Some(10.0);
+
+        let mut node_b = LayoutNode::new("B", 80.0, 32.0);
+        node_b.label = Some("Node".to_string());
+        node_b.x = Some(50.0);
+        node_b.y = Some(100.0);
+
+        // Short edge label "e" — substring of "Server"
+        let mut edge = LayoutEdge::new("e1", "A", "B");
+        edge.label = Some("e".to_string());
+
+        let mut graph = LayoutGraph::new("test");
+        graph.nodes.push(node_a);
+        graph.nodes.push(node_b);
+        graph.edges.push(edge);
+
+        // ASCII output does NOT contain "e" as a standalone edge label,
+        // but "Server" contains "e" as a substring
+        let output = [
+            "┌────────┐",
+            "│ Server │",
+            "└────────┘",
+            "    ▼     ",
+            "┌────────┐",
+            "│  Node  │",
+            "└────────┘",
+        ]
+        .join("\n");
+        let ascii = parse_ascii(&output);
+        let issues = check_ascii_structure(&ascii, &graph);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "ascii_missing_edge_label"),
+            "Should detect missing short edge label 'e' even though 'Server' contains 'e', got: {:?}",
+            issues
         );
     }
 
