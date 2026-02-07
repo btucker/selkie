@@ -2174,12 +2174,15 @@ mod tests {
         let (db, graph) = parse_and_layout(&input);
         let output = render_flowchart_ascii(&db, &graph).unwrap();
 
-        // The "Invalid" label on the Auth -> Reject edge must render in full,
-        // not be truncated to "Inv" by the nearby Authentication diamond.
-        assert!(
-            output.contains("Invalid"),
-            "Flowchart edge label 'Invalid' should not be truncated near diamond shape\nOutput:\n{}",
-            output
-        );
+        // Edge labels near the Authentication diamond must render in full,
+        // not be truncated by the diamond's occupied cells.
+        for label in &["Invalid", "Valid", "Cache Hit", "Cache Miss"] {
+            assert!(
+                output.contains(label),
+                "Flowchart edge label '{}' should not be truncated\nOutput:\n{}",
+                label,
+                output
+            );
+        }
     }
 }

@@ -45,38 +45,3 @@ fn flowchart_edge_label_not_truncated_near_diamond() {
         output
     );
 }
-
-/// Regression test: edge labels on the full flowchart_complex.mmd diagram.
-/// Ensures "Invalid", "Valid", "Cache Hit", and "Cache Miss" labels are intact.
-#[test]
-fn flowchart_complex_edge_labels_not_truncated() {
-    use selkie::layout::{CharacterSizeEstimator, ToLayoutGraph};
-    use selkie::render::ascii::render_flowchart_ascii;
-
-    let input = std::fs::read_to_string("docs/sources/flowchart_complex.mmd").unwrap();
-
-    let diagram = selkie::parse(&input).unwrap();
-    let db = match diagram {
-        selkie::diagrams::Diagram::Flowchart(db) => db,
-        _ => panic!("Expected flowchart"),
-    };
-    let estimator = CharacterSizeEstimator::default();
-    let graph = db.to_layout_graph(&estimator).unwrap();
-    let graph = selkie::layout::layout(graph).unwrap();
-
-    let output = render_flowchart_ascii(&db, &graph).unwrap();
-    println!(
-        "\n=== FLOWCHART COMPLEX OUTPUT ===\n{}\n=== END ===",
-        output
-    );
-
-    let labels = ["Invalid", "Valid", "Cache Hit", "Cache Miss"];
-    for label in &labels {
-        assert!(
-            output.contains(label),
-            "Edge label '{}' should not be truncated.\nOutput:\n{}",
-            label,
-            output
-        );
-    }
-}
