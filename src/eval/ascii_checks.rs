@@ -500,7 +500,8 @@ fn check_ascii_labels(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut 
     }
 }
 
-/// Check that edges are rendered (arrows and/or braille dots present).
+/// Check that edges are rendered (arrows and/or braille dots present)
+/// and that edge labels appear in full (not truncated).
 fn check_ascii_edges(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut Vec<Issue>) {
     let expected_edges = graph.edges.len();
 
@@ -526,6 +527,26 @@ fn check_ascii_edges(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut V
             )
             .with_values(expected_edges.to_string(), ascii.arrow_count.to_string()),
         );
+    }
+
+    // Check that edge labels appear in full (not truncated)
+    for edge in &graph.edges {
+        if let Some(ref label) = edge.label {
+            let label = label.trim();
+            if label.is_empty() {
+                continue;
+            }
+            if !ascii.edge_labels.contains(&label.to_string()) && !ascii.raw_output.contains(label)
+            {
+                issues.push(Issue::warning(
+                    "ascii_missing_edge_label",
+                    format!(
+                        "ASCII output missing edge label: '{}' (may be truncated or obscured by overlap)",
+                        label
+                    ),
+                ));
+            }
+        }
     }
 }
 
@@ -1931,6 +1952,102 @@ mod tests {
             output.contains("Yes"),
             "ASCII output should contain edge label 'Yes'\nOutput:\n{}",
             output
+        );
+    }
+
+    #[test]
+    fn check_detects_truncated_edge_label() {
+        use crate::layout::{LayoutEdge, LayoutNode};
+
+        // Build a graph with an edge labeled "Invalid"
+        let mut node_a = LayoutNode::new("A", 80.0, 32.0);
+        node_a.label = Some("Start".to_string());
+        node_a.x = Some(50.0);
+        node_a.y = Some(10.0);
+
+        let mut node_b = LayoutNode::new("B", 80.0, 32.0);
+        node_b.label = Some("End".to_string());
+        node_b.x = Some(50.0);
+        node_b.y = Some(100.0);
+
+        let mut edge = LayoutEdge::new("e1", "A", "B");
+        edge.label = Some("Invalid".to_string());
+
+        let mut graph = LayoutGraph::new("test");
+        graph.nodes.push(node_a);
+        graph.nodes.push(node_b);
+        graph.edges.push(edge);
+
+        // ASCII output where the edge label is truncated to "Inv"
+        let output = [
+            "┌───────┐",
+            "│ Start │",
+            "└───────┘",
+            "   Inv   ",
+            "    ▼    ",
+            "┌───────┐",
+            "│  End  │",
+            "└───────┘",
+        ]
+        .join("\n");
+        let ascii = parse_ascii(&output);
+        let issues = check_ascii_structure(&ascii, &graph);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "ascii_edge_label_truncated"
+                    || i.check == "ascii_missing_edge_label"),
+            "Should detect truncated edge label 'Invalid' (only 'Inv' present), got: {:?}",
+            issues
+        );
+    }
+
+    #[test]
+    fn check_passes_with_full_edge_label() {
+        use crate::layout::{LayoutEdge, LayoutNode};
+
+        let mut node_a = LayoutNode::new("A", 80.0, 32.0);
+        node_a.label = Some("Start".to_string());
+        node_a.x = Some(50.0);
+        node_a.y = Some(10.0);
+
+        let mut node_b = LayoutNode::new("B", 80.0, 32.0);
+        node_b.label = Some("End".to_string());
+        node_b.x = Some(50.0);
+        node_b.y = Some(100.0);
+
+        let mut edge = LayoutEdge::new("e1", "A", "B");
+        edge.label = Some("Invalid".to_string());
+
+        let mut graph = LayoutGraph::new("test");
+        graph.nodes.push(node_a);
+        graph.nodes.push(node_b);
+        graph.edges.push(edge);
+
+        // ASCII output where the edge label appears in full
+        let output = [
+            "┌───────┐",
+            "│ Start │",
+            "└───────┘",
+            "  Invalid ",
+            "    ▼    ",
+            "┌───────┐",
+            "│  End  │",
+            "└───────┘",
+        ]
+        .join("\n");
+        let ascii = parse_ascii(&output);
+        let issues = check_ascii_structure(&ascii, &graph);
+        let label_issues: Vec<_> = issues
+            .iter()
+            .filter(|i| {
+                i.check == "ascii_edge_label_truncated" || i.check == "ascii_missing_edge_label"
+            })
+            .collect();
+        assert!(
+            label_issues.is_empty(),
+            "Should have no edge label issues when label appears in full, got: {:?}",
+            label_issues
         );
     }
 
