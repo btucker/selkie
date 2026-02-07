@@ -108,28 +108,28 @@ marker path {
         <path d="M 80.00 77.80 C 88.33 77.80, 96.67 77.80, 105.00 77.80 C 113.33 77.80, 121.67 77.80, 130.00 77.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 238.28 56.48 L 339.60 26.40" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 238.28 56.48 L 339.60 26.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-B-D-0">
         <path d="M 238.28 99.12 L 339.60 129.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-C-E-0">
-        <path d="M 448.40 26.40 L 500.35 51.40" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 448.40 26.40 L 500.35 51.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-D-E-0">
-        <path d="M 448.40 129.20 L 500.35 104.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 448.40 129.20 L 500.35 104.20" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-E-F-0">
-        <path d="M 559.20 77.80 C 567.53 77.80, 575.87 77.80, 584.20 77.80 C 592.53 77.80, 600.87 77.80, 609.20 77.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 559.20 77.80 C 567.53 77.80, 575.87 77.80, 584.20 77.80 C 592.53 77.80, 600.87 77.80, 609.20 77.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-F-G-0">
-        <path d="M 742.00 77.80 C 750.33 77.80, 758.67 77.80, 767.00 77.80 C 775.33 77.80, 783.67 77.80, 792.00 77.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 742.00 77.80 C 750.33 77.80, 758.67 77.80, 767.00 77.80 C 775.33 77.80, 783.67 77.80, 792.00 77.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-G-H-0">
-        <path d="M 940.00 77.80 C 948.33 77.80, 956.67 77.80, 965.00 77.80 C 973.33 77.80, 981.67 77.80, 990.00 77.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 940.00 77.80 C 948.33 77.80, 956.67 77.80, 965.00 77.80 C 973.33 77.80, 981.67 77.80, 990.00 77.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-H-I-0">
-        <path d="M 1098.80 77.80 C 1107.13 77.80, 1115.47 77.80, 1123.80 77.80 C 1132.13 77.80, 1140.47 77.80, 1148.80 77.80" class="edge-path" stroke-width="1" marker-start="url(#arrow_circle_start)" fill="none" marker-end="url(#arrow_circle)"/>
+        <path d="M 1098.80 77.80 C 1107.13 77.80, 1115.47 77.80, 1123.80 77.80 C 1132.13 77.80, 1140.47 77.80, 1148.80 77.80" class="edge-path" marker-end="url(#arrow_circle)" fill="none" marker-start="url(#arrow_circle_start)" stroke-width="1"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -145,7 +145,7 @@ marker path {
     <g class="nodes">
       <g class="node" id="node-A">
         <rect x="0" y="51.40000000000001" width="80" height="52.8"/>
-        <text x="40" y="77.80000000000001" class="label" text-anchor="middle" dominant-baseline="central">Start</text>
+        <text x="40" y="77.80000000000001" class="label" dominant-baseline="central" text-anchor="middle">Start</text>
       </g>
       <g class="node" id="node-B">
         <polygon points="194.8,13.000000000000014 259.6,77.80000000000001 194.8,142.60000000000002 130,77.80000000000001"/>
@@ -153,23 +153,23 @@ marker path {
       </g>
       <g class="node" id="node-C">
         <rect x="339.6" y="0.000000000000007105427357601002" width="108.8" height="52.8"/>
-        <text x="394" y="26.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">Action 1</text>
+        <text x="394" y="26.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Action 1</text>
       </g>
       <g class="node" id="node-D">
         <rect x="339.6" y="102.80000000000001" width="108.8" height="52.8"/>
-        <text x="394" y="129.20000000000002" class="label" text-anchor="middle" dominant-baseline="central">Action 2</text>
+        <text x="394" y="129.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">Action 2</text>
       </g>
       <g class="node" id="node-E">
         <rect x="498.4000000000001" y="51.40000000000001" width="60.8" height="52.8"/>
-        <text x="528.8000000000001" y="77.80000000000001" class="label" text-anchor="middle" dominant-baseline="central">End</text>
+        <text x="528.8000000000001" y="77.80000000000001" class="label" dominant-baseline="central" text-anchor="middle">End</text>
       </g>
       <g class="node" id="node-F">
         <path d="M 635.6 51.40000000000001 H 715.6 A 26.4 26.4 0 0 1 715.6 104.20000000000002 H 635.6 A 26.4 26.4 0 0 1 635.6 51.40000000000001 Z"/>
-        <text x="675.6" y="77.80000000000001" class="label" dominant-baseline="central" text-anchor="middle">Round</text>
+        <text x="675.6" y="77.80000000000001" class="label" text-anchor="middle" dominant-baseline="central">Round</text>
       </g>
       <g class="node" id="node-G">
         <polygon points="802,51.40000000000001 930,51.40000000000001 930,104.20000000000002 802,104.20000000000002 802,51.40000000000001 792,51.40000000000001 940,51.40000000000001 940,104.20000000000002 792,104.20000000000002 792,51.40000000000001"/>
-        <text x="866" y="77.80000000000001" class="label" dominant-baseline="central" text-anchor="middle">Subroutine</text>
+        <text x="866" y="77.80000000000001" class="label" text-anchor="middle" dominant-baseline="central">Subroutine</text>
       </g>
       <g class="node" id="node-H">
         <path d="M 990.0000000000001 53.77600000000001 a 54.4 10.296 0 0 0 108.8 0 a 54.4 10.296 0 0 0 -108.8 0 l 0 48.048 a 54.4 10.296 0 0 0 108.8 0 l 0 -48.048"/>
@@ -177,7 +177,7 @@ marker path {
       </g>
       <g class="node" id="node-I">
         <circle cx="1181.6" cy="77.80000000000001" r="32.8"/>
-        <text x="1181.6" y="77.80000000000001" class="label" dominant-baseline="central" text-anchor="middle">Circle</text>
+        <text x="1181.6" y="77.80000000000001" class="label" text-anchor="middle" dominant-baseline="central">Circle</text>
       </g>
     </g>
   </g>
