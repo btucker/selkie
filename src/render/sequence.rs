@@ -1,6 +1,6 @@
 //! Sequence diagram renderer
 
-use crate::diagrams::sequence::{LineType, ParticipantType, SequenceDb};
+use crate::diagrams::sequence::{LineType, ParticipantType, Placement, SequenceDb};
 use crate::error::Result;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 use std::collections::HashMap;
@@ -15,8 +15,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let margin_top = 0.0; // Actors start at y=0 (mermaid style - viewBox offset handles padding)
     let actor_box_padding = 0.0; // No padding - full width box
 
-    let layout = build_actor_layout(db, &cfg);
-    let messages = db.get_messages();
+    let mut layout = build_actor_layout(db, &cfg);
 
     if layout.actors.is_empty() {
         // Empty diagram
@@ -103,39 +102,25 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         doc.add_element(top_actor);
     }
 
-    // Render messages and notes in timeline order
-    let mut events: Vec<(usize, TimelineEvent)> = Vec::new();
-    for message in messages {
-        events.push((message.order, TimelineEvent::Message(message)));
-    }
-    for note in db.get_notes() {
-        events.push((note.order, TimelineEvent::Note(note)));
-    }
-    events.sort_by_key(|(order, _)| *order);
+    let last_content_y = layout_basic_events(db, &mut layout, lifeline_start_y, &cfg);
 
     let mut current_y = lifeline_start_y + cfg.message_spacing;
-    let mut last_message_y: Option<f64> = None;
+    let mut last_content_bottom: Option<f64> = None;
     let mut activation_stacks: std::collections::HashMap<String, Vec<f64>> =
         std::collections::HashMap::new();
     let fragment_left = padding_x;
     let fragment_width = content_width;
     let mut fragment_stack: Vec<FragmentState> = Vec::new();
 
-    // Autonumber state
-    let autonumber_config = db.get_autonumber();
-    let mut sequence_index: i32 = autonumber_config.map_or(1, |c| c.start);
-    let sequence_step: i32 = autonumber_config.map_or(1, |c| c.step);
-    let autonumber_enabled = autonumber_config.is_some();
-
     // Collect activations to add after lifelines (for correct z-order)
     let mut pending_activations: Vec<SvgElement> = Vec::new();
 
-    for (_, event) in events {
+    for (_, event) in collect_timeline_events(db) {
         match event {
             TimelineEvent::Message(message) => match message.message_type {
                 LineType::ActiveStart => {
                     if let Some(actor) = message.message.split_whitespace().next() {
-                        let start_y = last_message_y.unwrap_or(current_y);
+                        let start_y = last_content_bottom.unwrap_or(current_y);
                         activation_stacks
                             .entry(actor.to_string())
                             .or_default()
@@ -147,7 +132,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                         if let Some(stack) = activation_stacks.get_mut(actor) {
                             if let Some(start_y) = stack.pop() {
                                 if let Some(&actor_x) = layout.actor_positions.get(actor) {
-                                    let end_y = last_message_y.unwrap_or(current_y);
+                                    let end_y = last_content_bottom.unwrap_or(current_y);
                                     // Collect activation to add after lifelines
                                     let activation = render_activation(actor_x, start_y, end_y);
                                     pending_activations.push(activation);
@@ -267,41 +252,6 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                     // Autonumber is handled at parse time, nothing to render
                 }
                 _ => {
-                    if let (Some(from), Some(to)) = (&message.from, &message.to) {
-                        if let (Some(&from_x), Some(&to_x)) = (
-                            layout.actor_positions.get(from),
-                            layout.actor_positions.get(to),
-                        ) {
-                            // Get sequence number if autonumber is enabled
-                            let seq_num = if autonumber_enabled {
-                                Some(sequence_index)
-                            } else {
-                                None
-                            };
-
-                            let msg_elements = render_message(
-                                from_x,
-                                to_x,
-                                current_y,
-                                &message.message,
-                                message.message_type,
-                                seq_num,
-                            );
-                            // Add shapes first (edge_paths), then labels (edge_labels)
-                            // This ensures proper z-order: shapes render before text
-                            for shape in msg_elements.shapes {
-                                doc.add_edge_path(shape);
-                            }
-                            for label in msg_elements.labels {
-                                doc.add_edge_label(label);
-                            }
-
-                            // Increment sequence number after each message
-                            if autonumber_enabled {
-                                sequence_index += sequence_step;
-                            }
-                        }
-                    }
                     if let (Some(from_idx), Some(to_idx)) = (
                         message
                             .from
@@ -318,25 +268,12 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             fragment.update_bounds(min_idx, max_idx);
                         }
                     }
-                    last_message_y = Some(current_y);
-                    current_y += cfg.message_spacing;
+                    let content_bottom = message_content_bottom(current_y, message, &cfg);
+                    last_content_bottom = Some(content_bottom);
+                    current_y = next_message_y(current_y, message, &cfg);
                 }
             },
             TimelineEvent::Note(note) => {
-                // Mermaid.js positions notes at previous_message_y + noteMargin
-                let note_y =
-                    last_message_y.unwrap_or(current_y - cfg.message_spacing) + cfg.note_margin;
-
-                if let Some(&actor_x) = layout.actor_positions.get(&note.actor) {
-                    let span_x = note
-                        .actor_to
-                        .as_ref()
-                        .and_then(|actor| layout.actor_positions.get(actor))
-                        .copied();
-                    let note_element =
-                        render_note(actor_x, span_x, note_y, &note.message, note.placement, &cfg);
-                    doc.add_element(note_element);
-                }
                 if let Some(actor_idx) = layout.actor_index.get(&note.actor).copied() {
                     let mut min_idx = actor_idx;
                     let mut max_idx = actor_idx;
@@ -352,11 +289,45 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                         fragment.update_bounds(min_idx, max_idx);
                     }
                 }
-                // Update current_y to be after the note bottom + message_spacing
-                // This matches mermaid.js behavior where next message is message_spacing below note
+                let previous_bottom =
+                    last_content_bottom.unwrap_or(current_y - cfg.message_spacing);
+                let note_y = previous_bottom + cfg.note_margin;
                 let note_bottom = note_y + note_height(&note.message, &cfg);
-                last_message_y = Some(note_bottom);
+                last_content_bottom = Some(note_bottom);
                 current_y = note_bottom + cfg.message_spacing;
+            }
+        }
+    }
+
+    for event in &layout.events {
+        match event {
+            LaidOutEvent::Message(msg) => {
+                let _ = msg.bounds;
+                let msg_elements = render_message(
+                    msg.from_x,
+                    msg.to_x,
+                    msg.y,
+                    &msg.message,
+                    msg.message_type,
+                    msg.sequence_num,
+                );
+                for shape in msg_elements.shapes {
+                    doc.add_edge_path(shape);
+                }
+                for label in msg_elements.labels {
+                    doc.add_edge_label(label);
+                }
+            }
+            LaidOutEvent::Note(note) => {
+                let _ = note.bounds;
+                doc.add_element(render_note(
+                    note.actor_x,
+                    note.span_x,
+                    note.y,
+                    &note.message,
+                    note.placement,
+                    &cfg,
+                ));
             }
         }
     }
@@ -364,7 +335,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     // Calculate final bottom actor position based on actual content
     // Mermaid uses boxMargin * 2 (~20px) between last content and bottom actors
     // We subtract extra message_spacing and add boxMargin to match
-    let bottom_actor_y = last_message_y.unwrap_or(current_y) + cfg.box_margin * 2.0;
+    let bottom_actor_y = last_content_y + cfg.box_margin * 2.0;
     let lifeline_end_y = bottom_actor_y;
 
     // Render lifelines and bottom actors now that we know the final height
@@ -419,6 +390,18 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
 enum TimelineEvent<'a> {
     Message(&'a crate::diagrams::sequence::Message),
     Note(&'a crate::diagrams::sequence::Note),
+}
+
+fn collect_timeline_events(db: &SequenceDb) -> Vec<(usize, TimelineEvent<'_>)> {
+    let mut events = Vec::new();
+    for message in db.get_messages() {
+        events.push((message.order, TimelineEvent::Message(message)));
+    }
+    for note in db.get_notes() {
+        events.push((note.order, TimelineEvent::Note(note)));
+    }
+    events.sort_by_key(|(order, _)| *order);
+    events
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -522,10 +505,32 @@ struct ActorLayout {
     center_x: f64,
 }
 
-// Placeholder layout records reserved for later sequence layout tasks.
-#[allow(dead_code)]
-#[derive(Debug)]
-struct LaidOutEvent;
+#[derive(Debug, Clone)]
+struct MessageLayout {
+    from_x: f64,
+    to_x: f64,
+    y: f64,
+    message: String,
+    message_type: LineType,
+    sequence_num: Option<i32>,
+    bounds: Bounds,
+}
+
+#[derive(Debug, Clone)]
+struct NoteLayout {
+    actor_x: f64,
+    span_x: Option<f64>,
+    y: f64,
+    message: String,
+    placement: Placement,
+    bounds: Bounds,
+}
+
+#[derive(Debug, Clone)]
+enum LaidOutEvent {
+    Message(MessageLayout),
+    Note(NoteLayout),
+}
 
 // Placeholder layout records reserved for later sequence layout tasks.
 #[allow(dead_code)]
@@ -629,6 +634,204 @@ impl FragmentState {
             self.max_actor_idx
                 .map_or(max_idx, |value| value.max(max_idx)),
         );
+    }
+}
+
+fn layout_basic_events(
+    db: &SequenceDb,
+    layout: &mut SequenceLayout,
+    lifeline_start_y: f64,
+    cfg: &SequenceLayoutConfig,
+) -> f64 {
+    let autonumber_config = db.get_autonumber();
+    let mut sequence_index: i32 = autonumber_config.map_or(1, |c| c.start);
+    let sequence_step: i32 = autonumber_config.map_or(1, |c| c.step);
+    let autonumber_enabled = autonumber_config.is_some();
+    let mut current_y = lifeline_start_y + cfg.message_spacing;
+    let mut last_content_bottom: Option<f64> = None;
+
+    for (_, event) in collect_timeline_events(db) {
+        match event {
+            TimelineEvent::Message(message) => match message.message_type {
+                LineType::LoopStart
+                | LineType::AltStart
+                | LineType::OptStart
+                | LineType::ParStart
+                | LineType::CriticalStart
+                | LineType::BreakStart
+                | LineType::RectStart
+                | LineType::AltElse
+                | LineType::ParAnd
+                | LineType::CriticalOption => {
+                    current_y += cfg.message_spacing;
+                }
+                LineType::LoopEnd
+                | LineType::AltEnd
+                | LineType::OptEnd
+                | LineType::ParEnd
+                | LineType::CriticalEnd
+                | LineType::BreakEnd
+                | LineType::RectEnd
+                | LineType::ActiveStart
+                | LineType::ActiveEnd
+                | LineType::Autonumber => {}
+                _ => {
+                    let (Some(from), Some(to)) = (&message.from, &message.to) else {
+                        continue;
+                    };
+                    let (Some(&from_x), Some(&to_x)) = (
+                        layout.actor_positions.get(from),
+                        layout.actor_positions.get(to),
+                    ) else {
+                        continue;
+                    };
+                    let sequence_num = if autonumber_enabled {
+                        Some(sequence_index)
+                    } else {
+                        None
+                    };
+                    let bounds = message_bounds(from_x, to_x, current_y, &message.message, cfg);
+                    layout.bounds.push(bounds);
+                    layout.events.push(LaidOutEvent::Message(MessageLayout {
+                        from_x,
+                        to_x,
+                        y: current_y,
+                        message: message.message.clone(),
+                        message_type: message.message_type,
+                        sequence_num,
+                        bounds,
+                    }));
+                    if autonumber_enabled {
+                        sequence_index += sequence_step;
+                    }
+
+                    last_content_bottom = Some(message_content_bottom(current_y, message, cfg));
+                    current_y = next_message_y(current_y, message, cfg);
+                }
+            },
+            TimelineEvent::Note(note) => {
+                let previous_bottom =
+                    last_content_bottom.unwrap_or(current_y - cfg.message_spacing);
+                let note_y = previous_bottom + cfg.note_margin;
+                if let Some(&actor_x) = layout.actor_positions.get(&note.actor) {
+                    let span_x = note
+                        .actor_to
+                        .as_ref()
+                        .and_then(|actor| layout.actor_positions.get(actor))
+                        .copied();
+                    let bounds =
+                        note_bounds(actor_x, span_x, note_y, &note.message, note.placement, cfg);
+                    layout.bounds.push(bounds);
+                    layout.events.push(LaidOutEvent::Note(NoteLayout {
+                        actor_x,
+                        span_x,
+                        y: note_y,
+                        message: note.message.clone(),
+                        placement: note.placement,
+                        bounds,
+                    }));
+                }
+                let note_bottom = note_y + note_height(&note.message, cfg);
+                last_content_bottom = Some(note_bottom);
+                current_y = note_bottom + cfg.message_spacing;
+            }
+        }
+    }
+
+    last_content_bottom.unwrap_or(current_y)
+}
+
+fn next_message_y(
+    y: f64,
+    message: &crate::diagrams::sequence::Message,
+    cfg: &SequenceLayoutConfig,
+) -> f64 {
+    if is_self_message(message) {
+        message_content_bottom(y, message, cfg) + cfg.message_spacing
+    } else {
+        y + cfg.message_spacing
+    }
+}
+
+fn message_content_bottom(
+    y: f64,
+    message: &crate::diagrams::sequence::Message,
+    cfg: &SequenceLayoutConfig,
+) -> f64 {
+    if is_self_message(message) {
+        message_bounds(0.0, 0.0, y, &message.message, cfg).bottom()
+    } else {
+        y
+    }
+}
+
+fn is_self_message(message: &crate::diagrams::sequence::Message) -> bool {
+    matches!(
+        (&message.from, &message.to),
+        (Some(from), Some(to)) if from == to
+    ) || matches!(
+        message.message_type,
+        LineType::SolidPoint | LineType::DottedPoint
+    )
+}
+
+fn message_bounds(
+    from_x: f64,
+    to_x: f64,
+    y: f64,
+    label: &str,
+    cfg: &SequenceLayoutConfig,
+) -> Bounds {
+    if (from_x - to_x).abs() < 1.0 {
+        let width = text_width(label, cfg).max(cfg.actor_width);
+        Bounds {
+            x: from_x - width / 2.0,
+            y: y - cfg.line_height,
+            width,
+            height: cfg.line_height + 40.0,
+        }
+    } else {
+        let left = from_x.min(to_x);
+        let width = (from_x - to_x).abs().max(text_width(label, cfg));
+        Bounds {
+            x: left,
+            y: y - cfg.line_height,
+            width,
+            height: cfg.line_height + 10.0,
+        }
+    }
+}
+
+fn note_bounds(
+    actor_x: f64,
+    span_x: Option<f64>,
+    y: f64,
+    message: &str,
+    placement: Placement,
+    cfg: &SequenceLayoutConfig,
+) -> Bounds {
+    let (note_width, x_center) = match placement {
+        Placement::Over => {
+            if let Some(span_x) = span_x {
+                let span = (span_x - actor_x).abs();
+                ((span + 50.0).max(MIN_NOTE_WIDTH), (actor_x + span_x) / 2.0)
+            } else {
+                (MIN_NOTE_WIDTH, actor_x)
+            }
+        }
+        Placement::RightOf => (RIGHT_OF_NOTE_WIDTH, actor_x),
+        Placement::LeftOf => (MIN_NOTE_WIDTH, actor_x),
+    };
+    let x = match placement {
+        Placement::LeftOf => actor_x - note_width - LEFT_OF_NOTE_X_OFFSET,
+        Placement::RightOf => actor_x + RIGHT_OF_NOTE_X_OFFSET,
+        Placement::Over => x_center - note_width / 2.0,
+    };
+    Bounds {
+        x,
+        y,
+        width: note_width,
+        height: note_height(message, cfg),
     }
 }
 
@@ -1311,12 +1514,11 @@ fn render_note(
 }
 
 fn note_height(message: &str, cfg: &SequenceLayoutConfig) -> f64 {
-    let text_padding = 10.0;
-    let line_count = count_text_lines(message);
-    (line_count as f64 * cfg.line_height + text_padding * 2.0).max(cfg.min_note_height)
+    let measured = visual_line_count(message) as f64 * cfg.line_height + cfg.note_margin * 2.0;
+    measured.max(cfg.min_note_height)
 }
 
-fn count_text_lines(message: &str) -> usize {
+fn visual_line_count(message: &str) -> usize {
     let normalized = super::text_utils::normalize_br_tags(message);
     normalized.lines().count().max(1)
 }
@@ -1685,7 +1887,11 @@ fn required_sequence_content_width(
 }
 
 fn text_width(text: &str, cfg: &SequenceLayoutConfig) -> f64 {
-    text.chars().count() as f64 * cfg.char_width
+    let normalized = super::text_utils::normalize_br_tags(text);
+    normalized
+        .lines()
+        .map(|line| line.chars().count() as f64 * cfg.char_width)
+        .fold(0.0, f64::max)
 }
 
 /// Calculate per-gap actor spacing based on message text widths.
