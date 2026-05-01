@@ -2,6 +2,9 @@
 
 use selkie::{parse, render};
 
+const TEST_CHAR_WIDTH: f64 = 8.0;
+const TEST_LINE_HEIGHT: f64 = 18.0;
+
 fn render_sequence(input: &str) -> String {
     let diagram = parse(input).expect("Failed to parse");
     render(&diagram).expect("Failed to render")
@@ -39,23 +42,69 @@ fn find_text_box(svg: &str, label: &str) -> TestBox {
     let doc = roxmltree::Document::parse(svg).expect("valid svg");
     let text = doc
         .descendants()
-        .find(|n| n.tag_name().name() == "text" && n.text().unwrap_or("").contains(label))
+        .find(|n| n.tag_name().name() == "text" && node_text(*n).contains(label))
         .unwrap_or_else(|| panic!("missing text {label}"));
-    let x = parse_num(text, "x");
+    let content = node_text(text);
+    let width = content.chars().count() as f64 * TEST_CHAR_WIDTH;
+    let mut x = parse_num(text, "x");
+    match text.attribute("text-anchor").unwrap_or("start") {
+        "middle" => x -= width / 2.0,
+        "end" => x -= width,
+        _ => {}
+    }
+
     let y = parse_num(text, "y");
     TestBox {
-        x: x - (label.len() as f64 * 4.0),
-        y: y - 18.0,
-        width: label.len() as f64 * 8.0,
-        height: 18.0,
+        x,
+        y: text_box_y(text, y),
+        width,
+        height: TEST_LINE_HEIGHT,
     }
+}
+
+fn node_text(node: roxmltree::Node<'_, '_>) -> String {
+    node.descendants()
+        .filter_map(|n| n.text())
+        .collect::<Vec<_>>()
+        .join("")
+}
+
+fn text_box_y(node: roxmltree::Node<'_, '_>, y: f64) -> f64 {
+    if node.attribute("class").unwrap_or("").contains("noteText") && has_middle_baseline(node) {
+        return y + parse_text_dy(node).unwrap_or(0.0) - (TEST_LINE_HEIGHT / 2.0);
+    }
+
+    y - TEST_LINE_HEIGHT
+}
+
+fn has_middle_baseline(node: roxmltree::Node<'_, '_>) -> bool {
+    matches!(
+        node.attribute("dominant-baseline"),
+        Some("middle" | "central")
+    ) || matches!(
+        node.attribute("alignment-baseline"),
+        Some("middle" | "central")
+    )
+}
+
+fn parse_text_dy(node: roxmltree::Node<'_, '_>) -> Option<f64> {
+    let dy = node.attribute("dy")?;
+    if let Some(em) = dy.strip_suffix("em") {
+        let font_size = node
+            .attribute("font-size")
+            .and_then(|value| value.parse::<f64>().ok())
+            .unwrap_or(16.0);
+        return Some(em.parse::<f64>().ok()? * font_size);
+    }
+
+    dy.parse::<f64>().ok()
 }
 
 fn find_note_box_containing(svg: &str, label: &str) -> TestBox {
     let doc = roxmltree::Document::parse(svg).expect("valid svg");
     let note_text = doc
         .descendants()
-        .find(|n| n.tag_name().name() == "text" && n.text().unwrap_or("").contains(label))
+        .find(|n| n.tag_name().name() == "text" && node_text(*n).contains(label))
         .unwrap_or_else(|| panic!("missing note text {label}"));
     let note_group = note_text.ancestors().find(|n| n.tag_name().name() == "g");
     if let Some(group) = note_group {
@@ -71,6 +120,64 @@ fn find_note_box_containing(svg: &str, label: &str) -> TestBox {
         }
     }
     panic!("missing note rect for {label}");
+}
+
+fn find_self_message_path_box(svg: &str) -> TestBox {
+    let doc = roxmltree::Document::parse(svg).expect("valid svg");
+    let path = doc
+        .descendants()
+        .find(|n| {
+            n.tag_name().name() == "path"
+                && n.attribute("class").unwrap_or("").contains("message-line")
+                && n.attribute("d")
+                    .map(|d| path_points(d).len() >= 3)
+                    .unwrap_or(false)
+        })
+        .unwrap_or_else(|| panic!("missing self-message path\n{svg}"));
+    box_from_points(&path_points(path.attribute("d").expect("path d")))
+}
+
+fn path_points(path: &str) -> Vec<(f64, f64)> {
+    let normalized: String = path
+        .chars()
+        .map(|ch| {
+            if ch.is_ascii_alphabetic() || ch == ',' {
+                ' '
+            } else {
+                ch
+            }
+        })
+        .collect();
+    let nums: Vec<f64> = normalized
+        .split_whitespace()
+        .filter_map(|part| part.parse::<f64>().ok())
+        .collect();
+
+    nums.chunks_exact(2)
+        .map(|chunk| (chunk[0], chunk[1]))
+        .collect()
+}
+
+fn box_from_points(points: &[(f64, f64)]) -> TestBox {
+    assert!(!points.is_empty(), "missing path points");
+    let mut min_x = f64::INFINITY;
+    let mut min_y = f64::INFINITY;
+    let mut max_x = f64::NEG_INFINITY;
+    let mut max_y = f64::NEG_INFINITY;
+
+    for (x, y) in points {
+        min_x = min_x.min(*x);
+        min_y = min_y.min(*y);
+        max_x = max_x.max(*x);
+        max_y = max_y.max(*y);
+    }
+
+    TestBox {
+        x: min_x,
+        y: min_y,
+        width: max_x - min_x,
+        height: max_y - min_y,
+    }
 }
 
 fn find_first_fragment_frame(svg: &str) -> TestBox {
@@ -286,6 +393,7 @@ fn sequence_issue_202_loop_self_message_and_note_do_not_overlap() {
     let note_text = find_text_box(&svg, "Rational thoughts prevail!");
     let loop_label = find_text_box(&svg, "Healthcheck");
     let loop_frame = find_first_fragment_frame(&svg);
+    let self_path = find_self_message_path_box(&svg);
 
     assert!(
         !self_label.overlaps(&note_box, 4.0),
@@ -302,5 +410,9 @@ fn sequence_issue_202_loop_self_message_and_note_do_not_overlap() {
     assert!(
         loop_frame.bottom() + 4.0 <= note_box.y || note_box.bottom() + 4.0 <= loop_frame.y,
         "note box should not overlap loop frame\n{svg}"
+    );
+    assert!(
+        !self_path.overlaps(&note_box, 4.0),
+        "self-message path should not overlap note box\n{svg}"
     );
 }
