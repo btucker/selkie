@@ -236,6 +236,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             frame_width,
                             current_y,
                             label,
+                            cfg.label_box_height,
                         );
                         // Add shapes to clusters (renders first) for proper z-order
                         for shape in label_elements.shapes {
@@ -281,6 +282,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             frame_width,
                             fragment.start_y,
                             &fragment.label,
+                            cfg.label_box_height,
                         );
                         // Add shapes to clusters (renders first) for proper z-order
                         for shape in label_elements.shapes {
@@ -363,8 +365,15 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                         .as_ref()
                         .and_then(|actor| actor_positions.get(actor))
                         .copied();
-                    let note_element =
-                        render_note(actor_x, span_x, note_y, &note.message, note.placement);
+                    let note_element = render_note(
+                        actor_x,
+                        span_x,
+                        note_y,
+                        &note.message,
+                        note.placement,
+                        cfg.min_note_height,
+                        cfg.line_height,
+                    );
                     doc.add_element(note_element);
                 }
                 if let Some(actor_idx) = actor_index.get(&note.actor).copied() {
@@ -454,7 +463,6 @@ enum TimelineEvent<'a> {
     Note(&'a crate::diagrams::sequence::Note),
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
 struct SequenceLayoutConfig {
     base_actor_spacing: f64,
@@ -488,12 +496,14 @@ impl Default for SequenceLayoutConfig {
             box_margin: 10.0,
             note_margin: 10.0,
             min_note_height: 39.0,
-            line_height: 18.0,
+            line_height: 19.0,
             label_box_height: 20.0,
         }
     }
 }
 
+// Bounds is layout scaffolding for follow-up tasks; keep the dead-code allowance
+// narrow until later layout work wires it into rendering.
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
 struct Bounds {
@@ -1022,10 +1032,10 @@ fn render_fragment_label(
     width: f64,
     y: f64,
     text: &str,
+    label_height: f64,
 ) -> FragmentLabelElements {
     let mut shapes = Vec::new();
     let mut labels = Vec::new();
-    let label_height = 20.0;
     let label_y = y;
 
     let (prefix, condition) = match kind {
@@ -1207,14 +1217,12 @@ fn render_note(
     y: f64,
     message: &str,
     placement: crate::diagrams::sequence::Placement,
+    min_note_height: f64,
+    line_height: f64,
 ) -> SvgElement {
     use crate::diagrams::sequence::Placement;
 
-    let font_size = 16.0_f64; // Match mermaid.js default
-    let line_height = (font_size * 1.2_f64).round();
     let text_padding = 10.0;
-    // Mermaid.js uses 39px height for notes (observed in reference)
-    let min_note_height = 39.0;
     let min_note_width = 100.0;
 
     let line_count = count_text_lines(message);
