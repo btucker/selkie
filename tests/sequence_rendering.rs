@@ -127,14 +127,29 @@ fn find_self_message_path_box(svg: &str) -> TestBox {
     let path = doc
         .descendants()
         .find(|n| {
-            n.tag_name().name() == "path"
-                && n.attribute("class").unwrap_or("").contains("message-line")
-                && n.attribute("d")
-                    .map(|d| path_points(d).len() >= 3)
-                    .unwrap_or(false)
+            if n.tag_name().name() != "path" || n.attribute("marker-end").is_none() {
+                return false;
+            }
+
+            let class = n.attribute("class").unwrap_or("");
+            let is_message_path = class.contains("message-line")
+                || class.contains("messageLine0")
+                || class.contains("messageLine1");
+            let is_self_loop_shape = n
+                .attribute("d")
+                .map(|d| path_points(d).len() >= 3)
+                .unwrap_or(false);
+
+            is_message_path && is_self_loop_shape
         })
         .unwrap_or_else(|| panic!("missing self-message path\n{svg}"));
-    box_from_points(&path_points(path.attribute("d").expect("path d")))
+    let points = path_points(path.attribute("d").expect("path d"));
+    assert!(
+        points.len() >= 3,
+        "unsupported self-message path geometry: {:?}",
+        path.attribute("d")
+    );
+    box_from_points(&points)
 }
 
 fn path_points(path: &str) -> Vec<(f64, f64)> {
