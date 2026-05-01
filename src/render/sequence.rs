@@ -355,7 +355,6 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
             },
             TimelineEvent::Note(note) => {
                 // Mermaid.js positions notes at previous_message_y + noteMargin
-                let note_height = cfg.min_note_height;
                 let note_y =
                     last_message_y.unwrap_or(current_y - cfg.message_spacing) + cfg.note_margin;
 
@@ -365,15 +364,8 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                         .as_ref()
                         .and_then(|actor| actor_positions.get(actor))
                         .copied();
-                    let note_element = render_note(
-                        actor_x,
-                        span_x,
-                        note_y,
-                        &note.message,
-                        note.placement,
-                        cfg.min_note_height,
-                        cfg.line_height,
-                    );
+                    let note_element =
+                        render_note(actor_x, span_x, note_y, &note.message, note.placement, &cfg);
                     doc.add_element(note_element);
                 }
                 if let Some(actor_idx) = actor_index.get(&note.actor).copied() {
@@ -393,7 +385,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 }
                 // Update current_y to be after the note bottom + message_spacing
                 // This matches mermaid.js behavior where next message is message_spacing below note
-                let note_bottom = note_y + note_height;
+                let note_bottom = note_y + note_height(&note.message, &cfg);
                 last_message_y = Some(note_bottom);
                 current_y = note_bottom + cfg.message_spacing;
             }
@@ -1217,16 +1209,13 @@ fn render_note(
     y: f64,
     message: &str,
     placement: crate::diagrams::sequence::Placement,
-    min_note_height: f64,
-    line_height: f64,
+    cfg: &SequenceLayoutConfig,
 ) -> SvgElement {
     use crate::diagrams::sequence::Placement;
 
-    let text_padding = 10.0;
     let min_note_width = 100.0;
 
-    let line_count = count_text_lines(message);
-    let note_height = (line_count as f64 * line_height + text_padding * 2.0).max(min_note_height);
+    let note_height = note_height(message, cfg);
 
     let (note_width, x_center) = match placement {
         Placement::Over => {
@@ -1276,7 +1265,7 @@ fn render_note(
     let normalized = super::text_utils::normalize_br_tags(message);
     for (idx, line) in normalized.lines().enumerate() {
         // Mermaid.js positions text at top with dy="1em" offset
-        let text_y = top_y + 5.0 + (idx as f64 * line_height);
+        let text_y = top_y + 5.0 + (idx as f64 * cfg.line_height);
         children.push(SvgElement::Text {
             x: x + note_width / 2.0,
             y: text_y,
@@ -1295,6 +1284,12 @@ fn render_note(
         children,
         attrs: Attrs::new().with_class("note"),
     }
+}
+
+fn note_height(message: &str, cfg: &SequenceLayoutConfig) -> f64 {
+    let text_padding = 10.0;
+    let line_count = count_text_lines(message);
+    (line_count as f64 * cfg.line_height + text_padding * 2.0).max(cfg.min_note_height)
 }
 
 fn count_text_lines(message: &str) -> usize {
