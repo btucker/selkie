@@ -332,10 +332,39 @@ fn text_sequence_box(node: &roxmltree::Node, kind: &'static str) -> Option<Seque
         kind,
         text.clone(),
         x,
-        y - SEQUENCE_LINE_HEIGHT,
+        text_box_y(node, kind, y),
         width,
         SEQUENCE_LINE_HEIGHT,
     ))
+}
+
+fn text_box_y(node: &roxmltree::Node, kind: &'static str, y: f64) -> f64 {
+    if kind == "noteText" && has_middle_baseline(node) {
+        let dy = parse_text_dy(node).unwrap_or(0.0);
+        return y + dy - (SEQUENCE_LINE_HEIGHT / 2.0);
+    }
+
+    y - SEQUENCE_LINE_HEIGHT
+}
+
+fn has_middle_baseline(node: &roxmltree::Node) -> bool {
+    matches!(
+        node.attribute("dominant-baseline"),
+        Some("middle" | "central")
+    ) || matches!(
+        node.attribute("alignment-baseline"),
+        Some("middle" | "central")
+    )
+}
+
+fn parse_text_dy(node: &roxmltree::Node) -> Option<f64> {
+    let dy = node.attribute("dy")?;
+    if let Some(em) = dy.strip_suffix("em") {
+        let font_size = parse_attr(node, "font-size").unwrap_or(16.0);
+        return Some(em.parse::<f64>().ok()? * font_size);
+    }
+
+    dy.parse::<f64>().ok()
 }
 
 fn line_coords(node: &roxmltree::Node) -> Option<(f64, f64, f64, f64)> {
@@ -3318,6 +3347,43 @@ mod tests {
         assert!(
             !issues.iter().any(|i| i.check == "sequence_overlap"),
             "unexpected sequence_overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_allows_real_rendered_note_text_inside_note() {
+        let diagram = crate::parse(
+            r#"sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>Bob: Ping
+    Note right of Bob: Rendered note text
+"#,
+        )
+        .expect("parse sequence");
+        let svg = crate::render(&diagram).expect("render sequence");
+        assert!(
+            svg.contains("class=\"noteText\"")
+                && svg.contains("dy=\"1em\"")
+                && svg.contains("dominant-baseline=\"middle\"")
+                && svg.contains("alignment-baseline=\"middle\""),
+            "expected real sequence renderer noteText attributes"
+        );
+        let svg_with_fragment = svg.replace(
+            "</svg>",
+            r#"<line class="loopLine" x1="300" y1="95" x2="450" y2="95"/>
+<line class="loopLine" x1="450" y1="95" x2="450" y2="180"/>
+<line class="loopLine" x1="300" y1="180" x2="450" y2="180"/>
+<line class="loopLine" x1="300" y1="95" x2="300" y2="180"/></svg>"#,
+        );
+        let structure = SvgStructure::from_svg(&svg_with_fragment).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            !issues.iter().any(|i| i.check == "sequence_overlap"),
+            "unexpected sequence_overlap issue for real rendered note text, got {issues:?}"
         );
     }
 
