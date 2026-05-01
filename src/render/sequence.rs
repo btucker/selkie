@@ -566,7 +566,7 @@ fn layout_basic_events(
                         },
                         sections: Vec::new(),
                     });
-                    current_y += cfg.box_margin + cfg.label_box_height + cfg.box_margin;
+                    current_y += fragment_header_reserve(cfg);
                 }
                 LineType::AltElse | LineType::ParAnd | LineType::CriticalOption => {
                     if let Some(fragment) = open_fragments.last_mut() {
@@ -579,10 +579,10 @@ fn layout_basic_events(
                             x: 0.0,
                             y: current_y,
                             width: layout.content_width,
-                            height: cfg.label_box_height + cfg.box_margin,
+                            height: fragment_header_reserve(cfg),
                         });
                     }
-                    current_y += cfg.box_margin + cfg.label_box_height;
+                    current_y += fragment_header_reserve(cfg);
                 }
                 LineType::LoopEnd
                 | LineType::AltEnd
@@ -801,6 +801,10 @@ fn fragment_frame_bounds(
     };
 
     frame
+}
+
+fn fragment_header_reserve(cfg: &SequenceLayoutConfig) -> f64 {
+    cfg.label_box_height + cfg.line_height + cfg.box_margin + cfg.box_margin / 2.0
 }
 
 fn fragment_actor_fallback_bounds(

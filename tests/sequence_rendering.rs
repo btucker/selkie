@@ -550,6 +550,50 @@ fn sequence_empty_alt_section_stays_inside_fragment_frame() {
 }
 
 #[test]
+fn sequence_fragment_headers_do_not_overlap_first_message_labels() {
+    let input = r#"sequenceDiagram
+    loop Daily query
+        Alice->>Bob: Hello Bob, how are you?
+        alt is sick
+            Bob->>Alice: Not so good :(
+        else is well
+            Bob->>Alice: Feeling fresh like a daisy
+        end
+
+        opt Extra response
+            Bob->>Alice: Thanks for asking
+        end
+    end"#;
+
+    let svg = render_sequence(input);
+    let daily = find_text_box(&svg, "Daily query");
+    let hello = find_text_box(&svg, "Hello Bob, how are you?");
+    let sick = find_text_box(&svg, "is sick");
+    let not_good = find_text_box(&svg, "Not so good :(");
+    let well = find_text_box(&svg, "is well");
+    let fresh = find_text_box(&svg, "Feeling fresh like a daisy");
+    let extra = find_text_box(&svg, "Extra response");
+    let thanks = find_text_box(&svg, "Thanks for asking");
+
+    assert!(
+        daily.bottom() + 4.0 <= hello.y,
+        "loop header should not overlap first message label\n{svg}"
+    );
+    assert!(
+        sick.bottom() + 4.0 <= not_good.y,
+        "alt header should not overlap first branch message label\n{svg}"
+    );
+    assert!(
+        well.bottom() + 4.0 <= fresh.y,
+        "else header should not overlap first branch message label\n{svg}"
+    );
+    assert!(
+        extra.bottom() + 4.0 <= thanks.y,
+        "opt header should not overlap first message label\n{svg}"
+    );
+}
+
+#[test]
 fn sequence_activation_renders() {
     let input = r#"sequenceDiagram
     Alice->>+Bob: Request
