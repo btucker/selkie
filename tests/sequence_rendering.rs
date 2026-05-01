@@ -68,6 +68,7 @@ fn find_text_box(svg: &str, label: &str) -> TestBox {
 
 fn node_text(node: roxmltree::Node<'_, '_>) -> String {
     node.descendants()
+        .filter(|n| n.is_text())
         .filter_map(|n| n.text())
         .collect::<Vec<_>>()
         .join("")
@@ -508,6 +509,32 @@ fn sequence_self_message_uses_path() {
     assert!(
         svg.contains("<path"),
         "Self messages should use path elements"
+    );
+}
+
+#[test]
+fn sequence_self_message_label_extends_actor_gap_without_overlap() {
+    let input = r#"sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>Alice: This self message label needs the full right side reserved
+    Bob-->>Alice: Reply"#;
+
+    let svg = render_sequence(input);
+    let self_label = find_text_box(
+        &svg,
+        "This self message label needs the full right side reserved",
+    );
+    let bob = find_actor_box_containing(&svg, "Bob");
+    let bob_lifeline_x = find_lifeline_x_for_actor(&svg, "Bob");
+
+    assert!(
+        !self_label.overlaps(&bob, 4.0),
+        "self-message label should not overlap following actor box\n{svg}"
+    );
+    assert!(
+        self_label.right() + 4.0 <= bob_lifeline_x,
+        "self-message label should not overlap following actor lifeline\n{svg}"
     );
 }
 

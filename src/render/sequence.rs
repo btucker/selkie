@@ -463,6 +463,7 @@ impl Default for SequenceLayoutConfig {
 const MIN_NOTE_WIDTH: f64 = 100.0;
 const RIGHT_OF_NOTE_WIDTH: f64 = 150.0;
 const SELF_MESSAGE_LOOP_WIDTH: f64 = 40.0;
+const SELF_MESSAGE_LABEL_OFFSET: f64 = 5.0;
 
 // Bounds is layout scaffolding for follow-up tasks; keep the dead-code allowance
 // narrow until later layout work wires it into rendering.
@@ -1625,7 +1626,8 @@ fn apply_sequence_gap_pressure(
             continue;
         };
         let label_width = text_width(&message.message, cfg) + 2.0 * cfg.wrap_padding;
-        let required_gap = SELF_MESSAGE_LOOP_WIDTH + label_width / 2.0 + cfg.actor_margin;
+        let required_gap =
+            SELF_MESSAGE_LOOP_WIDTH + SELF_MESSAGE_LABEL_OFFSET + label_width + cfg.actor_margin;
         if let Some(gap) = gap_spacings.get_mut(index) {
             *gap = gap.max(required_gap);
         }
