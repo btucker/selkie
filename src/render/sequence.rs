@@ -98,80 +98,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         doc.add_element(top_actor);
     }
 
-    let last_content_y = layout_basic_events(db, &mut layout, lifeline_start_y, &cfg);
-
-    let mut current_y = lifeline_start_y + cfg.message_spacing;
-    let mut last_content_bottom: Option<f64> = None;
-    let mut activation_stacks: std::collections::HashMap<String, Vec<f64>> =
-        std::collections::HashMap::new();
-
-    // Collect activations to add after lifelines (for correct z-order)
-    let mut pending_activations: Vec<SvgElement> = Vec::new();
-
-    for (_, event) in collect_timeline_events(db) {
-        match event {
-            TimelineEvent::Message(message) => match message.message_type {
-                LineType::ActiveStart => {
-                    if let Some(actor) = message.message.split_whitespace().next() {
-                        let start_y = last_content_bottom.unwrap_or(current_y);
-                        activation_stacks
-                            .entry(actor.to_string())
-                            .or_default()
-                            .push(start_y);
-                    }
-                }
-                LineType::ActiveEnd => {
-                    if let Some(actor) = message.message.split_whitespace().next() {
-                        if let Some(stack) = activation_stacks.get_mut(actor) {
-                            if let Some(start_y) = stack.pop() {
-                                if let Some(&actor_x) = layout.actor_positions.get(actor) {
-                                    let end_y = last_content_bottom.unwrap_or(current_y);
-                                    // Collect activation to add after lifelines
-                                    let activation = render_activation(actor_x, start_y, end_y);
-                                    pending_activations.push(activation);
-                                }
-                            }
-                        }
-                    }
-                }
-                LineType::LoopStart
-                | LineType::AltStart
-                | LineType::OptStart
-                | LineType::ParStart
-                | LineType::CriticalStart
-                | LineType::BreakStart
-                | LineType::RectStart => {
-                    current_y += cfg.box_margin + cfg.label_box_height + cfg.box_margin;
-                }
-                LineType::AltElse | LineType::ParAnd | LineType::CriticalOption => {
-                    current_y += cfg.box_margin + cfg.label_box_height;
-                }
-                LineType::LoopEnd
-                | LineType::AltEnd
-                | LineType::OptEnd
-                | LineType::ParEnd
-                | LineType::CriticalEnd
-                | LineType::BreakEnd
-                | LineType::RectEnd => {}
-                LineType::Autonumber => {
-                    // Autonumber is handled at parse time, nothing to render
-                }
-                _ => {
-                    let content_bottom = message_content_bottom(current_y, message, &cfg);
-                    last_content_bottom = Some(content_bottom);
-                    current_y = next_message_y(current_y, message, &cfg);
-                }
-            },
-            TimelineEvent::Note(note) => {
-                let previous_bottom =
-                    last_content_bottom.unwrap_or(current_y - cfg.message_spacing);
-                let note_y = previous_bottom + cfg.note_margin;
-                let note_bottom = note_y + note_height(&note.message, &cfg);
-                last_content_bottom = Some(note_bottom);
-                current_y = note_bottom + cfg.message_spacing;
-            }
-        }
-    }
+    layout_basic_events(db, &mut layout, lifeline_start_y, &cfg);
 
     for fragment in &layout.fragments {
         let frame = render_fragment_frame(
@@ -255,10 +182,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         }
     }
 
-    // Calculate final bottom actor position based on actual content
-    // Mermaid uses boxMargin * 2 (~20px) between last content and bottom actors
-    // We subtract extra message_spacing and add boxMargin to match
-    let bottom_actor_y = last_content_y + cfg.box_margin * 2.0;
+    let content_bottom = layout
+        .all_bounds()
+        .map(|bounds| bounds.bottom())
+        .fold(lifeline_start_y, f64::max);
+    let bottom_actor_y = content_bottom + cfg.box_margin * 2.0;
     let lifeline_end_y = bottom_actor_y;
 
     // Render lifelines and bottom actors now that we know the final height
@@ -290,8 +218,12 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     }
 
     // Add activations after lifelines (so activations render on top of lifelines)
-    for activation in pending_activations {
-        doc.add_cluster(activation);
+    for activation in &layout.activations {
+        doc.add_cluster(render_activation(
+            activation.actor_x + activation.stack_offset,
+            activation.start_y,
+            activation.end_y,
+        ));
     }
 
     // Set final SVG dimensions with mermaid-style viewBox offset for visual padding
@@ -372,6 +304,7 @@ const RIGHT_OF_NOTE_X_OFFSET: f64 = 25.0;
 const LEFT_OF_NOTE_X_OFFSET: f64 = 20.0;
 const SELF_MESSAGE_LOOP_WIDTH: f64 = 40.0;
 const SELF_MESSAGE_LABEL_OFFSET: f64 = 5.0;
+const ACTIVATION_WIDTH: f64 = 10.0;
 
 // Bounds is layout scaffolding for follow-up tasks; keep the dead-code allowance
 // narrow until later layout work wires it into rendering.
@@ -487,10 +420,19 @@ struct OpenFragmentLayout {
     sections: Vec<FragmentSectionLayout>,
 }
 
-// Placeholder layout records reserved for later sequence layout tasks.
-#[allow(dead_code)]
-#[derive(Debug)]
-struct ActivationLayout;
+#[derive(Debug, Clone)]
+struct ActivationLayout {
+    actor_x: f64,
+    start_y: f64,
+    end_y: f64,
+    stack_offset: f64,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct OpenActivationLayout {
+    start_y: f64,
+    stack_offset: f64,
+}
 
 #[derive(Debug)]
 struct SequenceLayout {
@@ -498,21 +440,12 @@ struct SequenceLayout {
     actor_positions: HashMap<String, f64>,
     actor_index: HashMap<String, usize>,
     content_width: f64,
-    // Future layout tasks will move timeline event ownership into SequenceLayout.
-    #[allow(dead_code)]
     events: Vec<LaidOutEvent>,
-    // Future layout tasks will move fragment ownership into SequenceLayout.
-    #[allow(dead_code)]
     fragments: Vec<FragmentLayout>,
-    // Future layout tasks will move activation ownership into SequenceLayout.
-    #[allow(dead_code)]
     activations: Vec<ActivationLayout>,
-    // Future layout tasks will compute overall bounds from laid-out elements.
-    #[allow(dead_code)]
     bounds: Vec<Bounds>,
 }
 
-#[allow(dead_code)]
 impl SequenceLayout {
     fn all_bounds(&self) -> impl Iterator<Item = Bounds> + '_ {
         self.bounds.iter().copied()
@@ -594,7 +527,7 @@ fn layout_basic_events(
     layout: &mut SequenceLayout,
     lifeline_start_y: f64,
     cfg: &SequenceLayoutConfig,
-) -> f64 {
+) {
     let autonumber_config = db.get_autonumber();
     let mut sequence_index: i32 = autonumber_config.map_or(1, |c| c.start);
     let sequence_step: i32 = autonumber_config.map_or(1, |c| c.step);
@@ -602,6 +535,7 @@ fn layout_basic_events(
     let mut current_y = lifeline_start_y + cfg.message_spacing;
     let mut last_content_bottom: Option<f64> = None;
     let mut open_fragments: Vec<OpenFragmentLayout> = Vec::new();
+    let mut activation_stacks: HashMap<String, Vec<OpenActivationLayout>> = HashMap::new();
 
     for (_, event) in collect_timeline_events(db) {
         match event {
@@ -687,7 +621,46 @@ fn layout_basic_events(
                         layout.fragments.push(fragment);
                     }
                 }
-                LineType::ActiveStart | LineType::ActiveEnd | LineType::Autonumber => {}
+                LineType::ActiveStart => {
+                    if let Some(actor) = message.message.split_whitespace().next() {
+                        let depth = activation_stacks.get(actor).map_or(0, Vec::len);
+                        let start_y = last_content_bottom.unwrap_or(current_y);
+                        activation_stacks
+                            .entry(actor.to_string())
+                            .or_default()
+                            .push(OpenActivationLayout {
+                                start_y,
+                                stack_offset: depth as f64 * ACTIVATION_WIDTH,
+                            });
+                    }
+                }
+                LineType::ActiveEnd => {
+                    if let Some(actor) = message.message.split_whitespace().next() {
+                        if let Some(stack) = activation_stacks.get_mut(actor) {
+                            if let Some(open) = stack.pop() {
+                                if let Some(&actor_x) = layout.actor_positions.get(actor) {
+                                    let end_y = last_content_bottom
+                                        .unwrap_or(current_y)
+                                        .max(open.start_y + cfg.line_height);
+                                    let activation = ActivationLayout {
+                                        actor_x,
+                                        start_y: open.start_y,
+                                        end_y,
+                                        stack_offset: open.stack_offset,
+                                    };
+                                    layout.bounds.push(Bounds {
+                                        x: actor_x + open.stack_offset - ACTIVATION_WIDTH / 2.0,
+                                        y: open.start_y,
+                                        width: ACTIVATION_WIDTH,
+                                        height: end_y - open.start_y,
+                                    });
+                                    layout.activations.push(activation);
+                                }
+                            }
+                        }
+                    }
+                }
+                LineType::Autonumber => {}
                 _ => {
                     let (Some(from), Some(to)) = (&message.from, &message.to) else {
                         continue;
@@ -775,7 +748,21 @@ fn layout_basic_events(
         }
     }
 
-    last_content_bottom.unwrap_or(current_y)
+    if let Some(bottom) = last_content_bottom {
+        layout.bounds.push(Bounds {
+            x: 0.0,
+            y: bottom,
+            width: 0.0,
+            height: 0.0,
+        });
+    } else {
+        layout.bounds.push(Bounds {
+            x: 0.0,
+            y: current_y,
+            width: 0.0,
+            height: 0.0,
+        });
+    }
 }
 
 fn fragment_frame_bounds(
@@ -1241,13 +1228,12 @@ fn render_message(
 }
 
 fn render_activation(actor_x: f64, start_y: f64, end_y: f64) -> SvgElement {
-    let width = 10.0;
     let height = (end_y - start_y).max(1.0);
 
     SvgElement::Rect {
-        x: actor_x - width / 2.0,
+        x: actor_x - ACTIVATION_WIDTH / 2.0,
         y: start_y,
-        width,
+        width: ACTIVATION_WIDTH,
         height,
         rx: Some(1.0),
         ry: Some(1.0),
