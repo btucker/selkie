@@ -418,14 +418,15 @@ fn sequence_right_note_extends_actor_gap_without_clipping() {
     let bob = find_actor_box_containing(&svg, "Bob");
     let bob_lifeline_x = find_lifeline_x_for_actor(&svg, "Bob");
     let visible_right = svg_visible_right(&svg);
+    let actor_margin = 50.0;
 
     assert!(
-        !note.overlaps(&bob, 4.0),
-        "right-of note should not overlap following actor box\n{svg}"
+        note.right() + actor_margin <= bob.x,
+        "right-of note should keep actor-margin gutter before following actor box\n{svg}"
     );
     assert!(
-        note.right() + 4.0 <= bob_lifeline_x,
-        "right-of note should not overlap following actor lifeline\n{svg}"
+        note.right() + actor_margin <= bob_lifeline_x,
+        "right-of note should keep actor-margin gutter before following actor lifeline\n{svg}"
     );
 
     assert!(

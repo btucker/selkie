@@ -462,6 +462,8 @@ impl Default for SequenceLayoutConfig {
 
 const MIN_NOTE_WIDTH: f64 = 100.0;
 const RIGHT_OF_NOTE_WIDTH: f64 = 150.0;
+const RIGHT_OF_NOTE_X_OFFSET: f64 = 25.0;
+const LEFT_OF_NOTE_X_OFFSET: f64 = 20.0;
 const SELF_MESSAGE_LOOP_WIDTH: f64 = 40.0;
 const SELF_MESSAGE_LABEL_OFFSET: f64 = 5.0;
 
@@ -509,9 +511,10 @@ impl Bounds {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct ActorLayout {
+    // The actor id is retained for later SequenceLayout-owned event layout.
+    #[allow(dead_code)]
     name: String,
     description: String,
     actor_type: ParticipantType,
@@ -534,16 +537,23 @@ struct FragmentLayout;
 #[derive(Debug)]
 struct ActivationLayout;
 
-#[allow(dead_code)]
 #[derive(Debug)]
 struct SequenceLayout {
     actors: Vec<ActorLayout>,
     actor_positions: HashMap<String, f64>,
     actor_index: HashMap<String, usize>,
     content_width: f64,
+    // Future layout tasks will move timeline event ownership into SequenceLayout.
+    #[allow(dead_code)]
     events: Vec<LaidOutEvent>,
+    // Future layout tasks will move fragment ownership into SequenceLayout.
+    #[allow(dead_code)]
     fragments: Vec<FragmentLayout>,
+    // Future layout tasks will move activation ownership into SequenceLayout.
+    #[allow(dead_code)]
     activations: Vec<ActivationLayout>,
+    // Future layout tasks will compute overall bounds from laid-out elements.
+    #[allow(dead_code)]
     bounds: Vec<Bounds>,
 }
 
@@ -1251,8 +1261,8 @@ fn render_note(
     };
 
     let x = match placement {
-        Placement::LeftOf => actor_x - note_width - 20.0,
-        Placement::RightOf => actor_x + 25.0, // Match mermaid.js offset from actor center
+        Placement::LeftOf => actor_x - note_width - LEFT_OF_NOTE_X_OFFSET,
+        Placement::RightOf => actor_x + RIGHT_OF_NOTE_X_OFFSET, // Match mermaid.js offset from actor center
         Placement::Over => x_center - note_width / 2.0,
     };
     // y is passed as the note's top position (mermaid.js style)
@@ -1598,13 +1608,19 @@ fn apply_sequence_gap_pressure(
         };
         match note.placement {
             Placement::RightOf => {
-                let required_gap = RIGHT_OF_NOTE_WIDTH + cfg.actor_width / 2.0 + cfg.actor_margin;
+                let required_gap = RIGHT_OF_NOTE_X_OFFSET
+                    + RIGHT_OF_NOTE_WIDTH
+                    + cfg.actor_width / 2.0
+                    + cfg.actor_margin;
                 if let Some(gap) = gap_spacings.get_mut(index) {
                     *gap = gap.max(required_gap);
                 }
             }
             Placement::LeftOf => {
-                let required_gap = MIN_NOTE_WIDTH + cfg.actor_width / 2.0 + cfg.actor_margin;
+                let required_gap = LEFT_OF_NOTE_X_OFFSET
+                    + MIN_NOTE_WIDTH
+                    + cfg.actor_width / 2.0
+                    + cfg.actor_margin;
                 if index > 0 {
                     if let Some(gap) = gap_spacings.get_mut(index - 1) {
                         *gap = gap.max(required_gap);
@@ -1648,7 +1664,8 @@ fn required_sequence_content_width(
             continue;
         }
         if let Some(&actor_x) = actor_positions.get(&note.actor) {
-            content_width = content_width.max(actor_x + 25.0 + RIGHT_OF_NOTE_WIDTH);
+            content_width =
+                content_width.max(actor_x + RIGHT_OF_NOTE_X_OFFSET + RIGHT_OF_NOTE_WIDTH);
         }
     }
 
