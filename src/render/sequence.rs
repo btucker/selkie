@@ -78,14 +78,10 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
 
     // Calculate actor positions
     // Content starts at (0,0) - visual padding achieved via negative viewBox offset (mermaid style)
-    let padding_x = 0.0; // Content coordinate origin
     let padding_y = margin_top; // Content coordinate origin
 
     let actor_y = padding_y + title_offset;
     let lifeline_start_y = actor_y + cfg.actor_height;
-
-    // Create actor position map using cumulative per-gap spacing
-    let actor_centers: Vec<f64> = layout.actors.iter().map(|actor| actor.center_x).collect();
 
     // Render top actors only (bottom actors rendered after we know the final height)
     for actor in &layout.actors {
@@ -108,9 +104,6 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let mut last_content_bottom: Option<f64> = None;
     let mut activation_stacks: std::collections::HashMap<String, Vec<f64>> =
         std::collections::HashMap::new();
-    let fragment_left = padding_x;
-    let fragment_width = content_width;
-    let mut fragment_stack: Vec<FragmentState> = Vec::new();
 
     // Collect activations to add after lifelines (for correct z-order)
     let mut pending_activations: Vec<SvgElement> = Vec::new();
@@ -148,59 +141,10 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 | LineType::CriticalStart
                 | LineType::BreakStart
                 | LineType::RectStart => {
-                    let kind = FragmentKind::from_message_type(message.message_type);
-                    let start_y = current_y - cfg.message_spacing / 2.0;
-                    fragment_stack.push(FragmentState {
-                        start_y,
-                        kind,
-                        label: message.message.trim().to_string(),
-                        min_actor_idx: None,
-                        max_actor_idx: None,
-                        color: if matches!(kind, FragmentKind::Rect) {
-                            if message.message.is_empty() {
-                                None
-                            } else {
-                                Some(message.message.clone())
-                            }
-                        } else {
-                            None
-                        },
-                    });
-                    current_y += cfg.message_spacing;
+                    current_y += cfg.box_margin + cfg.label_box_height + cfg.box_margin;
                 }
                 LineType::AltElse | LineType::ParAnd | LineType::CriticalOption => {
-                    if let Some(fragment) = fragment_stack.last() {
-                        let label = message.message.trim();
-                        let depth = fragment_stack.len().saturating_sub(1);
-                        let (frame_x, frame_width) = fragment_bounds_for_state(
-                            fragment,
-                            fragment_left,
-                            fragment_width,
-                            depth,
-                            &actor_centers,
-                            cfg.actor_width,
-                        );
-                        let divider =
-                            render_fragment_divider(frame_x, frame_width, current_y, true);
-                        doc.add_cluster(divider);
-                        let label_elements = render_fragment_label(
-                            FragmentKind::from_message_type(message.message_type),
-                            frame_x,
-                            frame_width,
-                            current_y,
-                            label,
-                            cfg.label_box_height,
-                        );
-                        // Add shapes to clusters (renders first) for proper z-order
-                        for shape in label_elements.shapes {
-                            doc.add_cluster(shape);
-                        }
-                        // Add text labels to edge_labels (renders after shapes)
-                        for label in label_elements.labels {
-                            doc.add_edge_label(label);
-                        }
-                    }
-                    current_y += cfg.message_spacing;
+                    current_y += cfg.box_margin + cfg.label_box_height;
                 }
                 LineType::LoopEnd
                 | LineType::AltEnd
@@ -208,93 +152,72 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 | LineType::ParEnd
                 | LineType::CriticalEnd
                 | LineType::BreakEnd
-                | LineType::RectEnd => {
-                    if let Some(fragment) = fragment_stack.pop() {
-                        // End fragment at current position (no extra spacing like mermaid.js)
-                        let end_y = current_y - cfg.message_spacing / 2.0;
-                        let depth = fragment_stack.len();
-                        let (frame_x, frame_width) = fragment_bounds_for_state(
-                            &fragment,
-                            fragment_left,
-                            fragment_width,
-                            depth,
-                            &actor_centers,
-                            cfg.actor_width,
-                        );
-                        let frame = render_fragment_frame(
-                            frame_x,
-                            frame_width,
-                            fragment.start_y,
-                            end_y,
-                            fragment.color.as_deref(),
-                        );
-                        doc.add_cluster(frame);
-                        let label_elements = render_fragment_label(
-                            fragment.kind,
-                            frame_x,
-                            frame_width,
-                            fragment.start_y,
-                            &fragment.label,
-                            cfg.label_box_height,
-                        );
-                        // Add shapes to clusters (renders first) for proper z-order
-                        for shape in label_elements.shapes {
-                            doc.add_cluster(shape);
-                        }
-                        // Add text labels to edge_labels (renders after shapes)
-                        for label in label_elements.labels {
-                            doc.add_edge_label(label);
-                        }
-                    }
-                    // Don't advance current_y after fragment end - content already positioned
-                }
+                | LineType::RectEnd => {}
                 LineType::Autonumber => {
                     // Autonumber is handled at parse time, nothing to render
                 }
                 _ => {
-                    if let (Some(from_idx), Some(to_idx)) = (
-                        message
-                            .from
-                            .as_ref()
-                            .and_then(|name| layout.actor_index.get(name).copied()),
-                        message
-                            .to
-                            .as_ref()
-                            .and_then(|name| layout.actor_index.get(name).copied()),
-                    ) {
-                        let min_idx = from_idx.min(to_idx);
-                        let max_idx = from_idx.max(to_idx);
-                        for fragment in &mut fragment_stack {
-                            fragment.update_bounds(min_idx, max_idx);
-                        }
-                    }
                     let content_bottom = message_content_bottom(current_y, message, &cfg);
                     last_content_bottom = Some(content_bottom);
                     current_y = next_message_y(current_y, message, &cfg);
                 }
             },
             TimelineEvent::Note(note) => {
-                if let Some(actor_idx) = layout.actor_index.get(&note.actor).copied() {
-                    let mut min_idx = actor_idx;
-                    let mut max_idx = actor_idx;
-                    if let Some(other) = note
-                        .actor_to
-                        .as_ref()
-                        .and_then(|name| layout.actor_index.get(name).copied())
-                    {
-                        min_idx = min_idx.min(other);
-                        max_idx = max_idx.max(other);
-                    }
-                    for fragment in &mut fragment_stack {
-                        fragment.update_bounds(min_idx, max_idx);
-                    }
-                }
                 let previous_bottom =
                     last_content_bottom.unwrap_or(current_y - cfg.message_spacing);
                 let note_y = previous_bottom + cfg.note_margin;
                 let note_bottom = note_y + note_height(&note.message, &cfg);
                 last_content_bottom = Some(note_bottom);
                 current_y = note_bottom + cfg.message_spacing;
+            }
+        }
+    }
+
+    for fragment in &layout.fragments {
+        let frame = render_fragment_frame(
+            fragment.frame.x,
+            fragment.frame.width,
+            fragment.frame.y,
+            fragment.frame.bottom(),
+            fragment.color.as_deref(),
+        );
+        doc.add_cluster(frame);
+
+        let label_elements = render_fragment_label(
+            fragment.kind,
+            fragment.frame.x,
+            fragment.frame.width,
+            fragment.frame.y,
+            &fragment.label,
+            cfg.label_box_height,
+        );
+        for shape in label_elements.shapes {
+            doc.add_cluster(shape);
+        }
+        for label in label_elements.labels {
+            doc.add_edge_label(label);
+        }
+
+        for section in &fragment.sections {
+            doc.add_cluster(render_fragment_divider(
+                fragment.frame.x,
+                fragment.frame.width,
+                section.y,
+                true,
+            ));
+            let label_elements = render_fragment_label(
+                section.kind,
+                fragment.frame.x,
+                fragment.frame.width,
+                section.y,
+                &section.label,
+                cfg.label_box_height,
+            );
+            for shape in label_elements.shapes {
+                doc.add_cluster(shape);
+            }
+            for label in label_elements.labels {
+                doc.add_edge_label(label);
             }
         }
     }
@@ -532,10 +455,37 @@ enum LaidOutEvent {
     Note(NoteLayout),
 }
 
-// Placeholder layout records reserved for later sequence layout tasks.
-#[allow(dead_code)]
-#[derive(Debug)]
-struct FragmentLayout;
+#[derive(Debug, Clone)]
+struct FragmentLayout {
+    kind: FragmentKind,
+    label: String,
+    frame: Bounds,
+    #[allow(dead_code)]
+    depth: usize,
+    color: Option<String>,
+    sections: Vec<FragmentSectionLayout>,
+    min_actor_idx: Option<usize>,
+    max_actor_idx: Option<usize>,
+}
+
+#[derive(Debug, Clone)]
+struct FragmentSectionLayout {
+    kind: FragmentKind,
+    label: String,
+    y: f64,
+}
+
+#[derive(Debug, Clone)]
+struct OpenFragmentLayout {
+    kind: FragmentKind,
+    label: String,
+    start_y: f64,
+    content_bounds: Option<Bounds>,
+    min_actor_idx: Option<usize>,
+    max_actor_idx: Option<usize>,
+    color: Option<String>,
+    sections: Vec<FragmentSectionLayout>,
+}
 
 // Placeholder layout records reserved for later sequence layout tasks.
 #[allow(dead_code)]
@@ -569,7 +519,7 @@ impl SequenceLayout {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 enum FragmentKind {
     Loop,
     Alt,
@@ -601,15 +551,6 @@ impl FragmentKind {
     }
 }
 
-struct FragmentState {
-    start_y: f64,
-    kind: FragmentKind,
-    label: String,
-    min_actor_idx: Option<usize>,
-    max_actor_idx: Option<usize>,
-    color: Option<String>,
-}
-
 /// Message elements separated into shapes (lines/paths) and labels (text)
 /// This enables proper SVG z-order: shapes render before labels
 struct MessageElements {
@@ -624,8 +565,8 @@ struct FragmentLabelElements {
     labels: Vec<SvgElement>,
 }
 
-impl FragmentState {
-    fn update_bounds(&mut self, min_idx: usize, max_idx: usize) {
+impl OpenFragmentLayout {
+    fn include_event(&mut self, min_idx: usize, max_idx: usize, bounds: Bounds) {
         self.min_actor_idx = Some(
             self.min_actor_idx
                 .map_or(min_idx, |value| value.min(min_idx)),
@@ -633,6 +574,17 @@ impl FragmentState {
         self.max_actor_idx = Some(
             self.max_actor_idx
                 .map_or(max_idx, |value| value.max(max_idx)),
+        );
+        self.content_bounds = Some(
+            self.content_bounds
+                .map_or(bounds, |existing| existing.union(bounds)),
+        );
+    }
+
+    fn include_bounds(&mut self, bounds: Bounds) {
+        self.content_bounds = Some(
+            self.content_bounds
+                .map_or(bounds, |existing| existing.union(bounds)),
         );
     }
 }
@@ -649,6 +601,7 @@ fn layout_basic_events(
     let autonumber_enabled = autonumber_config.is_some();
     let mut current_y = lifeline_start_y + cfg.message_spacing;
     let mut last_content_bottom: Option<f64> = None;
+    let mut open_fragments: Vec<OpenFragmentLayout> = Vec::new();
 
     for (_, event) in collect_timeline_events(db) {
         match event {
@@ -659,11 +612,43 @@ fn layout_basic_events(
                 | LineType::ParStart
                 | LineType::CriticalStart
                 | LineType::BreakStart
-                | LineType::RectStart
-                | LineType::AltElse
-                | LineType::ParAnd
-                | LineType::CriticalOption => {
-                    current_y += cfg.message_spacing;
+                | LineType::RectStart => {
+                    let kind = FragmentKind::from_message_type(message.message_type);
+                    open_fragments.push(OpenFragmentLayout {
+                        kind,
+                        label: message.message.trim().to_string(),
+                        start_y: current_y,
+                        content_bounds: None,
+                        min_actor_idx: None,
+                        max_actor_idx: None,
+                        color: if matches!(kind, FragmentKind::Rect) {
+                            if message.message.is_empty() {
+                                None
+                            } else {
+                                Some(message.message.clone())
+                            }
+                        } else {
+                            None
+                        },
+                        sections: Vec::new(),
+                    });
+                    current_y += cfg.box_margin + cfg.label_box_height + cfg.box_margin;
+                }
+                LineType::AltElse | LineType::ParAnd | LineType::CriticalOption => {
+                    if let Some(fragment) = open_fragments.last_mut() {
+                        fragment.sections.push(FragmentSectionLayout {
+                            kind: FragmentKind::from_message_type(message.message_type),
+                            label: message.message.trim().to_string(),
+                            y: current_y,
+                        });
+                        fragment.include_bounds(Bounds {
+                            x: 0.0,
+                            y: current_y,
+                            width: layout.content_width,
+                            height: cfg.label_box_height + cfg.box_margin,
+                        });
+                    }
+                    current_y += cfg.box_margin + cfg.label_box_height;
                 }
                 LineType::LoopEnd
                 | LineType::AltEnd
@@ -671,10 +656,38 @@ fn layout_basic_events(
                 | LineType::ParEnd
                 | LineType::CriticalEnd
                 | LineType::BreakEnd
-                | LineType::RectEnd
-                | LineType::ActiveStart
-                | LineType::ActiveEnd
-                | LineType::Autonumber => {}
+                | LineType::RectEnd => {
+                    if let Some(open) = open_fragments.pop() {
+                        let depth = open_fragments.len();
+                        let frame = fragment_frame_bounds(&open, depth, layout, cfg);
+                        let fragment = FragmentLayout {
+                            kind: open.kind,
+                            label: open.label,
+                            frame,
+                            depth,
+                            color: open.color,
+                            sections: open.sections,
+                            min_actor_idx: open.min_actor_idx,
+                            max_actor_idx: open.max_actor_idx,
+                        };
+                        layout.bounds.push(fragment.frame);
+                        if let Some(parent) = open_fragments.last_mut() {
+                            let min_idx = fragment.min_actor_idx.unwrap_or(0);
+                            let max_idx = fragment
+                                .max_actor_idx
+                                .unwrap_or_else(|| layout.actors.len().saturating_sub(1));
+                            parent.include_event(min_idx, max_idx, fragment.frame);
+                        }
+                        current_y = current_y.max(fragment.frame.bottom() + cfg.box_margin);
+                        last_content_bottom = Some(
+                            last_content_bottom.map_or(fragment.frame.bottom(), |bottom| {
+                                bottom.max(fragment.frame.bottom())
+                            }),
+                        );
+                        layout.fragments.push(fragment);
+                    }
+                }
+                LineType::ActiveStart | LineType::ActiveEnd | LineType::Autonumber => {}
                 _ => {
                     let (Some(from), Some(to)) = (&message.from, &message.to) else {
                         continue;
@@ -692,6 +705,15 @@ fn layout_basic_events(
                     };
                     let bounds = message_bounds(from_x, to_x, current_y, &message.message, cfg);
                     layout.bounds.push(bounds);
+                    if let (Some(&from_idx), Some(&to_idx)) =
+                        (layout.actor_index.get(from), layout.actor_index.get(to))
+                    {
+                        let min_idx = from_idx.min(to_idx);
+                        let max_idx = from_idx.max(to_idx);
+                        for fragment in &mut open_fragments {
+                            fragment.include_event(min_idx, max_idx, bounds);
+                        }
+                    }
                     layout.events.push(LaidOutEvent::Message(MessageLayout {
                         from_x,
                         to_x,
@@ -722,6 +744,21 @@ fn layout_basic_events(
                     let bounds =
                         note_bounds(actor_x, span_x, note_y, &note.message, note.placement, cfg);
                     layout.bounds.push(bounds);
+                    if let Some(&actor_idx) = layout.actor_index.get(&note.actor) {
+                        let mut min_idx = actor_idx;
+                        let mut max_idx = actor_idx;
+                        if let Some(other) = note
+                            .actor_to
+                            .as_ref()
+                            .and_then(|name| layout.actor_index.get(name).copied())
+                        {
+                            min_idx = min_idx.min(other);
+                            max_idx = max_idx.max(other);
+                        }
+                        for fragment in &mut open_fragments {
+                            fragment.include_event(min_idx, max_idx, bounds);
+                        }
+                    }
                     layout.events.push(LaidOutEvent::Note(NoteLayout {
                         actor_x,
                         span_x,
@@ -739,6 +776,70 @@ fn layout_basic_events(
     }
 
     last_content_bottom.unwrap_or(current_y)
+}
+
+fn fragment_frame_bounds(
+    open: &OpenFragmentLayout,
+    depth: usize,
+    layout: &SequenceLayout,
+    cfg: &SequenceLayoutConfig,
+) -> Bounds {
+    let content = open
+        .content_bounds
+        .unwrap_or_else(|| fragment_actor_fallback_bounds(open, layout, cfg));
+    let expand = cfg.box_margin * (depth as f64 + 1.0);
+    let mut frame = content.expand(expand);
+    if let (Some(min_idx), Some(max_idx)) = (open.min_actor_idx, open.max_actor_idx) {
+        let min_center = layout.actors[min_idx].center_x;
+        let max_center = layout.actors[max_idx].center_x;
+        let x = min_center - cfg.actor_width / 2.0 - expand;
+        let right = max_center + cfg.actor_width / 2.0 + expand;
+        frame.x = x;
+        frame.width = (right - x).max(20.0);
+    }
+
+    let content_bottom = open
+        .content_bounds
+        .map(|b| b.bottom())
+        .unwrap_or(open.start_y);
+    let original_bottom = frame.bottom();
+    let header_bottom = open.start_y + cfg.label_box_height + cfg.box_margin;
+    let top = frame.y.min(open.start_y);
+    let bottom = original_bottom.max(content_bottom).max(header_bottom);
+    frame = Bounds {
+        x: frame.x,
+        y: top,
+        width: frame.width,
+        height: bottom - top,
+    };
+
+    frame
+}
+
+fn fragment_actor_fallback_bounds(
+    open: &OpenFragmentLayout,
+    layout: &SequenceLayout,
+    cfg: &SequenceLayoutConfig,
+) -> Bounds {
+    if let (Some(min_idx), Some(max_idx)) = (open.min_actor_idx, open.max_actor_idx) {
+        let min_center = layout.actors[min_idx].center_x;
+        let max_center = layout.actors[max_idx].center_x;
+        let x = min_center - cfg.actor_width / 2.0;
+        let right = max_center + cfg.actor_width / 2.0;
+        return Bounds {
+            x,
+            y: open.start_y,
+            width: (right - x).max(20.0),
+            height: cfg.label_box_height + cfg.box_margin,
+        };
+    }
+
+    Bounds {
+        x: 0.0,
+        y: open.start_y,
+        width: layout.content_width.max(20.0),
+        height: cfg.label_box_height + cfg.box_margin,
+    }
 }
 
 fn next_message_y(
@@ -782,21 +883,38 @@ fn message_bounds(
     label: &str,
     cfg: &SequenceLayoutConfig,
 ) -> Bounds {
+    let label_width = text_width(label, cfg);
     if (from_x - to_x).abs() < 1.0 {
-        let width = text_width(label, cfg).max(cfg.actor_width);
-        Bounds {
-            x: from_x - width / 2.0,
+        let path = Bounds {
+            x: from_x,
+            y,
+            width: SELF_MESSAGE_LOOP_WIDTH,
+            height: 30.0,
+        };
+        let label = Bounds {
+            x: from_x + SELF_MESSAGE_LOOP_WIDTH + SELF_MESSAGE_LABEL_OFFSET,
+            y: y + 15.0 - cfg.line_height,
+            width: label_width,
+            height: cfg.line_height,
+        };
+        let actor = Bounds {
+            x: from_x - cfg.actor_width / 2.0,
             y: y - cfg.line_height,
-            width,
+            width: cfg.actor_width,
             height: cfg.line_height + 40.0,
-        }
+        };
+        path.union(label).union(actor)
     } else {
-        let left = from_x.min(to_x);
-        let width = (from_x - to_x).abs().max(text_width(label, cfg));
+        let line_left = from_x.min(to_x);
+        let line_right = from_x.max(to_x);
+        let label_center = (from_x + to_x) / 2.0;
+        let label_left = label_center - label_width / 2.0;
+        let left = line_left.min(label_left);
+        let right = line_right.max(label_left + label_width);
         Bounds {
             x: left,
             y: y - cfg.line_height,
-            width,
+            width: right - left,
             height: cfg.line_height + 10.0,
         }
     }
@@ -1213,38 +1331,6 @@ fn render_fragment_divider(x: f64, width: f64, y: f64, dashed: bool) -> SvgEleme
         y2: y,
         attrs,
     }
-}
-
-fn fragment_bounds(left: f64, width: f64, depth: usize) -> (f64, f64) {
-    let inset = depth as f64 * 10.0;
-    let frame_x = left + inset;
-    let frame_width = (width - inset * 2.0).max(20.0);
-    (frame_x, frame_width)
-}
-
-fn fragment_bounds_for_state(
-    fragment: &FragmentState,
-    left: f64,
-    width: f64,
-    depth: usize,
-    actor_centers: &[f64],
-    actor_width: f64,
-) -> (f64, f64) {
-    let (mut frame_x, mut frame_width) =
-        if let (Some(min_idx), Some(max_idx)) = (fragment.min_actor_idx, fragment.max_actor_idx) {
-            let min_center = actor_centers[min_idx];
-            let max_center = actor_centers[max_idx];
-            let left = min_center - actor_width / 2.0 - 10.0;
-            let right = max_center + actor_width / 2.0 + 10.0;
-            (left, (right - left).max(20.0))
-        } else {
-            fragment_bounds(left, width, 0)
-        };
-
-    let inset = depth as f64 * 10.0;
-    frame_x += inset;
-    frame_width = (frame_width - inset * 2.0).max(20.0);
-    (frame_x, frame_width)
 }
 
 fn render_fragment_label(

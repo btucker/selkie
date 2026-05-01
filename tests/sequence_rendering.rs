@@ -291,6 +291,46 @@ fn find_first_fragment_frame(svg: &str) -> TestBox {
     }
 }
 
+fn find_first_fragment_frame_group(svg: &str) -> TestBox {
+    let doc = roxmltree::Document::parse(svg).expect("valid svg");
+    for group in doc.descendants().filter(|n| n.tag_name().name() == "g") {
+        let lines: Vec<_> = group
+            .children()
+            .filter(|n| {
+                n.tag_name().name() == "line"
+                    && n.attribute("class").unwrap_or("").contains("loopLine")
+            })
+            .collect();
+        if lines.len() != 4 {
+            continue;
+        }
+
+        let mut min_x = f64::INFINITY;
+        let mut min_y = f64::INFINITY;
+        let mut max_x = f64::NEG_INFINITY;
+        let mut max_y = f64::NEG_INFINITY;
+        for line in lines {
+            let x1 = parse_num(line, "x1");
+            let y1 = parse_num(line, "y1");
+            let x2 = parse_num(line, "x2");
+            let y2 = parse_num(line, "y2");
+            min_x = min_x.min(x1).min(x2);
+            min_y = min_y.min(y1).min(y2);
+            max_x = max_x.max(x1).max(x2);
+            max_y = max_y.max(y1).max(y2);
+        }
+
+        return TestBox {
+            x: min_x,
+            y: min_y,
+            width: max_x - min_x,
+            height: max_y - min_y,
+        };
+    }
+
+    panic!("missing fragment frame group\n{svg}");
+}
+
 #[test]
 fn sequence_fragment_frames_use_lines_not_rects() {
     // Mermaid.js renders fragment frames as 4 line elements (top/right/bottom/left)
@@ -480,6 +520,32 @@ fn sequence_alt_fragment_has_divider() {
     assert!(
         svg.contains("loopLine"),
         "Should render fragment elements with loopLine class"
+    );
+}
+
+#[test]
+fn sequence_empty_alt_section_stays_inside_fragment_frame() {
+    let input = r#"sequenceDiagram
+    participant A
+    participant B
+    alt Success
+        A->>B: OK
+    else Failure
+    end
+    A->>B: After"#;
+
+    let svg = render_sequence(input);
+    let frame = find_first_fragment_frame_group(&svg);
+    let else_label = find_text_box(&svg, "Failure");
+    let next_label = find_text_box(&svg, "After");
+
+    assert!(
+        else_label.bottom() + 4.0 <= frame.bottom(),
+        "empty else label should stay inside fragment frame\n{svg}"
+    );
+    assert!(
+        else_label.bottom() + 4.0 <= next_label.y,
+        "following message should not overlap empty else label\n{svg}"
     );
 }
 
