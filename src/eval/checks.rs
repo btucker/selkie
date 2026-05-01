@@ -80,6 +80,332 @@ pub fn check_structure(
     issues
 }
 
+const SEQUENCE_OVERLAP_TOLERANCE: f64 = 4.0;
+const SEQUENCE_CHAR_WIDTH: f64 = 8.0;
+const SEQUENCE_LINE_HEIGHT: f64 = 18.0;
+
+#[derive(Debug, Clone)]
+struct SequenceBox {
+    kind: &'static str,
+    label: String,
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+}
+
+impl SequenceBox {
+    fn new(
+        kind: &'static str,
+        label: impl Into<String>,
+        x: f64,
+        y: f64,
+        width: f64,
+        height: f64,
+    ) -> Self {
+        Self {
+            kind,
+            label: label.into(),
+            x,
+            y,
+            width,
+            height,
+        }
+    }
+
+    fn intersects_with_tolerance(&self, other: &Self, tolerance: f64) -> bool {
+        let left = self.x + tolerance;
+        let right = self.x + self.width - tolerance;
+        let top = self.y + tolerance;
+        let bottom = self.y + self.height - tolerance;
+        let other_left = other.x + tolerance;
+        let other_right = other.x + other.width - tolerance;
+        let other_top = other.y + tolerance;
+        let other_bottom = other.y + other.height - tolerance;
+
+        left < other_right && right > other_left && top < other_bottom && bottom > other_top
+    }
+}
+
+/// Check sequence diagrams for text/box collisions that generic SVG structure checks miss.
+pub fn check_sequence_overlaps(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
+    let Ok(doc) = roxmltree::Document::parse(&selkie.raw_svg) else {
+        return;
+    };
+
+    let mut notes = Vec::new();
+    let mut message_texts = Vec::new();
+    let mut note_texts = Vec::new();
+    let mut loop_texts = Vec::new();
+    let mut loop_points = Vec::new();
+
+    for node in doc.descendants().filter(|node| node.is_element()) {
+        match node.tag_name().name() {
+            "rect" if has_class(&node, "note") => {
+                if let Some(note) = rect_sequence_box(&node, "note", "note") {
+                    notes.push(note);
+                }
+            }
+            "text" if has_class(&node, "messageText") => {
+                if let Some(text) = text_sequence_box(&node, "messageText") {
+                    message_texts.push(text);
+                }
+            }
+            "text" if has_class(&node, "noteText") => {
+                if let Some(text) = text_sequence_box(&node, "noteText") {
+                    note_texts.push(text);
+                }
+            }
+            "text" if has_class(&node, "loopText") => {
+                if let Some(text) = text_sequence_box(&node, "loopText") {
+                    loop_texts.push(text);
+                }
+            }
+            "line" if has_class(&node, "loopLine") => {
+                if let Some((x1, y1, x2, y2)) = line_coords(&node) {
+                    loop_points.push((x1, y1));
+                    loop_points.push((x2, y2));
+                }
+            }
+            _ => {}
+        }
+    }
+
+    let fragments = fragment_boxes_from_points(&loop_points);
+    let headers: Vec<_> = fragments
+        .iter()
+        .map(|frame| {
+            SequenceBox::new(
+                "fragment_header",
+                "loop fragment header",
+                frame.x,
+                frame.y,
+                frame.width,
+                20.0 + SEQUENCE_OVERLAP_TOLERANCE,
+            )
+        })
+        .collect();
+    let borders: Vec<_> = fragments.iter().flat_map(fragment_border_boxes).collect();
+
+    for message in &message_texts {
+        for note in &notes {
+            report_overlap_if_intersects(message, note, issues);
+        }
+
+        for (fragment, header) in fragments.iter().zip(&headers) {
+            if message.intersects_with_tolerance(header, SEQUENCE_OVERLAP_TOLERANCE)
+                && !is_message_text_inside_fragment_body(message, fragment, header)
+            {
+                push_sequence_overlap(message, header, issues);
+            }
+        }
+    }
+
+    for text in &note_texts {
+        let inside_own_note = is_note_text_inside_own_note(text, &notes);
+        let clear_of_headers = !headers
+            .iter()
+            .any(|header| text.intersects_with_tolerance(header, SEQUENCE_OVERLAP_TOLERANCE));
+        for header in &headers {
+            if inside_own_note && clear_of_headers {
+                continue;
+            }
+
+            if text.intersects_with_tolerance(header, SEQUENCE_OVERLAP_TOLERANCE) {
+                push_sequence_overlap(text, header, issues);
+            }
+        }
+    }
+
+    for text in &loop_texts {
+        let inside_own_header = is_loop_text_inside_own_header(text, &headers);
+        let clear_of_notes = !notes
+            .iter()
+            .any(|note| text.intersects_with_tolerance(note, SEQUENCE_OVERLAP_TOLERANCE));
+        for note in &notes {
+            if inside_own_header && clear_of_notes {
+                continue;
+            }
+
+            if text.intersects_with_tolerance(note, SEQUENCE_OVERLAP_TOLERANCE) {
+                push_sequence_overlap(text, note, issues);
+            }
+        }
+    }
+
+    for note in &notes {
+        for header in &headers {
+            report_overlap_if_intersects(note, header, issues);
+        }
+
+        for border in &borders {
+            report_overlap_if_intersects(note, border, issues);
+        }
+    }
+}
+
+fn report_overlap_if_intersects(a: &SequenceBox, b: &SequenceBox, issues: &mut Vec<Issue>) {
+    if a.intersects_with_tolerance(b, SEQUENCE_OVERLAP_TOLERANCE) {
+        push_sequence_overlap(a, b, issues);
+    }
+}
+
+fn push_sequence_overlap(a: &SequenceBox, b: &SequenceBox, issues: &mut Vec<Issue>) {
+    issues.push(Issue::warning(
+        "sequence_overlap",
+        format!(
+            "Sequence label '{}' ({}) overlaps '{}' ({}) beyond {}px tolerance",
+            a.label, a.kind, b.label, b.kind, SEQUENCE_OVERLAP_TOLERANCE
+        ),
+    ));
+}
+
+fn rect_sequence_box(
+    node: &roxmltree::Node,
+    kind: &'static str,
+    fallback_label: &str,
+) -> Option<SequenceBox> {
+    Some(SequenceBox::new(
+        kind,
+        node.attribute("id").unwrap_or(fallback_label),
+        parse_attr(node, "x")?,
+        parse_attr(node, "y")?,
+        parse_attr(node, "width")?,
+        parse_attr(node, "height")?,
+    ))
+}
+
+fn text_sequence_box(node: &roxmltree::Node, kind: &'static str) -> Option<SequenceBox> {
+    let text = node_text(node);
+    let x = parse_attr(node, "x")?;
+    let y = parse_attr(node, "y")?;
+    Some(SequenceBox::new(
+        kind,
+        text.clone(),
+        x,
+        y - SEQUENCE_LINE_HEIGHT,
+        text.chars().count() as f64 * SEQUENCE_CHAR_WIDTH,
+        SEQUENCE_LINE_HEIGHT,
+    ))
+}
+
+fn line_coords(node: &roxmltree::Node) -> Option<(f64, f64, f64, f64)> {
+    Some((
+        parse_attr(node, "x1")?,
+        parse_attr(node, "y1")?,
+        parse_attr(node, "x2")?,
+        parse_attr(node, "y2")?,
+    ))
+}
+
+fn fragment_boxes_from_points(points: &[(f64, f64)]) -> Vec<SequenceBox> {
+    if points.is_empty() {
+        return Vec::new();
+    }
+
+    let min_x = points.iter().map(|(x, _)| *x).fold(f64::INFINITY, f64::min);
+    let max_x = points
+        .iter()
+        .map(|(x, _)| *x)
+        .fold(f64::NEG_INFINITY, f64::max);
+    let min_y = points.iter().map(|(_, y)| *y).fold(f64::INFINITY, f64::min);
+    let max_y = points
+        .iter()
+        .map(|(_, y)| *y)
+        .fold(f64::NEG_INFINITY, f64::max);
+
+    vec![SequenceBox::new(
+        "fragment",
+        "loop fragment",
+        min_x,
+        min_y,
+        max_x - min_x,
+        max_y - min_y,
+    )]
+}
+
+fn fragment_border_boxes(fragment: &SequenceBox) -> Vec<SequenceBox> {
+    let thickness = SEQUENCE_OVERLAP_TOLERANCE * 2.0;
+    vec![
+        SequenceBox::new(
+            "fragment_border",
+            "loop fragment top border",
+            fragment.x,
+            fragment.y - SEQUENCE_OVERLAP_TOLERANCE,
+            fragment.width,
+            thickness,
+        ),
+        SequenceBox::new(
+            "fragment_border",
+            "loop fragment bottom border",
+            fragment.x,
+            fragment.y + fragment.height - SEQUENCE_OVERLAP_TOLERANCE,
+            fragment.width,
+            thickness,
+        ),
+        SequenceBox::new(
+            "fragment_border",
+            "loop fragment left border",
+            fragment.x - SEQUENCE_OVERLAP_TOLERANCE,
+            fragment.y,
+            thickness,
+            fragment.height,
+        ),
+        SequenceBox::new(
+            "fragment_border",
+            "loop fragment right border",
+            fragment.x + fragment.width - SEQUENCE_OVERLAP_TOLERANCE,
+            fragment.y,
+            thickness,
+            fragment.height,
+        ),
+    ]
+}
+
+fn is_note_text_inside_own_note(text: &SequenceBox, notes: &[SequenceBox]) -> bool {
+    notes.iter().any(|note| contains_with_tolerance(note, text))
+}
+
+fn is_loop_text_inside_own_header(text: &SequenceBox, headers: &[SequenceBox]) -> bool {
+    headers
+        .iter()
+        .any(|header| contains_with_tolerance(header, text))
+}
+
+fn is_message_text_inside_fragment_body(
+    text: &SequenceBox,
+    fragment: &SequenceBox,
+    header: &SequenceBox,
+) -> bool {
+    contains_with_tolerance(fragment, text)
+        && text.y >= header.y + header.height - SEQUENCE_OVERLAP_TOLERANCE
+}
+
+fn contains_with_tolerance(container: &SequenceBox, inner: &SequenceBox) -> bool {
+    inner.x >= container.x - SEQUENCE_OVERLAP_TOLERANCE
+        && inner.y >= container.y - SEQUENCE_OVERLAP_TOLERANCE
+        && inner.x + inner.width <= container.x + container.width + SEQUENCE_OVERLAP_TOLERANCE
+        && inner.y + inner.height <= container.y + container.height + SEQUENCE_OVERLAP_TOLERANCE
+}
+
+fn has_class(node: &roxmltree::Node, class_name: &str) -> bool {
+    node.attribute("class")
+        .unwrap_or("")
+        .split_whitespace()
+        .any(|class| class == class_name)
+}
+
+fn parse_attr(node: &roxmltree::Node, attr: &str) -> Option<f64> {
+    node.attribute(attr)?.parse::<f64>().ok()
+}
+
+fn node_text(node: &roxmltree::Node) -> String {
+    node.descendants()
+        .filter_map(|descendant| descendant.text())
+        .collect::<Vec<_>>()
+        .join("")
+}
+
 /// Check for text visibility issues where CSS fill rules override inline fill attributes
 /// This causes text to have unexpected colors that may be invisible against backgrounds
 fn check_text_visibility(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
@@ -2757,5 +3083,75 @@ mod tests {
             sim < 0.8,
             "Different structures should have lower similarity"
         );
+    }
+
+    #[test]
+    fn sequence_box_intersection_honors_tolerance() {
+        let a = SequenceBox::new("message", "A", 10.0, 10.0, 40.0, 20.0);
+        let b = SequenceBox::new("note", "B", 48.0, 10.0, 40.0, 20.0);
+        assert!(
+            !a.intersects_with_tolerance(&b, SEQUENCE_OVERLAP_TOLERANCE),
+            "4px tolerance should allow boxes that only touch within tolerance"
+        );
+
+        let c = SequenceBox::new("note", "C", 40.0, 10.0, 40.0, 20.0);
+        assert!(
+            a.intersects_with_tolerance(&c, SEQUENCE_OVERLAP_TOLERANCE),
+            "clear overlap beyond tolerance should be detected"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_message_note_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <rect class="note" x="90" y="80" width="120" height="40"/>
+        <text class="messageText" x="100" y="100">Fight against hypochondria</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected sequence_overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_note_text_fragment_header_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <line class="loopLine" x1="60" y1="70" x2="220" y2="70"/>
+        <line class="loopLine" x1="220" y1="70" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="150" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="70" x2="60" y2="150"/>
+        <text class="noteText" x="90" y="84">Rational thoughts prevail!</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(issues.iter().any(|i| i.check == "sequence_overlap"));
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_loop_text_note_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <rect class="note" x="80" y="70" width="120" height="40"/>
+        <text class="loopText" x="100" y="90">Healthcheck</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(issues.iter().any(|i| i.check == "sequence_overlap"));
     }
 }
