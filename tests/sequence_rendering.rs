@@ -338,6 +338,33 @@ fn sequence_basic_structure() {
 }
 
 #[test]
+fn sequence_right_note_extends_actor_gap_without_clipping() {
+    let input = r#"sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>Bob: Hello
+    Note right of Alice: This note needs enough horizontal room
+    Bob-->>Alice: Reply"#;
+
+    let svg = render_sequence(input);
+    let note = find_note_box_containing(&svg, "This note needs enough horizontal room");
+    let doc = roxmltree::Document::parse(&svg).expect("valid svg");
+    let root = doc.root_element();
+    let width = root.attribute("width").unwrap().parse::<f64>().unwrap();
+    let view_box = root.attribute("viewBox").unwrap_or("0 0 0 0");
+    let parts: Vec<f64> = view_box
+        .split_whitespace()
+        .map(|p| p.parse().unwrap())
+        .collect();
+    let visible_right = parts[0] + width;
+
+    assert!(
+        note.x + note.width <= visible_right,
+        "note should fit in viewBox\n{svg}"
+    );
+}
+
+#[test]
 fn sequence_alt_fragment_has_divider() {
     let input = r#"sequenceDiagram
     Alice->>Bob: Request

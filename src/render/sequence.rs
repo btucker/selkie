@@ -3,6 +3,7 @@
 use crate::diagrams::sequence::{LineType, ParticipantType, SequenceDb};
 use crate::error::Result;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
+use std::collections::HashMap;
 
 /// Render a sequence diagram to SVG
 pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String> {
@@ -14,23 +15,10 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let margin_top = 0.0; // Actors start at y=0 (mermaid style - viewBox offset handles padding)
     let actor_box_padding = 0.0; // No padding - full width box
 
-    // Get actors in order
-    let actors = db.get_actors_in_order();
+    let layout = build_actor_layout(db, &cfg);
     let messages = db.get_messages();
 
-    // Calculate per-gap actor spacing based on message text widths (mermaid.js style)
-    // Each pair of adjacent actors can have different spacing
-    let gap_spacings = calculate_per_gap_spacing(
-        &actors,
-        messages,
-        cfg.base_actor_spacing,
-        cfg.actor_width,
-        cfg.char_width,
-        cfg.wrap_padding,
-        cfg.actor_margin,
-    );
-
-    if actors.is_empty() {
+    if layout.actors.is_empty() {
         // Empty diagram
         doc.set_size(400.0, 200.0);
         if !db.diagram_title.is_empty() {
@@ -50,7 +38,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     }
 
     // Calculate content width from per-gap spacings
-    let content_width: f64 = gap_spacings.iter().sum::<f64>() + cfg.actor_width;
+    let content_width = layout.content_width;
     // Height will be set later after we know the actual content height
 
     // Add theme styles
@@ -98,33 +86,13 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let lifeline_start_y = actor_y + cfg.actor_height;
 
     // Create actor position map using cumulative per-gap spacing
-    let mut actor_positions: std::collections::HashMap<String, f64> =
-        std::collections::HashMap::new();
-    let mut actor_centers: Vec<f64> = Vec::with_capacity(actors.len());
-    let mut actor_index: std::collections::HashMap<String, usize> =
-        std::collections::HashMap::new();
-    // Precompute cumulative x offsets for each actor
-    let mut actor_x_offsets: Vec<f64> = Vec::with_capacity(actors.len());
-    let mut cumulative_x = padding_x;
-    for (i, actor) in actors.iter().enumerate() {
-        actor_x_offsets.push(cumulative_x);
-        let center_x = cumulative_x + cfg.actor_width / 2.0;
-        actor_positions.insert(actor.name.clone(), center_x);
-        actor_centers.push(center_x);
-        actor_index.insert(actor.name.clone(), i);
-        if i < gap_spacings.len() {
-            cumulative_x += gap_spacings[i];
-        }
-    }
+    let actor_centers: Vec<f64> = layout.actors.iter().map(|actor| actor.center_x).collect();
 
     // Render top actors only (bottom actors rendered after we know the final height)
-    for (i, actor) in actors.iter().enumerate() {
-        let x = actor_x_offsets[i];
-        let center_x = x + cfg.actor_width / 2.0;
-
+    for actor in &layout.actors {
         // Top actor box/stick figure
         let top_actor = render_actor(
-            center_x,
+            actor.center_x,
             actor_y,
             cfg.actor_width,
             cfg.actor_height,
@@ -178,7 +146,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                     if let Some(actor) = message.message.split_whitespace().next() {
                         if let Some(stack) = activation_stacks.get_mut(actor) {
                             if let Some(start_y) = stack.pop() {
-                                if let Some(&actor_x) = actor_positions.get(actor) {
+                                if let Some(&actor_x) = layout.actor_positions.get(actor) {
                                     let end_y = last_message_y.unwrap_or(current_y);
                                     // Collect activation to add after lifelines
                                     let activation = render_activation(actor_x, start_y, end_y);
@@ -300,9 +268,10 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 }
                 _ => {
                     if let (Some(from), Some(to)) = (&message.from, &message.to) {
-                        if let (Some(&from_x), Some(&to_x)) =
-                            (actor_positions.get(from), actor_positions.get(to))
-                        {
+                        if let (Some(&from_x), Some(&to_x)) = (
+                            layout.actor_positions.get(from),
+                            layout.actor_positions.get(to),
+                        ) {
                             // Get sequence number if autonumber is enabled
                             let seq_num = if autonumber_enabled {
                                 Some(sequence_index)
@@ -337,11 +306,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                         message
                             .from
                             .as_ref()
-                            .and_then(|name| actor_index.get(name).copied()),
+                            .and_then(|name| layout.actor_index.get(name).copied()),
                         message
                             .to
                             .as_ref()
-                            .and_then(|name| actor_index.get(name).copied()),
+                            .and_then(|name| layout.actor_index.get(name).copied()),
                     ) {
                         let min_idx = from_idx.min(to_idx);
                         let max_idx = from_idx.max(to_idx);
@@ -358,23 +327,23 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 let note_y =
                     last_message_y.unwrap_or(current_y - cfg.message_spacing) + cfg.note_margin;
 
-                if let Some(&actor_x) = actor_positions.get(&note.actor) {
+                if let Some(&actor_x) = layout.actor_positions.get(&note.actor) {
                     let span_x = note
                         .actor_to
                         .as_ref()
-                        .and_then(|actor| actor_positions.get(actor))
+                        .and_then(|actor| layout.actor_positions.get(actor))
                         .copied();
                     let note_element =
                         render_note(actor_x, span_x, note_y, &note.message, note.placement, &cfg);
                     doc.add_element(note_element);
                 }
-                if let Some(actor_idx) = actor_index.get(&note.actor).copied() {
+                if let Some(actor_idx) = layout.actor_index.get(&note.actor).copied() {
                     let mut min_idx = actor_idx;
                     let mut max_idx = actor_idx;
                     if let Some(other) = note
                         .actor_to
                         .as_ref()
-                        .and_then(|name| actor_index.get(name).copied())
+                        .and_then(|name| layout.actor_index.get(name).copied())
                     {
                         min_idx = min_idx.min(other);
                         max_idx = max_idx.max(other);
@@ -399,16 +368,13 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let lifeline_end_y = bottom_actor_y;
 
     // Render lifelines and bottom actors now that we know the final height
-    for (i, actor) in actors.iter().enumerate() {
-        let x = actor_x_offsets[i];
-        let center_x = x + cfg.actor_width / 2.0;
-
+    for actor in &layout.actors {
         // Lifeline (mermaid.js style) - rendered in clusters layer (back)
         // so message lines and autonumbers render on top
         let lifeline = SvgElement::Line {
-            x1: center_x,
+            x1: actor.center_x,
             y1: lifeline_start_y,
-            x2: center_x,
+            x2: actor.center_x,
             y2: lifeline_end_y,
             attrs: Attrs::new()
                 .with_attr("stroke-width", "0.5px")
@@ -418,7 +384,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
 
         // Bottom actor box/stick figure
         let bottom_actor = render_actor(
-            center_x,
+            actor.center_x,
             bottom_actor_y,
             cfg.actor_width,
             cfg.actor_height,
@@ -535,6 +501,51 @@ impl Bounds {
             width: self.width + amount * 2.0,
             height: self.height + amount * 2.0,
         }
+    }
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Clone)]
+struct ActorLayout {
+    name: String,
+    description: String,
+    actor_type: ParticipantType,
+    x: f64,
+    center_x: f64,
+}
+
+// Placeholder layout records reserved for later sequence layout tasks.
+#[allow(dead_code)]
+#[derive(Debug)]
+struct LaidOutEvent;
+
+// Placeholder layout records reserved for later sequence layout tasks.
+#[allow(dead_code)]
+#[derive(Debug)]
+struct FragmentLayout;
+
+// Placeholder layout records reserved for later sequence layout tasks.
+#[allow(dead_code)]
+#[derive(Debug)]
+struct ActivationLayout;
+
+#[allow(dead_code)]
+#[derive(Debug)]
+struct SequenceLayout {
+    actors: Vec<ActorLayout>,
+    actor_positions: HashMap<String, f64>,
+    actor_index: HashMap<String, usize>,
+    content_width: f64,
+    events: Vec<LaidOutEvent>,
+    fragments: Vec<FragmentLayout>,
+    activations: Vec<ActivationLayout>,
+    bounds: Vec<Bounds>,
+}
+
+#[allow(dead_code)]
+impl SequenceLayout {
+    fn all_bounds(&self) -> impl Iterator<Item = Bounds> + '_ {
+        self.bounds.iter().copied()
     }
 }
 
@@ -1513,6 +1524,152 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {{
         activation_bkg_color = theme.activation_bkg_color,
         activation_border_color = theme.activation_border_color,
     )
+}
+
+fn build_actor_layout(db: &SequenceDb, cfg: &SequenceLayoutConfig) -> SequenceLayout {
+    let actors = db.get_actors_in_order();
+    let messages = db.get_messages();
+    let mut actor_index: HashMap<String, usize> = HashMap::new();
+    for (index, actor) in actors.iter().enumerate() {
+        actor_index.insert(actor.name.clone(), index);
+    }
+
+    let mut gap_spacings = calculate_per_gap_spacing(
+        &actors,
+        messages,
+        cfg.base_actor_spacing,
+        cfg.actor_width,
+        cfg.char_width,
+        cfg.wrap_padding,
+        cfg.actor_margin,
+    );
+    apply_sequence_gap_pressure(&mut gap_spacings, db, &actor_index, cfg);
+
+    let mut layout_actors = Vec::with_capacity(actors.len());
+    let mut actor_positions = HashMap::new();
+    let mut cumulative_x = 0.0;
+    for (index, actor) in actors.iter().enumerate() {
+        let center_x = cumulative_x + cfg.actor_width / 2.0;
+        actor_positions.insert(actor.name.clone(), center_x);
+        layout_actors.push(ActorLayout {
+            name: actor.name.clone(),
+            description: actor.description.clone(),
+            actor_type: actor.actor_type,
+            x: cumulative_x,
+            center_x,
+        });
+        if index < gap_spacings.len() {
+            cumulative_x += gap_spacings[index];
+        }
+    }
+
+    let actor_span_width = layout_actors
+        .last()
+        .map_or(0.0, |actor| actor.x + cfg.actor_width);
+    let content_width =
+        required_sequence_content_width(db, &actor_positions, actor_span_width, cfg);
+
+    SequenceLayout {
+        actors: layout_actors,
+        actor_positions,
+        actor_index,
+        content_width,
+        events: Vec::new(),
+        fragments: Vec::new(),
+        activations: Vec::new(),
+        bounds: Vec::new(),
+    }
+}
+
+fn apply_sequence_gap_pressure(
+    gap_spacings: &mut [f64],
+    db: &SequenceDb,
+    actor_index: &HashMap<String, usize>,
+    cfg: &SequenceLayoutConfig,
+) {
+    use crate::diagrams::sequence::Placement;
+
+    for note in db.get_notes() {
+        let Some(&index) = actor_index.get(&note.actor) else {
+            continue;
+        };
+        let note_width = note_width_for_pressure(&note.message, cfg);
+        let required_gap = note_width + cfg.actor_width / 2.0 + cfg.actor_margin;
+        match note.placement {
+            Placement::RightOf => {
+                if let Some(gap) = gap_spacings.get_mut(index) {
+                    *gap = gap.max(required_gap);
+                }
+            }
+            Placement::LeftOf => {
+                if index > 0 {
+                    if let Some(gap) = gap_spacings.get_mut(index - 1) {
+                        *gap = gap.max(required_gap);
+                    }
+                }
+            }
+            Placement::Over => {}
+        }
+    }
+
+    for message in db.get_messages() {
+        let (Some(from), Some(to)) = (&message.from, &message.to) else {
+            continue;
+        };
+        if from != to {
+            continue;
+        }
+        let Some(&index) = actor_index.get(from) else {
+            continue;
+        };
+        let label_width = text_width(&message.message, cfg) + 2.0 * cfg.wrap_padding;
+        let required_gap = 40.0 + label_width / 2.0 + cfg.actor_margin;
+        if let Some(gap) = gap_spacings.get_mut(index) {
+            *gap = gap.max(required_gap);
+        }
+    }
+}
+
+fn required_sequence_content_width(
+    db: &SequenceDb,
+    actor_positions: &HashMap<String, f64>,
+    actor_span_width: f64,
+    cfg: &SequenceLayoutConfig,
+) -> f64 {
+    use crate::diagrams::sequence::Placement;
+
+    let mut content_width = actor_span_width;
+    for note in db.get_notes() {
+        if note.placement != Placement::RightOf {
+            continue;
+        }
+        if let Some(&actor_x) = actor_positions.get(&note.actor) {
+            content_width =
+                content_width.max(actor_x + 25.0 + note_width_for_pressure(&note.message, cfg));
+        }
+    }
+
+    for message in db.get_messages() {
+        let (Some(from), Some(to)) = (&message.from, &message.to) else {
+            continue;
+        };
+        if from != to {
+            continue;
+        }
+        if let Some(&actor_x) = actor_positions.get(from) {
+            content_width = content_width.max(actor_x + 45.0 + text_width(&message.message, cfg));
+        }
+    }
+
+    content_width
+}
+
+fn note_width_for_pressure(message: &str, cfg: &SequenceLayoutConfig) -> f64 {
+    150.0_f64.max(text_width(message, cfg) + 2.0 * cfg.note_margin)
+}
+
+fn text_width(text: &str, cfg: &SequenceLayoutConfig) -> f64 {
+    text.chars().count() as f64 * cfg.char_width
 }
 
 /// Calculate per-gap actor spacing based on message text widths.
