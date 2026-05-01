@@ -28,7 +28,9 @@ impl Default for CheckConfig {
     }
 }
 
-/// Run all structural checks between selkie and reference SVGs
+/// Run shared structural checks between selkie and reference SVGs.
+///
+/// Diagram-specific checks that need sample type context are wired by the eval runner.
 pub fn check_structure(
     selkie: &SvgStructure,
     reference: &SvgStructure,

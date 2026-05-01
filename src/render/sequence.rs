@@ -152,7 +152,6 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     for event in &layout.events {
         match event {
             LaidOutEvent::Message(msg) => {
-                let _ = msg.bounds;
                 let msg_elements = render_message(
                     msg.from_x,
                     msg.to_x,
@@ -169,7 +168,6 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 }
             }
             LaidOutEvent::Note(note) => {
-                let _ = note.bounds;
                 doc.add_element(render_note(
                     note.actor_x,
                     note.span_x,
@@ -303,12 +301,10 @@ const RIGHT_OF_NOTE_WIDTH: f64 = 150.0;
 const RIGHT_OF_NOTE_X_OFFSET: f64 = 25.0;
 const LEFT_OF_NOTE_X_OFFSET: f64 = 20.0;
 const SELF_MESSAGE_LOOP_WIDTH: f64 = 40.0;
+const SELF_MESSAGE_LOOP_HEIGHT: f64 = 30.0;
 const SELF_MESSAGE_LABEL_OFFSET: f64 = 5.0;
 const ACTIVATION_WIDTH: f64 = 10.0;
 
-// Bounds is layout scaffolding for follow-up tasks; keep the dead-code allowance
-// narrow until later layout work wires it into rendering.
-#[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
 struct Bounds {
     x: f64,
@@ -317,7 +313,6 @@ struct Bounds {
     height: f64,
 }
 
-#[allow(dead_code)]
 impl Bounds {
     fn right(&self) -> f64 {
         self.x + self.width
@@ -352,9 +347,6 @@ impl Bounds {
 
 #[derive(Debug, Clone)]
 struct ActorLayout {
-    // The actor id is retained for later SequenceLayout-owned event layout.
-    #[allow(dead_code)]
-    name: String,
     description: String,
     actor_type: ParticipantType,
     x: f64,
@@ -369,7 +361,6 @@ struct MessageLayout {
     message: String,
     message_type: LineType,
     sequence_num: Option<i32>,
-    bounds: Bounds,
 }
 
 #[derive(Debug, Clone)]
@@ -379,7 +370,6 @@ struct NoteLayout {
     y: f64,
     message: String,
     placement: Placement,
-    bounds: Bounds,
 }
 
 #[derive(Debug, Clone)]
@@ -393,12 +383,8 @@ struct FragmentLayout {
     kind: FragmentKind,
     label: String,
     frame: Bounds,
-    #[allow(dead_code)]
-    depth: usize,
     color: Option<String>,
     sections: Vec<FragmentSectionLayout>,
-    min_actor_idx: Option<usize>,
-    max_actor_idx: Option<usize>,
 }
 
 #[derive(Debug, Clone)]
@@ -594,21 +580,19 @@ fn layout_basic_events(
                     if let Some(open) = open_fragments.pop() {
                         let depth = open_fragments.len();
                         let frame = fragment_frame_bounds(&open, depth, layout, cfg);
+                        let min_actor_idx = open.min_actor_idx;
+                        let max_actor_idx = open.max_actor_idx;
                         let fragment = FragmentLayout {
                             kind: open.kind,
                             label: open.label,
                             frame,
-                            depth,
                             color: open.color,
                             sections: open.sections,
-                            min_actor_idx: open.min_actor_idx,
-                            max_actor_idx: open.max_actor_idx,
                         };
                         layout.bounds.push(fragment.frame);
                         if let Some(parent) = open_fragments.last_mut() {
-                            let min_idx = fragment.min_actor_idx.unwrap_or(0);
-                            let max_idx = fragment
-                                .max_actor_idx
+                            let min_idx = min_actor_idx.unwrap_or(0);
+                            let max_idx = max_actor_idx
                                 .unwrap_or_else(|| layout.actors.len().saturating_sub(1));
                             parent.include_event(min_idx, max_idx, fragment.frame);
                         }
@@ -694,7 +678,6 @@ fn layout_basic_events(
                         message: message.message.clone(),
                         message_type: message.message_type,
                         sequence_num,
-                        bounds,
                     }));
                     if autonumber_enabled {
                         sequence_index += sequence_step;
@@ -738,7 +721,6 @@ fn layout_basic_events(
                         y: note_y,
                         message: note.message.clone(),
                         placement: note.placement,
-                        bounds,
                     }));
                 }
                 let note_bottom = note_y + note_height(&note.message, cfg);
@@ -880,11 +862,11 @@ fn message_bounds(
             x: from_x,
             y,
             width: SELF_MESSAGE_LOOP_WIDTH,
-            height: 30.0,
+            height: SELF_MESSAGE_LOOP_HEIGHT,
         };
         let label = Bounds {
             x: from_x + SELF_MESSAGE_LOOP_WIDTH + SELF_MESSAGE_LABEL_OFFSET,
-            y: y + 15.0 - cfg.line_height,
+            y: y + SELF_MESSAGE_LOOP_HEIGHT / 2.0 - cfg.line_height,
             width: label_width,
             height: cfg.line_height,
         };
@@ -1438,20 +1420,18 @@ fn render_self_message(
 ) -> MessageElements {
     let mut shapes = Vec::new();
     let mut labels = Vec::new();
-    let loop_width = 40.0;
-    let loop_height = 30.0;
 
     // Self-message path (shape - rendered first in edge_paths)
     let path = format!(
         "M {} {} L {} {} L {} {} L {} {}",
         x,
         y,
-        x + loop_width,
+        x + SELF_MESSAGE_LOOP_WIDTH,
         y,
-        x + loop_width,
-        y + loop_height,
+        x + SELF_MESSAGE_LOOP_WIDTH,
+        y + SELF_MESSAGE_LOOP_HEIGHT,
         x,
-        y + loop_height
+        y + SELF_MESSAGE_LOOP_HEIGHT
     );
 
     let mut path_attrs = Attrs::new()
@@ -1495,8 +1475,8 @@ fn render_self_message(
 
     // Message label (text - rendered after shapes in edge_labels)
     labels.push(SvgElement::Text {
-        x: x + loop_width + 5.0,
-        y: y + loop_height / 2.0,
+        x: x + SELF_MESSAGE_LOOP_WIDTH + SELF_MESSAGE_LABEL_OFFSET,
+        y: y + SELF_MESSAGE_LOOP_HEIGHT / 2.0,
         content: label.to_string(),
         attrs: Attrs::new()
             .with_attr("text-anchor", "start")
@@ -1513,39 +1493,14 @@ fn render_note(
     span_x: Option<f64>,
     y: f64,
     message: &str,
-    placement: crate::diagrams::sequence::Placement,
+    placement: Placement,
     cfg: &SequenceLayoutConfig,
 ) -> SvgElement {
-    use crate::diagrams::sequence::Placement;
-
-    let note_height = note_height(message, cfg);
-
-    let (note_width, x_center) = match placement {
-        Placement::Over => {
-            if let Some(span_x) = span_x {
-                let span = (span_x - actor_x).abs();
-                // Match mermaid.js: note spans between actors with extra padding
-                // Reference uses span + 50 for spanning notes
-                let width = (span + 50.0).max(MIN_NOTE_WIDTH);
-                (width, (actor_x + span_x) / 2.0)
-            } else {
-                (MIN_NOTE_WIDTH, actor_x)
-            }
-        }
-        Placement::RightOf => {
-            // Match mermaid.js: note width of 150 for right-of notes
-            (RIGHT_OF_NOTE_WIDTH, actor_x)
-        }
-        _ => (MIN_NOTE_WIDTH, actor_x),
-    };
-
-    let x = match placement {
-        Placement::LeftOf => actor_x - note_width - LEFT_OF_NOTE_X_OFFSET,
-        Placement::RightOf => actor_x + RIGHT_OF_NOTE_X_OFFSET, // Match mermaid.js offset from actor center
-        Placement::Over => x_center - note_width / 2.0,
-    };
-    // y is passed as the note's top position (mermaid.js style)
-    let top_y = y;
+    let bounds = note_bounds(actor_x, span_x, y, message, placement, cfg);
+    let x = bounds.x;
+    let top_y = bounds.y;
+    let note_width = bounds.width;
+    let note_height = bounds.height;
 
     let mut children = Vec::new();
 
@@ -1843,7 +1798,6 @@ fn build_actor_layout(db: &SequenceDb, cfg: &SequenceLayoutConfig) -> SequenceLa
         let center_x = cumulative_x + cfg.actor_width / 2.0;
         actor_positions.insert(actor.name.clone(), center_x);
         layout_actors.push(ActorLayout {
-            name: actor.name.clone(),
             description: actor.description.clone(),
             actor_type: actor.actor_type,
             x: cumulative_x,
