@@ -8,19 +8,11 @@ use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String> {
     let mut doc = SvgDocument::new();
 
+    let cfg = SequenceLayoutConfig::default();
+
     // Layout constants (matching mermaid.js default theme)
-    let base_actor_spacing = 200.0;
-    let actor_width = 150.0; // mermaid.js uses 150
-    let actor_height = 65.0; // mermaid.js uses 65
-    let message_spacing = 44.0; // mermaid.js uses ~44px spacing in rendered output
     let margin_top = 0.0; // Actors start at y=0 (mermaid style - viewBox offset handles padding)
-    let _margin_left = 0.0; // No left margin (handled by viewBox offset)
     let actor_box_padding = 0.0; // No padding - full width box
-    let diagram_margin_x = 50.0; // Mermaid.js default diagramMarginX
-    let diagram_margin_y = 10.0; // Mermaid.js default diagramMarginY
-    let char_width = 9.0; // Approximate character width in pixels for 16px font (trebuchet ms)
-    let wrap_padding = 10.0; // mermaid.js wrapPadding
-    let actor_margin = 50.0; // mermaid.js default actorMargin
 
     // Get actors in order
     let actors = db.get_actors_in_order();
@@ -31,11 +23,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let gap_spacings = calculate_per_gap_spacing(
         &actors,
         messages,
-        base_actor_spacing,
-        actor_width,
-        char_width,
-        wrap_padding,
-        actor_margin,
+        cfg.base_actor_spacing,
+        cfg.actor_width,
+        cfg.char_width,
+        cfg.wrap_padding,
+        cfg.actor_margin,
     );
 
     if actors.is_empty() {
@@ -58,7 +50,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     }
 
     // Calculate content width from per-gap spacings
-    let content_width: f64 = gap_spacings.iter().sum::<f64>() + actor_width;
+    let content_width: f64 = gap_spacings.iter().sum::<f64>() + cfg.actor_width;
     // Height will be set later after we know the actual content height
 
     // Add theme styles
@@ -103,7 +95,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let padding_y = margin_top; // Content coordinate origin
 
     let actor_y = padding_y + title_offset;
-    let lifeline_start_y = actor_y + actor_height;
+    let lifeline_start_y = actor_y + cfg.actor_height;
 
     // Create actor position map using cumulative per-gap spacing
     let mut actor_positions: std::collections::HashMap<String, f64> =
@@ -116,7 +108,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     let mut cumulative_x = padding_x;
     for (i, actor) in actors.iter().enumerate() {
         actor_x_offsets.push(cumulative_x);
-        let center_x = cumulative_x + actor_width / 2.0;
+        let center_x = cumulative_x + cfg.actor_width / 2.0;
         actor_positions.insert(actor.name.clone(), center_x);
         actor_centers.push(center_x);
         actor_index.insert(actor.name.clone(), i);
@@ -128,14 +120,14 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     // Render top actors only (bottom actors rendered after we know the final height)
     for (i, actor) in actors.iter().enumerate() {
         let x = actor_x_offsets[i];
-        let center_x = x + actor_width / 2.0;
+        let center_x = x + cfg.actor_width / 2.0;
 
         // Top actor box/stick figure
         let top_actor = render_actor(
             center_x,
             actor_y,
-            actor_width,
-            actor_height,
+            cfg.actor_width,
+            cfg.actor_height,
             &actor.description,
             actor.actor_type,
             actor_box_padding,
@@ -153,7 +145,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     }
     events.sort_by_key(|(order, _)| *order);
 
-    let mut current_y = lifeline_start_y + message_spacing;
+    let mut current_y = lifeline_start_y + cfg.message_spacing;
     let mut last_message_y: Option<f64> = None;
     let mut activation_stacks: std::collections::HashMap<String, Vec<f64>> =
         std::collections::HashMap::new();
@@ -204,7 +196,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 | LineType::BreakStart
                 | LineType::RectStart => {
                     let kind = FragmentKind::from_message_type(message.message_type);
-                    let start_y = current_y - message_spacing / 2.0;
+                    let start_y = current_y - cfg.message_spacing / 2.0;
                     fragment_stack.push(FragmentState {
                         start_y,
                         kind,
@@ -221,7 +213,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             None
                         },
                     });
-                    current_y += message_spacing;
+                    current_y += cfg.message_spacing;
                 }
                 LineType::AltElse | LineType::ParAnd | LineType::CriticalOption => {
                     if let Some(fragment) = fragment_stack.last() {
@@ -233,7 +225,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             fragment_width,
                             depth,
                             &actor_centers,
-                            actor_width,
+                            cfg.actor_width,
                         );
                         let divider =
                             render_fragment_divider(frame_x, frame_width, current_y, true);
@@ -254,7 +246,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             doc.add_edge_label(label);
                         }
                     }
-                    current_y += message_spacing;
+                    current_y += cfg.message_spacing;
                 }
                 LineType::LoopEnd
                 | LineType::AltEnd
@@ -265,7 +257,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 | LineType::RectEnd => {
                     if let Some(fragment) = fragment_stack.pop() {
                         // End fragment at current position (no extra spacing like mermaid.js)
-                        let end_y = current_y - message_spacing / 2.0;
+                        let end_y = current_y - cfg.message_spacing / 2.0;
                         let depth = fragment_stack.len();
                         let (frame_x, frame_width) = fragment_bounds_for_state(
                             &fragment,
@@ -273,7 +265,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                             fragment_width,
                             depth,
                             &actor_centers,
-                            actor_width,
+                            cfg.actor_width,
                         );
                         let frame = render_fragment_frame(
                             frame_x,
@@ -356,14 +348,14 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                         }
                     }
                     last_message_y = Some(current_y);
-                    current_y += message_spacing;
+                    current_y += cfg.message_spacing;
                 }
             },
             TimelineEvent::Note(note) => {
                 // Mermaid.js positions notes at previous_message_y + noteMargin
-                let note_margin = 10.0; // mermaid.js default noteMargin
-                let note_height = 39.0; // mermaid.js default note height
-                let note_y = last_message_y.unwrap_or(current_y - message_spacing) + note_margin;
+                let note_height = cfg.min_note_height;
+                let note_y =
+                    last_message_y.unwrap_or(current_y - cfg.message_spacing) + cfg.note_margin;
 
                 if let Some(&actor_x) = actor_positions.get(&note.actor) {
                     let span_x = note
@@ -394,7 +386,7 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
                 // This matches mermaid.js behavior where next message is message_spacing below note
                 let note_bottom = note_y + note_height;
                 last_message_y = Some(note_bottom);
-                current_y = note_bottom + message_spacing;
+                current_y = note_bottom + cfg.message_spacing;
             }
         }
     }
@@ -402,14 +394,13 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     // Calculate final bottom actor position based on actual content
     // Mermaid uses boxMargin * 2 (~20px) between last content and bottom actors
     // We subtract extra message_spacing and add boxMargin to match
-    let box_margin = 10.0; // mermaid.js default boxMargin
-    let bottom_actor_y = last_message_y.unwrap_or(current_y) + box_margin * 2.0;
+    let bottom_actor_y = last_message_y.unwrap_or(current_y) + cfg.box_margin * 2.0;
     let lifeline_end_y = bottom_actor_y;
 
     // Render lifelines and bottom actors now that we know the final height
     for (i, actor) in actors.iter().enumerate() {
         let x = actor_x_offsets[i];
-        let center_x = x + actor_width / 2.0;
+        let center_x = x + cfg.actor_width / 2.0;
 
         // Lifeline (mermaid.js style) - rendered in clusters layer (back)
         // so message lines and autonumbers render on top
@@ -428,8 +419,8 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         let bottom_actor = render_actor(
             center_x,
             bottom_actor_y,
-            actor_width,
-            actor_height,
+            cfg.actor_width,
+            cfg.actor_height,
             &actor.description,
             actor.actor_type,
             actor_box_padding,
@@ -444,12 +435,12 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
 
     // Set final SVG dimensions with mermaid-style viewBox offset for visual padding
     // Mermaid uses viewBox="-50 -10 width height" to create visual padding around content
-    let content_height = bottom_actor_y + actor_height;
-    let total_width = content_width + 2.0 * diagram_margin_x;
-    let total_height = content_height + 2.0 * diagram_margin_y;
+    let content_height = bottom_actor_y + cfg.actor_height;
+    let total_width = content_width + 2.0 * cfg.diagram_margin_x;
+    let total_height = content_height + 2.0 * cfg.diagram_margin_y;
     doc.set_size_with_origin(
-        -diagram_margin_x,
-        -diagram_margin_y,
+        -cfg.diagram_margin_x,
+        -cfg.diagram_margin_y,
         total_width,
         total_height,
     );
@@ -461,6 +452,88 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
 enum TimelineEvent<'a> {
     Message(&'a crate::diagrams::sequence::Message),
     Note(&'a crate::diagrams::sequence::Note),
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Clone, Copy)]
+struct SequenceLayoutConfig {
+    base_actor_spacing: f64,
+    actor_width: f64,
+    actor_height: f64,
+    message_spacing: f64,
+    diagram_margin_x: f64,
+    diagram_margin_y: f64,
+    char_width: f64,
+    wrap_padding: f64,
+    actor_margin: f64,
+    box_margin: f64,
+    note_margin: f64,
+    min_note_height: f64,
+    line_height: f64,
+    label_box_height: f64,
+}
+
+impl Default for SequenceLayoutConfig {
+    fn default() -> Self {
+        Self {
+            base_actor_spacing: 200.0,
+            actor_width: 150.0,
+            actor_height: 65.0,
+            message_spacing: 44.0,
+            diagram_margin_x: 50.0,
+            diagram_margin_y: 10.0,
+            char_width: 9.0,
+            wrap_padding: 10.0,
+            actor_margin: 50.0,
+            box_margin: 10.0,
+            note_margin: 10.0,
+            min_note_height: 39.0,
+            line_height: 18.0,
+            label_box_height: 20.0,
+        }
+    }
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Clone, Copy)]
+struct Bounds {
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+}
+
+#[allow(dead_code)]
+impl Bounds {
+    fn right(&self) -> f64 {
+        self.x + self.width
+    }
+
+    fn bottom(&self) -> f64 {
+        self.y + self.height
+    }
+
+    fn union(self, other: Bounds) -> Bounds {
+        let x = self.x.min(other.x);
+        let y = self.y.min(other.y);
+        let right = self.right().max(other.right());
+        let bottom = self.bottom().max(other.bottom());
+        Bounds {
+            x,
+            y,
+            width: right - x,
+            height: bottom - y,
+        }
+    }
+
+    fn expand(self, amount: f64) -> Bounds {
+        Bounds {
+            x: self.x - amount,
+            y: self.y - amount,
+            width: self.width + amount * 2.0,
+            height: self.height + amount * 2.0,
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
