@@ -94,6 +94,44 @@ struct SequenceBox {
     height: f64,
 }
 
+#[derive(Debug, Clone, Copy)]
+struct SequenceLine {
+    x1: f64,
+    y1: f64,
+    x2: f64,
+    y2: f64,
+}
+
+impl SequenceLine {
+    fn new(x1: f64, y1: f64, x2: f64, y2: f64) -> Self {
+        Self { x1, y1, x2, y2 }
+    }
+
+    fn is_horizontal(&self) -> bool {
+        (self.y1 - self.y2).abs() < 0.5
+    }
+
+    fn is_vertical(&self) -> bool {
+        (self.x1 - self.x2).abs() < 0.5
+    }
+
+    fn min_x(&self) -> f64 {
+        self.x1.min(self.x2)
+    }
+
+    fn max_x(&self) -> f64 {
+        self.x1.max(self.x2)
+    }
+
+    fn min_y(&self) -> f64 {
+        self.y1.min(self.y2)
+    }
+
+    fn max_y(&self) -> f64 {
+        self.y1.max(self.y2)
+    }
+}
+
 impl SequenceBox {
     fn new(
         kind: &'static str,
@@ -137,7 +175,7 @@ pub fn check_sequence_overlaps(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
     let mut message_texts = Vec::new();
     let mut note_texts = Vec::new();
     let mut loop_texts = Vec::new();
-    let mut loop_points = Vec::new();
+    let mut loop_lines = Vec::new();
 
     for node in doc.descendants().filter(|node| node.is_element()) {
         match node.tag_name().name() {
@@ -163,15 +201,14 @@ pub fn check_sequence_overlaps(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
             }
             "line" if has_class(&node, "loopLine") => {
                 if let Some((x1, y1, x2, y2)) = line_coords(&node) {
-                    loop_points.push((x1, y1));
-                    loop_points.push((x2, y2));
+                    loop_lines.push(SequenceLine::new(x1, y1, x2, y2));
                 }
             }
             _ => {}
         }
     }
 
-    let fragments = fragment_boxes_from_points(&loop_points);
+    let fragments = fragment_boxes_from_lines(&loop_lines);
     let headers: Vec<_> = fragments
         .iter()
         .map(|frame| {
@@ -277,14 +314,21 @@ fn rect_sequence_box(
 
 fn text_sequence_box(node: &roxmltree::Node, kind: &'static str) -> Option<SequenceBox> {
     let text = node_text(node);
-    let x = parse_attr(node, "x")?;
+    let mut x = parse_attr(node, "x")?;
     let y = parse_attr(node, "y")?;
+    let width = text.chars().count() as f64 * SEQUENCE_CHAR_WIDTH;
+    match node.attribute("text-anchor").unwrap_or("start") {
+        "middle" => x -= width / 2.0,
+        "end" => x -= width,
+        _ => {}
+    }
+
     Some(SequenceBox::new(
         kind,
         text.clone(),
         x,
         y - SEQUENCE_LINE_HEIGHT,
-        text.chars().count() as f64 * SEQUENCE_CHAR_WIDTH,
+        width,
         SEQUENCE_LINE_HEIGHT,
     ))
 }
@@ -298,20 +342,86 @@ fn line_coords(node: &roxmltree::Node) -> Option<(f64, f64, f64, f64)> {
     ))
 }
 
-fn fragment_boxes_from_points(points: &[(f64, f64)]) -> Vec<SequenceBox> {
-    if points.is_empty() {
+fn fragment_boxes_from_lines(lines: &[SequenceLine]) -> Vec<SequenceBox> {
+    let horizontal: Vec<_> = lines.iter().filter(|line| line.is_horizontal()).collect();
+    let vertical: Vec<_> = lines.iter().filter(|line| line.is_vertical()).collect();
+    let mut fragments = Vec::new();
+
+    for top in &horizontal {
+        for bottom in &horizontal {
+            if bottom.y1 <= top.y1 {
+                continue;
+            }
+
+            let min_x = top.min_x();
+            let max_x = top.max_x();
+            if (bottom.min_x() - min_x).abs() > 0.5 || (bottom.max_x() - max_x).abs() > 0.5 {
+                continue;
+            }
+
+            let has_left = vertical.iter().any(|line| {
+                (line.x1 - min_x).abs() <= 0.5
+                    && (line.min_y() - top.y1).abs() <= 0.5
+                    && (line.max_y() - bottom.y1).abs() <= 0.5
+            });
+            let has_right = vertical.iter().any(|line| {
+                (line.x1 - max_x).abs() <= 0.5
+                    && (line.min_y() - top.y1).abs() <= 0.5
+                    && (line.max_y() - bottom.y1).abs() <= 0.5
+            });
+
+            if has_left && has_right {
+                fragments.push(SequenceBox::new(
+                    "fragment",
+                    "loop fragment",
+                    min_x,
+                    top.y1,
+                    max_x - min_x,
+                    bottom.y1 - top.y1,
+                ));
+            }
+        }
+    }
+
+    fragments.sort_by(|a, b| {
+        a.y.partial_cmp(&b.y)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| a.x.partial_cmp(&b.x).unwrap_or(std::cmp::Ordering::Equal))
+    });
+    fragments.dedup_by(|a, b| {
+        (a.x - b.x).abs() <= 0.5
+            && (a.y - b.y).abs() <= 0.5
+            && (a.width - b.width).abs() <= 0.5
+            && (a.height - b.height).abs() <= 0.5
+    });
+
+    if fragments.is_empty() {
+        return aggregate_fragment_box(lines);
+    }
+
+    fragments
+}
+
+fn aggregate_fragment_box(lines: &[SequenceLine]) -> Vec<SequenceBox> {
+    if lines.is_empty() {
         return Vec::new();
     }
 
-    let min_x = points.iter().map(|(x, _)| *x).fold(f64::INFINITY, f64::min);
-    let max_x = points
+    let min_x = lines
         .iter()
-        .map(|(x, _)| *x)
+        .map(|line| line.min_x())
+        .fold(f64::INFINITY, f64::min);
+    let max_x = lines
+        .iter()
+        .map(|line| line.max_x())
         .fold(f64::NEG_INFINITY, f64::max);
-    let min_y = points.iter().map(|(_, y)| *y).fold(f64::INFINITY, f64::min);
-    let max_y = points
+    let min_y = lines
         .iter()
-        .map(|(_, y)| *y)
+        .map(|line| line.min_y())
+        .fold(f64::INFINITY, f64::min);
+    let max_y = lines
+        .iter()
+        .map(|line| line.max_y())
         .fold(f64::NEG_INFINITY, f64::max);
 
     vec![SequenceBox::new(
@@ -3121,6 +3231,25 @@ mod tests {
     }
 
     #[test]
+    fn sequence_overlap_detector_accounts_for_centered_text_anchor() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <rect class="note" x="10" y="80" width="30" height="40"/>
+        <text class="messageText" text-anchor="middle" x="50" y="100">Centered</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected centered text overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
     fn sequence_overlap_detector_reports_note_text_fragment_header_collision() {
         let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
       <g>
@@ -3137,6 +3266,33 @@ mod tests {
         check_sequence_overlaps(&structure, &mut issues);
 
         assert!(issues.iter().any(|i| i.check == "sequence_overlap"));
+    }
+
+    #[test]
+    fn sequence_overlap_detector_checks_separate_fragment_headers() {
+        let svg = r##"<svg width="300" height="260" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <line class="loopLine" x1="60" y1="40" x2="220" y2="40"/>
+        <line class="loopLine" x1="220" y1="40" x2="220" y2="100"/>
+        <line class="loopLine" x1="60" y1="100" x2="220" y2="100"/>
+        <line class="loopLine" x1="60" y1="40" x2="60" y2="100"/>
+
+        <line class="loopLine" x1="60" y1="140" x2="220" y2="140"/>
+        <line class="loopLine" x1="220" y1="140" x2="220" y2="220"/>
+        <line class="loopLine" x1="60" y1="220" x2="220" y2="220"/>
+        <line class="loopLine" x1="60" y1="140" x2="60" y2="220"/>
+        <text class="noteText" x="90" y="154">Second header collision</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected second fragment header overlap issue, got {issues:?}"
+        );
     }
 
     #[test]
