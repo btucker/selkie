@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1146" height="884" viewBox="-50 -10 1146 884" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1146" height="1044" viewBox="-50 -10 1146 1044" class="mermaid">
   <style>
 
 .mermaid {
@@ -132,16 +132,16 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
 
 .note {
   stroke: #aaaa33;
-  fill: #FFFFCC;
+  fill: #fff5ad;
 }
 
 .noteText, .noteText > tspan {
-  fill: #333333;
+  fill: black;
   stroke: none;
 }
 
 .note-text, .note-text > tspan {
-  fill: #333333;
+  fill: black;
   stroke: none;
 }
 
@@ -211,110 +211,110 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
   </defs>
   <g class="root">
     <g class="clusters">
-      <line x1="-10" y1="378" x2="636" y2="378" class="loopLine" stroke-dasharray="3,3"/>
-      <line x1="220" y1="735" x2="1046" y2="735" class="loopLine" stroke-dasharray="3,3"/>
       <g>
-        <line x1="0" y1="581" x2="1046" y2="581" class="loopLine"/>
-        <line x1="1046" y1="581" x2="1046" y2="801" class="loopLine"/>
-        <line x1="0" y1="801" x2="1046" y2="801" class="loopLine"/>
-        <line x1="0" y1="581" x2="0" y2="801" class="loopLine"/>
+        <line x1="-20" y1="623" x2="1066" y2="623" class="loopLine"/>
+        <line x1="1066" y1="623" x2="1066" y2="929" class="loopLine"/>
+        <line x1="-20" y1="929" x2="1066" y2="929" class="loopLine"/>
+        <line x1="-20" y1="623" x2="-20" y2="929" class="loopLine"/>
       </g>
-      <polygon points="10,581 60,581 60,594 52,601 10,601" class="labelBox"/>
+      <polygon points="-10,623 40,623 40,636 32,643 -10,643" class="labelBox"/>
+      <line x1="-20" y1="845" x2="1066" y2="845" class="loopLine" stroke-dasharray="3,3"/>
       <g>
-        <line x1="-10" y1="268" x2="1056" y2="268" class="loopLine"/>
-        <line x1="1056" y1="268" x2="1056" y2="801" class="loopLine"/>
-        <line x1="-10" y1="801" x2="1056" y2="801" class="loopLine"/>
-        <line x1="-10" y1="268" x2="-10" y2="801" class="loopLine"/>
+        <line x1="-10" y1="290" x2="1056" y2="290" class="loopLine"/>
+        <line x1="1056" y1="290" x2="1056" y2="939" class="loopLine"/>
+        <line x1="-10" y1="939" x2="1056" y2="939" class="loopLine"/>
+        <line x1="-10" y1="290" x2="-10" y2="939" class="loopLine"/>
       </g>
-      <polygon points="0,268 50,268 50,281 42,288 0,288" class="labelBox"/>
-      <line x1="75" y1="65" x2="75" y2="799" class="actor-line" stroke-width="0.5px"/>
-      <line x1="295" y1="65" x2="295" y2="799" class="actor-line" stroke-width="0.5px"/>
-      <line x1="551" y1="65" x2="551" y2="799" class="actor-line" stroke-width="0.5px"/>
-      <line x1="771" y1="65" x2="771" y2="799" class="actor-line" stroke-width="0.5px"/>
-      <line x1="971" y1="65" x2="971" y2="799" class="actor-line" stroke-width="0.5px"/>
-      <rect x="546" y="158" width="10" height="264" rx="1" ry="1" class="activation"/>
-      <rect x="290" y="515" width="10" height="264" rx="1" ry="1" class="activation"/>
+      <polygon points="0,290 50,290 50,303 42,310 0,310" class="labelBox"/>
+      <line x1="-10" y1="388" x2="1056" y2="388" class="loopLine" stroke-dasharray="3,3"/>
+      <line x1="75" y1="65" x2="75" y2="959" class="actor-line" stroke-width="0.5px"/>
+      <line x1="295" y1="65" x2="295" y2="959" class="actor-line" stroke-width="0.5px"/>
+      <line x1="551" y1="65" x2="551" y2="959" class="actor-line" stroke-width="0.5px"/>
+      <line x1="771" y1="65" x2="771" y2="959" class="actor-line" stroke-width="0.5px"/>
+      <line x1="971" y1="65" x2="971" y2="959" class="actor-line" stroke-width="0.5px"/>
+      <rect x="546" y="158" width="10" height="284" rx="1" ry="1" class="activation"/>
+      <rect x="290" y="535" width="10" height="364" rx="1" ry="1" class="activation"/>
     </g>
     <g class="edgePaths">
-      <line x1="75" y1="158" x2="551" y2="158" class="messageLine0" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)" stroke-width="2"/>
-      <line x1="551" y1="202" x2="971" y2="202" class="messageLine0" marker-end="url(#arrow-filled)" stroke-width="2" stroke="none" style="fill: none;"/>
-      <line x1="971" y1="246" x2="551" y2="246" class="messageLine0" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none"/>
-      <line x1="551" y1="334" x2="75" y2="334" class="messageLine0" stroke="none" stroke-width="2" marker-end="url(#arrow-filled)" style="fill: none;"/>
-      <line x1="551" y1="422" x2="75" y2="422" class="messageLine0" style="fill: none;" marker-end="url(#arrow-filled)" stroke="none" stroke-width="2"/>
-      <line x1="75" y1="515" x2="295" y2="515" class="messageLine0" stroke="none" marker-end="url(#arrow-filled)" style="fill: none;" stroke-width="2"/>
-      <line x1="295" y1="559" x2="971" y2="559" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
-      <path d="M 295 647 L 335 647 L 335 677 L 295 677" class="message-line" stroke-width="1.5" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow-filled)"/>
-      <path d="M 295 691 L 335 691 L 335 721 L 295 721" class="message-line" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow-filled)" stroke-width="1.5"/>
-      <line x1="295" y1="779" x2="75" y2="779" class="messageLine1" marker-end="url(#arrow-filled)" style="stroke-dasharray: 3, 3; fill: none;" stroke-width="2" stroke="none"/>
+      <line x1="75" y1="158" x2="551" y2="158" class="messageLine0" stroke-width="2" style="fill: none;" marker-end="url(#arrow-filled)" stroke="none"/>
+      <line x1="551" y1="202" x2="971" y2="202" class="messageLine0" stroke="none" stroke-width="2" marker-end="url(#arrow-filled)" style="fill: none;"/>
+      <line x1="971" y1="246" x2="551" y2="246" class="messageLine0" stroke="none" stroke-width="2" style="fill: none;" marker-end="url(#arrow-filled)"/>
+      <line x1="551" y1="344" x2="75" y2="344" class="messageLine0" style="fill: none;" stroke-width="2" stroke="none" marker-end="url(#arrow-filled)"/>
+      <line x1="551" y1="442" x2="75" y2="442" class="messageLine0" stroke-width="2" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)"/>
+      <line x1="75" y1="535" x2="295" y2="535" class="messageLine0" stroke-width="2" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)"/>
+      <line x1="295" y1="579" x2="971" y2="579" class="messageLine0" marker-end="url(#arrow-filled)" stroke="none" stroke-width="2" style="fill: none;"/>
+      <path d="M 295 677 L 335 677 L 335 707 L 295 707" class="message-line" marker-end="url(#arrow-filled)" stroke-dasharray="3,3" stroke-width="1.5" fill="none"/>
+      <path d="M 295 761 L 335 761 L 335 791 L 295 791" class="message-line" marker-end="url(#arrow-filled)" fill="none" stroke-dasharray="3,3" stroke-width="1.5"/>
+      <line x1="295" y1="899" x2="75" y2="899" class="messageLine1" stroke-width="2" marker-end="url(#arrow-filled)" style="stroke-dasharray: 3, 3; fill: none;" stroke="none"/>
     </g>
     <g class="edgeLabels">
-      <text x="313" y="148" class="message-label" text-anchor="middle" font-size="16">Logs in using credentials</text>
-      <text x="761" y="192" class="message-label" text-anchor="middle" font-size="16">Query stored accounts</text>
-      <text x="761" y="236" class="message-label" font-size="16" text-anchor="middle">Respond with query result</text>
-      <text x="313" y="324" class="message-label" font-size="16" text-anchor="middle">Invalid credentials</text>
-      <text x="313" y="396" class="loopText" text-anchor="middle" font-size="16">[Credentials found]</text>
-      <text x="313" y="412" class="message-label" font-size="16" text-anchor="middle">Successfully logged in</text>
-      <text x="185" y="505" class="message-label" text-anchor="middle" font-size="16">Submit new post</text>
-      <text x="633" y="549" class="message-label" text-anchor="middle" font-size="16">Store post data</text>
-      <text x="340" y="662" class="message-label" font-size="16" text-anchor="start">Send mail to blog subscribers</text>
-      <text x="340" y="706" class="message-label" font-size="16" text-anchor="start">Store in-site notifications</text>
-      <text x="633" y="753" class="loopText" text-anchor="middle" font-size="16">[Response]</text>
-      <text x="185" y="769" class="message-label" text-anchor="middle" font-size="16">Successfully posted</text>
-      <text x="35" y="594" class="labelText" text-anchor="middle" font-size="16">par</text>
-      <text x="523" y="599" class="loopText" font-size="16" text-anchor="middle">[Notifications]</text>
-      <text x="25" y="281" class="labelText" text-anchor="middle" font-size="16">alt</text>
-      <text x="523" y="286" class="loopText" text-anchor="middle" font-size="16">[Credentials not found]</text>
+      <text x="15" y="636" class="labelText" font-size="16" text-anchor="middle">par</text>
+      <text x="523" y="641" class="loopText" text-anchor="middle" font-size="16">[Notifications]</text>
+      <text x="523" y="863" class="loopText" font-size="16" text-anchor="middle">[Response]</text>
+      <text x="25" y="303" class="labelText" font-size="16" text-anchor="middle">alt</text>
+      <text x="523" y="308" class="loopText" text-anchor="middle" font-size="16">[Credentials not found]</text>
+      <text x="523" y="406" class="loopText" font-size="16" text-anchor="middle">[Credentials found]</text>
+      <text x="313" y="148" class="message-label" font-size="16" text-anchor="middle">Logs in using credentials</text>
+      <text x="761" y="192" class="message-label" font-size="16" text-anchor="middle">Query stored accounts</text>
+      <text x="761" y="236" class="message-label" text-anchor="middle" font-size="16">Respond with query result</text>
+      <text x="313" y="334" class="message-label" font-size="16" text-anchor="middle">Invalid credentials</text>
+      <text x="313" y="432" class="message-label" text-anchor="middle" font-size="16">Successfully logged in</text>
+      <text x="185" y="525" class="message-label" text-anchor="middle" font-size="16">Submit new post</text>
+      <text x="633" y="569" class="message-label" text-anchor="middle" font-size="16">Store post data</text>
+      <text x="340" y="692" class="message-label" text-anchor="start" font-size="16">Send mail to blog subscribers</text>
+      <text x="340" y="776" class="message-label" font-size="16" text-anchor="start">Store in-site notifications</text>
+      <text x="185" y="889" class="message-label" text-anchor="middle" font-size="16">Successfully posted</text>
     </g>
     <g class="nodes">
 
     </g>
     <g class="actor">
-      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
-      <text x="75" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Web Browser</text>
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="75" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Web Browser</text>
     </g>
     <g class="actor">
-      <rect x="220" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="295" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Blog Service</text>
+      <rect x="220" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="295" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Blog Service</text>
     </g>
     <g class="actor">
       <rect x="476" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="551" y="32.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Account Service</text>
+      <text x="551" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Account Service</text>
     </g>
     <g class="actor">
-      <rect x="696" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
-      <text x="771" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Mail Service</text>
+      <rect x="696" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="771" y="32.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Mail Service</text>
     </g>
     <g class="actor">
-      <rect x="896" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
+      <rect x="896" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
       <text x="971" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Storage</text>
     </g>
     <g class="note">
       <rect x="50" y="75" width="946" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="523" y="80" class="noteText" font-size="16" alignment-baseline="middle" text-anchor="middle" dy="1em" dominant-baseline="middle">The user must be logged in to submit blog posts</text>
+      <text x="523" y="80" class="noteText" dy="1em" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" font-size="16">The user must be logged in to submit blog posts</text>
     </g>
     <g class="note">
-      <rect x="50" y="432" width="946" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="523" y="437" class="noteText" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" dy="1em" font-size="16">When the user is authenticated, they can now submit new posts</text>
+      <rect x="50" y="452" width="946" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="523" y="457" class="noteText" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle" dy="1em" font-size="16">When the user is authenticated, they can now submit new posts</text>
     </g>
     <g class="actor">
-      <rect x="0" y="799" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="75" y="831.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Web Browser</text>
+      <rect x="0" y="959" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="75" y="991.5" class="actor actor-box" dominant-baseline="central" font-size="16" text-anchor="middle">Web Browser</text>
     </g>
     <g class="actor">
-      <rect x="220" y="799" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="295" y="831.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Blog Service</text>
+      <rect x="220" y="959" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="295" y="991.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">Blog Service</text>
     </g>
     <g class="actor">
-      <rect x="476" y="799" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
-      <text x="551" y="831.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">Account Service</text>
+      <rect x="476" y="959" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="551" y="991.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Account Service</text>
     </g>
     <g class="actor">
-      <rect x="696" y="799" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="771" y="831.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Mail Service</text>
+      <rect x="696" y="959" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
+      <text x="771" y="991.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Mail Service</text>
     </g>
     <g class="actor">
-      <rect x="896" y="799" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
-      <text x="971" y="831.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Storage</text>
+      <rect x="896" y="959" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="971" y="991.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Storage</text>
     </g>
   </g>
 </svg>
