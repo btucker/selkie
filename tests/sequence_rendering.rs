@@ -19,6 +19,10 @@ struct TestBox {
 }
 
 impl TestBox {
+    fn right(&self) -> f64 {
+        self.x + self.width
+    }
+
     fn bottom(&self) -> f64 {
         self.y + self.height
     }
@@ -120,6 +124,68 @@ fn find_note_box_containing(svg: &str, label: &str) -> TestBox {
         }
     }
     panic!("missing note rect for {label}");
+}
+
+fn find_actor_box_containing(svg: &str, label: &str) -> TestBox {
+    let doc = roxmltree::Document::parse(svg).expect("valid svg");
+    let actor_text = doc
+        .descendants()
+        .find(|n| n.tag_name().name() == "text" && node_text(*n).contains(label))
+        .unwrap_or_else(|| panic!("missing actor text {label}"));
+    let actor_group = actor_text.ancestors().find(|n| {
+        n.tag_name().name() == "g" && n.attribute("class").unwrap_or("").contains("actor")
+    });
+    if let Some(group) = actor_group {
+        if let Some(rect) = group.descendants().find(|n| {
+            n.tag_name().name() == "rect"
+                && n.attribute("class").unwrap_or("").contains("actor-box")
+        }) {
+            return TestBox {
+                x: parse_num(rect, "x"),
+                y: parse_num(rect, "y"),
+                width: parse_num(rect, "width"),
+                height: parse_num(rect, "height"),
+            };
+        }
+    }
+    panic!("missing actor rect for {label}");
+}
+
+fn find_lifeline_x_for_actor(svg: &str, label: &str) -> f64 {
+    let actor = find_actor_box_containing(svg, label);
+    let center_x = actor.x + actor.width / 2.0;
+    let doc = roxmltree::Document::parse(svg).expect("valid svg");
+    doc.descendants()
+        .find(|n| {
+            n.tag_name().name() == "line"
+                && n.attribute("class").unwrap_or("").contains("actor-line")
+                && (parse_num(*n, "x1") - center_x).abs() < 0.1
+                && (parse_num(*n, "x2") - center_x).abs() < 0.1
+        })
+        .map(|line| parse_num(line, "x1"))
+        .unwrap_or_else(|| panic!("missing lifeline for {label}"))
+}
+
+fn svg_visible_right(svg: &str) -> f64 {
+    let doc = roxmltree::Document::parse(svg).expect("valid svg");
+    let root = doc.root_element();
+    let width = root.attribute("width").unwrap().parse::<f64>().unwrap();
+    let view_box = root.attribute("viewBox").unwrap_or("0 0 0 0");
+    let parts: Vec<f64> = view_box
+        .split_whitespace()
+        .map(|p| p.parse().unwrap())
+        .collect();
+
+    parts[0] + width
+}
+
+fn svg_width(svg: &str) -> f64 {
+    let doc = roxmltree::Document::parse(svg).expect("valid svg");
+    doc.root_element()
+        .attribute("width")
+        .unwrap()
+        .parse::<f64>()
+        .unwrap()
 }
 
 fn find_self_message_path_box(svg: &str) -> TestBox {
@@ -348,19 +414,49 @@ fn sequence_right_note_extends_actor_gap_without_clipping() {
 
     let svg = render_sequence(input);
     let note = find_note_box_containing(&svg, "This note needs enough horizontal room");
-    let doc = roxmltree::Document::parse(&svg).expect("valid svg");
-    let root = doc.root_element();
-    let width = root.attribute("width").unwrap().parse::<f64>().unwrap();
-    let view_box = root.attribute("viewBox").unwrap_or("0 0 0 0");
-    let parts: Vec<f64> = view_box
-        .split_whitespace()
-        .map(|p| p.parse().unwrap())
-        .collect();
-    let visible_right = parts[0] + width;
+    let bob = find_actor_box_containing(&svg, "Bob");
+    let bob_lifeline_x = find_lifeline_x_for_actor(&svg, "Bob");
+    let visible_right = svg_visible_right(&svg);
 
     assert!(
-        note.x + note.width <= visible_right,
+        !note.overlaps(&bob, 4.0),
+        "right-of note should not overlap following actor box\n{svg}"
+    );
+    assert!(
+        note.right() + 4.0 <= bob_lifeline_x,
+        "right-of note should not overlap following actor lifeline\n{svg}"
+    );
+
+    assert!(
+        note.right() <= visible_right,
         "note should fit in viewBox\n{svg}"
+    );
+}
+
+#[test]
+fn sequence_last_right_note_uses_rendered_width_for_viewbox() {
+    let input = r#"sequenceDiagram
+    participant Alice
+    Alice->>Alice: Hello
+    Note right of Alice: This rendered note is fixed width even with a much longer first line<br/>short"#;
+
+    let svg = render_sequence(input);
+    let note = find_note_box_containing(
+        &svg,
+        "This rendered note is fixed width even with a much longer first line",
+    );
+
+    assert_eq!(
+        note.width, 150.0,
+        "right-of note render width changed\n{svg}"
+    );
+    assert!(
+        note.right() <= svg_visible_right(&svg),
+        "last right-of note should fit in viewBox\n{svg}"
+    );
+    assert!(
+        svg_width(&svg) <= 400.0,
+        "viewBox should use rendered note width, not raw multiline text width\n{svg}"
     );
 }
 

@@ -460,6 +460,10 @@ impl Default for SequenceLayoutConfig {
     }
 }
 
+const MIN_NOTE_WIDTH: f64 = 100.0;
+const RIGHT_OF_NOTE_WIDTH: f64 = 150.0;
+const SELF_MESSAGE_LOOP_WIDTH: f64 = 40.0;
+
 // Bounds is layout scaffolding for follow-up tasks; keep the dead-code allowance
 // narrow until later layout work wires it into rendering.
 #[allow(dead_code)]
@@ -1224,8 +1228,6 @@ fn render_note(
 ) -> SvgElement {
     use crate::diagrams::sequence::Placement;
 
-    let min_note_width = 100.0;
-
     let note_height = note_height(message, cfg);
 
     let (note_width, x_center) = match placement {
@@ -1234,17 +1236,17 @@ fn render_note(
                 let span = (span_x - actor_x).abs();
                 // Match mermaid.js: note spans between actors with extra padding
                 // Reference uses span + 50 for spanning notes
-                let width = (span + 50.0).max(min_note_width);
+                let width = (span + 50.0).max(MIN_NOTE_WIDTH);
                 (width, (actor_x + span_x) / 2.0)
             } else {
-                (min_note_width, actor_x)
+                (MIN_NOTE_WIDTH, actor_x)
             }
         }
         Placement::RightOf => {
             // Match mermaid.js: note width of 150 for right-of notes
-            (150.0, actor_x)
+            (RIGHT_OF_NOTE_WIDTH, actor_x)
         }
-        _ => (min_note_width, actor_x),
+        _ => (MIN_NOTE_WIDTH, actor_x),
     };
 
     let x = match placement {
@@ -1593,15 +1595,15 @@ fn apply_sequence_gap_pressure(
         let Some(&index) = actor_index.get(&note.actor) else {
             continue;
         };
-        let note_width = note_width_for_pressure(&note.message, cfg);
-        let required_gap = note_width + cfg.actor_width / 2.0 + cfg.actor_margin;
         match note.placement {
             Placement::RightOf => {
+                let required_gap = RIGHT_OF_NOTE_WIDTH + cfg.actor_width / 2.0 + cfg.actor_margin;
                 if let Some(gap) = gap_spacings.get_mut(index) {
                     *gap = gap.max(required_gap);
                 }
             }
             Placement::LeftOf => {
+                let required_gap = MIN_NOTE_WIDTH + cfg.actor_width / 2.0 + cfg.actor_margin;
                 if index > 0 {
                     if let Some(gap) = gap_spacings.get_mut(index - 1) {
                         *gap = gap.max(required_gap);
@@ -1623,7 +1625,7 @@ fn apply_sequence_gap_pressure(
             continue;
         };
         let label_width = text_width(&message.message, cfg) + 2.0 * cfg.wrap_padding;
-        let required_gap = 40.0 + label_width / 2.0 + cfg.actor_margin;
+        let required_gap = SELF_MESSAGE_LOOP_WIDTH + label_width / 2.0 + cfg.actor_margin;
         if let Some(gap) = gap_spacings.get_mut(index) {
             *gap = gap.max(required_gap);
         }
@@ -1644,8 +1646,7 @@ fn required_sequence_content_width(
             continue;
         }
         if let Some(&actor_x) = actor_positions.get(&note.actor) {
-            content_width =
-                content_width.max(actor_x + 25.0 + note_width_for_pressure(&note.message, cfg));
+            content_width = content_width.max(actor_x + 25.0 + RIGHT_OF_NOTE_WIDTH);
         }
     }
 
@@ -1662,10 +1663,6 @@ fn required_sequence_content_width(
     }
 
     content_width
-}
-
-fn note_width_for_pressure(message: &str, cfg: &SequenceLayoutConfig) -> f64 {
-    150.0_f64.max(text_width(message, cfg) + 2.0 * cfg.note_margin)
 }
 
 fn text_width(text: &str, cfg: &SequenceLayoutConfig) -> f64 {
