@@ -240,7 +240,8 @@ fn report_self_message_label_to_right(
     label: &SequenceBox,
     issues: &mut Vec<Issue>,
 ) {
-    let vertically_overlaps_path = label.y < path.bottom() && label.bottom() > path.y;
+    let label_center_y = label.y + label.height / 2.0;
+    let vertically_overlaps_path = label_center_y >= path.y && label_center_y <= path.bottom();
     let starts_after_path = label.x >= path.right() - SEQUENCE_OVERLAP_TOLERANCE;
     if !(vertically_overlaps_path && starts_after_path) {
         return;
@@ -3380,6 +3381,25 @@ mod tests {
                 .iter()
                 .any(|i| i.check == "sequence_self_message_label"),
             "expected sequence_self_message_label issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_ignores_label_below_self_message() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <path class="message-line" marker-end="url(#arrow-filled)" d="M 75 110 C 135 100 135 140 75 130"/>
+      <text class="message-label" x="150" y="153" text-anchor="middle">Inventory reserved</text>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            !issues
+                .iter()
+                .any(|i| i.check == "sequence_self_message_label"),
+            "did not expect sequence_self_message_label issue, got {issues:?}"
         );
     }
 }

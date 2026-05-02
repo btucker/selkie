@@ -1,6 +1,6 @@
 //! Tests for sequence diagram rendering to match mermaid.js reference output
 
-use selkie::render::svg::sequence_geometry::{SequenceBox, SequenceGeometry};
+use selkie::render::svg::sequence_geometry::SequenceGeometry;
 use selkie::{parse, render};
 
 fn render_sequence(input: &str) -> String {
@@ -10,12 +10,6 @@ fn render_sequence(input: &str) -> String {
 
 fn geometry(svg: &str) -> SequenceGeometry {
     SequenceGeometry::parse(svg).expect("valid sequence svg geometry")
-}
-
-fn text_box(svg: &str, label: &str) -> SequenceBox {
-    geometry(svg)
-        .text_box_containing(label)
-        .unwrap_or_else(|| panic!("missing text {label}"))
 }
 
 #[test]
@@ -273,14 +267,31 @@ fn sequence_fragment_headers_do_not_overlap_first_message_labels() {
     end"#;
 
     let svg = render_sequence(input);
-    let daily = text_box(&svg, "Daily query");
-    let hello = text_box(&svg, "Hello Bob, how are you?");
-    let sick = text_box(&svg, "is sick");
-    let not_good = text_box(&svg, "Not so good :(");
-    let well = text_box(&svg, "is well");
-    let fresh = text_box(&svg, "Feeling fresh like a daisy");
-    let extra = text_box(&svg, "Extra response");
-    let thanks = text_box(&svg, "Thanks for asking");
+    let geometry = geometry(&svg);
+    let daily = geometry
+        .text_box_containing("Daily query")
+        .expect("missing text Daily query");
+    let hello = geometry
+        .text_box_containing("Hello Bob, how are you?")
+        .expect("missing text Hello Bob, how are you?");
+    let sick = geometry
+        .text_box_containing("is sick")
+        .expect("missing text is sick");
+    let not_good = geometry
+        .text_box_containing("Not so good :(")
+        .expect("missing text Not so good :(");
+    let well = geometry
+        .text_box_containing("is well")
+        .expect("missing text is well");
+    let fresh = geometry
+        .text_box_containing("Feeling fresh like a daisy")
+        .expect("missing text Feeling fresh like a daisy");
+    let extra = geometry
+        .text_box_containing("Extra response")
+        .expect("missing text Extra response");
+    let thanks = geometry
+        .text_box_containing("Thanks for asking")
+        .expect("missing text Thanks for asking");
 
     assert!(
         daily.bottom() + 4.0 <= hello.y,

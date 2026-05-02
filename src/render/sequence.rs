@@ -685,14 +685,20 @@ fn layout_basic_events(
                         sequence_index += sequence_step;
                     }
 
-                    last_content_bottom = Some(message_content_bottom(current_y, message, cfg));
-                    current_y = next_message_y(current_y, message, cfg);
+                    let message_bottom = if is_self_message(message) {
+                        bounds.bottom()
+                    } else {
+                        current_y
+                    };
+                    last_content_bottom = Some(message_bottom);
+                    current_y = message_bottom + cfg.message_spacing;
                 }
             },
             TimelineEvent::Note(note) => {
                 let previous_bottom =
                     last_content_bottom.unwrap_or(current_y - cfg.message_spacing);
                 let note_y = previous_bottom + cfg.note_margin;
+                let mut note_bottom = note_y + note_height(&note.message, cfg);
                 if let Some(&actor_x) = layout.actor_positions.get(&note.actor) {
                     let span_x = note
                         .actor_to
@@ -701,6 +707,7 @@ fn layout_basic_events(
                         .copied();
                     let bounds =
                         note_bounds(actor_x, span_x, note_y, &note.message, note.placement, cfg);
+                    note_bottom = bounds.bottom();
                     layout.bounds.push(bounds);
                     if let Some(&actor_idx) = layout.actor_index.get(&note.actor) {
                         let mut min_idx = actor_idx;
@@ -725,7 +732,6 @@ fn layout_basic_events(
                         placement: note.placement,
                     }));
                 }
-                let note_bottom = note_y + note_height(&note.message, cfg);
                 last_content_bottom = Some(note_bottom);
                 current_y = note_bottom + cfg.message_spacing;
             }
@@ -816,30 +822,6 @@ fn fragment_actor_fallback_bounds(
         y: open.start_y,
         width: layout.content_width.max(20.0),
         height: cfg.label_box_height + cfg.box_margin,
-    }
-}
-
-fn next_message_y(
-    y: f64,
-    message: &crate::diagrams::sequence::Message,
-    cfg: &SequenceLayoutConfig,
-) -> f64 {
-    if is_self_message(message) {
-        message_content_bottom(y, message, cfg) + cfg.message_spacing
-    } else {
-        y + cfg.message_spacing
-    }
-}
-
-fn message_content_bottom(
-    y: f64,
-    message: &crate::diagrams::sequence::Message,
-    cfg: &SequenceLayoutConfig,
-) -> f64 {
-    if is_self_message(message) {
-        message_bounds(0.0, 0.0, y, &message.message, cfg).bottom()
-    } else {
-        y
     }
 }
 
@@ -1809,15 +1791,7 @@ fn build_actor_layout(db: &SequenceDb, cfg: &SequenceLayoutConfig) -> SequenceLa
         actor_index.insert(actor.name.clone(), index);
     }
 
-    let mut gap_spacings = calculate_per_gap_spacing(
-        &actors,
-        messages,
-        cfg.base_actor_spacing,
-        cfg.actor_width,
-        cfg.char_width,
-        cfg.wrap_padding,
-        cfg.actor_margin,
-    );
+    let mut gap_spacings = calculate_per_gap_spacing(&actors, messages, cfg);
     apply_sequence_gap_pressure(&mut gap_spacings, db, &actor_index, cfg);
 
     let mut layout_actors = Vec::with_capacity(actors.len());
@@ -1900,9 +1874,7 @@ fn apply_sequence_gap_pressure(
         let Some(&index) = actor_index.get(from) else {
             continue;
         };
-        let label_width = text_width(&message.message, cfg) + 2.0 * cfg.wrap_padding;
-        let label_right_extent = SELF_MESSAGE_LOOP_WIDTH / 2.0 + label_width / 2.0;
-        let required_gap = SELF_MESSAGE_LOOP_WIDTH.max(label_right_extent)
+        let required_gap = self_message_right_extent(&message.message, cfg)
             + SELF_MESSAGE_LABEL_GAP
             + cfg.actor_margin;
         if let Some(gap) = gap_spacings.get_mut(index) {
@@ -1938,10 +1910,8 @@ fn required_sequence_content_width(
             continue;
         }
         if let Some(&actor_x) = actor_positions.get(from) {
-            let label_width = text_width(&message.message, cfg) + 2.0 * cfg.wrap_padding;
-            let label_right_extent = SELF_MESSAGE_LOOP_WIDTH / 2.0 + label_width / 2.0;
             content_width = content_width.max(
-                actor_x + SELF_MESSAGE_LOOP_WIDTH.max(label_right_extent) + SELF_MESSAGE_LABEL_GAP,
+                actor_x + self_message_right_extent(&message.message, cfg) + SELF_MESSAGE_LABEL_GAP,
             );
         }
     }
@@ -1957,17 +1927,19 @@ fn text_width(text: &str, cfg: &SequenceLayoutConfig) -> f64 {
         .fold(0.0, f64::max)
 }
 
+fn self_message_right_extent(label: &str, cfg: &SequenceLayoutConfig) -> f64 {
+    let label_width = text_width(label, cfg) + 2.0 * cfg.wrap_padding;
+    let label_right_extent = SELF_MESSAGE_LOOP_WIDTH / 2.0 + label_width / 2.0;
+    SELF_MESSAGE_LOOP_WIDTH.max(label_right_extent)
+}
+
 /// Calculate per-gap actor spacing based on message text widths.
 /// Returns a Vec of spacing values, one for each gap between adjacent actors.
 /// This matches mermaid.js behavior where each actor pair can have different spacing.
 fn calculate_per_gap_spacing(
     actors: &[&crate::diagrams::sequence::Actor],
     messages: &[crate::diagrams::sequence::Message],
-    base_spacing: f64,
-    actor_width: f64,
-    char_width: f64,
-    wrap_padding: f64,
-    actor_margin: f64,
+    cfg: &SequenceLayoutConfig,
 ) -> Vec<f64> {
     let num_gaps = if actors.len() > 1 {
         actors.len() - 1
@@ -1997,13 +1969,12 @@ fn calculate_per_gap_spacing(
 
         if let (Some(from), Some(to)) = (from_idx, to_idx) {
             if from != to {
-                let text_width =
-                    msg.message.chars().count() as f64 * char_width + 2.0 * wrap_padding;
+                let measured_width = text_width(&msg.message, cfg) + 2.0 * cfg.wrap_padding;
 
                 let min_idx = std::cmp::min(from, to);
 
                 // Assign the full text width to the first gap between sender/receiver.
-                max_width_per_gap[min_idx] = max_width_per_gap[min_idx].max(text_width);
+                max_width_per_gap[min_idx] = max_width_per_gap[min_idx].max(measured_width);
             }
         }
     }
@@ -2013,10 +1984,10 @@ fn calculate_per_gap_spacing(
         .iter()
         .map(|&width| {
             if width > 0.0 {
-                let required = width + actor_margin - actor_width / 2.0;
-                base_spacing.max(required)
+                let required = width + cfg.actor_margin - cfg.actor_width / 2.0;
+                cfg.base_actor_spacing.max(required)
             } else {
-                base_spacing
+                cfg.base_actor_spacing
             }
         })
         .collect()
