@@ -654,6 +654,7 @@ fn parse_f64(value: &str) -> Option<f64> {
 
 fn node_text(node: &roxmltree::Node<'_, '_>) -> String {
     node.descendants()
+        .filter(|descendant| descendant.is_text())
         .filter_map(|descendant| descendant.text())
         .collect::<Vec<_>>()
         .join("")
@@ -694,11 +695,14 @@ mod tests {
             geometry.actor_box_containing("Alice").expect("actor").x,
             0.0
         );
-        assert_eq!(geometry.lifeline_x_for_actor("Alice"), Some(75.0));
         assert_eq!(
-            geometry.text_box_containing("Fight").expect("message").kind,
-            "message-label"
+            geometry.actor_box_containing("Alice").expect("actor").label,
+            "Alice"
         );
+        assert_eq!(geometry.lifeline_x_for_actor("Alice"), Some(75.0));
+        let message = geometry.text_box_containing("Fight").expect("message");
+        assert_eq!(message.kind, "message-label");
+        assert_eq!(message.label, "Fight");
         assert_eq!(
             geometry
                 .note_box_containing("Rational")
