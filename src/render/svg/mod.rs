@@ -5,6 +5,7 @@ mod document;
 pub(crate) mod edges;
 mod elements;
 pub(crate) mod markers;
+pub mod sequence_geometry;
 mod shapes;
 pub mod structure;
 mod theme;
