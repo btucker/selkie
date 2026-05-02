@@ -300,9 +300,11 @@ const MIN_NOTE_WIDTH: f64 = 100.0;
 const RIGHT_OF_NOTE_WIDTH: f64 = 150.0;
 const RIGHT_OF_NOTE_X_OFFSET: f64 = 25.0;
 const LEFT_OF_NOTE_X_OFFSET: f64 = 20.0;
-const SELF_MESSAGE_LOOP_WIDTH: f64 = 40.0;
-const SELF_MESSAGE_LOOP_HEIGHT: f64 = 30.0;
-const SELF_MESSAGE_LABEL_OFFSET: f64 = 5.0;
+const SELF_MESSAGE_LOOP_WIDTH: f64 = 60.0;
+const SELF_MESSAGE_LOOP_TOP_OFFSET: f64 = 10.0;
+const SELF_MESSAGE_LOOP_BOTTOM_OFFSET: f64 = 30.0;
+const SELF_MESSAGE_END_OFFSET: f64 = 20.0;
+const SELF_MESSAGE_LABEL_GAP: f64 = 4.0;
 const ACTIVATION_WIDTH: f64 = 10.0;
 
 #[derive(Debug, Clone, Copy)]
@@ -860,23 +862,27 @@ fn message_bounds(
 ) -> Bounds {
     let label_width = text_width(label, cfg);
     if (from_x - to_x).abs() < 1.0 {
+        let label_center_x = from_x + SELF_MESSAGE_LOOP_WIDTH / 2.0;
+        let label_y = y - SELF_MESSAGE_LOOP_TOP_OFFSET - SELF_MESSAGE_LABEL_GAP;
         let path = Bounds {
             x: from_x,
-            y,
+            y: y - SELF_MESSAGE_LOOP_TOP_OFFSET,
             width: SELF_MESSAGE_LOOP_WIDTH,
-            height: SELF_MESSAGE_LOOP_HEIGHT,
+            height: SELF_MESSAGE_LOOP_TOP_OFFSET + SELF_MESSAGE_LOOP_BOTTOM_OFFSET,
         };
         let label = Bounds {
-            x: from_x + SELF_MESSAGE_LOOP_WIDTH + SELF_MESSAGE_LABEL_OFFSET,
-            y: y + SELF_MESSAGE_LOOP_HEIGHT / 2.0 - cfg.line_height,
+            x: label_center_x - label_width / 2.0,
+            y: label_y - cfg.line_height,
             width: label_width,
             height: cfg.line_height,
         };
         let actor = Bounds {
             x: from_x - cfg.actor_width / 2.0,
-            y: y - cfg.line_height,
+            y: y - SELF_MESSAGE_LOOP_TOP_OFFSET - cfg.line_height,
             width: cfg.actor_width,
-            height: cfg.line_height + 40.0,
+            height: cfg.line_height
+                + SELF_MESSAGE_LOOP_TOP_OFFSET
+                + SELF_MESSAGE_LOOP_BOTTOM_OFFSET,
         };
         path.union(label).union(actor)
     } else {
@@ -1444,17 +1450,17 @@ fn render_self_message(
     let mut shapes = Vec::new();
     let mut labels = Vec::new();
 
-    // Self-message path (shape - rendered first in edge_paths)
+    // Mermaid renders self messages as a rounded cubic loop by default.
     let path = format!(
-        "M {} {} L {} {} L {} {} L {} {}",
+        "M {} {} C {} {} {} {} {} {}",
         x,
         y,
         x + SELF_MESSAGE_LOOP_WIDTH,
-        y,
+        y - SELF_MESSAGE_LOOP_TOP_OFFSET,
         x + SELF_MESSAGE_LOOP_WIDTH,
-        y + SELF_MESSAGE_LOOP_HEIGHT,
+        y + SELF_MESSAGE_LOOP_BOTTOM_OFFSET,
         x,
-        y + SELF_MESSAGE_LOOP_HEIGHT
+        y + SELF_MESSAGE_END_OFFSET
     );
 
     let mut path_attrs = Attrs::new()
@@ -1498,11 +1504,11 @@ fn render_self_message(
 
     // Message label (text - rendered after shapes in edge_labels)
     labels.push(SvgElement::Text {
-        x: x + SELF_MESSAGE_LOOP_WIDTH + SELF_MESSAGE_LABEL_OFFSET,
-        y: y + SELF_MESSAGE_LOOP_HEIGHT / 2.0,
+        x: x + SELF_MESSAGE_LOOP_WIDTH / 2.0,
+        y: y - SELF_MESSAGE_LOOP_TOP_OFFSET - SELF_MESSAGE_LABEL_GAP,
         content: label.to_string(),
         attrs: Attrs::new()
-            .with_attr("text-anchor", "start")
+            .with_attr("text-anchor", "middle")
             .with_class("message-label")
             .with_attr("font-size", "16"),
     });
@@ -1895,8 +1901,10 @@ fn apply_sequence_gap_pressure(
             continue;
         };
         let label_width = text_width(&message.message, cfg) + 2.0 * cfg.wrap_padding;
-        let required_gap =
-            SELF_MESSAGE_LOOP_WIDTH + SELF_MESSAGE_LABEL_OFFSET + label_width + cfg.actor_margin;
+        let label_right_extent = SELF_MESSAGE_LOOP_WIDTH / 2.0 + label_width / 2.0;
+        let required_gap = SELF_MESSAGE_LOOP_WIDTH.max(label_right_extent)
+            + SELF_MESSAGE_LABEL_GAP
+            + cfg.actor_margin;
         if let Some(gap) = gap_spacings.get_mut(index) {
             *gap = gap.max(required_gap);
         }
@@ -1930,7 +1938,11 @@ fn required_sequence_content_width(
             continue;
         }
         if let Some(&actor_x) = actor_positions.get(from) {
-            content_width = content_width.max(actor_x + 45.0 + text_width(&message.message, cfg));
+            let label_width = text_width(&message.message, cfg) + 2.0 * cfg.wrap_padding;
+            let label_right_extent = SELF_MESSAGE_LOOP_WIDTH / 2.0 + label_width / 2.0;
+            content_width = content_width.max(
+                actor_x + SELF_MESSAGE_LOOP_WIDTH.max(label_right_extent) + SELF_MESSAGE_LABEL_GAP,
+            );
         }
     }
 

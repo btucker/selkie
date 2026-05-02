@@ -40,6 +40,7 @@ pub struct SequenceGeometry {
     actor_lifelines: Vec<(f64, f64)>,
     markers: Vec<SequenceMarker>,
     self_message_path_boxes: Vec<SequenceBox>,
+    self_message_paths: Vec<String>,
     aggregate_fragment_frame: Option<SequenceBox>,
     fragments: Vec<SequenceBox>,
     fragment_frame_groups: Vec<SequenceBox>,
@@ -153,6 +154,7 @@ impl SequenceGeometry {
         let mut actor_lifelines = Vec::new();
         let mut markers = Vec::new();
         let mut self_message_path_boxes = Vec::new();
+        let mut self_message_paths = Vec::new();
         let mut loop_lines = Vec::new();
 
         for node in doc.descendants().filter(|node| node.is_element()) {
@@ -203,8 +205,10 @@ impl SequenceGeometry {
                     }
                 }
                 "path" if node.attribute("marker-end").is_some() && is_message_path(&node) => {
-                    let points = path_points(node.attribute("d").unwrap_or(""));
+                    let path = node.attribute("d").unwrap_or("");
+                    let points = path_points(path);
                     if points.len() >= 3 {
+                        self_message_paths.push(path.to_string());
                         self_message_path_boxes.push(box_from_points(
                             "self_message_path",
                             "self-message path",
@@ -251,6 +255,7 @@ impl SequenceGeometry {
             actor_lifelines,
             markers,
             self_message_path_boxes,
+            self_message_paths,
             aggregate_fragment_frame,
             fragments,
             fragment_frame_groups,
@@ -289,6 +294,10 @@ impl SequenceGeometry {
 
     pub fn self_message_path_boxes(&self) -> &[SequenceBox] {
         &self.self_message_path_boxes
+    }
+
+    pub fn self_message_paths(&self) -> &[String] {
+        &self.self_message_paths
     }
 
     pub fn fragments(&self) -> &[SequenceBox] {
@@ -776,6 +785,10 @@ mod tests {
             150.0
         );
         assert!(geometry.self_message_path_box().expect("self path").width >= 40.0);
+        assert_eq!(
+            geometry.self_message_paths().first().expect("self path"),
+            "M 75 110 L 115 110 L 115 140 L 75 140"
+        );
         assert_eq!(
             geometry.first_fragment_frame_group().expect("frame").x,
             40.0

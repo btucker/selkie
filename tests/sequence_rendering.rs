@@ -331,6 +331,48 @@ fn sequence_self_message_uses_path() {
 }
 
 #[test]
+fn sequence_self_message_uses_curved_path() {
+    let input = r#"sequenceDiagram
+    Alice->>Alice: Fight against hypochondria"#;
+
+    let svg = render_sequence(input);
+    let geometry = geometry(&svg);
+    let path = geometry
+        .self_message_paths()
+        .first()
+        .expect("missing self-message path");
+
+    assert!(
+        path.contains('C'),
+        "self-message path should use a rounded cubic curve like Mermaid, got {path}\n{svg}"
+    );
+}
+
+#[test]
+fn sequence_self_message_label_sits_above_edge() {
+    let input = r#"sequenceDiagram
+    Alice->>Alice: Fight against hypochondria"#;
+
+    let svg = render_sequence(input);
+    let geometry = geometry(&svg);
+    let path = geometry
+        .self_message_path_box()
+        .expect("missing self-message path");
+    let label = geometry
+        .text_box_containing("Fight against hypochondria")
+        .expect("missing self-message label");
+
+    assert!(
+        label.bottom() + 4.0 <= path.y,
+        "self-message label should sit above the rounded self-edge\n{svg}"
+    );
+    assert!(
+        label.x < path.right(),
+        "self-message label should not be placed to the right of the self-edge\n{svg}"
+    );
+}
+
+#[test]
 fn sequence_self_message_label_extends_actor_gap_without_overlap() {
     let input = r#"sequenceDiagram
     participant Alice

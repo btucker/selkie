@@ -179,6 +179,16 @@ pub fn check_sequence_overlaps(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
             report_stroke_scaled_sequence_marker(marker, issues);
         }
     }
+
+    for path in geometry.self_message_paths() {
+        report_square_self_message_path(path, issues);
+    }
+
+    for path in geometry.self_message_path_boxes() {
+        for label in message_texts {
+            report_self_message_label_to_right(path, label, issues);
+        }
+    }
 }
 
 fn report_overlap_if_intersects(a: &SequenceBox, b: &SequenceBox, issues: &mut Vec<Issue>) {
@@ -210,6 +220,37 @@ fn report_stroke_scaled_sequence_marker(
         format!(
             "Sequence marker '{}' uses stroke-scaled units; expected markerUnits=\"userSpaceOnUse\" to keep arrowheads stable",
             marker.id
+        ),
+    ));
+}
+
+fn report_square_self_message_path(path: &str, issues: &mut Vec<Issue>) {
+    if path.contains('C') || path.contains('c') || path.contains('Q') || path.contains('q') {
+        return;
+    }
+
+    issues.push(Issue::warning(
+        "sequence_self_message_shape",
+        "Sequence self-message path uses square corners; expected a curved path".to_string(),
+    ));
+}
+
+fn report_self_message_label_to_right(
+    path: &SequenceBox,
+    label: &SequenceBox,
+    issues: &mut Vec<Issue>,
+) {
+    let vertically_overlaps_path = label.y < path.bottom() && label.bottom() > path.y;
+    let starts_after_path = label.x >= path.right() - SEQUENCE_OVERLAP_TOLERANCE;
+    if !(vertically_overlaps_path && starts_after_path) {
+        return;
+    }
+
+    issues.push(Issue::warning(
+        "sequence_self_message_label",
+        format!(
+            "Sequence self-message label '{}' is placed to the right of the self-edge; expected it above the edge",
+            label.label
         ),
     ));
 }
@@ -3302,6 +3343,43 @@ mod tests {
         assert!(
             issues.iter().any(|i| i.check == "sequence_marker_size"),
             "expected sequence_marker_size issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_square_self_message_path() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <path class="message-line" marker-end="url(#arrow-filled)" d="M 75 110 L 115 110 L 115 140 L 75 140"/>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "sequence_self_message_shape"),
+            "expected sequence_self_message_shape issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_self_message_label_to_right() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <path class="message-line" marker-end="url(#arrow-filled)" d="M 75 110 L 115 110 L 115 140 L 75 140"/>
+      <text class="message-label" x="120" y="125" text-anchor="start">Fight against hypochondria</text>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "sequence_self_message_label"),
+            "expected sequence_self_message_label issue, got {issues:?}"
         );
     }
 }
