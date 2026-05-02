@@ -761,8 +761,10 @@ fn fragment_frame_bounds(
     if let (Some(min_idx), Some(max_idx)) = (open.min_actor_idx, open.max_actor_idx) {
         let min_center = layout.actors[min_idx].center_x;
         let max_center = layout.actors[max_idx].center_x;
-        let x = min_center - cfg.actor_width / 2.0 - expand;
-        let right = max_center + cfg.actor_width / 2.0 + expand;
+        let actor_x = min_center - cfg.actor_width / 2.0 - expand;
+        let actor_right = max_center + cfg.actor_width / 2.0 + expand;
+        let x = frame.x.min(actor_x);
+        let right = frame.right().max(actor_right);
         frame.x = x;
         frame.width = (right - x).max(20.0);
     }
@@ -901,17 +903,13 @@ fn note_bounds(
     placement: Placement,
     cfg: &SequenceLayoutConfig,
 ) -> Bounds {
+    let rendered_note_width = note_width(message, placement, span_x, actor_x, cfg);
     let (note_width, x_center) = match placement {
-        Placement::Over => {
-            if let Some(span_x) = span_x {
-                let span = (span_x - actor_x).abs();
-                ((span + 50.0).max(MIN_NOTE_WIDTH), (actor_x + span_x) / 2.0)
-            } else {
-                (MIN_NOTE_WIDTH, actor_x)
-            }
-        }
-        Placement::RightOf => (RIGHT_OF_NOTE_WIDTH, actor_x),
-        Placement::LeftOf => (MIN_NOTE_WIDTH, actor_x),
+        Placement::Over => (
+            rendered_note_width,
+            span_x.map_or(actor_x, |span_x| (actor_x + span_x) / 2.0),
+        ),
+        Placement::RightOf | Placement::LeftOf => (rendered_note_width, actor_x),
     };
     let x = match placement {
         Placement::LeftOf => actor_x - note_width - LEFT_OF_NOTE_X_OFFSET,
@@ -924,6 +922,29 @@ fn note_bounds(
         width: note_width,
         height: note_height(message, cfg),
     }
+}
+
+fn note_width(
+    message: &str,
+    placement: Placement,
+    span_x: Option<f64>,
+    actor_x: f64,
+    cfg: &SequenceLayoutConfig,
+) -> f64 {
+    let text_width = text_width(message, cfg) + cfg.box_margin * 2.0;
+    let placement_min = match placement {
+        Placement::Over => {
+            if let Some(span_x) = span_x {
+                ((span_x - actor_x).abs() + 50.0).max(MIN_NOTE_WIDTH)
+            } else {
+                MIN_NOTE_WIDTH
+            }
+        }
+        Placement::RightOf => RIGHT_OF_NOTE_WIDTH,
+        Placement::LeftOf => MIN_NOTE_WIDTH,
+    };
+
+    placement_min.max(text_width)
 }
 
 /// Render an actor (participant box or stick figure)
@@ -1325,8 +1346,10 @@ fn render_fragment_label(
         ),
     };
 
+    let mut prefix_label_width = 0.0;
     if let Some(prefix) = prefix {
         let label_width = (prefix.len() as f64 * 7.0 + 16.0).max(50.0);
+        prefix_label_width = label_width;
         let label_x = x + 10.0;
         let notch_y = label_y + label_height;
         let notch_mid_y = label_y + label_height * 0.65;
@@ -1380,7 +1403,7 @@ fn render_fragment_label(
                 format!("[{}]", condition_text)
             };
             labels.push(SvgElement::Text {
-                x: x + width / 2.0,
+                x: x + width / 2.0 + prefix_label_width / 2.0,
                 y: label_y + label_height - 2.0,
                 content: wrapped,
                 attrs: Attrs::new()
@@ -1557,9 +1580,9 @@ fn visual_line_count(message: &str) -> usize {
 /// Create an arrow marker definition
 fn create_arrow_marker(id: &str, filled: bool) -> SvgElement {
     let path = if filled {
-        "M 0 0 L 10 5 L 0 10 z"
+        "M -1 0 L 10 5 L 0 10 z"
     } else {
-        "M 0 0 L 10 5 L 0 10"
+        "M -1 0 L 10 5 L 0 10"
     };
 
     // Use class for theming - fill handled by CSS .sequence-marker rule
@@ -1571,13 +1594,13 @@ fn create_arrow_marker(id: &str, filled: bool) -> SvgElement {
 
     SvgElement::Marker {
         id: id.to_string(),
-        view_box: "0 0 10 10".to_string(),
-        ref_x: 10.0,
+        view_box: String::new(),
+        ref_x: 7.9,
         ref_y: 5.0,
         marker_width: 12.0,
         marker_height: 12.0,
-        orient: "auto".to_string(),
-        marker_units: None,
+        orient: "auto-start-reverse".to_string(),
+        marker_units: Some("userSpaceOnUse".to_string()),
         children: vec![SvgElement::Path {
             d: path.to_string(),
             attrs: Attrs::new().with_class(class_name).with_stroke_width(1.0),
@@ -1840,19 +1863,17 @@ fn apply_sequence_gap_pressure(
         };
         match note.placement {
             Placement::RightOf => {
-                let required_gap = RIGHT_OF_NOTE_X_OFFSET
-                    + RIGHT_OF_NOTE_WIDTH
-                    + cfg.actor_width / 2.0
-                    + cfg.actor_margin;
+                let note_width = note_width(&note.message, note.placement, None, 0.0, cfg);
+                let required_gap =
+                    RIGHT_OF_NOTE_X_OFFSET + note_width + cfg.actor_width / 2.0 + cfg.actor_margin;
                 if let Some(gap) = gap_spacings.get_mut(index) {
                     *gap = gap.max(required_gap);
                 }
             }
             Placement::LeftOf => {
-                let required_gap = LEFT_OF_NOTE_X_OFFSET
-                    + MIN_NOTE_WIDTH
-                    + cfg.actor_width / 2.0
-                    + cfg.actor_margin;
+                let note_width = note_width(&note.message, note.placement, None, 0.0, cfg);
+                let required_gap =
+                    LEFT_OF_NOTE_X_OFFSET + note_width + cfg.actor_width / 2.0 + cfg.actor_margin;
                 if index > 0 {
                     if let Some(gap) = gap_spacings.get_mut(index - 1) {
                         *gap = gap.max(required_gap);
@@ -1896,8 +1917,8 @@ fn required_sequence_content_width(
             continue;
         }
         if let Some(&actor_x) = actor_positions.get(&note.actor) {
-            content_width =
-                content_width.max(actor_x + RIGHT_OF_NOTE_X_OFFSET + RIGHT_OF_NOTE_WIDTH);
+            let note_width = note_width(&note.message, note.placement, None, actor_x, cfg);
+            content_width = content_width.max(actor_x + RIGHT_OF_NOTE_X_OFFSET + note_width);
         }
     }
 

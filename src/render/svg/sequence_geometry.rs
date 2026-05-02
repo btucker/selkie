@@ -17,6 +17,16 @@ pub struct SequenceBox {
     pub height: f64,
 }
 
+#[derive(Debug, Clone)]
+pub struct SequenceMarker {
+    pub id: String,
+    pub ref_x: f64,
+    pub ref_y: f64,
+    pub marker_width: f64,
+    pub marker_height: f64,
+    pub marker_units: Option<String>,
+}
+
 #[derive(Debug)]
 pub struct SequenceGeometry {
     svg_width: Option<f64>,
@@ -25,8 +35,10 @@ pub struct SequenceGeometry {
     message_texts: Vec<SequenceBox>,
     note_texts: Vec<SequenceBox>,
     loop_texts: Vec<SequenceBox>,
+    label_texts: Vec<SequenceBox>,
     actor_boxes: Vec<SequenceBox>,
     actor_lifelines: Vec<(f64, f64)>,
+    markers: Vec<SequenceMarker>,
     self_message_path_boxes: Vec<SequenceBox>,
     aggregate_fragment_frame: Option<SequenceBox>,
     fragments: Vec<SequenceBox>,
@@ -136,8 +148,10 @@ impl SequenceGeometry {
         let mut message_texts = Vec::new();
         let mut note_texts = Vec::new();
         let mut loop_texts = Vec::new();
+        let mut label_texts = Vec::new();
         let mut actor_boxes = Vec::new();
         let mut actor_lifelines = Vec::new();
+        let mut markers = Vec::new();
         let mut self_message_path_boxes = Vec::new();
         let mut loop_lines = Vec::new();
 
@@ -168,6 +182,11 @@ impl SequenceGeometry {
                         loop_texts.push(text);
                     }
                 }
+                "text" if has_class(&node, "labelText") => {
+                    if let Some(text) = text_sequence_box(&node, "labelText") {
+                        label_texts.push(text);
+                    }
+                }
                 "rect" if has_class(&node, "actor-box") => {
                     if let Some(actor) = rect_sequence_box(&node, "actor", actor_label(&node)) {
                         actor_boxes.push(actor);
@@ -191,6 +210,11 @@ impl SequenceGeometry {
                             "self-message path",
                             &points,
                         ));
+                    }
+                }
+                "marker" => {
+                    if let Some(marker) = marker_geometry(&node) {
+                        markers.push(marker);
                     }
                 }
                 _ => {}
@@ -222,8 +246,10 @@ impl SequenceGeometry {
             message_texts,
             note_texts,
             loop_texts,
+            label_texts,
             actor_boxes,
             actor_lifelines,
+            markers,
             self_message_path_boxes,
             aggregate_fragment_frame,
             fragments,
@@ -249,8 +275,16 @@ impl SequenceGeometry {
         &self.loop_texts
     }
 
+    pub fn label_texts(&self) -> &[SequenceBox] {
+        &self.label_texts
+    }
+
     pub fn actor_boxes(&self) -> &[SequenceBox] {
         &self.actor_boxes
+    }
+
+    pub fn marker(&self, id: &str) -> Option<&SequenceMarker> {
+        self.markers.iter().find(|marker| marker.id == id)
     }
 
     pub fn self_message_path_boxes(&self) -> &[SequenceBox] {
@@ -278,6 +312,7 @@ impl SequenceGeometry {
             .iter()
             .chain(&self.note_texts)
             .chain(&self.loop_texts)
+            .chain(&self.label_texts)
             .find(|text| text.label.contains(label))
             .cloned()
     }
@@ -372,6 +407,17 @@ fn text_sequence_box(node: &roxmltree::Node<'_, '_>, kind: &'static str) -> Opti
         width,
         SEQUENCE_LINE_HEIGHT,
     ))
+}
+
+fn marker_geometry(node: &roxmltree::Node<'_, '_>) -> Option<SequenceMarker> {
+    Some(SequenceMarker {
+        id: node.attribute("id")?.to_string(),
+        ref_x: parse_attr(node, "refX")?,
+        ref_y: parse_attr(node, "refY")?,
+        marker_width: parse_attr(node, "markerWidth")?,
+        marker_height: parse_attr(node, "markerHeight")?,
+        marker_units: node.attribute("markerUnits").map(str::to_string),
+    })
 }
 
 fn text_box_y(node: &roxmltree::Node<'_, '_>, kind: &'static str, y: f64) -> f64 {
@@ -677,8 +723,12 @@ mod tests {
             <line class="loopLine" x1="220" y1="80" x2="220" y2="160"/>
             <line class="loopLine" x1="40" y1="160" x2="220" y2="160"/>
             <line class="loopLine" x1="40" y1="80" x2="40" y2="160"/>
+            <text class="labelText" x="65" y="95" text-anchor="middle">loop</text>
             <text class="loopText" x="130" y="98" text-anchor="middle">[Healthcheck]</text>
           </g>
+          <defs>
+            <marker id="arrow-filled" refX="7.9" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto"/>
+          </defs>
           <path class="message-line" marker-end="url(#arrow-filled)" d="M 75 110 L 115 110 L 115 140 L 75 140"/>
           <text class="message-label" x="120" y="125" text-anchor="start">Fight</text>
           <g class="note">
@@ -703,6 +753,21 @@ mod tests {
         let message = geometry.text_box_containing("Fight").expect("message");
         assert_eq!(message.kind, "message-label");
         assert_eq!(message.label, "Fight");
+        assert_eq!(
+            geometry
+                .text_box_containing("loop")
+                .expect("label text")
+                .kind,
+            "labelText"
+        );
+        assert_eq!(
+            geometry
+                .marker("arrow-filled")
+                .expect("arrow marker")
+                .marker_units
+                .as_deref(),
+            Some("userSpaceOnUse")
+        );
         assert_eq!(
             geometry
                 .note_box_containing("Rational")

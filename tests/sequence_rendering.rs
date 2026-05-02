@@ -185,10 +185,13 @@ fn sequence_last_right_note_uses_rendered_width_for_viewbox() {
         .expect(
             "missing note rect for This rendered note is fixed width even with a much longer first line",
         );
+    let note_text = geometry
+        .text_box_containing("This rendered note is fixed width even with a much longer first line")
+        .expect("missing note text");
 
-    assert_eq!(
-        note.width, 150.0,
-        "right-of note render width changed\n{svg}"
+    assert!(
+        note.contains_with_tolerance(&note_text, 4.0),
+        "right-of note should expand to contain the rendered first line\n{svg}"
     );
     assert!(
         note.right()
@@ -196,10 +199,6 @@ fn sequence_last_right_note_uses_rendered_width_for_viewbox() {
                 .svg_visible_right()
                 .expect("missing SVG visible right"),
         "last right-of note should fit in viewBox\n{svg}"
-    );
-    assert!(
-        geometry.svg_width().expect("missing SVG width") <= 400.0,
-        "viewBox should use rendered note width, not raw multiline text width\n{svg}"
     );
 }
 
@@ -389,6 +388,9 @@ fn sequence_issue_202_loop_self_message_and_note_do_not_overlap() {
     let loop_label = geometry
         .text_box_containing("Healthcheck")
         .expect("missing text Healthcheck");
+    let fragment_kind_label = geometry
+        .text_box_containing("loop")
+        .expect("missing fragment kind label loop");
     let loop_frame = geometry
         .first_fragment_frame()
         .expect("missing fragment frame");
@@ -409,6 +411,14 @@ fn sequence_issue_202_loop_self_message_and_note_do_not_overlap() {
         "loop header should sit above self-message label\n{svg}"
     );
     assert!(
+        !fragment_kind_label.intersects_with_tolerance(&loop_label, 4.0),
+        "fragment kind label should not overlap loop condition\n{svg}"
+    );
+    assert!(
+        note_box.contains_with_tolerance(&note_text, 4.0),
+        "note text should stay inside note box\n{svg}"
+    );
+    assert!(
         loop_frame.bottom() + 4.0 <= note_box.y || note_box.bottom() + 4.0 <= loop_frame.y,
         "note box should not overlap loop frame\n{svg}"
     );
@@ -416,4 +426,60 @@ fn sequence_issue_202_loop_self_message_and_note_do_not_overlap() {
         !self_path.intersects_with_tolerance(&note_box, 4.0),
         "self-message path should not overlap note box\n{svg}"
     );
+}
+
+#[test]
+fn sequence_arrowheads_use_user_space_marker_units() {
+    let input = r#"sequenceDiagram
+    Alice->>Bob: Solid message
+    Bob-->>Alice: Dotted message"#;
+
+    let svg = render_sequence(input);
+    let geometry = geometry(&svg);
+    let marker = geometry
+        .marker("arrow-filled")
+        .expect("missing arrow-filled marker");
+
+    assert_eq!(
+        marker.marker_units.as_deref(),
+        Some("userSpaceOnUse"),
+        "sequence arrowhead marker should not scale with stroke width\n{svg}"
+    );
+    assert!(
+        marker.marker_width <= 12.0 && marker.marker_height <= 12.0,
+        "sequence arrowhead marker dimensions should stay Mermaid-sized\n{svg}"
+    );
+}
+
+#[test]
+fn sequence_fragment_frame_contains_wide_single_actor_note() {
+    let input = r#"sequenceDiagram
+    participant T1 as Test Thread 1
+    participant T2 as Test Thread 2
+    participant Lock as Channel File Lock
+    par Concurrent Lock Contention
+        T2->>Lock: Channel::send()
+        Note over T2: Another test tries to write
+        Lock-->>T2: Lock acquired by T1
+    end"#;
+
+    let svg = render_sequence(input);
+    let geometry = geometry(&svg);
+    let note = geometry
+        .note_box_containing("Another test tries to write")
+        .expect("missing note rect");
+    let frame = geometry
+        .first_fragment_frame()
+        .expect("missing fragment frame");
+
+    assert!(
+        frame.contains_with_tolerance(&note, 4.0),
+        "fragment frame should include a wide single-actor note\n{svg}"
+    );
+    for border in geometry.fragment_borders() {
+        assert!(
+            !note.intersects_with_tolerance(border, 4.0),
+            "note should not overlap fragment border\n{svg}"
+        );
+    }
 }
