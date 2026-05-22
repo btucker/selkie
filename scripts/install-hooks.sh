@@ -15,9 +15,9 @@ echo "Installing git hooks..."
 cat > "$HOOKS_DIR/pre-commit" << 'EOF'
 #!/usr/bin/env sh
 #
-# Combined pre-commit hook: cargo checks + mb (microbeads) sync
+# Pre-commit hook: cargo checks
 #
-# Runs cargo fmt and clippy to match CI, then syncs mb issues.
+# Runs cargo fmt and clippy to match CI.
 
 set -e
 
@@ -39,14 +39,6 @@ if ! cargo clippy --features all-formats -- -D warnings; then
     exit 1
 fi
 
-# 3. Run mb hooks for issue tracking
-if command -v mb >/dev/null 2>&1; then
-    echo "  Syncing mb issues..."
-    mb hooks run pre-commit "$@"
-else
-    echo "  Warning: mb not found, skipping issue sync"
-fi
-
 echo "Pre-commit checks passed!"
 EOF
 
@@ -57,4 +49,3 @@ echo ""
 echo "The hook will run on each commit:"
 echo "  - cargo fmt --check"
 echo "  - cargo clippy --features all-formats -- -D warnings"
-echo "  - mb sync (if mb is installed)"

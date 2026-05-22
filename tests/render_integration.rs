@@ -1,5 +1,6 @@
 //! Integration tests for the rendering engine
 
+use selkie::render::svg::sequence_geometry::SequenceGeometry;
 use selkie::render::{RenderConfig, Theme};
 use selkie::{parse, render, render_text, render_with_config};
 
@@ -2414,56 +2415,29 @@ fn test_sequence_loop_scopes_to_single_actor() {
     let svg = render_with_config(&diagram, &RenderConfig::default())
         .expect("Failed to render sequence diagram");
 
-    // Fragment frames use line elements (not rects) matching mermaid.js.
-    // Find the horizontal top line of the loop frame (first loopLine) and compute its width.
-    let loop_width = svg
-        .split("<line")
-        .filter_map(|chunk| {
-            if !chunk.contains("loopLine") {
-                return None;
-            }
-            let x1 = chunk
-                .split("x1=\"")
-                .nth(1)?
-                .split('"')
-                .next()?
-                .parse::<f64>()
-                .ok()?;
-            let x2 = chunk
-                .split("x2=\"")
-                .nth(1)?
-                .split('"')
-                .next()?
-                .parse::<f64>()
-                .ok()?;
-            let y1 = chunk
-                .split("y1=\"")
-                .nth(1)?
-                .split('"')
-                .next()?
-                .parse::<f64>()
-                .ok()?;
-            let y2 = chunk
-                .split("y2=\"")
-                .nth(1)?
-                .split('"')
-                .next()?
-                .parse::<f64>()
-                .ok()?;
-            // Horizontal line (y1 == y2) indicates top or bottom of frame
-            if (y1 - y2).abs() < 0.1 {
-                Some((x2 - x1).abs())
-            } else {
-                None
-            }
-        })
-        .next()
-        .expect("Failed to find loop frame horizontal line");
+    let geometry = SequenceGeometry::parse(&svg).expect("valid sequence svg geometry");
+    let frame = geometry.first_fragment_frame().expect("missing loop frame");
+    let bob = geometry
+        .actor_box_containing("Bob")
+        .expect("missing Bob actor");
+    let john = geometry
+        .actor_box_containing("John")
+        .expect("missing John actor");
+    let self_label = geometry
+        .text_box_containing("Fight against hypochondria")
+        .expect("missing self-message label");
 
     assert!(
-        loop_width < 300.0,
-        "Loop frame should scope to a single actor, got width {}",
-        loop_width
+        frame.x > bob.right(),
+        "Loop frame should not expand back to the previous actor\n{svg}"
+    );
+    assert!(
+        frame.x <= john.x + 4.0,
+        "Loop frame should stay anchored to the scoped actor\n{svg}"
+    );
+    assert!(
+        frame.contains_with_tolerance(&self_label, 4.0),
+        "Loop frame should include its self-message label\n{svg}"
     );
 }
 

@@ -292,25 +292,6 @@ Convenience feature that enables `png`, `pdf`, and `kitty` together. Best for de
 cargo install selkie-rs --features all-formats
 ```
 
-## Issue Tracking
-
-This project uses [Microbeads](https://github.com/btucker/microbeads) for issue tracking - an AI-native issue tracker that lives directly in the repository. Issues are stored in `.beads/` and sync with git, making them accessible to both humans and AI coding agents.
-
-```bash
-# View available work
-mb ready
-
-# View issue details
-mb show <issue-id>
-
-# Update issue status
-mb update <issue-id> --status in_progress
-mb close <issue-id>
-
-# Sync with remote
-mb sync
-```
-
 ## Development
 
 This project follows test-driven development. Run the test suite:

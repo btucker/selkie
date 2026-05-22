@@ -6,6 +6,9 @@
 //! - Info: Acceptable variations (styling, minor dimension differences)
 
 use super::Issue;
+use crate::render::svg::sequence_geometry::{
+    SequenceBox, SequenceGeometry, SEQUENCE_OVERLAP_TOLERANCE,
+};
 use crate::render::svg::structure::{EdgeGeometry, NodeBounds};
 use crate::render::svg::SvgStructure;
 use std::collections::HashSet;
@@ -28,7 +31,9 @@ impl Default for CheckConfig {
     }
 }
 
-/// Run all structural checks between selkie and reference SVGs
+/// Run shared structural checks between selkie and reference SVGs.
+///
+/// Diagram-specific checks that need sample type context are wired by the eval runner.
 pub fn check_structure(
     selkie: &SvgStructure,
     reference: &SvgStructure,
@@ -78,6 +83,198 @@ pub fn check_structure(
     check_nested_composite_centering(selkie, reference, &mut issues);
 
     issues
+}
+
+/// Check sequence diagrams for text/box collisions that generic SVG structure checks miss.
+pub fn check_sequence_overlaps(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
+    let Some(geometry) = SequenceGeometry::parse(&selkie.raw_svg) else {
+        return;
+    };
+
+    let notes = geometry.notes();
+    let message_texts = geometry.message_texts();
+    let note_texts = geometry.note_texts();
+    let loop_texts = geometry.loop_texts();
+    let label_texts = geometry.label_texts();
+    let fragments = geometry.fragments();
+    let headers = geometry.fragment_headers();
+    let borders = geometry.fragment_borders();
+
+    for message in message_texts {
+        for note in notes {
+            report_overlap_if_intersects(message, note, issues);
+        }
+
+        for (fragment, header) in fragments.iter().zip(headers) {
+            if message.intersects_with_tolerance(header, SEQUENCE_OVERLAP_TOLERANCE)
+                && !is_message_text_inside_fragment_body(message, fragment, header)
+            {
+                push_sequence_overlap(message, header, issues);
+            }
+        }
+    }
+
+    for text in note_texts {
+        let inside_own_note = is_note_text_inside_own_note(text, notes);
+        if !inside_own_note {
+            issues.push(Issue::warning(
+                "sequence_overlap",
+                format!(
+                    "Sequence label '{}' ({}) is not contained by its note box beyond {}px tolerance",
+                    text.label, text.kind, SEQUENCE_OVERLAP_TOLERANCE
+                ),
+            ));
+        }
+
+        let clear_of_headers = !headers
+            .iter()
+            .any(|header| text.intersects_with_tolerance(header, SEQUENCE_OVERLAP_TOLERANCE));
+        for header in headers {
+            if inside_own_note && clear_of_headers {
+                continue;
+            }
+
+            if text.intersects_with_tolerance(header, SEQUENCE_OVERLAP_TOLERANCE) {
+                push_sequence_overlap(text, header, issues);
+            }
+        }
+
+        for label in label_texts {
+            report_overlap_if_intersects(text, label, issues);
+        }
+    }
+
+    for text in loop_texts {
+        let inside_own_header = is_loop_text_inside_own_header(text, headers);
+        let clear_of_notes = !notes
+            .iter()
+            .any(|note| text.intersects_with_tolerance(note, SEQUENCE_OVERLAP_TOLERANCE));
+        for note in notes {
+            if inside_own_header && clear_of_notes {
+                continue;
+            }
+
+            if text.intersects_with_tolerance(note, SEQUENCE_OVERLAP_TOLERANCE) {
+                push_sequence_overlap(text, note, issues);
+            }
+        }
+
+        for label in label_texts {
+            report_overlap_if_intersects(text, label, issues);
+        }
+    }
+
+    for note in notes {
+        for header in headers {
+            report_overlap_if_intersects(note, header, issues);
+        }
+
+        for border in borders {
+            report_overlap_if_intersects(note, border, issues);
+        }
+    }
+
+    for marker_id in ["arrow-filled", "arrow-open"] {
+        if let Some(marker) = geometry.marker(marker_id) {
+            report_stroke_scaled_sequence_marker(marker, issues);
+        }
+    }
+
+    for path in geometry.self_message_paths() {
+        report_square_self_message_path(path, issues);
+    }
+
+    for path in geometry.self_message_path_boxes() {
+        for label in message_texts {
+            report_self_message_label_to_right(path, label, issues);
+        }
+    }
+}
+
+fn report_overlap_if_intersects(a: &SequenceBox, b: &SequenceBox, issues: &mut Vec<Issue>) {
+    if a.intersects_with_tolerance(b, SEQUENCE_OVERLAP_TOLERANCE) {
+        push_sequence_overlap(a, b, issues);
+    }
+}
+
+fn push_sequence_overlap(a: &SequenceBox, b: &SequenceBox, issues: &mut Vec<Issue>) {
+    issues.push(Issue::warning(
+        "sequence_overlap",
+        format!(
+            "Sequence label '{}' ({}) overlaps '{}' ({}) beyond {}px tolerance",
+            a.label, a.kind, b.label, b.kind, SEQUENCE_OVERLAP_TOLERANCE
+        ),
+    ));
+}
+
+fn report_stroke_scaled_sequence_marker(
+    marker: &crate::render::svg::sequence_geometry::SequenceMarker,
+    issues: &mut Vec<Issue>,
+) {
+    if marker.marker_units.as_deref() == Some("userSpaceOnUse") {
+        return;
+    }
+
+    issues.push(Issue::warning(
+        "sequence_marker_size",
+        format!(
+            "Sequence marker '{}' uses stroke-scaled units; expected markerUnits=\"userSpaceOnUse\" to keep arrowheads stable",
+            marker.id
+        ),
+    ));
+}
+
+fn report_square_self_message_path(path: &str, issues: &mut Vec<Issue>) {
+    if path.contains('C') || path.contains('c') || path.contains('Q') || path.contains('q') {
+        return;
+    }
+
+    issues.push(Issue::warning(
+        "sequence_self_message_shape",
+        "Sequence self-message path uses square corners; expected a curved path".to_string(),
+    ));
+}
+
+fn report_self_message_label_to_right(
+    path: &SequenceBox,
+    label: &SequenceBox,
+    issues: &mut Vec<Issue>,
+) {
+    let label_center_y = label.y + label.height / 2.0;
+    let vertically_overlaps_path = label_center_y >= path.y && label_center_y <= path.bottom();
+    let starts_after_path = label.x >= path.right() - SEQUENCE_OVERLAP_TOLERANCE;
+    if !(vertically_overlaps_path && starts_after_path) {
+        return;
+    }
+
+    issues.push(Issue::warning(
+        "sequence_self_message_label",
+        format!(
+            "Sequence self-message label '{}' is placed to the right of the self-edge; expected it above the edge",
+            label.label
+        ),
+    ));
+}
+
+fn is_note_text_inside_own_note(text: &SequenceBox, notes: &[SequenceBox]) -> bool {
+    notes
+        .iter()
+        .any(|note| note.contains_with_tolerance(text, SEQUENCE_OVERLAP_TOLERANCE))
+}
+
+fn is_loop_text_inside_own_header(text: &SequenceBox, headers: &[SequenceBox]) -> bool {
+    headers
+        .iter()
+        .any(|header| header.contains_with_tolerance(text, SEQUENCE_OVERLAP_TOLERANCE))
+}
+
+fn is_message_text_inside_fragment_body(
+    text: &SequenceBox,
+    fragment: &SequenceBox,
+    header: &SequenceBox,
+) -> bool {
+    fragment.contains_with_tolerance(text, SEQUENCE_OVERLAP_TOLERANCE)
+        && text.y >= header.y + header.height - SEQUENCE_OVERLAP_TOLERANCE
 }
 
 /// Check for text visibility issues where CSS fill rules override inline fill attributes
@@ -2756,6 +2953,453 @@ mod tests {
         assert!(
             sim < 0.8,
             "Different structures should have lower similarity"
+        );
+    }
+
+    #[test]
+    fn sequence_box_intersection_honors_tolerance() {
+        let a = SequenceBox {
+            kind: "message",
+            label: "A".to_string(),
+            x: 10.0,
+            y: 10.0,
+            width: 40.0,
+            height: 20.0,
+        };
+        let b = SequenceBox {
+            kind: "note",
+            label: "B".to_string(),
+            x: 48.0,
+            y: 10.0,
+            width: 40.0,
+            height: 20.0,
+        };
+        assert!(
+            !a.intersects_with_tolerance(&b, SEQUENCE_OVERLAP_TOLERANCE),
+            "4px tolerance should allow boxes that only touch within tolerance"
+        );
+
+        let c = SequenceBox {
+            kind: "note",
+            label: "C".to_string(),
+            x: 40.0,
+            y: 10.0,
+            width: 40.0,
+            height: 20.0,
+        };
+        assert!(
+            a.intersects_with_tolerance(&c, SEQUENCE_OVERLAP_TOLERANCE),
+            "clear overlap beyond tolerance should be detected"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_message_note_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <rect class="note" x="90" y="80" width="120" height="40"/>
+        <text class="messageText" x="100" y="100">Fight against hypochondria</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected sequence_overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_rendered_message_label_collision() {
+        let diagram = crate::parse(
+            r#"sequenceDiagram
+    Alice->>Bob: Rendered message label
+"#,
+        )
+        .expect("parse sequence");
+        let svg = crate::render(&diagram).expect("render sequence");
+        assert!(
+            svg.contains("message-label"),
+            "expected real sequence renderer to emit message-label text"
+        );
+
+        let svg_with_note = svg.replace(
+            "</svg>",
+            r#"<rect class="note" x="0" y="0" width="10000" height="10000"/></svg>"#,
+        );
+        let structure = SvgStructure::from_svg(&svg_with_note).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected rendered message-label overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_message_label_note_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <rect class="note" x="90" y="80" width="120" height="40"/>
+        <text class="message-label" x="100" y="100">Rendered class label</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected message-label overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_accounts_for_centered_text_anchor() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <rect class="note" x="10" y="80" width="30" height="40"/>
+        <text class="messageText" text-anchor="middle" x="50" y="100">Centered</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected centered text overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_allows_note_text_inside_own_note() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <rect class="note" x="80" y="70" width="120" height="40"/>
+        <text class="noteText" x="90" y="90">Inside note</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            !issues.iter().any(|i| i.check == "sequence_overlap"),
+            "unexpected sequence_overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_allows_real_rendered_note_text_inside_note() {
+        let diagram = crate::parse(
+            r#"sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>Bob: Ping
+    Note right of Bob: Rendered note text
+"#,
+        )
+        .expect("parse sequence");
+        let svg = crate::render(&diagram).expect("render sequence");
+        assert!(
+            svg.contains("class=\"noteText\"")
+                && svg.contains("dy=\"1em\"")
+                && svg.contains("dominant-baseline=\"middle\"")
+                && svg.contains("alignment-baseline=\"middle\""),
+            "expected real sequence renderer noteText attributes"
+        );
+        let svg_with_fragment = svg.replace(
+            "</svg>",
+            r#"<line class="loopLine" x1="540" y1="95" x2="700" y2="95"/>
+<line class="loopLine" x1="700" y1="95" x2="700" y2="180"/>
+<line class="loopLine" x1="540" y1="180" x2="700" y2="180"/>
+<line class="loopLine" x1="540" y1="95" x2="540" y2="180"/></svg>"#,
+        );
+        let structure = SvgStructure::from_svg(&svg_with_fragment).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            !issues.iter().any(|i| i.check == "sequence_overlap"),
+            "unexpected sequence_overlap issue for real rendered note text, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_note_text_fragment_header_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <line class="loopLine" x1="60" y1="70" x2="220" y2="70"/>
+        <line class="loopLine" x1="220" y1="70" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="150" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="70" x2="60" y2="150"/>
+        <text class="noteText" x="90" y="84">Rational thoughts prevail!</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(issues.iter().any(|i| i.check == "sequence_overlap"));
+    }
+
+    #[test]
+    fn sequence_overlap_detector_allows_loop_text_inside_own_header() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <line class="loopLine" x1="60" y1="70" x2="220" y2="70"/>
+        <line class="loopLine" x1="220" y1="70" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="150" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="70" x2="60" y2="150"/>
+        <text class="loopText" x="70" y="88">Healthcheck</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            !issues.iter().any(|i| i.check == "sequence_overlap"),
+            "unexpected sequence_overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_allows_message_text_inside_fragment_body() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <line class="loopLine" x1="60" y1="70" x2="220" y2="70"/>
+        <line class="loopLine" x1="220" y1="70" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="150" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="70" x2="60" y2="150"/>
+        <text class="messageText" x="90" y="125">Inside body</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            !issues.iter().any(|i| i.check == "sequence_overlap"),
+            "unexpected sequence_overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_note_fragment_header_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <line class="loopLine" x1="60" y1="70" x2="220" y2="70"/>
+        <line class="loopLine" x1="220" y1="70" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="150" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="70" x2="60" y2="150"/>
+        <rect class="note" x="90" y="76" width="80" height="30"/>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected note/header overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_note_fragment_border_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <line class="loopLine" x1="60" y1="70" x2="220" y2="70"/>
+        <line class="loopLine" x1="220" y1="70" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="150" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="70" x2="60" y2="150"/>
+        <rect class="note" x="90" y="142" width="80" height="30"/>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected note/border overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_checks_separate_fragment_headers() {
+        let svg = r##"<svg width="300" height="260" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <line class="loopLine" x1="60" y1="40" x2="220" y2="40"/>
+        <line class="loopLine" x1="220" y1="40" x2="220" y2="100"/>
+        <line class="loopLine" x1="60" y1="100" x2="220" y2="100"/>
+        <line class="loopLine" x1="60" y1="40" x2="60" y2="100"/>
+
+        <line class="loopLine" x1="60" y1="140" x2="220" y2="140"/>
+        <line class="loopLine" x1="220" y1="140" x2="220" y2="220"/>
+        <line class="loopLine" x1="60" y1="220" x2="220" y2="220"/>
+        <line class="loopLine" x1="60" y1="140" x2="60" y2="220"/>
+        <text class="noteText" x="90" y="154">Second header collision</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected second fragment header overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_loop_text_note_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <rect class="note" x="80" y="70" width="120" height="40"/>
+        <text class="loopText" x="100" y="90">Healthcheck</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(issues.iter().any(|i| i.check == "sequence_overlap"));
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_loop_text_label_collision() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <line class="loopLine" x1="60" y1="70" x2="220" y2="70"/>
+        <line class="loopLine" x1="220" y1="70" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="150" x2="220" y2="150"/>
+        <line class="loopLine" x1="60" y1="70" x2="60" y2="150"/>
+        <text class="labelText" text-anchor="middle" x="85" y="88">loop</text>
+        <text class="loopText" text-anchor="middle" x="115" y="88">[Healthcheck]</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected loopText/labelText overlap issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_note_text_outside_note_box() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <g class="note">
+        <rect class="note" x="100" y="80" width="60" height="40"/>
+        <text class="noteText" text-anchor="middle" dominant-baseline="middle" dy="1em" x="130" y="85">Rational thoughts prevail!</text>
+      </g>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_overlap"),
+            "expected escaped noteText issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_stroke_scaled_arrow_marker() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow-filled" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z"/>
+        </marker>
+      </defs>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues.iter().any(|i| i.check == "sequence_marker_size"),
+            "expected sequence_marker_size issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_square_self_message_path() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <path class="message-line" marker-end="url(#arrow-filled)" d="M 75 110 L 115 110 L 115 140 L 75 140"/>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "sequence_self_message_shape"),
+            "expected sequence_self_message_shape issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_reports_self_message_label_to_right() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <path class="message-line" marker-end="url(#arrow-filled)" d="M 75 110 L 115 110 L 115 140 L 75 140"/>
+      <text class="message-label" x="120" y="125" text-anchor="start">Fight against hypochondria</text>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "sequence_self_message_label"),
+            "expected sequence_self_message_label issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn sequence_overlap_detector_ignores_label_below_self_message() {
+        let svg = r##"<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <path class="message-line" marker-end="url(#arrow-filled)" d="M 75 110 C 135 100 135 140 75 130"/>
+      <text class="message-label" x="150" y="153" text-anchor="middle">Inventory reserved</text>
+    </svg>"##;
+        let structure = SvgStructure::from_svg(svg).expect("parse svg");
+        let mut issues = Vec::new();
+
+        check_sequence_overlaps(&structure, &mut issues);
+
+        assert!(
+            !issues
+                .iter()
+                .any(|i| i.check == "sequence_self_message_label"),
+            "did not expect sequence_self_message_label issue, got {issues:?}"
         );
     }
 }

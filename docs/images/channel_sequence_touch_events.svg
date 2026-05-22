@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="787" height="777" viewBox="-50 -10 787 777" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="887" height="929" viewBox="-50 -10 887 929" class="mermaid">
   <style>
 
 .mermaid {
@@ -211,88 +211,88 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
   </defs>
   <g class="root">
     <g class="clusters">
-      <line x1="75" y1="65" x2="75" y2="692" class="actor-line" stroke-width="0.5px"/>
-      <line x1="412" y1="65" x2="412" y2="692" class="actor-line" stroke-width="0.5px"/>
-      <line x1="612" y1="65" x2="612" y2="692" class="actor-line" stroke-width="0.5px"/>
+      <line x1="75" y1="65" x2="75" y2="844" class="actor-line" stroke-width="0.5px"/>
+      <line x1="412" y1="65" x2="412" y2="844" class="actor-line" stroke-width="0.5px"/>
+      <line x1="612" y1="65" x2="612" y2="844" class="actor-line" stroke-width="0.5px"/>
     </g>
     <g class="edgePaths">
-      <line x1="75" y1="158" x2="412" y2="158" class="messageLine0" stroke-width="2" stroke="none" style="fill: none;" marker-end="url(#arrow-filled)"/>
-      <line x1="412" y1="202" x2="612" y2="202" class="messageLine0" stroke-width="2" style="fill: none;" marker-end="url(#arrow-filled)" stroke="none"/>
-      <line x1="75" y1="344" x2="412" y2="344" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
-      <line x1="412" y1="388" x2="612" y2="388" class="messageLine0" stroke-width="2" marker-end="url(#arrow-filled)" style="fill: none;" stroke="none"/>
-      <line x1="75" y1="530" x2="412" y2="530" class="messageLine0" marker-end="url(#arrow-filled)" stroke-width="2" style="fill: none;" stroke="none"/>
-      <line x1="412" y1="574" x2="612" y2="574" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
+      <line x1="75" y1="158" x2="412" y2="158" class="messageLine0" style="fill: none;" marker-end="url(#arrow-filled)" stroke-width="2" stroke="none"/>
+      <line x1="412" y1="202" x2="612" y2="202" class="messageLine0" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)" stroke-width="2"/>
+      <line x1="75" y1="382" x2="412" y2="382" class="messageLine0" stroke-width="2" style="fill: none;" marker-end="url(#arrow-filled)" stroke="none"/>
+      <line x1="412" y1="426" x2="612" y2="426" class="messageLine0" stroke-width="2" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)"/>
+      <line x1="75" y1="606" x2="412" y2="606" class="messageLine0" marker-end="url(#arrow-filled)" stroke="none" style="fill: none;" stroke-width="2"/>
+      <line x1="412" y1="650" x2="612" y2="650" class="messageLine0" stroke-width="2" marker-end="url(#arrow-filled)" style="fill: none;" stroke="none"/>
     </g>
     <g class="edgeLabels">
-      <text x="243.5" y="148" class="message-label" font-size="16" text-anchor="middle">Touch down on element</text>
+      <text x="243.5" y="148" class="message-label" text-anchor="middle" font-size="16">Touch down on element</text>
       <text x="512" y="192" class="message-label" font-size="16" text-anchor="middle">touchstart event</text>
-      <text x="243.5" y="334" class="message-label" text-anchor="middle" font-size="16">Drag finger (may leave element)</text>
-      <text x="512" y="378" class="message-label" font-size="16" text-anchor="middle">touchmove event</text>
-      <text x="243.5" y="520" class="message-label" font-size="16" text-anchor="middle">Lift finger (possibly outside element)</text>
-      <text x="512" y="564" class="message-label" text-anchor="middle" font-size="16">touchend event</text>
+      <text x="243.5" y="372" class="message-label" font-size="16" text-anchor="middle">Drag finger (may leave element)</text>
+      <text x="512" y="416" class="message-label" text-anchor="middle" font-size="16">touchmove event</text>
+      <text x="243.5" y="596" class="message-label" text-anchor="middle" font-size="16">Lift finger (possibly outside element)</text>
+      <text x="512" y="640" class="message-label" text-anchor="middle" font-size="16">touchend event</text>
     </g>
     <g class="nodes">
 
     </g>
     <g class="actor">
-      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="75" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">User</text>
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="75" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">User</text>
     </g>
     <g class="actor">
-      <rect x="337" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="412" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Element</text>
+      <rect x="337" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
+      <text x="412" y="32.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Element</text>
     </g>
     <g class="actor">
-      <rect x="537" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
-      <text x="612" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">TouchEvent</text>
+      <rect x="537" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="612" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">TouchEvent</text>
     </g>
     <g class="note">
       <rect x="50" y="75" width="587" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="343.5" y="80" class="noteText" font-size="16" dy="1em" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle">Touch Start Phase</text>
+      <text x="343.5" y="80" class="noteText" alignment-baseline="middle" text-anchor="middle" dy="1em" font-size="16" dominant-baseline="middle">Touch Start Phase</text>
     </g>
     <g class="note">
       <rect x="637" y="212" width="150" height="77" class="note" fill="#EDF2AE" stroke="#666"/>
-      <text x="712" y="217" class="noteText" text-anchor="middle" dy="1em" alignment-baseline="middle" dominant-baseline="middle" font-size="16">e.target = element</text>
-      <text x="712" y="236" class="noteText" alignment-baseline="middle" text-anchor="middle" dy="1em" dominant-baseline="middle" font-size="16">e.touches = [touch1]</text>
-      <text x="712" y="255" class="noteText" dy="1em" dominant-baseline="middle" text-anchor="middle" font-size="16" alignment-baseline="middle">e.changedTouches = [touch1]</text>
+      <text x="712" y="217" class="noteText" dominant-baseline="middle" font-size="16" alignment-baseline="middle" dy="1em" text-anchor="middle">e.target = element</text>
+      <text x="712" y="236" class="noteText" text-anchor="middle" alignment-baseline="middle" font-size="16" dominant-baseline="middle" dy="1em">e.touches = [touch1]</text>
+      <text x="712" y="255" class="noteText" font-size="16" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle" dy="1em">e.changedTouches = [touch1]</text>
     </g>
     <g class="note">
-      <rect x="50" y="261" width="587" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
-      <text x="343.5" y="266" class="noteText" dy="1em" dominant-baseline="middle" alignment-baseline="middle" text-anchor="middle" font-size="16">Touch Move Phase (optional)</text>
+      <rect x="50" y="299" width="587" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="343.5" y="304" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" dy="1em" font-size="16">Touch Move Phase (optional)</text>
     </g>
     <g class="note">
-      <rect x="637" y="398" width="150" height="77" class="note" fill="#EDF2AE" stroke="#666"/>
-      <text x="712" y="403" class="noteText" alignment-baseline="middle" dominant-baseline="middle" dy="1em" font-size="16" text-anchor="middle">e.target = STILL original element</text>
-      <text x="712" y="422" class="noteText" dominant-baseline="middle" font-size="16" alignment-baseline="middle" text-anchor="middle" dy="1em">e.touches = [touch1]</text>
-      <text x="712" y="441" class="noteText" alignment-baseline="middle" dy="1em" font-size="16" dominant-baseline="middle" text-anchor="middle">e.changedTouches = [touch1]</text>
+      <rect x="637" y="436" width="150" height="77" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="712" y="441" class="noteText" alignment-baseline="middle" text-anchor="middle" dy="1em" dominant-baseline="middle" font-size="16">e.target = STILL original element</text>
+      <text x="712" y="460" class="noteText" alignment-baseline="middle" font-size="16" text-anchor="middle" dy="1em" dominant-baseline="middle">e.touches = [touch1]</text>
+      <text x="712" y="479" class="noteText" alignment-baseline="middle" dy="1em" font-size="16" dominant-baseline="middle" text-anchor="middle">e.changedTouches = [touch1]</text>
     </g>
     <g class="note">
-      <rect x="50" y="447" width="587" height="39" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="343.5" y="452" class="noteText" font-size="16" text-anchor="middle" dy="1em" alignment-baseline="middle" dominant-baseline="middle">Touch End Phase</text>
+      <rect x="50" y="523" width="587" height="39" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="343.5" y="528" class="noteText" text-anchor="middle" dominant-baseline="middle" font-size="16" alignment-baseline="middle" dy="1em">Touch End Phase</text>
     </g>
     <g class="note">
-      <rect x="637" y="584" width="150" height="77" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="712" y="589" class="noteText" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle" font-size="16">e.target = STILL original element</text>
-      <text x="712" y="608" class="noteText" text-anchor="middle" alignment-baseline="middle" font-size="16" dy="1em" dominant-baseline="middle">e.touches = []</text>
-      <text x="712" y="627" class="noteText" dominant-baseline="middle" dy="1em" text-anchor="middle" font-size="16" alignment-baseline="middle">e.changedTouches = [touch1]</text>
+      <rect x="637" y="660" width="150" height="77" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="712" y="665" class="noteText" text-anchor="middle" font-size="16" dominant-baseline="middle" alignment-baseline="middle" dy="1em">e.target = STILL original element</text>
+      <text x="712" y="684" class="noteText" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle" font-size="16">e.touches = []</text>
+      <text x="712" y="703" class="noteText" dy="1em" dominant-baseline="middle" font-size="16" text-anchor="middle" alignment-baseline="middle">e.changedTouches = [touch1]</text>
     </g>
     <g class="note">
-      <rect x="562" y="633" width="100" height="77" class="note" fill="#EDF2AE" stroke="#666"/>
-      <text x="612" y="638" class="noteText" alignment-baseline="middle" text-anchor="middle" dy="1em" dominant-baseline="middle" font-size="16">For tap-to-dismiss:</text>
-      <text x="612" y="657" class="noteText" font-size="16" dominant-baseline="middle" dy="1em" alignment-baseline="middle" text-anchor="middle">Check e.touches.length === 0</text>
-      <text x="612" y="676" class="noteText" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle" font-size="16">AND e.target === container</text>
+      <rect x="562" y="747" width="100" height="77" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="612" y="752" class="noteText" text-anchor="middle" dominant-baseline="middle" font-size="16" dy="1em" alignment-baseline="middle">For tap-to-dismiss:</text>
+      <text x="612" y="771" class="noteText" text-anchor="middle" dy="1em" alignment-baseline="middle" dominant-baseline="middle" font-size="16">Check e.touches.length === 0</text>
+      <text x="612" y="790" class="noteText" dy="1em" dominant-baseline="middle" font-size="16" alignment-baseline="middle" text-anchor="middle">AND e.target === container</text>
     </g>
     <g class="actor">
-      <rect x="0" y="692" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="75" y="724.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">User</text>
+      <rect x="0" y="844" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" stroke-width="1" fill="#eaeaea"/>
+      <text x="75" y="876.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">User</text>
     </g>
     <g class="actor">
-      <rect x="337" y="692" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="412" y="724.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Element</text>
+      <rect x="337" y="844" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="412" y="876.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Element</text>
     </g>
     <g class="actor">
-      <rect x="537" y="692" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="612" y="724.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">TouchEvent</text>
+      <rect x="537" y="844" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" stroke="#666" fill="#eaeaea"/>
+      <text x="612" y="876.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16">TouchEvent</text>
     </g>
   </g>
 </svg>

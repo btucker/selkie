@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1241" height="811" viewBox="-50 -10 1241 811" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1244" height="946" viewBox="-50 -10 1244 946" class="mermaid">
   <style>
 
 .mermaid {
@@ -211,38 +211,38 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
   </defs>
   <g class="root">
     <g class="clusters">
-      <line x1="75" y1="65" x2="75" y2="726" class="actor-line" stroke-width="0.5px"/>
-      <line x1="592" y1="65" x2="592" y2="726" class="actor-line" stroke-width="0.5px"/>
-      <line x1="866" y1="65" x2="866" y2="726" class="actor-line" stroke-width="0.5px"/>
-      <line x1="1066" y1="65" x2="1066" y2="726" class="actor-line" stroke-width="0.5px"/>
+      <line x1="75" y1="65" x2="75" y2="861" class="actor-line" stroke-width="0.5px"/>
+      <line x1="592" y1="65" x2="592" y2="861" class="actor-line" stroke-width="0.5px"/>
+      <line x1="869" y1="65" x2="869" y2="861" class="actor-line" stroke-width="0.5px"/>
+      <line x1="1069" y1="65" x2="1069" y2="861" class="actor-line" stroke-width="0.5px"/>
     </g>
     <g class="edgePaths">
-      <line x1="75" y1="207" x2="592" y2="207" class="messageLine0" marker-end="url(#arrow-filled)" stroke-width="2" style="fill: none;" stroke="none"/>
-      <line x1="592" y1="251" x2="866" y2="251" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
-      <line x1="866" y1="295" x2="592" y2="295" class="messageLine1" stroke-width="2" stroke="none" marker-end="url(#arrow-filled)" style="stroke-dasharray: 3, 3; fill: none;"/>
-      <line x1="592" y1="339" x2="1066" y2="339" class="messageLine0" stroke-width="2" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)"/>
-      <line x1="75" y1="432" x2="592" y2="432" class="messageLine0" marker-end="url(#arrow-filled)" stroke-width="2" style="fill: none;" stroke="none"/>
-      <line x1="592" y1="476" x2="866" y2="476" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
-      <line x1="866" y1="520" x2="592" y2="520" class="messageLine1" style="stroke-dasharray: 3, 3; fill: none;" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none"/>
-      <path d="M 592 564 L 632 564 L 632 594 L 592 594" class="message-line" fill="none" stroke-width="1.5" marker-end="url(#arrow-filled)"/>
-      <line x1="592" y1="608" x2="75" y2="608" class="messageLine1" stroke-width="2" stroke="none" style="stroke-dasharray: 3, 3; fill: none;" marker-end="url(#arrow-filled)"/>
+      <line x1="75" y1="245" x2="592" y2="245" class="messageLine0" stroke="none" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)"/>
+      <line x1="592" y1="289" x2="869" y2="289" class="messageLine0" style="fill: none;" stroke="none" marker-end="url(#arrow-filled)" stroke-width="2"/>
+      <line x1="869" y1="333" x2="592" y2="333" class="messageLine1" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none" style="stroke-dasharray: 3, 3; fill: none;"/>
+      <line x1="592" y1="377" x2="1069" y2="377" class="messageLine0" marker-end="url(#arrow-filled)" stroke-width="2" stroke="none" style="fill: none;"/>
+      <line x1="75" y1="489" x2="592" y2="489" class="messageLine0" style="fill: none;" stroke-width="2" marker-end="url(#arrow-filled)" stroke="none"/>
+      <line x1="592" y1="533" x2="869" y2="533" class="messageLine0" stroke="none" marker-end="url(#arrow-filled)" style="fill: none;" stroke-width="2"/>
+      <line x1="869" y1="577" x2="592" y2="577" class="messageLine1" style="stroke-dasharray: 3, 3; fill: none;" marker-end="url(#arrow-filled)" stroke-width="2" stroke="none"/>
+      <path d="M 592 621 L 632 621 L 632 651 L 592 651" class="message-line" stroke-width="1.5" fill="none" marker-end="url(#arrow-filled)"/>
+      <line x1="592" y1="705" x2="75" y2="705" class="messageLine1" style="stroke-dasharray: 3, 3; fill: none;" stroke-width="2" stroke="none" marker-end="url(#arrow-filled)"/>
     </g>
     <g class="edgeLabels">
-      <text x="333.5" y="197" class="message-label" text-anchor="middle" font-size="16">Post &quot;[Review Note] PR #123: initial feedback&quot;</text>
-      <text x="729" y="241" class="message-label" text-anchor="middle" font-size="16">tracker.insert((reviewer, 123))</text>
-      <text x="729" y="285" class="message-label" text-anchor="middle" font-size="16">true (first note)</text>
-      <text x="829" y="329" class="message-label" font-size="16" text-anchor="middle">✅ Message posted</text>
-      <text x="333.5" y="422" class="message-label" font-size="16" text-anchor="middle">Post &quot;[Review Note] PR #123: correction - ignore previous&quot;</text>
-      <text x="729" y="466" class="message-label" text-anchor="middle" font-size="16">tracker.insert((reviewer, 123))</text>
-      <text x="729" y="510" class="message-label" font-size="16" text-anchor="middle">false (already exists)</text>
-      <text x="637" y="579" class="message-label" text-anchor="start" font-size="16">Suppress duplicate</text>
-      <text x="333.5" y="598" class="message-label" text-anchor="middle" font-size="16">❌ Silently dropped</text>
+      <text x="333.5" y="235" class="message-label" text-anchor="middle" font-size="16">Post &quot;[Review Note] PR #123: initial feedback&quot;</text>
+      <text x="730.5" y="279" class="message-label" text-anchor="middle" font-size="16">tracker.insert((reviewer, 123))</text>
+      <text x="730.5" y="323" class="message-label" text-anchor="middle" font-size="16">true (first note)</text>
+      <text x="830.5" y="367" class="message-label" font-size="16" text-anchor="middle">✅ Message posted</text>
+      <text x="333.5" y="479" class="message-label" text-anchor="middle" font-size="16">Post &quot;[Review Note] PR #123: correction - ignore previous&quot;</text>
+      <text x="730.5" y="523" class="message-label" text-anchor="middle" font-size="16">tracker.insert((reviewer, 123))</text>
+      <text x="730.5" y="567" class="message-label" font-size="16" text-anchor="middle">false (already exists)</text>
+      <text x="637" y="636" class="message-label" text-anchor="start" font-size="16">Suppress duplicate</text>
+      <text x="333.5" y="695" class="message-label" font-size="16" text-anchor="middle">❌ Silently dropped</text>
     </g>
     <g class="nodes">
 
     </g>
     <g class="actor">
-      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <rect x="0" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
       <text x="75" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Reviewer Coworker</text>
     </g>
     <g class="actor">
@@ -250,53 +250,53 @@ text.actor, text.actor > tspan, text.actor-box, text.actor-label {
       <text x="592" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">RPC Handler</text>
     </g>
     <g class="actor">
-      <rect x="791" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="866" y="32.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central"><tspan x="866" y="32.5" dy="-0.6em">review_note_tracker</tspan><tspan x="866" dy="1.2em">(HashSet)</tspan></text>
+      <rect x="794" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="869" y="32.5" class="actor actor-box" dominant-baseline="central" text-anchor="middle" font-size="16"><tspan x="869" y="32.5" dy="-0.6em">review_note_tracker</tspan><tspan x="869" dy="1.2em">(HashSet)</tspan></text>
     </g>
     <g class="actor">
-      <rect x="991" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
-      <text x="1066" y="32.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Channel Log</text>
+      <rect x="994" y="0" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="1069" y="32.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Channel Log</text>
     </g>
     <g class="note">
-      <rect x="816" y="75" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="866" y="80" class="noteText" dominant-baseline="middle" dy="1em" text-anchor="middle" font-size="16" alignment-baseline="middle">Documentation says:</text>
-      <text x="866" y="99" class="noteText" dy="1em" dominant-baseline="middle" alignment-baseline="middle" font-size="16" text-anchor="middle">HashMap with 60s cooldown</text>
+      <rect x="819" y="75" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="869" y="80" class="noteText" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle" font-size="16" dy="1em">Documentation says:</text>
+      <text x="869" y="99" class="noteText" dy="1em" alignment-baseline="middle" font-size="16" text-anchor="middle" dominant-baseline="middle">HashMap with 60s cooldown</text>
     </g>
     <g class="note">
-      <rect x="816" y="124" width="100" height="58" class="note" fill="#EDF2AE" stroke="#666"/>
-      <text x="866" y="129" class="noteText" font-size="16" dominant-baseline="middle" dy="1em" text-anchor="middle" alignment-baseline="middle">Reality:</text>
-      <text x="866" y="148" class="noteText" dominant-baseline="middle" alignment-baseline="middle" text-anchor="middle" dy="1em" font-size="16">HashSet with permanent dedup</text>
+      <rect x="819" y="143" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="869" y="148" class="noteText" dy="1em" alignment-baseline="middle" text-anchor="middle" font-size="16" dominant-baseline="middle">Reality:</text>
+      <text x="869" y="167" class="noteText" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" dy="1em" font-size="16">HashSet with permanent dedup</text>
     </g>
     <g class="note">
-      <rect x="25" y="349" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="75" y="354" class="noteText" alignment-baseline="middle" dy="1em" text-anchor="middle" font-size="16" dominant-baseline="middle">5 minutes later...</text>
-      <text x="75" y="373" class="noteText" text-anchor="middle" dominant-baseline="middle" dy="1em" font-size="16" alignment-baseline="middle">Reviewer discovers error</text>
+      <rect x="25" y="387" width="100" height="58" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="75" y="392" class="noteText" text-anchor="middle" dominant-baseline="middle" font-size="16" alignment-baseline="middle" dy="1em">5 minutes later...</text>
+      <text x="75" y="411" class="noteText" alignment-baseline="middle" text-anchor="middle" font-size="16" dominant-baseline="middle" dy="1em">Reviewer discovers error</text>
     </g>
     <g class="note">
-      <rect x="1016" y="618" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
-      <text x="1066" y="623" class="noteText" text-anchor="middle" dominant-baseline="middle" dy="1em" alignment-baseline="middle" font-size="16">Correction never appears</text>
-      <text x="1066" y="642" class="noteText" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em" font-size="16">Lead sees only the wrong note</text>
+      <rect x="1019" y="715" width="100" height="58" class="note" fill="#EDF2AE" stroke="#666"/>
+      <text x="1069" y="720" class="noteText" dominant-baseline="middle" text-anchor="middle" alignment-baseline="middle" dy="1em" font-size="16">Correction never appears</text>
+      <text x="1069" y="739" class="noteText" alignment-baseline="middle" text-anchor="middle" dy="1em" dominant-baseline="middle" font-size="16">Lead sees only the wrong note</text>
     </g>
     <g class="note">
-      <rect x="816" y="667" width="100" height="58" class="note" fill="#EDF2AE" stroke="#666"/>
-      <text x="866" y="672" class="noteText" font-size="16" alignment-baseline="middle" dy="1em" text-anchor="middle" dominant-baseline="middle">Only way to reset:</text>
-      <text x="866" y="691" class="noteText" font-size="16" dy="1em" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle">daemon restart</text>
+      <rect x="819" y="783" width="100" height="58" class="note" stroke="#666" fill="#EDF2AE"/>
+      <text x="869" y="788" class="noteText" font-size="16" dy="1em" alignment-baseline="middle" text-anchor="middle" dominant-baseline="middle">Only way to reset:</text>
+      <text x="869" y="807" class="noteText" text-anchor="middle" alignment-baseline="middle" dy="1em" font-size="16" dominant-baseline="middle">daemon restart</text>
     </g>
     <g class="actor">
-      <rect x="0" y="726" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
-      <text x="75" y="758.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Reviewer Coworker</text>
+      <rect x="0" y="861" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
+      <text x="75" y="893.5" class="actor actor-box" text-anchor="middle" dominant-baseline="central" font-size="16">Reviewer Coworker</text>
     </g>
     <g class="actor">
-      <rect x="517" y="726" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="592" y="758.5" class="actor actor-box" text-anchor="middle" font-size="16" dominant-baseline="central">RPC Handler</text>
+      <rect x="517" y="861" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke="#666" stroke-width="1"/>
+      <text x="592" y="893.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">RPC Handler</text>
     </g>
     <g class="actor">
-      <rect x="791" y="726" width="150" height="65" rx="3" ry="3" class="actor actor-box" fill="#eaeaea" stroke-width="1" stroke="#666"/>
-      <text x="866" y="758.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central"><tspan x="866" y="758.5" dy="-0.6em">review_note_tracker</tspan><tspan x="866" dy="1.2em">(HashSet)</tspan></text>
+      <rect x="794" y="861" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="869" y="893.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central"><tspan x="869" y="893.5" dy="-0.6em">review_note_tracker</tspan><tspan x="869" dy="1.2em">(HashSet)</tspan></text>
     </g>
     <g class="actor">
-      <rect x="991" y="726" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke="#666" fill="#eaeaea" stroke-width="1"/>
-      <text x="1066" y="758.5" class="actor actor-box" font-size="16" dominant-baseline="central" text-anchor="middle">Channel Log</text>
+      <rect x="994" y="861" width="150" height="65" rx="3" ry="3" class="actor actor-box" stroke-width="1" fill="#eaeaea" stroke="#666"/>
+      <text x="1069" y="893.5" class="actor actor-box" font-size="16" text-anchor="middle" dominant-baseline="central">Channel Log</text>
     </g>
   </g>
 </svg>

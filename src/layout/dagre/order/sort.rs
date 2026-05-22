@@ -48,7 +48,7 @@ pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
     });
 
     // Sort unsortable by original index (descending for consumption)
-    unsortable.sort_by(|a, b| b.i.cmp(&a.i));
+    unsortable.sort_by_key(|entry| std::cmp::Reverse(entry.i));
 
     // Merge the two lists
     let mut vs = Vec::new();

@@ -106,7 +106,7 @@ fn calculate_layout(db: &KanbanDb) -> KanbanLayout {
 
     // Total dimensions
     let total_width =
-        (num_sections as f64) * SECTION_WIDTH + ((num_sections - 1).max(0) as f64) * PADDING / 2.0;
+        (num_sections as f64) * SECTION_WIDTH + ((num_sections - 1) as f64) * PADDING / 2.0;
     let total_height = section_heights
         .iter()
         .cloned()

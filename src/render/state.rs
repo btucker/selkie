@@ -821,7 +821,7 @@ fn center_nested_composites(
     // This ensures that when inner composites are centered, they account for the
     // outer shifts that already happened. Deepest-first would break because outer
     // shifts would undo inner centering.
-    nested_composites.sort_by(|a, b| a.2.cmp(&b.2));
+    nested_composites.sort_by_key(|composite| composite.2);
 
     // Deduplicate by parent: process each parent composite only once.
     // Track which parents have been processed.

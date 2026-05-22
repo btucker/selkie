@@ -9,7 +9,7 @@
 //! 6. Compile results
 
 use super::cache::ReferenceCache;
-use super::checks::{calculate_similarity, check_structure, CheckConfig};
+use super::checks::{calculate_similarity, check_sequence_overlaps, check_structure, CheckConfig};
 use super::samples::{OwnedSample, Sample};
 use super::{
     DiagramResult, Dimensions, EvalResult, Issue, Level, ParseResult, RenderResult, Status,
@@ -285,8 +285,12 @@ impl EvalRunner {
             // Calculate structural similarity score
             result.structural_similarity = Some(calculate_similarity(selkie_struct, ref_struct));
 
-            let check_issues =
+            let mut check_issues =
                 check_structure(selkie_struct, ref_struct, &self.config.check_config);
+            if result.diagram_type == "sequence" {
+                // Sequence overlap checks are selkie-only and need diagram type context.
+                check_sequence_overlaps(selkie_struct, &mut check_issues);
+            }
             result.structural_match = !check_issues.iter().any(|i| i.level == Level::Error);
             result.issues.extend(check_issues);
         }

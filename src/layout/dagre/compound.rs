@@ -134,15 +134,11 @@ fn add_border_node(g: &mut DagreGraph, prop: &str, prefix: &str, sg: &str, rank:
     // Store the current border node id
     if let Some(node) = g.node_mut(sg) {
         match prop {
-            "borderLeft" => {
-                if idx < node.border_left.len() {
-                    node.border_left[idx] = Some(id.clone());
-                }
+            "borderLeft" if idx < node.border_left.len() => {
+                node.border_left[idx] = Some(id.clone());
             }
-            "borderRight" => {
-                if idx < node.border_right.len() {
-                    node.border_right[idx] = Some(id.clone());
-                }
+            "borderRight" if idx < node.border_right.len() => {
+                node.border_right[idx] = Some(id.clone());
             }
             _ => {}
         }
