@@ -94,11 +94,13 @@ pub fn add_border_segments(g: &mut DagreGraph) {
 
 /// Add a single border node at a specific rank
 fn add_border_node(g: &mut DagreGraph, prop: &str, prefix: &str, sg: &str, rank: i32) {
-    // Create the border node
-    // Border nodes have a small non-zero width to create separation between
-    // adjacent subgraphs during x-coordinate assignment. This matches how
-    // dagre.js creates visual separation between sibling subgraph boxes.
-    const BORDER_NODE_WIDTH: f64 = 10.0;
+    // Create the border node.
+    // Border nodes have zero width, matching dagre's add-border-segments.js
+    // (`{ width: 0, height: 0, ... }`). Their separation from neighbors comes
+    // from the BK sep() function (edgesep for dummy nodes), not from an
+    // inflated width; a non-zero width here spuriously widens every cluster
+    // band by ~width px per boundary.
+    const BORDER_NODE_WIDTH: f64 = 0.0;
 
     let id = g.unique_id(prefix);
     let label = NodeLabel {
@@ -432,6 +434,14 @@ mod tests {
             let node = g.node(id).unwrap();
             assert_eq!(node.dummy.as_deref(), Some("border"));
             assert_eq!(node.border_type.as_deref(), Some("borderLeft"));
+            // Border nodes must have zero width, matching dagre
+            // add-border-segments.js. A non-zero width spuriously inflates every
+            // cluster band during BK x-assignment.
+            assert_eq!(
+                node.width, 0.0,
+                "border node width must be 0 to match dagre; a positive width \
+                 widens each cluster boundary by that amount"
+            );
         }
     }
 
