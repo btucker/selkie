@@ -1,0 +1,25 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": "2026-07-03T03:44:18Z",
+  "closed_reason": "Ported mermaid's flowchart stylesheet (styles.ts + global styles.ts) into Theme::generate_flowchart_css, class-based edge styling (edge-thickness-*/edge-pattern-*/flowchart-link per flowDb+insertEdge), classDef CSS via createCssStyles port, and removed invented WCAG contrast label colors. Eval visual similarity 24.2% -> 25.1%. Commit fa53013d.",
+  "created_at": "2026-07-03T02:03:31Z",
+  "dependencies": [],
+  "description": "Fix 7 of parity plan. Port flowchart/styles.ts getStyles() with theme-default vars + global mermaid styles (edge-thickness/pattern classes), emit classDef as '.<id> > * {...!important}' per mermaidAPI createCssStyles, add class names to node groups, remove text_color_for_styles WCAG inventions. FLOW-4.2.",
+  "design": "",
+  "history": [
+    {
+      "at": "2026-07-03T03:44:18Z",
+      "field": "status",
+      "new": "closed",
+      "old": "open"
+    }
+  ],
+  "id": "se-337a6df0",
+  "labels": [],
+  "notes": "",
+  "priority": 2,
+  "status": "closed",
+  "title": "flowchart: port mermaid stylesheet + classDef CSS, drop invented contrast label colors",
+  "type": "bug",
+  "updated_at": "2026-07-03T03:44:18Z"
+}

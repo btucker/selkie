@@ -1,0 +1,17 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": null,
+  "closed_reason": null,
+  "created_at": "2026-07-03T05:33:01Z",
+  "dependencies": [],
+  "description": "dagre's buildLayerMatrix does layering[rank][order]=v; a dummy whose cluster parent does not span its rank never gets re-ordered in sweeps (unreachable from the layer-graph root), keeps a stale order, and collides with another node's slot — the earlier node silently drops out of the matrix and of positioning. Selkie's port keeps both nodes (stable sort). Affects channel_flowchart_data_collection (_d8_29, parent subGraph2 span 9..11 at rank 8) and channel_flowchart_clippy_fix (rank 9), shifting 3 orders by 1 in each. Replicating would need care: dropped nodes get no BK x-coordinate (NaN risk in edge paths).",
+  "design": "",
+  "id": "se-32e0d6dc",
+  "labels": [],
+  "notes": "",
+  "priority": 2,
+  "status": "open",
+  "title": "Consider replicating dagre buildLayerMatrix collision for out-of-span dummies",
+  "type": "task",
+  "updated_at": "2026-07-03T05:33:01Z"
+}

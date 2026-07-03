@@ -1,0 +1,20 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": null,
+  "closed_reason": null,
+  "created_at": "2026-07-03T05:40:04Z",
+  "dependencies": [],
+  "description": "With SVG attribute order now deterministic (se-16f93d45), repeated renders of the same input still occasionally differ in the low bits of layout coordinates, e.g. x=45.27344000000002 vs x=45.273439999999994 and edge path points differing around 1e-13. Reproduce: render docs/sources/channel_flowchart_clippy_fix.mmd ~5 times and compare hashes; roughly 1 in 5 runs differs. Likely cause: a HashMap iteration order somewhere in layout changes float accumulation order. Fix: find the unordered iteration feeding position sums and make it ordered (BTreeMap/sorted keys/insertion order), or round coordinates at serialization. This keeps docs/images churn small but nonzero after eval runs.",
+  "design": "",
+  "id": "se-92c83344",
+  "labels": [
+    "flowchart",
+    "determinism"
+  ],
+  "notes": "",
+  "priority": 3,
+  "status": "open",
+  "title": "layout: float low-bit nondeterminism causes residual SVG churn",
+  "type": "bug",
+  "updated_at": "2026-07-03T05:40:04Z"
+}

@@ -1,0 +1,25 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": "2026-07-03T05:32:45Z",
+  "closed_reason": "Part A: cluster-id edges no longer mark clusters external (mermaid d1 XOR d2 semantics) — terminal_layers now landscape 1682x1036 vs ref 1746x1032. Part B: faithful dagre-d3-es order() port fixes flowchart_complex horizontal mirroring (UI x~913 vs ref 797, was 233). Remaining cluster width inflation is position-phase parity, tracked separately.",
+  "created_at": "2026-07-03T03:06:46Z",
+  "dependencies": [],
+  "description": "flowchart_complex (and other subgraph-heavy flowcharts) render with subgraph groups arranged mirrored/differently vs the mermaid reference (ref edge 1 starts x=797, selkie x=233) even though within-subgraph node order now matches document order. Mermaid's dagre wrapper (rendering-util/layout-algorithms/dagre/index.js recursiveRender + mermaid-graphlib adjustClustersAndEdges) lays out self-contained clusters as separate recursive dagre runs and embeds them as single nodes; selkie uses a nesting-graph compound approach, so subgraph left/right placement diverges. Porting the recursive cluster rendering (or dagre's buildLayerGraph/sortSubgraph order phase) is needed for parity. Affected eval cases: flowchart_complex, channel_flowchart_viewer_logic, channel_flowchart_sccache_sharing.",
+  "design": "",
+  "history": [
+    {
+      "at": "2026-07-03T05:32:45Z",
+      "field": "status",
+      "new": "closed",
+      "old": "open"
+    }
+  ],
+  "id": "se-38e8d522",
+  "labels": [],
+  "notes": "",
+  "priority": 2,
+  "status": "closed",
+  "title": "Subgraph placement mirrored vs mermaid: port recursive cluster rendering",
+  "type": "bug",
+  "updated_at": "2026-07-03T05:32:45Z"
+}

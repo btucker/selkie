@@ -1,0 +1,25 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": "2026-07-03T03:22:07Z",
+  "closed_reason": "Ported mermaid's cluster extraction: isolated clusters laid out recursively with flipped default direction; eval visual similarity 17.8% -> 24.2%, orientation failures 15 -> 5",
+  "created_at": "2026-07-03T02:03:31Z",
+  "dependencies": [],
+  "description": "Fix 6 of parity plan. Mermaid extracts clusters WITHOUT external connections into own graph, recursive dagre with ranksep+25, dir = explicit or FLIP of parent (TB->LR else TB), margin 8; places result as fixed-size node. Selkie does single-pass compound nesting instead. Primary FLOW-3.2 orientation fix (~14/16 diagrams). See mermaid-graphlib.js:73-116,228-342, dagre/index.js:72-97.",
+  "design": "",
+  "history": [
+    {
+      "at": "2026-07-03T03:22:07Z",
+      "field": "status",
+      "new": "closed",
+      "old": "open"
+    }
+  ],
+  "id": "se-9e34ca05",
+  "labels": [],
+  "notes": "",
+  "priority": 1,
+  "status": "closed",
+  "title": "flowchart: port mermaid cluster extraction (recursive subgraph layout, flipped default dir)",
+  "type": "bug",
+  "updated_at": "2026-07-03T03:22:07Z"
+}
