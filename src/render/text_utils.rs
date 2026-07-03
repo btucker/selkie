@@ -12,6 +12,19 @@ pub(crate) fn normalize_br_tags(text: &str) -> String {
         .replace("<br>", "\n")
 }
 
+/// Decode common HTML entities to their literal characters.
+///
+/// Handles the entities mermaid labels commonly contain (`&lt;`, `&gt;`,
+/// `&quot;`, `&#39;`, `&amp;`). `&amp;` is decoded last so that doubly
+/// escaped sequences (e.g. `&amp;lt;`) are not over-decoded.
+pub(crate) fn decode_html_entities(text: &str) -> String {
+    text.replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&#39;", "'")
+        .replace("&amp;", "&")
+}
+
 /// Estimate text width in pixels using per-character weight classes.
 ///
 /// Approximates browser rendering of proportional fonts (e.g. Trebuchet MS)

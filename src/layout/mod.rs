@@ -12,7 +12,9 @@ pub mod dagre;
 
 pub use adapter::{NodeSizeConfig, SizeEstimator, ToLayoutGraph};
 pub use graph::LayoutGraph;
-pub use size::{create_size_estimator, CharacterSizeEstimator, FontdueSizeEstimator};
+pub use size::{
+    create_size_estimator, CharacterSizeEstimator, FontdueSizeEstimator, TrebuchetSizeEstimator,
+};
 pub use types::{
     geometric_midpoint, LayoutDirection, LayoutEdge, LayoutNode, LayoutOptions, LayoutRanker,
     NodeShape, Padding, Point,
@@ -215,11 +217,11 @@ fn to_dagre_graph(graph: &LayoutGraph) -> DagreGraph {
     // Add edges
     for edge in &graph.edges {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
-            // Estimate label size if present (roughly 8px per char, 16px height)
-            let (label_width, label_height) = if let Some(label) = &edge.label {
-                let width = (label.len() as f64) * 8.0 + 16.0; // padding
-                let height = 20.0;
-                (width, height)
+            // Use the label dimensions measured before layout (mirroring
+            // mermaid's insertEdgeLabel, which sets edge.width/height from
+            // the label bbox before running dagre).
+            let (label_width, label_height) = if edge.label.is_some() {
+                (edge.label_width, edge.label_height)
             } else {
                 (0.0, 0.0)
             };
