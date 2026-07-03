@@ -12,7 +12,7 @@ use std::path::Path;
 pub type RgbaImage = (Vec<u8>, u32, u32);
 
 #[cfg(feature = "png")]
-use super::ssim::{calculate_ssim_with_resize, rgba_to_grayscale};
+use super::ssim::{calculate_ssim_registered, calculate_ssim_with_resize, rgba_to_grayscale};
 
 /// Result of visual comparison between two images
 #[derive(Debug, Clone)]
@@ -166,7 +166,7 @@ pub fn compare_svg_to_reference_source(
 
     let selkie_gray = rgba_to_grayscale(&selkie_rgba);
     let reference_gray = rgba_to_grayscale(&reference_rgba);
-    let ssim = calculate_ssim_with_resize(&selkie_gray, sw, sh, &reference_gray, rw, rh);
+    let ssim = calculate_ssim_registered(&selkie_gray, sw, sh, &reference_gray, rw, rh);
 
     Ok(VisualComparison {
         ssim,
@@ -797,7 +797,7 @@ pub fn write_comparison_pngs(
         // Calculate visual similarity between renderings
         let selkie_gray = rgba_to_grayscale(selkie_rgba);
         let reference_gray = rgba_to_grayscale(reference_rgba);
-        let ssim = calculate_ssim_with_resize(&selkie_gray, sw, sh, &reference_gray, rw, rh);
+        let ssim = calculate_ssim_registered(&selkie_gray, sw, sh, &reference_gray, rw, rh);
 
         // Create side-by-side comparison PNG from pre-rendered RGBA data
         let png_data =

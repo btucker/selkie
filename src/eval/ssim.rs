@@ -249,6 +249,116 @@ pub fn calculate_ssim_with_resize(
     calculate_ssim(&resized1, &resized2, target_w, target_h)
 }
 
+/// Luma threshold below which a pixel counts as content rather than the white
+/// background. mmdc/Chrome reference PNGs and selkie rasters are both composited
+/// on white; anti-aliased edges are darker than this.
+const CONTENT_THRESHOLD: u8 = 250;
+
+/// Maximum tolerated ratio between the two images' content aspect ratios before
+/// registration is skipped. Layout-aligned diagrams differ only by white slack
+/// and sub-pixel scale, so their content boxes share an aspect ratio; a larger
+/// mismatch means the layouts genuinely differ and must NOT be masked by
+/// cropping and rescaling into alignment.
+const AR_TOLERANCE: f64 = 1.10;
+
+/// Non-white content bounding box as (x0, y0, x1, y1) with exclusive ends,
+/// or None if the image is entirely background.
+fn content_bbox(gray: &[u8], width: u32, height: u32) -> Option<(u32, u32, u32, u32)> {
+    if gray.len() != (width as usize) * (height as usize) {
+        return None;
+    }
+    let mut min_x = width;
+    let mut min_y = height;
+    let mut max_x = 0u32;
+    let mut max_y = 0u32;
+    let mut found = false;
+    for y in 0..height {
+        let row = (y * width) as usize;
+        for x in 0..width {
+            if gray[row + x as usize] < CONTENT_THRESHOLD {
+                found = true;
+                min_x = min_x.min(x);
+                min_y = min_y.min(y);
+                max_x = max_x.max(x);
+                max_y = max_y.max(y);
+            }
+        }
+    }
+    if found {
+        Some((min_x, min_y, max_x + 1, max_y + 1))
+    } else {
+        None
+    }
+}
+
+/// Copy the sub-rectangle `bbox` out of `gray` into a tightly packed buffer.
+fn crop_grayscale(gray: &[u8], width: u32, bbox: (u32, u32, u32, u32)) -> (Vec<u8>, u32, u32) {
+    let (x0, y0, x1, y1) = bbox;
+    let cw = x1 - x0;
+    let ch = y1 - y0;
+    let mut out = vec![0u8; (cw as usize) * (ch as usize)];
+    for y in 0..ch {
+        let src = (((y0 + y) * width) + x0) as usize;
+        let dst = (y * cw) as usize;
+        out[dst..dst + cw as usize].copy_from_slice(&gray[src..src + cw as usize]);
+    }
+    (out, cw, ch)
+}
+
+/// Registration-corrected SSIM.
+///
+/// mmdc/Chrome reference PNGs pad the diagram with white slack, so the same
+/// diagram fills a slightly different pixel fraction than selkie's raster. Even
+/// a ~1% scale mismatch plus a translation decorrelates the overlapping SSIM
+/// windows progressively toward the far edge, understating similarity of an
+/// otherwise identical layout. This aligns the two images by their non-white
+/// content bounding boxes (removing translation) and rescales the boxes to
+/// common dimensions (removing scale) before computing SSIM.
+///
+/// When the two content boxes' aspect ratios diverge beyond [`AR_TOLERANCE`],
+/// the layouts genuinely differ; registration is skipped and the plain
+/// resize-based compare is used so the divergence is not masked.
+pub fn calculate_ssim_registered(
+    img1: &[u8],
+    w1: u32,
+    h1: u32,
+    img2: &[u8],
+    w2: u32,
+    h2: u32,
+) -> f64 {
+    let (b1, b2) = match (content_bbox(img1, w1, h1), content_bbox(img2, w2, h2)) {
+        (Some(a), Some(b)) => (a, b),
+        // One or both blank: nothing to register against.
+        _ => return calculate_ssim_with_resize(img1, w1, h1, img2, w2, h2),
+    };
+
+    let (c1, cw1, ch1) = crop_grayscale(img1, w1, b1);
+    let (c2, cw2, ch2) = crop_grayscale(img2, w2, b2);
+
+    let ar1 = cw1 as f64 / ch1 as f64;
+    let ar2 = cw2 as f64 / ch2 as f64;
+    if (ar1 / ar2).max(ar2 / ar1) > AR_TOLERANCE {
+        return calculate_ssim_with_resize(img1, w1, h1, img2, w2, h2);
+    }
+
+    // Rescale both content boxes to common dimensions (the smaller of each
+    // axis) so residual scale differences are removed before comparison.
+    let target_w = cw1.min(cw2).max(1);
+    let target_h = ch1.min(ch2).max(1);
+    let r1 = if cw1 != target_w || ch1 != target_h {
+        resize_grayscale(&c1, cw1, ch1, target_w, target_h)
+    } else {
+        c1
+    };
+    let r2 = if cw2 != target_w || ch2 != target_h {
+        resize_grayscale(&c2, cw2, ch2, target_w, target_h)
+    } else {
+        c2
+    };
+
+    calculate_ssim(&r1, &r2, target_w, target_h)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -346,6 +456,75 @@ mod tests {
                 "downscale must average 0/255 columns to ~128, got {v} in {out:?}"
             );
         }
+    }
+
+    /// Fill a `w`x`h` white canvas with a period-8 vertical-bar pattern of
+    /// size `cw`x`ch` placed at (off_x, off_y).
+    fn bars_on_canvas(w: u32, h: u32, cw: u32, ch: u32, off_x: u32, off_y: u32) -> Vec<u8> {
+        let mut img = vec![255u8; (w * h) as usize];
+        for y in 0..ch {
+            for x in 0..cw {
+                if (x % 8) < 4 {
+                    let px = off_x + x;
+                    let py = off_y + y;
+                    img[(py * w + px) as usize] = 0;
+                }
+            }
+        }
+        img
+    }
+
+    #[test]
+    fn test_registration_corrects_translation() {
+        // Two rasters with IDENTICAL content but placed at different offsets
+        // inside a white canvas (mmdc slack + sub-pixel translation). Plain
+        // windowed SSIM compares them misaligned and collapses; registering to
+        // the content bounding box must recover a near-1.0 score.
+        let w = 100u32;
+        let h = 100u32;
+        let a = bars_on_canvas(w, h, 80, 80, 0, 0);
+        let b = bars_on_canvas(w, h, 80, 80, 18, 18);
+
+        let plain = calculate_ssim(&a, &b, w, h);
+        let registered = calculate_ssim_registered(&a, w, h, &b, w, h);
+
+        assert!(
+            plain < 0.6,
+            "misaligned identical content should score low without registration, got {plain}"
+        );
+        assert!(
+            registered > 0.95,
+            "registration should align identical content to near-1.0, got {registered}"
+        );
+    }
+
+    #[test]
+    fn test_registration_respects_aspect_ratio_band() {
+        // Genuinely different layouts (wide vs tall content) must NOT be forced
+        // into alignment: registration falls back to the plain resize compare
+        // so a real divergence is not masked.
+        let w = 100u32;
+        let h = 100u32;
+        // Wide content block (80x20) vs tall content block (20x80).
+        let mut wide = vec![255u8; (w * h) as usize];
+        for y in 10..30 {
+            for x in 10..90 {
+                wide[(y * w + x) as usize] = 0;
+            }
+        }
+        let mut tall = vec![255u8; (w * h) as usize];
+        for y in 10..90 {
+            for x in 10..30 {
+                tall[(y * w + x) as usize] = 0;
+            }
+        }
+
+        let registered = calculate_ssim_registered(&wide, w, h, &tall, w, h);
+        let fallback = calculate_ssim_with_resize(&wide, w, h, &tall, w, h);
+        assert!(
+            (registered - fallback).abs() < 1e-9,
+            "aspect-ratio mismatch must fall back to resize compare, got {registered} vs {fallback}"
+        );
     }
 
     #[test]
