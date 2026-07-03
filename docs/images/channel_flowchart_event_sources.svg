@@ -153,11 +153,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-Health-0">
         <rect x="284.1282168440821" y="430.45127715474126" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="320.52821684408207" y="441.45127715474126" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
+        <text x="320.52821684408207" y="441.45127715474126" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-PR-0">
         <rect x="412.6618240459449" y="449.0980862590785" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="449.0618240459449" y="460.0980862590785" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
+        <text x="449.0618240459449" y="460.0980862590785" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-Dispatch-0">
         <rect x="721.0584350672639" y="448.58810871222335" width="72.8" height="22" class="edge-label-bg"/>
@@ -169,11 +169,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-Health-Effects-0">
         <rect x="280.0602406053873" y="639.7942157460811" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="323.66024060538734" y="650.7942157460811" class="edge-label" dominant-baseline="central" text-anchor="middle">Vec&lt;Effect&gt;</text>
+        <text x="323.66024060538734" y="650.7942157460811" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&lt;Effect&gt;</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-PR-Effects-0">
         <rect x="406.6154918857337" y="621.1401992036809" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="450.21549188573374" y="632.1401992036809" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&lt;Effect&gt;</text>
+        <text x="450.21549188573374" y="632.1401992036809" class="edge-label" dominant-baseline="central" text-anchor="middle">Vec&lt;Effect&gt;</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Dispatch-Effects-0">
         <rect x="715.0238150159927" y="621.187090702733" width="87.2" height="22" class="edge-label-bg"/>
@@ -191,7 +191,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Webhook">
         <rect x="401.9355479999998" y="25" width="185.67190399999998" height="54"/>
-        <text x="494.77149999999983" y="52" class="label" text-anchor="middle" dominant-baseline="central">GitHub Webhooks</text>
+        <text x="494.77149999999983" y="52" class="label" dominant-baseline="central" text-anchor="middle">GitHub Webhooks</text>
       </g>
       <g class="node default" id="node-RPC">
         <rect x="637.6074519999997" y="25" width="126.51564800000001" height="54"/>
@@ -199,23 +199,23 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Signal">
         <rect x="814.1230999999998" y="25" width="145.148464" height="54"/>
-        <text x="886.6973319999997" y="52" class="label" dominant-baseline="central" text-anchor="middle">Unix Signals</text>
+        <text x="886.6973319999997" y="52" class="label" text-anchor="middle" dominant-baseline="central">Unix Signals</text>
       </g>
       <g class="node default imperative" id="node-Events">
         <rect x="486.41217199999994" y="179" width="222.87500799999998" height="78" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
-        <text x="597.8496759999999" y="218" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="597.8496759999999" y="218" dy="-0.6em">events.rs</tspan><tspan x="597.8496759999999" dy="1.2em">DaemonEvent dispatch</tspan></text>
+        <text x="597.8496759999999" y="218" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="597.8496759999999" y="218" dy="-0.6em">events.rs</tspan><tspan x="597.8496759999999" dy="1.2em">DaemonEvent dispatch</tspan></text>
       </g>
       <g class="node default pure" id="node-Snapshot">
         <rect x="489.8770199999999" y="331" width="215.945312" height="102" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="597.8496759999999" y="382" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="597.8496759999999" y="382" dy="-1.2em">snapshot.rs</tspan><tspan x="597.8496759999999" dy="1.2em">WorldSnapshot</tspan><tspan x="597.8496759999999" dy="1.2em">immutable state view</tspan></text>
+        <text x="597.8496759999999" y="382" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="597.8496759999999" y="382" dy="-1.2em">snapshot.rs</tspan><tspan x="597.8496759999999" dy="1.2em">WorldSnapshot</tspan><tspan x="597.8496759999999" dy="1.2em">immutable state view</tspan></text>
       </g>
       <g class="node default pure" id="node-Health">
         <rect x="91.27930000000003" y="507" width="192.15625599999998" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="187.35742800000003" y="546" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="187.35742800000003" y="546" dy="-0.6em">health.rs</tspan><tspan x="187.35742800000003" dy="1.2em">coworker lifecycle</tspan></text>
+        <text x="187.35742800000003" y="546" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="187.35742800000003" y="546" dy="-0.6em">health.rs</tspan><tspan x="187.35742800000003" dy="1.2em">coworker lifecycle</tspan></text>
       </g>
       <g class="node default pure" id="node-PR">
         <rect x="333.43555599999996" y="507" width="193.52345599999998" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="430.19728399999997" y="546" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="430.19728399999997" y="546" dy="-0.6em">pr.rs</tspan><tspan x="430.19728399999997" dy="1.2em">reviewer spawning</tspan></text>
+        <text x="430.19728399999997" y="546" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="430.19728399999997" y="546" dy="-0.6em">pr.rs</tspan><tspan x="430.19728399999997" dy="1.2em">reviewer spawning</tspan></text>
       </g>
       <g class="node default pure" id="node-Dispatch">
         <rect x="691.9239119999999" y="507" width="173.906256" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
@@ -223,7 +223,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default pure" id="node-Chat">
         <rect x="915.830168" y="507" width="187.359376" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="1009.5098559999999" y="546" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1009.5098559999999" y="546" dy="-0.6em">chat.rs</tspan><tspan x="1009.5098559999999" dy="1.2em">@mention routing</tspan></text>
+        <text x="1009.5098559999999" y="546" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1009.5098559999999" y="546" dy="-0.6em">chat.rs</tspan><tspan x="1009.5098559999999" dy="1.2em">@mention routing</tspan></text>
       </g>
       <g class="node default imperative" id="node-Effects">
         <rect x="496.1640919999999" y="659" width="215.515632" height="102" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
@@ -231,11 +231,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default infra" id="node-Tmux">
         <rect x="63.572259999999915" y="861" width="259.265664" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="193.20509199999992" y="900" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.20509199999992" y="900" dy="-0.6em">tmux.rs</tspan><tspan x="193.20509199999992" dy="1.2em">spawn/nudge/pane capture</tspan></text>
+        <text x="193.20509199999992" y="900" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="193.20509199999992" y="900" dy="-0.6em">tmux.rs</tspan><tspan x="193.20509199999992" dy="1.2em">spawn/nudge/pane capture</tspan></text>
       </g>
       <g class="node default infra" id="node-Channel">
         <rect x="372.8379239999998" y="861" width="197.66409600000003" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="471.6699719999998" y="900" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="471.6699719999998" y="900" dy="-0.6em">channel.rs</tspan><tspan x="471.6699719999998" dy="1.2em">append-only JSONL</tspan></text>
+        <text x="471.6699719999998" y="900" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="471.6699719999998" y="900" dy="-0.6em">channel.rs</tspan><tspan x="471.6699719999998" dy="1.2em">append-only JSONL</tspan></text>
       </g>
       <g class="node default infra" id="node-Tasks">
         <rect x="620.5020199999999" y="861" width="182.64064000000002" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>

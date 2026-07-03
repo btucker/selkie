@@ -5,7 +5,7 @@
 
 mod adapter;
 mod graph;
-mod size;
+pub(crate) mod size;
 mod types;
 
 pub mod dagre;

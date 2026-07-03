@@ -134,11 +134,11 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-CheckPending-End-0">
         <rect x="9.721887999999968" y="1168.5467706058694" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="20.921887999999967" y="1179.5467706058694" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <text x="20.921887999999967" y="1179.5467706058694" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CheckPending-ExtractPR-0">
         <rect x="150.8718230863939" y="310.5377927620335" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="165.6718230863939" y="321.5377927620335" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+        <text x="165.6718230863939" y="321.5377927620335" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-HasPR-CheckOwner-0">
         <rect x="158.85625599999997" y="710.4649714611389" width="29.599999999999998" height="22" class="edge-label-bg"/>
@@ -146,23 +146,23 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-HasPR-AllocateFresh-0">
         <rect x="601.4191599999999" y="916.0293853126547" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="612.61916" y="927.0293853126547" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <text x="612.61916" y="927.0293853126547" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-InMemory-ReuseOwner-0">
         <rect x="106.88751199999997" y="1286.550710446154" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="121.68751199999997" y="1297.550710446154" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <text x="121.68751199999997" y="1297.550710446154" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-InMemory-CheckDisk-0">
         <rect x="308.3130313782878" y="1081.3128702332374" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="319.5130313782878" y="1092.3128702332374" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <text x="319.5130313782878" y="1092.3128702332374" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-OnDisk-ReuseOwner-0">
         <rect x="309.178110902212" y="1475.4164581798723" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="323.978110902212" y="1486.4164581798723" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+        <text x="323.978110902212" y="1486.4164581798723" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-OnDisk-AllocateFresh-0">
         <rect x="498.0612390152516" y="1470.2003251156195" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="509.2612390152516" y="1481.2003251156195" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <text x="509.2612390152516" y="1481.2003251156195" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-RunningCheck-NudgeClaim-0">
         <rect x="162.91899723006313" y="1910.4638597394912" width="29.599999999999998" height="22" class="edge-label-bg"/>
@@ -174,11 +174,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-MissingCheck-CheckOwner-0">
         <rect x="283.6655304056187" y="708.1919640521255" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="327.26553040561873" y="719.1919640521255" class="edge-label" dominant-baseline="central" text-anchor="middle">Should gate</text>
+        <text x="327.26553040561873" y="719.1919640521255" class="edge-label" text-anchor="middle" dominant-baseline="central">Should gate</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-MissingCheck-CheckDisk-0">
         <rect x="437.13438399999995" y="891.7045395680783" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="480.734384" y="902.7045395680783" class="edge-label" text-anchor="middle" dominant-baseline="central">Should gate</text>
+        <text x="480.734384" y="902.7045395680783" class="edge-label" dominant-baseline="central" text-anchor="middle">Should gate</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-PRCache-MissingCheck-0">
         <rect x="380.27109599999994" y="517.800895461139" width="87.2" height="22" class="edge-label-bg"/>
@@ -204,15 +204,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-HasPR">
         <polygon points="173.65625599999998,552.246203461139 239.76564,618.355587461139 173.65625599999998,684.4649714611389 107.54687199999998,618.355587461139"/>
-        <text x="173.65625599999998" y="618.355587461139" class="label" dominant-baseline="central" text-anchor="middle">PR# found?</text>
+        <text x="173.65625599999998" y="618.355587461139" class="label" text-anchor="middle" dominant-baseline="central">PR# found?</text>
       </g>
       <g class="node default" id="node-CheckOwner">
         <rect x="79.28124799999998" y="758.4649714611389" width="188.75001600000002" height="78"/>
-        <text x="173.65625599999998" y="797.4649714611389" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="173.65625599999998" y="797.4649714611389" dy="-0.6em">Check in-memory</tspan><tspan x="173.65625599999998" dy="1.2em">pr_coworker_map</tspan></text>
+        <text x="173.65625599999998" y="797.4649714611389" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="173.65625599999998" y="797.4649714611389" dy="-0.6em">Check in-memory</tspan><tspan x="173.65625599999998" dy="1.2em">pr_coworker_map</tspan></text>
       </g>
       <g class="node default" id="node-AllocateFresh">
         <rect x="503.11524000000003" y="1526.6525234611388" width="170.21096" height="78"/>
-        <text x="588.22072" y="1565.6525234611388" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="588.22072" y="1565.6525234611388" dy="-0.6em">Allocate fresh</tspan><tspan x="588.22072" dy="1.2em">coworker name</tspan></text>
+        <text x="588.22072" y="1565.6525234611388" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="588.22072" y="1565.6525234611388" dy="-0.6em">Allocate fresh</tspan><tspan x="588.22072" dy="1.2em">coworker name</tspan></text>
       </g>
       <g class="node default" id="node-InMemory">
         <polygon points="173.65625599999998,910.4649714611389 258.70314399999995,995.5118594611389 173.65625599999998,1080.5587474611389 88.60936799999999,995.5118594611389"/>
@@ -220,19 +220,19 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-ReuseOwner">
         <rect x="66.777348" y="1538.6525234611388" width="192.04689599999998" height="54"/>
-        <text x="162.800796" y="1565.6525234611388" class="label" text-anchor="middle" dominant-baseline="central">Reuse same owner</text>
+        <text x="162.800796" y="1565.6525234611388" class="label" dominant-baseline="central" text-anchor="middle">Reuse same owner</text>
       </g>
       <g class="node default" id="node-CheckDisk">
         <rect x="341.292968" y="1154.5587474611389" width="230.08595200000002" height="54" style="fill:#ff9999 !important"/>
-        <text x="456.335944" y="1181.5587474611389" class="label" text-anchor="middle" dominant-baseline="central">find_pr_owner_in_tasks</text>
+        <text x="456.335944" y="1181.5587474611389" class="label" dominant-baseline="central" text-anchor="middle">find_pr_owner_in_tasks</text>
       </g>
       <g class="node default" id="node-OnDisk">
         <polygon points="456.3359439999999,1282.5587474611389 541.382832,1367.605635461139 456.3359439999999,1452.6525234611388 371.28905599999996,1367.605635461139" style="fill:#ff9999 !important"/>
-        <text x="456.3359439999999" y="1367.605635461139" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="456.3359439999999" y="1367.605635461139" dy="-0.6em">Owner found</tspan><tspan x="456.3359439999999" dy="1.2em">on disk?</tspan></text>
+        <text x="456.3359439999999" y="1367.605635461139" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="456.3359439999999" y="1367.605635461139" dy="-0.6em">Owner found</tspan><tspan x="456.3359439999999" dy="1.2em">on disk?</tspan></text>
       </g>
       <g class="node default" id="node-AssignTask">
         <rect x="145.38085599999997" y="1654.6525234611388" width="206.593776" height="54"/>
-        <text x="248.67774399999996" y="1681.6525234611388" class="label" text-anchor="middle" dominant-baseline="central">Assign task to owner</text>
+        <text x="248.67774399999996" y="1681.6525234611388" class="label" dominant-baseline="central" text-anchor="middle">Assign task to owner</text>
       </g>
       <g class="node default" id="node-RunningCheck">
         <polygon points="248.67774399999996,1758.6525234611386 321.61915999999997,1831.5939394611387 248.67774399999996,1904.5353554611386 175.73632799999996,1831.5939394611387"/>
@@ -247,8 +247,8 @@ rect.text{fill:none;stroke-width:0;}
         <text x="426.347704" y="2005.5353554611388" class="label" dominant-baseline="central" text-anchor="middle">Spawn fresh with task</text>
       </g>
       <g class="node default" id="node-MissingCheck">
-        <rect x="329.278096" y="579.355587461139" width="189.18599999999998" height="78" style="fill:#ffcccc !important;stroke:#ff0000 !important;stroke-width:3px !important"/>
-        <text x="423.87109599999997" y="618.355587461139" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="423.87109599999997" y="618.355587461139" dy="-0.6em">❌ MISSING CHECK:</tspan><tspan x="423.87109599999997" dy="1.2em">Is PR merged?</tspan></text>
+        <rect x="324.074192" y="579.355587461139" width="199.593808" height="78" style="fill:#ffcccc !important;stroke:#ff0000 !important;stroke-width:3px !important"/>
+        <text x="423.87109599999997" y="618.355587461139" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="423.87109599999997" y="618.355587461139" dy="-0.6em">❌ MISSING CHECK:</tspan><tspan x="423.87109599999997" dy="1.2em">Is PR merged?</tspan></text>
       </g>
       <g class="node default" id="node-PRCache">
         <path d="M 341.390624 388.42835291917083 a 82.48047199999999 15.85020891917085 0 0 0 164.96094399999998 0 a 82.48047199999999 15.85020891917085 0 0 0 -164.96094399999998 0 l 0 73.96764162279732 a 82.48047199999999 15.85020891917085 0 0 0 164.96094399999998 0 l 0 -73.96764162279732" style="fill:#ccffcc !important"/>

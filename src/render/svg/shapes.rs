@@ -270,6 +270,9 @@ pub fn render_shape(
         .as_deref()
         .map(crate::render::text_utils::normalize_mermaid_label_markup)
         .unwrap_or_else(|| node.id.clone());
+    // Apply mermaid's wrappingWidth word-wrap so the drawn text matches the
+    // label bbox the layout was sized with (default node font size 16px).
+    let label_text = crate::render::text_utils::wrap_label_text_mermaid(&label_text, 16.0);
     let mut label_attrs = Attrs::new()
         .with_class("label")
         .with_attr("text-anchor", "middle")

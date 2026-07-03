@@ -86,11 +86,11 @@ rect.text{fill:none;stroke-width:0;}
     <g class="nodes">
       <g class="node default" id="node-A">
         <rect x="0" y="54.039063999999996" width="145.17969599999998" height="54"/>
-        <text x="72.58984799999999" y="81.039064" class="label" text-anchor="middle" dominant-baseline="central">Square Rect</text>
+        <text x="72.58984799999999" y="81.039064" class="label" dominant-baseline="central" text-anchor="middle">Square Rect</text>
       </g>
       <g class="node default" id="node-B">
         <circle cx="299.24219999999997" cy="28.359376" r="28.359376"/>
-        <text x="299.24219999999997" y="28.359376" class="label" text-anchor="middle" dominant-baseline="central">Circle</text>
+        <text x="299.24219999999997" y="28.359376" class="label" dominant-baseline="central" text-anchor="middle">Circle</text>
       </g>
       <g class="node default" id="node-C">
         <path d="M 234.17969599999998 106.718752 H 364.30470399999996 A 5 5 0 0 1 369.30470399999996 111.718752 V 155.718752 A 5 5 0 0 1 364.30470399999996 160.718752 H 234.17969599999998 A 5 5 0 0 1 229.17969599999998 155.718752 V 111.718752 A 5 5 0 0 1 234.17969599999998 106.718752 Z"/>

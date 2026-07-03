@@ -47,10 +47,10 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5" class="marker"/>
@@ -63,11 +63,11 @@ rect.text{fill:none;stroke-width:0;}
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
         <rect x="1039.7734560000001" y="52" width="2241.07816" height="119" class="cluster"/>
-        <text x="2160.3125360000004" y="68" class="cluster-label" text-anchor="middle">Current Architecture (with resvg)</text>
+        <text x="2160.3125360000004" y="68" class="cluster-label" text-anchor="middle"><tspan x="2160.3125360000004" y="68" dy="-0.6em">Current Architecture (with</tspan><tspan x="2160.3125360000004" dy="1.2em">resvg)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
         <rect x="0" y="0" width="989.7734560000001" height="223" class="cluster"/>
-        <text x="494.88672800000006" y="16" class="cluster-label" text-anchor="middle">Proposed Architecture (ASCII + Browser)</text>
+        <text x="494.88672800000006" y="16" class="cluster-label" text-anchor="middle"><tspan x="494.88672800000006" y="16" dy="-0.6em">Proposed Architecture</tspan><tspan x="494.88672800000006" dy="1.2em">(ASCII + Browser)</tspan></text>
       </g>
     </g>
     <g class="edgePaths">
@@ -136,7 +136,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-E1">
         <rect x="2074.1484800000003" y="97" width="133.906256" height="54" style="fill:#ff6b6b !important"/>
-        <text x="2141.1016080000004" y="124" class="label" dominant-baseline="central" text-anchor="middle">usvg Parse</text>
+        <text x="2141.1016080000004" y="124" class="label" text-anchor="middle" dominant-baseline="central">usvg Parse</text>
       </g>
       <g class="node default" id="node-F1">
         <rect x="2283.054736" y="97" width="192.117184" height="54" style="fill:#ff6b6b !important"/>
@@ -144,7 +144,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-G1">
         <rect x="2550.17192" y="97" width="133.125008" height="54"/>
-        <text x="2616.7344239999998" y="124" class="label" text-anchor="middle" dominant-baseline="central">PNG bytes</text>
+        <text x="2616.7344239999998" y="124" class="label" dominant-baseline="central" text-anchor="middle">PNG bytes</text>
       </g>
       <g class="node default" id="node-H1">
         <rect x="2758.2969279999998" y="97" width="224.289056" height="54" style="fill:#ff6b6b !important"/>
@@ -152,11 +152,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-I1">
         <rect x="3057.585984" y="97" width="203.26563199999998" height="54"/>
-        <text x="3159.2187999999996" y="124" class="label" dominant-baseline="central" text-anchor="middle">Inline Image Display</text>
+        <text x="3159.2187999999996" y="124" class="label" text-anchor="middle" dominant-baseline="central">Inline Image Display</text>
       </g>
       <g class="node default" id="node-A2">
         <rect x="20" y="97" width="174.171888" height="54"/>
-        <text x="107.085944" y="124" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
+        <text x="107.085944" y="124" class="label" dominant-baseline="central" text-anchor="middle">Mermaid Source</text>
       </g>
       <g class="node default" id="node-B2">
         <rect x="269.17188799999997" y="45" width="238.71875200000005" height="54"/>
@@ -168,7 +168,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-D2">
         <rect x="792.2187680000001" y="45" width="177.554688" height="54"/>
-        <text x="880.996112" y="72" class="label" dominant-baseline="central" text-anchor="middle">Terminal Display</text>
+        <text x="880.996112" y="72" class="label" text-anchor="middle" dominant-baseline="central">Terminal Display</text>
       </g>
       <g class="node default" id="node-E2">
         <rect x="289.33204" y="149" width="198.398448" height="54"/>

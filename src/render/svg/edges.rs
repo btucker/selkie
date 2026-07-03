@@ -92,8 +92,11 @@ pub fn render_edge_parts(
             let font_size = 12.0;
             let char_width_ratio = 0.6;
 
-            // Handle multiline text (split by <br> or newlines)
+            // Handle multiline text (split by <br> or newlines), applying
+            // mermaid's wrappingWidth word-wrap (measured at the 16px label
+            // font, like the layout's edge label measurement).
             let text = crate::render::text_utils::normalize_mermaid_label_markup(&flow_edge.text);
+            let text = crate::render::text_utils::wrap_label_text_mermaid(&text, 16.0);
             let lines: Vec<&str> = text.lines().collect();
             let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
             let num_lines = lines.len().max(1);

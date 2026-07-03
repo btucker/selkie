@@ -470,6 +470,25 @@ const TREBUCHET_FALLBACK_WIDTH: f64 = 0.6;
 /// Line height ratio used by mermaid HTML labels (line-height: 1.5).
 const TREBUCHET_LINE_HEIGHT: f64 = 1.5;
 
+/// Mermaid `flowchart.wrappingWidth` default (config.schema.yaml): HTML
+/// labels wider than this are re-rendered with `display: table`,
+/// `white-space: break-spaces` and `width: 200px`, greedily word-wrapping
+/// (rendering-util/createText.ts `addHtmlSpan`).
+pub(crate) const MERMAID_WRAPPING_WIDTH: f64 = 200.0;
+
+/// Advance widths (in em at 16px) for non-ASCII symbols that appear in
+/// labels, derived from mermaid reference SVG label bboxes (browser
+/// font-fallback rendering of the trebuchet ms stack).
+#[rustfmt::skip]
+const TREBUCHET_SYMBOL_WIDTHS: [(char, f64); 6] = [
+    ('\u{2192}', 1.000486), // → (from 'SVG → PNG conversion' 164.734375)
+    ('\u{2705}', 1.250488), // ✅ (from '✅ PASS' 56.796875)
+    ('\u{2713}', 0.764648), // ✓ (bare label 12.234375)
+    ('\u{2717}', 0.571289), // ✗ (bare label 9.140625)
+    ('\u{25BC}', 0.897949), // ▼ (from 'World → Wor▼d' 119.4375)
+    ('\u{274C}', 1.250488), // ❌ (from '❌ FLAKY FAIL' 102.328125)
+];
+
 /// Size estimator using pre-computed 'trebuchet ms' font metrics.
 ///
 /// Mermaid.js measures flowchart labels in the browser with the default
@@ -497,7 +516,11 @@ impl TrebuchetSizeEstimator {
         for c in line.chars() {
             let advance = match u32::from(c) {
                 0x20..=0x7E => TREBUCHET_ADVANCE_WIDTHS[(u32::from(c) - 0x20) as usize],
-                _ => TREBUCHET_FALLBACK_WIDTH,
+                _ => TREBUCHET_SYMBOL_WIDTHS
+                    .iter()
+                    .find(|(sym, _)| *sym == c)
+                    .map(|(_, w)| *w)
+                    .unwrap_or(TREBUCHET_FALLBACK_WIDTH),
             };
             width += advance;
             if let (Some(p), true) = (prev, c.is_ascii()) {
@@ -514,6 +537,93 @@ impl TrebuchetSizeEstimator {
         }
         width * font_size
     }
+
+    /// Measure a label the way mermaid's `addHtmlSpan` does
+    /// (rendering-util/createText.ts):
+    ///
+    /// 1. Split on `<br/>` and collapse HTML whitespace runs per line.
+    /// 2. Render nowrap with `max-width: wrapping_width`; if any line reaches
+    ///    the limit, re-render with `display: table; width: wrapping_width;
+    ///    white-space: break-spaces`, greedily word-wrapping every line.
+    ///    A break keeps its space at the end of the broken line
+    ///    (break-spaces preserves spaces), and words longer than the limit
+    ///    stay unbroken, expanding the table beyond `wrapping_width`.
+    ///
+    /// Returns the final visual lines and the measured (width, height):
+    /// width is the longest line, clamped up to `wrapping_width` when
+    /// wrapping occurred (the forced table width); height is
+    /// `lines * font_size * 1.5`.
+    pub(crate) fn measure_label(
+        text: &str,
+        font_size: f64,
+        wrapping_width: f64,
+    ) -> (Vec<String>, f64, f64) {
+        // Normalize <br> variants to newlines and decode HTML entities
+        // before measuring, matching what the browser renders.
+        let normalized = crate::render::text_utils::normalize_br_tags(text);
+        let decoded = crate::render::text_utils::decode_html_entities(&normalized);
+
+        // HTML collapses whitespace runs (and strips leading/trailing
+        // whitespace around line breaks) in both nowrap and initial layout.
+        let segments: Vec<String> = decoded
+            .lines()
+            .map(|line| line.split_whitespace().collect::<Vec<_>>().join(" "))
+            .collect();
+
+        let needs_wrap = segments
+            .iter()
+            .any(|seg| Self::measure_line(seg, font_size) >= wrapping_width);
+
+        let lines: Vec<String> = if needs_wrap {
+            segments
+                .iter()
+                .flat_map(|seg| Self::wrap_segment(seg, font_size, wrapping_width))
+                .collect()
+        } else {
+            segments
+        };
+
+        let max_line_width = lines
+            .iter()
+            .map(|line| Self::measure_line(line, font_size))
+            .fold(0.0_f64, f64::max);
+        let width = if needs_wrap {
+            // The re-rendered div gets width: wrapping_width, so the bbox is
+            // at least that wide; unbreakable words can expand it further.
+            max_line_width.max(wrapping_width)
+        } else {
+            max_line_width
+        };
+        let height = (lines.len().max(1) as f64) * font_size * TREBUCHET_LINE_HEIGHT;
+
+        (lines, width, height)
+    }
+
+    /// Greedily wrap one whitespace-collapsed segment at `wrapping_width`,
+    /// mirroring `white-space: break-spaces` line breaking: breaks happen
+    /// after a space, the space stays on the broken line, and a word wider
+    /// than the limit occupies its own line unbroken.
+    fn wrap_segment(segment: &str, font_size: f64, wrapping_width: f64) -> Vec<String> {
+        let mut lines = Vec::new();
+        let mut current = String::new();
+        for word in segment.split(' ') {
+            if current.is_empty() {
+                current = word.to_string();
+                continue;
+            }
+            let candidate = format!("{current} {word}");
+            if Self::measure_line(&candidate, font_size) > wrapping_width {
+                // break-spaces keeps the breaking space on the ended line
+                current.push(' ');
+                lines.push(current);
+                current = word.to_string();
+            } else {
+                current = candidate;
+            }
+        }
+        lines.push(current);
+        lines
+    }
 }
 
 impl SizeEstimator for TrebuchetSizeEstimator {
@@ -522,20 +632,7 @@ impl SizeEstimator for TrebuchetSizeEstimator {
             return (0.0, 0.0);
         }
 
-        // Normalize <br> variants to newlines and decode HTML entities
-        // before measuring, matching what the browser renders.
-        let normalized = crate::render::text_utils::normalize_br_tags(text);
-        let decoded = crate::render::text_utils::decode_html_entities(&normalized);
-
-        let lines: Vec<&str> = decoded.lines().collect();
-        let num_lines = lines.len().max(1);
-
-        let width = lines
-            .iter()
-            .map(|line| Self::measure_line(line, font_size))
-            .fold(0.0_f64, f64::max);
-        let height = (num_lines as f64) * font_size * TREBUCHET_LINE_HEIGHT;
-
+        let (_, width, height) = Self::measure_label(text, font_size, MERMAID_WRAPPING_WIDTH);
         (width, height)
     }
 
@@ -565,7 +662,11 @@ impl SizeEstimator for TrebuchetSizeEstimator {
         config: &NodeSizeConfig,
     ) -> (f64, f64) {
         let (bw, bh) = label
-            .map(|l| self.estimate_text_size(l, config.font_size))
+            .filter(|l| !l.is_empty())
+            .map(|l| {
+                let (_, w, h) = Self::measure_label(l, config.font_size, config.wrapping_width);
+                (w, h)
+            })
             .unwrap_or((0.0, 0.0));
         let p = config.padding;
 
@@ -789,6 +890,86 @@ mod tests {
         let (w, h) = estimator.estimate_node_size(Some("Rhombus"), NodeShape::Diamond, &config);
         assert_close(w, 118.0625, 2.0, "diamond size");
         assert_close(h, 118.0625, 2.0, "diamond size (height)");
+    }
+
+    // ── wrappingWidth (mermaid flowchart.wrappingWidth = 200) ────────
+    //
+    // Mermaid's addHtmlSpan (rendering-util/createText.ts) renders HTML
+    // labels with max-width: 200px; when the measured bbox hits that limit
+    // it switches to display:table / white-space:break-spaces / width:200px
+    // and re-measures, greedily word-wrapping the label. Reference bboxes
+    // below are taken from mermaid reference SVGs in docs/images/reference.
+
+    #[test]
+    fn trebuchet_wraps_labels_at_wrapping_width() {
+        // task_completion node J: label bbox is exactly 200 x 72 (3 lines);
+        // "Dependent tasks stuck forever" wraps after "stuck".
+        let estimator = TrebuchetSizeEstimator::new();
+        let (w, h) = estimator.estimate_text_size(
+            "Without ClearBlockedBy:<br/>Dependent tasks stuck forever",
+            16.0,
+        );
+        assert_close(w, 200.0, 0.001, "wrapped label width clamps to 200");
+        assert_close(h, 72.0, 0.001, "wrapped label height (3 lines)");
+    }
+
+    #[test]
+    fn trebuchet_wrapped_width_expands_to_longest_unbreakable_word() {
+        // message_indent ActionIndent: "(TIMESTAMP_GUTTER_WIDTH" cannot be
+        // broken; with its trailing break space the reference bbox is
+        // 211.59375 x 72 (min-content wider than the 200px table width).
+        let estimator = TrebuchetSizeEstimator::new();
+        let (w, h) = estimator.estimate_text_size(
+            "indent_width = 7 + 2 = 9<br/>(TIMESTAMP_GUTTER_WIDTH + extra_indent)",
+            16.0,
+        );
+        assert_close(w, 211.59375, 0.5, "unbreakable word width");
+        assert_close(h, 72.0, 0.001, "3 visual lines");
+    }
+
+    #[test]
+    fn trebuchet_collapses_html_whitespace_runs() {
+        // message_indent Mermaid placeholder node: HTML collapses the run of
+        // 9 spaces to one, so no line reaches 200px; reference bbox is
+        // 197.21875 x 72 with no wrapping.
+        let estimator = TrebuchetSizeEstimator::new();
+        let (w, h) = estimator.estimate_text_size(
+            "Mermaid placeholder:<br/>'         [1] Diagram: ...'<br/>(9 spaces via indent_width)",
+            16.0,
+        );
+        assert_close(w, 197.21875, 0.5, "whitespace-collapsed width");
+        assert_close(h, 72.0, 0.001, "3 explicit lines");
+    }
+
+    #[test]
+    fn trebuchet_wrapped_node_matches_mermaid_sizing() {
+        // task_completion node J renders as 260 x 102 (200 + 4*15, 72 + 2*15).
+        let estimator = TrebuchetSizeEstimator::new();
+        let config = NodeSizeConfig::default();
+        let (w, h) = estimator.estimate_node_size(
+            Some("Without ClearBlockedBy:<br/>Dependent tasks stuck forever"),
+            NodeShape::Rectangle,
+            &config,
+        );
+        assert_close(w, 260.0, 0.001, "wrapped rect width");
+        assert_close(h, 102.0, 0.001, "wrapped rect height");
+    }
+
+    #[test]
+    fn trebuchet_symbol_widths_match_reference() {
+        // Symbol advance widths derived from mermaid reference SVG label
+        // bboxes (modal_click_paths, test_parallel, refactoring samples).
+        let estimator = TrebuchetSizeEstimator::new();
+        for (text, expected_w) in [
+            ("\u{2713}", 12.234375),                     // ✓
+            ("\u{2717}", 9.140625),                      // ✗
+            ("\u{2705} PASS", 56.796875),                // ✅ PASS
+            ("\u{274C} FLAKY FAIL", 102.328125),         // ❌ FLAKY FAIL
+            ("list() \u{2192} all statuses", 140.15625), // →
+        ] {
+            let (w, _) = estimator.estimate_text_size(text, 16.0);
+            assert_close(w, expected_w, 0.5, text);
+        }
     }
 
     #[test]

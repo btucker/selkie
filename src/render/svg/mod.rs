@@ -374,11 +374,15 @@ impl SvgRenderer {
             &subgraph.id
         };
 
+        // Cluster titles go through the same createText path in mermaid and
+        // wrap at flowchart.wrappingWidth (200px).
+        let title = crate::render::text_utils::wrap_label_text_mermaid(title, 16.0);
+
         // Center the label horizontally within the subgraph box
         let label = SvgElement::Text {
             x: min_x + width / 2.0,
             y: min_y + 16.0,
-            content: title.to_string(),
+            content: title,
             attrs: Attrs::new()
                 .with_class("cluster-label")
                 .with_attr("text-anchor", "middle"),
@@ -1014,6 +1018,38 @@ mod tests {
             "Subgraph rect y ({}) should be within viewBox (origin y={})",
             rect_y,
             vb_y
+        );
+    }
+
+    #[test]
+    fn test_node_label_text_wraps_like_layout() {
+        // The drawn label must use the same 200px word-wrap as the layout
+        // measurement (mermaid wrappingWidth), so text stays inside the node.
+        use crate::diagrams::flowchart::parse;
+        use crate::layout;
+        use crate::layout::{ToLayoutGraph, TrebuchetSizeEstimator};
+
+        let input =
+            "flowchart TD\n    J[\"Without ClearBlockedBy:<br/>Dependent tasks stuck forever\"]";
+        let db = parse(input).unwrap();
+        let estimator = TrebuchetSizeEstimator::new();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+        let graph = layout::layout(graph).unwrap();
+
+        let renderer = SvgRenderer::new(RenderConfig::default());
+        let svg = renderer.render_flowchart(&db, &graph).unwrap();
+
+        // The overflowing line wraps after "stuck"; "forever" moves to its
+        // own tspan, matching the 3-line layout measurement.
+        assert!(
+            svg.contains(">Dependent tasks stuck</tspan>"),
+            "wrapped line should end after 'stuck', got: {}",
+            svg
+        );
+        assert!(
+            svg.contains(">forever</tspan>"),
+            "'forever' should be on its own line, got: {}",
+            svg
         );
     }
 

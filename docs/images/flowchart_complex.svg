@@ -134,11 +134,11 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-Auth-Rate-0">
         <rect x="479.9995222191259" y="344.90916919957147" width="44" height="22" class="edge-label-bg"/>
-        <text x="501.9995222191259" y="355.90916919957147" class="edge-label" dominant-baseline="central" text-anchor="middle">Valid</text>
+        <text x="501.9995222191259" y="355.90916919957147" class="edge-label" text-anchor="middle" dominant-baseline="central">Valid</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Auth-Reject-0">
         <rect x="257.05922912174174" y="360.5430105137962" width="58.4" height="22" class="edge-label-bg"/>
-        <text x="286.2592291217417" y="371.5430105137962" class="edge-label" text-anchor="middle" dominant-baseline="central">Invalid</text>
+        <text x="286.2592291217417" y="371.5430105137962" class="edge-label" dominant-baseline="central" text-anchor="middle">Invalid</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Cache-Response-0">
         <rect x="350.8714946851269" y="623.7320695688566" width="72.8" height="22" class="edge-label-bg"/>
@@ -152,15 +152,15 @@ rect.text{fill:none;stroke-width:0;}
     <g class="nodes">
       <g class="node default" id="node-UI">
         <rect x="152.2577920000001" y="25" width="160.812512" height="54"/>
-        <text x="232.6640480000001" y="52" class="label" text-anchor="middle" dominant-baseline="central">Web Interface</text>
+        <text x="232.6640480000001" y="52" class="label" dominant-baseline="central" text-anchor="middle">Web Interface</text>
       </g>
       <g class="node default" id="node-Mobile">
         <rect x="363.0703040000001" y="25" width="138.06251200000003" height="54"/>
-        <text x="432.10156000000006" y="52" class="label" dominant-baseline="central" text-anchor="middle">Mobile App</text>
+        <text x="432.10156000000006" y="52" class="label" text-anchor="middle" dominant-baseline="central">Mobile App</text>
       </g>
       <g class="node default" id="node-CLI">
         <rect x="551.1328160000002" y="25" width="115.84376" height="54"/>
-        <text x="609.0546960000001" y="52" class="label" dominant-baseline="central" text-anchor="middle">CLI Tool</text>
+        <text x="609.0546960000001" y="52" class="label" text-anchor="middle" dominant-baseline="central">CLI Tool</text>
       </g>
       <g class="node default" id="node-Auth">
         <polygon points="432.10156000000006,179 512.2031200000001,259.10156 432.10156000000006,339.20312 352.00000000000006,259.10156"/>
@@ -168,7 +168,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Rate">
         <rect x="441.94923600000004" y="413.20312" width="149.40624" height="54"/>
-        <text x="516.652356" y="440.20312" class="label" text-anchor="middle" dominant-baseline="central">Rate Limiter</text>
+        <text x="516.652356" y="440.20312" class="label" dominant-baseline="central" text-anchor="middle">Rate Limiter</text>
       </g>
       <g class="node default" id="node-Cache">
         <path d="M 466.3867240000001 553.0678425707918 a 50.265632 10.864722570791782 0 0 0 100.531264 0 a 50.265632 10.864722570791782 0 0 0 -100.531264 0 l 0 50.70203866369498 a 50.265632 10.864722570791782 0 0 0 100.531264 0 l 0 -50.70203866369498"/>
@@ -184,15 +184,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-PaymentSvc">
         <rect x="1048.4589880000003" y="551.4188619026393" width="178.070304" height="54"/>
-        <text x="1137.4941400000002" y="578.4188619026393" class="label" dominant-baseline="central" text-anchor="middle">Payment Service</text>
+        <text x="1137.4941400000002" y="578.4188619026393" class="label" text-anchor="middle" dominant-baseline="central">Payment Service</text>
       </g>
       <g class="node default" id="node-NotifySvc">
         <rect x="1150.814456" y="713.6346038052785" width="201.249984" height="54"/>
-        <text x="1251.439448" y="740.6346038052785" class="label" dominant-baseline="central" text-anchor="middle">Notification Service</text>
+        <text x="1251.439448" y="740.6346038052785" class="label" text-anchor="middle" dominant-baseline="central">Notification Service</text>
       </g>
       <g class="node default" id="node-DB">
         <path d="M 872.4531360000001 880.8632286133319 a 47.082024000000004 10.683573524796367 0 0 0 94.16404800000001 0 a 47.082024000000004 10.683573524796367 0 0 0 -94.16404800000001 0 l 0 49.856676449049715 a 47.082024000000004 10.683573524796367 0 0 0 94.16404800000001 0 l 0 -49.856676449049715"/>
-        <text x="919.5351600000001" y="905.7915668378569" class="label" dominant-baseline="central" text-anchor="middle">PostgreSQL</text>
+        <text x="919.5351600000001" y="905.7915668378569" class="label" text-anchor="middle" dominant-baseline="central">PostgreSQL</text>
       </g>
       <g class="node default" id="node-Search">
         <path d="M 713.9609440000002 879.9444992802402 a 54.246096 11.077314667549995 0 0 0 108.492192 0 a 54.246096 11.077314667549995 0 0 0 -108.492192 0 l 0 51.694135115233316 a 54.246096 11.077314667549995 0 0 0 108.492192 0 l 0 -51.694135115233316"/>
@@ -200,15 +200,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Queue">
         <path d="M 1145.093744 879.081692715052 a 61.88281599999999 11.447088909773516 0 0 0 123.76563199999998 0 a 61.88281599999999 11.447088909773516 0 0 0 -123.76563199999998 0 l 0 53.419748245609746 a 61.88281599999999 11.447088909773516 0 0 0 123.76563199999998 0 l 0 -53.419748245609746"/>
-        <text x="1206.97656" y="905.7915668378569" class="label" dominant-baseline="central" text-anchor="middle">Message Queue</text>
+        <text x="1206.97656" y="905.7915668378569" class="label" text-anchor="middle" dominant-baseline="central">Message Queue</text>
       </g>
       <g class="node default" id="node-Reject">
         <rect x="0.00000000000002842170943040401" y="413.20312" width="167.66404800000004" height="54"/>
-        <text x="83.83202400000005" y="440.20312" class="label" text-anchor="middle" dominant-baseline="central">Reject Request</text>
+        <text x="83.83202400000005" y="440.20312" class="label" dominant-baseline="central" text-anchor="middle">Reject Request</text>
       </g>
       <g class="node default" id="node-Response">
         <rect x="287.22265200000004" y="713.6346038052785" width="177.57032000000004" height="54"/>
-        <text x="376.00781200000006" y="740.6346038052785" class="label" dominant-baseline="central" text-anchor="middle">Return Response</text>
+        <text x="376.00781200000006" y="740.6346038052785" class="label" text-anchor="middle" dominant-baseline="central">Return Response</text>
       </g>
       <g class="node default" id="node-EmailWorker">
         <rect x="811.1913920000002" y="1018.9485298704353" width="155.07816" height="54"/>
@@ -216,7 +216,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-SMSWorker">
         <rect x="1187.625" y="1018.9485298704353" width="142.28128" height="54"/>
-        <text x="1258.76564" y="1045.9485298704353" class="label" text-anchor="middle" dominant-baseline="central">SMS Worker</text>
+        <text x="1258.76564" y="1045.9485298704353" class="label" dominant-baseline="central" text-anchor="middle">SMS Worker</text>
       </g>
     </g>
   </g>

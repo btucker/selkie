@@ -61,6 +61,25 @@ fn decode_mermaid_escapes(text: &str) -> String {
     text.replace("\\\\", "\\")
 }
 
+/// Wrap flowchart label text exactly like the layout measurement does
+/// (mermaid `flowchart.wrappingWidth` = 200px greedy word-wrap), so the
+/// drawn tspans match the node/edge boxes sized by the layout.
+///
+/// Lines are joined with `\n`; trailing break spaces are trimmed for
+/// display (they only affect measurement).
+pub(crate) fn wrap_label_text_mermaid(text: &str, font_size: f64) -> String {
+    let (lines, _, _) = crate::layout::TrebuchetSizeEstimator::measure_label(
+        text,
+        font_size,
+        crate::layout::size::MERMAID_WRAPPING_WIDTH,
+    );
+    lines
+        .iter()
+        .map(|l| l.trim_end())
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
 /// Estimate text width in pixels using per-character weight classes.
 ///
 /// Approximates browser rendering of proportional fonts (e.g. Trebuchet MS)
