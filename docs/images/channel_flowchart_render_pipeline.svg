@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -105,28 +105,28 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 294.00 52.80 C 294.00 64.47, 294.00 76.13, 294.00 87.80 C 294.00 99.47, 294.00 111.13, 294.00 122.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M294,52.8L294,58.63333333333333C294,64.46666666666665,294,76.13333333333333,294,87.13333333333333C294,98.13333333333333,294,108.46666666666665,294,113.63333333333331L294,118.79999999999998" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 294.00 175.60 C 294.00 187.27, 294.00 198.93, 294.00 210.60 C 294.00 222.27, 294.00 233.93, 294.00 245.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M294,175.6L294,181.4333333333333C294,187.26666666666665,294,198.9333333333333,294,209.9333333333333C294,220.9333333333333,294,231.26666666666665,294,236.4333333333333L294,241.6" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-C-D-0">
-        <path d="M 294.00 298.40 C 294.00 310.07, 294.00 321.73, 294.00 333.40 C 294.00 345.07, 294.00 356.73, 294.00 368.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M294,298.4L294,304.23333333333335C294,310.06666666666666,294,321.7333333333333,294,332.73333333333335C294,343.7333333333333,294,354.0666666666666,294,359.23333333333335L294,364.4" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-D-E-0">
-        <path d="M 294.00 421.20 C 294.00 432.87, 294.00 444.53, 294.00 456.20 C 294.00 467.87, 294.00 479.53, 294.00 491.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M294,421.19999999999993L294,427.03333333333325C294,432.8666666666666,294,444.5333333333333,294,455.5333333333333C294,466.5333333333333,294,476.86666666666673,294,482.0333333333333L294,487.20000000000005" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-E-F-0">
-        <path d="M 294.00 544.00 C 294.00 555.67, 294.00 567.33, 294.00 579.00 C 294.00 590.67, 294.00 602.33, 294.00 614.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M294,544L294,549.8333333333334C294,555.6666666666666,294,567.3333333333334,294,578.3333333333334C294,589.3333333333334,294,599.6666666666666,294,604.8333333333334L294,610" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-F-G-0">
-        <path d="M 236.90 792.10 L 150.00 919.20" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M236.90492245448416,792.1049224544842L222.42076871207016,807.4541020454035C207.93661496965612,822.8032816363228,178.96830748482807,853.5016408181614,164.48415374241404,874.0174870757473C150,894.5333333333334,150,904.8666666666668,150,910.0333333333333L150,915.2" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-F-H-0">
-        <path d="M 351.10 792.10 L 438.00 919.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M351.09507754551584,792.1049224544842L365.5792312879298,807.4541020454035C380.06338503034385,822.8032816363228,409.0316925151719,853.5016408181614,423.51584625758596,874.0174870757473C438,894.5333333333334,438,904.8666666666668,438,910.0333333333333L438,915.2" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-G-I-0">
-        <path d="M 150.00 972.00 C 150.00 983.67, 150.00 995.33, 150.00 1007.00 C 150.00 1018.67, 150.00 1030.33, 150.00 1042.00" class="edge-path" stroke-width="2" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3"/>
+        <path d="M150,972L150,977.8333333333334C150,983.6666666666666,150,995.3333333333334,150,1006.3333333333334C150,1017.3333333333334,150,1027.6666666666667,150,1032.8333333333333L150,1038" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-dasharray="3,3" stroke-width="2"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -136,7 +136,7 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-B-C-0">
         <rect x="243.2" y="199.6" width="101.6" height="22" class="edge-label-bg"/>
-        <text x="294" y="210.6" class="edge-label" dominant-baseline="central" text-anchor="middle">ToLayoutGraph</text>
+        <text x="294" y="210.6" class="edge-label" text-anchor="middle" dominant-baseline="central">ToLayoutGraph</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-C-D-0">
         <rect x="232.4" y="322.4" width="123.19999999999999" height="22" class="edge-label-bg"/>
@@ -152,11 +152,11 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-F-G-0">
         <rect x="80.2419385590512" y="839.8802789992277" width="202.4" height="22" class="edge-label-bg"/>
-        <text x="181.4419385590512" y="850.8802789992277" class="edge-label" dominant-baseline="central" text-anchor="middle">edge arrow at node boundary</text>
+        <text x="181.4419385590512" y="850.8802789992277" class="edge-label" text-anchor="middle" dominant-baseline="central">edge arrow at node boundary</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F-H-0">
         <rect x="359.3580614409488" y="839.8802789992277" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="406.5580614409488" y="850.8802789992277" class="edge-label" dominant-baseline="central" text-anchor="middle">no collision</text>
+        <text x="406.5580614409488" y="850.8802789992277" class="edge-label" text-anchor="middle" dominant-baseline="central">no collision</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-G-I-0">
         <rect x="120.8" y="996" width="58.4" height="22" class="edge-label-bg"/>
@@ -166,19 +166,19 @@ marker path {
     <g class="nodes">
       <g class="node" id="node-A">
         <rect x="210.8" y="0" width="166.4" height="52.8"/>
-        <text x="294" y="26.4" class="label" dominant-baseline="central" text-anchor="middle">Mermaid Source</text>
+        <text x="294" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
       </g>
       <g class="node" id="node-B">
         <rect x="215.6" y="122.79999999999998" width="156.8" height="52.8"/>
-        <text x="294" y="149.2" class="label" dominant-baseline="central" text-anchor="middle">Flowchart AST</text>
+        <text x="294" y="149.2" class="label" text-anchor="middle" dominant-baseline="central">Flowchart AST</text>
       </g>
       <g class="node" id="node-C">
         <rect x="220.4" y="245.6" width="147.2" height="52.8"/>
-        <text x="294" y="272" class="label" dominant-baseline="central" text-anchor="middle">Layout Graph</text>
+        <text x="294" y="272" class="label" text-anchor="middle" dominant-baseline="central">Layout Graph</text>
       </g>
       <g class="node" id="node-D">
         <rect x="162.8" y="368.4" width="262.4" height="52.8"/>
-        <text x="294" y="394.79999999999995" class="label" dominant-baseline="central" text-anchor="middle">Positioned Nodes &amp; Edges</text>
+        <text x="294" y="394.79999999999995" class="label" text-anchor="middle" dominant-baseline="central">Positioned Nodes &amp; Edges</text>
       </g>
       <g class="node" id="node-E">
         <rect x="210.8" y="491.20000000000005" width="166.4" height="52.8"/>
@@ -190,15 +190,15 @@ marker path {
       </g>
       <g class="node" id="node-G">
         <rect x="0" y="919.2" width="300" height="52.8" style="fill:#ff6b6b !important"/>
-        <text x="150" y="945.6" class="label" text-anchor="middle" dominant-baseline="central">Arrow Character Replaces Node Text</text>
+        <text x="150" y="945.6" class="label" style="fill: #ffffff" dominant-baseline="central" text-anchor="middle">Arrow Character Replaces Node Text</text>
       </g>
       <g class="node" id="node-H">
         <rect x="350" y="919.2" width="176" height="52.8" style="fill:#51cf66 !important"/>
-        <text x="438" y="945.6" class="label" text-anchor="middle" dominant-baseline="central">Clean Rendering</text>
+        <text x="438" y="945.6" class="label" style="fill: #ffffff" text-anchor="middle" dominant-baseline="central">Clean Rendering</text>
       </g>
       <g class="node" id="node-I">
         <rect x="71.6" y="1042" width="156.8" height="52.8" style="fill:#ff6b6b !important"/>
-        <text x="150" y="1068.4" class="label" dominant-baseline="central" text-anchor="middle">World → Wor▼d</text>
+        <text x="150" y="1068.4" class="label" style="fill: #ffffff" dominant-baseline="central" text-anchor="middle">World → Wor▼d</text>
       </g>
     </g>
   </g>

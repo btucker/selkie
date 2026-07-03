@@ -116,37 +116,37 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 152.44 237.40 C 143.49 249.07, 134.55 260.73, 134.55 272.40 C 134.55 284.07, 143.49 295.73, 152.44 307.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M152.4421052631578,237.40000000000003L147.9684210526315,243.23333333333335C143.49473684210517,249.0666666666667,134.54736842105254,260.73333333333335,134.14166389464796,271.87099311753127C133.73595936824339,283.0086529017292,141.87191873648683,293.6173058034584,145.93989842060856,298.921632254323L150.0078781047303,304.2259587051876" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 186.80 397.00 C 186.80 405.33, 186.80 413.67, 186.80 422.00 C 186.80 430.33, 186.80 438.67, 186.80 447.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M186.79999999999995,397L186.79999999999995,401.1666666666667C186.79999999999995,405.3333333333333,186.79999999999995,413.6666666666667,186.79999999999995,421.3333333333333C186.79999999999995,429,186.79999999999995,436,186.79999999999995,439.5L186.79999999999995,442.99999999999994" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-C-D-0">
-        <path d="M 186.80 536.60 C 186.80 544.93, 186.80 553.27, 186.80 561.60 C 186.80 569.93, 186.80 578.27, 186.80 586.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M186.79999999999995,536.5999999999999L186.79999999999995,540.7666666666665C186.79999999999995,544.9333333333333,186.79999999999995,553.2666666666667,186.79999999999995,560.9333333333333C186.79999999999995,568.6,186.79999999999995,575.6,186.79999999999995,579.1L186.79999999999995,582.6" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-E-A-0">
-        <path d="M 186.80 77.80 C 186.80 89.47, 186.80 101.13, 186.80 112.80 C 186.80 124.47, 186.80 136.13, 186.80 147.80" class="edge-path" fill="none" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)"/>
+        <path d="M186.79999999999995,77.80000000000001L186.79999999999995,83.63333333333334C186.79999999999995,89.46666666666668,186.79999999999995,101.13333333333334,186.79999999999995,112.13333333333333C186.79999999999995,123.13333333333334,186.79999999999995,133.46666666666667,186.79999999999995,138.63333333333333L186.79999999999995,143.8" class="edge-path" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none" stroke-width="2"/>
       </g>
       <g class="edge" id="edge-L-F-B-0">
-        <path d="M 564.40 219.00 C 564.40 236.80, 564.40 254.60, 516.93 273.53 C 469.47 292.46, 374.53 312.53, 279.60 332.59" class="edge-path" stroke-dasharray="3,3" stroke-width="2" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M564.4,219.00000000000003L564.4,227.9C564.4,236.80000000000004,564.4,254.6,517.5855933607264,273.393510725143C470.771186721453,292.1870214502861,377.14237344290603,311.9740429005723,330.3279668036325,321.86755362571535L283.513560164359,331.7610643508584" class="edge-path" stroke-dasharray="3,3" fill="none" stroke-width="2" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-G-H-0">
-        <path d="M 422.40 397.00 C 422.40 405.33, 422.40 413.67, 422.40 422.00 C 422.40 430.33, 422.40 438.67, 422.40 447.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M422.4,397L422.40000000000003,401.1666666666667C422.3999999999999,405.3333333333333,422.3999999999999,413.6666666666667,422.40000000000003,421.3333333333333C422.3999999999999,429,422.3999999999999,436,422.40000000000003,439.5L422.4,442.99999999999994" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-H-I-0">
-        <path d="M 422.40 536.60 C 422.40 544.93, 422.40 553.27, 422.40 561.60 C 422.40 569.93, 422.40 578.27, 422.40 586.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M422.4,536.5999999999999L422.40000000000003,540.7666666666665C422.3999999999999,544.9333333333333,422.3999999999999,553.2666666666667,422.40000000000003,560.9333333333333C422.3999999999999,568.6,422.3999999999999,575.6,422.40000000000003,579.1L422.4,582.6" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-I-J-0">
-        <path d="M 422.40 676.20 C 422.40 684.53, 422.40 692.87, 422.40 701.20 C 422.40 709.53, 422.40 717.87, 422.40 726.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M422.4,676.1999999999999L422.40000000000003,680.3666666666667C422.3999999999999,684.5333333333333,422.3999999999999,692.8666666666667,422.40000000000003,700.5333333333333C422.3999999999999,708.2000000000002,422.3999999999999,715.2000000000002,422.40000000000003,718.6999999999999L422.4,722.2" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A-G-0">
-        <path d="M 274.80 232.87 L 388.04 307.40" class="edge-path" marker-end="url(#arrow_point)" stroke-width="2" stroke-dasharray="3,3" fill="none"/>
+        <path d="M274.79999999999995,232.86605504587158L289.2,239.4550458715597C303.59999999999997,246.04403669724772,332.3999999999999,259.22201834862386,350.8679796841216,271.11533562517656C369.33595936824344,283.0086529017292,377.4719187364869,293.6173058034584,381.5398984206086,298.921632254323L385.60787810473033,304.2259587051876" class="edge-path" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-E-A-0">
         <rect x="117.99999999999996" y="101.80000000000001" width="137.6" height="22" class="edge-label-bg"/>
-        <text x="186.79999999999995" y="112.80000000000001" class="edge-label" dominant-baseline="central" text-anchor="middle">Why heap allocate?</text>
+        <text x="186.79999999999995" y="112.80000000000001" class="edge-label" text-anchor="middle" dominant-baseline="central">Why heap allocate?</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-A-G-0">
         <rect x="290.8542309903209" y="250.80921807928672" width="94.39999999999999" height="22" class="edge-label-bg"/>
@@ -156,7 +156,7 @@ marker path {
     <g class="nodes">
       <g class="node" id="node-A">
         <rect x="98.79999999999995" y="147.8" width="176" height="89.6" style="fill:#ff9999 !important"/>
-        <text x="186.79999999999995" y="192.60000000000002" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="186.79999999999995" y="192.60000000000002" dy="-0.6em">vec!</tspan><tspan x="186.79999999999995" dy="1.2em">Heap allocation</tspan></text>
+        <text x="186.79999999999995" y="192.60000000000002" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff"><tspan x="186.79999999999995" y="192.60000000000002" dy="-0.6em">vec!</tspan><tspan x="186.79999999999995" dy="1.2em">Heap allocation</tspan></text>
       </g>
       <g class="node" id="node-B">
         <rect x="93.99999999999996" y="307.4" width="185.6" height="89.6"/>
@@ -164,7 +164,7 @@ marker path {
       </g>
       <g class="node" id="node-C">
         <rect x="127.59999999999997" y="446.99999999999994" width="118.39999999999999" height="89.6"/>
-        <text x="186.79999999999995" y="491.79999999999995" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="186.79999999999995" y="491.79999999999995" dy="-0.6em">.filter</tspan><tspan x="186.79999999999995" dy="1.2em">Read-only</tspan></text>
+        <text x="186.79999999999995" y="491.79999999999995" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="186.79999999999995" y="491.79999999999995" dy="-0.6em">.filter</tspan><tspan x="186.79999999999995" dy="1.2em">Read-only</tspan></text>
       </g>
       <g class="node" id="node-D">
         <rect x="132.39999999999995" y="586.6" width="108.8" height="89.6"/>
@@ -172,27 +172,27 @@ marker path {
       </g>
       <g class="node" id="node-E">
         <rect x="84.39999999999996" y="25.000000000000007" width="204.79999999999998" height="52.8" style="fill:#ffcccc !important"/>
-        <text x="186.79999999999995" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">vec! never mutated</text>
+        <text x="186.79999999999995" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000">vec! never mutated</text>
       </g>
       <g class="node" id="node-F">
         <rect x="438" y="166.20000000000002" width="252.79999999999998" height="52.8" style="fill:#ffcccc !important"/>
-        <text x="564.4" y="192.60000000000002" class="label" text-anchor="middle" dominant-baseline="central">Only used for iteration</text>
+        <text x="564.4" y="192.60000000000002" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">Only used for iteration</text>
       </g>
       <g class="node" id="node-G">
         <rect x="329.59999999999997" y="307.4" width="185.6" height="89.6" style="fill:#99ff99 !important"/>
-        <text x="422.4" y="352.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="422.4" y="352.2" dy="-0.6em">[...]</tspan><tspan x="422.4" dy="1.2em">Stack allocation</tspan></text>
+        <text x="422.4" y="352.2" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="422.4" y="352.2" dy="-0.6em">[...]</tspan><tspan x="422.4" dy="1.2em">Stack allocation</tspan></text>
       </g>
       <g class="node" id="node-H">
         <rect x="344" y="446.99999999999994" width="156.8" height="89.6"/>
-        <text x="422.4" y="491.79999999999995" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="422.4" y="491.79999999999995" dy="-0.6em">.iter</tspan><tspan x="422.4" dy="1.2em">Same behavior</tspan></text>
+        <text x="422.4" y="491.79999999999995" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="422.4" y="491.79999999999995" dy="-0.6em">.iter</tspan><tspan x="422.4" dy="1.2em">Same behavior</tspan></text>
       </g>
       <g class="node" id="node-I">
         <rect x="344" y="586.6" width="156.8" height="89.6"/>
-        <text x="422.4" y="631.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="422.4" y="631.4" dy="-0.6em">.filter</tspan><tspan x="422.4" dy="1.2em">Same behavior</tspan></text>
+        <text x="422.4" y="631.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="422.4" y="631.4" dy="-0.6em">.filter</tspan><tspan x="422.4" dy="1.2em">Same behavior</tspan></text>
       </g>
       <g class="node" id="node-J">
         <rect x="353.59999999999997" y="726.2" width="137.6" height="89.6"/>
-        <text x="422.4" y="771" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="422.4" y="771" dy="-0.6em">.collect</tspan><tspan x="422.4" dy="1.2em">Same result</tspan></text>
+        <text x="422.4" y="771" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="422.4" y="771" dy="-0.6em">.collect</tspan><tspan x="422.4" dy="1.2em">Same result</tspan></text>
       </g>
     </g>
   </g>

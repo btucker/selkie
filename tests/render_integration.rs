@@ -3437,9 +3437,11 @@ fn test_mermaid_fork_join() {
         .collect();
 
     // At least some edges should have curve commands (C for cubic bezier)
+    // d3-path format: "C{x1},{y1},{x2},{y2},{x},{y}" (no spaces)
+    let curve_cmd = regex::Regex::new(r"C-?[\d.]").expect("regex");
     let curved_edges = fork_edges
         .iter()
-        .filter(|line| line.contains(" C "))
+        .filter(|line| curve_cmd.is_match(line))
         .count();
     assert!(
         curved_edges > 0,
@@ -3607,7 +3609,8 @@ fn test_fork_edges_are_curved() {
     }
 
     // Count paths with curves (should have C commands for curves)
-    let curved_count = paths.iter().filter(|p| p.contains(" C ")).count();
+    // d3-path format: "C{x1},{y1},{x2},{y2},{x},{y}" (no spaces)
+    let curved_count = paths.iter().filter(|p| p.contains('C')).count();
 
     // At least some paths from fork should be curved
     assert!(

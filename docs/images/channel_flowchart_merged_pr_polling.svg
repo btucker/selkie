@@ -87,7 +87,7 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
@@ -105,31 +105,31 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 115.00 89.60 C 115.00 101.27, 115.00 112.93, 115.00 124.60 C 115.00 136.27, 115.00 147.93, 115.00 159.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M115,89.6L115,95.43333333333334C115,101.26666666666665,115,112.93333333333332,115,123.93333333333332C115,134.9333333333333,115,145.26666666666665,115,150.4333333333333L115,155.59999999999997" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 115.00 249.20 C 115.00 257.53, 115.00 265.87, 115.00 274.20 C 115.00 282.53, 115.00 290.87, 115.00 299.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M115,249.2L115,253.36666666666667C115,257.5333333333333,115,265.8666666666666,115,273.53333333333336C115,281.2,115,288.2,115,291.7L115,295.2" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-C-D-0">
-        <path d="M 67.07 465.67 C 44.71 493.31, 22.36 520.96, 33.79 540.61 C 45.22 560.27, 90.45 571.93, 135.67 583.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M67.06842923794713,465.6684292379471L55.89035769828928,479.49035769828924C44.71228615863142,493.3122861586314,22.35614307931571,520.9561430793157,33.14383269798916,540.4448687460509C43.931522316662615,559.9335944127861,87.86304463332523,571.2671888255721,109.82880579165654,576.9339860319651L131.79456694998785,582.6007832383582" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-D-E-0">
-        <path d="M 238.00 636.40 C 238.00 648.07, 238.00 659.73, 253.07 671.40 C 268.14 683.07, 298.27 694.73, 328.41 706.40" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M238,636.4L238,642.2333333333333C238,648.0666666666666,238,659.7333333333332,252.44615746941417,671.1593152708409C266.89231493882835,682.5852972083484,295.7846298776567,693.7705944166969,310.2307873470709,699.3632430208712L324.67694481648505,704.9558916250453" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-C-F-0">
-        <path d="M 171.52 457.08 C 205.55 487.59, 239.57 518.09, 283.34 539.18 C 327.11 560.27, 380.61 571.93, 434.12 583.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M171.5223404255319,457.0776595744681L188.53528368794323,472.3313829787234C205.54822695035463,487.5851063829787,239.5741134751773,518.0925531914894,282.6892224061317,539.0375868658035C325.8043313370861,559.9826205401175,378.00866267417223,571.365241080235,404.11082834271537,577.0565513502937L430.2129940112584,582.7478616203525" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-F-E-0">
-        <path d="M 555.20 636.40 C 555.20 648.07, 555.20 659.73, 540.13 671.40 C 525.06 683.07, 494.93 694.73, 464.79 706.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M555.2,636.4L555.1999999999999,642.2333333333333C555.2,648.0666666666666,555.2,659.7333333333332,540.7538425305858,671.1593152708409C526.3076850611716,682.5852972083484,497.4153701223433,693.7705944166969,482.9692126529291,699.3632430208712L468.5230551835149,704.9558916250453" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-E-G-0">
-        <path d="M 396.60 759.20 C 396.60 770.87, 396.60 782.53, 396.60 794.20 C 396.60 805.87, 396.60 817.53, 396.60 829.20" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M396.6,759.1999999999999L396.59999999999997,765.0333333333333C396.6000000000001,770.8666666666667,396.6000000000001,782.5333333333333,396.59999999999997,793.5333333333333C396.6000000000001,804.5333333333333,396.6000000000001,814.8666666666667,396.59999999999997,820.0333333333333L396.6,825.1999999999999" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-H-D-0">
-        <path d="M 628.23 451.20 C 592.02 483.67, 555.81 516.13, 510.95 538.20 C 466.09 560.27, 412.59 571.93, 359.08 583.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+        <path d="M628.2331926863573,451.2L610.1276605719644,467.43333333333334C592.0221284575715,483.6666666666667,555.8110642287858,516.1333333333333,511.6033664458498,538.0579769367254C467.3956686629139,559.9826205401175,415.19133732582776,571.365241080235,389.0891716572847,577.0565513502937L362.98700598874166,582.7478616203525" class="edge-path" fill="none" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-H-F-0">
-        <path d="M 706.87 451.20 C 727.65 483.67, 748.42 516.13, 738.48 538.20 C 728.54 560.27, 687.88 571.93, 647.21 583.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="2" stroke-dasharray="3,3"/>
+        <path d="M706.8694796061885,451.2L717.2578996718238,467.43333333333334C727.6463197374591,483.6666666666667,748.4231598687296,516.1333333333333,739.121230326924,538.0161408063717C729.8193007851183,559.89894827941,690.4386015702368,571.1978965588199,670.748251962796,576.847370698525L651.0579023553552,582.4968448382299" class="edge-path" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -143,7 +143,7 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-D-E-0">
         <rect x="169.2838648424806" y="671.5820258595732" width="195.2" height="22" class="edge-label-bg"/>
-        <text x="266.8838648424806" y="682.5820258595732" class="edge-label" text-anchor="middle" dominant-baseline="central">if pr_number in merged_prs</text>
+        <text x="266.8838648424806" y="682.5820258595732" class="edge-label" dominant-baseline="central" text-anchor="middle">if pr_number in merged_prs</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-C-F-0">
         <rect x="236.08457172101618" y="531.4965649988295" width="101.6" height="40" class="edge-label-bg"/>
@@ -151,11 +151,11 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-F-E-0">
         <rect x="428.7161351575194" y="671.5820258595732" width="195.2" height="22" class="edge-label-bg"/>
-        <text x="526.3161351575194" y="682.5820258595732" class="edge-label" text-anchor="middle" dominant-baseline="central">if pr_number in merged_prs</text>
+        <text x="526.3161351575194" y="682.5820258595732" class="edge-label" dominant-baseline="central" text-anchor="middle">if pr_number in merged_prs</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-E-G-0">
         <rect x="338.6" y="783.1999999999999" width="116" height="22" class="edge-label-bg"/>
-        <text x="396.6" y="794.1999999999999" class="edge-label" text-anchor="middle" dominant-baseline="central">execute_effects</text>
+        <text x="396.6" y="794.1999999999999" class="edge-label" dominant-baseline="central" text-anchor="middle">execute_effects</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-H-D-0">
         <rect x="445.4166973640238" y="539.5587172650886" width="130.39999999999998" height="22" class="edge-label-bg"/>
@@ -169,11 +169,11 @@ marker path {
     <g class="nodes">
       <g class="node" id="node-A">
         <rect x="17.400000000000006" y="0" width="195.2" height="89.6" style="fill:#fff3cd !important"/>
-        <text x="115" y="44.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="115" y="44.8" dy="-0.6em">Merged PR Polling</tspan><tspan x="115" dy="1.2em">5min interval</tspan></text>
+        <text x="115" y="44.8" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="115" y="44.8" dy="-0.6em">Merged PR Polling</tspan><tspan x="115" dy="1.2em">5min interval</tspan></text>
       </g>
       <g class="node" id="node-B">
         <rect x="17.400000000000006" y="159.59999999999997" width="195.2" height="89.6" style="fill:#e1f5ff !important"/>
-        <text x="115" y="204.39999999999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="115" y="204.39999999999998" dy="-0.6em">WorldSnapshot</tspan><tspan x="115" dy="1.2em">merged_pr_numbers</tspan></text>
+        <text x="115" y="204.39999999999998" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="115" y="204.39999999999998" dy="-0.6em">WorldSnapshot</tspan><tspan x="115" dy="1.2em">merged_pr_numbers</tspan></text>
       </g>
       <g class="node" id="node-C">
         <polygon points="115,299.2 222.2,406.4 115,513.6 7.799999999999997,406.4"/>
@@ -181,11 +181,11 @@ marker path {
       </g>
       <g class="node" id="node-D">
         <rect x="116.4" y="583.6" width="243.2" height="52.8"/>
-        <text x="238" y="610" class="label" dominant-baseline="central" text-anchor="middle">decide_task_assignment</text>
+        <text x="238" y="610" class="label" text-anchor="middle" dominant-baseline="central">decide_task_assignment</text>
       </g>
       <g class="node" id="node-E">
         <rect x="284.6" y="706.4" width="224" height="52.8" style="fill:#d4edda !important"/>
-        <text x="396.6" y="732.8" class="label" text-anchor="middle" dominant-baseline="central">Effect::CompleteTask</text>
+        <text x="396.6" y="732.8" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000">Effect::CompleteTask</text>
       </g>
       <g class="node" id="node-F">
         <rect x="409.6" y="583.6" width="291.2" height="52.8"/>
@@ -193,11 +193,11 @@ marker path {
       </g>
       <g class="node" id="node-G">
         <rect x="279.8" y="829.1999999999999" width="233.6" height="52.8" style="fill:#d4edda !important"/>
-        <text x="396.6" y="855.5999999999999" class="label" dominant-baseline="central" text-anchor="middle">midtown task complete</text>
+        <text x="396.6" y="855.5999999999999" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">midtown task complete</text>
       </g>
       <g class="node" id="node-H">
         <rect x="575.8000000000001" y="361.59999999999997" width="204.79999999999998" height="89.6"/>
-        <text x="678.2" y="406.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="678.2" y="406.4" dy="-0.6em">Task Subject</tspan><tspan x="678.2" dy="1.2em">e.g. &apos;Review #123&apos;</tspan></text>
+        <text x="678.2" y="406.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="678.2" y="406.4" dy="-0.6em">Task Subject</tspan><tspan x="678.2" dy="1.2em">e.g. &apos;Review #123&apos;</tspan></text>
       </g>
     </g>
   </g>

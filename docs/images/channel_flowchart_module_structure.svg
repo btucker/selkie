@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -116,32 +116,32 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-app_tests-test_helper-0">
-        <path d="M 364.78 89.60 C 385.69 101.27, 406.59 112.93, 417.05 124.60 C 427.50 136.27, 427.50 147.93, 448.64 161.00 C 512.06 188.53, 554.34 203.00, 554.34 203.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M364.780701754386,89.6L375.233918128655,95.43333333333334C385.687134502924,101.26666666666665,406.593567251462,112.93333333333332,417.046783625731,124.60000000000001C427.5,136.26666666666665,427.5,147.9333333333333,448.00963512481457,160.78417907701987C468.519270249629,173.63502482070638,509.53854049925803,187.6700496414128,530.0481756240725,194.68756205176598L550.557810748887,201.70507446211917" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-mod_use-test_helper-0">
-        <path d="M 631.50 71.20 C 631.50 89.00, 631.50 106.80, 631.50 121.53 C 631.50 136.27, 631.50 147.93, 631.50 161.00 C 631.50 188.53, 631.50 203.00, 631.50 203.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M631.5,71.19999999999999L631.5,80.09999999999998C631.5,89,631.5,106.8,631.5,121.53333333333332C631.5,136.26666666666665,631.5,147.9333333333333,631.5,160.33333333333334C631.5,172.73333333333332,631.5,185.86666666666665,631.5,192.4333333333333L631.5,198.99999999999997" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-test_fn-test_helper-0">
-        <path d="M 948.70 89.60 C 948.70 112.93, 948.70 136.27, 915.83 155.17 C 882.96 174.07, 817.21 188.53, 751.47 203.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M948.6999999999999,89.6L948.6999999999999,95.43333333333334C948.6999999999999,101.26666666666665,948.6999999999999,112.93333333333332,948.6999999999999,124.60000000000001C948.6999999999999,136.26666666666665,948.6999999999999,147.9333333333333,916.4798382248474,160.85672748604134C884.2596764496949,173.7801216387493,819.8193528993899,187.96024327749865,787.5991911242373,195.05030409687333L755.3790293490849,202.140364916248" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-app_tests-mod-0">
-        <path d="M 204.22 89.60 C 183.31 101.27, 162.41 112.93, 155.74 128.77 C 149.07 144.60, 156.64 164.60, 164.21 184.60" class="edge-path" fill="none" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)"/>
+        <path d="M204.21929824561403,89.6L193.76608187134502,95.43333333333334C183.31286549707602,101.26666666666665,162.406432748538,112.93333333333332,151.953216374269,124.60000000000001C141.5,136.26666666666665,141.5,147.9333333333333,144.8363853833261,157.43984805083326C148.1727707666522,166.9463627683332,154.84554153330444,174.29272553666638,158.18192691663054,177.96590692083302L161.51831229995665,181.6390883049996" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-dasharray="3,3" stroke-width="2"/>
       </g>
       <g class="edge" id="edge-L-mod-app-0">
-        <path d="M 204.90 274.20 C 204.90 285.87, 204.90 297.53, 204.90 309.20 C 204.90 320.87, 204.90 332.53, 204.90 344.20" class="edge-path" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)" stroke-width="2"/>
+        <path d="M204.89999999999998,274.2L204.9,280.03333333333336C204.89999999999998,285.8666666666666,204.89999999999998,297.5333333333333,204.9,308.53333333333336C204.89999999999998,319.5333333333333,204.89999999999998,329.8666666666666,204.9,335.03333333333336L204.89999999999998,340.2" class="edge-path" marker-end="url(#arrow_point)" stroke-dasharray="3,3" stroke-width="2" fill="none"/>
       </g>
       <g class="edge" id="edge-L-mod-ui-0">
-        <path d="M 116.89999999999998 229.39999999999998 L 120 229.39999999999998" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+        <path d="M115,229.39999999999998L116,229.39999999999998" class="edge-path" stroke-dasharray="3,3" stroke-width="2" fill="none" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-app_tests-test_helper-0">
         <rect x="407.5854142913813" y="153.00883292910987" width="65.6" height="22" class="edge-label-bg"/>
-        <text x="440.3854142913813" y="164.00883292910987" class="edge-label" dominant-baseline="central" text-anchor="middle">contains</text>
+        <text x="440.3854142913813" y="164.00883292910987" class="edge-label" text-anchor="middle" dominant-baseline="central">contains</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod_use-test_helper-0">
         <rect x="602.3" y="126.09999999999997" width="58.4" height="22" class="edge-label-bg"/>
-        <text x="631.5" y="137.09999999999997" class="edge-label" dominant-baseline="central" text-anchor="middle">imports</text>
+        <text x="631.5" y="137.09999999999997" class="edge-label" text-anchor="middle" dominant-baseline="central">imports</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-test_fn-test_helper-0">
         <rect x="862.2684409019146" y="162.77819301717008" width="44" height="22" class="edge-label-bg"/>
@@ -153,11 +153,11 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-mod-app-0">
         <rect x="150.49999999999997" y="298.2" width="108.8" height="22" class="edge-label-bg"/>
-        <text x="204.89999999999998" y="309.2" class="edge-label" dominant-baseline="central" text-anchor="middle">parent of both</text>
+        <text x="204.89999999999998" y="309.2" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod-ui-0">
         <rect x="64.04999999999998" y="218.39999999999998" width="108.8" height="22" class="edge-label-bg"/>
-        <text x="118.44999999999999" y="229.39999999999998" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
+        <text x="118.44999999999999" y="229.39999999999998" class="edge-label" dominant-baseline="central" text-anchor="middle">parent of both</text>
       </g>
     </g>
     <g class="nodes">
@@ -167,11 +167,11 @@ marker path {
       </g>
       <g class="node" id="node-app_code">
         <rect x="691" y="202.99999999999997" width="243.2" height="52.8"/>
-        <text x="812.6" y="229.39999999999998" class="label" dominant-baseline="central" text-anchor="middle">pub struct App { ... }</text>
+        <text x="812.6" y="229.39999999999998" class="label" text-anchor="middle" dominant-baseline="central">pub struct App { ... }</text>
       </g>
       <g class="node" id="node-app_tests">
         <rect x="172.5" y="0" width="224" height="89.6" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#fff4e1 !important"/>
-        <text x="284.5" y="44.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="284.5" y="44.8" dy="-0.6em">#[cfg(test)]</tspan><tspan x="284.5" dy="1.2em">pub(super) mod tests</tspan></text>
+        <text x="284.5" y="44.8" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="284.5" y="44.8" dy="-0.6em">#[cfg(test)]</tspan><tspan x="284.5" dy="1.2em">pub(super) mod tests</tspan></text>
       </g>
       <g class="node" id="node-mod">
         <rect x="116.89999999999998" y="184.59999999999997" width="176" height="89.6"/>
@@ -179,11 +179,11 @@ marker path {
       </g>
       <g class="node" id="node-mod_tests">
         <rect x="984.2000000000002" y="184.59999999999997" width="147.2" height="89.6"/>
-        <text x="1057.8000000000002" y="229.39999999999998" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1057.8000000000002" y="229.39999999999998" dy="-0.6em">#[cfg(test)]</tspan><tspan x="1057.8000000000002" dy="1.2em">mod tests</tspan></text>
+        <text x="1057.8000000000002" y="229.39999999999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1057.8000000000002" y="229.39999999999998" dy="-0.6em">#[cfg(test)]</tspan><tspan x="1057.8000000000002" dy="1.2em">mod tests</tspan></text>
       </g>
       <g class="node" id="node-mod_use">
         <rect x="495.5" y="18.4" width="272" height="52.8" style="fill:#e1f5e1 !important"/>
-        <text x="631.5" y="44.8" class="label" text-anchor="middle" dominant-baseline="central">use app::tests::test_app;</text>
+        <text x="631.5" y="44.8" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">use app::tests::test_app;</text>
       </g>
       <g class="node" id="node-test_fn">
         <rect x="817.5" y="0" width="262.4" height="89.6"/>
@@ -191,7 +191,7 @@ marker path {
       </g>
       <g class="node" id="node-test_helper">
         <rect x="500.3" y="202.99999999999997" width="262.4" height="52.8" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#e1f5e1 !important"/>
-        <text x="631.5" y="229.39999999999998" class="label" dominant-baseline="central" text-anchor="middle">pub(super) fn test_app()</text>
+        <text x="631.5" y="229.39999999999998" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">pub(super) fn test_app()</text>
       </g>
       <g class="node" id="node-ui">
         <rect x="40" y="202.99999999999997" width="80" height="52.8"/>

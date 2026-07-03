@@ -105,40 +105,40 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 214.30 52.80 C 214.30 61.13, 214.30 69.47, 214.30 77.80 C 214.30 86.13, 214.30 94.47, 214.30 102.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M214.29999999999998,52.8L214.29999999999998,56.96666666666667C214.29999999999998,61.133333333333326,214.29999999999998,69.46666666666665,214.29999999999998,77.13333333333334C214.29999999999998,84.8,214.29999999999998,91.8,214.29999999999998,95.3L214.29999999999998,98.8" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 214.30 192.40 C 214.30 200.73, 214.30 209.07, 214.30 217.40 C 214.30 225.73, 214.30 234.07, 214.30 242.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M214.29999999999998,192.39999999999998L214.29999999999998,196.56666666666663C214.29999999999998,200.73333333333332,214.29999999999998,209.06666666666663,214.29999999999998,216.73333333333332C214.29999999999998,224.39999999999998,214.29999999999998,231.39999999999995,214.29999999999998,234.89999999999995L214.29999999999998,238.39999999999995" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-C-D-0">
-        <path d="M 214.30 295.20 C 214.30 303.53, 214.30 311.87, 214.30 320.20 C 214.30 328.53, 214.30 336.87, 214.30 345.20" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M214.29999999999998,295.19999999999993L214.29999999999998,299.3666666666666C214.29999999999998,303.5333333333333,214.29999999999998,311.8666666666666,214.29999999999998,319.53333333333336C214.29999999999998,327.2,214.29999999999998,334.2,214.29999999999998,337.7L214.29999999999998,341.2" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-D-E-0">
-        <path d="M 214.30 398.00 C 214.30 406.33, 214.30 414.67, 214.30 423.00 C 214.30 431.33, 214.30 439.67, 214.30 448.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M214.29999999999998,397.99999999999994L214.29999999999998,402.1666666666667C214.29999999999998,406.3333333333333,214.29999999999998,414.6666666666667,214.29999999999998,422.3333333333333C214.29999999999998,430,214.29999999999998,437,214.29999999999998,440.5L214.29999999999998,444" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-E-F-0">
-        <path d="M 214.30 672.00 C 214.30 683.67, 214.30 695.33, 214.30 707.00 C 214.30 718.67, 214.30 730.33, 214.30 742.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M214.29999999999998,672L214.29999999999998,677.8333333333334C214.29999999999998,683.6666666666666,214.29999999999998,695.3333333333334,214.29999999999998,706.3333333333334C214.29999999999998,717.3333333333334,214.29999999999998,727.6666666666666,214.29999999999998,732.8333333333334L214.29999999999998,738" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-F-G-0">
-        <path d="M 214.30 831.60 C 214.30 839.93, 214.30 848.27, 214.30 856.60 C 214.30 864.93, 214.30 873.27, 214.30 881.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M214.29999999999998,831.5999999999999L214.29999999999998,835.7666666666668C214.29999999999998,839.9333333333333,214.29999999999998,848.2666666666668,214.29999999999998,855.9333333333334C214.29999999999998,863.6,214.29999999999998,870.6,214.29999999999998,874.1L214.29999999999998,877.6" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-G-H-0">
-        <path d="M 160.96 971.20 L 131.20 1021.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M160.9636103151863,971.1999999999999L156.00300859598858,975.3666666666667C151.04240687679086,979.5333333333333,141.12120343839544,987.8666666666667,136.16060171919773,995.5333333333333C131.2,1003.2000000000002,131.2,1010.2000000000002,131.20000000000002,1013.6999999999999L131.2,1017.2" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-H-I-0">
-        <path d="M 131.20 1110.80 C 131.20 1119.13, 131.20 1127.47, 131.20 1135.80 C 131.20 1144.13, 131.20 1152.47, 131.20 1160.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M131.2,1110.8L131.20000000000002,1114.9666666666667C131.2,1119.1333333333332,131.2,1127.4666666666665,131.20000000000002,1135.1333333333334C131.2,1142.8,131.2,1149.8,131.20000000000002,1153.3L131.2,1156.8" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-I-J-0">
-        <path d="M 131.20 1213.60 C 131.20 1221.93, 131.20 1230.27, 131.20 1238.60 C 131.20 1246.93, 131.20 1255.27, 131.20 1263.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M131.2,1213.6000000000001L131.20000000000002,1217.7666666666667C131.2,1221.9333333333334,131.2,1230.2666666666667,131.20000000000002,1237.9333333333334C131.2,1245.6,131.2,1252.6,131.20000000000002,1256.1000000000001L131.2,1259.6" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-J-K-0">
-        <path d="M 131.20 1353.20 C 131.20 1361.53, 131.20 1369.87, 131.20 1378.20 C 131.20 1386.53, 131.20 1394.87, 131.20 1403.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M131.2,1353.1999999999998L131.20000000000002,1357.3666666666666C131.2,1361.533333333333,131.2,1369.8666666666666,131.20000000000002,1377.533333333333C131.2,1385.1999999999998,131.2,1392.1999999999998,131.20000000000002,1395.6999999999998L131.2,1399.1999999999998" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-K-L-0">
-        <path d="M 131.20 1492.80 L 171.62 1542.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M131.2,1492.7999999999997L131.20000000000002,1496.9666666666662C131.2,1501.1333333333332,131.2,1509.4666666666665,137.36940706780712,1517.449308342783C143.53881413561422,1525.4319500188994,155.87762827122847,1533.0639000377994,162.0470353390356,1536.8798750472495L168.21644240684273,1540.695850056699" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-L-G-0">
-        <path d="M 256.98 1542.80 C 270.45 1534.47, 283.93 1526.13, 290.66 1435.03 C 297.40 1343.93, 297.40 1170.07, 292.44 1078.97 C 277.56 979.53, 267.64 971.20, 267.64 971.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M256.9817120622567,1542.7999999999997L263.71809338521393,1538.633333333333C270.4544747081711,1534.4666666666665,283.92723735408555,1526.1333333333332,290.66361867704273,1510.333333333333C297.4,1494.533333333333,297.4,1471.2666666666664,297.40000000000003,1448C297.4,1424.733333333333,297.4,1401.4666666666665,297.40000000000003,1378.1999999999998C297.4,1354.9333333333332,297.4,1331.6666666666665,297.40000000000003,1308.3999999999999C297.4,1285.1333333333332,297.4,1261.8666666666666,297.40000000000003,1241.6666666666665C297.4,1221.4666666666665,297.4,1204.3333333333333,297.40000000000003,1187.2C297.4,1170.0666666666666,297.4,1152.9333333333334,297.40000000000003,1132.7333333333333C297.4,1112.5333333333333,297.4,1089.2666666666667,297.40000000000003,1066C297.4,1042.7333333333333,297.4,1019.4666666666667,292.9498802920229,1004.095446984154C288.4997605840458,988.7242273016415,279.5995211680917,981.2484546032829,275.1494014601146,977.5105682541034L270.69928175213755,973.7726819049242" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -154,11 +154,11 @@ marker path {
       </g>
       <g class="node" id="node-B">
         <rect x="73.49999999999997" y="102.8" width="281.6" height="89.6"/>
-        <text x="214.29999999999998" y="147.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="214.29999999999998" y="147.6" dy="-0.6em">cleanup_orphaned_worktrees</tspan><tspan x="214.29999999999998" dy="1.2em">limit: Some&lt;b&gt;2&lt;/b&gt;</tspan></text>
+        <text x="214.29999999999998" y="147.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="214.29999999999998" y="147.6" dy="-0.6em">cleanup_orphaned_worktrees</tspan><tspan x="214.29999999999998" dy="1.2em">limit: Some&lt;b&gt;2&lt;/b&gt;</tspan></text>
       </g>
       <g class="node" id="node-C">
         <rect x="64.29999999999998" y="242.39999999999995" width="300" height="52.8"/>
-        <text x="214.29999999999998" y="268.79999999999995" class="label" dominant-baseline="central" text-anchor="middle">unmerged: Vec of 2 worktrees</text>
+        <text x="214.29999999999998" y="268.79999999999995" class="label" text-anchor="middle" dominant-baseline="central">unmerged: Vec of 2 worktrees</text>
       </g>
       <g class="node" id="node-D">
         <rect x="64.29999999999998" y="345.2" width="300" height="52.8"/>
@@ -166,19 +166,19 @@ marker path {
       </g>
       <g class="node" id="node-E">
         <polygon points="214.29999999999998,448 326.29999999999995,560 214.29999999999998,672 102.29999999999998,560"/>
-        <text x="214.29999999999998" y="560" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="214.29999999999998" y="560" dy="-0.6em">Is worktree #3</tspan><tspan x="214.29999999999998" dy="1.2em">in unmerged?</tspan></text>
+        <text x="214.29999999999998" y="560" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="214.29999999999998" y="560" dy="-0.6em">Is worktree #3</tspan><tspan x="214.29999999999998" dy="1.2em">in unmerged?</tspan></text>
       </g>
       <g class="node" id="node-F">
         <rect x="97.49999999999999" y="742" width="233.6" height="89.6" style="fill:#f99 !important"/>
-        <text x="214.29999999999998" y="786.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="214.29999999999998" y="786.8" dy="-0.6em">Entry for worktree #3</tspan><tspan x="214.29999999999998" dy="1.2em">REMOVED from tracker</tspan></text>
+        <text x="214.29999999999998" y="786.8" class="label" dominant-baseline="central" style="fill: #ffffff" text-anchor="middle"><tspan x="214.29999999999998" y="786.8" dy="-0.6em">Entry for worktree #3</tspan><tspan x="214.29999999999998" dy="1.2em">REMOVED from tracker</tspan></text>
       </g>
       <g class="node" id="node-G">
         <rect x="97.49999999999999" y="881.6" width="233.6" height="89.6"/>
-        <text x="214.29999999999998" y="926.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="214.29999999999998" y="926.4" dy="-0.6em">Next tick:</tspan><tspan x="214.29999999999998" dy="1.2em">worktree #3 processed</tspan></text>
+        <text x="214.29999999999998" y="926.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="214.29999999999998" y="926.4" dy="-0.6em">Next tick:</tspan><tspan x="214.29999999999998" dy="1.2em">worktree #3 processed</tspan></text>
       </g>
       <g class="node" id="node-H">
         <rect x="9.599999999999994" y="1021.2" width="243.2" height="89.6" style="fill:#f99 !important"/>
-        <text x="131.2" y="1066" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="131.2" y="1066" dy="-0.6em">Re-tracked with</tspan><tspan x="131.2" dy="1.2em">&lt;b&gt;warned_at: None&lt;/b&gt;</tspan></text>
+        <text x="131.2" y="1066" class="label" dominant-baseline="central" style="fill: #ffffff" text-anchor="middle"><tspan x="131.2" y="1066" dy="-0.6em">Re-tracked with</tspan><tspan x="131.2" dy="1.2em">&lt;b&gt;warned_at: None&lt;/b&gt;</tspan></text>
       </g>
       <g class="node" id="node-I">
         <rect x="0" y="1160.8" width="262.4" height="52.8"/>
@@ -186,7 +186,7 @@ marker path {
       </g>
       <g class="node" id="node-J">
         <rect x="19.19999999999999" y="1263.6" width="224" height="89.6" style="fill:#f99 !important"/>
-        <text x="131.2" y="1308.3999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="131.2" y="1308.3999999999999" dy="-0.6em">Warn AGAIN</tspan><tspan x="131.2" dy="1.2em">bypasses 1h cooldown</tspan></text>
+        <text x="131.2" y="1308.3999999999999" class="label" style="fill: #ffffff" text-anchor="middle" dominant-baseline="central"><tspan x="131.2" y="1308.3999999999999" dy="-0.6em">Warn AGAIN</tspan><tspan x="131.2" dy="1.2em">bypasses 1h cooldown</tspan></text>
       </g>
       <g class="node" id="node-K">
         <rect x="23.999999999999986" y="1403.1999999999998" width="214.4" height="89.6"/>
@@ -194,7 +194,7 @@ marker path {
       </g>
       <g class="node" id="node-L">
         <rect x="107.09999999999998" y="1542.7999999999997" width="214.4" height="52.8"/>
-        <text x="214.29999999999998" y="1569.1999999999998" class="label" dominant-baseline="central" text-anchor="middle">prune removes entry</text>
+        <text x="214.29999999999998" y="1569.1999999999998" class="label" text-anchor="middle" dominant-baseline="central">prune removes entry</text>
       </g>
     </g>
   </g>

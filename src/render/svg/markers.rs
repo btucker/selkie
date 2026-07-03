@@ -115,3 +115,27 @@ pub fn get_start_marker_url(edge_type: Option<&str>) -> Option<String> {
         _ => None,
     }
 }
+
+/// Marker endpoint offset for the start of an edge.
+///
+/// Port of mermaid's `markerOffsets` table (utils/lineWithOffset.ts): lines are
+/// drawn slightly shorter so they do not show under transparent arrow markers.
+/// For flowcharts only `arrow_point` has an offset (4px); the start of an edge
+/// only carries a marker for `double_` edge types (arrowTypeStart).
+pub fn start_marker_offset(edge_type: Option<&str>) -> Option<f64> {
+    match edge_type {
+        Some("double_arrow_point") => Some(4.0),
+        _ => None,
+    }
+}
+
+/// Marker endpoint offset for the end of an edge.
+///
+/// Port of mermaid's `markerOffsets` table (utils/lineWithOffset.ts):
+/// `arrow_point` => 4. Cross and circle markers have no offset entry.
+pub fn end_marker_offset(edge_type: Option<&str>) -> Option<f64> {
+    match edge_type {
+        Some("arrow_point") | Some("double_arrow_point") => Some(4.0),
+        _ => None,
+    }
+}

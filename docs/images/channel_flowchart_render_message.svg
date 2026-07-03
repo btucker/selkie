@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -105,46 +105,46 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-Start-CheckType-0">
-        <path d="M 210.60 52.80 C 210.60 61.13, 210.60 69.47, 210.60 77.80 C 210.60 86.13, 210.60 94.47, 210.60 102.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M210.60000000000002,52.8L210.6,56.96666666666667C210.60000000000002,61.133333333333326,210.60000000000002,69.46666666666665,210.6,77.13333333333334C210.60000000000002,84.80000000000001,210.60000000000002,91.80000000000003,210.6,95.30000000000003L210.60000000000002,98.80000000000004" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-CheckType-CalcIndent-0">
-        <path d="M 151.98 353.84 L 92.80 484.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M151.98406185409175,353.8394243282554L142.12005154507645,369.83285360687955C132.25604123606118,385.8262828855036,112.5280206180306,417.8131414427518,102.6640103090153,438.9732373880426C92.80000000000001,460.1333333333334,92.80000000000001,470.4666666666667,92.80000000000001,475.6333333333334L92.80000000000001,480.8" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CheckType-NoIndent-0">
-        <path d="M 269.22 353.84 L 328.40 484.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M269.2159381459083,353.8394243282554L279.07994845492357,369.83285360687955C288.94395876393884,385.8262828855036,308.6719793819695,417.8131414427518,318.53598969098476,438.9732373880426C328.40000000000003,460.1333333333334,328.40000000000003,470.4666666666667,328.40000000000003,475.6333333333334L328.40000000000003,480.8" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-CalcIndent-CalcWidth-0">
-        <path d="M 92.80 537.60 L 150.10 587.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M92.80000000000001,537.6L92.80000000000001,541.7666666666667C92.80000000000001,545.9333333333334,92.80000000000001,554.2666666666668,101.73825347455427,562.3333862076296C110.67650694910851,570.4001057485924,128.55301389821702,578.2002114971847,137.49126737277126,582.1002643714809L146.42952084732553,586.0003172457771" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-NoIndent-CalcWidth-0">
-        <path d="M 328.40 537.60 L 271.10 587.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M328.40000000000003,537.6L328.40000000000003,541.7666666666667C328.40000000000003,545.9333333333334,328.40000000000003,554.2666666666668,319.4617465254458,562.3333862076296C310.52349305089155,570.4001057485924,292.64698610178306,578.2002114971847,283.70873262722876,582.1002643714809L274.7704791526745,586.0003172457771" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-CalcWidth-Action-0">
-        <path d="M 150.10 640.40 L 92.80 690.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M150.09571984435797,640.4L140.54643320363164,644.5666666666667C130.99714656290533,648.7333333333332,111.89857328145267,657.0666666666666,102.34928664072633,664.7333333333333C92.80000000000001,672.4,92.80000000000001,679.4,92.80000000000001,682.9L92.80000000000001,686.4" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-CalcWidth-Normal-0">
-        <path d="M 271.10 640.40 L 328.40 690.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M271.1042801556421,640.4L280.6535667963684,644.5666666666667C290.20285343709475,648.7333333333332,309.30142671854736,657.0666666666666,318.8507133592737,664.7333333333333C328.40000000000003,672.4,328.40000000000003,679.4,328.40000000000003,682.9L328.40000000000003,686.4" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Action-RenderMermaid-0">
-        <path d="M 92.80 743.20 L 150.10 793.20" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M92.80000000000001,743.1999999999999L92.80000000000001,747.3666666666667C92.80000000000001,751.5333333333333,92.80000000000001,759.8666666666667,101.73825347455427,767.9333862076295C110.67650694910851,776.0001057485923,128.55301389821702,783.8002114971846,137.49126737277126,787.7002643714808L146.42952084732553,791.600317245777" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Normal-RenderMermaid-0">
-        <path d="M 328.40 743.20 L 271.10 793.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M328.40000000000003,743.1999999999999L328.40000000000003,747.3666666666667C328.40000000000003,751.5333333333333,328.40000000000003,759.8666666666667,319.4617465254458,767.9333862076295C310.52349305089155,776.0001057485923,292.64698610178306,783.8002114971846,283.70873262722876,787.7002643714808L274.7704791526745,791.600317245777" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-RenderMermaid-Placeholder-0">
-        <path d="M 210.60 846.00 C 210.60 854.33, 210.60 862.67, 210.60 871.00 C 210.60 879.33, 210.60 887.67, 210.60 896.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M210.60000000000002,845.9999999999999L210.6,850.1666666666665C210.60000000000002,854.3333333333331,210.60000000000002,862.6666666666665,210.6,870.3333333333331C210.60000000000002,877.9999999999999,210.60000000000002,884.9999999999999,210.6,888.4999999999999L210.60000000000002,891.9999999999999" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Placeholder-ActionLine-0">
-        <path d="M 152.56 948.80 L 97.60 998.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M152.5610894941634,948.7999999999998L143.40090791180285,952.9666666666666C134.24072632944228,957.1333333333332,115.92036316472115,965.4666666666666,106.76018158236059,973.1333333333332C97.60000000000002,980.7999999999998,97.60000000000002,987.7999999999998,97.60000000000002,991.3000000000001L97.60000000000002,994.8" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Placeholder-NormalLine-0">
-        <path d="M 268.64 948.80 L 323.60 998.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M268.63891050583663,948.7999999999998L277.79909208819714,952.9666666666666C286.95927367055776,957.1333333333332,305.2796368352789,965.4666666666666,314.4398184176394,973.1333333333332C323.6,980.7999999999998,323.6,987.7999999999998,323.59999999999997,991.3000000000001L323.6,994.8" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-CheckType-CalcIndent-0">
-        <rect x="98.40553699893611" y="405.714621674051" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="113.20553699893611" y="416.714621674051" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <rect x="98.40553699893613" y="405.714621674051" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="113.20553699893613" y="416.714621674051" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CheckType-NoIndent-0">
         <rect x="296.79446300106395" y="405.714621674051" width="22.4" height="22" class="edge-label-bg"/>
@@ -153,20 +153,20 @@ marker path {
     </g>
     <g class="nodes">
       <g class="node" id="node-Action">
-        <rect x="0" y="690.4" width="185.6" height="52.8" style="fill:#e1f5ff !important"/>
-        <text x="92.8" y="716.8" class="label" text-anchor="middle" dominant-baseline="central">indent_width = 9</text>
+        <rect x="0.000000000000014210854715202004" y="690.4" width="185.6" height="52.8" style="fill:#e1f5ff !important"/>
+        <text x="92.80000000000001" y="716.8" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle">indent_width = 9</text>
       </g>
       <g class="node" id="node-ActionLine">
-        <rect x="9.600000000000009" y="998.8" width="176" height="89.6"/>
-        <text x="97.60000000000001" y="1043.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="97.60000000000001" y="1043.6" dy="-0.6em">HH:MM * content</tspan><tspan x="97.60000000000001" dy="1.2em">(9-char indent)</tspan></text>
+        <rect x="9.600000000000023" y="998.8" width="176" height="89.6"/>
+        <text x="97.60000000000002" y="1043.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="97.60000000000002" y="1043.6" dy="-0.6em">HH:MM * content</tspan><tspan x="97.60000000000002" dy="1.2em">(9-char indent)</tspan></text>
       </g>
       <g class="node" id="node-CalcIndent">
-        <rect x="0" y="484.8" width="185.6" height="52.8"/>
-        <text x="92.8" y="511.2" class="label" text-anchor="middle" dominant-baseline="central">extra_indent = 2</text>
+        <rect x="0.000000000000014210854715202004" y="484.8" width="185.6" height="52.8"/>
+        <text x="92.80000000000001" y="511.2" class="label" text-anchor="middle" dominant-baseline="central">extra_indent = 2</text>
       </g>
       <g class="node" id="node-CalcWidth">
         <rect x="60.60000000000002" y="587.6" width="300" height="52.8"/>
-        <text x="210.60000000000002" y="614" class="label" text-anchor="middle" dominant-baseline="central">indent_width = TIMESTAMP_GUTTER_WIDTH + extra_indent</text>
+        <text x="210.60000000000002" y="614" class="label" dominant-baseline="central" text-anchor="middle">indent_width = TIMESTAMP_GUTTER_WIDTH + extra_indent</text>
       </g>
       <g class="node" id="node-CheckType">
         <polygon points="210.60000000000002,102.80000000000001 360.6,258.8 210.60000000000002,414.8 60.60000000000002,258.8"/>
@@ -174,19 +174,19 @@ marker path {
       </g>
       <g class="node" id="node-NoIndent">
         <rect x="235.60000000000002" y="484.8" width="185.6" height="52.8"/>
-        <text x="328.40000000000003" y="511.2" class="label" text-anchor="middle" dominant-baseline="central">extra_indent = 0</text>
+        <text x="328.40000000000003" y="511.2" class="label" dominant-baseline="central" text-anchor="middle">extra_indent = 0</text>
       </g>
       <g class="node" id="node-Normal">
         <rect x="235.60000000000002" y="690.4" width="185.6" height="52.8" style="fill:#fff5e1 !important"/>
-        <text x="328.40000000000003" y="716.8" class="label" text-anchor="middle" dominant-baseline="central">indent_width = 7</text>
+        <text x="328.40000000000003" y="716.8" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">indent_width = 7</text>
       </g>
       <g class="node" id="node-NormalLine">
         <rect x="235.60000000000002" y="998.8" width="176" height="89.6"/>
-        <text x="323.6" y="1043.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="323.6" y="1043.6" dy="-0.6em">HH:MM content</tspan><tspan x="323.6" dy="1.2em">(7-char indent)</tspan></text>
+        <text x="323.6" y="1043.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="323.6" y="1043.6" dy="-0.6em">HH:MM content</tspan><tspan x="323.6" dy="1.2em">(7-char indent)</tspan></text>
       </g>
       <g class="node" id="node-Placeholder">
         <rect x="60.60000000000002" y="895.9999999999999" width="300" height="52.8" style="fill:#d4edda !important"/>
-        <text x="210.60000000000002" y="922.3999999999999" class="label" dominant-baseline="central" text-anchor="middle">format!(&apos;{}[1] Diagram...&apos;, &apos; &apos;.repeat(indent_width))</text>
+        <text x="210.60000000000002" y="922.3999999999999" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">format!(&apos;{}[1] Diagram...&apos;, &apos; &apos;.repeat(indent_width))</text>
       </g>
       <g class="node" id="node-RenderMermaid">
         <rect x="69.80000000000001" y="793.1999999999999" width="281.6" height="52.8"/>
@@ -194,7 +194,7 @@ marker path {
       </g>
       <g class="node" id="node-Start">
         <rect x="60.60000000000002" y="0" width="300" height="52.8"/>
-        <text x="210.60000000000002" y="26.4" class="label" dominant-baseline="central" text-anchor="middle">render_message_with_mermaid()</text>
+        <text x="210.60000000000002" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">render_message_with_mermaid()</text>
       </g>
     </g>
   </g>

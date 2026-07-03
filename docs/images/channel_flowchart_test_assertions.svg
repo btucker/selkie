@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -105,49 +105,49 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-Start-RenderAction-0">
-        <path d="M 466.50 52.80 C 466.50 61.13, 466.50 69.47, 466.50 77.80 C 466.50 86.13, 466.50 94.47, 466.50 102.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M466.5,52.8L466.5,56.96666666666667C466.5,61.133333333333326,466.5,69.46666666666665,466.5,77.13333333333333C466.5,84.8,466.5,91.8,466.5,95.3L466.5,98.79999999999998" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-RenderAction-BuildActionIndent-0">
-        <path d="M 466.50 155.60 C 466.50 163.93, 466.50 172.27, 466.50 180.60 C 466.50 188.93, 466.50 197.27, 466.50 205.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M466.5,155.6L466.5,159.76666666666668C466.5,163.9333333333333,466.5,172.26666666666665,466.5,179.9333333333333C466.5,187.6,466.5,194.6,466.5,198.1L466.5,201.59999999999997" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-BuildActionIndent-CollectActionText-0">
-        <path d="M 466.50 295.20 C 466.50 303.53, 466.50 311.87, 466.50 320.20 C 466.50 328.53, 466.50 336.87, 466.50 345.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M466.5,295.2L466.5,299.3666666666667C466.5,303.5333333333333,466.5,311.8666666666666,466.5,319.53333333333336C466.5,327.2,466.5,334.2,466.5,337.7L466.5,341.2" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-CollectActionText-Assert1-0">
-        <path d="M 466.50 398.00 C 466.50 406.33, 466.50 414.67, 466.50 423.00 C 466.50 431.33, 466.50 439.67, 466.50 448.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M466.5,397.99999999999994L466.5,402.1666666666667C466.5,406.3333333333333,466.5,414.6666666666667,466.5,422.3333333333333C466.5,430,466.5,437,466.5,440.5L466.5,443.99999999999994" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Assert1-Assert2-0">
-        <path d="M 415.93 722.04 L 374.00 847.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M415.92716857610475,722.0373158756138L408.93930714675395,737.1310965630115C401.9514457174032,752.2248772504091,387.9757228587016,782.4124386252046,380.98786142935086,802.6728859792689C374,822.9333333333334,374,833.2666666666665,374,838.4333333333334L374,843.5999999999999" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Assert2-RenderNormal-0">
-        <path d="M 322.18 1191.74 L 281.50 1333.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M322.1774106661878,1191.739342790447L315.39784222182317,1209.5494523253726C308.61827377745857,1227.3595618602978,295.05913688872926,1262.979780930149,288.27956844436466,1285.956557131741C281.5,1308.9333333333332,281.5,1319.2666666666667,281.5,1324.4333333333334L281.5,1329.6" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-RenderNormal-BuildNormalIndent-0">
-        <path d="M 281.50 1386.40 C 281.50 1394.73, 281.50 1403.07, 281.50 1411.40 C 281.50 1419.73, 281.50 1428.07, 281.50 1436.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M281.5,1386.4L281.5,1390.5666666666666C281.5,1394.7333333333333,281.5,1403.0666666666666,281.5,1410.7333333333333C281.5,1418.3999999999999,281.5,1425.3999999999999,281.5,1428.8999999999999L281.5,1432.3999999999999" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-BuildNormalIndent-CollectNormalText-0">
-        <path d="M 281.50 1526.00 C 281.50 1537.67, 281.50 1549.33, 281.50 1561.00 C 281.50 1572.67, 281.50 1584.33, 281.50 1596.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M281.5,1525.9999999999998L281.5,1531.833333333333C281.5,1537.6666666666663,281.5,1549.333333333333,281.5,1560.333333333333C281.5,1571.333333333333,281.5,1581.6666666666663,281.5,1586.833333333333L281.5,1591.9999999999998" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-CollectNormalText-Assert3-0">
-        <path d="M 281.50 1648.80 C 281.50 1657.13, 281.50 1665.47, 281.50 1673.80 C 281.50 1682.13, 281.50 1690.47, 281.50 1698.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M281.5,1648.8L281.5,1652.9666666666665C281.5,1657.1333333333332,281.5,1665.4666666666665,281.5,1673.133333333333C281.5,1680.8,281.5,1687.8,281.5,1691.2999999999995L281.5,1694.7999999999997" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Assert3-Assert4-0">
-        <path d="M 230.45 1996.21 L 189.00 2127.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M230.45084794481173,1996.2132796780681L223.5423732873431,2012.2110663983901C216.63389862987447,2028.208853118712,202.81694931493723,2060.204426559356,195.90847465746864,2081.368879946345C189,2102.5333333333333,189,2112.8666666666663,189,2118.0333333333333L189,2123.2" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Assert4-Success-0">
-        <path d="M 162.11 2462.21 C 158.07 2484.87, 154.04 2507.54, 152.02 2524.70 C 150.00 2541.87, 150.00 2553.53, 150.00 2565.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M162.10748013791036,2462.211842302503L160.08956678159197,2473.5432019187524C158.07165342527358,2484.874561535002,154.03582671263678,2507.5372807675008,152.0179133563184,2524.035307050417C150,2540.5333333333333,150,2550.8666666666663,150,2556.0333333333333L150,2561.2" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Assert1-Failure-0">
-        <path d="M 546.89 689.28 C 590.09 730.39, 633.30 771.49, 654.90 1078.31 C 676.50 1385.13, 676.50 1957.67, 661.17 2249.97 C 615.17 2554.34, 584.50 2566.41, 584.50 2566.41" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M546.8865093375452,689.2820217411502L568.4887577812877,709.8350181176252C590.0910062250301,730.3880144941,633.2955031125151,771.49400724705,654.8977515562575,832.547003623525C676.5,893.6,676.5,974.5999999999999,676.5,1055.6000000000001C676.5,1136.6,676.5,1217.6,676.5,1268.3333333333333C676.5,1319.0666666666666,676.5,1339.5333333333333,676.5,1358.3333333333333C676.5,1377.1333333333332,676.5,1394.2666666666664,676.5,1414.4666666666665C676.5,1434.6666666666667,676.5,1457.9333333333332,676.5,1482.8666666666666C676.5,1507.8,676.5,1534.3999999999996,676.5,1557.9333333333332C676.5,1581.4666666666665,676.5,1601.9333333333332,676.5,1620.7333333333333C676.5,1639.533333333333,676.5,1656.6666666666663,676.5,1699.2666666666664C676.5,1741.8666666666666,676.5,1809.9333333333332,676.5,1879.6666666666667C676.5,1949.3999999999996,676.5,2020.8,676.5,2093C676.5,2165.2,676.5,2238.2,676.5,2311.2000000000003C676.5,2384.2,676.5,2457.2,661.7870128682731,2499.490880832616C647.0740257365463,2541.781761665231,617.6480514730926,2553.363523330462,602.9350643413658,2559.154404163078L588.2220772096389,2564.9452849956933" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Assert2-Failure-0">
-        <path d="M 448.08 1160.87 C 480.39 1206.78, 512.69 1252.69, 526.52 1486.75 C 540.34 1720.80, 535.69 2143.00, 531.03 2565.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M448.0814796300925,1160.873681579605L464.2345663584104,1183.8280679830043C480.3876530867283,1206.7824543864033,512.6938265433641,1252.6912271932017,528.8469132716821,1285.8789469299343C545,1319.0666666666666,545,1339.5333333333333,545,1358.3333333333333C545,1377.1333333333332,545,1394.2666666666664,545,1414.4666666666665C545,1434.6666666666667,545,1457.9333333333332,545,1482.8666666666666C545,1507.8,545,1534.3999999999996,545,1557.9333333333332C545,1581.4666666666665,545,1601.9333333333332,545,1620.7333333333333C545,1639.533333333333,545,1656.6666666666663,545,1699.2666666666664C545,1741.8666666666666,545,1809.9333333333332,545,1879.6666666666667C545,1949.3999999999996,545,2020.8,545,2093C545,2165.2,545,2238.2,545,2311.2000000000003C545,2384.2,545,2457.2,542.9194390727896,2498.914140446152C540.8388781455792,2540.628280892304,536.6777562911583,2551.0565617846073,534.5971953639479,2556.270702230759L532.5166344367375,2561.484842676911" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Assert3-Failure-0">
-        <path d="M 345.10 1981.21 C 367.90 2018.21, 390.70 2055.20, 402.10 2146.70 C 413.50 2238.20, 413.50 2384.20, 423.67 2463.03 C 454.16 2553.53, 474.49 2565.20, 474.49 2565.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M345.10487878331577,1981.2133714801985L356.50406565276313,1999.7111429001652C367.90325252221055,2018.2089143201322,390.7016262611053,2055.204457160066,402.1008131305527,2110.2022285800326C413.5,2165.2,413.5,2238.2,413.5,2311.2000000000003C413.5,2384.2,413.5,2457.2,423.08735167501163,2499.201527035941C432.6747033500232,2541.2030540718824,451.84940670004636,2552.2061081437646,461.436758375058,2557.707635179706L471.02411005006957,2563.209162215647" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Assert4-Failure-0">
-        <path d="M 240.38 2432.18 C 254.25 2464.85, 268.13 2497.53, 304.15 2521.35 C 340.17 2545.17, 398.33 2560.15, 456.50 2575.12" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M240.37504503422602,2432.179944758016L247.3125375285217,2448.5166206316803C254.25003002281733,2464.853296505344,268.12501501140866,2497.5266482526717,303.50022554581824,2521.184397030583C338.8754360802278,2544.8421458084945,395.75087216045563,2559.484291616989,424.18859020056954,2566.8053645212362L452.62630824068344,2574.126437425484" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -161,7 +161,7 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-Assert3-Assert4-0">
         <rect x="184.38750633967157" y="2049.2726069409982" width="36.8" height="22" class="edge-label-bg"/>
-        <text x="202.78750633967158" y="2060.2726069409982" class="edge-label" dominant-baseline="central" text-anchor="middle">Pass</text>
+        <text x="202.78750633967158" y="2060.2726069409982" class="edge-label" text-anchor="middle" dominant-baseline="central">Pass</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Assert4-Success-0">
         <rect x="134.5855727954295" y="2502.434860456434" width="36.8" height="22" class="edge-label-bg"/>
@@ -173,7 +173,7 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-Assert2-Failure-0">
         <rect x="526.6" y="1838.0370140116192" width="36.8" height="22" class="edge-label-bg"/>
-        <text x="545" y="1849.0370140116192" class="edge-label" text-anchor="middle" dominant-baseline="central">Fail</text>
+        <text x="545" y="1849.0370140116192" class="edge-label" dominant-baseline="central" text-anchor="middle">Fail</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Assert3-Failure-0">
         <rect x="395.1" y="2270.176867866398" width="36.8" height="22" class="edge-label-bg"/>
@@ -181,17 +181,17 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-Assert4-Failure-0">
         <rect x="299.2853020352229" y="2528.386907945336" width="36.8" height="22" class="edge-label-bg"/>
-        <text x="317.6853020352229" y="2539.386907945336" class="edge-label" dominant-baseline="central" text-anchor="middle">Fail</text>
+        <text x="317.6853020352229" y="2539.386907945336" class="edge-label" text-anchor="middle" dominant-baseline="central">Fail</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-Assert1">
         <polygon points="466.5,447.99999999999994 616.5,612.8 466.5,777.5999999999999 316.5,612.8"/>
-        <text x="466.5" y="612.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="466.5" y="612.8" dy="-0.6em">Assert: all_text contains</tspan><tspan x="466.5" dy="1.2em">&apos;         --- graph ---&apos;</tspan></text>
+        <text x="466.5" y="612.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="466.5" y="612.8" dy="-0.6em">Assert: all_text contains</tspan><tspan x="466.5" dy="1.2em">&apos;         --- graph ---&apos;</tspan></text>
       </g>
       <g class="node" id="node-Assert2">
         <polygon points="374,847.5999999999999 524,1055.6 374,1263.6 224,1055.6"/>
-        <text x="374" y="1055.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="374" y="1055.6" dy="-0.6em">Assert: all_text contains</tspan><tspan x="374" dy="1.2em">&apos;         --- press 1 to open ---&apos;</tspan></text>
+        <text x="374" y="1055.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="374" y="1055.6" dy="-0.6em">Assert: all_text contains</tspan><tspan x="374" dy="1.2em">&apos;         --- press 1 to open ---&apos;</tspan></text>
       </g>
       <g class="node" id="node-Assert3">
         <polygon points="281.5,1698.7999999999997 431.5,1877.9999999999998 281.5,2057.2 131.5,1877.9999999999998"/>
@@ -199,15 +199,15 @@ marker path {
       </g>
       <g class="node" id="node-Assert4">
         <polygon points="189,2127.2 339,2311.2 189,2495.2 39,2311.2" style="fill:#e1f5ff !important"/>
-        <text x="189" y="2311.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="189" y="2311.2" dy="-0.6em">Assert: !normal_text contains</tspan><tspan x="189" dy="1.2em">&apos;         --- graph ---&apos;</tspan></text>
+        <text x="189" y="2311.2" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="189" y="2311.2" dy="-0.6em">Assert: !normal_text contains</tspan><tspan x="189" dy="1.2em">&apos;         --- graph ---&apos;</tspan></text>
       </g>
       <g class="node" id="node-BuildActionIndent">
         <rect x="316.5" y="205.59999999999997" width="300" height="89.6" style="fill:#fff4e1 !important"/>
-        <text x="466.5" y="250.39999999999998" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="466.5" y="250.39999999999998" dy="-0.6em">action_indent = 9 spaces</tspan><tspan x="466.5" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH + 2)</tspan></text>
+        <text x="466.5" y="250.39999999999998" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="466.5" y="250.39999999999998" dy="-0.6em">action_indent = 9 spaces</tspan><tspan x="466.5" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH + 2)</tspan></text>
       </g>
       <g class="node" id="node-BuildNormalIndent">
         <rect x="150.3" y="1436.3999999999999" width="262.4" height="89.6" style="fill:#fff4e1 !important"/>
-        <text x="281.5" y="1481.1999999999998" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="281.5" y="1481.1999999999998" dy="-0.6em">normal_indent = 7 spaces</tspan><tspan x="281.5" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH)</tspan></text>
+        <text x="281.5" y="1481.1999999999998" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="281.5" y="1481.1999999999998" dy="-0.6em">normal_indent = 7 spaces</tspan><tspan x="281.5" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH)</tspan></text>
       </g>
       <g class="node" id="node-CollectActionText">
         <rect x="316.5" y="345.2" width="300" height="52.8"/>
@@ -219,23 +219,23 @@ marker path {
       </g>
       <g class="node" id="node-Failure">
         <rect x="456.5" y="2565.2" width="128" height="52.8" style="fill:#ffebee !important"/>
-        <text x="520.5" y="2591.6" class="label" dominant-baseline="central" text-anchor="middle">Test fails</text>
+        <text x="520.5" y="2591.6" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">Test fails</text>
       </g>
       <g class="node" id="node-RenderAction">
         <rect x="316.5" y="102.79999999999998" width="300" height="52.8"/>
-        <text x="466.5" y="129.2" class="label" dominant-baseline="central" text-anchor="middle">Render action message with Mermaid</text>
+        <text x="466.5" y="129.2" class="label" text-anchor="middle" dominant-baseline="central">Render action message with Mermaid</text>
       </g>
       <g class="node" id="node-RenderNormal">
         <rect x="131.5" y="1333.6" width="300" height="52.8"/>
-        <text x="281.5" y="1360" class="label" dominant-baseline="central" text-anchor="middle">Render normal message with same Mermaid</text>
+        <text x="281.5" y="1360" class="label" text-anchor="middle" dominant-baseline="central">Render normal message with same Mermaid</text>
       </g>
       <g class="node" id="node-Start">
         <rect x="397.7" y="0" width="137.6" height="52.8"/>
-        <text x="466.5" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">Test starts</text>
+        <text x="466.5" y="26.4" class="label" dominant-baseline="central" text-anchor="middle">Test starts</text>
       </g>
       <g class="node" id="node-Success">
         <rect x="0" y="2565.2" width="300" height="52.8" style="fill:#e8f5e9 !important"/>
-        <text x="150" y="2591.6" class="label" dominant-baseline="central" text-anchor="middle">Test passes: indents are different</text>
+        <text x="150" y="2591.6" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">Test passes: indents are different</text>
       </g>
     </g>
   </g>

@@ -90,7 +90,7 @@ marker path {
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -120,47 +120,47 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-START-IH-0">
-        <path d="M 291.40 359.62 C 257.60 371.48, 223.80 383.34, 206.90 395.10 C 190.00 406.87, 190.00 418.53, 190.00 430.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M291.4,359.62308571428576L274.5,365.5525714285715C257.59999999999997,371.48205714285723,223.79999999999998,383.3410285714286,206.9,394.43718095238097C190,405.53333333333336,190,415.86666666666673,190,421.0333333333333L190,426.20000000000005" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-START-RNT-0">
-        <path d="M 438.60 359.62 C 472.40 371.48, 506.20 383.34, 523.10 395.10 C 540.00 406.87, 540.00 418.53, 540.00 430.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M438.6,359.62308571428576L455.5,365.5525714285715C472.40000000000003,371.48205714285723,506.2,383.3410285714286,523.1,394.43718095238097C540,405.53333333333336,540,415.86666666666673,540,421.0333333333333L540,426.20000000000005" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-MERGE-RESTART-0">
-        <path d="M 445.72 77.80 C 418.81 89.47, 391.91 101.13, 378.45 115.87 C 365.00 130.60, 365.00 148.40, 365.00 166.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M445.7166123778502,77.80000000000007L432.2638436482085,83.6333333333334C418.8110749185668,89.46666666666674,391.9055374592834,101.1333333333334,378.4527687296417,115.20000000000006C365,129.26666666666674,365,145.7333333333334,365,153.96666666666673L365,162.20000000000007" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-RESTART-START-0">
-        <path d="M 365.00 219.00 C 365.00 236.80, 365.00 254.60, 365.00 269.33 C 365.00 284.07, 365.00 295.73, 365.00 307.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M365,219.00000000000009L365,227.9000000000001C365,236.80000000000007,365,254.60000000000005,365,268.6666666666667C365,282.73333333333335,365,293.06666666666666,365,298.2333333333334L365,303.40000000000003" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-EVENT-CHECK-0">
-        <path d="M 823.20 519.80 C 823.20 531.47, 823.20 543.13, 785.41 564.21 C 747.61 585.28, 672.03 615.76, 596.44 646.24" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M823.2,519.8L823.1999999999999,525.6333333333333C823.2000000000002,531.4666666666666,823.2000000000002,543.1333333333333,786.0250332642305,563.9574194958506C748.8500665284613,584.7815056583677,674.5001330569223,614.7630113167355,637.3251663211528,629.7537641459193L600.1501995853835,644.7445169751032" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-CHECK-DROP-0">
-        <path d="M 478.98 687.18 C 371.52 719.18, 264.06 751.19, 210.33 773.03 C 156.60 794.87, 156.60 806.53, 156.60 818.20" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M478.9765273311897,687.1765273311898L425.2471061093247,703.1804394426582C371.51768488745984,719.1843515541265,264.05884244372993,751.1921757770633,210.32942122186492,772.3627545551984C156.60000000000002,793.5333333333334,156.60000000000002,803.8666666666668,156.60000000000002,809.0333333333333L156.60000000000002,814.2" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-CHECK-INSERT-0">
-        <path d="M 596.97 691.23 C 675.55 721.89, 754.12 752.54, 793.41 773.70 C 832.70 794.87, 832.70 806.53, 832.70 818.20" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M596.9718358318997,691.2281641681004L636.2598631932498,706.556803473417C675.5478905545998,721.8854427787337,754.1239452772999,752.5427213893669,793.4119726386499,773.03802736135C832.7000000000002,793.5333333333334,832.7000000000002,803.8666666666668,832.6999999999999,809.0333333333333L832.7,814.2" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-INSERT-POST-0">
-        <path d="M 832.70 871.00 C 832.70 879.33, 832.70 887.67, 832.70 896.00 C 832.70 904.33, 832.70 912.67, 832.70 921.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M832.7,871L832.6999999999999,875.1666666666666C832.7000000000002,879.3333333333334,832.7000000000002,887.6666666666666,832.6999999999999,895.3333333333334C832.7000000000002,903,832.7000000000002,910,832.6999999999999,913.5L832.7,917" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-MERGE-WINDOW-0">
-        <path d="M 604.20 72.46 C 666.53 85.90, 728.87 99.35, 760.03 111.91 C 791.20 124.47, 791.20 136.13, 791.20 147.80" class="edge-path" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M604.2,72.45635980323267L635.3666666666667,79.18029983602723C666.5333333333334,85.90423986882179,728.8666666666668,99.35211993441094,760.0333333333333,111.24272663387217C791.2000000000002,123.1333333333334,791.2000000000002,133.46666666666673,791.1999999999999,138.6333333333334L791.2,143.80000000000007" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
       </g>
       <g class="edge" id="edge-L-IH-CHECK-0">
-        <path d="M 190.00 519.80 C 190.00 531.47, 190.00 543.13, 238.38 564.75 C 286.76 586.37, 383.52 617.94, 480.28 649.52" class="edge-path" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none" stroke-width="2"/>
+        <path d="M190,519.8L190,525.6333333333333C190,531.4666666666666,190,543.1333333333333,237.74694394441164,564.5458123765289C285.4938878888233,585.9582914197246,380.9877757776465,617.1165828394493,428.7347197220582,632.6957285493116L476.48166366646984,648.2748742591739" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-dasharray="3,3" stroke-width="2"/>
       </g>
       <g class="edge" id="edge-L-RNT-CHECK-0">
-        <path d="M 540.00 519.80 C 540.00 531.47, 540.00 543.13, 540.00 554.80 C 540.00 566.47, 540.00 578.13, 540.00 589.80" class="edge-path" stroke-dasharray="3,3" fill="none" stroke-width="2" marker-end="url(#arrow_point)"/>
+        <path d="M540,519.8L540,525.6333333333333C540,531.4666666666666,540,543.1333333333333,540,554.1333333333333C540,565.1333333333333,540,575.4666666666666,540,580.6333333333333L540,585.8" class="edge-path" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-START-IH-0">
         <rect x="184.18689687810206" y="372.20528303819736" width="80" height="22" class="edge-label-bg"/>
-        <text x="224.18689687810206" y="383.20528303819736" class="edge-label" dominant-baseline="central" text-anchor="middle">Empty sets</text>
+        <text x="224.18689687810206" y="383.20528303819736" class="edge-label" text-anchor="middle" dominant-baseline="central">Empty sets</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-START-RNT-0">
         <rect x="465.81310312189794" y="372.20528303819736" width="80" height="22" class="edge-label-bg"/>
-        <text x="505.81310312189794" y="383.20528303819736" class="edge-label" text-anchor="middle" dominant-baseline="central">Empty sets</text>
+        <text x="505.81310312189794" y="383.20528303819736" class="edge-label" dominant-baseline="central" text-anchor="middle">Empty sets</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-MERGE-RESTART-0">
         <rect x="322.8620962274771" y="94.92194414994998" width="116" height="22" class="edge-label-bg"/>
@@ -188,7 +188,7 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-IH-CHECK-0">
         <rect x="271.30538280620823" y="585.7294706184828" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="318.5053828062082" y="596.7294706184828" class="edge-label" text-anchor="middle" dominant-baseline="central">Check/insert</text>
+        <text x="318.5053828062082" y="596.7294706184828" class="edge-label" dominant-baseline="central" text-anchor="middle">Check/insert</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-RNT-CHECK-0">
         <rect x="492.8" y="543.8" width="94.39999999999999" height="22" class="edge-label-bg"/>
@@ -202,15 +202,15 @@ marker path {
       </g>
       <g class="node" id="node-DROP">
         <rect x="73.40000000000002" y="818.1999999999999" width="166.4" height="52.8" style="fill:#ffe1e1 !important"/>
-        <text x="156.60000000000002" y="844.5999999999999" class="label" dominant-baseline="central" text-anchor="middle">Drop duplicate</text>
+        <text x="156.60000000000002" y="844.5999999999999" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">Drop duplicate</text>
       </g>
       <g class="node" id="node-EVENT">
         <rect x="740" y="430.20000000000005" width="166.4" height="89.6"/>
-        <text x="823.2" y="475.00000000000006" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="823.2" y="475.00000000000006" dy="-0.6em">Event</tspan><tspan x="823.2" dy="1.2em">insight/review</tspan></text>
+        <text x="823.2" y="475.00000000000006" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="823.2" y="475.00000000000006" dy="-0.6em">Event</tspan><tspan x="823.2" dy="1.2em">insight/review</tspan></text>
       </g>
       <g class="node" id="node-IH">
         <rect x="40" y="430.20000000000005" width="300" height="89.6" style="fill:#e1f5ff !important"/>
-        <text x="190" y="475.00000000000006" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="190" y="475.00000000000006" dy="-0.6em">insight_hashes</tspan><tspan x="190" dy="1.2em">Mutex&amp;lt;HashSet&amp;lt;u64&amp;gt;&amp;gt;</tspan></text>
+        <text x="190" y="475.00000000000006" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central"><tspan x="190" y="475.00000000000006" dy="-0.6em">insight_hashes</tspan><tspan x="190" dy="1.2em">Mutex&amp;lt;HashSet&amp;lt;u64&amp;gt;&amp;gt;</tspan></text>
       </g>
       <g class="node" id="node-INSERT">
         <rect x="768.7" y="818.1999999999999" width="128" height="52.8"/>
@@ -222,23 +222,23 @@ marker path {
       </g>
       <g class="node" id="node-POST">
         <rect x="744.7" y="920.9999999999999" width="176" height="52.8" style="fill:#e1ffe1 !important"/>
-        <text x="832.7" y="947.3999999999999" class="label" dominant-baseline="central" text-anchor="middle">Post to channel</text>
+        <text x="832.7" y="947.3999999999999" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">Post to channel</text>
       </g>
       <g class="node" id="node-RESTART">
         <rect x="281.8" y="166.20000000000007" width="166.4" height="52.8" style="fill:#ffe1e1 !important"/>
-        <text x="365" y="192.60000000000008" class="label" dominant-baseline="central" text-anchor="middle">Daemon Restart</text>
+        <text x="365" y="192.60000000000008" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">Daemon Restart</text>
       </g>
       <g class="node" id="node-RNT">
         <rect x="390" y="430.20000000000005" width="300" height="89.6" style="fill:#e1f5ff !important"/>
-        <text x="540" y="475.00000000000006" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="540" y="475.00000000000006" dy="-0.6em">review_note_tracker</tspan><tspan x="540" dy="1.2em">Mutex&amp;lt;HashSet&amp;lt;(String, u64)&amp;gt;&amp;gt;</tspan></text>
+        <text x="540" y="475.00000000000006" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="540" y="475.00000000000006" dy="-0.6em">review_note_tracker</tspan><tspan x="540" dy="1.2em">Mutex&amp;lt;HashSet&amp;lt;(String, u64)&amp;gt;&amp;gt;</tspan></text>
       </g>
       <g class="node" id="node-START">
         <rect x="291.4" y="307.40000000000003" width="147.2" height="52.8"/>
-        <text x="365" y="333.8" class="label" text-anchor="middle" dominant-baseline="central">Daemon Start</text>
+        <text x="365" y="333.8" class="label" dominant-baseline="central" text-anchor="middle">Daemon Start</text>
       </g>
       <g class="node" id="node-WINDOW">
         <rect x="641.2" y="147.80000000000007" width="300" height="89.6" style="fill:#fff9e1 !important"/>
-        <text x="791.2" y="192.60000000000008" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="791.2" y="192.60000000000008" dy="-0.6em">Window: Between merges</tspan><tspan x="791.2" dy="1.2em">Growth: Bounded by PR velocity</tspan></text>
+        <text x="791.2" y="192.60000000000008" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="791.2" y="192.60000000000008" dy="-0.6em">Window: Between merges</tspan><tspan x="791.2" dy="1.2em">Growth: Bounded by PR velocity</tspan></text>
       </g>
     </g>
   </g>
