@@ -68,34 +68,34 @@ rect.text{fill:none;stroke-width:0;}
         <path d="M206.31251199999997,54L206.31251199999997,58.166666666666664C206.31251199999997,62.333333333333336,206.31251199999997,70.66666666666667,206.31251199999997,78.33333333333333C206.31251199999997,86,206.31251199999997,93,206.31251199999997,96.5L206.31251199999997,100" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CheckType-CalcIndent-0">
-        <path d="M151.5905303553555,327.2780183553555L141.66463529612955,342.5650152961296C131.73874023690365,357.85201223690365,111.88695011845181,388.4260061184518,101.96105505922587,409.2130030592259C92.03515999999996,430,92.03515999999996,441,92.03515999999996,446.5L92.03515999999996,452" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M151.5905303553555,327.2780183553555L141.66463529612957,342.5650152961296C131.73874023690365,357.85201223690365,111.88695011845182,388.4260061184518,101.9610550592259,409.2130030592259C92.03515999999998,430,92.03515999999998,441,92.03515999999998,446.5L92.03515999999998,452" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CheckType-NoIndent-0">
         <path d="M261.03449364464444,327.2780183553555L270.96038870387036,342.5650152961296C280.8862837630963,357.85201223690365,300.73807388154813,388.4260061184518,310.66396894077405,409.2130030592259C320.589864,430,320.589864,441,320.589864,446.5L320.589864,452" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CalcIndent-CalcWidth-0">
-        <path d="M92.03515999999996,510L92.03515999999996,514.1666666666666C92.03515999999996,518.3333333333334,92.03515999999996,526.6666666666666,97.74525131041243,534.6308219169973C103.45534262082492,542.594977167328,114.87552524164987,550.1899543346559,120.58561655206235,553.9874429183199L126.29570786247481,557.7849315019838" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M92.03515999999998,510L92.03515999999998,514.1666666666666C92.03515999999998,518.3333333333334,92.03515999999998,526.6666666666666,97.74525131041246,534.6308219169973C103.45534262082492,542.594977167328,114.87552524164988,550.1899543346559,120.58561655206238,553.9874429183199L126.29570786247484,557.7849315019838" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-NoIndent-CalcWidth-0">
         <path d="M320.589864,510L320.589864,514.1666666666666C320.589864,518.3333333333334,320.589864,526.6666666666666,314.8797726895875,534.6308219169973C309.169681379175,542.594977167328,297.74949875835006,550.1899543346559,292.03940744793755,553.9874429183199L286.3293161375251,557.7849315019838" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CalcWidth-Action-0">
-        <path d="M128.70107705263155,662L122.3602735438596,666.1666666666666C116.01947003508769,670.3333333333334,103.33786301754384,678.6666666666666,96.9970595087719,686.3333333333334C90.65625599999998,694,90.65625599999998,701,90.65625599999998,704.5L90.65625599999998,708" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
-      </g>
-      <g class="edge" id="edge-L-CalcWidth-Normal-0">
         <path d="M283.9239469473684,662L290.26475045614035,666.1666666666666C296.60555396491225,670.3333333333334,309.2871609824561,678.6666666666666,315.62796449122806,686.3333333333334C321.96876799999995,694,321.96876799999995,701,321.96876799999995,704.5L321.96876799999995,708" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
+      <g class="edge" id="edge-L-CalcWidth-Normal-0">
+        <path d="M128.70107705263158,662L122.36027354385965,666.1666666666666C116.0194700350877,670.3333333333334,103.33786301754385,678.6666666666666,96.99705950877193,686.3333333333334C90.656256,694,90.656256,701,90.656256,704.5L90.656256,708" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+      </g>
       <g class="edge" id="edge-L-Action-RenderMermaid-0">
-        <path d="M90.65625599999998,766L90.65625599999998,770.1666666666666C90.65625599999998,774.3333333333334,90.65625599999998,782.6666666666666,97.60264674835463,790.6772153961825C104.54903749670927,798.6877641256984,118.44181899341856,806.375528251397,125.38820974177321,810.219410314246L132.33460049012785,814.0632923770953" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M321.96876799999995,766L321.96876799999995,770.1666666666666C321.96876799999995,774.3333333333334,321.96876799999995,782.6666666666666,315.0223772516453,790.6772153961825C308.07598650329066,798.6877641256984,294.1832050065814,806.375528251397,287.23681425822673,810.219410314246L280.2904235098721,814.0632923770953" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Normal-RenderMermaid-0">
-        <path d="M321.96876799999995,766L321.96876799999995,770.1666666666666C321.96876799999995,774.3333333333334,321.96876799999995,782.6666666666666,315.0223772516453,790.6772153961825C308.07598650329066,798.6877641256984,294.1832050065814,806.375528251397,287.23681425822673,810.219410314246L280.2904235098721,814.0632923770953" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M90.656256,766L90.656256,770.1666666666666C90.656256,774.3333333333334,90.656256,782.6666666666666,97.60264674835464,790.6772153961825C104.54903749670927,798.6877641256984,118.44181899341856,806.375528251397,125.38820974177321,810.219410314246L132.33460049012785,814.0632923770953" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-RenderMermaid-Placeholder-0">
         <path d="M206.31251199999997,894L206.31251199999997,898.1666666666666C206.31251199999997,902.3333333333334,206.31251199999997,910.6666666666666,206.31251199999997,918.3333333333334C206.31251199999997,926,206.31251199999997,933,206.31251199999997,936.5L206.31251199999997,940" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Placeholder-ActionLine-0">
-        <path d="M137.73044162499997,1022L130.40329735416663,1026.1666666666667C123.0761530833333,1030.3333333333333,108.42186454166664,1038.6666666666667,101.09472027083329,1046.3333333333333C93.76757599999996,1054,93.76757599999996,1061,93.76757599999996,1064.5L93.76757599999996,1068" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M137.73044162499997,1022L130.40329735416663,1026.1666666666667C123.0761530833333,1030.3333333333333,108.42186454166665,1038.6666666666667,101.0947202708333,1046.3333333333333C93.76757599999998,1054,93.76757599999998,1061,93.76757599999998,1064.5L93.76757599999998,1068" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Placeholder-NormalLine-0">
         <path d="M274.89458237499997,1022L282.2217266458333,1026.1666666666667C289.54887091666666,1030.3333333333333,304.20315945833335,1038.6666666666667,311.53030372916663,1046.3333333333333C318.857448,1054,318.857448,1061,318.857448,1064.5L318.857448,1068" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
@@ -118,27 +118,27 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-CheckType">
         <polygon points="206.31251199999997,104 345.31251199999997,243 206.31251199999997,382 67.31251199999997,243"/>
-        <text x="206.31251199999997" y="243" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="206.31251199999997" y="243" dy="-0.6em">msg.message_type ==</tspan><tspan x="206.31251199999997" dy="1.2em">Action?</tspan></text>
+        <text x="206.31251199999997" y="243" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="206.31251199999997" y="243" dy="-0.6em">msg.message_type ==</tspan><tspan x="206.31251199999997" dy="1.2em">Action?</tspan></text>
       </g>
       <g class="node default" id="node-CalcIndent">
-        <rect x="2.7578079999999687" y="456" width="178.554704" height="54"/>
-        <text x="92.03515999999996" y="483" class="label" dominant-baseline="central" text-anchor="middle">extra_indent = 2</text>
+        <rect x="2.757807999999983" y="456" width="178.554704" height="54"/>
+        <text x="92.03515999999998" y="483" class="label" dominant-baseline="central" text-anchor="middle">extra_indent = 2</text>
       </g>
       <g class="node default" id="node-NoIndent">
         <rect x="231.31251199999997" y="456" width="178.554704" height="54"/>
-        <text x="320.589864" y="483" class="label" text-anchor="middle" dominant-baseline="central">extra_indent = 0</text>
+        <text x="320.589864" y="483" class="label" dominant-baseline="central" text-anchor="middle">extra_indent = 0</text>
       </g>
       <g class="node default" id="node-CalcWidth">
         <rect x="73.45313599999997" y="560" width="265.718752" height="102"/>
         <text x="206.31251199999997" y="611" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="206.31251199999997" y="611" dy="-1.2em">indent_width =</tspan><tspan x="206.31251199999997" dy="1.2em">TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="206.31251199999997" dy="1.2em">+ extra_indent</tspan></text>
       </g>
       <g class="node default" id="node-Normal">
-        <rect x="231.31251199999997" y="712" width="181.312512" height="54" style="fill:#fff5e1 !important"/>
-        <text x="321.96876799999995" y="739" class="label" text-anchor="middle" dominant-baseline="central">indent_width = 7</text>
+        <rect x="0" y="712" width="181.312512" height="54" style="fill:#fff5e1 !important"/>
+        <text x="90.656256" y="739" class="label" dominant-baseline="central" text-anchor="middle">indent_width = 7</text>
       </g>
       <g class="node default" id="node-Action">
-        <rect x="-0.000000000000014210854715202004" y="712" width="181.312512" height="54" style="fill:#e1f5ff !important"/>
-        <text x="90.65625599999998" y="739" class="label" text-anchor="middle" dominant-baseline="central">indent_width = 9</text>
+        <rect x="231.31251199999997" y="712" width="181.312512" height="54" style="fill:#e1f5ff !important"/>
+        <text x="321.96876799999995" y="739" class="label" text-anchor="middle" dominant-baseline="central">indent_width = 9</text>
       </g>
       <g class="node default" id="node-RenderMermaid">
         <rect x="76.31251199999997" y="816" width="260" height="78"/>
@@ -149,12 +149,12 @@ rect.text{fill:none;stroke-width:0;}
         <text x="206.31251199999997" y="983" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="206.31251199999997" y="983" dy="-0.6em">format!(&apos;{}[1] Diagram...&apos;, &apos;</tspan><tspan x="206.31251199999997" dy="1.2em">&apos;.repeat(indent_width))</tspan></text>
       </g>
       <g class="node default" id="node-ActionLine">
-        <rect x="3.5488079999999655" y="1072" width="180.437536" height="78"/>
-        <text x="93.76757599999996" y="1111" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="93.76757599999996" y="1111" dy="-0.6em">HH:MM * content</tspan><tspan x="93.76757599999996" dy="1.2em">(9-char indent)</tspan></text>
+        <rect x="3.5488079999999798" y="1072" width="180.437536" height="78"/>
+        <text x="93.76757599999998" y="1111" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="93.76757599999998" y="1111" dy="-0.6em">HH:MM * content</tspan><tspan x="93.76757599999998" dy="1.2em">(9-char indent)</tspan></text>
       </g>
       <g class="node default" id="node-NormalLine">
         <rect x="233.98634399999997" y="1072" width="169.742208" height="78"/>
-        <text x="318.857448" y="1111" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="318.857448" y="1111" dy="-0.6em">HH:MM content</tspan><tspan x="318.857448" dy="1.2em">(7-char indent)</tspan></text>
+        <text x="318.857448" y="1111" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="318.857448" y="1111" dy="-0.6em">HH:MM content</tspan><tspan x="318.857448" dy="1.2em">(7-char indent)</tspan></text>
       </g>
     </g>
   </g>

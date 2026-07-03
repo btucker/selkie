@@ -1,9 +1,10 @@
-//! Sorting nodes by barycenter
+//! Sorting entries by barycenter
 //!
-//! Sorts nodes within a layer by their barycenter values, with special
-//! handling for nodes without barycenters.
+//! Port of dagre's lib/order/sort.js. Sorts resolved entries (each possibly
+//! holding several nodes) by their barycenter values; entries without a
+//! barycenter are re-inserted at their original index.
 
-use super::barycenter::BarycenterEntry;
+use super::resolve_conflicts::ResolvedEntry;
 
 /// Result of sorting operation
 #[derive(Debug, Clone)]
@@ -15,12 +16,12 @@ pub struct SortResult {
 
 /// Sort entries by barycenter value
 ///
-/// Entries with a barycenter are sorted by that value.
-/// Entries without a barycenter maintain their relative order.
-pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
-    // Partition into sortable (has barycenter) and unsortable (no barycenter)
-    let mut sortable: Vec<BarycenterEntry> = Vec::new();
-    let mut unsortable: Vec<BarycenterEntry> = Vec::new();
+/// Entries with a barycenter are sorted by that value (ties broken by the
+/// original index, reversed when `bias_right`). Entries without a barycenter
+/// are consumed back into the result at their original index.
+pub fn sort(entries: Vec<ResolvedEntry>, bias_right: bool) -> SortResult {
+    let mut sortable: Vec<ResolvedEntry> = Vec::new();
+    let mut unsortable: Vec<ResolvedEntry> = Vec::new();
 
     for entry in entries {
         if entry.barycenter.is_some() {
@@ -30,11 +31,10 @@ pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
         }
     }
 
-    // Sort sortable entries by barycenter, using original index (entry.i) for tie-breaking
+    // compareWithBias: barycenter ascending, ties by original index
     sortable.sort_by(|a, b| {
         let bc_a = a.barycenter.unwrap();
         let bc_b = b.barycenter.unwrap();
-
         match bc_a.partial_cmp(&bc_b) {
             Some(std::cmp::Ordering::Equal) | None => {
                 if bias_right {
@@ -47,21 +47,19 @@ pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
         }
     });
 
-    // Sort unsortable by original index (descending for consumption)
+    // Unsortable entries are consumed from the highest index down
     unsortable.sort_by_key(|entry| std::cmp::Reverse(entry.i));
 
-    // Merge the two lists
-    let mut vs = Vec::new();
+    let mut vs: Vec<String> = Vec::new();
     let mut sum = 0.0;
     let mut weight = 0.0;
-    let mut vs_index = 0;
+    let mut vs_index = 0usize;
 
-    // Consume unsortable entries that come before any sortable
     consume_unsortable(&mut vs, &mut unsortable, &mut vs_index);
 
     for entry in sortable {
-        vs_index += 1;
-        vs.push(entry.v.clone());
+        vs_index += entry.vs.len();
+        vs.extend(entry.vs.iter().cloned());
         if let Some(bc) = entry.barycenter {
             sum += bc * entry.weight;
             weight += entry.weight;
@@ -82,13 +80,13 @@ pub fn sort(entries: Vec<BarycenterEntry>, bias_right: bool) -> SortResult {
 
 fn consume_unsortable(
     vs: &mut Vec<String>,
-    unsortable: &mut Vec<BarycenterEntry>,
+    unsortable: &mut Vec<ResolvedEntry>,
     index: &mut usize,
 ) {
     while let Some(entry) = unsortable.last() {
         if entry.i <= *index {
             let entry = unsortable.pop().unwrap();
-            vs.push(entry.v);
+            vs.extend(entry.vs);
             *index += 1;
         } else {
             break;
@@ -100,77 +98,51 @@ fn consume_unsortable(
 mod tests {
     use super::*;
 
+    fn entry(vs: &[&str], barycenter: Option<f64>, weight: f64, i: usize) -> ResolvedEntry {
+        ResolvedEntry {
+            vs: vs.iter().map(|s| s.to_string()).collect(),
+            barycenter,
+            weight,
+            i,
+        }
+    }
+
     #[test]
-    fn test_sort_by_barycenter() {
+    fn test_sorts_flat_entries_by_barycenter() {
+        // dagre sort-test.js "sorts flat subgraphs by barycenter"
         let entries = vec![
-            BarycenterEntry {
-                v: "a".to_string(),
-                barycenter: Some(2.0),
-                weight: 1.0,
-                i: 0,
-            },
-            BarycenterEntry {
-                v: "b".to_string(),
-                barycenter: Some(1.0),
-                weight: 1.0,
-                i: 1,
-            },
-            BarycenterEntry {
-                v: "c".to_string(),
-                barycenter: Some(3.0),
-                weight: 1.0,
-                i: 2,
-            },
+            entry(&["a"], Some(2.0), 3.0, 0),
+            entry(&["b"], Some(1.0), 2.0, 1),
+            entry(&["c"], Some(4.0), 1.0, 2),
         ];
 
         let result = sort(entries, false);
 
         assert_eq!(result.vs, vec!["b", "a", "c"]);
+        // (2*3 + 1*2 + 4*1) / 6 = 12/6 = 2
+        assert_eq!(result.barycenter, Some(2.0));
+        assert_eq!(result.weight, 6.0);
     }
 
     #[test]
-    fn test_sort_preserves_order_for_equal_barycenter() {
+    fn test_sorts_nested_entries_by_barycenter() {
+        // dagre sort-test.js "can sort super-nodes"
         let entries = vec![
-            BarycenterEntry {
-                v: "a".to_string(),
-                barycenter: Some(1.0),
-                weight: 1.0,
-                i: 0,
-            },
-            BarycenterEntry {
-                v: "b".to_string(),
-                barycenter: Some(1.0),
-                weight: 1.0,
-                i: 1,
-            },
-            BarycenterEntry {
-                v: "c".to_string(),
-                barycenter: Some(1.0),
-                weight: 1.0,
-                i: 2,
-            },
+            entry(&["a", "d"], Some(2.0), 3.0, 0),
+            entry(&["b"], Some(1.0), 2.0, 1),
+            entry(&["c"], Some(4.0), 1.0, 2),
         ];
 
         let result = sort(entries, false);
 
-        assert_eq!(result.vs, vec!["a", "b", "c"]);
+        assert_eq!(result.vs, vec!["b", "a", "d", "c"]);
     }
 
     #[test]
-    fn test_sort_bias_right() {
+    fn test_bias_right() {
         let entries = vec![
-            BarycenterEntry {
-                v: "a".to_string(),
-                barycenter: Some(1.0),
-                weight: 1.0,
-                i: 0,
-            },
-            BarycenterEntry {
-                v: "b".to_string(),
-                barycenter: Some(1.0),
-                weight: 1.0,
-                i: 1,
-            },
+            entry(&["a"], Some(1.0), 1.0, 0),
+            entry(&["b"], Some(1.0), 1.0, 1),
         ];
 
         let result = sort(entries, true);
@@ -179,34 +151,29 @@ mod tests {
     }
 
     #[test]
-    fn test_sort_handles_no_barycenter() {
+    fn test_biases_left_without_bias_right() {
         let entries = vec![
-            BarycenterEntry {
-                v: "a".to_string(),
-                barycenter: Some(2.0),
-                weight: 1.0,
-                i: 0,
-            },
-            BarycenterEntry {
-                v: "b".to_string(),
-                barycenter: None,
-                weight: 0.0,
-                i: 1,
-            },
-            BarycenterEntry {
-                v: "c".to_string(),
-                barycenter: Some(1.0),
-                weight: 1.0,
-                i: 2,
-            },
+            entry(&["a"], Some(1.0), 1.0, 0),
+            entry(&["b"], Some(1.0), 1.0, 1),
         ];
 
         let result = sort(entries, false);
 
-        // b has no barycenter, should maintain position relative to its original index
-        assert_eq!(result.vs.len(), 3);
-        assert!(result.vs.contains(&"a".to_string()));
-        assert!(result.vs.contains(&"b".to_string()));
-        assert!(result.vs.contains(&"c".to_string()));
+        assert_eq!(result.vs, vec!["a", "b"]);
+    }
+
+    #[test]
+    fn test_handles_no_barycenter() {
+        // dagre sort-test.js "keeps entries w/o barycenters in their position"
+        let entries = vec![
+            entry(&["a"], Some(2.0), 1.0, 0),
+            entry(&["b"], None, 0.0, 1),
+            entry(&["c"], Some(1.0), 1.0, 2),
+        ];
+
+        let result = sort(entries, false);
+
+        // c (bc=1) first, then b consumed at index 1, then a
+        assert_eq!(result.vs, vec!["c", "b", "a"]);
     }
 }

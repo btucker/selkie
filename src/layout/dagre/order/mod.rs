@@ -1,12 +1,17 @@
 //! Node ordering (crossing minimization) for dagre layout
 //!
-//! Applies heuristics to minimize edge crossings in the graph and sets the best
-//! order solution as an order attribute on each node.
+//! Port of dagre's lib/order/index.js. Applies heuristics to minimize edge
+//! crossings in the graph and sets the best order solution as an order
+//! attribute on each node.
 //!
-//! Uses the barycenter heuristic with alternating up/down sweeps, with
-//! hierarchical subgraph sorting to keep sibling subgraphs together.
+//! Each sweep builds a layer graph per rank (containing the movable layer
+//! with its full subgraph hierarchy under a synthetic root, plus the fixed
+//! neighbor layer and the edges between them) and sorts it recursively with
+//! `sort_subgraph`, threading a single constraint graph across the layers of
+//! the sweep to keep sibling subgraphs in a consistent relative order.
 
 mod barycenter;
+mod build_layer_graph;
 mod cross_count;
 mod init_order;
 mod resolve_conflicts;
@@ -15,15 +20,13 @@ mod sort_subgraph;
 
 use crate::layout::dagre::graph::DagreGraph;
 
-pub use barycenter::{barycenter, barycenter_down, BarycenterEntry};
+pub use barycenter::{barycenter, BarycenterEntry};
+pub use build_layer_graph::{build_layer_graph, Relationship};
 pub use cross_count::cross_count;
 pub use init_order::{assign_order, init_order};
-pub use resolve_conflicts::ConstraintGraph;
+pub use resolve_conflicts::{resolve_conflicts, ConstraintGraph, ResolvedEntry};
 pub use sort::{sort, SortResult};
 pub use sort_subgraph::{add_subgraph_constraints, sort_subgraph};
-
-/// Entry for parent group during layer sorting: (parent, sorted_nodes, barycenter, weight)
-type ParentGroupEntry = (Option<String>, Vec<String>, Option<f64>, f64);
 
 /// Assign order to nodes to minimize edge crossings
 pub fn order(g: &mut DagreGraph) {
@@ -31,7 +34,7 @@ pub fn order(g: &mut DagreGraph) {
     let layering = init_order(g);
     assign_order(g, &layering);
 
-    // Find max rank for iteration
+    // Find max rank for iteration (compound nodes have no rank)
     let max_rank = g
         .nodes()
         .iter()
@@ -43,322 +46,82 @@ pub fn order(g: &mut DagreGraph) {
         return; // Only one layer, no crossings possible
     }
 
+    // dagre: downLayerGraphs use ranks 1..=maxRank with in-edges,
+    // upLayerGraphs use ranks maxRank-1..=0 with out-edges.
+    let down_ranks: Vec<i32> = (1..=max_rank as i32).collect();
+    let up_ranks: Vec<i32> = (0..max_rank as i32).rev().collect();
+
     // Track best solution
     let mut best_cc = i32::MAX;
     let mut best_layering = layering.clone();
 
-    // Iterate: alternate between down sweep and up sweep
-    let mut last_best = 0;
-    for i in 0..24 {
-        // Max 24 iterations like dagre.js
-        if last_best >= 4 {
-            break; // Stop if no improvement in 4 iterations
-        }
-
+    // Iterate: alternate between up and down sweeps.
+    // dagre: `for (let i = 0, lastBest = 0; lastBest < 4; ++i, ++lastBest)` —
+    // note lastBest is ALSO incremented right after an improving iteration
+    // (the body sets it to 0, the loop update bumps it to 1).
+    let mut i = 0usize;
+    let mut last_best = 0usize;
+    while last_best < 4 {
         let bias_right = (i % 4) >= 2;
 
         // dagre: `sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, ...)`
-        // Even iterations sweep UP (successors), odd iterations sweep DOWN
-        // (predecessors).
         if i % 2 == 1 {
-            // Down sweep (top to bottom) - uses predecessors
-            sweep_down_hierarchical(g, max_rank, bias_right);
+            sweep_layer_graphs(g, &down_ranks, Relationship::InEdges, bias_right);
         } else {
-            // Up sweep (bottom to top) - uses successors
-            sweep_up_hierarchical(g, max_rank, bias_right);
+            sweep_layer_graphs(g, &up_ranks, Relationship::OutEdges, bias_right);
         }
 
         // Build layering from current order
         let current_layering = build_layer_matrix(g, max_rank);
         let cc = cross_count(g, &current_layering);
 
+        // dagre-d3-es (the dagre vendored by mermaid) only keeps a layering
+        // that STRICTLY improves the crossing count; ties keep the earlier
+        // layering. (Newer standalone dagre keeps the latest layering on
+        // ties, but mermaid parity requires the dagre-d3-es behavior.)
         if cc < best_cc {
             best_cc = cc;
             best_layering = current_layering;
             last_best = 0;
-        } else if cc == best_cc {
-            // dagre keeps the LATEST layering on ties (cc === bestCC =>
-            // best = structuredClone(layering)) without resetting lastBest
-            best_layering = current_layering;
-            last_best += 1;
-        } else {
-            last_best += 1;
         }
+
+        i += 1;
+        last_best += 1;
     }
 
     // Apply best ordering
     assign_order(g, &best_layering);
 }
 
-/// Down sweep with hierarchical subgraph sorting
+/// One sweep across the given ranks (dagre's sweepLayerGraphs)
 ///
-/// For each layer (top to bottom), sort nodes hierarchically, keeping sibling
-/// subgraphs together and maintaining ordering constraints between them.
-fn sweep_down_hierarchical(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
-    let mut cg = ConstraintGraph::new();
-
-    for rank in 1..=max_rank {
-        // Get nodes at this rank (the "movable" layer)
-        // Sort by current order to preserve init_order's edge-based ordering for tie-breaking
-        let mut layer_nodes: Vec<String> = g
-            .nodes()
-            .iter()
-            .filter(|v| {
-                g.node(v)
-                    .map(|n| n.rank == Some(rank as i32))
-                    .unwrap_or(false)
-            })
-            .map(|s| s.to_string())
-            .collect();
-        // Sort by current order to preserve edge definition order for tie-breaking
-        layer_nodes.sort_by_key(|v| g.node(v).and_then(|n| n.order).unwrap_or(i32::MAX as usize));
-
-        if layer_nodes.is_empty() {
-            continue;
-        }
-
-        // Build a temporary view for sorting this rank
-        // We need to sort nodes hierarchically based on their subgraph structure
-        let sorted = sort_layer_hierarchical(g, &layer_nodes, &cg, bias_right, true);
-
-        // Assign new order
-        for (i, v) in sorted.iter().enumerate() {
-            if let Some(node) = g.node_mut(v) {
-                node.order = Some(i);
-            }
-        }
-
-        // Add subgraph constraints based on new ordering
-        add_subgraph_constraints(g, &mut cg, &sorted);
-    }
-}
-
-/// Up sweep with hierarchical subgraph sorting
+/// A single constraint graph is threaded across all layer graphs of the
+/// sweep; each sorted layer extends it with constraints between sibling
+/// subgraphs so later layers keep them in a consistent relative order.
 ///
-/// For each layer (bottom to top), sort nodes hierarchically, keeping sibling
-/// subgraphs together and maintaining ordering constraints between them.
-fn sweep_up_hierarchical(g: &mut DagreGraph, max_rank: usize, bias_right: bool) {
-    let mut cg = ConstraintGraph::new();
-
-    for rank in (0..max_rank).rev() {
-        // Get nodes at this rank (the "movable" layer)
-        // Sort by current order to preserve init_order's edge-based ordering for tie-breaking
-        let mut layer_nodes: Vec<String> = g
-            .nodes()
-            .iter()
-            .filter(|v| {
-                g.node(v)
-                    .map(|n| n.rank == Some(rank as i32))
-                    .unwrap_or(false)
-            })
-            .map(|s| s.to_string())
-            .collect();
-        // Sort by current order to preserve edge definition order for tie-breaking
-        layer_nodes.sort_by_key(|v| g.node(v).and_then(|n| n.order).unwrap_or(i32::MAX as usize));
-
-        if layer_nodes.is_empty() {
-            continue;
-        }
-
-        // Sort hierarchically using successors (outgoing edges)
-        let sorted = sort_layer_hierarchical(g, &layer_nodes, &cg, bias_right, false);
-
-        // Assign new order
-        for (i, v) in sorted.iter().enumerate() {
-            if let Some(node) = g.node_mut(v) {
-                node.order = Some(i);
-            }
-        }
-
-        // Add subgraph constraints based on new ordering
-        add_subgraph_constraints(g, &mut cg, &sorted);
-    }
-}
-
-/// Sort a layer hierarchically, respecting subgraph structure
-///
-/// This function groups nodes by their immediate parent, sorts each group
-/// recursively, and then combines them while respecting constraint graph.
-fn sort_layer_hierarchical(
-    g: &DagreGraph,
-    layer_nodes: &[String],
-    _cg: &ConstraintGraph,
+/// dagre builds all layer graphs up front and mutates shared node labels; we
+/// build each rank's layer graph on demand so it reflects the orders
+/// assigned to the previous layer.
+fn sweep_layer_graphs(
+    g: &mut DagreGraph,
+    ranks: &[i32],
+    relationship: Relationship,
     bias_right: bool,
-    use_predecessors: bool,
-) -> Vec<String> {
-    use std::collections::HashMap;
+) {
+    let mut cg = ConstraintGraph::new();
 
-    // Group nodes by their parent subgraph, iterating parent groups in order
-    // of first appearance in the layer (deterministic, insertion-order based)
-    let mut by_parent: HashMap<Option<String>, Vec<String>> = HashMap::new();
-    let mut parent_order: Vec<Option<String>> = Vec::new();
-    for v in layer_nodes {
-        let parent = g.parent(v).map(|s| s.to_string());
-        let group = by_parent.entry(parent.clone()).or_default();
-        if group.is_empty() {
-            parent_order.push(parent);
-        }
-        group.push(v.clone());
-    }
+    for &rank in ranks {
+        let (lg, root) = build_layer_graph(g, rank, relationship);
+        let sorted = sort_subgraph(&lg, &root, &cg, bias_right);
 
-    // For each parent, get barycenters and sort
-    let mut parent_entries: Vec<ParentGroupEntry> = Vec::new();
-
-    for parent in parent_order {
-        let mut nodes = by_parent.remove(&parent).unwrap_or_default();
-        // Sort nodes within this parent by current order for stability
-        nodes.sort_by_key(|v| g.node(v).and_then(|n| n.order).unwrap_or(usize::MAX));
-
-        // Debug: trace sorted nodes
-        #[cfg(test)]
-        {
-            if nodes.iter().any(|v| v == "ZZZ" || v == "AAA") {
-                eprintln!(
-                    "    After sort by order: {:?}, orders: {:?}",
-                    nodes,
-                    nodes
-                        .iter()
-                        .map(|v| g.node(v).and_then(|n| n.order))
-                        .collect::<Vec<_>>()
-                );
+        for (i, v) in sorted.vs.iter().enumerate() {
+            if let Some(node) = g.node_mut(v) {
+                node.order = Some(i);
             }
         }
 
-        // Calculate barycenters
-        let entries: Vec<BarycenterEntry> = if use_predecessors {
-            barycenter(g, &nodes)
-        } else {
-            barycenter_down(g, &nodes)
-        };
-
-        // Debug: trace barycenters
-        #[cfg(test)]
-        {
-            if nodes.iter().any(|v| v == "ZZZ" || v == "AAA") {
-                eprintln!(
-                    "    Barycenters: {:?}",
-                    entries
-                        .iter()
-                        .map(|e| (&e.v, e.barycenter, e.i))
-                        .collect::<Vec<_>>()
-                );
-            }
-        }
-
-        // Sort by barycenter
-        let sorted = sort(entries, bias_right);
-
-        // Debug: trace sorted result
-        #[cfg(test)]
-        {
-            if nodes.iter().any(|v| v == "ZZZ" || v == "AAA") {
-                eprintln!(
-                    "    After sort (bias_right={}): {:?}",
-                    bias_right, sorted.vs
-                );
-            }
-        }
-
-        // Ensure border nodes at edges for this parent
-        let reordered = if parent.is_some() {
-            ensure_border_nodes_at_edges_for_parent(g, sorted.vs, &parent)
-        } else {
-            sorted.vs
-        };
-
-        // Calculate aggregate barycenter for this parent group
-        let (sum, weight) = reordered.iter().fold((0.0, 0.0), |(sum, weight), v| {
-            if let Some(node) = g.node(v) {
-                if let Some(order) = node.order {
-                    return (sum + order as f64, weight + 1.0);
-                }
-            }
-            (sum, weight)
-        });
-
-        let avg_bc = if weight > 0.0 {
-            Some(sum / weight)
-        } else {
-            None
-        };
-
-        parent_entries.push((parent, reordered, avg_bc, weight));
+        add_subgraph_constraints(&lg, &mut cg, &sorted.vs);
     }
-
-    // Sort parent groups by their aggregate barycenter
-    parent_entries.sort_by(|a, b| match (a.2, b.2) {
-        (Some(bc_a), Some(bc_b)) => bc_a.partial_cmp(&bc_b).unwrap_or(std::cmp::Ordering::Equal),
-        (Some(_), None) => std::cmp::Ordering::Less,
-        (None, Some(_)) => std::cmp::Ordering::Greater,
-        (None, None) => std::cmp::Ordering::Equal,
-    });
-
-    // Flatten into final order
-    let mut result: Vec<String> = Vec::new();
-    for (_, nodes, _, _) in parent_entries {
-        result.extend(nodes);
-    }
-
-    result
-}
-
-/// Ensure border nodes are at edges for a specific parent subgraph
-fn ensure_border_nodes_at_edges_for_parent(
-    g: &DagreGraph,
-    vs: Vec<String>,
-    parent: &Option<String>,
-) -> Vec<String> {
-    let parent = match parent {
-        Some(p) => p,
-        None => return vs,
-    };
-
-    let (border_left, border_right) = if let Some(parent_node) = g.node(parent) {
-        // Get the rank of the first node to determine which border nodes to use
-        let first_rank = vs.first().and_then(|v| g.node(v)).and_then(|n| n.rank);
-
-        if let Some(rank) = first_rank {
-            let min_rank = parent_node.min_rank.unwrap_or(0);
-            if rank >= min_rank {
-                let rank_idx = (rank - min_rank) as usize;
-                let bl = parent_node.border_left.get(rank_idx).cloned().flatten();
-                let br = parent_node.border_right.get(rank_idx).cloned().flatten();
-                (bl, br)
-            } else {
-                (None, None)
-            }
-        } else {
-            (None, None)
-        }
-    } else {
-        (None, None)
-    };
-
-    // Remove border nodes from their current positions
-    let non_border: Vec<String> = vs
-        .iter()
-        .filter(|v| {
-            Some(v.as_str()) != border_left.as_deref()
-                && Some(v.as_str()) != border_right.as_deref()
-        })
-        .cloned()
-        .collect();
-
-    // Reconstruct: [borderLeft, ...non_border, borderRight]
-    let mut reordered = Vec::new();
-    if let Some(ref bl) = border_left {
-        if vs.contains(bl) {
-            reordered.push(bl.clone());
-        }
-    }
-    reordered.extend(non_border);
-    if let Some(ref br) = border_right {
-        if vs.contains(br) {
-            reordered.push(br.clone());
-        }
-    }
-
-    reordered
 }
 
 /// Build layer matrix from current order assignments
@@ -435,6 +198,28 @@ mod tests {
         let c_order = g.node("c").unwrap().order;
         assert!(b_order.is_some());
         assert!(c_order.is_some());
+        assert_ne!(b_order, c_order);
+    }
+
+    #[test]
+    fn test_order_tree_has_no_crossings() {
+        // dagre order-test.js "does not add crossings to a tree structure"
+        let mut g = DagreGraph::new();
+        g.set_path(&["a", "b", "c"]);
+        g.set_edge("b", "d", EdgeLabel::default());
+        g.set_path(&["a", "e", "f"]);
+        rank::assign_ranks(&mut g, Ranker::LongestPath);
+
+        order(&mut g);
+
+        let max_rank = g
+            .nodes()
+            .iter()
+            .filter_map(|v| g.node(v).and_then(|n| n.rank))
+            .max()
+            .unwrap() as usize;
+        let layering = build_layer_matrix(&g, max_rank);
+        assert_eq!(cross_count(&g, &layering), 0);
     }
 
     #[test]
@@ -483,13 +268,15 @@ mod tests {
     }
 
     #[test]
-    fn test_order_decision_branches_preserve_edge_order() {
+    fn test_order_decision_branches_match_reference() {
         // Simulates the flowchart:
         //   B -->|Yes| C[Action 1]
         //   B -->|No| D[Action 2]
         //
-        // In mermaid.js, the first edge's target (C) appears ABOVE
-        // the second edge's target (D). So C should have order 0, D order 1.
+        // dagre-d3-es (mermaid's dagre) keeps the FIRST layering with the
+        // best crossing count, so the initial [C, D] order survives the
+        // later bias-right sweeps: C order 0, D order 1 (first edge target
+        // on the left, as mermaid renders it).
         let mut g = DagreGraph::new();
 
         // Add edges in specific order - C first, then D
@@ -499,30 +286,28 @@ mod tests {
         rank::assign_ranks(&mut g, Ranker::LongestPath);
         order(&mut g);
 
-        // C and D are on the same rank (both successors of B)
-        let c_order = g.node("C").unwrap().order;
-        let d_order = g.node("D").unwrap().order;
-
-        assert!(c_order.is_some() && d_order.is_some());
-
-        // C (first edge target) should have lower order than D (second edge target)
-        // This matches mermaid.js behavior where first branch appears on top
-        assert!(
-            c_order.unwrap() < d_order.unwrap(),
-            "C (Action 1, first edge) should have lower order than D (Action 2, second edge). C order: {:?}, D order: {:?}",
-            c_order, d_order
+        assert_eq!(
+            g.node("C").unwrap().order,
+            Some(0),
+            "C (first edge target) must keep order 0 like dagre-d3-es"
+        );
+        assert_eq!(
+            g.node("D").unwrap().order,
+            Some(1),
+            "D (second edge target) must keep order 1 like dagre-d3-es"
         );
     }
 
     #[test]
-    fn test_order_fork_pattern_preserves_edge_order() {
+    fn test_order_fork_pattern_matches_reference() {
         // Fork pattern like state diagrams:
         // start -> fork -> first_target
         //              \-> second_target
         // -> join
         //
-        // When both targets have same barycenter (both connected to single fork node),
-        // the first-defined edge target should appear on the left (lower order).
+        // dagre-d3-es (mermaid's dagre) keeps the FIRST layering with the
+        // best crossing count, so the initial edge-definition order wins:
+        // first_target order 0, second_target order 1.
         let mut g = DagreGraph::new();
 
         g.set_edge("start", "fork", EdgeLabel::default());
@@ -532,26 +317,17 @@ mod tests {
         g.set_edge("second_target", "join", EdgeLabel::default());
 
         rank::assign_ranks(&mut g, Ranker::LongestPath);
-
-        // Check initial order
-        let init_layering = init_order(&g);
-        eprintln!("init_order layer 2: {:?}", init_layering[2]);
-
         order(&mut g);
 
-        let first_order = g.node("first_target").unwrap().order;
-        let second_order = g.node("second_target").unwrap().order;
-
-        eprintln!(
-            "After order(): first_target order={:?}, second_target order={:?}",
-            first_order, second_order
+        assert_eq!(
+            g.node("first_target").unwrap().order,
+            Some(0),
+            "first_target (first edge) must keep order 0 like dagre-d3-es"
         );
-
-        assert!(first_order.is_some() && second_order.is_some());
-        assert!(
-            first_order.unwrap() < second_order.unwrap(),
-            "first_target (first edge) should have lower order than second_target. first={:?}, second={:?}",
-            first_order, second_order
+        assert_eq!(
+            g.node("second_target").unwrap().order,
+            Some(1),
+            "second_target (second edge) must keep order 1 like dagre-d3-es"
         );
     }
 }
