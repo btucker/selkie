@@ -65,3 +65,34 @@ def test_all_5_directions_covered():
 def test_every_case_starts_with_flowchart_keyword():
     for c in gc.EMITTERS["flowchart"]():
         assert c.source.lstrip().startswith(("flowchart", "graph", "%%{")), c.name
+
+
+def test_all_families_present():
+    cases = gc.EMITTERS["flowchart"]()
+    families = {c.family for c in cases}
+    expected = {
+        "shapes", "directions", "edges", "labels",
+        "subgraphs", "styling", "interactions", "a11y_directives",
+        "integration", "stretch",
+    }
+    assert expected <= families, expected - families
+
+
+def test_corpus_size_in_target_range():
+    cases = gc.EMITTERS["flowchart"]()
+    assert 60 <= len(cases) <= 100, len(cases)
+
+
+def test_styling_family_uses_classdef_and_linkstyle():
+    cases = gc.EMITTERS["flowchart"]()
+    styling = "\n".join(c.source for c in cases if c.family == "styling")
+    assert "classDef" in styling
+    assert "linkStyle" in styling
+    assert "\n  style " in "\n" + styling
+
+
+def test_isolated_and_connected_subgraph_cases_exist():
+    names = {c.name for c in gc.EMITTERS["flowchart"]() if c.family == "subgraphs"}
+    assert "isolated" in names
+    assert "connected" in names
+    assert "own_direction" in names
