@@ -200,6 +200,10 @@ impl LayoutNode {
         &self.id
     }
 
+    /// Returns the node's top-left layout position.
+    ///
+    /// This is the rendering coordinate exposed by `selkie-layout`, not the
+    /// center coordinate used internally by the Dagre-compatible algorithm.
     pub fn position(&self) -> Option<Point> {
         match (self.x, self.y) {
             (Some(x), Some(y)) => Some(Point::new(x, y)),
