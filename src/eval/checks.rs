@@ -790,10 +790,121 @@ fn check_markers(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut V
     }
 }
 
+/// Extract text/background colors declared inside `foreignObject` HTML,
+/// canonicalized to lowercase 6-digit hex.
+///
+/// Mermaid renders label text color as HTML `color:`/`background-color:` on
+/// foreignObject `<div>`/`<span>` elements. Only values that canonicalize to a
+/// hex color (hex shorthand/longhand or `rgb(...)`) are returned so they line
+/// up with selkie's normalized fill colors; anything else is skipped to avoid
+/// inventing "missing" colors the comparator would otherwise flag.
+fn extract_foreign_object_colors(svg: &str) -> Vec<String> {
+    let mut colors = Vec::new();
+    let Ok(doc) = roxmltree::Document::parse(svg) else {
+        return colors;
+    };
+
+    for fo in doc
+        .descendants()
+        .filter(|n| n.tag_name().name() == "foreignObject")
+    {
+        for node in fo.descendants() {
+            let Some(style) = node.attribute("style") else {
+                continue;
+            };
+            for property in ["color", "background-color"] {
+                if let Some(value) = foreign_object_style_value(style, property) {
+                    if let Some(hex) = canonical_hex(value) {
+                        colors.push(hex);
+                    }
+                }
+            }
+        }
+    }
+
+    colors.sort();
+    colors.dedup();
+    colors
+}
+
+/// Read a single CSS property value out of an inline `style` string, matching
+/// the exact property name (so `color` does not match `background-color`).
+fn foreign_object_style_value<'a>(style: &'a str, property: &str) -> Option<&'a str> {
+    for decl in style.split(';') {
+        let decl = decl.trim();
+        if let Some((name, value)) = decl.split_once(':') {
+            if name.trim().eq_ignore_ascii_case(property) {
+                return Some(value.trim());
+            }
+        }
+    }
+    None
+}
+
+/// Canonicalize a CSS color to lowercase 6-digit hex (`#rrggbb`).
+///
+/// Handles `#rgb`, `#rrggbb`, and `rgb(r, g, b)` (dropping any trailing
+/// `!important`). Returns `None` for forms that cannot be reduced to hex so
+/// they are not compared against selkie's hex fills.
+fn canonical_hex(value: &str) -> Option<String> {
+    let value = value
+        .split('!')
+        .next()
+        .unwrap_or(value)
+        .trim()
+        .to_lowercase();
+
+    if let Some(hex) = value.strip_prefix('#') {
+        if hex.len() == 6 && hex.chars().all(|c| c.is_ascii_hexdigit()) {
+            return Some(format!("#{}", hex));
+        }
+        if hex.len() == 3 && hex.chars().all(|c| c.is_ascii_hexdigit()) {
+            let mut expanded = String::with_capacity(7);
+            expanded.push('#');
+            for c in hex.chars() {
+                expanded.push(c);
+                expanded.push(c);
+            }
+            return Some(expanded);
+        }
+        return None;
+    }
+
+    if let Some(inner) = value.strip_prefix("rgb(").and_then(|s| s.strip_suffix(')')) {
+        let components: Vec<u8> = inner
+            .split(',')
+            .filter_map(|p| p.trim().parse::<u8>().ok())
+            .collect();
+        if components.len() == 3 {
+            return Some(format!(
+                "#{:02x}{:02x}{:02x}",
+                components[0], components[1], components[2]
+            ));
+        }
+    }
+
+    None
+}
+
 /// Check colors - WARNING if fill colors significantly different
 fn check_colors(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
-    let selkie_fills: HashSet<_> = selkie.color_analysis.fill_colors.iter().collect();
-    let ref_fills: HashSet<_> = reference.color_analysis.fill_colors.iter().collect();
+    let selkie_fills: HashSet<String> = selkie.color_analysis.fill_colors.iter().cloned().collect();
+
+    // Mermaid renders label text color (from `classDef color:`) via HTML
+    // `color:`/`background-color:` on foreignObject div/span elements, so those
+    // colors never appear in the reference's shape/CSS fill set. Selkie emits
+    // the same color as a native `<text fill="...">`, which the fill analysis
+    // does pick up. Fold the reference's foreignObject colors into its fill set
+    // so selkie's text fills are recognized as matched, not "extra".
+    let mut ref_fills: HashSet<String> = reference
+        .color_analysis
+        .fill_colors
+        .iter()
+        .cloned()
+        .collect();
+    for color in extract_foreign_object_colors(&reference.raw_svg) {
+        ref_fills.insert(color);
+    }
 
     // Find colors in reference that are missing in selkie
     let missing_fills: Vec<_> = ref_fills.difference(&selkie_fills).cloned().collect();
@@ -3023,6 +3134,55 @@ mod tests {
         assert!(
             issues.is_empty(),
             "Equivalent colors (shorthand hex, !important, dead rules) must not be flagged: {:?}",
+            issues
+        );
+    }
+
+    #[test]
+    fn check_colors_accounts_for_reference_foreign_object_text_colors() {
+        // classDef `color:` sets label text color. Selkie emits it as a native
+        // <text fill="..."> (picked up as a fill color), while mermaid hides it
+        // inside foreignObject HTML `color:` on div/span. Without teaching the
+        // comparator about foreignObject colors, selkie's #ffffff/#000000 text
+        // fills look like "extra" fills the reference lacks — a false positive
+        // (FLOW-4.2) on diagrams like data_collection / modal_click_paths.
+        let reference_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <g class="node">
+                <rect width="80" height="40" style="fill:#ff6b6b"/>
+                <g class="label"><foreignObject width="60" height="24">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(255, 255, 255) !important; display: table-cell;">
+                        <span style="color:#fff !important" class="nodeLabel"><p>Bug</p></span>
+                    </div>
+                </foreignObject></g>
+            </g>
+            <g class="node">
+                <rect width="80" height="40" style="fill:#51cf66"/>
+                <g class="label"><foreignObject width="60" height="24">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(0, 0, 0) !important; display: table-cell;">
+                        <span style="color:#000 !important" class="nodeLabel"><p>Fix</p></span>
+                    </div>
+                </foreignObject></g>
+            </g>
+        </svg>"##;
+        let selkie_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <g class="node">
+                <rect width="80" height="40" style="fill:#ff6b6b !important"/>
+                <text style="fill:#ffffff !important">Bug</text>
+            </g>
+            <g class="node">
+                <rect width="80" height="40" style="fill:#51cf66 !important"/>
+                <text style="fill:#000000 !important">Fix</text>
+            </g>
+        </svg>"##;
+
+        let reference = SvgStructure::from_svg(reference_svg).unwrap();
+        let selkie = SvgStructure::from_svg(selkie_svg).unwrap();
+
+        let mut issues = Vec::new();
+        check_colors(&selkie, &reference, &mut issues);
+        assert!(
+            issues.is_empty(),
+            "Text colors mermaid renders via foreignObject HTML must not be flagged as extra selkie fills: {:?}",
             issues
         );
     }

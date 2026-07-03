@@ -25,6 +25,22 @@ pub struct VisualComparison {
     pub reference_dims: (u32, u32),
 }
 
+/// Point resvg's generic `sans-serif` family at "Trebuchet MS".
+///
+/// Mermaid's stylesheet uses the lowercase family stack
+/// `trebuchet ms, verdana, arial, sans-serif`. resvg's fontdb (0.23) matches
+/// family names case-sensitively, so none of those lowercase names match the
+/// installed "Trebuchet MS"/"Verdana"/"Arial" faces and resvg falls back to
+/// whatever it resolves generic `sans-serif` to (typically Arial). Chrome —
+/// which mmdc rasterizes the reference with — matches case-insensitively and
+/// lands on the real Trebuchet MS. Aliasing the generic family here makes our
+/// raster use the same glyph metrics Chrome does, so SSIM compares like with
+/// like instead of penalizing an eval-only font substitution.
+#[cfg(feature = "png")]
+fn alias_sans_serif_to_trebuchet(opt: &mut resvg::usvg::Options) {
+    opt.fontdb_mut().set_sans_serif_family("Trebuchet MS");
+}
+
 /// Convert SVG string to PNG bytes
 #[cfg(feature = "png")]
 pub fn svg_to_png(svg: &str) -> Result<(Vec<u8>, u32, u32), String> {
@@ -34,6 +50,7 @@ pub fn svg_to_png(svg: &str) -> Result<(Vec<u8>, u32, u32), String> {
     // Set up options with font database
     let mut opt = usvg::Options::default();
     opt.fontdb_mut().load_system_fonts();
+    alias_sans_serif_to_trebuchet(&mut opt);
 
     // Parse SVG
     let tree =
@@ -75,6 +92,7 @@ pub fn svg_to_rgba(svg: &str) -> Result<(Vec<u8>, u32, u32), String> {
     // Set up options with font database
     let mut opt = usvg::Options::default();
     opt.fontdb_mut().load_system_fonts();
+    alias_sans_serif_to_trebuchet(&mut opt);
 
     // Parse SVG
     let tree =
@@ -116,6 +134,7 @@ pub fn svg_to_rgba_at_width(svg: &str, target_width: u32) -> Result<(Vec<u8>, u3
     // Set up options with font database
     let mut opt = usvg::Options::default();
     opt.fontdb_mut().load_system_fonts();
+    alias_sans_serif_to_trebuchet(&mut opt);
 
     // Parse SVG
     let tree =
