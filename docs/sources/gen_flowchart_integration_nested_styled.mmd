@@ -1,0 +1,11 @@
+flowchart TB
+  subgraph Web [Frontend]
+    direction LR
+    UI[UI] --> API[API]
+  end
+  subgraph Data
+    DB[(DB)]
+  end
+  API --> DB
+  classDef svc fill:#cef
+  class UI,API svc

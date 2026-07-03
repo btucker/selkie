@@ -1,0 +1,9 @@
+flowchart LR
+  subgraph Ingest
+    S[(Source)] --> P{Parse?}
+  end
+  P -->|ok| T[[Transform]]
+  P -->|fail| E>Error]
+  T --> D[(Sink)]
+  classDef bad fill:#f99
+  class E bad

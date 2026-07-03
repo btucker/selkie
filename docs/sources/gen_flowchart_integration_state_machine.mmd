@@ -1,0 +1,5 @@
+flowchart LR
+  I((Init)) --> R[Running]
+  R -.->|pause| P[Paused]
+  P ==>|resume| R
+  R --> F(((Final)))
