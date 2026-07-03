@@ -241,6 +241,7 @@ fn compute_level_layout(
         min_width: 35.0,         // Reduced from 40.0 to allow narrower nodes
         min_height: 24.0,        // Match mermaid's node height
         max_width: Some(200.0),
+        ..Default::default()
     };
 
     let mut graph = LayoutGraph::new(parent_id.unwrap_or("root"));
@@ -495,6 +496,7 @@ impl ToLayoutGraph for StateDb {
             min_width: 35.0,         // Reduced from 40.0 to allow narrower nodes
             min_height: 24.0,        // Match mermaid's node height
             max_width: Some(200.0),
+            ..Default::default()
         };
         let mut graph = LayoutGraph::new("state");
 

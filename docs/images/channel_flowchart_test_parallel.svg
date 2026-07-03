@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1016" height="1046" viewBox="-8 -8 1016 1046" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1279.46096" height="966" viewBox="-8 -8 1279.46096 966" class="mermaid">
   <style>
 
 .mermaid {
@@ -105,61 +105,61 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-Start-Parallel-0">
-        <path d="M500,89.6L500,93.76666666666667C500,97.93333333333332,500,106.26666666666665,500,113.93333333333334C500,121.59999999999998,500,128.6,500,132.1L500,135.6" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 631.73 78.00 C 631.73 86.33, 631.73 94.67, 631.73 103.00 C 631.73 111.33, 631.73 119.67, 631.73 128.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Parallel-T1-0">
-        <path d="M383.2,183.15291428571427L344.3333333333333,188.86076190476192C305.46666666666664,194.56860952380953,227.73333333333335,205.98430476190472,188.86666666666667,215.1921523809524C150,224.39999999999998,150,231.39999999999998,150,234.9L150,238.39999999999998" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 529.98 167.09 C 417.95 180.39, 305.93 193.70, 249.92 204.51 C 193.91 215.33, 193.91 223.67, 193.91 232.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Parallel-T2-0">
-        <path d="M500,192.4L500,196.5666666666667C500,200.73333333333335,500,209.06666666666663,500,216.73333333333335C500,224.39999999999998,500,231.39999999999998,500,234.9L500,238.39999999999998" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 631.73 182.00 C 631.73 190.33, 631.73 198.67, 631.73 207.00 C 631.73 215.33, 631.73 223.67, 631.73 232.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Parallel-T3-0">
-        <path d="M616.8,183.15291428571427L655.6666666666666,188.86076190476192C694.5333333333333,194.56860952380953,772.2666666666668,205.98430476190472,811.1333333333333,215.1921523809524C850,224.39999999999998,850,231.39999999999998,850,234.9L850,238.39999999999998" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 733.48 167.09 C 845.51 180.39, 957.53 193.70, 1013.54 204.51 C 1069.55 215.33, 1069.55 223.67, 1069.55 232.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-T1-Same1-0">
-        <path d="M150,332L150,336.1666666666667C150,340.3333333333333,150,348.6666666666667,150,356.3333333333333C150,364,150,371,150,374.5L150,378" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 193.91 310.00 C 193.91 318.33, 193.91 326.67, 193.91 335.00 C 193.91 343.33, 193.91 351.67, 193.91 360.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-T2-Same2-0">
-        <path d="M500,332L500,336.1666666666667C500,340.3333333333333,500,348.6666666666667,500,356.3333333333333C500,364,500,371,500,374.5L500,378" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 631.73 310.00 C 631.73 318.33, 631.73 326.67, 631.73 335.00 C 631.73 343.33, 631.73 351.67, 631.73 360.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T3-Same3-0">
-        <path d="M850,332L850,336.1666666666667C850,340.3333333333333,850,348.6666666666667,850,356.3333333333333C850,364,850,371,850,374.5L850,378" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 1069.55 310.00 C 1069.55 318.33, 1069.55 326.67, 1069.55 335.00 C 1069.55 343.33, 1069.55 351.67, 1069.55 360.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Same1-Lock1-0">
-        <path d="M150,471.6L150,475.76666666666665C150,479.9333333333334,150,488.2666666666667,150,495.93333333333334C150,503.6000000000001,150,510.6000000000001,150,514.1L150,517.6" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 193.91 438.00 C 193.91 446.33, 193.91 454.67, 193.91 463.00 C 193.91 471.33, 193.91 479.67, 193.91 488.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Same2-Lock2-0">
-        <path d="M500,471.6L500,475.76666666666665C500,479.9333333333334,500,488.2666666666667,500,495.93333333333334C500,503.6000000000001,500,510.6000000000001,500,514.1L500,517.6" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 631.73 438.00 C 631.73 446.33, 631.73 454.67, 631.73 463.00 C 631.73 471.33, 631.73 479.67, 631.73 488.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Same3-Lock3-0">
-        <path d="M850,471.6L850,475.76666666666665C850,479.9333333333334,850,488.2666666666667,850,495.93333333333334C850,503.6000000000001,850,510.6000000000001,850,514.1L850,517.6" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 1069.55 438.00 C 1069.55 446.33, 1069.55 454.67, 1069.55 463.00 C 1069.55 471.33, 1069.55 479.67, 1069.55 488.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Lock1-FirstWins-0">
-        <path d="M150,648.0000000000001L150,652.1666666666667C150,656.3333333333334,150,664.6666666666666,150,675.4C150,686.1333333333333,150,699.2666666666668,150,705.8333333333334L150,712.4" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 193.91 590.00 C 193.91 598.33, 193.91 606.67, 193.91 617.00 C 193.91 627.33, 193.91 639.67, 193.91 652.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Lock2-Starve2-0">
-        <path d="M500,648.0000000000001L500,652.1666666666667C500,656.3333333333334,500,664.6666666666666,500,672.3333333333334C500,680,500,687,500,690.5L500,694" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 631.73 590.00 C 631.73 598.33, 631.73 606.67, 631.73 615.00 C 631.73 623.33, 631.73 631.67, 631.73 640.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Lock3-Starve3-0">
-        <path d="M850,648.0000000000001L850,652.1666666666667C850,656.3333333333334,850,664.6666666666666,850,672.3333333333334C850,680,850,687,850,690.5L850,694" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 1069.55 590.00 C 1069.55 598.33, 1069.55 606.67, 1069.55 615.00 C 1069.55 623.33, 1069.55 631.67, 1069.55 640.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-FirstWins-Works-0">
-        <path d="M150,769.1999999999999L150,776.4333333333333C150,783.6666666666666,150,798.1333333333333,150,811.9333333333334C150,825.7333333333332,150,838.8666666666667,150,845.4333333333334L150,852" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 193.91 706.00 C 193.91 718.33, 193.91 730.67, 193.91 743.00 C 193.91 755.33, 193.91 767.67, 193.91 780.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Starve2-Timeout2-0">
-        <path d="M500,787.5999999999999L500,791.7666666666665C500,795.9333333333333,500,804.2666666666668,500,811.9333333333334C500,819.6,500,826.6,500,830.1L500,833.6" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 631.73 718.00 C 631.73 726.33, 631.73 734.67, 631.73 743.00 C 631.73 751.33, 631.73 759.67, 631.73 768.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Starve3-Timeout3-0">
-        <path d="M850,787.5999999999999L850,791.7666666666665C850,795.9333333333333,850,804.2666666666668,850,811.9333333333334C850,819.6,850,826.6,850,830.1L850,833.6" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 1069.55 718.00 C 1069.55 726.33, 1069.55 734.67, 1069.55 743.00 C 1069.55 751.33, 1069.55 759.67, 1069.55 768.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Works-Pass-0">
-        <path d="M150,908.8L150,916.0333333333333C150,923.2666666666668,150,937.7333333333332,150,948.4666666666667C150,959.2000000000002,150,966.2000000000002,150,969.6999999999999L150,973.2" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 193.91 834.00 C 193.91 846.33, 193.91 858.67, 193.91 869.00 C 193.91 879.33, 193.91 887.67, 193.91 896.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Timeout2-Fail2-0">
-        <path d="M500,927.1999999999999L500,931.3666666666667C500,935.5333333333333,500,943.8666666666667,500,951.5333333333333C500,959.2000000000002,500,966.2000000000002,500,969.6999999999999L500,973.2" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 631.73 846.00 C 631.73 854.33, 631.73 862.67, 631.73 871.00 C 631.73 879.33, 631.73 887.67, 631.73 896.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Timeout3-Fail3-0">
-        <path d="M850,927.1999999999999L850,931.3666666666667C850,935.5333333333333,850,943.8666666666667,850,951.5333333333333C850,959.2000000000002,850,966.2000000000002,850,969.6999999999999L850,973.2" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 1069.55 846.00 C 1069.55 854.33, 1069.55 862.67, 1069.55 871.00 C 1069.55 879.33, 1069.55 887.67, 1069.55 896.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -167,84 +167,84 @@ marker path {
     </g>
     <g class="nodes">
       <g class="node" id="node-Fail2">
-        <rect x="426.4" y="977.2" width="147.2" height="52.8" style="fill:#cc0000 !important;color:#fff !important"/>
-        <text x="500" y="1003.6" class="label" dominant-baseline="central" style="fill: #fff" text-anchor="middle">❌ FLAKY FAIL</text>
+        <rect x="555.7703119999999" y="896" width="151.92033600000002" height="54" style="fill:#cc0000 !important;color:#fff !important"/>
+        <text x="631.73048" y="923" class="label" style="fill: #fff" dominant-baseline="central" text-anchor="middle">❌ FLAKY FAIL</text>
       </g>
       <g class="node" id="node-Fail3">
-        <rect x="776.4" y="977.2" width="147.2" height="52.8" style="fill:#cc0000 !important;color:#fff !important"/>
-        <text x="850" y="1003.6" class="label" dominant-baseline="central" style="fill: #fff" text-anchor="middle">❌ FLAKY FAIL</text>
+        <rect x="993.5906319999999" y="896" width="151.92033600000002" height="54" style="fill:#cc0000 !important;color:#fff !important"/>
+        <text x="1069.5508" y="923" class="label" dominant-baseline="central" style="fill: #fff" text-anchor="middle">❌ FLAKY FAIL</text>
       </g>
       <g class="node" id="node-FirstWins">
-        <rect x="38" y="716.4" width="224" height="52.8"/>
-        <text x="150" y="742.8" class="label" text-anchor="middle" dominant-baseline="central">Test 1 Acquires Lock</text>
+        <rect x="91.66406400000001" y="652" width="204.49219200000002" height="54"/>
+        <text x="193.91016000000002" y="679" class="label" dominant-baseline="central" text-anchor="middle">Test 1 Acquires Lock</text>
       </g>
       <g class="node" id="node-Lock1">
-        <rect x="0" y="521.6" width="300" height="126.39999999999999"/>
-        <text x="150" y="584.8000000000001" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="150" y="584.8000000000001" dy="-1.2em">Try to acquire</tspan><tspan x="150" dy="1.2em">exclusive lock on</tspan><tspan x="150" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+        <rect x="0.00000000000002842170943040401" y="488" width="387.82032" height="102"/>
+        <text x="193.91016000000002" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016000000002" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="193.91016000000002" dy="1.2em">exclusive lock on</tspan><tspan x="193.91016000000002" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
       </g>
       <g class="node" id="node-Lock2">
-        <rect x="350" y="521.6" width="300" height="126.39999999999999"/>
-        <text x="500" y="584.8000000000001" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="584.8000000000001" dy="-1.2em">Try to acquire</tspan><tspan x="500" dy="1.2em">exclusive lock on</tspan><tspan x="500" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+        <rect x="437.8203199999999" y="488" width="387.82032" height="102"/>
+        <text x="631.73048" y="539" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="631.73048" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="631.73048" dy="1.2em">exclusive lock on</tspan><tspan x="631.73048" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
       </g>
       <g class="node" id="node-Lock3">
-        <rect x="700" y="521.6" width="300" height="126.39999999999999"/>
-        <text x="850" y="584.8000000000001" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="850" y="584.8000000000001" dy="-1.2em">Try to acquire</tspan><tspan x="850" dy="1.2em">exclusive lock on</tspan><tspan x="850" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+        <rect x="875.64064" y="488" width="387.82032" height="102"/>
+        <text x="1069.5508" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="1069.5508" dy="1.2em">exclusive lock on</tspan><tspan x="1069.5508" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
       </g>
       <g class="node" id="node-Parallel">
-        <rect x="383.2" y="139.6" width="233.6" height="52.8"/>
-        <text x="500" y="166" class="label" dominant-baseline="central" text-anchor="middle">Tests Run in Parallel</text>
+        <rect x="529.9765679999999" y="128" width="203.507824" height="54"/>
+        <text x="631.73048" y="155" class="label" dominant-baseline="central" text-anchor="middle">Tests Run in Parallel</text>
       </g>
       <g class="node" id="node-Pass">
-        <rect x="105.2" y="977.2" width="89.6" height="52.8" style="fill:#00cc00 !important"/>
-        <text x="150" y="1003.6" class="label" style="fill: #ffffff" dominant-baseline="central" text-anchor="middle">✅ PASS</text>
+        <rect x="140.71562400000002" y="896" width="106.389072" height="54" style="fill:#00cc00 !important"/>
+        <text x="193.91016000000002" y="923" class="label" text-anchor="middle" style="fill: #ffffff" dominant-baseline="central">✅ PASS</text>
       </g>
       <g class="node" id="node-Same1">
-        <rect x="52.400000000000006" y="382" width="195.2" height="89.6" style="fill:#ff9999 !important"/>
-        <text x="150" y="426.8" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff"><tspan x="150" y="426.8" dy="-0.6em">Channel::for_repo</tspan><tspan x="150" dy="1.2em">&apos;midtown&apos;</tspan></text>
+        <rect x="98.43357600000002" y="360" width="190.953168" height="78" style="fill:#ff9999 !important"/>
+        <text x="193.91016000000002" y="399" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #ffffff"><tspan x="193.91016000000002" y="399" dy="-0.6em">Channel::for_repo</tspan><tspan x="193.91016000000002" dy="1.2em">&apos;midtown&apos;</tspan></text>
       </g>
       <g class="node" id="node-Same2">
-        <rect x="402.4" y="382" width="195.2" height="89.6" style="fill:#ff9999 !important"/>
-        <text x="500" y="426.8" class="label" style="fill: #ffffff" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="426.8" dy="-0.6em">Channel::for_repo</tspan><tspan x="500" dy="1.2em">&apos;midtown&apos;</tspan></text>
+        <rect x="536.2538959999999" y="360" width="190.953168" height="78" style="fill:#ff9999 !important"/>
+        <text x="631.73048" y="399" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #ffffff"><tspan x="631.73048" y="399" dy="-0.6em">Channel::for_repo</tspan><tspan x="631.73048" dy="1.2em">&apos;midtown&apos;</tspan></text>
       </g>
       <g class="node" id="node-Same3">
-        <rect x="752.4" y="382" width="195.2" height="89.6" style="fill:#ff9999 !important"/>
-        <text x="850" y="426.8" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #ffffff"><tspan x="850" y="426.8" dy="-0.6em">Channel::for_repo</tspan><tspan x="850" dy="1.2em">&apos;midtown&apos;</tspan></text>
+        <rect x="974.074216" y="360" width="190.953168" height="78" style="fill:#ff9999 !important"/>
+        <text x="1069.5508" y="399" class="label" style="fill: #ffffff" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="399" dy="-0.6em">Channel::for_repo</tspan><tspan x="1069.5508" dy="1.2em">&apos;midtown&apos;</tspan></text>
       </g>
       <g class="node" id="node-Start">
-        <rect x="407.2" y="0" width="185.6" height="89.6"/>
-        <text x="500" y="44.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="500" y="44.8" dy="-0.6em">Test Suite Runs</tspan><tspan x="500" dy="1.2em">cargo test --lib</tspan></text>
+        <rect x="548.046896" y="0" width="167.367168" height="78"/>
+        <text x="631.73048" y="39" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="39" dy="-0.6em">Test Suite Runs</tspan><tspan x="631.73048" dy="1.2em">cargo test --lib</tspan></text>
       </g>
       <g class="node" id="node-Starve2">
-        <rect x="402.4" y="698" width="195.2" height="89.6"/>
-        <text x="500" y="742.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="500" y="742.8" dy="-0.6em">Test 2 Waits</tspan><tspan x="500" dy="1.2em">max 2s retry loop</tspan></text>
+        <rect x="539.1132799999999" y="640" width="185.2344" height="78"/>
+        <text x="631.73048" y="679" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="679" dy="-0.6em">Test 2 Waits</tspan><tspan x="631.73048" dy="1.2em">max 2s retry loop</tspan></text>
       </g>
       <g class="node" id="node-Starve3">
-        <rect x="752.4" y="698" width="195.2" height="89.6"/>
-        <text x="850" y="742.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="850" y="742.8" dy="-0.6em">Test 3 Waits</tspan><tspan x="850" dy="1.2em">max 2s retry loop</tspan></text>
+        <rect x="976.9336" y="640" width="185.2344" height="78"/>
+        <text x="1069.5508" y="679" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1069.5508" y="679" dy="-0.6em">Test 3 Waits</tspan><tspan x="1069.5508" dy="1.2em">max 2s retry loop</tspan></text>
       </g>
       <g class="node" id="node-T1">
-        <rect x="76.4" y="242.39999999999998" width="147.2" height="89.6"/>
-        <text x="150" y="287.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="150" y="287.2" dy="-0.6em">Test 1:</tspan><tspan x="150" dy="1.2em">TempDir::new</tspan></text>
+        <rect x="113.94140800000002" y="232" width="159.937504" height="78"/>
+        <text x="193.91016000000002" y="271" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="193.91016000000002" y="271" dy="-0.6em">Test 1:</tspan><tspan x="193.91016000000002" dy="1.2em">TempDir::new</tspan></text>
       </g>
       <g class="node" id="node-T2">
-        <rect x="426.4" y="242.39999999999998" width="147.2" height="89.6"/>
-        <text x="500" y="287.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="500" y="287.2" dy="-0.6em">Test 2:</tspan><tspan x="500" dy="1.2em">TempDir::new</tspan></text>
+        <rect x="551.761728" y="232" width="159.937504" height="78"/>
+        <text x="631.73048" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="271" dy="-0.6em">Test 2:</tspan><tspan x="631.73048" dy="1.2em">TempDir::new</tspan></text>
       </g>
       <g class="node" id="node-T3">
-        <rect x="776.4" y="242.39999999999998" width="147.2" height="89.6"/>
-        <text x="850" y="287.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="850" y="287.2" dy="-0.6em">Test 3:</tspan><tspan x="850" dy="1.2em">TempDir::new</tspan></text>
+        <rect x="989.582048" y="232" width="159.937504" height="78"/>
+        <text x="1069.5508" y="271" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1069.5508" y="271" dy="-0.6em">Test 3:</tspan><tspan x="1069.5508" dy="1.2em">TempDir::new</tspan></text>
       </g>
       <g class="node" id="node-Timeout2">
-        <rect x="388" y="837.6" width="224" height="89.6"/>
-        <text x="500" y="882.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="882.4" dy="-0.6em">WouldBlock Error</tspan><tspan x="500" dy="1.2em">or TimedOut after 2s</tspan></text>
+        <rect x="527.015632" y="768" width="209.429696" height="78"/>
+        <text x="631.73048" y="807" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="807" dy="-0.6em">WouldBlock Error</tspan><tspan x="631.73048" dy="1.2em">or TimedOut after 2s</tspan></text>
       </g>
       <g class="node" id="node-Timeout3">
-        <rect x="738" y="837.6" width="224" height="89.6"/>
-        <text x="850" y="882.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="850" y="882.4" dy="-0.6em">WouldBlock Error</tspan><tspan x="850" dy="1.2em">or TimedOut after 2s</tspan></text>
+        <rect x="964.835952" y="768" width="209.429696" height="78"/>
+        <text x="1069.5508" y="807" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="807" dy="-0.6em">WouldBlock Error</tspan><tspan x="1069.5508" dy="1.2em">or TimedOut after 2s</tspan></text>
       </g>
       <g class="node" id="node-Works">
-        <rect x="57.2" y="856" width="185.6" height="52.8"/>
-        <text x="150" y="882.4" class="label" text-anchor="middle" dominant-baseline="central">Test 1 completes</text>
+        <rect x="103.62501600000002" y="780" width="180.570288" height="54"/>
+        <text x="193.91016000000002" y="807" class="label" dominant-baseline="central" text-anchor="middle">Test 1 completes</text>
       </g>
     </g>
   </g>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1171.64" height="560.8" viewBox="-8 -28.000000000000014 1171.64 560.8" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100.3028399999998" height="530.7250399999999" viewBox="-8 -28.000000000000014 1100.3028399999998 530.7250399999999" class="mermaid">
   <style>
 
 .mermaid {
@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -102,83 +102,83 @@ marker path {
   <g class="root">
     <g class="clusters">
       <g class="subgraph" id="subgraph-A">
-        <rect x="32.48000000000002" y="-20.000000000000014" width="309.64" height="532.8" class="cluster"/>
-        <text x="187.3" y="-4.000000000000014" class="cluster-label" text-anchor="middle">A</text>
+        <rect x="17.256660000000267" y="-20.000000000000014" width="283.83011999999974" height="503.11252799999994" class="cluster"/>
+        <text x="159.17172000000014" y="-4.000000000000014" class="cluster-label" text-anchor="middle">A</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-sq-ci-0">
-        <path d="M1134.52,158.6L1134.5200000000002,176.23333333333335C1134.52,193.86666666666665,1134.52,229.13333333333333,1047.0466666666669,252.6C959.5733333333333,276.06666666666666,784.6266666666667,287.7333333333333,757.9805314354281,312.08275474506553C731.3343962041898,336.4321761567977,852.9887924083797,373.4643523135954,913.8159905104745,391.9804403919943L974.6431886125696,410.4965284703932" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 1044.16 142.75 C 1044.16 172.33, 1044.16 201.92, 963.14 224.88 C 882.11 247.83, 720.06 264.17, 696.88 291.57 C 789.41 357.43, 905.11 395.90, 905.11 395.90" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-od-ro-0">
-        <path d="M257,158.6L257,176.23333333333335C257,193.86666666666665,257,229.13333333333333,330.71999999999997,252.6C404.44,276.06666666666666,551.88,287.7333333333333,539.1300573151349,313.238155584701C526.3801146302698,338.74297783606875,353.4402292605394,378.0859556721375,266.97028657567427,397.7574445901719L180.50034389080918,417.4289335082062" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 231.36 135.25 C 231.36 167.33, 231.36 199.42, 300.01 223.63 C 368.66 247.83, 505.96 264.17, 496.18 291.76 C 329.56 358.22, 172.72 397.09, 172.72 397.09" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-di-ro-0">
-        <path d="M164.48000000000002,239.39999999999998L164.48000000000002,243.5666666666667C164.48000000000002,247.73333333333332,164.48000000000002,256.06666666666666,234.10000000000002,266.06666666666666C303.72,276.06666666666666,442.96000000000004,287.7333333333333,445.62096280262494,312.7188341602919C448.28192560524985,337.70433498725055,314.36385121049966,376.0086699745011,247.40481401312456,395.16083746812643L180.44577681574947,414.31300496175174" class="edge-path" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 147.10 206.50 C 147.10 214.83, 147.10 223.17, 211.41 235.50 C 275.73 247.83, 404.35 264.17, 408.62 291.11 C 292.81 355.60, 172.72 393.15, 172.72 393.15" class="edge-path" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2"/>
       </g>
       <g class="edge" id="edge-L-di-ro2-0">
-        <path d="M164.48000000000002,132.2L164.48000000000002,132.2" class="edge-path" stroke-width="3.5" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 147.09652400000027 115.75000799999998 L 147.09652400000027 115.75000799999998" class="edge-path" stroke-width="3.5" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-e-od3-0">
-        <path d="M870.6650730486532,207.60985518270058L864.4075608738776,217.07487931891714C858.1500486991021,226.53990345513373,845.6350243495509,245.46995172756684,732.0708455081088,260.7683091971167C618.5066666666665,276.06666666666666,403.89333333333326,287.7333333333333,342.7068153401705,307.60585902917063C281.5202973470078,327.47838472500797,373.76059469401554,355.55676945001596,419.88074336751947,369.59596181252L466.0008920410234,383.63515417502396" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 803.54 175.66 C 790.87 194.27, 778.20 212.89, 672.23 230.36 C 566.26 247.83, 366.98 264.17, 317.54 289.02 C 368.47 347.24, 468.85 380.61, 468.85 380.61" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-e-f-0">
-        <path d="M973.9983944045348,205.08498701319093L981.2519953371121,214.97082251099246C988.5055962696898,224.85665800879394,1003.0127981348447,244.62832900439696,914.6263990674224,260.34749783553184C826.2399999999999,276.06666666666666,634.9599999999999,287.7333333333333,600.9022275265505,312.3125892888421C566.8444550531009,336.89184524435086,690.0089101062018,374.3836904887017,751.5911376327523,393.1296131108771L813.1733651593029,411.8755357330526" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 888.76 172.97 C 903.92 192.48, 919.08 211.99, 837.61 229.91 C 756.15 247.83, 578.07 264.17, 545.57 291.13 C 626.16 355.69, 739.25 393.29, 739.25 393.29" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-cyr-cyr2-0">
-        <path d="M725.7199999999999,158.6L725.7199999999999,176.23333333333335C725.7199999999999,193.86666666666665,725.7199999999999,229.13333333333333,604.7666666666665,252.6C483.8133333333333,276.06666666666666,241.90666666666664,287.7333333333333,159.26027853754562,309.06562336520125C76.61389040842461,330.3979133970692,153.22778081684922,361.39582679413843,191.53472602106152,376.894783492673L229.8416712252738,392.39374019120766" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 666.76 142.75 C 666.76 172.33, 666.76 201.92, 555.63 224.88 C 444.51 247.83, 222.25 264.17, 149.37 288.82 C 152.98 346.44, 229.47 379.41, 229.47 379.41" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-od-ro-0">
-        <rect x="645.427531021623" y="278.8704367556448" width="94.39999999999999" height="40" class="edge-label-bg"/>
-        <text x="692.6275310216231" y="298.8704367556448" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="692.6275310216231" y="298.8704367556448" dy="-0.6em">Two line</tspan><tspan x="692.6275310216231" dy="1.2em">edge comment</tspan></text>
+        <rect x="583.00778821639" y="258.9477241322668" width="94.39999999999999" height="40" class="edge-label-bg"/>
+        <text x="630.2077882163901" y="278.9477241322668" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="630.2077882163901" y="278.9477241322668" dy="-0.6em">Two line</tspan><tspan x="630.2077882163901" dy="1.2em">edge comment</tspan></text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-ci">
-        <circle cx="1037.3999999999999" cy="429.6" r="61.599999999999994"/>
-        <text x="1037.3999999999999" y="429.6" class="label" text-anchor="middle" dominant-baseline="central">Circle shape</text>
+        <circle cx="953.891932" cy="412.11252799999994" r="51.40235199999999"/>
+        <text x="953.891932" y="412.11252799999994" class="label" text-anchor="middle" dominant-baseline="central">Circle shape</text>
       </g>
       <g class="node" id="node-cyr">
-        <rect x="671.3199999999999" y="105.79999999999998" width="108.8" height="52.8"/>
-        <text x="725.7199999999999" y="132.2" class="label" dominant-baseline="central" text-anchor="middle">Cyrillic</text>
+        <rect x="611.6766520000001" y="88.75000799999998" width="110.164064" height="54"/>
+        <text x="666.7586840000001" y="115.75000799999998" class="label" dominant-baseline="central" text-anchor="middle">Cyrillic</text>
       </g>
       <g class="node" id="node-cyr2">
-        <circle cx="321.79999999999995" cy="429.59999999999997" r="95.2"/>
-        <text x="321.79999999999995" y="429.59999999999997" class="label" dominant-baseline="central" text-anchor="middle">Circle shape Начало</text>
+        <circle cx="305.33166000000006" cy="412.11252799999994" r="82.61251199999998"/>
+        <text x="305.33166000000006" y="412.11252799999994" class="label" dominant-baseline="central" text-anchor="middle">Circle shape Начало</text>
       </g>
       <g class="node" id="node-di">
-        <polygon points="164.48000000000002,24.999999999999986 271.68,132.2 164.48000000000002,239.39999999999998 57.280000000000015,132.2" style="fill:#f96 !important;stroke:#333 !important;stroke-width:4px !important"/>
-        <text x="164.48000000000002" y="132.2" class="label" text-anchor="middle" style="fill: #ffffff" dominant-baseline="central"><tspan x="164.48000000000002" y="132.2" dy="-0.6em">Diamond with </tspan><tspan x="164.48000000000002" dy="1.2em"> line break</tspan></text>
+        <polygon points="147.09652400000027,24.999999999999986 237.84653200000025,115.75000799999998 147.09652400000027,206.50001599999996 56.34651600000028,115.75000799999998" style="fill:#f96 !important;stroke:#333 !important;stroke-width:4px !important"/>
+        <text x="147.09652400000027" y="115.75000799999998" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff"><tspan x="147.09652400000027" y="115.75000799999998" dy="-0.6em">Diamond with </tspan><tspan x="147.09652400000027" dy="1.2em"> line break</tspan></text>
       </g>
       <g class="node" id="node-e">
-        <circle cx="920.52" cy="132.2" r="90.39999999999999" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
-        <text x="920.52" y="132.2" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="920.52" y="132.2" dy="-1.2em">Inner / circle</tspan><tspan x="920.52" dy="1.2em">and some odd </tspan><tspan x="920.52" dy="1.2em">special characters</tspan></text>
+        <circle cx="844.3055640000002" cy="115.75000799999998" r="72.46484799999999" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
+        <text x="844.3055640000002" y="115.75000799999998" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="844.3055640000002" y="115.75000799999998" dy="-1.2em">Inner / circle</tspan><tspan x="844.3055640000002" dy="1.2em">and some odd </tspan><tspan x="844.3055640000002" dy="1.2em">special characters</tspan></text>
       </g>
       <g class="node" id="node-f">
-        <path d="M 821.9999999999999 403.2 H 920.7999999999998 A 5 5 0 0 1 925.7999999999998 408.2 V 451 A 5 5 0 0 1 920.7999999999998 456 H 821.9999999999999 A 5 5 0 0 1 816.9999999999999 451 V 408.2 A 5 5 0 0 1 821.9999999999999 403.2 Z"/>
-        <text x="871.3999999999999" y="429.59999999999997" class="label" text-anchor="middle" dominant-baseline="central">,.?!+-*ز</text>
+        <path d="M 744.248908 385.11252799999994 H 847.48958 A 5 5 0 0 1 852.48958 390.11252799999994 V 434.11252799999994 A 5 5 0 0 1 847.48958 439.11252799999994 H 744.248908 A 5 5 0 0 1 739.248908 434.11252799999994 V 390.11252799999994 A 5 5 0 0 1 744.248908 385.11252799999994 Z"/>
+        <text x="795.869244" y="412.11252799999994" class="label" text-anchor="middle" dominant-baseline="central">,.?!+-*ز</text>
       </g>
       <g class="node" id="node-od">
-        <path d="M 191.88 105.79999999999998 L 322.12 105.79999999999998 L 302.584 132.2 L 322.12 158.59999999999997 L 191.88 158.59999999999997 Z"/>
-        <text x="257" y="132.2" class="label" dominant-baseline="central" text-anchor="middle">Odd shape</text>
+        <path d="M 181.64145199999996 96.25000799999998 L 281.08678 96.25000799999998 L 266.16998079999996 115.75000799999998 L 281.08678 135.25000799999998 L 181.64145199999996 135.25000799999998 Z"/>
+        <text x="231.36411599999997" y="115.75000799999998" class="label" text-anchor="middle" dominant-baseline="central">Odd shape</text>
       </g>
       <g class="node" id="node-od3">
-        <path d="M 467 384.79999999999995 L 767 384.79999999999995 L 722 429.59999999999997 L 767 474.4 L 467 474.4 Z"/>
-        <text x="617" y="429.59999999999997" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="617" y="429.59999999999997" dy="-0.6em">Really long text with linebreak</tspan><tspan x="617" dy="1.2em">in an Odd shape</tspan></text>
+        <path d="M 437.944172 380.61252799999994 L 689.248908 380.61252799999994 L 651.5531976 412.11252799999994 L 689.248908 443.61252799999994 L 437.944172 443.61252799999994 Z"/>
+        <text x="563.59654" y="412.11252799999994" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="563.59654" y="412.11252799999994" dy="-0.6em">Really long text with linebreak</tspan><tspan x="563.59654" dy="1.2em">in an Odd shape</tspan></text>
       </g>
       <g class="node" id="node-ro">
-        <path d="M 82.4 366.4 H 171.60000000000002 A 5 5 0 0 1 176.60000000000002 371.4 V 487.79999999999995 A 5 5 0 0 1 171.60000000000002 492.79999999999995 H 82.4 A 5 5 0 0 1 77.4 487.79999999999995 V 371.4 A 5 5 0 0 1 82.4 366.4 Z"/>
-        <text x="127" y="429.59999999999997" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="127" y="429.59999999999997" dy="-1.2em">Rounded</tspan><tspan x="127" dy="1.2em">square</tspan><tspan x="127" dy="1.2em">shape</tspan></text>
+        <path d="M 56.430075999999886 361.11252799999994 H 167.7191479999999 A 5 5 0 0 1 172.7191479999999 366.11252799999994 V 458.11252799999994 A 5 5 0 0 1 167.7191479999999 463.11252799999994 H 56.430075999999886 A 5 5 0 0 1 51.430075999999886 458.11252799999994 V 366.11252799999994 A 5 5 0 0 1 56.430075999999886 361.11252799999994 Z"/>
+        <text x="112.07461199999989" y="412.11252799999994" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="112.07461199999989" y="412.11252799999994" dy="-1.2em">Rounded</tspan><tspan x="112.07461199999989" dy="1.2em">square</tspan><tspan x="112.07461199999989" dy="1.2em">shape</tspan></text>
       </g>
       <g class="node" id="node-ro2">
-        <path d="M 57.48000000000002 105.79999999999998 H 271.48 A 5 5 0 0 1 276.48 110.79999999999998 V 153.59999999999997 A 5 5 0 0 1 271.48 158.59999999999997 H 57.48000000000002 A 5 5 0 0 1 52.48000000000002 153.59999999999997 V 110.79999999999998 A 5 5 0 0 1 57.48000000000002 105.79999999999998 Z"/>
-        <text x="164.48000000000002" y="132.2" class="label" text-anchor="middle" dominant-baseline="central">Rounded square shape</text>
+        <path d="M 42.25666000000027 88.75000799999998 H 251.9363880000003 A 5 5 0 0 1 256.9363880000003 93.75000799999998 V 137.75000799999998 A 5 5 0 0 1 251.9363880000003 142.75000799999998 H 42.25666000000027 A 5 5 0 0 1 37.25666000000027 137.75000799999998 V 93.75000799999998 A 5 5 0 0 1 42.25666000000027 88.75000799999998 Z"/>
+        <text x="147.09652400000027" y="115.75000799999998" class="label" text-anchor="middle" dominant-baseline="central">Rounded square shape</text>
       </g>
       <g class="node" id="node-sq">
-        <rect x="1060.92" y="105.79999999999998" width="147.2" height="52.8" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
-        <text x="1134.52" y="132.2" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">Square shape</text>
+        <rect x="966.7704120000001" y="88.75000799999998" width="154.789088" height="54" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
+        <text x="1044.164956" y="115.75000799999998" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle">Square shape</text>
       </g>
     </g>
   </g>

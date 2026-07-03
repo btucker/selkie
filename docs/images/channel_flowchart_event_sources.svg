@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1375.6" height="970.4" viewBox="-8 -27.999999999999993 1375.6 970.4" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1384.781352" height="900" viewBox="-8 -28 1384.781352 900" class="mermaid">
   <style>
 
 .mermaid {
@@ -102,173 +102,173 @@ marker path {
   <g class="root">
     <g class="clusters">
       <g class="subgraph" id="subgraph-">
-        <rect x="20.00000000000005" y="-19.999999999999993" width="1319.6" height="117.80000000000001" class="cluster"/>
-        <text x="679.8" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
+        <rect x="20.00000000000002" y="-20" width="1328.781352" height="119" class="cluster"/>
+        <text x="684.390676" y="-4" class="cluster-label" text-anchor="middle"></text>
       </g>
       <g class="subgraph" id="subgraph-">
-        <rect x="89.80000000000005" y="438.7999999999999" width="1121.6999999999998" height="154.59999999999997" class="cluster"/>
-        <text x="650.65" y="454.7999999999999" class="cluster-label" text-anchor="middle"></text>
+        <rect x="96.50587600000006" y="412" width="1145.87898" height="143" class="cluster"/>
+        <text x="669.445366" y="428" class="cluster-label" text-anchor="middle"></text>
       </g>
       <g class="subgraph" id="subgraph-">
-        <rect x="89.80000000000005" y="82.80000000000003" width="1121.6999999999998" height="706.9999999999999" class="cluster"/>
-        <text x="650.65" y="98.80000000000003" class="cluster-label" text-anchor="middle"></text>
+        <rect x="96.50587600000006" y="84" width="1145.87898" height="647" class="cluster"/>
+        <text x="669.445366" y="100" class="cluster-label" text-anchor="middle"></text>
       </g>
       <g class="subgraph" id="subgraph-">
-        <rect x="20.000000000000057" y="774.8" width="1319.6" height="154.60000000000002" class="cluster"/>
-        <text x="679.8" y="790.8" class="cluster-label" text-anchor="middle"></text>
+        <rect x="20" y="716" width="1328.781352" height="143" class="cluster"/>
+        <text x="684.390676" y="732" class="cluster-label" text-anchor="middle"></text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-Timer-Events-0">
-        <path d="M1024.7999999999997,77.80000000000001L1024.7999999999995,81.96666666666668C1024.7999999999997,86.13333333333334,1024.7999999999997,94.46666666666665,988.4192519676071,106.23170620185816C952.0385039352149,117.99674573704965,879.2770078704299,133.1934914740993,842.8962598380373,140.7918643426241L806.515511805645,148.39023721114893" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 1022.31 79.00 C 1022.31 87.33, 1022.31 95.67, 986.08 106.88 C 949.86 118.10, 877.41 132.21, 804.96 146.31" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Webhook-Events-0">
-        <path d="M1231.6,77.80000000000001L1231.6000000000001,81.96666666666668C1231.6,86.13333333333334,1231.6,94.46666666666665,1160.7611862451188,107.77298065327919C1089.9223724902376,121.07929463989171,948.2447449804753,139.35858927978342,877.405931225594,148.49823659972927L806.5671174707129,157.63788391967512" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 1235.95 79.00 C 1235.95 87.33, 1235.95 95.67, 1164.11 108.31 C 1092.28 120.95, 948.62 137.90, 804.96 154.85" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-RPC-Events-0">
-        <path d="M99.20000000000005,77.80000000000001L99.20000000000005,81.96666666666668C99.20000000000005,86.13333333333334,99.20000000000005,94.46666666666665,178.43792868130723,107.9853918756993C257.6758573626144,121.50411708473196,416.1517147252287,140.20823416946394,495.3896434065359,149.5602927118299L574.6275720878431,158.9123512541959" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 103.26 79.00 C 103.26 87.33, 103.26 95.67, 183.06 108.49 C 262.87 121.31, 422.47 138.61, 582.08 155.92" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Signal-Events-0">
-        <path d="M282,77.80000000000001L282,81.96666666666668C282,86.13333333333334,282,94.46666666666665,330.7761861312055,106.96563336259948C379.552372262411,119.4646000585323,477.1047445248221,136.12920011706458,525.8809306560275,144.46150014633074L574.6571167872331,152.79380017559689" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 289.09 79.00 C 289.09 87.33, 289.09 95.67, 337.92 107.56 C 386.75 119.46, 484.42 134.91, 582.08 150.37" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Events-Snapshot-0">
-        <path d="M690.5999999999999,217.40000000000003L690.5999999999999,223.23333333333335C690.5999999999999,229.0666666666667,690.5999999999999,240.73333333333335,690.5999999999999,251.73333333333335C690.5999999999999,262.7333333333333,690.5999999999999,273.06666666666666,690.5999999999999,278.23333333333335L690.5999999999999,283.4" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 693.52 207.00 C 693.52 219.33, 693.52 231.67, 693.52 244.00 C 693.52 256.33, 693.52 268.67, 693.52 281.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Snapshot-Health-0">
-        <path d="M578.5999999999999,373.58996655518393L517.5333333333333,386.12497212931993C456.46666666666664,398.6599777034559,334.3333333333333,423.72998885172797,273.2666666666667,441.43166109253053C212.20000000000005,459.13333333333327,212.20000000000005,469.4666666666665,212.20000000000005,474.6333333333332L212.20000000000005,479.7999999999999" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 585.55 351.76 C 461.23 374.50, 336.90 397.25, 274.74 414.79 C 212.58 432.33, 212.58 444.67, 212.58 457.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Snapshot-PR-0">
-        <path d="M578.5999999999999,398.75411558669L559.1999999999999,407.09509632224166C539.8,415.4360770577933,501,432.11803852889665,481.6000000000001,445.62568593111496C462.20000000000005,459.13333333333327,462.20000000000005,469.4666666666665,462.2,474.6333333333332L462.20000000000005,479.7999999999999" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 585.55 371.91 C 542.17 387.94, 498.80 403.97, 477.11 418.15 C 455.42 432.33, 455.42 444.67, 455.42 457.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Snapshot-Dispatch-0">
-        <path d="M802.5999999999999,412.63271291596163L813.4833333333332,418.66059409663467C824.3666666666664,424.68847527730776,846.1333333333332,436.7442376386539,857.0166666666664,447.93878548599355C867.9,459.13333333333327,867.9,469.4666666666665,867.8999999999997,474.6333333333332L867.8999999999999,479.7999999999999" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 801.49 378.45 C 833.69 392.30, 865.88 406.15, 881.98 419.24 C 898.07 432.33, 898.07 444.67, 898.07 457.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Snapshot-Chat-0">
-        <path d="M802.5999999999999,377.5502572898799L851.9499999999998,389.4252144082332C901.2999999999998,401.30017152658655,999.9999999999999,425.0500857632933,1049.35,442.09170954831325C1098.6999999999998,459.13333333333327,1098.6999999999998,469.4666666666665,1098.6999999999998,474.6333333333332L1098.6999999999998,479.7999999999999" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 801.49 353.83 C 910.56 375.89, 1019.63 397.94, 1074.17 415.14 C 1128.71 432.33, 1128.71 444.67, 1128.71 457.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Health-Effects-0">
-        <path d="M212.20000000000005,573.3999999999999L212.20000000000005,579.2333333333332C212.20000000000005,585.0666666666666,212.20000000000005,596.7333333333332,262.21706739170725,614.1072588139074C312.23413478341445,631.4811842944814,412.26826956682885,654.5623685889628,462.285336958536,666.1029607362037L512.3024043502433,677.6435528834444" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 212.58 535.00 C 212.58 547.33, 212.58 559.67, 265.51 576.78 C 318.43 593.90, 424.28 615.80, 530.13 637.70" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-PR-Effects-0">
-        <path d="M462.20000000000005,573.3999999999999L462.2,579.2333333333332C462.20000000000005,585.0666666666666,462.20000000000005,596.7333333333332,472.0492303169892,608.0746075386959C481.89846063397846,619.4158817440585,501.59692126795693,630.4317634881171,511.4461515849461,635.9397043601464L521.2953819019353,641.4476452321757" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 455.42 535.00 C 455.42 547.33, 455.42 559.67, 468.21 572.00 C 481.00 584.33, 506.57 596.67, 532.14 609.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Dispatch-Effects-0">
-        <path d="M867.8999999999999,573.3999999999999L867.8999999999997,579.2333333333332C867.9,585.0666666666666,867.9,596.7333333333332,850.429829024925,610.0224284648081C832.9596580498504,623.3115235962829,798.0193160997009,638.2230471925658,780.5491451246262,645.6788089907071L763.0789741495514,653.1345707888486" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 898.07 535.00 C 898.07 547.33, 898.07 559.67, 872.67 574.43 C 847.26 589.18, 796.45 606.37, 745.64 623.55" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Chat-Effects-0">
-        <path d="M1098.6999999999998,573.3999999999999L1098.6999999999998,579.2333333333332C1098.6999999999998,585.0666666666666,1098.6999999999998,596.7333333333332,1042.802031381384,614.4763662074522C986.9040627627684,632.2193990815712,875.108125525537,656.0387981631421,819.2101569069213,667.9484977039277L763.3121882883056,679.8581972447133" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 1128.71 535.00 C 1128.71 547.33, 1128.71 559.67, 1064.86 577.28 C 1001.02 594.89, 873.33 617.79, 745.64 640.68" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Effects-Tmux-0">
-        <path d="M516.1999999999999,729.5856836690956L458.7,740.4547363909129C401.2,751.3237891127304,286.2,773.0618945563651,228.70000000000002,787.4309472781825C171.20000000000005,801.7999999999998,171.20000000000005,808.7999999999998,171.20000000000005,812.3000000000001L171.20000000000005,815.8" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 530.13 677.49 C 409.96 696.99, 289.80 716.50, 229.72 730.41 C 169.63 744.33, 169.63 752.67, 169.63 761.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Effects-Channel-0">
-        <path d="M516.1999999999999,763.7092651757189L505.1666666666666,768.8910543130991C494.13333333333327,774.0728434504794,472.0666666666666,784.4364217252396,461.0333333333333,793.1182108626198C450,801.7999999999998,450,808.7999999999998,450,812.3000000000001L450,815.8" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 530.13 703.15 C 502.78 714.10, 475.44 725.05, 461.77 734.69 C 448.10 744.33, 448.10 752.67, 448.10 761.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Effects-Tasks-0">
-        <path d="M759.4,739.6410351201479L793.2333333333332,748.8341959334566C827.0666666666666,758.0273567467652,894.7333333333331,776.4136783733826,928.5666666666665,789.1068391866912C962.3999999999997,801.7999999999998,962.3999999999997,808.7999999999998,962.3999999999997,812.3000000000001L962.3999999999997,815.8" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 745.64 684.32 C 821.95 701.55, 898.26 718.77, 936.42 731.55 C 974.57 744.33, 974.57 752.67, 974.57 761.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Effects-WebSocket-0">
-        <path d="M759.4,725.2653672119735L834.9,736.8544726766446C910.4,748.4435781413157,1061.3999999999999,771.6217890706579,1136.8999999999999,786.7108945353289C1212.3999999999999,801.7999999999998,1212.3999999999999,808.7999999999998,1212.3999999999999,812.3000000000001L1212.3999999999999,815.8" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 745.64 674.01 C 904.54 694.67, 1063.44 715.34, 1142.89 729.84 C 1222.34 744.33, 1222.34 752.67, 1222.34 761.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-Events-Snapshot-0">
-        <rect x="643.3999999999999" y="241.4" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="690.5999999999999" y="252.4" class="edge-label" text-anchor="middle" dominant-baseline="central">collect once</text>
+        <rect x="646.319592" y="233" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="693.519592" y="244" class="edge-label" text-anchor="middle" dominant-baseline="central">collect once</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-Health-0">
-        <rect x="341.85742313143567" y="403.7137981782881" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="378.25742313143564" y="414.7137981782881" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
+        <rect x="344.46759858982875" y="378.2080255788745" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="380.86759858982873" y="389.2080255788745" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-PR-0">
-        <rect x="467.9229827000512" y="419.689330555407" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="504.32298270005117" y="430.689330555407" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
+        <rect x="466.732691708613" y="391.36685237869807" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="503.132691708613" y="402.36685237869807" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-Dispatch-0">
-        <rect x="814.15873612834" y="428.195306755798" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="850.55873612834" y="439.195306755798" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
+        <rect x="830.3764039907229" y="395.53626856554575" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="866.7764039907229" y="406.53626856554575" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-Chat-0">
-        <rect x="931.2643527673082" y="406.2692463654733" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="967.6643527673082" y="417.2692463654733" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
+        <rect x="946.8316939501015" y="379.58343285626023" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="983.2316939501014" y="390.58343285626023" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Health-Effects-0">
-        <rect x="281.9480190323146" y="628.5369724364974" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="347.1480190323146" y="639.5369724364974" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&amp;lt;Effect&amp;gt;</text>
+        <rect x="288.03924110601514" y="590.1033088018871" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="353.23924110601513" y="601.1033088018871" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&amp;lt;Effect&amp;gt;</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-PR-Effects-0">
-        <rect x="413.0193833973415" y="606.3584478907684" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="478.2193833973415" y="617.3584478907684" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&amp;lt;Effect&amp;gt;</text>
+        <rect x="411.9189002133422" y="571.4634086142469" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="477.1189002133422" y="582.4634086142469" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&amp;lt;Effect&amp;gt;</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Dispatch-Effects-0">
-        <rect x="764.5455119042873" y="613.6832278617948" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="829.7455119042874" y="624.6832278617948" class="edge-label" dominant-baseline="central" text-anchor="middle">Vec&amp;lt;Effect&amp;gt;</text>
+        <rect x="774.1822852953835" y="580.8500126078532" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="839.3822852953836" y="591.8500126078532" class="edge-label" dominant-baseline="central" text-anchor="middle">Vec&amp;lt;Effect&amp;gt;</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Chat-Effects-0">
-        <rect x="880.9658237613369" y="629.8991453821582" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="946.1658237613369" y="640.8991453821582" class="edge-label" dominant-baseline="central" text-anchor="middle">Vec&amp;lt;Effect&amp;gt;</text>
+        <rect x="890.1835360655555" y="592.0751246318146" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="955.3835360655555" y="603.0751246318146" class="edge-label" dominant-baseline="central" text-anchor="middle">Vec&amp;lt;Effect&amp;gt;</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-Channel">
-        <rect x="352.4" y="819.8" width="195.2" height="89.6" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="450" y="864.5999999999999" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central"><tspan x="450" y="864.5999999999999" dy="-0.6em">channel.rs</tspan><tspan x="450" dy="1.2em">append-only JSONL</tspan></text>
+        <rect x="349.265664" y="761" width="197.66409600000003" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="448.097712" y="800" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="448.097712" y="800" dy="-0.6em">channel.rs</tspan><tspan x="448.097712" dy="1.2em">append-only JSONL</tspan></text>
       </g>
       <g class="node" id="node-Chat">
-        <rect x="1005.8999999999999" y="483.7999999999999" width="185.6" height="89.6" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="1098.6999999999998" y="528.5999999999999" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle"><tspan x="1098.6999999999998" y="528.5999999999999" dy="-0.6em">chat.rs</tspan><tspan x="1098.6999999999998" dy="1.2em">@mention routing</tspan></text>
+        <rect x="1035.02548" y="457" width="187.359376" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="1128.705168" y="496" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="1128.705168" y="496" dy="-0.6em">chat.rs</tspan><tspan x="1128.705168" dy="1.2em">@mention routing</tspan></text>
       </g>
       <g class="node" id="node-Dispatch">
-        <rect x="779.8999999999999" y="483.7999999999999" width="176" height="89.6" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="867.8999999999999" y="528.5999999999999" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="867.8999999999999" y="528.5999999999999" dy="-0.6em">dispatch.rs</tspan><tspan x="867.8999999999999" dy="1.2em">task assignment</tspan></text>
+        <rect x="811.1192239999999" y="457" width="173.906256" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="898.0723519999999" y="496" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="898.0723519999999" y="496" dy="-0.6em">dispatch.rs</tspan><tspan x="898.0723519999999" dy="1.2em">task assignment</tspan></text>
       </g>
       <g class="node" id="node-Effects">
-        <rect x="516.1999999999999" y="643.4" width="243.2" height="126.39999999999999" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
-        <text x="637.8" y="706.6" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="637.8" y="706.6" dy="-1.2em">effects.rs</tspan><tspan x="637.8" dy="1.2em">Effect execution</tspan><tspan x="637.8" dy="1.2em">only side effects here</tspan></text>
+        <rect x="530.127" y="609" width="215.515632" height="102" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
+        <text x="637.884816" y="660" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="637.884816" y="660" dy="-1.2em">effects.rs</tspan><tspan x="637.884816" dy="1.2em">Effect execution</tspan><tspan x="637.884816" dy="1.2em">only side effects here</tspan></text>
       </g>
       <g class="node" id="node-Events">
-        <rect x="578.5999999999999" y="127.80000000000003" width="224" height="89.6" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
-        <text x="690.5999999999999" y="172.60000000000002" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="690.5999999999999" y="172.60000000000002" dy="-0.6em">events.rs</tspan><tspan x="690.5999999999999" dy="1.2em">DaemonEvent dispatch</tspan></text>
+        <rect x="582.082088" y="129" width="222.87500799999998" height="78" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
+        <text x="693.519592" y="168" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="693.519592" y="168" dy="-0.6em">events.rs</tspan><tspan x="693.519592" dy="1.2em">DaemonEvent dispatch</tspan></text>
       </g>
       <g class="node" id="node-Health">
-        <rect x="109.80000000000005" y="483.7999999999999" width="204.79999999999998" height="89.6" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="212.20000000000005" y="528.5999999999999" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="212.20000000000005" y="528.5999999999999" dy="-0.6em">health.rs</tspan><tspan x="212.20000000000005" dy="1.2em">coworker lifecycle</tspan></text>
+        <rect x="116.50587600000006" y="457" width="192.15625599999998" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="212.58400400000005" y="496" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="212.58400400000005" y="496" dy="-0.6em">health.rs</tspan><tspan x="212.58400400000005" dy="1.2em">coworker lifecycle</tspan></text>
       </g>
       <g class="node" id="node-PR">
-        <rect x="364.6" y="483.7999999999999" width="195.2" height="89.6" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="462.20000000000005" y="528.5999999999999" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="462.20000000000005" y="528.5999999999999" dy="-0.6em">pr.rs</tspan><tspan x="462.20000000000005" dy="1.2em">reviewer spawning</tspan></text>
+        <rect x="358.662132" y="457" width="193.52345599999998" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="455.42386" y="496" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="455.42386" y="496" dy="-0.6em">pr.rs</tspan><tspan x="455.42386" dy="1.2em">reviewer spawning</tspan></text>
       </g>
       <g class="node" id="node-RPC">
-        <rect x="40.00000000000005" y="25.000000000000007" width="118.39999999999999" height="52.8"/>
-        <text x="99.20000000000005" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">RPC Calls</text>
+        <rect x="40.00000000000002" y="25" width="126.51564800000001" height="54"/>
+        <text x="103.25782400000003" y="52" class="label" text-anchor="middle" dominant-baseline="central">RPC Calls</text>
       </g>
       <g class="node" id="node-Signal">
-        <rect x="208.4" y="25.000000000000007" width="147.2" height="52.8"/>
-        <text x="282" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Unix Signals</text>
+        <rect x="216.515648" y="25" width="145.148464" height="54"/>
+        <text x="289.08988" y="52" class="label" text-anchor="middle" dominant-baseline="central">Unix Signals</text>
       </g>
       <g class="node" id="node-Snapshot">
-        <rect x="578.5999999999999" y="287.4" width="224" height="126.39999999999999" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="690.5999999999999" y="350.59999999999997" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="690.5999999999999" y="350.59999999999997" dy="-1.2em">snapshot.rs</tspan><tspan x="690.5999999999999" dy="1.2em">WorldSnapshot</tspan><tspan x="690.5999999999999" dy="1.2em">immutable state view</tspan></text>
+        <rect x="585.546936" y="281" width="215.945312" height="102" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="693.519592" y="332" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="693.519592" y="332" dy="-1.2em">snapshot.rs</tspan><tspan x="693.519592" dy="1.2em">WorldSnapshot</tspan><tspan x="693.519592" dy="1.2em">immutable state view</tspan></text>
       </g>
       <g class="node" id="node-Tasks">
-        <rect x="869.5999999999998" y="819.8" width="185.6" height="89.6" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="962.3999999999997" y="864.5999999999999" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="962.3999999999997" y="864.5999999999999" dy="-0.6em">tasks.rs</tspan><tspan x="962.3999999999997" dy="1.2em">~/.claude/tasks/</tspan></text>
+        <rect x="883.2500719999998" y="761" width="182.64064000000002" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="974.5703919999999" y="800" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="974.5703919999999" y="800" dy="-0.6em">tasks.rs</tspan><tspan x="974.5703919999999" dy="1.2em">~/.claude/tasks/</tspan></text>
       </g>
       <g class="node" id="node-Timer">
-        <rect x="955.9999999999998" y="25.000000000000007" width="137.6" height="52.8"/>
-        <text x="1024.7999999999997" y="51.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">Timer Ticks</text>
+        <rect x="951.5078959999998" y="25" width="141.601552" height="54"/>
+        <text x="1022.3086719999999" y="52" class="label" text-anchor="middle" dominant-baseline="central">Timer Ticks</text>
       </g>
       <g class="node" id="node-Tmux">
-        <rect x="40.00000000000006" y="819.8" width="262.4" height="89.6" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="171.20000000000005" y="864.5999999999999" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="171.20000000000005" y="864.5999999999999" dy="-0.6em">tmux.rs</tspan><tspan x="171.20000000000005" dy="1.2em">spawn/nudge/pane capture</tspan></text>
+        <rect x="40" y="761" width="259.265664" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="169.632832" y="800" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="169.632832" y="800" dy="-0.6em">tmux.rs</tspan><tspan x="169.632832" dy="1.2em">spawn/nudge/pane capture</tspan></text>
       </g>
       <g class="node" id="node-WebSocket">
-        <rect x="1105.1999999999998" y="819.8" width="214.4" height="89.6" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="1212.3999999999999" y="864.5999999999999" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="1212.3999999999999" y="864.5999999999999" dy="-0.6em">web.rs</tspan><tspan x="1212.3999999999999" dy="1.2em">WebSocket broadcast</tspan></text>
+        <rect x="1115.890712" y="761" width="212.89064" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="1222.336032" y="800" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle"><tspan x="1222.336032" y="800" dy="-0.6em">web.rs</tspan><tspan x="1222.336032" dy="1.2em">WebSocket broadcast</tspan></text>
       </g>
       <g class="node" id="node-Webhook">
-        <rect x="1143.6" y="25.000000000000007" width="176" height="52.8"/>
-        <text x="1231.6" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">GitHub Webhooks</text>
+        <rect x="1143.109448" y="25" width="185.67190399999998" height="54"/>
+        <text x="1235.9453999999998" y="52" class="label" dominant-baseline="central" text-anchor="middle">GitHub Webhooks</text>
       </g>
     </g>
   </g>

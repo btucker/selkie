@@ -109,7 +109,13 @@ impl ToLayoutGraph for FlowchartDb {
             let mut layout_edge = LayoutEdge::new(&edge_id, &edge.start, &edge.end);
 
             if !edge.text.is_empty() {
-                layout_edge = layout_edge.with_label(&edge.text);
+                // Measure the label before layout (mermaid's insertEdgeLabel):
+                // the raw text bbox, with no extra padding.
+                let (label_w, label_h) =
+                    size_estimator.estimate_text_size(&edge.text, config.font_size);
+                layout_edge = layout_edge
+                    .with_label(&edge.text)
+                    .with_label_size(label_w, label_h);
             }
 
             // Set weight based on length hint
@@ -187,6 +193,36 @@ mod tests {
 
         let node_c = graph.get_node("C").unwrap();
         assert_eq!(node_c.shape, NodeShape::Diamond);
+    }
+
+    #[test]
+    fn test_edge_labels_measured_with_estimator() {
+        // Edge labels must be measured pre-layout via the size estimator
+        // (mirroring mermaid's insertEdgeLabel), not via char-count heuristics.
+        // Reference bbox for 'Link text' at 16px trebuchet: 63.734375 x 24.
+        use crate::layout::TrebuchetSizeEstimator;
+
+        let mut db = FlowchartDb::new();
+        db.set_direction("TB");
+        db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Rect));
+        db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
+        db.add_edge("A", "B", "-->", Some("Link text"), None);
+
+        let estimator = TrebuchetSizeEstimator::new();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        let edge = &graph.edges[0];
+        assert_eq!(edge.label.as_deref(), Some("Link text"));
+        assert!(
+            (edge.label_width - 63.734375).abs() <= 2.0,
+            "edge label width should be ~63.73, got {}",
+            edge.label_width
+        );
+        assert!(
+            (edge.label_height - 24.0).abs() <= 0.001,
+            "edge label height should be 24, got {}",
+            edge.label_height
+        );
     }
 
     #[test]

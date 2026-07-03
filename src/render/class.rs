@@ -24,6 +24,7 @@ impl ToLayoutGraph for ClassDb {
             min_width: 100.0,
             min_height: 60.0,
             max_width: Some(200.0),
+            ..Default::default()
         };
 
         let mut graph = LayoutGraph::new("class-diagram");

@@ -313,10 +313,21 @@ impl LayoutEdge {
 
     pub fn with_label(mut self, label: impl Into<String>) -> Self {
         let text = label.into();
-        // Estimate label dimensions (same as renderer: 16px font, 0.6 char ratio)
-        self.label_width = text.len() as f64 * 16.0 * 0.6 + 4.0; // + padding
-        self.label_height = 16.0 * 1.1 + 4.0; // + padding
+        // Coarse character-count fallback for adapters that do not measure
+        // labels with a size estimator. Adapters aiming for mermaid parity
+        // (e.g. flowchart) should overwrite label_width/label_height with
+        // per-line measurements from a SizeEstimator before layout.
+        self.label_width = text.len() as f64 * 8.0 + 16.0;
+        self.label_height = 20.0;
         self.label = Some(text);
+        self
+    }
+
+    /// Set measured label dimensions (from a size estimator), mirroring
+    /// mermaid's insertEdgeLabel which records the label bbox before layout.
+    pub fn with_label_size(mut self, width: f64, height: f64) -> Self {
+        self.label_width = width;
+        self.label_height = height;
         self
     }
 

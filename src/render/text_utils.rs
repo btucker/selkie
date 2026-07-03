@@ -20,7 +20,7 @@ pub(crate) fn normalize_br_tags(text: &str) -> String {
 pub(crate) fn normalize_mermaid_label_markup(text: &str) -> String {
     let with_breaks = normalize_br_tags(text);
     let without_formatting = strip_inline_formatting_tags(&with_breaks);
-    let decoded = decode_basic_html_entities(&without_formatting);
+    let decoded = decode_html_entities(&without_formatting);
     decode_mermaid_escapes(&decoded)
 }
 
@@ -43,7 +43,12 @@ fn strip_inline_formatting_tags(text: &str) -> String {
     result
 }
 
-fn decode_basic_html_entities(text: &str) -> String {
+/// Decode common HTML entities to their literal characters.
+///
+/// Handles the entities mermaid labels commonly contain (`&lt;`, `&gt;`,
+/// `&quot;`, `&#39;`, `&apos;`, `&amp;`). `&amp;` is decoded last so that
+/// doubly escaped sequences (e.g. `&amp;lt;`) are not over-decoded.
+pub(crate) fn decode_html_entities(text: &str) -> String {
     text.replace("&lt;", "<")
         .replace("&gt;", ">")
         .replace("&quot;", "\"")
