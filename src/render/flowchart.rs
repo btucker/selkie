@@ -348,6 +348,34 @@ Terminal -.->|"current approach"| Problem
     }
 
     #[test]
+    fn test_generated_subgraph_id_does_not_shadow_real_vertex() {
+        use crate::diagrams::flowchart::parse;
+
+        let input = r#"flowchart TD
+subGraph0[Real node]
+subgraph "Quoted Group"
+    A --> B
+end
+subGraph0 --> A
+"#;
+
+        let db = parse(input).expect("flowchart should parse");
+        let subgraph = db.subgraphs().first().expect("subgraph should exist");
+        assert_ne!(subgraph.id, "subGraph0");
+        assert_eq!(subgraph.title, "Quoted Group");
+
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+        let real_node = graph
+            .get_node("subGraph0")
+            .expect("real subGraph0 vertex should remain in layout graph");
+        assert_ne!(
+            real_node.metadata.get("is_group").map(String::as_str),
+            Some("true")
+        );
+    }
+
+    #[test]
     fn test_decision_branch_ordering_from_parsed_flowchart() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;

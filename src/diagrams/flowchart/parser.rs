@@ -642,11 +642,13 @@ fn next_generated_subgraph_id(db: &FlowchartDb) -> String {
     let mut index = db.subgraphs().len();
     loop {
         let candidate = format!("subGraph{index}");
-        if db
+        let conflicts_with_subgraph = db
             .subgraphs()
             .iter()
-            .all(|subgraph| subgraph.id != candidate)
-        {
+            .any(|subgraph| subgraph.id == candidate);
+        let conflicts_with_vertex = db.vertices().contains_key(&candidate);
+
+        if !conflicts_with_subgraph && !conflicts_with_vertex {
             return candidate;
         }
         index += 1;
