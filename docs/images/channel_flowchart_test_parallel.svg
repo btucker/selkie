@@ -128,7 +128,7 @@ rect.text{fill:none;stroke-width:0;}
     <g class="nodes">
       <g class="node default" id="node-Start">
         <rect x="548.046896" y="0" width="167.367168" height="78"/>
-        <text x="631.73048" y="39" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="39" dy="-0.6em">Test Suite Runs</tspan><tspan x="631.73048" dy="1.2em">cargo test --lib</tspan></text>
+        <text x="631.73048" y="39" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="39" dy="-0.75em">Test Suite Runs</tspan><tspan x="631.73048" dy="1.5em">cargo test --lib</tspan></text>
       </g>
       <g class="node default" id="node-Parallel">
         <rect x="529.9765679999999" y="128" width="203.507824" height="54"/>
@@ -136,39 +136,39 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-T1">
         <rect x="113.941408" y="232" width="159.937504" height="78"/>
-        <text x="193.91016" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016" y="271" dy="-0.6em">Test 1:</tspan><tspan x="193.91016" dy="1.2em">TempDir::new</tspan></text>
+        <text x="193.91016" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016" y="271" dy="-0.75em">Test 1:</tspan><tspan x="193.91016" dy="1.5em">TempDir::new</tspan></text>
       </g>
       <g class="node default" id="node-T2">
         <rect x="551.761728" y="232" width="159.937504" height="78"/>
-        <text x="631.73048" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="271" dy="-0.6em">Test 2:</tspan><tspan x="631.73048" dy="1.2em">TempDir::new</tspan></text>
+        <text x="631.73048" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="271" dy="-0.75em">Test 2:</tspan><tspan x="631.73048" dy="1.5em">TempDir::new</tspan></text>
       </g>
       <g class="node default" id="node-T3">
         <rect x="989.582048" y="232" width="159.937504" height="78"/>
-        <text x="1069.5508" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="271" dy="-0.6em">Test 3:</tspan><tspan x="1069.5508" dy="1.2em">TempDir::new</tspan></text>
+        <text x="1069.5508" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="271" dy="-0.75em">Test 3:</tspan><tspan x="1069.5508" dy="1.5em">TempDir::new</tspan></text>
       </g>
       <g class="node default" id="node-Same1">
         <rect x="98.43357599999999" y="360" width="190.953168" height="78" style="fill:#ff9999 !important"/>
-        <text x="193.91016" y="399" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016" y="399" dy="-0.6em">Channel::for_repo</tspan><tspan x="193.91016" dy="1.2em">&apos;midtown&apos;</tspan></text>
+        <text x="193.91016" y="399" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016" y="399" dy="-0.75em">Channel::for_repo</tspan><tspan x="193.91016" dy="1.5em">&apos;midtown&apos;</tspan></text>
       </g>
       <g class="node default" id="node-Same2">
         <rect x="536.2538959999999" y="360" width="190.953168" height="78" style="fill:#ff9999 !important"/>
-        <text x="631.73048" y="399" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="399" dy="-0.6em">Channel::for_repo</tspan><tspan x="631.73048" dy="1.2em">&apos;midtown&apos;</tspan></text>
+        <text x="631.73048" y="399" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="399" dy="-0.75em">Channel::for_repo</tspan><tspan x="631.73048" dy="1.5em">&apos;midtown&apos;</tspan></text>
       </g>
       <g class="node default" id="node-Same3">
         <rect x="974.074216" y="360" width="190.953168" height="78" style="fill:#ff9999 !important"/>
-        <text x="1069.5508" y="399" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="399" dy="-0.6em">Channel::for_repo</tspan><tspan x="1069.5508" dy="1.2em">&apos;midtown&apos;</tspan></text>
+        <text x="1069.5508" y="399" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="399" dy="-0.75em">Channel::for_repo</tspan><tspan x="1069.5508" dy="1.5em">&apos;midtown&apos;</tspan></text>
       </g>
       <g class="node default" id="node-Lock1">
         <rect x="0" y="488" width="387.82032" height="102"/>
-        <text x="193.91016" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="193.91016" dy="1.2em">exclusive lock on</tspan><tspan x="193.91016" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+        <text x="193.91016" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016" y="539" dy="-1.5em">Try to acquire</tspan><tspan x="193.91016" dy="1.5em">exclusive lock on</tspan><tspan x="193.91016" dy="1.5em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
       </g>
       <g class="node default" id="node-Lock2">
         <rect x="437.8203199999999" y="488" width="387.82032" height="102"/>
-        <text x="631.73048" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="631.73048" dy="1.2em">exclusive lock on</tspan><tspan x="631.73048" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+        <text x="631.73048" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="539" dy="-1.5em">Try to acquire</tspan><tspan x="631.73048" dy="1.5em">exclusive lock on</tspan><tspan x="631.73048" dy="1.5em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
       </g>
       <g class="node default" id="node-Lock3">
         <rect x="875.64064" y="488" width="387.82032" height="102"/>
-        <text x="1069.5508" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="1069.5508" dy="1.2em">exclusive lock on</tspan><tspan x="1069.5508" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+        <text x="1069.5508" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="539" dy="-1.5em">Try to acquire</tspan><tspan x="1069.5508" dy="1.5em">exclusive lock on</tspan><tspan x="1069.5508" dy="1.5em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
       </g>
       <g class="node default" id="node-FirstWins">
         <rect x="91.66406399999998" y="652" width="204.49219200000002" height="54"/>
@@ -176,11 +176,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Starve2">
         <rect x="539.1132799999999" y="640" width="185.2344" height="78"/>
-        <text x="631.73048" y="679" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="679" dy="-0.6em">Test 2 Waits</tspan><tspan x="631.73048" dy="1.2em">max 2s retry loop</tspan></text>
+        <text x="631.73048" y="679" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="679" dy="-0.75em">Test 2 Waits</tspan><tspan x="631.73048" dy="1.5em">max 2s retry loop</tspan></text>
       </g>
       <g class="node default" id="node-Starve3">
         <rect x="976.9336" y="640" width="185.2344" height="78"/>
-        <text x="1069.5508" y="679" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="679" dy="-0.6em">Test 3 Waits</tspan><tspan x="1069.5508" dy="1.2em">max 2s retry loop</tspan></text>
+        <text x="1069.5508" y="679" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="679" dy="-0.75em">Test 3 Waits</tspan><tspan x="1069.5508" dy="1.5em">max 2s retry loop</tspan></text>
       </g>
       <g class="node default" id="node-Works">
         <rect x="103.62501599999999" y="780" width="180.570288" height="54"/>
@@ -188,11 +188,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Timeout2">
         <rect x="527.015632" y="768" width="209.429696" height="78"/>
-        <text x="631.73048" y="807" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="807" dy="-0.6em">WouldBlock Error</tspan><tspan x="631.73048" dy="1.2em">or TimedOut after 2s</tspan></text>
+        <text x="631.73048" y="807" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="807" dy="-0.75em">WouldBlock Error</tspan><tspan x="631.73048" dy="1.5em">or TimedOut after 2s</tspan></text>
       </g>
       <g class="node default" id="node-Timeout3">
         <rect x="964.835952" y="768" width="209.429696" height="78"/>
-        <text x="1069.5508" y="807" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="807" dy="-0.6em">WouldBlock Error</tspan><tspan x="1069.5508" dy="1.2em">or TimedOut after 2s</tspan></text>
+        <text x="1069.5508" y="807" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="807" dy="-0.75em">WouldBlock Error</tspan><tspan x="1069.5508" dy="1.5em">or TimedOut after 2s</tspan></text>
       </g>
       <g class="node default" id="node-Pass">
         <rect x="135.51171999999997" y="896" width="116.79688000000002" height="54" style="fill:#00cc00 !important"/>

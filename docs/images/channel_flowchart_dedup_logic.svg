@@ -108,7 +108,7 @@ rect.text{fill:none;stroke-width:0;}
         <path d="M950.7038888955857,836.9290031044143L970.0559920796546,851.9981265870119C989.4080952637238,867.0672500696095,1028.112301631862,897.2054970348048,1047.464404815931,918.441287184069C1066.816508,939.6770773333334,1066.816508,952.0104106666668,1066.816508,961.6770773333333C1066.816508,971.3437440000001,1066.816508,978.3437440000001,1066.816508,981.8437439999999L1066.816508,985.343744" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-AssignCheck-Allow1-0">
-        <path d="M837.2480275813506,830.3026235813504L809.4765589844588,846.4761436511253C781.705090387567,862.6496637209002,726.1621531937835,894.9967038604501,698.3906845968918,917.3368905968917C670.619216,939.6770773333334,670.619216,952.0104106666668,628.8042273348505,964.3034374877288C586.9892386697009,976.5964643087909,503.35926133940166,988.849184617582,461.544272674252,994.9755447719775L419.72928400910246,1001.1019049263729" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M837.7122256847158,830.7668216847158L810.6465940705966,846.8629754039298C783.5809624564772,862.959129123144,729.4496992282387,895.1514365615718,702.3840676141193,917.4142569474526C675.318436,939.6770773333334,675.318436,952.0104106666668,632.72042402361,964.3366060009881C590.1224120472201,976.6628013353098,504.92638809444014,988.9818586706197,462.3283761180501,995.1413873382744L419.7303641416601,1001.3009160059294" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Allow1-Effect1-0">
         <path d="M230.08405461538462,1043.343744L216.87213217948715,1047.5104106666665C203.66020974358972,1051.6770773333335,177.23636487179488,1060.0104106666668,164.0244424358974,1068.343744C150.81251999999998,1076.6770773333335,150.81251999999998,1085.0104106666668,150.81251999999998,1093.343744C150.81251999999998,1101.6770773333335,150.81251999999998,1110.0104106666668,150.81251999999998,1119.6770773333333C150.81251999999998,1129.343744,150.81251999999998,1140.343744,150.81251999999998,1145.843744L150.81251999999998,1151.343744" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
@@ -143,20 +143,20 @@ rect.text{fill:none;stroke-width:0;}
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-Check-Bypass-0">
-        <rect x="728.9643269992877" y="497.9749596550526" width="116" height="22" class="edge-label-bg"/>
-        <text x="786.9643269992877" y="508.9749596550526" class="edge-label" text-anchor="middle" dominant-baseline="central">Grouped PR task</text>
+        <rect x="685.119216" y="524.328128" width="116" height="22" class="edge-label-bg"/>
+        <text x="743.119216" y="535.328128" class="edge-label" text-anchor="middle" dominant-baseline="central">Grouped PR task</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Check-BlockSnap-0">
-        <rect x="965.5565394672844" y="501.065909184945" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="1012.7565394672845" y="512.065909184945" class="edge-label" text-anchor="middle" dominant-baseline="central">Regular task</text>
+        <rect x="1004.25908" y="524.328128" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="1051.45908" y="535.328128" class="edge-label" text-anchor="middle" dominant-baseline="central">Regular task</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-AssignCheck-Block1-0">
-        <rect x="1018.4194019821812" y="890.182301265589" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="1033.2194019821811" y="901.182301265589" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <rect x="1052.0165080000002" y="916.343744" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="1066.816508" y="927.343744" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-AssignCheck-Allow1-0">
-        <rect x="645.6949012510745" y="955.3545085059408" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="656.8949012510745" y="966.3545085059408" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+        <rect x="664.118436" y="916.343744" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="675.318436" y="927.343744" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Check2-Block2-0">
         <rect x="250.49731200000002" y="1922.671872" width="130.39999999999998" height="22" class="edge-label-bg"/>
@@ -182,7 +182,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Bypass">
         <rect x="613.119216" y="572.328128" width="260" height="78"/>
-        <text x="743.119216" y="611.328128" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="743.119216" y="611.328128" dy="-0.6em">bypass</tspan><tspan x="743.119216" dy="1.2em">is_busy_from_snapshot</tspan></text>
+        <text x="743.119216" y="611.328128" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="743.119216" y="611.328128" dy="-0.75em">bypass</tspan><tspan x="743.119216" dy="1.5em">is_busy_from_snapshot</tspan></text>
       </g>
       <g class="node default" id="node-BlockSnap">
         <rect x="923.119216" y="584.328128" width="256.679728" height="54"/>
@@ -206,7 +206,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Effect2">
         <rect x="316.62503999999996" y="1143.343744" width="327.914128" height="78"/>
-        <text x="480.58210399999996" y="1182.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="480.58210399999996" y="1182.343744" dy="-0.6em">Effect::NudgeCoworkerWithCallbacks</tspan><tspan x="480.58210399999996" dy="1.2em">└─ RecordTaskAssignment</tspan></text>
+        <text x="480.58210399999996" y="1182.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="480.58210399999996" y="1182.343744" dy="-0.75em">Effect::NudgeCoworkerWithCallbacks</tspan><tspan x="480.58210399999996" dy="1.5em">└─ RecordTaskAssignment</tspan></text>
       </g>
       <g class="node default" id="node-Track1">
         <rect x="38.96875999999996" y="1283.343744" width="223.68752000000003" height="54"/>
@@ -214,7 +214,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Track2">
         <rect x="368.7383439999999" y="1271.343744" width="223.68752000000003" height="78"/>
-        <text x="480.58210399999996" y="1310.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="480.58210399999996" y="1310.343744" dy="-0.6em">mark_in_flight_spawns</tspan><tspan x="480.58210399999996" dy="1.2em">scans sub-effects</tspan></text>
+        <text x="480.58210399999996" y="1310.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="480.58210399999996" y="1310.343744" dy="-0.75em">mark_in_flight_spawns</tspan><tspan x="480.58210399999996" dy="1.5em">scans sub-effects</tspan></text>
       </g>
       <g class="node default" id="node-InFlight">
         <rect x="226.037152" y="1449.343744" width="179.32032" height="54" style="fill:#ffffcc !important"/>
@@ -222,7 +222,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-NextSnapshot">
         <rect x="223.88090400000002" y="1553.343744" width="183.632816" height="78"/>
-        <text x="315.697312" y="1592.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="315.697312" y="1592.343744" dy="-0.6em">collect_snapshot</tspan><tspan x="315.697312" dy="1.2em">includes in_flight</tspan></text>
+        <text x="315.697312" y="1592.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="315.697312" y="1592.343744" dy="-0.75em">collect_snapshot</tspan><tspan x="315.697312" dy="1.5em">includes in_flight</tspan></text>
       </g>
       <g class="node default" id="node-NextRules">
         <rect x="237.099656" y="1681.343744" width="157.195312" height="54"/>

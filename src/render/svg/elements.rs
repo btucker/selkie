@@ -519,10 +519,13 @@ impl SvgElement {
                 if normalized.contains('\n') {
                     let lines: Vec<&str> = normalized.split('\n').collect();
                     let num_lines = lines.len();
-                    // Calculate vertical offset to center the text block
-                    // For n lines with 1.2em spacing, offset first line by -(n-1)*0.6em
+                    // Calculate vertical offset to center the text block.
+                    // Mermaid renders label HTML with line-height 1.5 (24px at
+                    // the 16px base font), so lines advance by 1.5em and the
+                    // block is centered by offsetting the first line by
+                    // -(n-1)*0.75em (half of 1.5em per extra line).
                     let first_line_offset = if num_lines > 1 {
-                        -((num_lines - 1) as f64 * 0.6)
+                        -((num_lines - 1) as f64 * 0.75)
                     } else {
                         0.0
                     };
@@ -550,7 +553,7 @@ impl SvgElement {
                                 }
                             } else {
                                 format!(
-                                    "<tspan x=\"{}\" dy=\"1.2em\">{}</tspan>",
+                                    "<tspan x=\"{}\" dy=\"1.5em\">{}</tspan>",
                                     x,
                                     escape_xml(line)
                                 )
@@ -656,9 +659,11 @@ mod tests {
         };
         let svg = element.to_svg(0);
 
-        // For 2 lines, first line should be offset by -0.6em to center the block
-        assert!(svg.contains("<tspan x=\"10\" y=\"20\" dy=\"-0.6em\">Line 1</tspan>"));
-        assert!(svg.contains("<tspan x=\"10\" dy=\"1.2em\">Line 2</tspan>"));
+        // Mermaid renders multi-line labels with line-height 1.5 (24px at the
+        // 16px base font), so continuation lines advance by 1.5em and a 2-line
+        // block is centered by offsetting the first line by -(2-1)*0.75em.
+        assert!(svg.contains("<tspan x=\"10\" y=\"20\" dy=\"-0.75em\">Line 1</tspan>"));
+        assert!(svg.contains("<tspan x=\"10\" dy=\"1.5em\">Line 2</tspan>"));
         assert!(!svg.contains("<br/>"));
     }
 
@@ -700,13 +705,14 @@ mod tests {
         };
         let svg = element.to_svg(0);
 
-        // For 3 lines, first line should be offset by -1.2em (2 * 0.6) to center
+        // For 3 lines with 1.5em line-height, first line is offset by
+        // -(3-1)*0.75em = -1.5em to center the block.
         assert!(
-            svg.contains("<tspan x=\"50\" y=\"100\" dy=\"-1.2em\">Line 1</tspan>"),
-            "First line should have dy=-1.2em for 3 lines. Got: {}",
+            svg.contains("<tspan x=\"50\" y=\"100\" dy=\"-1.5em\">Line 1</tspan>"),
+            "First line should have dy=-1.5em for 3 lines. Got: {}",
             svg
         );
-        assert!(svg.contains("<tspan x=\"50\" dy=\"1.2em\">Line 2</tspan>"));
-        assert!(svg.contains("<tspan x=\"50\" dy=\"1.2em\">Line 3</tspan>"));
+        assert!(svg.contains("<tspan x=\"50\" dy=\"1.5em\">Line 2</tspan>"));
+        assert!(svg.contains("<tspan x=\"50\" dy=\"1.5em\">Line 3</tspan>"));
     }
 }

@@ -359,6 +359,13 @@ fn to_dagre_graph_filtered(
                 weight: edge.weight as i32,
                 width: label_width,
                 height: label_height,
+                // Mermaid renders flowchart/state/class/requirement edges with
+                // labelpos "c" (see flowDb.ts / stateCommon.ts G_EDGE_LABELPOS),
+                // which centers the label on the edge path. Dagre's default is
+                // "r", which shifts the label right by width/2 + labeloffset and
+                // pulls it off the polyline. Use "c" so the dagre-computed
+                // edge.x/edge.y coincide with the edge-label dummy bend point.
+                labelpos: "c".to_string(),
                 ..Default::default()
             };
             dg.set_edge(source, target, label);
@@ -443,16 +450,18 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
                     .map(|p| Point::new(p.x, p.y))
                     .collect();
 
-                // Compute label position from the actual edge path (bend_points)
-                // Use geometric midpoint (point at half the total path length) for accurate
-                // positioning, matching mermaid's traverseEdge approach
-                if edge.label.is_some() && !edge.bend_points.is_empty() {
-                    edge.label_position = types::geometric_midpoint(&edge.bend_points);
-                }
-                // Fallback to dagre's position if no bend points (shouldn't happen)
-                else if edge.label.is_some() {
+                // Position the edge label. Mirror mermaid's positionEdgeLabel
+                // (dagre-wrapper/edges.js): prefer dagre's computed edge label
+                // coordinate (edge.x/edge.y), which comes from the edge-label
+                // dummy node's placement. Only fall back to the geometric
+                // midpoint of the polyline when dagre did not compute one (e.g.
+                // paths cut/rerouted around clusters, matching mermaid's
+                // paths.updatedPath branch).
+                if edge.label.is_some() {
                     if let (Some(x), Some(y)) = (edge_label.x, edge_label.y) {
                         edge.label_position = Some(Point::new(x, y));
+                    } else if !edge.bend_points.is_empty() {
+                        edge.label_position = types::geometric_midpoint(&edge.bend_points);
                     }
                 }
             }
@@ -1048,6 +1057,60 @@ mod tests {
                 midpoint_y
             );
         }
+    }
+
+    #[test]
+    fn test_edge_label_uses_dagre_position_not_midpoint() {
+        // Mermaid's positionEdgeLabel keeps the dagre-computed edge label
+        // coordinate (edge.x/edge.y) unless the path was cut by a cluster.
+        // Dagre computes that coordinate from the edge-label dummy node, which
+        // is also emitted as a bend point. So the label position must coincide
+        // with one of the edge's bend points -- NOT the geometric midpoint of
+        // the polyline, which for a diagonal decision edge falls between
+        // vertices and can be ~50px away.
+        let mut graph = LayoutGraph::new("test_dagre_label_pos");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        // Decision diamond fanning out to two children (message_indent shape).
+        graph.add_node(LayoutNode::new("Start", 200.0, 54.0));
+        graph.add_node(LayoutNode::new("IsAction", 124.0, 124.0));
+        graph.add_node(LayoutNode::new("ActionPath", 178.0, 54.0));
+        graph.add_node(LayoutNode::new("NormalPath", 178.0, 54.0));
+
+        graph.add_edge(LayoutEdge::new("e0", "Start", "IsAction"));
+        graph.add_edge(
+            LayoutEdge::new("e1", "IsAction", "ActionPath").with_label("Yes\nMessageType::Action"),
+        );
+        graph.add_edge(
+            LayoutEdge::new("e2", "IsAction", "NormalPath").with_label("No\nNormal text"),
+        );
+
+        let result = layout(graph).unwrap();
+
+        let edge = result
+            .edges
+            .iter()
+            .find(|e| e.id == "e1")
+            .expect("edge e1 present");
+        let label_pos = edge.label_position.expect("label position set");
+
+        // The label must coincide with one of the bend points (the edge-label
+        // dummy vertex that dagre also uses as edge.x/edge.y).
+        let min_dist = edge
+            .bend_points
+            .iter()
+            .map(|p| ((p.x - label_pos.x).powi(2) + (p.y - label_pos.y).powi(2)).sqrt())
+            .fold(f64::INFINITY, f64::min);
+
+        assert!(
+            min_dist < 1.0,
+            "Edge label at ({:.2},{:.2}) should coincide with a dagre bend point, \
+             but nearest bend point is {:.2}px away. Bend points: {:?}",
+            label_pos.x,
+            label_pos.y,
+            min_dist,
+            edge.bend_points
+        );
     }
 
     #[test]

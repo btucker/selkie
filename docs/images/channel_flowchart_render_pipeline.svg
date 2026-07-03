@@ -111,12 +111,12 @@ rect.text{fill:none;stroke-width:0;}
         <text x="264.078132" y="603" class="edge-label" text-anchor="middle" dominant-baseline="central">overlay</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F-G-0">
-        <rect x="88.68421753581852" y="828.682577313284" width="137.6" height="40" class="edge-label-bg"/>
-        <text x="157.48421753581852" y="848.682577313284" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="157.48421753581852" y="848.682577313284" dy="-0.6em">edge arrow at node</tspan><tspan x="157.48421753581852" dy="1.2em">boundary</tspan></text>
+        <rect x="61.2" y="858.1093599999999" width="137.6" height="40" class="edge-label-bg"/>
+        <text x="130" y="878.1093599999999" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="130" y="878.1093599999999" dy="-0.75em">edge arrow at node</tspan><tspan x="130" dy="1.5em">boundary</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F-H-0">
-        <rect x="327.56748637856714" y="842.0674800382776" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="374.7674863785671" y="853.0674800382776" class="edge-label" text-anchor="middle" dominant-baseline="central">no collision</text>
+        <rect x="350.956264" y="867.1093599999999" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="398.15626399999996" y="878.1093599999999" class="edge-label" text-anchor="middle" dominant-baseline="central">no collision</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-G-I-0">
         <rect x="100.8" y="1031.10936" width="58.4" height="22" class="edge-label-bg"/>
@@ -150,7 +150,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-G">
         <rect x="0" y="927.1093599999999" width="260" height="78" style="fill:#ff6b6b !important"/>
-        <text x="130" y="966.1093599999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="130" y="966.1093599999999" dy="-0.6em">Arrow Character Replaces</tspan><tspan x="130" dy="1.2em">Node Text</tspan></text>
+        <text x="130" y="966.1093599999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="130" y="966.1093599999999" dy="-0.75em">Arrow Character Replaces</tspan><tspan x="130" dy="1.5em">Node Text</tspan></text>
       </g>
       <g class="node default" id="node-H">
         <rect x="310" y="939.1093599999999" width="176.312528" height="54" style="fill:#51cf66 !important"/>

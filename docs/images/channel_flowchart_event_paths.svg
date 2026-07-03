@@ -154,7 +154,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-S1">
         <rect x="292.88480400000003" y="387" width="260" height="78" style="fill:#f96 !important;stroke:#333 !important;stroke-width:2px !important"/>
-        <text x="422.88480400000003" y="426" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="422.88480400000003" y="426" dy="-0.6em">mouseMovedDuringPress</tspan><tspan x="422.88480400000003" dy="1.2em">tracking</tspan></text>
+        <text x="422.88480400000003" y="426" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="422.88480400000003" y="426" dy="-0.75em">mouseMovedDuringPress</tspan><tspan x="422.88480400000003" dy="1.5em">tracking</tspan></text>
       </g>
       <g class="node default" id="node-S2">
         <rect x="602.8848040000001" y="399" width="225.90624" height="54"/>

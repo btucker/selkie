@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1599.023456" height="1155.695328" viewBox="-8 -28 1599.023456 1155.695328" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1527.283224" height="1155.695328" viewBox="-8 -28 1527.283224 1155.695328" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,143 +62,143 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="527.5703039999999" y="487" width="569.125008" height="167" class="cluster"/>
-        <text x="812.1328079999998" y="503" class="cluster-label" text-anchor="middle">Daemon State (In-Memory)</text>
+        <rect x="445.59570399999996" y="487" width="569.125008" height="167" class="cluster"/>
+        <text x="730.158208" y="503" class="cluster-label" text-anchor="middle">Daemon State (In-Memory)</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="78.2656079999998" y="-20" width="1018.429704" height="674" class="cluster"/>
-        <text x="587.4804599999998" y="-4" class="cluster-label" text-anchor="middle">Lifecycle</text>
+        <rect x="69.96678400000003" y="-20" width="944.7539279999999" height="674" class="cluster"/>
+        <text x="542.343748" y="-4" class="cluster-label" text-anchor="middle">Lifecycle</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="1146.6953119999998" y="499" width="418.25587199999995" height="615.695328" class="cluster"/>
-        <text x="1355.8232479999997" y="515" class="cluster-label" text-anchor="middle">Deduplication Flow</text>
+        <rect x="1077.546884" y="499" width="418.7363399999999" height="615.695328" class="cluster"/>
+        <text x="1286.915054" y="515" class="cluster-label" text-anchor="middle">Deduplication Flow</text>
       </g>
       <g class="cluster" id="subgraph-subGraph3">
-        <rect x="14.999999999999773" y="-20" width="300" height="320" class="cluster"/>
-        <text x="164.99999999999977" y="-4" class="cluster-label" text-anchor="middle">Bounded Growth</text>
+        <rect x="14.999999999999972" y="-20" width="300" height="320" class="cluster"/>
+        <text x="164.99999999999997" y="-4" class="cluster-label" text-anchor="middle">Bounded Growth</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-START-IH-0">
-        <path d="M705.4265700624999,433L697.3776097187498,439.1666666666667C689.3286493749998,445.3333333333333,673.2307286874999,457.6666666666667,665.1817683437499,470C657.1328079999998,482.3333333333333,657.1328079999998,494.6666666666667,657.1328079999998,506.3333333333333C657.1328079999998,518,657.1328079999998,529,657.1328079999998,534.5L657.1328079999998,540" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M634.1326051249999,433L624.3035389374999,439.1666666666667C614.47447275,445.3333333333333,594.816340375,457.6666666666667,584.9872741874999,470C575.158208,482.3333333333333,575.158208,494.6666666666667,575.158208,506.3333333333333C575.158208,518,575.158208,529,575.158208,534.5L575.158208,540" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-START-RNT-0">
-        <path d="M819.3593719999999,430.44457088289073L840.5820286666666,437.03714240240896C861.8046853333332,443.62971392192713,904.2499986666666,456.8148569609636,925.4726553333331,469.57409514714845C946.6953119999998,482.3333333333333,946.6953119999998,494.6666666666667,946.6953119999998,504.3333333333333C946.6953119999998,514,946.6953119999998,521,946.6953119999998,524.5L946.6953119999998,528" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M755.859384,432.8524481135802L774.0029386666666,439.0437067613168C792.1464933333333,445.2349654090535,828.4336026666666,457.6174827045267,846.5771573333333,469.97540801893C864.7207119999999,482.3333333333333,864.7207119999999,494.6666666666667,864.7207119999999,504.3333333333333C864.7207119999999,514,864.7207119999999,521,864.7207119999999,524.5L864.7207119999999,528" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-MERGE-RESTART-0">
-        <path d="M258.75499824999974,79L273.4091118749997,85.16666666666667C288.06322549999976,91.33333333333333,317.3714527499997,103.66666666666667,332.02556637499976,116C346.67967999999973,128.33333333333334,346.67967999999973,140.66666666666666,397.22690427356116,156.58384927707817C447.77412854712264,172.5010318874897,548.8685770942456,192.00206377497935,599.415801367807,201.7525797187242L649.9630256413685,211.50309566246904" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M242.189236625,79L254.95522252083333,85.16666666666667C267.7212084166667,91.33333333333333,293.2531802083333,103.66666666666667,306.0191661041666,116C318.7851519999999,128.33333333333334,318.7851519999999,140.66666666666666,363.4005683086139,156.2946451272676C408.01598461722796,171.92262358786851,497.2468172344559,190.845247175737,541.8622335430699,200.30655896967127L586.4776498516839,209.76787076360552" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-RESTART-START-0">
-        <path d="M740.6679639999999,256L740.6679639999999,264.1666666666667C740.6679639999999,272.3333333333333,740.6679639999999,288.6666666666667,740.6679639999999,303C740.6679639999999,317.3333333333333,740.6679639999999,329.6666666666667,740.6679639999999,341.3333333333333C740.6679639999999,353,740.6679639999999,364,740.6679639999999,369.5L740.6679639999999,375" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M677.167976,256L677.1679759999998,264.1666666666667C677.167976,272.3333333333333,677.167976,288.6666666666667,677.1679759999998,303C677.167976,317.3333333333333,677.167976,329.6666666666667,677.1679759999998,341.3333333333333C677.167976,353,677.167976,364,677.1679759999998,369.5L677.167976,375" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-EVENT-CHECK-0">
-        <path d="M1456.8046879999997,622L1456.804688,628.1666666666666C1456.8046879999995,634.3333333333334,1456.8046879999995,646.6666666666666,1456.804688,659C1456.8046879999995,671.3333333333334,1456.8046879999995,683.6666666666666,1437.7241454206385,702.196023913796C1418.6436028412772,720.7253811609252,1380.4825176825543,745.4507623218502,1361.401975103193,757.8134529023129L1342.3214325238318,770.1761434827755" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1394.369168,622L1394.369168,628.1666666666666C1394.369168,634.3333333333334,1394.369168,646.6666666666666,1394.369168,659C1394.369168,671.3333333333334,1394.369168,683.6666666666666,1377.8119438368312,701.8670207679282C1361.2547196736623,720.0673748691898,1328.1402713473246,744.1347497383798,1311.5830471841557,756.1684371729747L1295.025823020987,768.2021246075695" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CHECK-DROP-0">
-        <path d="M1278.2268744107032,841.3089184107034L1273.4384113422527,851.0399866755861C1268.649948273802,860.7710549404688,1259.073022136901,880.2331914702345,1254.2845590684503,895.4642597351173C1249.4960959999999,910.6953280000001,1249.4960959999999,921.6953280000001,1249.4960959999999,927.1953279999999L1249.4960959999999,932.695328" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1226.9710212178547,835.4300052178545L1219.2004623482123,846.1408923482121C1211.42990347857,856.8517794785697,1195.888785739285,878.2735537392849,1188.1182268696427,894.4844408696423C1180.347668,910.6953280000001,1180.347668,921.6953280000001,1180.347668,927.1953279999999L1180.347668,932.695328" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CHECK-INSERT-0">
-        <path d="M1339.2633236077972,823.0452883922026L1359.365596339831,835.8202949935021C1379.4678690718647,848.5953015948016,1419.6724145359324,874.1453147974008,1439.774687267966,892.4203213987004C1459.8769599999998,910.6953280000001,1459.8769599999998,921.6953280000001,1459.8769599999998,927.1953279999999L1459.8769599999998,932.695328" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1291.428978083547,825.502693916453L1308.058981736289,837.8681329303776C1324.6889853890314,850.2335719443021,1357.9489926945157,874.9644499721511,1374.578996347258,892.8298889860754C1391.209,910.6953280000001,1391.209,921.6953280000001,1391.209,927.1953279999999L1391.209,932.695328" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-INSERT-POST-0">
-        <path d="M1459.8769599999998,990.695328L1459.8769599999998,994.8619946666666C1459.8769599999998,999.0286613333334,1459.8769599999998,1007.3619946666668,1459.8769599999998,1015.0286613333333C1459.8769599999998,1022.6953280000001,1459.8769599999998,1029.695328,1459.8769599999998,1033.195328L1459.8769599999998,1036.695328" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1391.209,990.695328L1391.209,994.8619946666666C1391.209,999.0286613333334,1391.209,1007.3619946666668,1391.209,1015.0286613333333C1391.209,1022.6953280000001,1391.209,1029.695328,1391.209,1033.195328L1391.209,1036.695328" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-MERGE-WINDOW-0">
-        <path d="M182.10888324999974,79L179.25740270833307,85.16666666666667C176.40592216666641,91.33333333333333,170.7029610833331,103.66666666666667,167.85148054166643,116C164.99999999999977,128.33333333333334,164.99999999999977,140.66666666666666,164.99999999999977,150.33333333333334C164.99999999999977,160,164.99999999999977,167,164.99999999999977,170.5L164.99999999999977,174" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M177.311125625,79L175.25927135416666,85.16666666666667C173.20741708333333,91.33333333333333,169.10370854166663,103.66666666666667,167.05185427083333,116C164.99999999999997,128.33333333333334,164.99999999999997,140.66666666666666,164.99999999999997,150.33333333333334C164.99999999999997,160,164.99999999999997,167,164.99999999999997,170.5L164.99999999999997,174" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-IH-CHECK-0">
-        <path d="M657.1328079999998,622L657.1328079999998,628.1666666666666C657.1328079999998,634.3333333333334,657.1328079999998,646.6666666666666,739.5598919999999,659C821.9869759999998,671.3333333333334,986.8411439999999,683.6666666666666,1086.971372109911,702.0226829348126C1187.101600219822,720.3786992029585,1222.5078884396446,744.7573984059168,1240.2110325495557,756.946748007396L1257.9141766594669,769.1360976088752" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M575.158208,622L575.158208,628.1666666666666C575.158208,634.3333333333334,575.158208,646.6666666666666,667.4306699999999,659C759.703132,671.3333333333334,944.2480559999999,683.6666666666666,1050.945211414918,701.5447645432424C1157.642366829836,719.4228624198182,1186.4917536596722,742.8457248396363,1200.9164470745905,754.5571560495455L1215.3411404895085,766.2685872594545" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-RNT-CHECK-0">
-        <path d="M946.6953119999998,634L946.6953119999998,638.1666666666666C946.6953119999998,642.3333333333334,946.6953119999998,650.6666666666666,1005.5149739999998,661C1064.3346359999998,671.3333333333334,1181.97396,683.6666666666666,1240.793622,695.3333333333334C1299.613284,707,1299.613284,718,1299.613284,723.5000000000001L1299.613284,729.0000000000001" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M864.7207119999999,634L864.7207119999999,638.1666666666666C864.7207119999999,642.3333333333334,864.7207119999999,650.6666666666666,931.7776793333333,661C998.8346466666666,671.3333333333334,1132.9485813333333,683.6666666666666,1199.160011404482,696.5474172375939C1265.3714414756305,709.4281678085209,1263.6803669512608,722.856335617042,1262.834829689076,729.5704195213025L1261.9892924268913,736.284503425563" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-START-IH-0">
-        <rect x="617.1328079999998" y="465.5808964047699" width="80" height="22" class="edge-label-bg"/>
-        <text x="657.1328079999998" y="476.5808964047699" class="edge-label" text-anchor="middle" dominant-baseline="central">Empty sets</text>
+        <rect x="535.158208" y="459" width="80" height="22" class="edge-label-bg"/>
+        <text x="575.158208" y="470" class="edge-label" text-anchor="middle" dominant-baseline="central">Empty sets</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-START-RNT-0">
-        <rect x="872.6318691423912" y="448.41858756107" width="80" height="22" class="edge-label-bg"/>
-        <text x="912.6318691423912" y="459.41858756107" class="edge-label" text-anchor="middle" dominant-baseline="central">Empty sets</text>
+        <rect x="824.7207119999999" y="459" width="80" height="22" class="edge-label-bg"/>
+        <text x="864.7207119999999" y="470" class="edge-label" text-anchor="middle" dominant-baseline="central">Empty sets</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-MERGE-RESTART-0">
-        <rect x="377.28709246235957" y="159.09229340215444" width="116" height="22" class="edge-label-bg"/>
-        <text x="435.28709246235957" y="170.09229340215444" class="edge-label" text-anchor="middle" dominant-baseline="central">midtown restart</text>
+        <rect x="260.7851519999999" y="105" width="116" height="22" class="edge-label-bg"/>
+        <text x="318.7851519999999" y="116" class="edge-label" text-anchor="middle" dominant-baseline="central">midtown restart</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-RESTART-START-0">
-        <rect x="686.2679639999999" y="306.5" width="108.8" height="22" class="edge-label-bg"/>
-        <text x="740.6679639999999" y="317.5" class="edge-label" text-anchor="middle" dominant-baseline="central">Memory cleared</text>
+        <rect x="622.767976" y="331" width="108.8" height="22" class="edge-label-bg"/>
+        <text x="677.167976" y="342" class="edge-label" text-anchor="middle" dominant-baseline="central">Memory cleared</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-EVENT-CHECK-0">
-        <rect x="1381.7364551824608" y="703.0564225526891" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="1428.9364551824608" y="714.0564225526891" class="edge-label" text-anchor="middle" dominant-baseline="central">Generate key</text>
+        <rect x="1347.169168" y="685" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="1394.369168" y="696" class="edge-label" text-anchor="middle" dominant-baseline="central">Generate key</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CHECK-DROP-0">
-        <rect x="1240.8933744325775" y="876.1012787984442" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="1255.6933744325775" y="887.1012787984442" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <rect x="1165.5476680000002" y="888.695328" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="1180.347668" y="899.695328" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CHECK-INSERT-0">
-        <rect x="1403.9839798258233" y="860.2929117972282" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="1415.1839798258234" y="871.2929117972282" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+        <rect x="1380.009" y="888.695328" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="1391.209" y="899.695328" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-MERGE-WINDOW-0">
-        <rect x="88.99999999999977" y="115.61793750584764" width="152" height="22" class="edge-label-bg"/>
-        <text x="164.99999999999977" y="126.61793750584764" class="edge-label" text-anchor="middle" dominant-baseline="central">Restarts every merge</text>
+        <rect x="88.99999999999997" y="105" width="152" height="22" class="edge-label-bg"/>
+        <text x="164.99999999999997" y="116" class="edge-label" text-anchor="middle" dominant-baseline="central">Restarts every merge</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-IH-CHECK-0">
-        <rect x="905.061612255537" y="670.0796475048883" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="952.2616122555371" y="681.0796475048883" class="edge-label" text-anchor="middle" dominant-baseline="central">Check/insert</text>
+        <rect x="1081.59298" y="685" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="1128.79298" y="696" class="edge-label" text-anchor="middle" dominant-baseline="central">Check/insert</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-RNT-CHECK-0">
-        <rect x="1081.9215929429006" y="667.1256125513702" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="1129.1215929429006" y="678.1256125513702" class="edge-label" text-anchor="middle" dominant-baseline="central">Check/insert</text>
+        <rect x="1219.862516" y="685" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="1267.062516" y="696" class="edge-label" text-anchor="middle" dominant-baseline="central">Check/insert</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node default" id="node-IH">
-        <rect x="547.5703039999999" y="544" width="219.12500800000004" height="78" style="fill:#e1f5ff !important"/>
-        <text x="657.1328079999998" y="583" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="657.1328079999998" y="583" dy="-0.6em">insight_hashes</tspan><tspan x="657.1328079999998" dy="1.2em">Mutex&lt;HashSet&lt;u64&gt;&gt;</tspan></text>
+        <rect x="465.59570399999996" y="544" width="219.12500800000004" height="78" style="fill:#e1f5ff !important"/>
+        <text x="575.158208" y="583" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="575.158208" y="583" dy="-0.75em">insight_hashes</tspan><tspan x="575.158208" dy="1.5em">Mutex&lt;HashSet&lt;u64&gt;&gt;</tspan></text>
       </g>
       <g class="node default" id="node-RNT">
-        <rect x="816.6953119999998" y="532" width="260" height="102" style="fill:#e1f5ff !important"/>
-        <text x="946.6953119999998" y="583" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="946.6953119999998" y="583" dy="-1.2em">review_note_tracker</tspan><tspan x="946.6953119999998" dy="1.2em">Mutex&lt;HashSet&lt;(String,</tspan><tspan x="946.6953119999998" dy="1.2em">u64)&gt;&gt;</tspan></text>
+        <rect x="734.7207119999999" y="532" width="260" height="102" style="fill:#e1f5ff !important"/>
+        <text x="864.7207119999999" y="583" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="864.7207119999999" y="583" dy="-1.5em">review_note_tracker</tspan><tspan x="864.7207119999999" dy="1.5em">Mutex&lt;HashSet&lt;(String,</tspan><tspan x="864.7207119999999" dy="1.5em">u64)&gt;&gt;</tspan></text>
       </g>
       <g class="node default" id="node-START">
-        <rect x="661.9765559999998" y="379" width="157.382816" height="54"/>
-        <text x="740.6679639999999" y="406" class="label" text-anchor="middle" dominant-baseline="central">Daemon Start</text>
+        <rect x="598.4765679999999" y="379" width="157.382816" height="54"/>
+        <text x="677.167976" y="406" class="label" text-anchor="middle" dominant-baseline="central">Daemon Start</text>
       </g>
       <g class="node default" id="node-MERGE">
-        <rect x="98.2656079999998" y="25" width="192.65627199999997" height="54"/>
-        <text x="194.5937439999998" y="52" class="label" text-anchor="middle" dominant-baseline="central">PR Merged to Main</text>
+        <rect x="89.96678400000003" y="25" width="192.65627199999997" height="54"/>
+        <text x="186.29492000000002" y="52" class="label" text-anchor="middle" dominant-baseline="central">PR Merged to Main</text>
       </g>
       <g class="node default" id="node-RESTART">
-        <rect x="653.8906199999999" y="202" width="173.554688" height="54" style="fill:#ffe1e1 !important"/>
-        <text x="740.6679639999999" y="229" class="label" text-anchor="middle" dominant-baseline="central">Daemon Restart</text>
+        <rect x="590.390632" y="202" width="173.554688" height="54" style="fill:#ffe1e1 !important"/>
+        <text x="677.167976" y="229" class="label" text-anchor="middle" dominant-baseline="central">Daemon Restart</text>
       </g>
       <g class="node default" id="node-EVENT">
-        <rect x="1374.8906319999996" y="544" width="163.82811199999998" height="78"/>
-        <text x="1456.8046879999997" y="583" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1456.8046879999997" y="583" dy="-0.6em">Event</tspan><tspan x="1456.8046879999997" dy="1.2em">insight/review</tspan></text>
+        <rect x="1312.4551119999999" y="544" width="163.82811199999998" height="78"/>
+        <text x="1394.369168" y="583" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1394.369168" y="583" dy="-0.75em">Event</tspan><tspan x="1394.369168" dy="1.5em">insight/review</tspan></text>
       </g>
       <g class="node default" id="node-CHECK">
-        <polygon points="1299.6132839999998,733 1364.460948,797.847664 1299.6132839999998,862.695328 1234.76562,797.847664"/>
-        <text x="1299.6132839999998" y="797.847664" class="label" text-anchor="middle" dominant-baseline="central">Key in set?</text>
+        <polygon points="1254.2363440000001,733 1319.0840080000003,797.847664 1254.2363440000001,862.695328 1189.3886800000002,797.847664"/>
+        <text x="1254.2363440000001" y="797.847664" class="label" text-anchor="middle" dominant-baseline="central">Key in set?</text>
       </g>
       <g class="node default" id="node-DROP">
-        <rect x="1166.6953119999998" y="936.695328" width="165.601568" height="54" style="fill:#ffe1e1 !important"/>
-        <text x="1249.4960959999999" y="963.695328" class="label" text-anchor="middle" dominant-baseline="central">Drop duplicate</text>
+        <rect x="1097.546884" y="936.695328" width="165.601568" height="54" style="fill:#ffe1e1 !important"/>
+        <text x="1180.347668" y="963.695328" class="label" text-anchor="middle" dominant-baseline="central">Drop duplicate</text>
       </g>
       <g class="node default" id="node-INSERT">
-        <rect x="1394.6425839999997" y="936.695328" width="130.468752" height="54"/>
-        <text x="1459.8769599999996" y="963.695328" class="label" text-anchor="middle" dominant-baseline="central">Insert key</text>
+        <rect x="1325.974624" y="936.695328" width="130.468752" height="54"/>
+        <text x="1391.2089999999998" y="963.695328" class="label" text-anchor="middle" dominant-baseline="central">Insert key</text>
       </g>
       <g class="node default" id="node-POST">
-        <rect x="1374.8027359999999" y="1040.695328" width="170.148448" height="54" style="fill:#e1ffe1 !important"/>
-        <text x="1459.8769599999998" y="1067.695328" class="label" text-anchor="middle" dominant-baseline="central">Post to channel</text>
+        <rect x="1306.134776" y="1040.695328" width="170.148448" height="54" style="fill:#e1ffe1 !important"/>
+        <text x="1391.209" y="1067.695328" class="label" text-anchor="middle" dominant-baseline="central">Post to channel</text>
       </g>
       <g class="node default" id="node-WINDOW">
-        <rect x="34.99999999999977" y="178" width="260" height="102" style="fill:#fff9e1 !important"/>
-        <text x="164.99999999999977" y="229" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="164.99999999999977" y="229" dy="-1.2em">Window: Between merges</tspan><tspan x="164.99999999999977" dy="1.2em">Growth: Bounded by PR</tspan><tspan x="164.99999999999977" dy="1.2em">velocity</tspan></text>
+        <rect x="34.99999999999997" y="178" width="260" height="102" style="fill:#fff9e1 !important"/>
+        <text x="164.99999999999997" y="229" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="164.99999999999997" y="229" dy="-1.5em">Window: Between merges</tspan><tspan x="164.99999999999997" dy="1.5em">Growth: Bounded by PR</tspan><tspan x="164.99999999999997" dy="1.5em">velocity</tspan></text>
       </g>
     </g>
   </g>

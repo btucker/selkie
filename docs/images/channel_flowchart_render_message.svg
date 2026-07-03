@@ -103,12 +103,12 @@ rect.text{fill:none;stroke-width:0;}
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-CheckType-CalcIndent-0">
-        <rect x="96.93816305358736" y="377.65515496516423" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="111.73816305358736" y="388.65515496516423" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <rect x="77.23515999999998" y="408" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="92.03515999999998" y="419" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CheckType-NoIndent-0">
-        <rect x="289.6868609464126" y="377.65515496516423" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="300.8868609464126" y="388.65515496516423" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+        <rect x="309.389864" y="408" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="320.589864" y="419" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
     </g>
     <g class="nodes">
@@ -118,7 +118,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-CheckType">
         <polygon points="206.31251199999997,104 345.31251199999997,243 206.31251199999997,382 67.31251199999997,243"/>
-        <text x="206.31251199999997" y="243" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="206.31251199999997" y="243" dy="-0.6em">msg.message_type ==</tspan><tspan x="206.31251199999997" dy="1.2em">Action?</tspan></text>
+        <text x="206.31251199999997" y="243" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="206.31251199999997" y="243" dy="-0.75em">msg.message_type ==</tspan><tspan x="206.31251199999997" dy="1.5em">Action?</tspan></text>
       </g>
       <g class="node default" id="node-CalcIndent">
         <rect x="2.757807999999983" y="456" width="178.554704" height="54"/>
@@ -130,7 +130,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-CalcWidth">
         <rect x="73.45313599999997" y="560" width="265.718752" height="102"/>
-        <text x="206.31251199999997" y="611" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="206.31251199999997" y="611" dy="-1.2em">indent_width =</tspan><tspan x="206.31251199999997" dy="1.2em">TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="206.31251199999997" dy="1.2em">+ extra_indent</tspan></text>
+        <text x="206.31251199999997" y="611" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="206.31251199999997" y="611" dy="-1.5em">indent_width =</tspan><tspan x="206.31251199999997" dy="1.5em">TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="206.31251199999997" dy="1.5em">+ extra_indent</tspan></text>
       </g>
       <g class="node default" id="node-Normal">
         <rect x="0" y="712" width="181.312512" height="54" style="fill:#fff5e1 !important"/>
@@ -142,19 +142,19 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-RenderMermaid">
         <rect x="76.31251199999997" y="816" width="260" height="78"/>
-        <text x="206.31251199999997" y="855" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="206.31251199999997" y="855" dy="-0.6em">Render Mermaid</tspan><tspan x="206.31251199999997" dy="1.2em">placeholder</tspan></text>
+        <text x="206.31251199999997" y="855" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="206.31251199999997" y="855" dy="-0.75em">Render Mermaid</tspan><tspan x="206.31251199999997" dy="1.5em">placeholder</tspan></text>
       </g>
       <g class="node default" id="node-Placeholder">
         <rect x="76.31251199999997" y="944" width="260" height="78" style="fill:#d4edda !important"/>
-        <text x="206.31251199999997" y="983" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="206.31251199999997" y="983" dy="-0.6em">format!(&apos;{}[1] Diagram...&apos;, &apos;</tspan><tspan x="206.31251199999997" dy="1.2em">&apos;.repeat(indent_width))</tspan></text>
+        <text x="206.31251199999997" y="983" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="206.31251199999997" y="983" dy="-0.75em">format!(&apos;{}[1] Diagram...&apos;, &apos;</tspan><tspan x="206.31251199999997" dy="1.5em">&apos;.repeat(indent_width))</tspan></text>
       </g>
       <g class="node default" id="node-ActionLine">
         <rect x="3.5488079999999798" y="1072" width="180.437536" height="78"/>
-        <text x="93.76757599999998" y="1111" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="93.76757599999998" y="1111" dy="-0.6em">HH:MM * content</tspan><tspan x="93.76757599999998" dy="1.2em">(9-char indent)</tspan></text>
+        <text x="93.76757599999998" y="1111" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="93.76757599999998" y="1111" dy="-0.75em">HH:MM * content</tspan><tspan x="93.76757599999998" dy="1.5em">(9-char indent)</tspan></text>
       </g>
       <g class="node default" id="node-NormalLine">
         <rect x="233.98634399999997" y="1072" width="169.742208" height="78"/>
-        <text x="318.857448" y="1111" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="318.857448" y="1111" dy="-0.6em">HH:MM content</tspan><tspan x="318.857448" dy="1.2em">(7-char indent)</tspan></text>
+        <text x="318.857448" y="1111" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="318.857448" y="1111" dy="-0.75em">HH:MM content</tspan><tspan x="318.857448" dy="1.5em">(7-char indent)</tspan></text>
       </g>
     </g>
   </g>

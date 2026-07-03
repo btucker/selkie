@@ -63,11 +63,11 @@ rect.text{fill:none;stroke-width:0;}
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
         <rect x="1835.7188159999998" y="0" width="1706.3203999999998" height="143" class="cluster"/>
-        <text x="2688.879016" y="16" class="cluster-label" text-anchor="middle"><tspan x="2688.879016" y="16" dy="-0.6em">Current Test Approach</tspan><tspan x="2688.879016" dy="1.2em">(Weak)</tspan></text>
+        <text x="2688.879016" y="16" class="cluster-label" text-anchor="middle"><tspan x="2688.879016" y="16" dy="-0.75em">Current Test Approach</tspan><tspan x="2688.879016" dy="1.5em">(Weak)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
         <rect x="0" y="0" width="1785.718816" height="143" class="cluster"/>
-        <text x="892.859408" y="16" class="cluster-label" text-anchor="middle"><tspan x="892.859408" y="16" dy="-0.6em">Improved Test Approach</tspan><tspan x="892.859408" dy="1.2em">(Precise)</tspan></text>
+        <text x="892.859408" y="16" class="cluster-label" text-anchor="middle"><tspan x="892.859408" y="16" dy="-0.75em">Improved Test Approach</tspan><tspan x="892.859408" dy="1.5em">(Precise)</tspan></text>
       </g>
     </g>
     <g class="edgePaths">
@@ -134,11 +134,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-F1">
         <rect x="3004.882912" y="45" width="182.718752" height="78"/>
-        <text x="3096.242288" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="3096.242288" y="84" dy="-0.6em">.contains</tspan><tspan x="3096.242288" dy="1.2em">indent+separator</tspan></text>
+        <text x="3096.242288" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="3096.242288" y="84" dy="-0.75em">.contains</tspan><tspan x="3096.242288" dy="1.5em">indent+separator</tspan></text>
       </g>
       <g class="node default" id="node-G1">
         <rect x="3262.601664" y="45" width="259.437552" height="78" style="fill:#faa !important;stroke:#f00 !important"/>
-        <text x="3392.32044" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="3392.32044" y="84" dy="-0.6em">Problem: Can&apos;t verify</tspan><tspan x="3392.32044" dy="1.2em">which line has which indent</tspan></text>
+        <text x="3392.32044" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="3392.32044" y="84" dy="-0.75em">Problem: Can&apos;t verify</tspan><tspan x="3392.32044" dy="1.5em">which line has which indent</tspan></text>
       </g>
       <g class="node default" id="node-A2">
         <rect x="20" y="57" width="176.062496" height="54"/>
@@ -158,15 +158,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-E2">
         <rect x="993.6562880000001" y="45" width="173.375008" height="78"/>
-        <text x="1080.3437920000001" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1080.3437920000001" y="84" dy="-0.6em">Verify first span</tspan><tspan x="1080.3437920000001" dy="1.2em">is indent</tspan></text>
+        <text x="1080.3437920000001" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1080.3437920000001" y="84" dy="-0.75em">Verify first span</tspan><tspan x="1080.3437920000001" dy="1.5em">is indent</tspan></text>
       </g>
       <g class="node default" id="node-F2">
         <rect x="1242.031296" y="45" width="196.74999999999997" height="78"/>
-        <text x="1340.406296" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1340.406296" y="84" dy="-0.6em">Assert indent.len</tspan><tspan x="1340.406296" dy="1.2em">== expected_width</tspan></text>
+        <text x="1340.406296" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1340.406296" y="84" dy="-0.75em">Assert indent.len</tspan><tspan x="1340.406296" dy="1.5em">== expected_width</tspan></text>
       </g>
       <g class="node default" id="node-G2">
         <rect x="1513.781296" y="45" width="251.93752" height="78" style="fill:#afa !important;stroke:#0f0 !important"/>
-        <text x="1639.750056" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1639.750056" y="84" dy="-0.6em">Catches: separator correct</tspan><tspan x="1639.750056" dy="1.2em">but ASCII art wrong indent</tspan></text>
+        <text x="1639.750056" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1639.750056" y="84" dy="-0.75em">Catches: separator correct</tspan><tspan x="1639.750056" dy="1.5em">but ASCII art wrong indent</tspan></text>
       </g>
     </g>
   </g>

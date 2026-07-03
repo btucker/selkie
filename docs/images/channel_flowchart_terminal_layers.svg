@@ -116,22 +116,22 @@ rect.text{fill:none;stroke-width:0;}
         <text x="1086.88876" y="349.5" class="edge-label" text-anchor="middle" dominant-baseline="central">every redraw</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Terminal-Problem-0">
-        <rect x="656.7221032917754" y="482.802741995038" width="123.19999999999999" height="22" class="edge-label-bg"/>
-        <text x="718.3221032917754" y="493.802741995038" class="edge-label" text-anchor="middle" dominant-baseline="central">current approach</text>
+        <rect x="596.32584" y="523" width="123.19999999999999" height="22" class="edge-label-bg"/>
+        <text x="657.92584" y="534" class="edge-label" text-anchor="middle" dominant-baseline="central">current approach</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Terminal-Solution-0">
-        <rect x="1344.5710214642331" y="440.4170391884655" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="1391.7710214642332" y="451.4170391884655" class="edge-label" text-anchor="middle" dominant-baseline="central">proposed fix</text>
+        <rect x="1468.65168" y="523" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="1515.85168" y="534" class="edge-label" text-anchor="middle" dominant-baseline="central">proposed fix</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node default" id="node-Layer1">
         <rect x="956.88876" y="45" width="260" height="102" style="fill:#4a5568 !important;stroke:#cbd5e0 !important;color:#fff !important"/>
-        <text x="1086.88876" y="96" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1086.88876" y="96" dy="-1.2em">Ratatui Text Buffer</tspan><tspan x="1086.88876" dy="1.2em">(Lines, Scroll State,</tspan><tspan x="1086.88876" dy="1.2em">Layout)</tspan></text>
+        <text x="1086.88876" y="96" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1086.88876" y="96" dy="-1.5em">Ratatui Text Buffer</tspan><tspan x="1086.88876" dy="1.5em">(Lines, Scroll State,</tspan><tspan x="1086.88876" dy="1.5em">Layout)</tspan></text>
       </g>
       <g class="node default" id="node-Layer2">
         <rect x="961.763736" y="399" width="250.25004800000002" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
-        <text x="1086.88876" y="438" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1086.88876" y="438" dy="-0.6em">Kitty Graphics Layer</tspan><tspan x="1086.88876" dy="1.2em">(Absolute x,y Coordinates)</tspan></text>
+        <text x="1086.88876" y="438" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1086.88876" y="438" dy="-0.75em">Kitty Graphics Layer</tspan><tspan x="1086.88876" dy="1.5em">(Absolute x,y Coordinates)</tspan></text>
       </g>
       <g class="node default" id="node-Calc">
         <rect x="957.5840720000001" y="246" width="258.609376" height="54" style="fill:#805ad5 !important;stroke:#b794f4 !important;color:#fff !important"/>
@@ -143,23 +143,23 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-P2">
         <rect x="239.898448" y="769" width="203.906272" height="78" style="fill:#2d3748 !important;stroke:#4a5568 !important;color:#fff !important"/>
-        <text x="341.851584" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="341.851584" y="808" dy="-0.6em">Text Buffer Redraws</tspan><tspan x="341.851584" dy="1.2em">(new line positions)</tspan></text>
+        <text x="341.851584" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="341.851584" y="808" dy="-0.75em">Text Buffer Redraws</tspan><tspan x="341.851584" dy="1.5em">(new line positions)</tspan></text>
       </g>
       <g class="node default" id="node-P3">
         <rect x="518.80472" y="769" width="181.031264" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
-        <text x="609.320352" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="609.320352" y="808" dy="-0.6em">Must Recalculate</tspan><tspan x="609.320352" dy="1.2em">Image Positions</tspan></text>
+        <text x="609.320352" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="609.320352" y="808" dy="-0.75em">Must Recalculate</tspan><tspan x="609.320352" dy="1.5em">Image Positions</tspan></text>
       </g>
       <g class="node default" id="node-P4">
         <rect x="774.8359839999999" y="769" width="238.19536" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
-        <text x="893.9336639999999" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="893.9336639999999" y="808" dy="-0.6em">Tmux DCS Passthrough</tspan><tspan x="893.9336639999999" dy="1.2em">(doubled ESC sequences)</tspan></text>
+        <text x="893.9336639999999" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="893.9336639999999" y="808" dy="-0.75em">Tmux DCS Passthrough</tspan><tspan x="893.9336639999999" dy="1.5em">(doubled ESC sequences)</tspan></text>
       </g>
       <g class="node default" id="node-P5">
         <rect x="1088.031344" y="769" width="207.820336" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
-        <text x="1191.9415119999999" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1191.9415119999999" y="808" dy="-0.6em">Re-render All Images</tspan><tspan x="1191.9415119999999" dy="1.2em">at New Coords</tspan></text>
+        <text x="1191.9415119999999" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1191.9415119999999" y="808" dy="-0.75em">Re-render All Images</tspan><tspan x="1191.9415119999999" dy="1.5em">at New Coords</tspan></text>
       </g>
       <g class="node default" id="node-S1">
         <rect x="1404.23448" y="616" width="223.2344" height="78" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
-        <text x="1515.85168" y="655" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1515.85168" y="655" dy="-0.6em">User Sees Placeholder</tspan><tspan x="1515.85168" dy="1.2em">(text-based reference)</tspan></text>
+        <text x="1515.85168" y="655" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1515.85168" y="655" dy="-0.75em">User Sees Placeholder</tspan><tspan x="1515.85168" dy="1.5em">(text-based reference)</tspan></text>
       </g>
       <g class="node default" id="node-S2">
         <rect x="1396.640728" y="769" width="238.421904" height="54" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
@@ -167,7 +167,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-S3">
         <rect x="1385.85168" y="898" width="260" height="102" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
-        <text x="1515.85168" y="949" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1515.85168" y="949" dy="-1.2em">Open Image Fullscreen</tspan><tspan x="1515.85168" dy="1.2em">(separate rendering</tspan><tspan x="1515.85168" dy="1.2em">context)</tspan></text>
+        <text x="1515.85168" y="949" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1515.85168" y="949" dy="-1.5em">Open Image Fullscreen</tspan><tspan x="1515.85168" dy="1.5em">(separate rendering</tspan><tspan x="1515.85168" dy="1.5em">context)</tspan></text>
       </g>
     </g>
   </g>

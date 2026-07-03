@@ -106,12 +106,12 @@ rect.text{fill:none;stroke-width:0;}
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-IsAction-ActionPath-0">
-        <rect x="105.30426018877971" y="227.95532815024117" width="144.79999999999998" height="40" class="edge-label-bg"/>
-        <text x="177.7042601887797" y="247.95532815024117" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="177.7042601887797" y="247.95532815024117" dy="-0.6em">Yes</tspan><tspan x="177.7042601887797" dy="1.2em">MessageType::Action</tspan></text>
+        <rect x="63.396880000000024" y="256.867184" width="144.79999999999998" height="40" class="edge-label-bg"/>
+        <text x="135.79688000000002" y="276.867184" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000002" y="276.867184" dy="-0.75em">Yes</tspan><tspan x="135.79688000000002" dy="1.5em">MessageType::Action</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-IsAction-NormalPath-0">
-        <rect x="371.88325981122034" y="227.95532815024117" width="87.2" height="40" class="edge-label-bg"/>
-        <text x="415.48325981122036" y="247.95532815024117" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="415.48325981122036" y="247.95532815024117" dy="-0.6em">No</tspan><tspan x="415.48325981122036" dy="1.2em">Normal text</tspan></text>
+        <rect x="413.79064000000005" y="256.867184" width="87.2" height="40" class="edge-label-bg"/>
+        <text x="457.3906400000001" y="276.867184" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="276.867184" dy="-0.75em">No</tspan><tspan x="457.3906400000001" dy="1.5em">Normal text</tspan></text>
       </g>
     </g>
     <g class="nodes">
@@ -133,35 +133,35 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-ActionIndent">
         <rect x="0" y="429.867184" width="271.59376000000003" height="102" style="fill:#e1f5ff !important"/>
-        <text x="135.79688000000002" y="480.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000002" y="480.867184" dy="-1.2em">indent_width = 7 + 2 = 9</tspan><tspan x="135.79688000000002" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="135.79688000000002" dy="1.2em">+ extra_indent)</tspan></text>
+        <text x="135.79688000000002" y="480.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000002" y="480.867184" dy="-1.5em">indent_width = 7 + 2 = 9</tspan><tspan x="135.79688000000002" dy="1.5em">(TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="135.79688000000002" dy="1.5em">+ extra_indent)</tspan></text>
       </g>
       <g class="node default" id="node-NormalIndent">
         <rect x="321.5937600000001" y="429.867184" width="271.59376000000003" height="102" style="fill:#fff4e1 !important"/>
-        <text x="457.3906400000001" y="480.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="480.867184" dy="-1.2em">indent_width = 7 + 0 = 7</tspan><tspan x="457.3906400000001" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="457.3906400000001" dy="1.2em">only)</tspan></text>
+        <text x="457.3906400000001" y="480.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="480.867184" dy="-1.5em">indent_width = 7 + 0 = 7</tspan><tspan x="457.3906400000001" dy="1.5em">(TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="457.3906400000001" dy="1.5em">only)</tspan></text>
       </g>
       <g class="node default" id="node-ActionFirst">
         <rect x="13.527311999999995" y="581.867184" width="244.53913600000004" height="102" style="fill:#e1f5ff !important"/>
-        <text x="135.79688000000002" y="632.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000002" y="632.867184" dy="-1.2em">First line:</tspan><tspan x="135.79688000000002" dy="1.2em">&apos; HH:MM * content&apos;</tspan><tspan x="135.79688000000002" dy="1.2em">(7 chars gutter + 2 for &apos;* &apos;)</tspan></text>
+        <text x="135.79688000000002" y="632.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000002" y="632.867184" dy="-1.5em">First line:</tspan><tspan x="135.79688000000002" dy="1.5em">&apos; HH:MM * content&apos;</tspan><tspan x="135.79688000000002" dy="1.5em">(7 chars gutter + 2 for &apos;* &apos;)</tspan></text>
       </g>
       <g class="node default" id="node-NormalFirst">
         <rect x="367.55468800000006" y="581.867184" width="179.671904" height="102" style="fill:#fff4e1 !important"/>
-        <text x="457.3906400000001" y="632.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="632.867184" dy="-1.2em">First line:</tspan><tspan x="457.3906400000001" dy="1.2em">&apos; HH:MM content&apos;</tspan><tspan x="457.3906400000001" dy="1.2em">(7 chars gutter)</tspan></text>
+        <text x="457.3906400000001" y="632.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="632.867184" dy="-1.5em">First line:</tspan><tspan x="457.3906400000001" dy="1.5em">&apos; HH:MM content&apos;</tspan><tspan x="457.3906400000001" dy="1.5em">(7 chars gutter)</tspan></text>
       </g>
       <g class="node default" id="node-ActionCont">
         <rect x="37.871088000000015" y="733.867184" width="195.851584" height="102" style="fill:#e1f5ff !important"/>
-        <text x="135.79688000000002" y="784.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000002" y="784.867184" dy="-1.2em">Continuation lines:</tspan><tspan x="135.79688000000002" dy="1.2em">&apos; content&apos;</tspan><tspan x="135.79688000000002" dy="1.2em">(9 spaces)</tspan></text>
+        <text x="135.79688000000002" y="784.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000002" y="784.867184" dy="-1.5em">Continuation lines:</tspan><tspan x="135.79688000000002" dy="1.5em">&apos; content&apos;</tspan><tspan x="135.79688000000002" dy="1.5em">(9 spaces)</tspan></text>
       </g>
       <g class="node default" id="node-NormalCont">
         <rect x="359.4648480000001" y="733.867184" width="195.851584" height="102" style="fill:#fff4e1 !important"/>
-        <text x="457.3906400000001" y="784.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="784.867184" dy="-1.2em">Continuation lines:</tspan><tspan x="457.3906400000001" dy="1.2em">&apos; content&apos;</tspan><tspan x="457.3906400000001" dy="1.2em">(7 spaces)</tspan></text>
+        <text x="457.3906400000001" y="784.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="784.867184" dy="-1.5em">Continuation lines:</tspan><tspan x="457.3906400000001" dy="1.5em">&apos; content&apos;</tspan><tspan x="457.3906400000001" dy="1.5em">(7 spaces)</tspan></text>
       </g>
       <g class="node default" id="node-ActionMermaid">
         <rect x="7.18748800000003" y="885.867184" width="257.21878399999997" height="102" style="fill:#e1f5ff !important"/>
-        <text x="135.79688000000002" y="936.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000002" y="936.867184" dy="-1.2em">Mermaid placeholder:</tspan><tspan x="135.79688000000002" dy="1.2em">&apos; [1] Diagram: ...&apos;</tspan><tspan x="135.79688000000002" dy="1.2em">(9 spaces via indent_width)</tspan></text>
+        <text x="135.79688000000002" y="936.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000002" y="936.867184" dy="-1.5em">Mermaid placeholder:</tspan><tspan x="135.79688000000002" dy="1.5em">&apos; [1] Diagram: ...&apos;</tspan><tspan x="135.79688000000002" dy="1.5em">(9 spaces via indent_width)</tspan></text>
       </g>
       <g class="node default" id="node-NormalMermaid">
         <rect x="328.7812480000001" y="885.867184" width="257.21878399999997" height="102" style="fill:#fff4e1 !important"/>
-        <text x="457.3906400000001" y="936.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="936.867184" dy="-1.2em">Mermaid placeholder:</tspan><tspan x="457.3906400000001" dy="1.2em">&apos; [1] Diagram: ...&apos;</tspan><tspan x="457.3906400000001" dy="1.2em">(7 spaces via indent_width)</tspan></text>
+        <text x="457.3906400000001" y="936.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="936.867184" dy="-1.5em">Mermaid placeholder:</tspan><tspan x="457.3906400000001" dy="1.5em">&apos; [1] Diagram: ...&apos;</tspan><tspan x="457.3906400000001" dy="1.5em">(7 spaces via indent_width)</tspan></text>
       </g>
       <g class="node default" id="node-Result">
         <rect x="187.941392" y="1037.867184" width="217.30473600000002" height="54"/>

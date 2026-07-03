@@ -111,8 +111,8 @@ rect.text{fill:none;stroke-width:0;}
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-E-F-0">
-        <rect x="402.37815200000006" y="682.6484479999999" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="413.57815200000005" y="693.6484479999999" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+        <rect x="402.37815200000006" y="670.148448" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="413.57815200000005" y="681.148448" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
     </g>
     <g class="nodes">
@@ -122,11 +122,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-B">
         <rect x="277.83985600000005" y="104" width="271.476592" height="78"/>
-        <text x="413.57815200000005" y="143" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="143" dy="-0.6em">cleanup_orphaned_worktrees</tspan><tspan x="413.57815200000005" dy="1.2em">limit: Some2</tspan></text>
+        <text x="413.57815200000005" y="143" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="143" dy="-0.75em">cleanup_orphaned_worktrees</tspan><tspan x="413.57815200000005" dy="1.5em">limit: Some2</tspan></text>
       </g>
       <g class="node default" id="node-C">
         <rect x="283.57815200000005" y="232" width="260" height="78"/>
-        <text x="413.57815200000005" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="271" dy="-0.6em">unmerged: Vec of 2</tspan><tspan x="413.57815200000005" dy="1.2em">worktrees</tspan></text>
+        <text x="413.57815200000005" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="271" dy="-0.75em">unmerged: Vec of 2</tspan><tspan x="413.57815200000005" dy="1.5em">worktrees</tspan></text>
       </g>
       <g class="node default" id="node-D">
         <rect x="233.3515600000001" y="360" width="360.4531839999999" height="54"/>
@@ -134,19 +134,19 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-E">
         <polygon points="413.57815200000005,463.99999999999994 503.65237600000006,554.074224 413.57815200000005,644.1484479999999 323.50392800000003,554.074224"/>
-        <text x="413.57815200000005" y="554.074224" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="554.074224" dy="-0.6em">Is worktree #3</tspan><tspan x="413.57815200000005" dy="1.2em">in unmerged?</tspan></text>
+        <text x="413.57815200000005" y="554.074224" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="554.074224" dy="-0.75em">Is worktree #3</tspan><tspan x="413.57815200000005" dy="1.5em">in unmerged?</tspan></text>
       </g>
       <g class="node default" id="node-F">
         <rect x="301.906264" y="743.148448" width="223.34377600000002" height="78" style="fill:#f99 !important"/>
-        <text x="413.57815200000005" y="782.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="782.148448" dy="-0.6em">Entry for worktree #3</tspan><tspan x="413.57815200000005" dy="1.2em">REMOVED from tracker</tspan></text>
+        <text x="413.57815200000005" y="782.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="782.148448" dy="-0.75em">Entry for worktree #3</tspan><tspan x="413.57815200000005" dy="1.5em">REMOVED from tracker</tspan></text>
       </g>
       <g class="node default" id="node-G">
         <rect x="0" y="871.148448" width="222.179696" height="78"/>
-        <text x="111.089848" y="910.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="111.089848" y="910.148448" dy="-0.6em">Next tick:</tspan><tspan x="111.089848" dy="1.2em">worktree #3 processed</tspan></text>
+        <text x="111.089848" y="910.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="111.089848" y="910.148448" dy="-0.75em">Next tick:</tspan><tspan x="111.089848" dy="1.5em">worktree #3 processed</tspan></text>
       </g>
       <g class="node default" id="node-H">
         <rect x="292.17969600000004" y="999.1484479999999" width="242.79691199999996" height="78" style="fill:#f99 !important"/>
-        <text x="413.57815200000005" y="1038.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="1038.148448" dy="-0.6em">Re-tracked with</tspan><tspan x="413.57815200000005" dy="1.2em">warned_at: None</tspan></text>
+        <text x="413.57815200000005" y="1038.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="1038.148448" dy="-0.75em">Re-tracked with</tspan><tspan x="413.57815200000005" dy="1.5em">warned_at: None</tspan></text>
       </g>
       <g class="node default" id="node-I">
         <rect x="604.976608" y="1127.148448" width="234.585952" height="54"/>
@@ -154,11 +154,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-J">
         <rect x="305.070328" y="1231.148448" width="217.015648" height="78" style="fill:#f99 !important"/>
-        <text x="413.57815200000005" y="1270.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="1270.148448" dy="-0.6em">Warn AGAIN</tspan><tspan x="413.57815200000005" dy="1.2em">bypasses 1h cooldown</tspan></text>
+        <text x="413.57815200000005" y="1270.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="1270.148448" dy="-0.75em">Warn AGAIN</tspan><tspan x="413.57815200000005" dy="1.5em">bypasses 1h cooldown</tspan></text>
       </g>
       <g class="node default" id="node-K">
         <rect x="314.12111200000004" y="1384.148448" width="198.91407999999998" height="78"/>
-        <text x="413.57815200000005" y="1423.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="1423.148448" dy="-0.6em">Tick after that:</tspan><tspan x="413.57815200000005" dy="1.2em">limit reached again</tspan></text>
+        <text x="413.57815200000005" y="1423.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="413.57815200000005" y="1423.148448" dy="-0.75em">Tick after that:</tspan><tspan x="413.57815200000005" dy="1.5em">limit reached again</tspan></text>
       </g>
       <g class="node default" id="node-L">
         <rect x="151.50977200000008" y="1512.148448" width="208.75782399999997" height="54"/>

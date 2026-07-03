@@ -120,7 +120,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-D1">
         <rect x="1914.4688800000001" y="97" width="260" height="102" style="fill:#a44 !important;stroke:#822 !important"/>
-        <text x="2044.4688800000001" y="148" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="2044.4688800000001" y="148" dy="-1.2em">svg_to_png</tspan><tspan x="2044.4688800000001" dy="1.2em">resvg + usvg + tiny-skia +</tspan><tspan x="2044.4688800000001" dy="1.2em">fontdb</tspan></text>
+        <text x="2044.4688800000001" y="148" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="2044.4688800000001" y="148" dy="-1.5em">svg_to_png</tspan><tspan x="2044.4688800000001" dy="1.5em">resvg + usvg + tiny-skia +</tspan><tspan x="2044.4688800000001" dy="1.5em">fontdb</tspan></text>
       </g>
       <g class="node default" id="node-E1">
         <rect x="2249.4688800000004" y="121" width="133.125008" height="54"/>
@@ -136,15 +136,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-B2">
         <rect x="269.17188799999997" y="109" width="180.10156800000001" height="78" style="fill:#4a4 !important;stroke:#282 !important"/>
-        <text x="359.222672" y="148" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="359.222672" y="148" dy="-0.6em">selkie parser</tspan><tspan x="359.222672" dy="1.2em">single parse step</tspan></text>
+        <text x="359.222672" y="148" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="359.222672" y="148" dy="-0.75em">selkie parser</tspan><tspan x="359.222672" dy="1.5em">single parse step</tspan></text>
       </g>
       <g class="node default" id="node-C2">
         <rect x="557.8242640000001" y="45" width="145.367184" height="78"/>
-        <text x="630.5078560000001" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="630.5078560000001" y="84" dy="-0.6em">render_text</tspan><tspan x="630.5078560000001" dy="1.2em">SVG output</tspan></text>
+        <text x="630.5078560000001" y="84" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="630.5078560000001" y="84" dy="-0.75em">render_text</tspan><tspan x="630.5078560000001" dy="1.5em">SVG output</tspan></text>
       </g>
       <g class="node default" id="node-C3">
         <rect x="524.2734560000001" y="173" width="212.46880000000002" height="78"/>
-        <text x="630.5078560000002" y="212" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="630.5078560000002" y="212" dy="-0.6em">render_text_ascii</tspan><tspan x="630.5078560000002" dy="1.2em">box-drawing + braille</tspan></text>
+        <text x="630.5078560000002" y="212" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="630.5078560000002" y="212" dy="-0.75em">render_text_ascii</tspan><tspan x="630.5078560000002" dy="1.5em">box-drawing + braille</tspan></text>
       </g>
       <g class="node default" id="node-D2">
         <rect x="846.304752" y="57" width="152.406272" height="54"/>

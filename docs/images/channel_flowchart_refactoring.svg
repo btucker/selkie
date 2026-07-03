@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1983.0077920000003" height="1891.4688" viewBox="-8.000000000000114 -8 1983.0077920000003 1891.4688" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1963.2734160000005" height="1754.572296" viewBox="-8 -8 1963.2734160000005 1754.572296" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,220 +62,220 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="1422.007792" y="251.7344" width="530" height="823.7344" class="cluster"/>
-        <text x="1687.007792" y="267.7344" class="cluster-label" text-anchor="middle"><tspan x="1687.007792" y="267.7344" dy="-0.6em">Before Refactoring</tspan><tspan x="1687.007792" dy="1.2em">(daemon/mod.rs)</tspan></text>
+        <rect x="1472.0077920000003" y="183.28614800000003" width="460.2656240000001" height="755.286148" class="cluster"/>
+        <text x="1702.1406040000004" y="199.28614800000003" class="cluster-label" text-anchor="middle"><tspan x="1702.1406040000004" y="199.28614800000003" dy="-0.75em">Before Refactoring</tspan><tspan x="1702.1406040000004" dy="1.5em">(daemon/mod.rs)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="653.75388" y="756.4688" width="633.2539119999999" height="576.0000000000001" class="cluster"/>
-        <text x="970.3808359999999" y="772.4688" class="cluster-label" text-anchor="middle"><tspan x="970.3808359999999" y="772.4688" dy="-0.6em">After Refactoring (chat.rs,</tspan><tspan x="970.3808359999999" dy="1.2em">health.rs)</tspan></text>
+        <rect x="613.7538800000002" y="619.572296" width="633.2539120000001" height="576" class="cluster"/>
+        <text x="930.3808360000003" y="635.572296" class="cluster-label" text-anchor="middle"><tspan x="930.3808360000003" y="635.572296" dy="-0.75em">After Refactoring (chat.rs,</tspan><tspan x="930.3808360000003" dy="1.5em">health.rs)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="-0.00000000000011368683772161603" y="136.3672" width="1287.0077920000003" height="486.10159999999996" class="cluster"/>
-        <text x="643.503896" y="152.3672" class="cluster-label" text-anchor="middle">Coworker Lifecycle States</text>
+        <rect x="0" y="103.8418" width="1247.007792" height="381.730496" class="cluster"/>
+        <text x="623.503896" y="119.8418" class="cluster-label" text-anchor="middle">Coworker Lifecycle States</text>
       </g>
       <g class="cluster" id="subgraph-subGraph3">
-        <rect x="809.85154" y="1391.4688" width="300.0000000000001" height="479" class="cluster"/>
-        <text x="959.8515400000001" y="1407.4688" class="cluster-label" text-anchor="middle">PR #722 Fix</text>
+        <rect x="769.8515400000001" y="1254.572296" width="300" height="479" class="cluster"/>
+        <text x="919.8515400000001" y="1270.572296" class="cluster-label" text-anchor="middle">PR #722 Fix</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-M1-M2-0">
-        <path d="M1572.007792,350.7344L1572.007792,400.19013333333334C1572.007792,449.6458666666667,1572.007792,548.5573333333333,1572.007792,601.5130666666666C1572.007792,654.4688,1572.007792,661.4688,1572.007792,664.9688L1572.007792,668.4688" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1622.0077920000003,282.286148L1622.0077920000003,320.3338393333334C1622.0077920000003,358.3815306666667,1622.0077920000003,434.4769133333334,1622.0077920000003,476.0246046666668C1622.0077920000003,517.572296,1622.0077920000003,524.572296,1622.0077920000003,528.0722960000002L1622.0077920000003,531.572296" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-M2-M3-0">
-        <path d="M1572.007792,726.4688L1572.007792,730.6354666666666C1572.007792,734.8021333333332,1572.007792,743.1354666666666,1572.007792,751.4688C1572.007792,759.8021333333332,1572.007792,768.1354666666666,1572.007792,775.8021333333332C1572.007792,783.4688,1572.007792,790.4688,1572.007792,793.9688L1572.007792,797.4688" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1622.0077920000003,589.572296L1622.0077920000003,593.7389626666668C1622.0077920000003,597.9056293333334,1622.0077920000003,606.2389626666667,1622.0077920000003,614.5722960000002C1622.0077920000003,622.9056293333334,1622.0077920000003,631.2389626666667,1622.0077920000003,638.9056293333334C1622.0077920000003,646.572296,1622.0077920000003,653.572296,1622.0077920000003,657.0722960000002L1622.0077920000003,660.572296" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-M3-M4-0">
-        <path d="M1673.9396101818184,879.4688L1695.2843071515153,887.6354666666666C1716.6290041212123,895.8021333333332,1759.3183980606063,912.1354666666666,1780.663095030303,927.8021333333332C1802.007792,943.4688,1802.007792,958.4688000000001,1802.007792,965.9688L1802.007792,973.4688000000001" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1693.034602636364,742.572296L1707.90773819697,750.7389626666668C1722.780873757576,758.9056293333333,1752.5271448787882,775.2389626666667,1767.4002804393942,790.9056293333334C1782.2734160000007,806.5722959999999,1782.2734160000007,821.5722959999999,1782.2734160000002,829.0722960000002L1782.2734160000005,836.572296" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-R1-R2-0">
-        <path d="M803.75388,867.4688L803.7538800000001,877.6354666666666C803.7538799999999,887.8021333333332,803.7538799999999,908.1354666666666,803.7538800000001,925.8021333333332C803.7538799999999,943.4688,803.7538799999999,958.4688000000001,803.7538800000001,965.9688L803.75388,973.4688000000001" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M763.7538800000002,730.572296L763.7538800000002,740.7389626666668C763.7538800000002,750.9056293333333,763.7538800000002,771.2389626666667,763.7538800000002,788.9056293333334C763.7538800000002,806.5722959999999,763.7538800000002,821.5722959999999,763.7538800000002,829.0722960000002L763.7538800000002,836.572296" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-R3-R4-0">
-        <path d="M1115.9492,879.4688L1115.9492,887.6354666666666C1115.9492,895.8021333333332,1115.9492,912.1354666666666,1115.9492,929.8021333333332C1115.9492,947.4688,1115.9492,966.4688000000001,1115.9492,975.9688L1115.9492,985.4688000000001" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1075.9492000000002,742.572296L1075.9492000000002,750.7389626666668C1075.9492000000002,758.9056293333333,1075.9492000000002,775.2389626666667,1075.9492000000002,792.9056293333334C1075.9492000000002,810.5722959999999,1075.9492000000002,829.5722959999999,1075.9492000000002,839.0722960000002L1075.9492000000002,848.572296" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-R2-R5-0">
-        <path d="M803.75388,1055.4688L803.7538800000001,1059.6354666666668C803.7538799999999,1063.8021333333334,803.7538799999999,1072.1354666666668,803.7538800000001,1080.4688000000003C803.7538799999999,1088.8021333333334,803.7538799999999,1097.1354666666668,815.6292102285785,1105.2581002061622C827.5045404571568,1113.3807337456576,851.2552009143137,1121.292667491315,863.1305311428922,1125.2486343641438L875.0058613714706,1129.2046012369724" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M763.7538800000002,918.572296L763.7538800000002,922.7389626666668C763.7538800000002,926.9056293333333,763.7538800000002,935.2389626666667,763.7538800000002,943.5722960000002C763.7538800000002,951.9056293333333,763.7538800000002,960.2389626666667,775.6292102285787,968.3615962061622C787.5045404571571,976.4842297456574,811.2552009143141,984.3961634913148,823.1305311428924,988.3521303641437L835.0058613714708,992.3080972369723" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-R4-R5-0">
-        <path d="M1115.9492,1043.4688L1115.9492,1049.6354666666668C1115.9492,1055.8021333333334,1115.9492,1068.1354666666668,1115.9492,1078.4688000000003C1115.9492,1088.8021333333334,1115.9492,1097.1354666666668,1104.0738697714216,1105.2581002061622C1092.198539542843,1113.3807337456576,1068.4478790856863,1121.292667491315,1056.572548857108,1125.2486343641438L1044.6972186285295,1129.2046012369724" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1075.9492000000002,906.572296L1075.9492000000002,912.7389626666668C1075.9492000000002,918.9056293333333,1075.9492000000002,931.2389626666667,1075.9492000000002,941.5722960000002C1075.9492000000002,951.9056293333333,1075.9492000000002,960.2389626666667,1064.0738697714216,968.3615962061622C1052.1985395428435,976.4842297456574,1028.4478790856865,984.3961634913148,1016.5725488571079,988.3521303641437L1004.6972186285295,992.3080972369723" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-R5-R6-0">
-        <path d="M959.85154,1184.4688L959.85154,1188.6354666666668C959.85154,1192.8021333333334,959.85154,1201.1354666666668,959.85154,1208.8021333333336C959.85154,1216.4688,959.85154,1223.4688,959.85154,1226.9688000000003L959.85154,1230.4688" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M919.8515400000001,1047.572296L919.85154,1051.7389626666668C919.8515400000001,1055.9056293333333,919.8515400000001,1064.2389626666666,919.85154,1071.9056293333335C919.8515400000001,1079.572296,919.8515400000001,1086.572296,919.85154,1090.072296L919.8515400000001,1093.572296" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S1-S2-0">
-        <path d="M102.24568659745873,235.3672L117.01202949788227,251.9284C131.77837239830578,268.4896,161.31105819915285,301.612,184.49406776624303,318.1732C207.67707733333324,334.7344,224.51041066666662,334.7344,232.92707733333327,334.7344L241.34374399999993,334.7344" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M109.15103633827995,202.8418L121.93315428189997,213.98210000000003C134.71527222551995,225.12240000000006,160.27950811276,247.40300000000005,180.64495938971334,258.54330000000004C201.01041066666667,269.68360000000007,216.17707733333336,269.68360000000007,223.76041066666673,269.68360000000007L231.34374400000004,269.68360000000007" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S2-S3-0">
-        <path d="M321.4459571105857,361.7344L337.24793225882144,385.5762C353.0499074070571,409.41799999999995,384.6538577035285,457.10159999999996,420.39007818509754,480.94339999999994C456.12629866666657,504.7852,495.99478933333324,504.7852,515.9290346666666,504.7852L535.8632799999999,504.7852" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M318.8681797808198,296.68360000000007L332.59978448401654,311.32780800000006C346.33138918721323,325.97201600000005,373.7945985936066,355.26043200000004,406.6271152968033,369.90464000000003C439.45963200000006,384.5488480000001,477.66145600000004,384.5488480000001,496.762368,384.54884799999996L515.86328,384.548848" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S3-S4-0">
-        <path d="M661.652336,528.1144382620098L682.253248,536.0068318850082C702.85416,543.8992255080066,744.055984,559.6840127540032,773.0735626666666,567.5764063770017C802.0911413333333,575.4688,818.9244746666667,575.4688,827.3411413333333,575.4688L835.757808,575.4688" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M641.6523360000001,402.8760478155574L661.4199146666668,408.82542251296445C681.1874933333335,414.7747972103716,720.7226506666667,426.6735466051858,748.0735626666668,432.62292130259294C775.4244746666667,438.57229600000005,790.5911413333333,438.57229600000005,798.1744746666668,438.5722960000001L805.7578080000001,438.57229600000005" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S1-L1-0">
-        <path d="M102.24568659745873,181.3672L117.01202949788227,164.806C131.77837239830578,148.2448,161.31105819915285,115.12240000000001,194.8619064329097,98.5612C228.4127546666666,82,265.98176533333327,82,303.55077599999987,82C341.1197866666666,82,378.68879733333324,82,428.22330266666654,82C477.7578079999999,82,539.257808,82,600.757808,82C662.257808,82,723.757808,82,773.4322866666666,82C823.1067653333333,82,860.9557226666666,82,898.8046800000001,82C936.6536373333333,82,974.5025946666666,82,1016.5865393475516,127.30938397418663C1058.6704840284367,172.61876794837326,1104.9894160568736,263.2375358967465,1128.148882071092,308.54691987093315L1151.3083480853104,353.8563038451198" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M109.15103633827998,148.8418L121.93315428189999,137.7015C134.71527222552,126.56120000000003,160.27950811276,104.2806,191.01279805638,93.14030000000002C221.74608800000001,82.00000000000003,257.648432,82.00000000000003,293.55077600000004,82.00000000000001C329.45312000000007,82.00000000000003,365.35546400000004,82.00000000000003,413.2233026666667,82.00000000000001C461.0911413333333,82.00000000000003,520.9244746666667,82.00000000000003,580.757808,82.00000000000001C640.5911413333334,82.00000000000003,700.4244746666667,82.00000000000003,748.4322866666668,82.00000000000001C796.4400986666668,82.00000000000003,832.6223893333334,82.00000000000003,868.8046800000001,82.00000000000001C904.9869706666668,82.00000000000003,941.1692613333335,82.00000000000003,980.717998664356,113.20490672254846C1020.2667359953786,144.4098134450969,1063.181919990757,206.81962689019375,1084.6395119884464,238.0245336127422L1106.0971039861356,269.22944033529063" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S2-L1-0">
-        <path d="M361.75780799999995,334.7344L370.84114133333327,334.7344C379.9244746666666,334.7344,398.09114133333327,334.7344,437.9244746666666,334.7344C477.7578079999999,334.7344,539.257808,334.7344,600.757808,334.7344C662.257808,334.7344,723.757808,334.7344,773.4322866666666,334.7344C823.1067653333333,334.7344,860.9557226666666,334.7344,898.8046800000001,334.7344C936.6536373333333,334.7344,974.5025946666666,334.7344,1004.5547781990387,338.31100215731544C1034.6069617314108,341.8876043146309,1056.862371462822,349.0408086292618,1067.9900763285275,352.61741078657724L1079.117781194233,356.19401294389263" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M351.75780800000007,269.68360000000007L360.00780800000007,269.68360000000007C368.25780800000007,269.68360000000007,384.757808,269.68360000000007,422.92447466666664,269.68360000000007C461.0911413333333,269.68360000000007,520.9244746666667,269.68360000000007,580.757808,269.68360000000007C640.5911413333334,269.68360000000007,700.4244746666667,269.68360000000007,748.4322866666668,269.68360000000007C796.4400986666668,269.68360000000007,832.6223893333334,269.68360000000007,868.8046800000001,269.68360000000007C904.9869706666668,269.68360000000007,941.1692613333335,269.68360000000007,966.8566242373159,271.1990944152247C992.5439871412985,272.71458883044926,1007.7364222825968,275.7455776608985,1015.332639853246,277.2610720761231L1022.9288574238951,278.77656649134775" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S3-L1-0">
-        <path d="M661.652336,481.4559617379902L682.253248,473.5635681149918C702.85416,465.6711744919935,744.055984,449.88638724599673,783.5813746666666,441.9939936229983C823.1067653333333,434.10159999999996,860.9557226666666,434.10159999999996,898.8046800000001,434.10159999999996C936.6536373333333,434.10159999999996,974.5025946666666,434.10159999999996,1004.5547781990387,430.52499784268457C1034.6069617314108,426.9483956853691,1056.862371462822,419.7951913707382,1067.9900763285275,416.21858921342283L1079.117781194233,412.6419870561074" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M641.6523360000001,366.22164818444264L661.4199146666668,360.27227348703553C681.1874933333335,354.3228987896284,720.7226506666667,342.42414939481415,758.5813746666668,336.4747746974071C796.4400986666668,330.5254,832.6223893333334,330.5254,868.8046800000001,330.5254C904.9869706666668,330.5254,941.1692613333335,330.5254,966.8576121452888,328.9508824847559C992.5459629572443,327.37636496951177,1007.7403739144887,324.22732993902355,1015.3375793931109,322.65281242377944L1022.934784871733,321.0782949085353" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S4-L1-0">
-        <path d="M957.851552,575.4688L966.9348853333332,575.4688C976.0182186666666,575.4688,994.1848853333332,575.4688,1024.9709831524628,548.645272082705C1055.7570809715926,521.82174416541,1099.1626099431853,468.17468833081995,1120.8653744289816,441.35116041352495L1142.5681389147778,414.52763249622996" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M927.8515520000001,438.57229600000005L936.1015520000001,438.5722960000001C944.3515520000001,438.57229600000005,960.8515520000001,438.57229600000005,988.7021347497938,420.35171540204936C1016.5527174995874,402.1311348040985,1055.7538829991747,365.689973608197,1075.3544657489683,347.4693930102462L1094.955048498762,329.2488124122954" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S2-L2-0">
-        <path d="M334.175467689008,307.7344L347.85585774084,295.6732C361.53624779267193,283.612,388.89702789633594,259.48960000000005,410.99408461483455,247.4284C433.09114133333327,235.36720000000003,449.9244746666666,235.36720000000003,458.34114133333327,235.36720000000005L466.75780799999995,235.36720000000003" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M332.8492876756757,242.68360000000004L344.25070772972975,234.8502666666667C355.6521277837838,227.01693333333336,378.45496789189195,211.3502666666667,397.43972127927935,203.51693333333336C416.42447466666664,195.68360000000004,431.5911413333334,195.68360000000004,439.17447466666664,195.68360000000004L446.75780800000007,195.68360000000004" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-F1-F2-0">
-        <path d="M959.85154,1490.4688L959.85154,1494.6354666666668C959.85154,1498.8021333333334,959.85154,1507.1354666666666,959.85154,1514.8021333333336C959.85154,1522.4687999999999,959.85154,1529.4687999999999,959.85154,1532.9688000000003L959.85154,1536.4688" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M919.8515400000001,1353.572296L919.85154,1357.7389626666668C919.8515400000001,1361.9056293333333,919.8515400000001,1370.2389626666666,919.85154,1377.9056293333333C919.8515400000001,1385.572296,919.8515400000001,1392.572296,919.85154,1396.072296L919.8515400000001,1399.572296" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-F2-F3-0">
-        <path d="M959.85154,1594.4688L959.85154,1598.6354666666668C959.85154,1602.8021333333334,959.85154,1611.1354666666666,959.85154,1618.8021333333336C959.85154,1626.4687999999999,959.85154,1633.4687999999999,959.85154,1636.9688000000003L959.85154,1640.4688" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M919.8515400000001,1457.572296L919.85154,1461.7389626666666C919.8515400000001,1465.9056293333333,919.8515400000001,1474.2389626666666,919.85154,1481.9056293333333C919.8515400000001,1489.572296,919.8515400000001,1496.572296,919.85154,1500.072296L919.8515400000001,1503.572296" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-F3-F4-0">
-        <path d="M959.85154,1722.4688L959.85154,1726.6354666666668C959.85154,1730.8021333333334,959.85154,1739.1354666666666,959.85154,1746.8021333333336C959.85154,1754.4687999999999,959.85154,1761.4687999999999,959.85154,1764.9688000000003L959.85154,1768.4688" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M919.8515400000001,1585.572296L919.85154,1589.7389626666666C919.8515400000001,1593.9056293333333,919.8515400000001,1602.2389626666666,919.85154,1609.9056293333333C919.8515400000001,1617.572296,919.8515400000001,1624.572296,919.85154,1628.072296L919.8515400000001,1631.572296" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-M3-R2-0">
-        <path d="M1470.0759738181819,879.4688L1448.731276848485,887.6354666666666C1427.386579878788,895.8021333333332,1384.697185939394,912.1354666666666,1295.9681018628091,931.3189154378471C1207.2390177862242,950.5023642090276,1072.4702435724482,972.5359284180553,1005.0858564655604,983.5527105225689L937.7014693586724,994.5694926270828" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1524.5077920000003,742.572296L1504.0911253333336,750.7389626666668C1483.674458666667,758.9056293333333,1442.8411253333336,775.2389626666667,1338.3758923236453,794.9939231128566C1233.9106593139566,814.7488835590465,1065.813526627913,837.9254711180928,981.7649602848911,849.5137648976159L897.7163939418692,861.1020586771391" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-M3-R4-0">
-        <path d="M1572.007792,879.4688L1572.007792,887.6354666666666C1572.007792,895.8021333333332,1572.007792,912.1354666666666,1515.1337386004627,931.2764177497517C1458.2596852009253,950.4173688328366,1344.5115784018508,972.3659376656733,1287.6375250023134,983.3402220820917L1230.763471602776,994.31450649851" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1622.0077920000003,742.572296L1622.0077920000003,750.7389626666668C1622.0077920000003,758.9056293333333,1622.0077920000003,775.2389626666667,1550.1373214230225,794.987905490933C1478.2668508460447,814.7368483151994,1334.5259096920893,837.9014006303987,1262.6554391151114,849.4836767879983L1190.7849685381336,861.065952945598" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-R6-F1-0">
-        <path d="M959.85154,1312.4688L959.85154,1316.6354666666668C959.85154,1320.8021333333334,959.85154,1329.1354666666668,959.85154,1339.4688000000003C959.85154,1349.8021333333334,959.85154,1362.1354666666668,959.85154,1374.4688000000003C959.85154,1386.8021333333334,959.85154,1399.1354666666666,959.85154,1408.8021333333336C959.85154,1418.4687999999999,959.85154,1425.4687999999999,959.85154,1428.9688000000003L959.85154,1432.4688" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M919.8515400000001,1175.572296L919.85154,1179.7389626666668C919.8515400000001,1183.9056293333333,919.8515400000001,1192.2389626666666,919.85154,1202.572296C919.8515400000001,1212.9056293333333,919.8515400000001,1225.2389626666666,919.85154,1237.572296C919.8515400000001,1249.9056293333333,919.8515400000001,1262.2389626666666,919.85154,1271.9056293333335C919.8515400000001,1281.572296,919.8515400000001,1288.572296,919.85154,1292.072296L919.8515400000001,1295.572296" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-M3-M4-0">
-        <rect x="1720.856018251228" y="901.723773522209" width="80" height="22" class="edge-label-bg"/>
-        <text x="1760.856018251228" y="912.723773522209" class="edge-label" text-anchor="middle" dominant-baseline="central">assumption</text>
+        <rect x="1742.2734160000005" y="780.572296" width="80" height="22" class="edge-label-bg"/>
+        <text x="1782.2734160000005" y="791.572296" class="edge-label" text-anchor="middle" dominant-baseline="central">assumption</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S1-S2-0">
-        <rect x="113.8796709551237" y="294.3900694888634" width="101.6" height="22" class="edge-label-bg"/>
-        <text x="164.6796709551237" y="305.3900694888634" class="edge-label" text-anchor="middle" dominant-baseline="central">no window yet</text>
+        <rect x="135.043744" y="258.68360000000007" width="101.6" height="22" class="edge-label-bg"/>
+        <text x="185.84374400000002" y="269.68360000000007" class="edge-label" text-anchor="middle" dominant-baseline="central">no window yet</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S2-S3-0">
-        <rect x="362.99529280303784" y="473.7749018026741" width="80" height="22" class="edge-label-bg"/>
-        <text x="402.99529280303784" y="484.7749018026741" class="edge-label" text-anchor="middle" dominant-baseline="central">has window</text>
+        <rect x="361.257808" y="373.548848" width="80" height="22" class="edge-label-bg"/>
+        <text x="401.257808" y="384.548848" class="edge-label" text-anchor="middle" dominant-baseline="central">has window</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S3-S4-0">
-        <rect x="665.7015615947108" y="550.5403968649707" width="166.4" height="22" class="edge-label-bg"/>
-        <text x="748.9015615947109" y="561.5403968649707" class="edge-label" text-anchor="middle" dominant-baseline="central">window being torn down</text>
+        <rect x="677.057808" y="427.57229600000005" width="166.4" height="22" class="edge-label-bg"/>
+        <text x="760.2578080000001" y="438.57229600000005" class="edge-label" text-anchor="middle" dominant-baseline="central">window being torn down</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S1-L1-0">
-        <rect x="646.0884403607018" y="71" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="689.6884403607019" y="82" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
+        <rect x="537.157808" y="71.00000000000003" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="580.7578080000001" y="82.00000000000003" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S2-L1-0">
-        <rect x="680.5197778485676" y="323.7344" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="724.1197778485677" y="334.7344" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
+        <rect x="716.657808" y="258.68360000000007" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="760.2578080000001" y="269.68360000000007" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S3-L1-0">
-        <rect x="826.0867961161857" y="423.10159999999996" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="869.6867961161857" y="434.10159999999996" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
+        <rect x="825.20468" y="319.5254" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="868.8046800000001" y="330.5254" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S4-L1-0">
-        <rect x="1017.9776835988117" y="503.6277713805664" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="1061.5776835988117" y="514.6277713805664" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
+        <rect x="933.7515520000001" y="427.57229600000005" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="977.3515520000001" y="438.57229600000005" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S2-L2-0">
-        <rect x="352.0569319248067" y="242.52978787773722" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="395.6569319248067" y="253.52978787773722" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
+        <rect x="357.657808" y="184.68360000000004" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="401.257808" y="195.68360000000004" class="edge-label" text-anchor="middle" dominant-baseline="central">included in</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-M3-R2-0">
-        <rect x="1133.1435338520332" y="930.7795616113733" width="144.79999999999998" height="40" class="edge-label-bg"/>
-        <text x="1205.5435338520333" y="950.7795616113733" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="1205.5435338520333" y="950.7795616113733" dy="-0.6em">refactoring exposed</tspan><tspan x="1205.5435338520333" dy="1.2em">assumption</tspan></text>
+        <rect x="1329.6077920000002" y="771.572296" width="144.79999999999998" height="40" class="edge-label-bg"/>
+        <text x="1402.0077920000003" y="791.572296" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="1402.0077920000003" y="791.572296" dy="-0.75em">refactoring exposed</tspan><tspan x="1402.0077920000003" dy="1.5em">assumption</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-M3-R4-0">
-        <rect x="1351.0781095670036" y="937.1287403747308" width="144.79999999999998" height="40" class="edge-label-bg"/>
-        <text x="1423.4781095670037" y="957.1287403747308" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="1423.4781095670037" y="957.1287403747308" dy="-0.6em">refactoring exposed</tspan><tspan x="1423.4781095670037" dy="1.2em">assumption</tspan></text>
+        <rect x="1549.6077920000002" y="771.572296" width="144.79999999999998" height="40" class="edge-label-bg"/>
+        <text x="1622.0077920000003" y="791.572296" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="1622.0077920000003" y="791.572296" dy="-0.75em">refactoring exposed</tspan><tspan x="1622.0077920000003" dy="1.5em">assumption</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-R6-F1-0">
-        <rect x="916.25154" y="1363.4688" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="959.85154" y="1374.4688" class="edge-label" text-anchor="middle" dominant-baseline="central">PR #722 fix</text>
+        <rect x="876.2515400000001" y="1226.572296" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="919.8515400000001" y="1237.572296" class="edge-label" text-anchor="middle" dominant-baseline="central">PR #722 fix</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node default" id="node-M1">
-        <rect x="1445.3163760000002" y="296.7344" width="253.38283199999998" height="54"/>
-        <text x="1572.007792" y="323.7344" class="label" text-anchor="middle" dominant-baseline="central">Monolithic daemon module</text>
+        <rect x="1495.3163760000004" y="228.28614800000003" width="253.38283199999998" height="54"/>
+        <text x="1622.0077920000003" y="255.28614800000003" class="label" text-anchor="middle" dominant-baseline="central">Monolithic daemon module</text>
       </g>
       <g class="node default" id="node-M2">
-        <rect x="1466.824184" y="672.4688" width="210.36721599999998" height="54"/>
-        <text x="1572.007792" y="699.4688" class="label" text-anchor="middle" dominant-baseline="central">All nudge logic inline</text>
+        <rect x="1516.8241840000003" y="535.572296" width="210.36721599999998" height="54"/>
+        <text x="1622.0077920000003" y="562.572296" class="label" text-anchor="middle" dominant-baseline="central">All nudge logic inline</text>
       </g>
       <g class="node default" id="node-M3">
-        <rect x="1442.007792" y="801.4688" width="260" height="78"/>
-        <text x="1572.007792" y="840.4688" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1572.007792" y="840.4688" dy="-0.6em">Implicit use of</tspan><tspan x="1572.007792" dy="1.2em">active_coworkers</tspan></text>
+        <rect x="1492.0077920000003" y="664.572296" width="260" height="78"/>
+        <text x="1622.0077920000003" y="703.572296" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1622.0077920000003" y="703.572296" dy="-0.75em">Implicit use of</tspan><tspan x="1622.0077920000003" dy="1.5em">active_coworkers</tspan></text>
       </g>
       <g class="node default" id="node-M4">
-        <rect x="1672.007792" y="977.4688000000001" width="260" height="78"/>
-        <text x="1802.007792" y="1016.4688000000001" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1802.007792" y="1016.4688000000001" dy="-0.6em">All active = have tmux</tspan><tspan x="1802.007792" dy="1.2em">windows</tspan></text>
+        <rect x="1652.2734160000005" y="840.572296" width="260" height="78"/>
+        <text x="1782.2734160000005" y="879.572296" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1782.2734160000005" y="879.572296" dy="-0.75em">All active = have tmux</tspan><tspan x="1782.2734160000005" dy="1.5em">windows</tspan></text>
       </g>
       <g class="node default" id="node-R1">
-        <rect x="692.617152" y="813.4688" width="222.273456" height="54"/>
-        <text x="803.75388" y="840.4688" class="label" text-anchor="middle" dominant-baseline="central">Extracted route_at_all</text>
+        <rect x="652.6171520000003" y="676.572296" width="222.273456" height="54"/>
+        <text x="763.7538800000002" y="703.572296" class="label" text-anchor="middle" dominant-baseline="central">Extracted route_at_all</text>
       </g>
       <g class="node default" id="node-R2">
-        <rect x="673.75388" y="977.4688000000001" width="260" height="78"/>
-        <text x="803.75388" y="1016.4688000000001" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="803.75388" y="1016.4688000000001" dy="-0.6em">Uses .list() →</tspan><tspan x="803.75388" dy="1.2em">active_coworkers</tspan></text>
+        <rect x="633.7538800000002" y="840.572296" width="260" height="78"/>
+        <text x="763.7538800000002" y="879.572296" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="763.7538800000002" y="879.572296" dy="-0.75em">Uses .list() →</tspan><tspan x="763.7538800000002" dy="1.5em">active_coworkers</tspan></text>
       </g>
       <g class="node default" id="node-R3">
-        <rect x="964.8906079999999" y="801.4688" width="302.11718400000007" height="78"/>
-        <text x="1115.9492" y="840.4688" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1115.9492" y="840.4688" dy="-0.6em">Extracted</tspan><tspan x="1115.9492" dy="1.2em">maybe_nudge_usage_limit_expiry</tspan></text>
+        <rect x="924.8906080000002" y="664.572296" width="302.11718400000007" height="78"/>
+        <text x="1075.9492000000002" y="703.572296" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1075.9492000000002" y="703.572296" dy="-0.75em">Extracted</tspan><tspan x="1075.9492000000002" dy="1.5em">maybe_nudge_usage_limit_expiry</tspan></text>
       </g>
       <g class="node default" id="node-R4">
-        <rect x="1005.06248" y="989.4688000000001" width="221.77344000000002" height="54"/>
-        <text x="1115.9492" y="1016.4688000000001" class="label" text-anchor="middle" dominant-baseline="central">Uses active_coworkers</text>
+        <rect x="965.0624800000003" y="852.572296" width="221.77344000000002" height="54"/>
+        <text x="1075.9492000000002" y="879.572296" class="label" text-anchor="middle" dominant-baseline="central">Uses active_coworkers</text>
       </g>
       <g class="node default" id="node-R5">
-        <rect x="838.957004" y="1130.4688" width="241.78907200000003" height="54"/>
-        <text x="959.85154" y="1157.4688" class="label" text-anchor="middle" dominant-baseline="central">Attempts tmux send-keys</text>
+        <rect x="798.9570040000001" y="993.572296" width="241.78907200000003" height="54"/>
+        <text x="919.8515400000001" y="1020.572296" class="label" text-anchor="middle" dominant-baseline="central">Attempts tmux send-keys</text>
       </g>
       <g class="node default" id="node-R6">
-        <rect x="828.5116840000001" y="1234.4688" width="262.679712" height="78" style="fill:#fdd !important"/>
-        <text x="959.8515400000001" y="1273.4688" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="959.8515400000001" y="1273.4688" dy="-0.6em">❌ Error: Starting/Stopping</tspan><tspan x="959.8515400000001" dy="1.2em">have no tmux window</tspan></text>
+        <rect x="788.5116840000001" y="1097.572296" width="262.679712" height="78" style="fill:#fdd !important"/>
+        <text x="919.8515400000001" y="1136.572296" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="919.8515400000001" y="1136.572296" dy="-0.75em">❌ Error: Starting/Stopping</tspan><tspan x="919.8515400000001" dy="1.5em">have no tmux window</tspan></text>
       </g>
       <g class="node default" id="node-S1">
-        <rect x="19.999999999999886" y="181.3672" width="116.34374400000002" height="54"/>
-        <text x="78.1718719999999" y="208.3672" class="label" text-anchor="middle" dominant-baseline="central">Starting</text>
+        <rect x="20" y="148.8418" width="116.34374400000002" height="54"/>
+        <text x="78.17187200000001" y="175.8418" class="label" text-anchor="middle" dominant-baseline="central">Starting</text>
       </g>
       <g class="node default" id="node-S2">
-        <rect x="245.34374399999993" y="307.7344" width="116.414064" height="54"/>
-        <text x="303.5507759999999" y="334.7344" class="label" text-anchor="middle" dominant-baseline="central">Running</text>
+        <rect x="235.34374400000004" y="242.68360000000004" width="116.414064" height="54"/>
+        <text x="293.55077600000004" y="269.68360000000007" class="label" text-anchor="middle" dominant-baseline="central">Running</text>
       </g>
       <g class="node default" id="node-S3">
-        <rect x="539.8632799999999" y="477.7852" width="121.78905599999999" height="54"/>
-        <text x="600.757808" y="504.7852" class="label" text-anchor="middle" dominant-baseline="central">Stopping</text>
+        <rect x="519.86328" y="357.548848" width="121.78905599999999" height="54"/>
+        <text x="580.7578080000001" y="384.548848" class="label" text-anchor="middle" dominant-baseline="central">Stopping</text>
       </g>
       <g class="node default" id="node-S4">
-        <rect x="839.757808" y="548.4688" width="118.093744" height="54"/>
-        <text x="898.80468" y="575.4688" class="label" text-anchor="middle" dominant-baseline="central">Stopped</text>
+        <rect x="809.7578080000001" y="411.57229600000005" width="118.093744" height="54"/>
+        <text x="868.8046800000001" y="438.57229600000005" class="label" text-anchor="middle" dominant-baseline="central">Stopped</text>
       </g>
       <g class="node default" id="node-L1">
-        <rect x="1066.851552" y="357.418" width="200.15624000000003" height="54" style="fill:#fee !important"/>
-        <text x="1166.9296720000002" y="384.418" class="label" text-anchor="middle" dominant-baseline="central">list() → all statuses</text>
+        <rect x="1026.851552" y="272.52540000000005" width="200.15624000000003" height="54" style="fill:#fee !important"/>
+        <text x="1126.9296720000002" y="299.52540000000005" class="label" text-anchor="middle" dominant-baseline="central">list() → all statuses</text>
       </g>
       <g class="node default" id="node-L2">
-        <rect x="470.75780799999995" y="196.36720000000003" width="260" height="78" style="fill:#efe !important"/>
-        <text x="600.757808" y="235.36720000000003" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="600.757808" y="235.36720000000003" dy="-0.6em">list_running() → Running</tspan><tspan x="600.757808" dy="1.2em">only</tspan></text>
+        <rect x="450.75780800000007" y="156.68360000000004" width="260" height="78" style="fill:#efe !important"/>
+        <text x="580.7578080000001" y="195.68360000000004" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="580.7578080000001" y="195.68360000000004" dy="-0.75em">list_running() → Running</tspan><tspan x="580.7578080000001" dy="1.5em">only</tspan></text>
       </g>
       <g class="node default" id="node-F1">
-        <rect x="836.9531" y="1436.4688" width="245.79688000000002" height="54"/>
-        <text x="959.85154" y="1463.4688" class="label" text-anchor="middle" dominant-baseline="central">Replace active_coworkers</text>
+        <rect x="796.9531000000001" y="1299.572296" width="245.79688000000002" height="54"/>
+        <text x="919.8515400000001" y="1326.572296" class="label" text-anchor="middle" dominant-baseline="central">Replace active_coworkers</text>
       </g>
       <g class="node default" id="node-F2">
-        <rect x="843.468716" y="1540.4688" width="232.76564800000003" height="54"/>
-        <text x="959.85154" y="1567.4688" class="label" text-anchor="middle" dominant-baseline="central">With running_coworkers</text>
+        <rect x="803.4687160000001" y="1403.572296" width="232.76564800000003" height="54"/>
+        <text x="919.8515400000001" y="1430.572296" class="label" text-anchor="middle" dominant-baseline="central">With running_coworkers</text>
       </g>
       <g class="node default" id="node-F3">
-        <rect x="829.85154" y="1644.4688" width="260" height="78"/>
-        <text x="959.85154" y="1683.4688" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="959.85154" y="1683.4688" dy="-0.6em">Filter by</tspan><tspan x="959.85154" dy="1.2em">CoworkerStatus::Running</tspan></text>
+        <rect x="789.8515400000001" y="1507.572296" width="260" height="78"/>
+        <text x="919.8515400000001" y="1546.572296" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="919.8515400000001" y="1546.572296" dy="-0.75em">Filter by</tspan><tspan x="919.8515400000001" dy="1.5em">CoworkerStatus::Running</tspan></text>
       </g>
       <g class="node default" id="node-F4">
-        <rect x="829.85154" y="1772.4688" width="260" height="78" style="fill:#dfd !important"/>
-        <text x="959.85154" y="1811.4688" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="959.85154" y="1811.4688" dy="-0.6em">✓ Only nudge coworkers</tspan><tspan x="959.85154" dy="1.2em">with tmux windows</tspan></text>
+        <rect x="789.8515400000001" y="1635.572296" width="260" height="78" style="fill:#dfd !important"/>
+        <text x="919.8515400000001" y="1674.572296" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="919.8515400000001" y="1674.572296" dy="-0.75em">✓ Only nudge coworkers</tspan><tspan x="919.8515400000001" dy="1.5em">with tmux windows</tspan></text>
       </g>
     </g>
   </g>

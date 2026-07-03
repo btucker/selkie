@@ -97,12 +97,12 @@ rect.text{fill:none;stroke-width:0;}
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-F-G-0">
-        <rect x="139.8531926363566" y="511.9090616257407" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="154.6531926363566" y="522.9090616257407" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <rect x="115.2" y="540.070368" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="130" y="551.070368" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F-H-0">
-        <rect x="339.77862492633005" y="516.4235643839353" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="350.97862492633004" y="527.4235643839353" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+        <rect x="360.479696" y="540.070368" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="371.679696" y="551.070368" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
     </g>
     <g class="nodes">
@@ -132,7 +132,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-G">
         <rect x="0" y="588.070368" width="260" height="78"/>
-        <text x="130" y="627.070368" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="130" y="627.070368" dy="-0.6em">Remove 42 from blockedBy</tspan><tspan x="130" dy="1.2em">array</tspan></text>
+        <text x="130" y="627.070368" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="130" y="627.070368" dy="-0.75em">Remove 42 from blockedBy</tspan><tspan x="130" dy="1.5em">array</tspan></text>
       </g>
       <g class="node default" id="node-H">
         <rect x="310" y="600.070368" width="123.359392" height="54"/>
@@ -144,7 +144,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-J">
         <rect x="401.87503200000003" y="362.035184" width="260" height="102" style="fill:#ffe1e1 !important"/>
-        <text x="531.875032" y="413.035184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="531.875032" y="413.035184" dy="-1.2em">Without ClearBlockedBy:</tspan><tspan x="531.875032" dy="1.2em">Dependent tasks stuck</tspan><tspan x="531.875032" dy="1.2em">forever</tspan></text>
+        <text x="531.875032" y="413.035184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="531.875032" y="413.035184" dy="-1.5em">Without ClearBlockedBy:</tspan><tspan x="531.875032" dy="1.5em">Dependent tasks stuck</tspan><tspan x="531.875032" dy="1.5em">forever</tspan></text>
       </g>
     </g>
   </g>

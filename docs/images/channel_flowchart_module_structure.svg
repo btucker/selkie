@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="980.0235360000001" height="706.9296959999999" viewBox="-8.000000000000057 -8 980.0235360000001 706.9296959999999" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="960.0235360000001" height="643.984384" viewBox="-8.000000000000057 -8 960.0235360000001 643.984384" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -67,100 +67,100 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="14.535159999999962" y="56.039071999999976" width="635.6836719999999" height="506.89062399999995" class="cluster"/>
-        <text x="332.3769959999999" y="72.03907199999998" class="cluster-label" text-anchor="middle">app.rs</text>
+        <rect x="14.535159999999962" y="20.984383999999977" width="625.6836719999999" height="479" class="cluster"/>
+        <text x="327.3769959999999" y="36.98438399999998" class="cluster-label" text-anchor="middle">app.rs</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="-0.00000000000005684341886080802" y="315.929696" width="281.25784000000004" height="374.99999999999994" class="cluster"/>
-        <text x="140.62891999999997" y="331.929696" class="cluster-label" text-anchor="middle">mod.rs</text>
+        <rect x="-0.00000000000005684341886080802" y="252.98438399999998" width="281.25784000000004" height="375" class="cluster"/>
+        <text x="140.62891999999997" y="268.984384" class="cluster-label" text-anchor="middle">mod.rs</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="-0.00000000000005684341886080802" y="0" width="864.0235360000001" height="690.9296959999999" class="cluster"/>
-        <text x="432.011768" y="16" class="cluster-label" text-anchor="middle">src/bin/midtown/cli/chat/</text>
+        <rect x="-0.00000000000005684341886080802" y="0" width="844.0235360000001" height="627.984384" class="cluster"/>
+        <text x="422.011768" y="16" class="cluster-label" text-anchor="middle">src/bin/midtown/cli/chat/</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-app_tests-test_helper-0">
-        <path d="M206.97462799999994,283.039072L227.10516333333328,294.87240533333335C247.23569866666662,306.7057386666666,287.49676933333325,330.3724053333333,332.7450492455053,364.24778338959936C377.99332915767735,398.12316144586543,428.22881831535466,442.2072508917309,453.34656289419337,464.24929561466365L478.4643074730321,486.29134033759635" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M225.73692394560254,247.98438399999998L241.90707662133545,255.39421533333328C258.0772292970683,262.80404666666664,290.4175346485342,277.6237093333333,330.9733334858525,306.84591805754945C371.5291323231708,336.06812678176567,420.3004246463417,379.69288156353144,444.68607080792714,401.50525895441433L469.0717169695126,423.31763634529716" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-mod_use-test_helper-0">
-        <path d="M261.25784,515.9296959999999L272.3411733333333,515.929696C283.4245066666667,515.9296959999999,305.5911733333333,515.9296959999999,327.0911733333333,515.929696C348.59117333333324,515.9296959999999,369.42450666666656,515.9296959999999,379.84117333333324,515.929696L390.25783999999993,515.9296959999999" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M261.25784,452.984384L271.50784,452.9843839999999C281.75784,452.98438400000003,302.25783999999993,452.98438400000003,322.0911733333333,452.9843839999999C341.92450666666656,452.98438400000003,361.09117333333324,452.98438400000003,370.67450666666656,452.9843839999999L380.25783999999993,452.984384" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-test_fn-test_helper-0">
-        <path d="M261.24222399999996,631.9296959999999L272.32815999999997,631.929696C283.414096,631.9296959999999,305.5859679999999,631.9296959999999,339.6977142884512,617.4512332281937C373.8094605769026,602.9727704563875,419.8610811538052,574.0158449127749,442.88689144225646,559.5373821409687L465.9127017307078,545.0589193691625" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M261.24222399999996,568.984384L271.49482666666665,568.984384C281.7474293333333,568.984384,302.2526346666666,568.984384,334.89614324108715,554.5129225142937C367.5396518155078,540.0414610285875,412.3214636310156,511.09853805717495,434.71236953876956,496.6270765714687L457.10327544652347,482.15561508576246" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-app_tests-mod-0">
-        <path d="M206.97462799999994,205.03907199999998L227.10516333333328,193.20573866666666C247.23569866666662,181.3724053333333,287.49676933333325,157.70573866666663,322.9664993333333,145.87240533333332C358.4362293333333,134.03907199999998,389.11461866666656,134.03907199999998,404.4538133333333,134.039072L419.79300799999993,134.03907199999998" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M235.40506663876502,169.98438399999998L249.96386219897087,163.99349866666662C264.52265775917664,158.0026133333333,293.6402488795883,146.02084266666665,322.70490577312745,140.0299573333333C351.7695626666666,134.03907199999998,380.78128533333324,134.03907199999998,395.2871466666666,134.039072L409.79300799999993,134.03907199999998" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-mod-app-0">
-        <path d="M600.6836639999999,102.22639636938484L614.6895253333333,97.18866364115404C628.6953866666666,92.15093091292323,656.7071093333333,82.07546545646161,679.1296373333333,77.03773272823081C701.5521653333334,72,718.3854986666666,72,726.8021653333334,72L735.218832,72" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M590.6836639999999,101.27665367126747L603.856192,96.3972113927229C617.0287199999999,91.51776911417831,643.373776,81.75888455708916,664.1296373333333,76.87944227854457C684.8854986666666,72,700.0521653333334,72,707.6354986666666,72L715.218832,72" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-mod-ui-0">
-        <path d="M600.6836639999999,165.85174763061514L614.6895253333333,170.88948035884596C628.6953866666666,175.92721308707675,656.7071093333333,186.00267854353834,680.207112,191.04041127176916C703.7071146666667,196.07814399999998,722.6953973333333,196.07814399999998,732.1895386666665,196.07814399999998L741.6836799999999,196.07814399999998" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M590.6836639999999,166.8014903287325L603.856192,171.6809326072771C617.0287199999999,176.5603748858217,643.373776,186.31925944291083,665.207112,191.19870172145542C687.0404480000001,196.07814399999998,704.3620639999999,196.07814399999998,713.0228719999999,196.07814399999998L721.6836799999999,196.07814399999998" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-app_tests-test_helper-0">
-        <rect x="319.16077592145183" y="364.27832755228263" width="65.6" height="22" class="edge-label-bg"/>
-        <text x="351.96077592145184" y="375.27832755228263" class="edge-label" text-anchor="middle" dominant-baseline="central">contains</text>
+        <rect x="289.9578399999999" y="281.44337199999995" width="65.6" height="22" class="edge-label-bg"/>
+        <text x="322.75783999999993" y="292.44337199999995" class="edge-label" text-anchor="middle" dominant-baseline="central">contains</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod_use-test_helper-0">
-        <rect x="298.55783999999994" y="504.9296959999999" width="58.4" height="22" class="edge-label-bg"/>
-        <text x="327.75783999999993" y="515.9296959999999" class="edge-label" text-anchor="middle" dominant-baseline="central">imports</text>
+        <rect x="293.55783999999994" y="441.984384" width="58.4" height="22" class="edge-label-bg"/>
+        <text x="322.75783999999993" y="452.984384" class="edge-label" text-anchor="middle" dominant-baseline="central">imports</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-test_fn-test_helper-0">
-        <rect x="348.37390726618406" y="594.1330215001799" width="44" height="22" class="edge-label-bg"/>
-        <text x="370.37390726618406" y="605.1330215001799" class="edge-label" text-anchor="middle" dominant-baseline="central">calls</text>
+        <rect x="300.75783999999993" y="557.984384" width="44" height="22" class="edge-label-bg"/>
+        <text x="322.75783999999993" y="568.984384" class="edge-label" text-anchor="middle" dominant-baseline="central">calls</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-app_tests-mod-0">
-        <rect x="221.96156200432733" y="125.2056548003709" width="173.6" height="40" class="edge-label-bg"/>
-        <text x="308.76156200432735" y="145.2056548003709" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="308.76156200432735" y="145.2056548003709" dy="-0.6em">pub(super) = visible to</tspan><tspan x="308.76156200432735" dy="1.2em">parent</tspan></text>
+        <rect x="235.95783999999992" y="114.03907199999998" width="173.6" height="40" class="edge-label-bg"/>
+        <text x="322.75783999999993" y="134.03907199999998" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="322.75783999999993" y="134.03907199999998" dy="-0.75em">pub(super) = visible to</tspan><tspan x="322.75783999999993" dy="1.5em">parent</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod-app-0">
-        <rect x="613.9429830269081" y="66.89018756939785" width="108.8" height="22" class="edge-label-bg"/>
-        <text x="668.3429830269081" y="77.89018756939785" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
+        <rect x="615.318832" y="61" width="108.8" height="22" class="edge-label-bg"/>
+        <text x="669.718832" y="72" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod-ui-0">
-        <rect x="616.9846329242517" y="180.2819997651024" width="108.8" height="22" class="edge-label-bg"/>
-        <text x="671.3846329242517" y="191.2819997651024" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
+        <rect x="615.318832" y="185.07814399999998" width="108.8" height="22" class="edge-label-bg"/>
+        <text x="669.718832" y="196.07814399999998" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node default" id="node-mod">
-        <rect x="423.79300799999993" y="95.03907199999998" width="176.89065599999998" height="78"/>
-        <text x="512.2383359999999" y="134.03907199999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="512.2383359999999" y="134.03907199999998" dy="-0.6em">mod.rs</tspan><tspan x="512.2383359999999" dy="1.2em">(parent module)</tspan></text>
+        <rect x="413.79300799999993" y="95.03907199999998" width="176.89065599999998" height="78"/>
+        <text x="502.2383359999999" y="134.03907199999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="502.2383359999999" y="134.03907199999998" dy="-0.75em">mod.rs</tspan><tspan x="502.2383359999999" dy="1.5em">(parent module)</tspan></text>
       </g>
       <g class="node default" id="node-app">
-        <rect x="739.218832" y="45" width="104.804704" height="54"/>
-        <text x="791.621184" y="72" class="label" text-anchor="middle" dominant-baseline="central">app.rs</text>
+        <rect x="719.218832" y="45" width="104.804704" height="54"/>
+        <text x="771.621184" y="72" class="label" text-anchor="middle" dominant-baseline="central">app.rs</text>
       </g>
       <g class="node default" id="node-ui">
-        <rect x="745.6836799999999" y="169.07814399999998" width="91.87500800000001" height="54"/>
-        <text x="791.6211839999999" y="196.07814399999998" class="label" text-anchor="middle" dominant-baseline="central">ui.rs</text>
+        <rect x="725.6836799999999" y="169.07814399999998" width="91.87500800000001" height="54"/>
+        <text x="771.6211839999999" y="196.07814399999998" class="label" text-anchor="middle" dominant-baseline="central">ui.rs</text>
       </g>
       <g class="node default" id="node-app_code">
-        <rect x="36.390599999999964" y="101.03907199999998" width="208.47663999999997" height="54"/>
-        <text x="140.62891999999994" y="128.03907199999998" class="label" text-anchor="middle" dominant-baseline="central">pub struct App { ... }</text>
+        <rect x="36.390599999999964" y="65.98438399999998" width="208.47663999999997" height="54"/>
+        <text x="140.62891999999994" y="92.98438399999998" class="label" text-anchor="middle" dominant-baseline="central">pub struct App { ... }</text>
       </g>
       <g class="node default visibility" id="node-app_tests">
-        <rect x="34.53515999999996" y="205.03907199999998" width="212.18751999999998" height="78" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#fff4e1 !important"/>
-        <text x="140.62891999999994" y="244.03907199999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="140.62891999999994" y="244.03907199999998" dy="-0.6em">#[cfg(test)]</tspan><tspan x="140.62891999999994" dy="1.2em">pub(super) mod tests</tspan></text>
+        <rect x="34.53515999999996" y="169.98438399999998" width="212.18751999999998" height="78" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#fff4e1 !important"/>
+        <text x="140.62891999999994" y="208.98438399999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="140.62891999999994" y="208.98438399999998" dy="-0.75em">#[cfg(test)]</tspan><tspan x="140.62891999999994" dy="1.5em">pub(super) mod tests</tspan></text>
       </g>
       <g class="node default visibility" id="node-test_helper">
-        <rect x="394.25783999999993" y="488.929696" width="235.96099199999998" height="54" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#e1f5e1 !important"/>
-        <text x="512.2383359999999" y="515.9296959999999" class="label" text-anchor="middle" dominant-baseline="central">pub(super) fn test_app()</text>
+        <rect x="384.25783999999993" y="425.984384" width="235.96099199999998" height="54" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#e1f5e1 !important"/>
+        <text x="502.2383359999999" y="452.984384" class="label" text-anchor="middle" dominant-baseline="central">pub(super) fn test_app()</text>
       </g>
       <g class="node default" id="node-mod_tests">
-        <rect x="69.80469599999996" y="360.929696" width="141.64844799999997" height="78"/>
-        <text x="140.62891999999994" y="399.929696" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="140.62891999999994" y="399.929696" dy="-0.6em">#[cfg(test)]</tspan><tspan x="140.62891999999994" dy="1.2em">mod tests</tspan></text>
+        <rect x="69.80469599999996" y="297.984384" width="141.64844799999997" height="78"/>
+        <text x="140.62891999999994" y="336.984384" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="140.62891999999994" y="336.984384" dy="-0.75em">#[cfg(test)]</tspan><tspan x="140.62891999999994" dy="1.5em">mod tests</tspan></text>
       </g>
       <g class="node default" id="node-mod_use">
-        <rect x="19.999999999999943" y="488.929696" width="241.25784000000002" height="54" style="fill:#e1f5e1 !important"/>
-        <text x="140.62891999999994" y="515.9296959999999" class="label" text-anchor="middle" dominant-baseline="central">use app::tests::test_app;</text>
+        <rect x="19.999999999999943" y="425.984384" width="241.25784000000002" height="54" style="fill:#e1f5e1 !important"/>
+        <text x="140.62891999999994" y="452.984384" class="label" text-anchor="middle" dominant-baseline="central">use app::tests::test_app;</text>
       </g>
       <g class="node default" id="node-test_fn">
-        <rect x="20.015615999999937" y="592.9296959999999" width="241.22660800000003" height="78"/>
-        <text x="140.62891999999994" y="631.9296959999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="140.62891999999994" y="631.9296959999999" dy="-0.6em">#[test]</tspan><tspan x="140.62891999999994" dy="1.2em">fn test_number_key_...()</tspan></text>
+        <rect x="20.015615999999937" y="529.984384" width="241.22660800000003" height="78"/>
+        <text x="140.62891999999994" y="568.984384" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="140.62891999999994" y="568.984384" dy="-0.75em">#[test]</tspan><tspan x="140.62891999999994" dy="1.5em">fn test_number_key_...()</tspan></text>
       </g>
     </g>
   </g>
