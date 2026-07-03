@@ -196,6 +196,21 @@ impl LayoutNode {
         }
     }
 
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+
+    pub fn position(&self) -> Option<Point> {
+        match (self.x, self.y) {
+            (Some(x), Some(y)) => Some(Point::new(x, y)),
+            _ => None,
+        }
+    }
+
+    pub fn size(&self) -> (f64, f64) {
+        (self.width, self.height)
+    }
+
     pub fn with_parent(mut self, parent_id: impl Into<String>) -> Self {
         self.parent_id = Some(parent_id.into());
         self
@@ -309,6 +324,14 @@ impl LayoutEdge {
             reversed: false,
             metadata: HashMap::new(),
         }
+    }
+
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+
+    pub fn points(&self) -> &[Point] {
+        &self.bend_points
     }
 
     pub fn with_label(mut self, label: impl Into<String>) -> Self {

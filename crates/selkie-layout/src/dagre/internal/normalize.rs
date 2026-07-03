@@ -7,7 +7,7 @@
 //! for proper edge routing.
 
 use super::graph::{DagreGraph, EdgeLabel, NodeLabel};
-use crate::layout::NodeShape;
+use crate::NodeShape;
 
 /// Run normalization: break long edges into unit-length segments
 pub fn run(graph: &mut DagreGraph) {

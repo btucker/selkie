@@ -187,7 +187,6 @@ mod tests {
     fn test_compound_graph_structure() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
-        use crate::layout::dagre::graph::{DagreGraph, NodeLabel};
 
         // Parse a flowchart with subgraphs
         let input = r#"flowchart TB
@@ -232,14 +231,7 @@ mod tests {
             "Frontend subgraph should have no parent"
         );
         eprintln!("Frontend size: {}x{}", frontend.width, frontend.height);
-
-        // Create DagreGraph manually to test is_compound
-        let mut dg = DagreGraph::new();
-        dg.set_node("sg", NodeLabel::default());
-        dg.set_node("a", NodeLabel::default());
-        dg.set_parent("a", "sg");
-        eprintln!("\nManual DagreGraph is_compound: {}", dg.is_compound());
-        eprintln!("Children of sg: {:?}", dg.children("sg"));
+        assert_eq!(node_a.parent_id.as_deref(), Some("Frontend"));
 
         // Run layout
         let laid_out = layout::layout(graph).unwrap();

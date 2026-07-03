@@ -3,7 +3,7 @@
 //! Calculates the barycenter (weighted average position) for nodes based on
 //! the positions of their neighbors.
 
-use crate::layout::dagre::graph::DagreGraph;
+use crate::dagre::internal::graph::DagreGraph;
 
 /// Result of barycenter calculation for a node
 #[derive(Debug, Clone)]
@@ -142,7 +142,7 @@ pub fn barycenter_down(g: &DagreGraph, movable: &[String]) -> Vec<BarycenterEntr
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
+    use crate::dagre::internal::graph::{EdgeLabel, NodeLabel};
 
     #[test]
     fn test_barycenter_single_predecessor() {

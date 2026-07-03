@@ -7,7 +7,7 @@
 use super::barycenter::{barycenter, barycenter_down, BarycenterEntry};
 use super::resolve_conflicts::{resolve_conflicts, ConstraintGraph, ResolvedEntry};
 use super::sort::{sort, SortResult};
-use crate::layout::dagre::graph::DagreGraph;
+use crate::dagre::internal::graph::DagreGraph;
 use std::collections::HashMap;
 
 /// Sort a subgraph and its nested subgraphs hierarchically
@@ -257,7 +257,7 @@ pub fn add_subgraph_constraints(g: &DagreGraph, cg: &mut ConstraintGraph, vs: &[
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::NodeLabel;
+    use crate::dagre::internal::graph::NodeLabel;
 
     #[test]
     fn test_sort_subgraph_simple() {

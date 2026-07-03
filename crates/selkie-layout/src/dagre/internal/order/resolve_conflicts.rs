@@ -224,7 +224,7 @@ fn merge_entries(mapped: &mut HashMap<String, MappedEntry>, target: &str, source
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::order::BarycenterEntry;
+    use crate::dagre::internal::order::BarycenterEntry;
 
     #[test]
     fn test_resolve_no_conflicts() {

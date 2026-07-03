@@ -91,7 +91,7 @@ fn pull_sources_toward_targets(g: &mut DagreGraph) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{DagreGraph, EdgeLabel, NodeLabel};
+    use crate::dagre::internal::graph::{DagreGraph, EdgeLabel, NodeLabel};
 
     #[test]
     fn test_assign_single_node() {

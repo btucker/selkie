@@ -2,7 +2,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use super::types::{LayoutEdge, LayoutNode, LayoutOptions};
+use crate::types::{LayoutEdge, LayoutNode, LayoutOptions};
 
 /// A graph ready for layout computation
 #[derive(Debug, Clone)]
@@ -42,6 +42,14 @@ impl LayoutGraph {
     pub fn with_options(mut self, options: LayoutOptions) -> Self {
         self.options = options;
         self
+    }
+
+    pub fn nodes(&self) -> &[LayoutNode] {
+        &self.nodes
+    }
+
+    pub fn edges(&self) -> &[LayoutEdge] {
+        &self.edges
     }
 
     /// Add a node to the graph

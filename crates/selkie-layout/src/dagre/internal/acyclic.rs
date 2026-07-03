@@ -262,7 +262,7 @@ fn greedy_fas(g: &DagreGraph) -> Vec<EdgeKey> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::EdgeLabel;
+    use crate::dagre::internal::graph::EdgeLabel;
 
     fn find_cycles(g: &DagreGraph) -> Vec<Vec<String>> {
         // Simple cycle detection using DFS

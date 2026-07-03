@@ -103,7 +103,7 @@ pub fn build_layer_matrix(g: &DagreGraph) -> Vec<Vec<String>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::NodeLabel;
+    use crate::dagre::internal::graph::NodeLabel;
 
     #[test]
     fn test_build_layer_matrix_empty_graph() {

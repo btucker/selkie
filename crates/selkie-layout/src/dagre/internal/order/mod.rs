@@ -13,7 +13,7 @@ mod resolve_conflicts;
 mod sort;
 mod sort_subgraph;
 
-use crate::layout::dagre::graph::DagreGraph;
+use crate::dagre::internal::graph::DagreGraph;
 
 pub use barycenter::{barycenter, barycenter_down, BarycenterEntry};
 pub use cross_count::cross_count;
@@ -374,9 +374,9 @@ fn build_layer_matrix(g: &DagreGraph, max_rank: usize) -> Vec<Vec<String>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::EdgeLabel;
-    use crate::layout::dagre::rank;
-    use crate::layout::dagre::Ranker;
+    use crate::dagre::internal::graph::EdgeLabel;
+    use crate::dagre::internal::rank;
+    use crate::dagre::internal::Ranker;
 
     #[test]
     fn test_order_single_node() {

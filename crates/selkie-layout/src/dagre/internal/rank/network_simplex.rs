@@ -6,7 +6,7 @@
 //! The algorithm finds an optimal rank assignment that minimizes the
 //! weighted sum of edge lengths while respecting minimum length constraints.
 
-use crate::layout::dagre::graph::{DagreGraph, EdgeKey};
+use crate::dagre::internal::graph::{DagreGraph, EdgeKey};
 use std::collections::{HashMap, HashSet};
 
 /// Type alias for tracking edge exchanges during network simplex iteration
@@ -745,7 +745,7 @@ fn dfs_postorder(tree: &SpanningTree, v: &str, parent: Option<&str>, out: &mut V
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
+    use crate::dagre::internal::graph::{EdgeLabel, NodeLabel};
 
     #[test]
     fn test_single_node() {

@@ -4,7 +4,7 @@
 //! from any source node. This is used as an initial ranking before network
 //! simplex optimization, and can be used standalone for simple cases.
 
-use crate::layout::dagre::graph::DagreGraph;
+use crate::dagre::internal::graph::DagreGraph;
 use std::collections::HashSet;
 
 /// State for iterative DFS
@@ -124,7 +124,7 @@ pub fn run(g: &mut DagreGraph) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
+    use crate::dagre::internal::graph::{EdgeLabel, NodeLabel};
 
     #[test]
     fn test_single_node() {

@@ -195,7 +195,7 @@ pub fn fixup_edge_label_coords(g: &mut DagreGraph, rankdir: RankDir) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::EdgeLabel;
+    use crate::dagre::internal::graph::EdgeLabel;
 
     #[test]
     fn test_make_space_doubles_minlen() {

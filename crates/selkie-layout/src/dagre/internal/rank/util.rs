@@ -1,6 +1,6 @@
 //! Utility functions for ranking algorithms
 
-use crate::layout::dagre::graph::DagreGraph;
+use crate::dagre::internal::graph::DagreGraph;
 
 /// Normalize ranks so that the minimum rank is 0
 pub fn normalize_ranks(g: &mut DagreGraph) {
@@ -35,7 +35,7 @@ pub fn slack(g: &DagreGraph, v: &str, w: &str) -> Option<i32> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
+    use crate::dagre::internal::graph::{EdgeLabel, NodeLabel};
 
     #[test]
     fn test_normalize_ranks() {

@@ -1,7 +1,6 @@
 //! Adapter traits for converting diagrams to layout graphs
 
-use super::graph::LayoutGraph;
-use super::types::NodeShape;
+use super::{LayoutDirection, LayoutGraph, NodeShape};
 use crate::error::Result;
 
 /// Configuration for node size estimation
@@ -61,5 +60,5 @@ pub trait ToLayoutGraph {
     fn to_layout_graph(&self, size_estimator: &dyn SizeEstimator) -> Result<LayoutGraph>;
 
     /// Get the preferred layout direction for this diagram type
-    fn preferred_direction(&self) -> super::types::LayoutDirection;
+    fn preferred_direction(&self) -> LayoutDirection;
 }

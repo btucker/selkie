@@ -7,7 +7,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::layout::NodeShape;
+use crate::NodeShape;
 
 /// A multigraph with compound node support for dagre layout
 #[derive(Debug, Clone)]

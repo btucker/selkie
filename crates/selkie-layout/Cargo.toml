@@ -1,0 +1,12 @@
+[package]
+name = "selkie-layout"
+version = "0.3.0"
+edition = "2021"
+description = "Graph layout engine extracted from Selkie"
+license = "MIT"
+repository = "https://github.com/btucker/selkie"
+keywords = ["graph", "layout", "dagre", "diagram"]
+categories = ["visualization", "algorithms"]
+
+[dependencies]
+thiserror = "1.0"

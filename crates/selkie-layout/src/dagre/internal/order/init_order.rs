@@ -6,7 +6,7 @@
 //!
 //! This approach comes from Gansner, et al., "A Technique for Drawing Directed Graphs."
 
-use crate::layout::dagre::graph::DagreGraph;
+use crate::dagre::internal::graph::DagreGraph;
 use std::collections::HashSet;
 
 /// Build initial layering by DFS traversal
@@ -93,9 +93,9 @@ pub fn assign_order(g: &mut DagreGraph, layering: &[Vec<String>]) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::NodeLabel;
-    use crate::layout::dagre::rank;
-    use crate::layout::dagre::Ranker;
+    use crate::dagre::internal::graph::NodeLabel;
+    use crate::dagre::internal::rank;
+    use crate::dagre::internal::Ranker;
 
     #[test]
     fn test_init_order_single_node() {
@@ -165,7 +165,7 @@ mod tests {
         // Tests that when a node has multiple outgoing edges (like a fork),
         // the successors are visited in edge definition order.
         // First edge target should get lower order (appear on LEFT in TB layout).
-        use crate::layout::dagre::graph::EdgeLabel;
+        use crate::dagre::internal::graph::EdgeLabel;
 
         let mut g = DagreGraph::new();
         // Create fork pattern: start -> fork, fork -> first_target, fork -> second_target

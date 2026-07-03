@@ -7,7 +7,7 @@
 
 mod bk;
 
-use crate::layout::dagre::graph::DagreGraph;
+use crate::dagre::internal::graph::DagreGraph;
 
 /// Assign x and y coordinates to all nodes
 pub fn position(g: &mut DagreGraph) {
@@ -72,10 +72,10 @@ fn position_y(g: &mut DagreGraph) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
-    use crate::layout::dagre::order;
-    use crate::layout::dagre::rank;
-    use crate::layout::dagre::Ranker;
+    use crate::dagre::internal::graph::{EdgeLabel, NodeLabel};
+    use crate::dagre::internal::order;
+    use crate::dagre::internal::rank;
+    use crate::dagre::internal::Ranker;
 
     #[test]
     fn test_position_single_node() {

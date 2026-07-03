@@ -5,7 +5,7 @@
 //!
 //! This algorithm is derived from Barth, et al., "Bilayer Cross Counting."
 
-use crate::layout::dagre::graph::DagreGraph;
+use crate::dagre::internal::graph::DagreGraph;
 use std::collections::HashMap;
 
 /// Count total edge crossings in the layering
@@ -87,7 +87,7 @@ fn two_layer_cross_count(g: &DagreGraph, north_layer: &[String], south_layer: &[
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::EdgeLabel;
+    use crate::dagre::internal::graph::EdgeLabel;
 
     #[test]
     fn test_no_crossings() {

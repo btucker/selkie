@@ -17,6 +17,8 @@
 //! - Gansner et al. "A Technique for Drawing Directed Graphs" (1993)
 //! - Brandes & Köpf "Fast and Simple Horizontal Coordinate Assignment" (2002)
 
+#![allow(dead_code, unused_imports)]
+
 pub mod acyclic;
 pub mod compound;
 pub mod edge_labels;

@@ -5,7 +5,7 @@
 //! The algorithm runs four passes (up-left, up-right, down-left, down-right) and
 //! balances them by taking the median of the four x-coordinates for each node.
 
-use crate::layout::dagre::graph::DagreGraph;
+use crate::dagre::internal::graph::DagreGraph;
 use std::collections::{HashMap, HashSet};
 
 /// Block graph for horizontal compaction: (block root nodes, edges with separations).
@@ -714,10 +714,10 @@ fn balance(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::dagre::graph::{EdgeLabel, NodeLabel};
-    use crate::layout::dagre::order;
-    use crate::layout::dagre::rank;
-    use crate::layout::dagre::Ranker;
+    use crate::dagre::internal::graph::{EdgeLabel, NodeLabel};
+    use crate::dagre::internal::order;
+    use crate::dagre::internal::rank;
+    use crate::dagre::internal::Ranker;
 
     /// Helper to set up a node with rank and order for conflict detection tests.
     fn setup_node(g: &mut DagreGraph, id: &str, rank: i32, order: usize, dummy: Option<&str>) {
@@ -1115,7 +1115,7 @@ mod tests {
         // The BK algorithm should compact this into a tight layout.
         // This structure mimics the requirement diagram: a tree-like
         // graph with one cross-rank link creating dummy nodes.
-        use crate::layout::dagre::normalize;
+        use crate::dagre::internal::normalize;
 
         let mut g = DagreGraph::new();
         g.graph_mut().nodesep = 50.0;
