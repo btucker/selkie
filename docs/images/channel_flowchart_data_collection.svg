@@ -47,10 +47,10 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5" class="marker"/>
@@ -128,7 +128,7 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-F-G-0">
         <rect x="1259.577204897779" y="940.6114529924195" width="58.4" height="22" class="edge-label-bg"/>
-        <text x="1288.777204897779" y="951.6114529924195" class="edge-label" dominant-baseline="central" text-anchor="middle">PR #709</text>
+        <text x="1288.777204897779" y="951.6114529924195" class="edge-label" text-anchor="middle" dominant-baseline="central">PR #709</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-G-H-0">
         <rect x="725.6879143227387" y="1210.1319055846634" width="44" height="22" class="edge-label-bg"/>
@@ -136,15 +136,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-G-I-0">
         <rect x="903.0542465448988" y="1205.9648361326226" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="939.4542465448988" y="1216.9648361326226" class="edge-label" dominant-baseline="central" text-anchor="middle">not found</text>
+        <text x="939.4542465448988" y="1216.9648361326226" class="edge-label" text-anchor="middle" dominant-baseline="central">not found</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-C-K-0">
         <rect x="856.3939588680863" y="369.9321188850071" width="152" height="22" class="edge-label-bg"/>
-        <text x="932.3939588680863" y="380.9321188850071" class="edge-label" dominant-baseline="central" text-anchor="middle">Available but unused</text>
+        <text x="932.3939588680863" y="380.9321188850071" class="edge-label" text-anchor="middle" dominant-baseline="central">Available but unused</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F-K-0">
         <rect x="661.8327525044955" y="416.97717703636766" width="144.79999999999998" height="22" class="edge-label-bg"/>
-        <text x="734.2327525044955" y="427.97717703636766" class="edge-label" dominant-baseline="central" text-anchor="middle">PR number extracted</text>
+        <text x="734.2327525044955" y="427.97717703636766" class="edge-label" text-anchor="middle" dominant-baseline="central">PR number extracted</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-K-G-0">
         <rect x="263.50468800000016" y="688.8072853019058" width="137.6" height="22" class="edge-label-bg"/>
@@ -152,7 +152,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-M-N-0">
         <rect x="739.6453440000003" y="934.0976545665485" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="754.4453440000002" y="945.0976545665485" class="edge-label" dominant-baseline="central" text-anchor="middle">yes</text>
+        <text x="754.4453440000002" y="945.0976545665485" class="edge-label" text-anchor="middle" dominant-baseline="central">yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-M-G-0">
         <rect x="543.9841668805365" y="917.3051444643027" width="22.4" height="22" class="edge-label-bg"/>
@@ -178,7 +178,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-E">
         <rect x="1185.4375680000003" y="129" width="211.375008" height="54"/>
-        <text x="1291.1250720000003" y="156" class="label" dominant-baseline="central" text-anchor="middle">iterate pending tasks</text>
+        <text x="1291.1250720000003" y="156" class="label" text-anchor="middle" dominant-baseline="central">iterate pending tasks</text>
       </g>
       <g class="node default" id="node-F">
         <rect x="1151.8281920000002" y="245" width="278.59376000000003" height="54"/>
@@ -186,11 +186,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-G">
         <polygon points="448.81251199999997,974.82032 550.320336,1076.328144 448.81251199999997,1177.835968 347.30468799999994,1076.328144"/>
-        <text x="448.81251199999997" y="1076.328144" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="448.81251199999997" y="1076.328144" dy="-0.6em">Check in-memory</tspan><tspan x="448.81251199999997" dy="1.2em">PR map?</tspan></text>
+        <text x="448.81251199999997" y="1076.328144" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="448.81251199999997" y="1076.328144" dy="-0.6em">Check in-memory</tspan><tspan x="448.81251199999997" dy="1.2em">PR map?</tspan></text>
       </g>
       <g class="node default" id="node-H">
         <rect x="986.4043280000003" y="1288.835968" width="232.312528" height="54"/>
-        <text x="1102.5605920000003" y="1315.835968" class="label" dominant-baseline="central" text-anchor="middle">Group to existing owner</text>
+        <text x="1102.5605920000003" y="1315.835968" class="label" text-anchor="middle" dominant-baseline="central">Group to existing owner</text>
       </g>
       <g class="node default" id="node-I">
         <rect x="1268.7168560000002" y="1276.835968" width="161.41409599999997" height="78"/>
@@ -198,11 +198,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-J">
         <rect x="1236.2598320000002" y="1404.835968" width="226.328144" height="54"/>
-        <text x="1349.4239040000002" y="1431.835968" class="label" dominant-baseline="central" text-anchor="middle">Assign/nudge coworker</text>
+        <text x="1349.4239040000002" y="1431.835968" class="label" text-anchor="middle" dominant-baseline="central">Assign/nudge coworker</text>
       </g>
       <g class="node default" id="node-K">
         <rect x="40.000000000000085" y="435" width="197.304688" height="78" style="fill:#ff6b6b !important;stroke:#c92a2a !important;color:#fff !important"/>
-        <text x="138.65234400000008" y="474" class="label" style="fill: #fff" text-anchor="middle" dominant-baseline="central"><tspan x="138.65234400000008" y="474" dy="-0.6em">❌ Never checks if</tspan><tspan x="138.65234400000008" dy="1.2em">PR is in merged set</tspan></text>
+        <text x="138.65234400000008" y="474" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="138.65234400000008" y="474" dy="-0.6em">❌ Never checks if</tspan><tspan x="138.65234400000008" dy="1.2em">PR is in merged set</tspan></text>
       </g>
       <g class="node default" id="node-L">
         <rect x="575.2500160000002" y="447" width="211.039072" height="54"/>
@@ -210,7 +210,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-M">
         <polygon points="680.7695520000002,612 825.1797120000002,756.41016 680.7695520000002,900.82032 536.3593920000002,756.41016"/>
-        <text x="680.7695520000002" y="756.41016" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="680.7695520000002" y="756.41016" dy="-0.6em">Is PR in</tspan><tspan x="680.7695520000002" dy="1.2em">coworkers_with_merged_prs?</tspan></text>
+        <text x="680.7695520000002" y="756.41016" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="680.7695520000002" y="756.41016" dy="-0.6em">Is PR in</tspan><tspan x="680.7695520000002" dy="1.2em">coworkers_with_merged_prs?</tspan></text>
       </g>
       <g class="node default" id="node-N">
         <rect x="663.9961280000002" y="1037.328144" width="180.898432" height="78" style="fill:#51cf66 !important;stroke:#2f9e44 !important;color:#000 !important"/>

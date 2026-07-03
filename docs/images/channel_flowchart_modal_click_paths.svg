@@ -50,7 +50,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5" class="marker"/>
@@ -135,7 +135,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-CHK-CLOSE1-0">
         <rect x="4284.505424478211" y="323.33619943049547" width="159.2" height="40" class="edge-label-bg"/>
-        <text x="4364.105424478212" y="343.33619943049547" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="4364.105424478212" y="343.33619943049547" dy="-0.6em">✓ Never TRUE</tspan><tspan x="4364.105424478212" dy="1.2em">(backdrop is covered)</tspan></text>
+        <text x="4364.105424478212" y="343.33619943049547" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="4364.105424478212" y="343.33619943049547" dy="-0.6em">✓ Never TRUE</tspan><tspan x="4364.105424478212" dy="1.2em">(backdrop is covered)</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CHK2-CLOSE3-0">
         <rect x="891.8631328757582" y="252.57262022280725" width="15.2" height="22" class="edge-label-bg"/>
@@ -143,17 +143,17 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-CHK2-NOOP3-0">
         <rect x="890.3339609226726" y="349.06178464358146" width="15.2" height="22" class="edge-label-bg"/>
-        <text x="897.9339609226727" y="360.06178464358146" class="edge-label" dominant-baseline="central" text-anchor="middle">✗</text>
+        <text x="897.9339609226727" y="360.06178464358146" class="edge-label" text-anchor="middle" dominant-baseline="central">✗</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node default" id="node-BC">
         <rect x="3417.580696" y="225" width="236.94536" height="54" style="fill:#333 !important;color:#fff !important"/>
-        <text x="3536.053376" y="252" class="label" dominant-baseline="central" style="fill: #fff" text-anchor="middle">.modal-backdrop onclick</text>
+        <text x="3536.053376" y="252" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">.modal-backdrop onclick</text>
       </g>
       <g class="node default" id="node-ZC">
         <rect x="3406.553344" y="329" width="259.00006399999995" height="78" style="fill:#ff5555 !important;color:#fff !important"/>
-        <text x="3536.053376" y="368" class="label" text-anchor="middle" style="fill: #fff" dominant-baseline="central"><tspan x="3536.053376" y="368" dy="-0.6em">.zoom-container</tspan><tspan x="3536.053376" dy="1.2em">(width: 100%, height: 100%)</tspan></text>
+        <text x="3536.053376" y="368" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="3536.053376" y="368" dy="-0.6em">.zoom-container</tspan><tspan x="3536.053376" dy="1.2em">(width: 100%, height: 100%)</tspan></text>
       </g>
       <g class="node default" id="node-HBC">
         <rect x="3740.5534079999998" y="225" width="229.65630400000003" height="54"/>
@@ -161,7 +161,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-CHK">
         <polygon points="4184.209712,113 4323.209712,252 4184.209712,391 4045.209712,252" style="fill:#ff5555 !important;color:#fff !important"/>
-        <text x="4184.209712" y="252" class="label" text-anchor="middle" style="fill: #fff" dominant-baseline="central"><tspan x="4184.209712" y="252" dy="-0.6em">e.target ===</tspan><tspan x="4184.209712" dy="1.2em">e.currentTarget?</tspan></text>
+        <text x="4184.209712" y="252" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="4184.209712" y="252" dy="-0.6em">e.target ===</tspan><tspan x="4184.209712" dy="1.2em">e.currentTarget?</tspan></text>
       </g>
       <g class="node default" id="node-NOOP1">
         <rect x="4456.209712" y="120.66405599999999" width="120.04688" height="54" style="fill:#ff5555 !important;color:#fff !important"/>
@@ -173,39 +173,39 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-EMP">
         <rect x="1931.4438719999998" y="221" width="260" height="78" style="fill:#333 !important;color:#fff !important"/>
-        <text x="2061.443872" y="260" class="label" text-anchor="middle" style="fill: #fff" dominant-baseline="central"><tspan x="2061.443872" y="260" dy="-0.6em">Click in empty viewport</tspan><tspan x="2061.443872" dy="1.2em">area</tspan></text>
+        <text x="2061.443872" y="260" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="2061.443872" y="260" dy="-0.6em">Click in empty viewport</tspan><tspan x="2061.443872" dy="1.2em">area</tspan></text>
       </g>
       <g class="node default" id="node-MD">
         <rect x="2266.443872" y="233" width="211.65628800000002" height="54"/>
-        <text x="2372.272016" y="260" class="label" dominant-baseline="central" text-anchor="middle">handleMouseDown(e)</text>
+        <text x="2372.272016" y="260" class="label" text-anchor="middle" dominant-baseline="central">handleMouseDown(e)</text>
       </g>
       <g class="node default" id="node-PRV">
         <rect x="2553.10016" y="233" width="194.52345599999998" height="54"/>
-        <text x="2650.361888" y="260" class="label" dominant-baseline="central" text-anchor="middle">e.preventDefault()</text>
+        <text x="2650.361888" y="260" class="label" text-anchor="middle" dominant-baseline="central">e.preventDefault()</text>
       </g>
       <g class="node default" id="node-DRAG">
         <rect x="2822.623616" y="233" width="169.000016" height="54" style="fill:#ff5555 !important;color:#fff !important"/>
-        <text x="2907.123624" y="260" class="label" style="fill: #fff" text-anchor="middle" dominant-baseline="central">dragging = true</text>
+        <text x="2907.123624" y="260" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">dragging = true</text>
       </g>
       <g class="node default" id="node-NOOP2">
         <rect x="3066.623632" y="233" width="249.92971200000005" height="54" style="fill:#ff5555 !important;color:#fff !important"/>
-        <text x="3191.588488" y="260" class="label" dominant-baseline="central" style="fill: #fff" text-anchor="middle">Starts pan instead of close</text>
+        <text x="3191.588488" y="260" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">Starts pan instead of close</text>
       </g>
       <g class="node default" id="node-CB">
         <rect x="1178.953184" y="233" width="146.60001599999998" height="54"/>
-        <text x="1252.253192" y="260" class="label" dominant-baseline="central" text-anchor="middle">.close-btn ×</text>
+        <text x="1252.253192" y="260" class="label" text-anchor="middle" dominant-baseline="central">.close-btn ×</text>
       </g>
       <g class="node default" id="node-TINY">
         <rect x="1400.5532" y="221" width="206.05472000000003" height="78" style="fill:#ffaa00 !important;color:#000 !important"/>
-        <text x="1503.58056" y="260" class="label" text-anchor="middle" style="fill: #000" dominant-baseline="central"><tspan x="1503.58056" y="260" dy="-0.6em">0.8rem font</tspan><tspan x="1503.58056" dy="1.2em">#d0d0d0 on #2a2a2a</tspan></text>
+        <text x="1503.58056" y="260" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000"><tspan x="1503.58056" y="260" dy="-0.6em">0.8rem font</tspan><tspan x="1503.58056" dy="1.2em">#d0d0d0 on #2a2a2a</tspan></text>
       </g>
       <g class="node default" id="node-OK">
         <rect x="1681.60792" y="233" width="159.83595200000002" height="54"/>
-        <text x="1761.5258959999999" y="260" class="label" dominant-baseline="central" text-anchor="middle">onclose works</text>
+        <text x="1761.5258959999999" y="260" class="label" text-anchor="middle" dominant-baseline="central">onclose works</text>
       </g>
       <g class="node default" id="node-ESC">
         <rect x="46.378912" y="45" width="138.523456" height="54" style="fill:#55ff55 !important;color:#000 !important"/>
-        <text x="115.64064" y="72" class="label" text-anchor="middle" style="fill: #000" dominant-baseline="central">Escape key</text>
+        <text x="115.64064" y="72" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000">Escape key</text>
       </g>
       <g class="node default" id="node-KD">
         <rect x="286.28128000000004" y="45" width="172.625024" height="54"/>
@@ -213,11 +213,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-CLOSE2">
         <rect x="640.0274000000001" y="45" width="113.757808" height="54" style="fill:#55ff55 !important;color:#000 !important"/>
-        <text x="696.9063040000001" y="72" class="label" style="fill: #000" text-anchor="middle" dominant-baseline="central">onclose</text>
+        <text x="696.9063040000001" y="72" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000">onclose</text>
       </g>
       <g class="node default" id="node-NODRG">
         <rect x="20" y="273" width="191.28128" height="78" style="fill:#55ff55 !important;color:#000 !important"/>
-        <text x="115.64064" y="312" class="label" dominant-baseline="central" style="fill: #000" text-anchor="middle"><tspan x="115.64064" y="312" dy="-0.6em">Click without drag</tspan><tspan x="115.64064" dy="1.2em">on containerEl</tspan></text>
+        <text x="115.64064" y="312" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000"><tspan x="115.64064" y="312" dy="-0.6em">Click without drag</tspan><tspan x="115.64064" dy="1.2em">on containerEl</tspan></text>
       </g>
       <g class="node default" id="node-MU">
         <rect x="286.88284" y="285" width="171.42190399999998" height="54"/>
@@ -233,7 +233,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-NOOP3">
         <rect x="968.9063040000001" y="337" width="120.04688" height="54"/>
-        <text x="1028.929744" y="364" class="label" dominant-baseline="central" text-anchor="middle">No close</text>
+        <text x="1028.929744" y="364" class="label" text-anchor="middle" dominant-baseline="central">No close</text>
       </g>
     </g>
   </g>

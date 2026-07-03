@@ -65,7 +65,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
@@ -120,11 +120,11 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-TmuxPath-ShellCmd-0">
         <rect x="1356.9821279999999" y="164.04358546370997" width="137.6" height="22" class="edge-label-bg"/>
-        <text x="1425.7821279999998" y="175.04358546370997" class="edge-label" dominant-baseline="central" text-anchor="middle">to_shell_command()</text>
+        <text x="1425.7821279999998" y="175.04358546370997" class="edge-label" text-anchor="middle" dominant-baseline="central">to_shell_command()</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-HeadlessPath-TokioCmd-0">
         <rect x="1633.9014339230578" y="123.64956546912094" width="180.79999999999998" height="22" class="edge-label-bg"/>
-        <text x="1724.3014339230579" y="134.64956546912094" class="edge-label" dominant-baseline="central" text-anchor="middle">HeadlessSession::spawn()</text>
+        <text x="1724.3014339230579" y="134.64956546912094" class="edge-label" text-anchor="middle" dominant-baseline="central">HeadlessSession::spawn()</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-TmuxPath-SharedLogic-0">
         <rect x="1649.1440948941113" y="204.83180657465016" width="80" height="22" class="edge-label-bg"/>
@@ -136,7 +136,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-NewLaunch-HeadlessOut-0">
         <rect x="71.70446700716903" y="478.6850146556071" width="152" height="22" class="edge-label-bg"/>
-        <text x="147.70446700716903" y="489.6850146556071" class="edge-label" dominant-baseline="central" text-anchor="middle">to_headless_config()</text>
+        <text x="147.70446700716903" y="489.6850146556071" class="edge-label" text-anchor="middle" dominant-baseline="central">to_headless_config()</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-NewLaunch-ShellOut-0">
         <rect x="273.79767199999986" y="508.47884380768687" width="137.6" height="22" class="edge-label-bg"/>
@@ -148,21 +148,21 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-SharedLogic-UnifiedLogic-0">
         <rect x="1271.944938710778" y="515.3031238098937" width="159.2" height="22" class="edge-label-bg"/>
-        <text x="1351.5449387107778" y="526.3031238098937" class="edge-label" dominant-baseline="central" text-anchor="middle">must consolidate into</text>
+        <text x="1351.5449387107778" y="526.3031238098937" class="edge-label" text-anchor="middle" dominant-baseline="central">must consolidate into</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Risk-UnifiedLogic-0">
         <rect x="735.9435480401936" y="449.2161559589178" width="80" height="22" class="edge-label-bg"/>
-        <text x="775.9435480401936" y="460.2161559589178" class="edge-label" dominant-baseline="central" text-anchor="middle">avoided by</text>
+        <text x="775.9435480401936" y="460.2161559589178" class="edge-label" text-anchor="middle" dominant-baseline="central">avoided by</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node default" id="node-TmuxPath">
         <rect x="1443.233268" y="25" width="205.14067200000002" height="78"/>
-        <text x="1545.803604" y="64" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1545.803604" y="64" dy="-0.6em">ClaudeLaunchConfig</tspan><tspan x="1545.803604" dy="1.2em">(tmux.rs)</tspan></text>
+        <text x="1545.803604" y="64" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1545.803604" y="64" dy="-0.6em">ClaudeLaunchConfig</tspan><tspan x="1545.803604" dy="1.2em">(tmux.rs)</tspan></text>
       </g>
       <g class="node default" id="node-HeadlessPath">
         <rect x="1888.59852" y="25" width="168.32031999999998" height="78"/>
-        <text x="1972.75868" y="64" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1972.75868" y="64" dy="-0.6em">HeadlessConfig</tspan><tspan x="1972.75868" dy="1.2em">(headless.rs)</tspan></text>
+        <text x="1972.75868" y="64" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1972.75868" y="64" dy="-0.6em">HeadlessConfig</tspan><tspan x="1972.75868" dy="1.2em">(headless.rs)</tspan></text>
       </g>
       <g class="node default" id="node-ShellCmd">
         <rect x="1319.8680559999998" y="279.24815077375206" width="211.828144" height="126"/>
@@ -178,7 +178,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-NewLaunch">
         <rect x="256.70311199999986" y="303.24815077375206" width="171.78912" height="78"/>
-        <text x="342.5976719999999" y="342.24815077375206" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="342.5976719999999" y="342.24815077375206" dy="-0.6em">LaunchConfig</tspan><tspan x="342.5976719999999" dy="1.2em">(new launch.rs)</tspan></text>
+        <text x="342.5976719999999" y="342.24815077375206" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="342.5976719999999" y="342.24815077375206" dy="-0.6em">LaunchConfig</tspan><tspan x="342.5976719999999" dy="1.2em">(new launch.rs)</tspan></text>
       </g>
       <g class="node default" id="node-HeadlessOut">
         <rect x="39.999999999999915" y="657.7095368416218" width="168.32031999999998" height="78"/>
@@ -186,7 +186,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-ShellOut">
         <rect x="258.32031999999987" y="657.7095368416218" width="168.55470400000002" height="78"/>
-        <text x="342.5976719999999" y="696.7095368416218" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="342.5976719999999" y="696.7095368416218" dy="-0.6em">Shell command</tspan><tspan x="342.5976719999999" dy="1.2em">(bash string)</tspan></text>
+        <text x="342.5976719999999" y="696.7095368416218" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="342.5976719999999" y="696.7095368416218" dy="-0.6em">Shell command</tspan><tspan x="342.5976719999999" dy="1.2em">(bash string)</tspan></text>
       </g>
       <g class="node default unifiedNode" id="node-UnifiedLogic">
         <path d="M 534.691448 616.0602721357394 a 107.5 34.56397058823529 0 0 0 215 0 a 107.5 34.56397058823529 0 0 0 -215 0 l 0 161.29852941176472 a 107.5 34.56397058823529 0 0 0 215 0 l 0 -161.29852941176472" style="fill:#51cf66 !important;stroke:#2f9e44 !important;color:#000 !important"/>
@@ -194,7 +194,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default riskNode" id="node-Risk">
         <rect x="979.4648879999999" y="267.24815077375206" width="260.40316800000005" height="150" style="fill:#ff6b6b !important;stroke:#c92a2a !important;color:#fff !important"/>
-        <text x="1109.6664719999999" y="342.24815077375206" class="label" style="fill: #fff" text-anchor="middle" dominant-baseline="central"><tspan x="1109.6664719999999" y="342.24815077375206" dy="-2.4em">⚠️ Risk: Two paths to same</tspan><tspan x="1109.6664719999999" dy="1.2em">thing</tspan><tspan x="1109.6664719999999" dy="1.2em">if shared logic not</tspan><tspan x="1109.6664719999999" dy="1.2em">extracted</tspan><tspan x="1109.6664719999999" dy="1.2em">into launch.rs</tspan></text>
+        <text x="1109.6664719999999" y="342.24815077375206" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1109.6664719999999" y="342.24815077375206" dy="-2.4em">⚠️ Risk: Two paths to same</tspan><tspan x="1109.6664719999999" dy="1.2em">thing</tspan><tspan x="1109.6664719999999" dy="1.2em">if shared logic not</tspan><tspan x="1109.6664719999999" dy="1.2em">extracted</tspan><tspan x="1109.6664719999999" dy="1.2em">into launch.rs</tspan></text>
       </g>
     </g>
   </g>

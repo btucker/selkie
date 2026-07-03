@@ -134,7 +134,7 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-CheckPending-End-0">
         <rect x="-11.2" y="1123.7169006514537" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="0" y="1134.7169006514537" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <text x="0" y="1134.7169006514537" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CheckPending-ExtractPR-0">
         <rect x="389.3592912368495" y="291.2394265429845" width="29.599999999999998" height="22" class="edge-label-bg"/>
@@ -158,11 +158,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-OnDisk-ReuseOwner-0">
         <rect x="196.24486894128185" y="1476.0473348966927" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="211.04486894128186" y="1487.0473348966927" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+        <text x="211.04486894128186" y="1487.0473348966927" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-OnDisk-AllocateFresh-0">
         <rect x="319.47571576133566" y="1478.815016380116" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="330.67571576133565" y="1489.815016380116" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <text x="330.67571576133565" y="1489.815016380116" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-RunningCheck-NudgeClaim-0">
         <rect x="174.77207284108198" y="1898.2062832905312" width="29.599999999999998" height="22" class="edge-label-bg"/>
@@ -170,11 +170,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-RunningCheck-SpawnFresh-0">
         <rect x="409.06115123909706" y="1904.6780650784153" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="420.26115123909705" y="1915.6780650784153" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <text x="420.26115123909705" y="1915.6780650784153" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-MissingCheck-CheckOwner-0">
         <rect x="100.51437943054637" y="694.0815485779515" width="87.2" height="22" class="edge-label-bg"/>
-        <text x="144.11437943054636" y="705.0815485779515" class="edge-label" dominant-baseline="central" text-anchor="middle">Should gate</text>
+        <text x="144.11437943054636" y="705.0815485779515" class="edge-label" text-anchor="middle" dominant-baseline="central">Should gate</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-MissingCheck-CheckDisk-0">
         <rect x="254.34337999999997" y="883.7820724526346" width="87.2" height="22" class="edge-label-bg"/>
@@ -200,11 +200,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-ExtractPR">
         <rect x="335.855504" y="386.4121737305695" width="235.468736" height="78"/>
-        <text x="453.589872" y="425.4121737305695" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="453.589872" y="425.4121737305695" dy="-0.6em">Extract PR# from</tspan><tspan x="453.589872" dy="1.2em">task subject/description</tspan></text>
+        <text x="453.589872" y="425.4121737305695" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="453.589872" y="425.4121737305695" dy="-0.6em">Extract PR# from</tspan><tspan x="453.589872" dy="1.2em">task subject/description</tspan></text>
       </g>
       <g class="node default" id="node-HasPR">
         <polygon points="453.589872,552.246203461139 519.6992560000001,618.355587461139 453.589872,684.4649714611389 387.48048800000004,618.355587461139"/>
-        <text x="453.589872" y="618.355587461139" class="label" dominant-baseline="central" text-anchor="middle">PR# found?</text>
+        <text x="453.589872" y="618.355587461139" class="label" text-anchor="middle" dominant-baseline="central">PR# found?</text>
       </g>
       <g class="node default" id="node-CheckOwner">
         <rect x="39.460939999999965" y="758.4649714611389" width="188.75001600000002" height="78"/>
@@ -216,7 +216,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-InMemory">
         <polygon points="133.83594799999997,910.4649714611389 218.88283599999997,995.5118594611389 133.83594799999997,1080.5587474611389 48.78905999999998,995.5118594611389"/>
-        <text x="133.83594799999997" y="995.5118594611389" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="133.83594799999997" y="995.5118594611389" dy="-0.6em">Owner found</tspan><tspan x="133.83594799999997" dy="1.2em">this tick?</tspan></text>
+        <text x="133.83594799999997" y="995.5118594611389" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="133.83594799999997" y="995.5118594611389" dy="-0.6em">Owner found</tspan><tspan x="133.83594799999997" dy="1.2em">this tick?</tspan></text>
       </g>
       <g class="node default" id="node-ReuseOwner">
         <rect x="38.63672000000001" y="1538.6525234611388" width="192.04689599999998" height="54"/>
@@ -228,7 +228,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-OnDisk">
         <polygon points="273.54494,1282.5587474611389 358.59182799999996,1367.605635461139 273.54494,1452.6525234611388 188.498052,1367.605635461139" style="fill:#ff9999 !important"/>
-        <text x="273.54494" y="1367.605635461139" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="273.54494" y="1367.605635461139" dy="-0.6em">Owner found</tspan><tspan x="273.54494" dy="1.2em">on disk?</tspan></text>
+        <text x="273.54494" y="1367.605635461139" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="273.54494" y="1367.605635461139" dy="-0.6em">Owner found</tspan><tspan x="273.54494" dy="1.2em">on disk?</tspan></text>
       </g>
       <g class="node default" id="node-AssignTask">
         <rect x="220.33398399999996" y="1654.6525234611388" width="206.593776" height="54"/>
@@ -236,15 +236,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-RunningCheck">
         <polygon points="323.63087199999995,1758.6525234611386 396.57228799999996,1831.5939394611387 323.63087199999995,1904.5353554611386 250.68945599999995,1831.5939394611387"/>
-        <text x="323.63087199999995" y="1831.5939394611387" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="323.63087199999995" y="1831.5939394611387" dy="-0.6em">Coworker</tspan><tspan x="323.63087199999995" dy="1.2em">running?</tspan></text>
+        <text x="323.63087199999995" y="1831.5939394611387" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="323.63087199999995" y="1831.5939394611387" dy="-0.6em">Coworker</tspan><tspan x="323.63087199999995" dy="1.2em">running?</tspan></text>
       </g>
       <g class="node default" id="node-NudgeClaim">
         <rect x="39.56640399999999" y="1978.5353554611388" width="188.32816" height="54"/>
-        <text x="133.730484" y="2005.5353554611388" class="label" dominant-baseline="central" text-anchor="middle">Nudge: claim task</text>
+        <text x="133.730484" y="2005.5353554611388" class="label" text-anchor="middle" dominant-baseline="central">Nudge: claim task</text>
       </g>
       <g class="node default" id="node-SpawnFresh">
         <rect x="341.44922799999995" y="1978.5353554611388" width="217.05473600000002" height="54"/>
-        <text x="449.976596" y="2005.5353554611388" class="label" dominant-baseline="central" text-anchor="middle">Spawn fresh with task</text>
+        <text x="449.976596" y="2005.5353554611388" class="label" text-anchor="middle" dominant-baseline="central">Spawn fresh with task</text>
       </g>
       <g class="node default" id="node-MissingCheck">
         <rect x="98.72654799999997" y="579.355587461139" width="199.593808" height="78" style="fill:#ffcccc !important;stroke:#ff0000 !important;stroke-width:3px !important"/>
@@ -252,7 +252,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-PRCache">
         <path d="M 116.04297999999997 388.42835291917083 a 82.48047199999999 15.85020891917085 0 0 0 164.96094399999998 0 a 82.48047199999999 15.85020891917085 0 0 0 -164.96094399999998 0 l 0 73.96764162279732 a 82.48047199999999 15.85020891917085 0 0 0 164.96094399999998 0 l 0 -73.96764162279732" style="fill:#ccffcc !important"/>
-        <text x="198.52345199999996" y="425.4121737305695" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="198.52345199999996" y="425.4121737305695" dy="-0.6em">merged_pr_branches</tspan><tspan x="198.52345199999996" dy="1.2em">HashSet</tspan></text>
+        <text x="198.52345199999996" y="425.4121737305695" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="198.52345199999996" y="425.4121737305695" dy="-0.6em">merged_pr_branches</tspan><tspan x="198.52345199999996" dy="1.2em">HashSet</tspan></text>
       </g>
     </g>
   </g>

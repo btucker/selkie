@@ -55,7 +55,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5" class="marker"/>
@@ -114,11 +114,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-app_tests-mod-0">
         <rect x="221.96156200432733" y="125.2056548003709" width="173.6" height="40" class="edge-label-bg"/>
-        <text x="308.76156200432735" y="145.2056548003709" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="308.76156200432735" y="145.2056548003709" dy="-0.6em">pub(super) = visible to</tspan><tspan x="308.76156200432735" dy="1.2em">parent</tspan></text>
+        <text x="308.76156200432735" y="145.2056548003709" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="308.76156200432735" y="145.2056548003709" dy="-0.6em">pub(super) = visible to</tspan><tspan x="308.76156200432735" dy="1.2em">parent</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod-app-0">
         <rect x="613.9429830269081" y="66.89018756939785" width="108.8" height="22" class="edge-label-bg"/>
-        <text x="668.3429830269081" y="77.89018756939785" class="edge-label" dominant-baseline="central" text-anchor="middle">parent of both</text>
+        <text x="668.3429830269081" y="77.89018756939785" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod-ui-0">
         <rect x="616.9846329242517" y="180.2819997651024" width="108.8" height="22" class="edge-label-bg"/>

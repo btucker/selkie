@@ -47,10 +47,10 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5" class="marker"/>
@@ -106,7 +106,7 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-CapCheck-Numbered-0">
         <rect x="796.3084904796934" y="105.01821323753686" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="811.1084904796934" y="116.01821323753686" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+        <text x="811.1084904796934" y="116.01821323753686" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CapCheck-Unnumbered-0">
         <rect x="806.068793220753" y="221.6043770928219" width="22.4" height="22" class="edge-label-bg"/>
@@ -128,7 +128,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-KeyPress">
         <rect x="1221.8790560000002" y="133.5" width="148.87500799999998" height="54"/>
-        <text x="1296.3165600000002" y="160.5" class="label" dominant-baseline="central" text-anchor="middle">KeyPress 1-9</text>
+        <text x="1296.3165600000002" y="160.5" class="label" text-anchor="middle" dominant-baseline="central">KeyPress 1-9</text>
       </g>
       <g class="node default" id="node-RenderMsg">
         <rect x="20" y="146" width="187.812512" height="54"/>
@@ -140,7 +140,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-CapCheck">
         <polygon points="677.261792,77.167952 773.09384,173 677.261792,268.832048 581.429744,173" style="fill:#f96 !important"/>
-        <text x="677.261792" y="173" class="label" dominant-baseline="central" text-anchor="middle">diagram_num &lt;= 9?</text>
+        <text x="677.261792" y="173" class="label" text-anchor="middle" dominant-baseline="central">diagram_num &lt;= 9?</text>
       </g>
       <g class="node default" id="node-Numbered">
         <rect x="882.09384" y="70" width="188.07035199999999" height="78"/>

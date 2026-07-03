@@ -47,10 +47,10 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5" class="marker"/>
@@ -86,15 +86,15 @@ rect.text{fill:none;stroke-width:0;}
     <g class="nodes">
       <g class="node default" id="node-A">
         <rect x="0" y="54.039063999999996" width="145.17969599999998" height="54"/>
-        <text x="72.58984799999999" y="81.039064" class="label" dominant-baseline="central" text-anchor="middle">Square Rect</text>
+        <text x="72.58984799999999" y="81.039064" class="label" text-anchor="middle" dominant-baseline="central">Square Rect</text>
       </g>
       <g class="node default" id="node-B">
         <circle cx="299.24219999999997" cy="28.359376" r="28.359376"/>
-        <text x="299.24219999999997" y="28.359376" class="label" dominant-baseline="central" text-anchor="middle">Circle</text>
+        <text x="299.24219999999997" y="28.359376" class="label" text-anchor="middle" dominant-baseline="central">Circle</text>
       </g>
       <g class="node default" id="node-C">
         <path d="M 234.17969599999998 106.718752 H 364.30470399999996 A 5 5 0 0 1 369.30470399999996 111.718752 V 155.718752 A 5 5 0 0 1 364.30470399999996 160.718752 H 234.17969599999998 A 5 5 0 0 1 229.17969599999998 155.718752 V 111.718752 A 5 5 0 0 1 234.17969599999998 106.718752 Z"/>
-        <text x="299.24219999999997" y="133.718752" class="label" dominant-baseline="central" text-anchor="middle">Round Rect</text>
+        <text x="299.24219999999997" y="133.718752" class="label" text-anchor="middle" dominant-baseline="central">Round Rect</text>
       </g>
       <g class="node default" id="node-D">
         <polygon points="478.332048,22.01171999999999 537.359392,81.039064 478.332048,140.066408 419.30470399999996,81.039064"/>

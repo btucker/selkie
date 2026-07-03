@@ -47,7 +47,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
@@ -149,19 +149,19 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-M3-M4-0">
         <rect x="1730.856018251228" y="901.723773522209" width="80" height="22" class="edge-label-bg"/>
-        <text x="1770.856018251228" y="912.723773522209" class="edge-label" dominant-baseline="central" text-anchor="middle">assumption</text>
+        <text x="1770.856018251228" y="912.723773522209" class="edge-label" text-anchor="middle" dominant-baseline="central">assumption</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S1-S2-0">
         <rect x="113.8796709551237" y="294.3900694888634" width="101.6" height="22" class="edge-label-bg"/>
-        <text x="164.6796709551237" y="305.3900694888634" class="edge-label" dominant-baseline="central" text-anchor="middle">no window yet</text>
+        <text x="164.6796709551237" y="305.3900694888634" class="edge-label" text-anchor="middle" dominant-baseline="central">no window yet</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S2-S3-0">
         <rect x="362.99529280303784" y="473.7749018026741" width="80" height="22" class="edge-label-bg"/>
-        <text x="402.99529280303784" y="484.7749018026741" class="edge-label" dominant-baseline="central" text-anchor="middle">has window</text>
+        <text x="402.99529280303784" y="484.7749018026741" class="edge-label" text-anchor="middle" dominant-baseline="central">has window</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S3-S4-0">
         <rect x="665.7015615947108" y="550.5403968649707" width="166.4" height="22" class="edge-label-bg"/>
-        <text x="748.9015615947109" y="561.5403968649707" class="edge-label" dominant-baseline="central" text-anchor="middle">window being torn down</text>
+        <text x="748.9015615947109" y="561.5403968649707" class="edge-label" text-anchor="middle" dominant-baseline="central">window being torn down</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-S1-L1-0">
         <rect x="646.0884403607018" y="71" width="87.2" height="22" class="edge-label-bg"/>
@@ -189,7 +189,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-M3-R4-0">
         <rect x="1351.1137045382982" y="937.7666215938381" width="144.79999999999998" height="40" class="edge-label-bg"/>
-        <text x="1423.5137045382983" y="957.7666215938381" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="1423.5137045382983" y="957.7666215938381" dy="-0.6em">refactoring exposed</tspan><tspan x="1423.5137045382983" dy="1.2em">assumption</tspan></text>
+        <text x="1423.5137045382983" y="957.7666215938381" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="1423.5137045382983" y="957.7666215938381" dy="-0.6em">refactoring exposed</tspan><tspan x="1423.5137045382983" dy="1.2em">assumption</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-R6-F1-0">
         <rect x="906.25154" y="1363.4688" width="87.2" height="22" class="edge-label-bg"/>
@@ -203,19 +203,19 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-M2">
         <rect x="1476.824184" y="672.4688" width="210.36721599999998" height="54"/>
-        <text x="1582.007792" y="699.4688" class="label" dominant-baseline="central" text-anchor="middle">All nudge logic inline</text>
+        <text x="1582.007792" y="699.4688" class="label" text-anchor="middle" dominant-baseline="central">All nudge logic inline</text>
       </g>
       <g class="node default" id="node-M3">
         <rect x="1452.007792" y="801.4688" width="260" height="78"/>
-        <text x="1582.007792" y="840.4688" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1582.007792" y="840.4688" dy="-0.6em">Implicit use of</tspan><tspan x="1582.007792" dy="1.2em">active_coworkers</tspan></text>
+        <text x="1582.007792" y="840.4688" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1582.007792" y="840.4688" dy="-0.6em">Implicit use of</tspan><tspan x="1582.007792" dy="1.2em">active_coworkers</tspan></text>
       </g>
       <g class="node default" id="node-M4">
         <rect x="1682.007792" y="977.4688000000001" width="260" height="78"/>
-        <text x="1812.007792" y="1016.4688000000001" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1812.007792" y="1016.4688000000001" dy="-0.6em">All active = have tmux</tspan><tspan x="1812.007792" dy="1.2em">windows</tspan></text>
+        <text x="1812.007792" y="1016.4688000000001" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1812.007792" y="1016.4688000000001" dy="-0.6em">All active = have tmux</tspan><tspan x="1812.007792" dy="1.2em">windows</tspan></text>
       </g>
       <g class="node default" id="node-R1">
         <rect x="682.617152" y="813.4688" width="222.273456" height="54"/>
-        <text x="793.75388" y="840.4688" class="label" dominant-baseline="central" text-anchor="middle">Extracted route_at_all</text>
+        <text x="793.75388" y="840.4688" class="label" text-anchor="middle" dominant-baseline="central">Extracted route_at_all</text>
       </g>
       <g class="node default" id="node-R2">
         <rect x="663.75388" y="977.4688000000001" width="260" height="78"/>
@@ -223,19 +223,19 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-R3">
         <rect x="954.8906079999999" y="801.4688" width="302.11718400000007" height="78"/>
-        <text x="1105.9492" y="840.4688" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1105.9492" y="840.4688" dy="-0.6em">Extracted</tspan><tspan x="1105.9492" dy="1.2em">maybe_nudge_usage_limit_expiry</tspan></text>
+        <text x="1105.9492" y="840.4688" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1105.9492" y="840.4688" dy="-0.6em">Extracted</tspan><tspan x="1105.9492" dy="1.2em">maybe_nudge_usage_limit_expiry</tspan></text>
       </g>
       <g class="node default" id="node-R4">
         <rect x="995.06248" y="989.4688000000001" width="221.77344000000002" height="54"/>
-        <text x="1105.9492" y="1016.4688000000001" class="label" dominant-baseline="central" text-anchor="middle">Uses active_coworkers</text>
+        <text x="1105.9492" y="1016.4688000000001" class="label" text-anchor="middle" dominant-baseline="central">Uses active_coworkers</text>
       </g>
       <g class="node default" id="node-R5">
         <rect x="828.957004" y="1130.4688" width="241.78907200000003" height="54"/>
-        <text x="949.85154" y="1157.4688" class="label" dominant-baseline="central" text-anchor="middle">Attempts tmux send-keys</text>
+        <text x="949.85154" y="1157.4688" class="label" text-anchor="middle" dominant-baseline="central">Attempts tmux send-keys</text>
       </g>
       <g class="node default" id="node-R6">
         <rect x="818.5116840000001" y="1234.4688" width="262.679712" height="78" style="fill:#fdd !important"/>
-        <text x="949.8515400000001" y="1273.4688" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="949.8515400000001" y="1273.4688" dy="-0.6em">❌ Error: Starting/Stopping</tspan><tspan x="949.8515400000001" dy="1.2em">have no tmux window</tspan></text>
+        <text x="949.8515400000001" y="1273.4688" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="949.8515400000001" y="1273.4688" dy="-0.6em">❌ Error: Starting/Stopping</tspan><tspan x="949.8515400000001" dy="1.2em">have no tmux window</tspan></text>
       </g>
       <g class="node default" id="node-S1">
         <rect x="19.999999999999886" y="181.3672" width="116.34374400000002" height="54"/>
@@ -247,11 +247,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-S3">
         <rect x="539.8632799999999" y="477.7852" width="121.78905599999999" height="54"/>
-        <text x="600.757808" y="504.7852" class="label" dominant-baseline="central" text-anchor="middle">Stopping</text>
+        <text x="600.757808" y="504.7852" class="label" text-anchor="middle" dominant-baseline="central">Stopping</text>
       </g>
       <g class="node default" id="node-S4">
         <rect x="839.757808" y="548.4688" width="118.093744" height="54"/>
-        <text x="898.80468" y="575.4688" class="label" dominant-baseline="central" text-anchor="middle">Stopped</text>
+        <text x="898.80468" y="575.4688" class="label" text-anchor="middle" dominant-baseline="central">Stopped</text>
       </g>
       <g class="node default" id="node-L1">
         <rect x="1066.851552" y="357.418" width="200.15624000000003" height="54" style="fill:#fee !important"/>
@@ -275,7 +275,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-F4">
         <rect x="819.85154" y="1772.4688" width="260" height="78" style="fill:#dfd !important"/>
-        <text x="949.85154" y="1811.4688" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="949.85154" y="1811.4688" dy="-0.6em">✓ Only nudge coworkers</tspan><tspan x="949.85154" dy="1.2em">with tmux windows</tspan></text>
+        <text x="949.85154" y="1811.4688" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="949.85154" y="1811.4688" dy="-0.6em">✓ Only nudge coworkers</tspan><tspan x="949.85154" dy="1.2em">with tmux windows</tspan></text>
       </g>
     </g>
   </g>

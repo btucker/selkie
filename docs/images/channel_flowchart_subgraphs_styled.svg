@@ -116,15 +116,15 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-START-IH-0">
         <rect x="642.1328079999998" y="465.5808964047699" width="80" height="22" class="edge-label-bg"/>
-        <text x="682.1328079999998" y="476.5808964047699" class="edge-label" dominant-baseline="central" text-anchor="middle">Empty sets</text>
+        <text x="682.1328079999998" y="476.5808964047699" class="edge-label" text-anchor="middle" dominant-baseline="central">Empty sets</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-START-RNT-0">
         <rect x="897.6318691423912" y="448.41858756107" width="80" height="22" class="edge-label-bg"/>
-        <text x="937.6318691423912" y="459.41858756107" class="edge-label" dominant-baseline="central" text-anchor="middle">Empty sets</text>
+        <text x="937.6318691423912" y="459.41858756107" class="edge-label" text-anchor="middle" dominant-baseline="central">Empty sets</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-MERGE-RESTART-0">
         <rect x="392.17688262293376" y="160.08212379107565" width="116" height="22" class="edge-label-bg"/>
-        <text x="450.17688262293376" y="171.08212379107565" class="edge-label" dominant-baseline="central" text-anchor="middle">midtown restart</text>
+        <text x="450.17688262293376" y="171.08212379107565" class="edge-label" text-anchor="middle" dominant-baseline="central">midtown restart</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-RESTART-START-0">
         <rect x="711.2679639999999" y="306.5" width="108.8" height="22" class="edge-label-bg"/>
@@ -132,7 +132,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-EVENT-CHECK-0">
         <rect x="1426.7364551824608" y="703.0564225526891" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="1473.9364551824608" y="714.0564225526891" class="edge-label" dominant-baseline="central" text-anchor="middle">Generate key</text>
+        <text x="1473.9364551824608" y="714.0564225526891" class="edge-label" text-anchor="middle" dominant-baseline="central">Generate key</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CHECK-DROP-0">
         <rect x="1285.8933744325775" y="876.1012787984442" width="29.599999999999998" height="22" class="edge-label-bg"/>
@@ -144,7 +144,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-MERGE-WINDOW-0">
         <rect x="93.99999999999977" y="115.61793750584764" width="152" height="22" class="edge-label-bg"/>
-        <text x="169.99999999999977" y="126.61793750584764" class="edge-label" dominant-baseline="central" text-anchor="middle">Restarts every merge</text>
+        <text x="169.99999999999977" y="126.61793750584764" class="edge-label" text-anchor="middle" dominant-baseline="central">Restarts every merge</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-IH-CHECK-0">
         <rect x="940.071765473613" y="669.9412439475452" width="94.39999999999999" height="22" class="edge-label-bg"/>
@@ -158,7 +158,7 @@ rect.text{fill:none;stroke-width:0;}
     <g class="nodes">
       <g class="node default" id="node-IH">
         <rect x="572.5703039999999" y="544" width="219.12500800000004" height="78" style="fill:#e1f5ff !important"/>
-        <text x="682.1328079999998" y="583" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="682.1328079999998" y="583" dy="-0.6em">insight_hashes</tspan><tspan x="682.1328079999998" dy="1.2em">Mutex&lt;HashSet&lt;u64&gt;&gt;</tspan></text>
+        <text x="682.1328079999998" y="583" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="682.1328079999998" y="583" dy="-0.6em">insight_hashes</tspan><tspan x="682.1328079999998" dy="1.2em">Mutex&lt;HashSet&lt;u64&gt;&gt;</tspan></text>
       </g>
       <g class="node default" id="node-RNT">
         <rect x="841.6953119999998" y="532" width="260" height="102" style="fill:#e1f5ff !important"/>
@@ -190,7 +190,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-INSERT">
         <rect x="1439.6425839999997" y="936.695328" width="130.468752" height="54"/>
-        <text x="1504.8769599999996" y="963.695328" class="label" dominant-baseline="central" text-anchor="middle">Insert key</text>
+        <text x="1504.8769599999996" y="963.695328" class="label" text-anchor="middle" dominant-baseline="central">Insert key</text>
       </g>
       <g class="node default" id="node-POST">
         <rect x="1419.8027359999999" y="1040.695328" width="170.148448" height="54" style="fill:#e1ffe1 !important"/>
@@ -198,7 +198,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-WINDOW">
         <rect x="39.99999999999977" y="178" width="260" height="102" style="fill:#fff9e1 !important"/>
-        <text x="169.99999999999977" y="229" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="169.99999999999977" y="229" dy="-1.2em">Window: Between merges</tspan><tspan x="169.99999999999977" dy="1.2em">Growth: Bounded by PR</tspan><tspan x="169.99999999999977" dy="1.2em">velocity</tspan></text>
+        <text x="169.99999999999977" y="229" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="169.99999999999977" y="229" dy="-1.2em">Window: Between merges</tspan><tspan x="169.99999999999977" dy="1.2em">Growth: Bounded by PR</tspan><tspan x="169.99999999999977" dy="1.2em">velocity</tspan></text>
       </g>
     </g>
   </g>

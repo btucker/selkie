@@ -96,11 +96,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-B-C-0">
         <rect x="213.27813199999997" y="208" width="101.6" height="22" class="edge-label-bg"/>
-        <text x="264.078132" y="219" class="edge-label" dominant-baseline="central" text-anchor="middle">ToLayoutGraph</text>
+        <text x="264.078132" y="219" class="edge-label" text-anchor="middle" dominant-baseline="central">ToLayoutGraph</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-C-D-0">
         <rect x="202.478132" y="336" width="123.19999999999999" height="22" class="edge-label-bg"/>
-        <text x="264.078132" y="347" class="edge-label" dominant-baseline="central" text-anchor="middle">layout algorithm</text>
+        <text x="264.078132" y="347" class="edge-label" text-anchor="middle" dominant-baseline="central">layout algorithm</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-D-E-0">
         <rect x="188.07813199999998" y="464" width="152" height="22" class="edge-label-bg"/>
@@ -108,7 +108,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-E-F-0">
         <rect x="234.878132" y="592" width="58.4" height="22" class="edge-label-bg"/>
-        <text x="264.078132" y="603" class="edge-label" dominant-baseline="central" text-anchor="middle">overlay</text>
+        <text x="264.078132" y="603" class="edge-label" text-anchor="middle" dominant-baseline="central">overlay</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F-G-0">
         <rect x="88.68421753581852" y="828.682577313284" width="137.6" height="40" class="edge-label-bg"/>
@@ -126,11 +126,11 @@ rect.text{fill:none;stroke-width:0;}
     <g class="nodes">
       <g class="node default" id="node-A">
         <rect x="176.992188" y="0" width="174.171888" height="54"/>
-        <text x="264.078132" y="27" class="label" dominant-baseline="central" text-anchor="middle">Mermaid Source</text>
+        <text x="264.078132" y="27" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
       </g>
       <g class="node default" id="node-B">
         <rect x="183.277348" y="128" width="161.601568" height="54"/>
-        <text x="264.078132" y="155" class="label" dominant-baseline="central" text-anchor="middle">Flowchart AST</text>
+        <text x="264.078132" y="155" class="label" text-anchor="middle" dominant-baseline="central">Flowchart AST</text>
       </g>
       <g class="node default" id="node-C">
         <rect x="186.08202" y="256" width="155.992224" height="54"/>
@@ -154,11 +154,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-H">
         <rect x="310" y="939.1093599999999" width="176.312528" height="54" style="fill:#51cf66 !important"/>
-        <text x="398.15626399999996" y="966.1093599999999" class="label" dominant-baseline="central" text-anchor="middle">Clean Rendering</text>
+        <text x="398.15626399999996" y="966.1093599999999" class="label" text-anchor="middle" dominant-baseline="central">Clean Rendering</text>
       </g>
       <g class="node default" id="node-I">
         <rect x="41.015624" y="1079.10936" width="177.968752" height="54" style="fill:#ff6b6b !important"/>
-        <text x="130" y="1106.10936" class="label" dominant-baseline="central" text-anchor="middle">World → Wor▼d</text>
+        <text x="130" y="1106.10936" class="label" text-anchor="middle" dominant-baseline="central">World → Wor▼d</text>
       </g>
     </g>
   </g>

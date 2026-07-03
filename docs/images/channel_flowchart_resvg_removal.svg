@@ -124,7 +124,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-B1">
         <rect x="1308.9453440000002" y="97" width="198.398448" height="54"/>
-        <text x="1408.1445680000002" y="124" class="label" dominant-baseline="central" text-anchor="middle">selkie::render_text</text>
+        <text x="1408.1445680000002" y="124" class="label" text-anchor="middle" dominant-baseline="central">selkie::render_text</text>
       </g>
       <g class="node default" id="node-C1">
         <rect x="1582.3437920000001" y="97" width="134.32812800000002" height="54"/>
@@ -140,11 +140,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-F1">
         <rect x="2283.054736" y="97" width="192.117184" height="54" style="fill:#ff6b6b !important"/>
-        <text x="2379.113328" y="124" class="label" dominant-baseline="central" text-anchor="middle">tiny-skia Rasterize</text>
+        <text x="2379.113328" y="124" class="label" text-anchor="middle" dominant-baseline="central">tiny-skia Rasterize</text>
       </g>
       <g class="node default" id="node-G1">
         <rect x="2550.17192" y="97" width="133.125008" height="54"/>
-        <text x="2616.7344239999998" y="124" class="label" dominant-baseline="central" text-anchor="middle">PNG bytes</text>
+        <text x="2616.7344239999998" y="124" class="label" text-anchor="middle" dominant-baseline="central">PNG bytes</text>
       </g>
       <g class="node default" id="node-H1">
         <rect x="2758.2969279999998" y="97" width="224.289056" height="54" style="fill:#ff6b6b !important"/>
@@ -156,7 +156,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-A2">
         <rect x="20" y="97" width="174.171888" height="54"/>
-        <text x="107.085944" y="124" class="label" dominant-baseline="central" text-anchor="middle">Mermaid Source</text>
+        <text x="107.085944" y="124" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
       </g>
       <g class="node default" id="node-B2">
         <rect x="269.17188799999997" y="45" width="238.71875200000005" height="54"/>
@@ -172,15 +172,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-E2">
         <rect x="289.33204" y="149" width="198.398448" height="54"/>
-        <text x="388.531264" y="176" class="label" dominant-baseline="central" text-anchor="middle">selkie::render_text</text>
+        <text x="388.531264" y="176" class="label" text-anchor="middle" dominant-baseline="central">selkie::render_text</text>
       </g>
       <g class="node default" id="node-F2">
         <rect x="582.8906400000001" y="149" width="134.32812800000002" height="54"/>
-        <text x="650.0547040000001" y="176" class="label" dominant-baseline="central" text-anchor="middle">SVG String</text>
+        <text x="650.0547040000001" y="176" class="label" text-anchor="middle" dominant-baseline="central">SVG String</text>
       </g>
       <g class="node default" id="node-G2">
         <rect x="795.3672" y="149" width="171.257824" height="54" style="fill:#51cf66 !important"/>
-        <text x="880.996112" y="176" class="label" dominant-baseline="central" text-anchor="middle">Browser Viewer</text>
+        <text x="880.996112" y="176" class="label" text-anchor="middle" dominant-baseline="central">Browser Viewer</text>
       </g>
     </g>
   </g>

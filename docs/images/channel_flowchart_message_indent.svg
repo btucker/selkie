@@ -50,7 +50,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5" class="marker"/>
@@ -107,7 +107,7 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-IsAction-ActionPath-0">
         <rect x="105.30426018877971" y="227.95532815024117" width="144.79999999999998" height="40" class="edge-label-bg"/>
-        <text x="177.7042601887797" y="247.95532815024117" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="177.7042601887797" y="247.95532815024117" dy="-0.6em">Yes</tspan><tspan x="177.7042601887797" dy="1.2em">MessageType::Action</tspan></text>
+        <text x="177.7042601887797" y="247.95532815024117" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="177.7042601887797" y="247.95532815024117" dy="-0.6em">Yes</tspan><tspan x="177.7042601887797" dy="1.2em">MessageType::Action</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-IsAction-NormalPath-0">
         <rect x="371.88325981122034" y="227.95532815024117" width="87.2" height="40" class="edge-label-bg"/>
@@ -125,19 +125,19 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-ActionPath">
         <rect x="46.51952800000005" y="325.867184" width="178.554704" height="54" style="fill:#e1f5ff !important"/>
-        <text x="135.79688000000004" y="352.867184" class="label" dominant-baseline="central" text-anchor="middle">extra_indent = 2</text>
+        <text x="135.79688000000004" y="352.867184" class="label" text-anchor="middle" dominant-baseline="central">extra_indent = 2</text>
       </g>
       <g class="node default" id="node-NormalPath">
         <rect x="368.11328800000007" y="325.867184" width="178.554704" height="54" style="fill:#fff4e1 !important"/>
-        <text x="457.3906400000001" y="352.867184" class="label" dominant-baseline="central" text-anchor="middle">extra_indent = 0</text>
+        <text x="457.3906400000001" y="352.867184" class="label" text-anchor="middle" dominant-baseline="central">extra_indent = 0</text>
       </g>
       <g class="node default" id="node-ActionIndent">
         <rect x="0.00000000000002842170943040401" y="429.867184" width="271.59376000000003" height="102" style="fill:#e1f5ff !important"/>
-        <text x="135.79688000000004" y="480.867184" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="135.79688000000004" y="480.867184" dy="-1.2em">indent_width = 7 + 2 = 9</tspan><tspan x="135.79688000000004" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="135.79688000000004" dy="1.2em">+ extra_indent)</tspan></text>
+        <text x="135.79688000000004" y="480.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="135.79688000000004" y="480.867184" dy="-1.2em">indent_width = 7 + 2 = 9</tspan><tspan x="135.79688000000004" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="135.79688000000004" dy="1.2em">+ extra_indent)</tspan></text>
       </g>
       <g class="node default" id="node-NormalIndent">
         <rect x="321.5937600000001" y="429.867184" width="271.59376000000003" height="102" style="fill:#fff4e1 !important"/>
-        <text x="457.3906400000001" y="480.867184" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="457.3906400000001" y="480.867184" dy="-1.2em">indent_width = 7 + 0 = 7</tspan><tspan x="457.3906400000001" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="457.3906400000001" dy="1.2em">only)</tspan></text>
+        <text x="457.3906400000001" y="480.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="480.867184" dy="-1.2em">indent_width = 7 + 0 = 7</tspan><tspan x="457.3906400000001" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH</tspan><tspan x="457.3906400000001" dy="1.2em">only)</tspan></text>
       </g>
       <g class="node default" id="node-ActionFirst">
         <rect x="13.527312000000023" y="581.867184" width="244.53913600000004" height="102" style="fill:#e1f5ff !important"/>
@@ -153,7 +153,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-NormalCont">
         <rect x="359.4648480000001" y="733.867184" width="195.851584" height="102" style="fill:#fff4e1 !important"/>
-        <text x="457.3906400000001" y="784.867184" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="457.3906400000001" y="784.867184" dy="-1.2em">Continuation lines:</tspan><tspan x="457.3906400000001" dy="1.2em">&apos; content&apos;</tspan><tspan x="457.3906400000001" dy="1.2em">(7 spaces)</tspan></text>
+        <text x="457.3906400000001" y="784.867184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3906400000001" y="784.867184" dy="-1.2em">Continuation lines:</tspan><tspan x="457.3906400000001" dy="1.2em">&apos; content&apos;</tspan><tspan x="457.3906400000001" dy="1.2em">(7 spaces)</tspan></text>
       </g>
       <g class="node default" id="node-ActionMermaid">
         <rect x="7.187488000000059" y="885.867184" width="257.21878399999997" height="102" style="fill:#e1f5ff !important"/>

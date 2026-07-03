@@ -47,7 +47,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
@@ -108,7 +108,7 @@ rect.text{fill:none;stroke-width:0;}
     <g class="nodes">
       <g class="node default" id="node-A1">
         <rect x="1123.2735200000002" y="121" width="174.171888" height="54"/>
-        <text x="1210.3594640000001" y="148" class="label" dominant-baseline="central" text-anchor="middle">Mermaid Source</text>
+        <text x="1210.3594640000001" y="148" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
       </g>
       <g class="node default" id="node-B1">
         <rect x="1372.445408" y="121" width="257.695344" height="54"/>
@@ -120,15 +120,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-D1">
         <rect x="1914.4688800000001" y="97" width="260" height="102" style="fill:#a44 !important;stroke:#822 !important"/>
-        <text x="2044.4688800000001" y="148" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="2044.4688800000001" y="148" dy="-1.2em">svg_to_png</tspan><tspan x="2044.4688800000001" dy="1.2em">resvg + usvg + tiny-skia +</tspan><tspan x="2044.4688800000001" dy="1.2em">fontdb</tspan></text>
+        <text x="2044.4688800000001" y="148" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="2044.4688800000001" y="148" dy="-1.2em">svg_to_png</tspan><tspan x="2044.4688800000001" dy="1.2em">resvg + usvg + tiny-skia +</tspan><tspan x="2044.4688800000001" dy="1.2em">fontdb</tspan></text>
       </g>
       <g class="node default" id="node-E1">
         <rect x="2249.4688800000004" y="121" width="133.125008" height="54"/>
-        <text x="2316.0313840000003" y="148" class="label" dominant-baseline="central" text-anchor="middle">PNG bytes</text>
+        <text x="2316.0313840000003" y="148" class="label" text-anchor="middle" dominant-baseline="central">PNG bytes</text>
       </g>
       <g class="node default" id="node-F1">
         <rect x="2457.5938880000003" y="121" width="214.375008" height="54"/>
-        <text x="2564.7813920000003" y="148" class="label" dominant-baseline="central" text-anchor="middle">Kitty terminal display</text>
+        <text x="2564.7813920000003" y="148" class="label" text-anchor="middle" dominant-baseline="central">Kitty terminal display</text>
       </g>
       <g class="node default" id="node-A2">
         <rect x="20" y="121" width="174.171888" height="54"/>
@@ -144,7 +144,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-C3">
         <rect x="524.2734560000001" y="173" width="212.46880000000002" height="78"/>
-        <text x="630.5078560000002" y="212" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="630.5078560000002" y="212" dy="-0.6em">render_text_ascii</tspan><tspan x="630.5078560000002" dy="1.2em">box-drawing + braille</tspan></text>
+        <text x="630.5078560000002" y="212" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="630.5078560000002" y="212" dy="-0.6em">render_text_ascii</tspan><tspan x="630.5078560000002" dy="1.2em">box-drawing + braille</tspan></text>
       </g>
       <g class="node default" id="node-D2">
         <rect x="846.304752" y="57" width="152.406272" height="54"/>

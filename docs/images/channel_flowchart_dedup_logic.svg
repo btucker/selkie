@@ -152,7 +152,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-AssignCheck-Block1-0">
         <rect x="1043.4194019821812" y="890.182301265589" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="1058.2194019821811" y="901.182301265589" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+        <text x="1058.2194019821811" y="901.182301265589" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-AssignCheck-Allow1-0">
         <rect x="660.8191625332994" y="956.6169664155899" width="22.4" height="22" class="edge-label-bg"/>
@@ -160,13 +160,13 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-Check2-Block2-0">
         <rect x="255.49731200000002" y="1922.671872" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="320.697312" y="1933.671872" class="edge-label" dominant-baseline="central" text-anchor="middle">in_flight tracked</text>
+        <text x="320.697312" y="1933.671872" class="edge-label" text-anchor="middle" dominant-baseline="central">in_flight tracked</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node default" id="node-Event">
         <rect x="843.4024280000001" y="25" width="157.77344" height="54"/>
-        <text x="922.2891480000001" y="52" class="label" dominant-baseline="central" text-anchor="middle">DaemonEvent</text>
+        <text x="922.2891480000001" y="52" class="label" text-anchor="middle" dominant-baseline="central">DaemonEvent</text>
       </g>
       <g class="node default" id="node-Snapshot">
         <rect x="832.28134" y="129" width="180.01561600000002" height="54"/>
@@ -174,7 +174,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Rules">
         <rect x="805.4922600000001" y="283" width="233.593776" height="54"/>
-        <text x="922.2891480000001" y="310" class="label" dominant-baseline="central" text-anchor="middle">evaluate_tick in rules.rs</text>
+        <text x="922.2891480000001" y="310" class="label" text-anchor="middle" dominant-baseline="central">evaluate_tick in rules.rs</text>
       </g>
       <g class="node default" id="node-Check">
         <polygon points="922.2891480000001,387 977.953212,442.664064 922.2891480000001,498.328128 866.625084,442.664064"/>
@@ -182,15 +182,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Bypass">
         <rect x="638.119216" y="572.328128" width="260" height="78"/>
-        <text x="768.119216" y="611.328128" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="768.119216" y="611.328128" dy="-0.6em">bypass</tspan><tspan x="768.119216" dy="1.2em">is_busy_from_snapshot</tspan></text>
+        <text x="768.119216" y="611.328128" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="768.119216" y="611.328128" dy="-0.6em">bypass</tspan><tspan x="768.119216" dy="1.2em">is_busy_from_snapshot</tspan></text>
       </g>
       <g class="node default" id="node-BlockSnap">
         <rect x="948.119216" y="584.328128" width="256.679728" height="54"/>
-        <text x="1076.45908" y="611.328128" class="label" dominant-baseline="central" text-anchor="middle">block if busy from snapshot</text>
+        <text x="1076.45908" y="611.328128" class="label" text-anchor="middle" dominant-baseline="central">block if busy from snapshot</text>
       </g>
       <g class="node default" id="node-AssignCheck">
         <polygon points="922.2891480000001,700.3281279999999 1017.296956,795.335936 922.2891480000001,890.3437439999999 827.28134,795.335936"/>
-        <text x="922.2891480000001" y="795.335936" class="label" dominant-baseline="central" text-anchor="middle">assigned_this_tick?</text>
+        <text x="922.2891480000001" y="795.335936" class="label" text-anchor="middle" dominant-baseline="central">assigned_this_tick?</text>
       </g>
       <g class="node default" id="node-Block1">
         <rect x="994.1915000000001" y="989.343744" width="195.250016" height="54" style="fill:#ffcccc !important"/>
@@ -198,7 +198,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Allow1">
         <rect x="220.623088" y="989.343744" width="200.148448" height="54" style="fill:#ccffcc !important"/>
-        <text x="320.697312" y="1016.343744" class="label" dominant-baseline="central" text-anchor="middle">✓ Allow assignment</text>
+        <text x="320.697312" y="1016.343744" class="label" text-anchor="middle" dominant-baseline="central">✓ Allow assignment</text>
       </g>
       <g class="node default" id="node-Effect1">
         <rect x="39.99999999999996" y="1155.343744" width="231.62504000000004" height="54"/>
@@ -206,7 +206,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Effect2">
         <rect x="321.62503999999996" y="1143.343744" width="327.914128" height="78"/>
-        <text x="485.58210399999996" y="1182.343744" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="485.58210399999996" y="1182.343744" dy="-0.6em">Effect::NudgeCoworkerWithCallbacks</tspan><tspan x="485.58210399999996" dy="1.2em">└─ RecordTaskAssignment</tspan></text>
+        <text x="485.58210399999996" y="1182.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="485.58210399999996" y="1182.343744" dy="-0.6em">Effect::NudgeCoworkerWithCallbacks</tspan><tspan x="485.58210399999996" dy="1.2em">└─ RecordTaskAssignment</tspan></text>
       </g>
       <g class="node default" id="node-Track1">
         <rect x="43.96875999999996" y="1283.343744" width="223.68752000000003" height="54"/>
@@ -214,7 +214,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Track2">
         <rect x="373.7383439999999" y="1271.343744" width="223.68752000000003" height="78"/>
-        <text x="485.58210399999996" y="1310.343744" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="485.58210399999996" y="1310.343744" dy="-0.6em">mark_in_flight_spawns</tspan><tspan x="485.58210399999996" dy="1.2em">scans sub-effects</tspan></text>
+        <text x="485.58210399999996" y="1310.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="485.58210399999996" y="1310.343744" dy="-0.6em">mark_in_flight_spawns</tspan><tspan x="485.58210399999996" dy="1.2em">scans sub-effects</tspan></text>
       </g>
       <g class="node default" id="node-InFlight">
         <rect x="231.037152" y="1449.343744" width="179.32032" height="54" style="fill:#ffffcc !important"/>
@@ -234,7 +234,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Block2">
         <rect x="223.07230400000003" y="1970.671872" width="195.250016" height="54" style="fill:#ffcccc !important"/>
-        <text x="320.697312" y="1997.671872" class="label" dominant-baseline="central" text-anchor="middle">❌ Block duplicate</text>
+        <text x="320.697312" y="1997.671872" class="label" text-anchor="middle" dominant-baseline="central">❌ Block duplicate</text>
       </g>
     </g>
   </g>

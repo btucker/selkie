@@ -50,7 +50,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5" class="marker"/>
@@ -123,7 +123,7 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-F1-G1-0">
         <rect x="3007.1859880074694" y="142.10074655474398" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="3021.9859880074696" y="153.10074655474398" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+        <text x="3021.9859880074696" y="153.10074655474398" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F1-H1-0">
         <rect x="3021.5247688797303" y="250.37076524153315" width="22.4" height="22" class="edge-label-bg"/>
@@ -139,7 +139,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-C2-E2-0">
         <rect x="780.9524318703952" y="189.36786950047306" width="58.4" height="22" class="edge-label-bg"/>
-        <text x="810.1524318703953" y="200.36786950047306" class="edge-label" dominant-baseline="central" text-anchor="middle">Mermaid</text>
+        <text x="810.1524318703953" y="200.36786950047306" class="edge-label" text-anchor="middle" dominant-baseline="central">Mermaid</text>
       </g>
     </g>
     <g class="nodes">
@@ -149,7 +149,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-B1">
         <rect x="1690.8126240000001" y="125.76367199999999" width="164.281264" height="54"/>
-        <text x="1772.9532560000002" y="152.76367199999999" class="label" dominant-baseline="central" text-anchor="middle">Parse Mermaid</text>
+        <text x="1772.9532560000002" y="152.76367199999999" class="label" text-anchor="middle" dominant-baseline="central">Parse Mermaid</text>
       </g>
       <g class="node default" id="node-C1">
         <rect x="1930.093888" y="125.76367199999999" width="164.515648" height="54"/>
@@ -169,7 +169,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-G1">
         <rect x="3090.2501760000005" y="107.76367199999999" width="182.742224" height="78" style="fill:#f99 !important;stroke:#f00 !important"/>
-        <text x="3181.6212880000003" y="146.76367199999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="3181.6212880000003" y="146.76367199999999" dy="-0.6em">DCS Passthrough</tspan><tspan x="3181.6212880000003" dy="1.2em">Double ESC chars</tspan></text>
+        <text x="3181.6212880000003" y="146.76367199999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="3181.6212880000003" y="146.76367199999999" dy="-0.6em">DCS Passthrough</tspan><tspan x="3181.6212880000003" dy="1.2em">Double ESC chars</tspan></text>
       </g>
       <g class="node default" id="node-H1">
         <rect x="3113.894728" y="235.76367199999999" width="135.45312" height="54"/>
@@ -181,11 +181,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-A2">
         <rect x="31.86328800000011" y="120.99999999999999" width="180.07032" height="54"/>
-        <text x="121.89844800000012" y="148" class="label" dominant-baseline="central" text-anchor="middle">Message Content</text>
+        <text x="121.89844800000012" y="148" class="label" text-anchor="middle" dominant-baseline="central">Message Content</text>
       </g>
       <g class="node default" id="node-B2">
         <rect x="307.1211360000001" y="120.99999999999999" width="170.84374400000002" height="54"/>
-        <text x="392.5430080000001" y="148" class="label" dominant-baseline="central" text-anchor="middle">Parse Segments</text>
+        <text x="392.5430080000001" y="148" class="label" text-anchor="middle" dominant-baseline="central">Parse Segments</text>
       </g>
       <g class="node default" id="node-C2">
         <polygon points="673.6328720000001,71.47265599999999 750.1602160000002,148 673.6328720000001,224.52734399999997 597.1055280000002,148"/>
@@ -209,7 +209,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-H2">
         <rect x="298.7968960000001" y="250.52734399999997" width="187.492224" height="102" style="fill:#9f9 !important;stroke:#0f0 !important"/>
-        <text x="392.5430080000001" y="301.52734399999997" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="392.5430080000001" y="301.52734399999997" dy="-1.2em">Fullscreen View</tspan><tspan x="392.5430080000001" dy="1.2em">Simple Context</tspan><tspan x="392.5430080000001" dy="1.2em">No Scroll Tracking</tspan></text>
+        <text x="392.5430080000001" y="301.52734399999997" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="392.5430080000001" y="301.52734399999997" dy="-1.2em">Fullscreen View</tspan><tspan x="392.5430080000001" dy="1.2em">Simple Context</tspan><tspan x="392.5430080000001" dy="1.2em">No Scroll Tracking</tspan></text>
       </g>
       <g class="node default" id="node-I2">
         <rect x="561.2891200000001" y="274.52734399999997" width="224.687504" height="54"/>

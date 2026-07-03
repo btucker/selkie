@@ -95,7 +95,7 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-A-B-0">
         <rect x="107.07421600000009" y="107" width="188" height="40" class="edge-label-bg"/>
-        <text x="201.0742160000001" y="127" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="201.0742160000001" y="127" dy="-0.6em">gh pr list --state merged</tspan><tspan x="201.0742160000001" dy="1.2em">→ Vec&lt;u64&gt;</tspan></text>
+        <text x="201.0742160000001" y="127" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="201.0742160000001" y="127" dy="-0.6em">gh pr list --state merged</tspan><tspan x="201.0742160000001" dy="1.2em">→ Vec&lt;u64&gt;</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-C-D-0">
         <rect x="40.31633076316782" y="482.6637153988538" width="87.2" height="40" class="edge-label-bg"/>
@@ -111,15 +111,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-F-E-0">
         <rect x="417.02019677900455" y="675.9874244624957" width="116" height="40" class="edge-label-bg"/>
-        <text x="475.02019677900455" y="695.9874244624957" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="475.02019677900455" y="695.9874244624957" dy="-0.6em">if pr_number in</tspan><tspan x="475.02019677900455" dy="1.2em">merged_prs</tspan></text>
+        <text x="475.02019677900455" y="695.9874244624957" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="475.02019677900455" y="695.9874244624957" dy="-0.6em">if pr_number in</tspan><tspan x="475.02019677900455" dy="1.2em">merged_prs</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-E-G-0">
         <rect x="258.6835960000001" y="809.1953120000001" width="116" height="22" class="edge-label-bg"/>
-        <text x="316.6835960000001" y="820.1953120000001" class="edge-label" dominant-baseline="central" text-anchor="middle">execute_effects</text>
+        <text x="316.6835960000001" y="820.1953120000001" class="edge-label" text-anchor="middle" dominant-baseline="central">execute_effects</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-H-D-0">
         <rect x="201.80494484409292" y="493.5624549895846" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="267.0049448440929" y="504.5624549895846" class="edge-label" dominant-baseline="central" text-anchor="middle">extract_pr_number</text>
+        <text x="267.0049448440929" y="504.5624549895846" class="edge-label" text-anchor="middle" dominant-baseline="central">extract_pr_number</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-H-F-0">
         <rect x="489.6843755613742" y="490.3689441600303" width="130.39999999999998" height="22" class="edge-label-bg"/>
@@ -129,11 +129,11 @@ rect.text{fill:none;stroke-width:0;}
     <g class="nodes">
       <g class="node default" id="node-A">
         <rect x="107.3867120000001" y="0" width="187.37500799999998" height="78" style="fill:#fff3cd !important"/>
-        <text x="201.0742160000001" y="39" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="201.0742160000001" y="39" dy="-0.6em">Merged PR Polling</tspan><tspan x="201.0742160000001" dy="1.2em">5min interval</tspan></text>
+        <text x="201.0742160000001" y="39" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="201.0742160000001" y="39" dy="-0.6em">Merged PR Polling</tspan><tspan x="201.0742160000001" dy="1.2em">5min interval</tspan></text>
       </g>
       <g class="node default" id="node-B">
         <rect x="97.6171840000001" y="176" width="206.914064" height="78" style="fill:#e1f5ff !important"/>
-        <text x="201.0742160000001" y="215" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="201.0742160000001" y="215" dy="-0.6em">WorldSnapshot</tspan><tspan x="201.0742160000001" dy="1.2em">merged_pr_numbers</tspan></text>
+        <text x="201.0742160000001" y="215" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="201.0742160000001" y="215" dy="-0.6em">WorldSnapshot</tspan><tspan x="201.0742160000001" dy="1.2em">merged_pr_numbers</tspan></text>
       </g>
       <g class="node default" id="node-C">
         <polygon points="201.0742160000001,304 288.6718720000001,391.59765600000003 201.0742160000001,479.195312 113.47656000000009,391.59765600000003"/>
@@ -145,11 +145,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-E">
         <rect x="209.55468400000007" y="729.1953120000001" width="214.25782400000003" height="54" style="fill:#d4edda !important"/>
-        <text x="316.6835960000001" y="756.1953120000001" class="label" dominant-baseline="central" text-anchor="middle">Effect::CompleteTask</text>
+        <text x="316.6835960000001" y="756.1953120000001" class="label" text-anchor="middle" dominant-baseline="central">Effect::CompleteTask</text>
       </g>
       <g class="node default" id="node-F">
         <rect x="375.1679680000001" y="577.1953120000001" width="282.76564800000006" height="54"/>
-        <text x="516.5507920000001" y="604.1953120000001" class="label" dominant-baseline="central" text-anchor="middle">decide_unowned_task_cleanup</text>
+        <text x="516.5507920000001" y="604.1953120000001" class="label" text-anchor="middle" dominant-baseline="central">decide_unowned_task_cleanup</text>
       </g>
       <g class="node default" id="node-G">
         <rect x="202.43750000000009" y="857.1953120000001" width="228.492192" height="54" style="fill:#d4edda !important"/>

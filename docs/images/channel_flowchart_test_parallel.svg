@@ -47,7 +47,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
@@ -68,16 +68,16 @@ rect.text{fill:none;stroke-width:0;}
         <path d="M631.73048,78L631.7304800000001,82.16666666666667C631.73048,86.33333333333333,631.73048,94.66666666666667,631.7304800000001,102.33333333333333C631.73048,110,631.73048,117,631.7304800000001,120.5L631.73048,124" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Parallel-T1-0">
-        <path d="M529.976568,167.08533085901541L473.9655,173.73777571584617C417.954432,180.39022057267695,305.932296,193.69511028633846,249.921228,203.84755514316922C193.91016000000002,214,193.91016000000002,221,193.91016000000002,224.5L193.91016000000002,228" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M529.9765679999999,167.08533085901541L473.96549999999996,173.73777571584617C417.95443199999994,180.39022057267695,305.93229599999995,193.69511028633846,249.92122799999996,203.84755514316922C193.91016,214,193.91016,221,193.91016,224.5L193.91016,228" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Parallel-T2-0">
         <path d="M631.73048,182L631.7304800000001,186.16666666666666C631.73048,190.33333333333334,631.73048,198.66666666666666,631.7304800000001,206.33333333333334C631.73048,214,631.73048,221,631.7304800000001,224.5L631.73048,228" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Parallel-T3-0">
-        <path d="M733.4843920000001,167.08533085901541L789.4954600000001,173.73777571584617C845.506528,180.39022057267695,957.528664,193.69511028633846,1013.5397320000001,203.84755514316922C1069.5508,214,1069.5508,221,1069.5508,224.5L1069.5508,228" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M733.484392,167.08533085901541L789.49546,173.73777571584617C845.5065279999999,180.39022057267695,957.5286639999999,193.69511028633846,1013.5397320000001,203.84755514316922C1069.5508,214,1069.5508,221,1069.5508,224.5L1069.5508,228" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T1-Same1-0">
-        <path d="M193.91016000000002,310L193.91016000000002,314.1666666666667C193.91016000000002,318.3333333333333,193.91016000000002,326.6666666666667,193.91016000000002,334.3333333333333C193.91016000000002,342,193.91016000000002,349,193.91016000000002,352.5L193.91016000000002,356" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M193.91016,310L193.91016,314.1666666666667C193.91016,318.3333333333333,193.91016,326.6666666666667,193.91016,334.3333333333333C193.91016,342,193.91016,349,193.91016,352.5L193.91016,356" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T2-Same2-0">
         <path d="M631.73048,310L631.7304800000001,314.1666666666667C631.73048,318.3333333333333,631.73048,326.6666666666667,631.7304800000001,334.3333333333333C631.73048,342,631.73048,349,631.7304800000001,352.5L631.73048,356" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
@@ -86,7 +86,7 @@ rect.text{fill:none;stroke-width:0;}
         <path d="M1069.5508,310L1069.5508,314.1666666666667C1069.5508,318.3333333333333,1069.5508,326.6666666666667,1069.5508,334.3333333333333C1069.5508,342,1069.5508,349,1069.5508,352.5L1069.5508,356" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Same1-Lock1-0">
-        <path d="M193.91016000000002,438L193.91016000000002,442.1666666666667C193.91016000000002,446.3333333333333,193.91016000000002,454.6666666666667,193.91016000000002,462.3333333333333C193.91016000000002,470,193.91016000000002,477,193.91016000000002,480.5L193.91016000000002,484" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M193.91016,438L193.91016,442.1666666666667C193.91016,446.3333333333333,193.91016,454.6666666666667,193.91016,462.3333333333333C193.91016,470,193.91016,477,193.91016,480.5L193.91016,484" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Same2-Lock2-0">
         <path d="M631.73048,438L631.7304800000001,442.1666666666667C631.73048,446.3333333333333,631.73048,454.6666666666667,631.7304800000001,462.3333333333333C631.73048,470,631.73048,477,631.7304800000001,480.5L631.73048,484" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
@@ -95,7 +95,7 @@ rect.text{fill:none;stroke-width:0;}
         <path d="M1069.5508,438L1069.5508,442.1666666666667C1069.5508,446.3333333333333,1069.5508,454.6666666666667,1069.5508,462.3333333333333C1069.5508,470,1069.5508,477,1069.5508,480.5L1069.5508,484" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Lock1-FirstWins-0">
-        <path d="M193.91016000000002,590L193.91016000000002,594.1666666666666C193.91016000000002,598.3333333333334,193.91016000000002,606.6666666666666,193.91016000000002,616.3333333333334C193.91016000000002,626,193.91016000000002,637,193.91016000000002,642.5L193.91016000000002,648" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M193.91016,590L193.91016,594.1666666666666C193.91016,598.3333333333334,193.91016,606.6666666666666,193.91016,616.3333333333334C193.91016,626,193.91016,637,193.91016,642.5L193.91016,648" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Lock2-Starve2-0">
         <path d="M631.73048,590L631.7304800000001,594.1666666666666C631.73048,598.3333333333334,631.73048,606.6666666666666,631.7304800000001,614.3333333333334C631.73048,622,631.73048,629,631.7304800000001,632.5L631.73048,636" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
@@ -104,7 +104,7 @@ rect.text{fill:none;stroke-width:0;}
         <path d="M1069.5508,590L1069.5508,594.1666666666666C1069.5508,598.3333333333334,1069.5508,606.6666666666666,1069.5508,614.3333333333334C1069.5508,622,1069.5508,629,1069.5508,632.5L1069.5508,636" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-FirstWins-Works-0">
-        <path d="M193.91016000000002,706L193.91016000000002,712.1666666666666C193.91016000000002,718.3333333333334,193.91016000000002,730.6666666666666,193.91016000000002,742.3333333333334C193.91016000000002,754,193.91016000000002,765,193.91016000000002,770.5L193.91016000000002,776" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M193.91016,706L193.91016,712.1666666666666C193.91016,718.3333333333334,193.91016,730.6666666666666,193.91016,742.3333333333334C193.91016,754,193.91016,765,193.91016,770.5L193.91016,776" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Starve2-Timeout2-0">
         <path d="M631.73048,718L631.7304800000001,722.1666666666666C631.73048,726.3333333333334,631.73048,734.6666666666666,631.7304800000001,742.3333333333334C631.73048,750,631.73048,757,631.7304800000001,760.5L631.73048,764" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
@@ -113,7 +113,7 @@ rect.text{fill:none;stroke-width:0;}
         <path d="M1069.5508,718L1069.5508,722.1666666666666C1069.5508,726.3333333333334,1069.5508,734.6666666666666,1069.5508,742.3333333333334C1069.5508,750,1069.5508,757,1069.5508,760.5L1069.5508,764" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Works-Pass-0">
-        <path d="M193.91016000000002,834L193.91016000000002,840.1666666666666C193.91016000000002,846.3333333333334,193.91016000000002,858.6666666666666,193.91016000000002,868.3333333333334C193.91016000000002,878,193.91016000000002,885,193.91016000000002,888.5L193.91016000000002,892" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M193.91016,834L193.91016,840.1666666666666C193.91016,846.3333333333334,193.91016,858.6666666666666,193.91016,868.3333333333334C193.91016,878,193.91016,885,193.91016,888.5L193.91016,892" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Timeout2-Fail2-0">
         <path d="M631.73048,846L631.7304800000001,850.1666666666666C631.73048,854.3333333333334,631.73048,862.6666666666666,631.7304800000001,870.3333333333334C631.73048,878,631.73048,885,631.7304800000001,888.5L631.73048,892" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
@@ -132,11 +132,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Parallel">
         <rect x="529.9765679999999" y="128" width="203.507824" height="54"/>
-        <text x="631.73048" y="155" class="label" dominant-baseline="central" text-anchor="middle">Tests Run in Parallel</text>
+        <text x="631.73048" y="155" class="label" text-anchor="middle" dominant-baseline="central">Tests Run in Parallel</text>
       </g>
       <g class="node default" id="node-T1">
-        <rect x="113.94140800000002" y="232" width="159.937504" height="78"/>
-        <text x="193.91016000000002" y="271" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="193.91016000000002" y="271" dy="-0.6em">Test 1:</tspan><tspan x="193.91016000000002" dy="1.2em">TempDir::new</tspan></text>
+        <rect x="113.941408" y="232" width="159.937504" height="78"/>
+        <text x="193.91016" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016" y="271" dy="-0.6em">Test 1:</tspan><tspan x="193.91016" dy="1.2em">TempDir::new</tspan></text>
       </g>
       <g class="node default" id="node-T2">
         <rect x="551.761728" y="232" width="159.937504" height="78"/>
@@ -144,11 +144,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-T3">
         <rect x="989.582048" y="232" width="159.937504" height="78"/>
-        <text x="1069.5508" y="271" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1069.5508" y="271" dy="-0.6em">Test 3:</tspan><tspan x="1069.5508" dy="1.2em">TempDir::new</tspan></text>
+        <text x="1069.5508" y="271" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="271" dy="-0.6em">Test 3:</tspan><tspan x="1069.5508" dy="1.2em">TempDir::new</tspan></text>
       </g>
       <g class="node default" id="node-Same1">
-        <rect x="98.43357600000002" y="360" width="190.953168" height="78" style="fill:#ff9999 !important"/>
-        <text x="193.91016000000002" y="399" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016000000002" y="399" dy="-0.6em">Channel::for_repo</tspan><tspan x="193.91016000000002" dy="1.2em">&apos;midtown&apos;</tspan></text>
+        <rect x="98.43357599999999" y="360" width="190.953168" height="78" style="fill:#ff9999 !important"/>
+        <text x="193.91016" y="399" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016" y="399" dy="-0.6em">Channel::for_repo</tspan><tspan x="193.91016" dy="1.2em">&apos;midtown&apos;</tspan></text>
       </g>
       <g class="node default" id="node-Same2">
         <rect x="536.2538959999999" y="360" width="190.953168" height="78" style="fill:#ff9999 !important"/>
@@ -159,20 +159,20 @@ rect.text{fill:none;stroke-width:0;}
         <text x="1069.5508" y="399" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="399" dy="-0.6em">Channel::for_repo</tspan><tspan x="1069.5508" dy="1.2em">&apos;midtown&apos;</tspan></text>
       </g>
       <g class="node default" id="node-Lock1">
-        <rect x="0.00000000000002842170943040401" y="488" width="387.82032" height="102"/>
-        <text x="193.91016000000002" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016000000002" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="193.91016000000002" dy="1.2em">exclusive lock on</tspan><tspan x="193.91016000000002" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+        <rect x="0" y="488" width="387.82032" height="102"/>
+        <text x="193.91016" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="193.91016" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="193.91016" dy="1.2em">exclusive lock on</tspan><tspan x="193.91016" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
       </g>
       <g class="node default" id="node-Lock2">
         <rect x="437.8203199999999" y="488" width="387.82032" height="102"/>
-        <text x="631.73048" y="539" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="631.73048" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="631.73048" dy="1.2em">exclusive lock on</tspan><tspan x="631.73048" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+        <text x="631.73048" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="631.73048" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="631.73048" dy="1.2em">exclusive lock on</tspan><tspan x="631.73048" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
       </g>
       <g class="node default" id="node-Lock3">
         <rect x="875.64064" y="488" width="387.82032" height="102"/>
         <text x="1069.5508" y="539" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="539" dy="-1.2em">Try to acquire</tspan><tspan x="1069.5508" dy="1.2em">exclusive lock on</tspan><tspan x="1069.5508" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
       </g>
       <g class="node default" id="node-FirstWins">
-        <rect x="91.66406400000001" y="652" width="204.49219200000002" height="54"/>
-        <text x="193.91016000000002" y="679" class="label" text-anchor="middle" dominant-baseline="central">Test 1 Acquires Lock</text>
+        <rect x="91.66406399999998" y="652" width="204.49219200000002" height="54"/>
+        <text x="193.91016" y="679" class="label" text-anchor="middle" dominant-baseline="central">Test 1 Acquires Lock</text>
       </g>
       <g class="node default" id="node-Starve2">
         <rect x="539.1132799999999" y="640" width="185.2344" height="78"/>
@@ -183,8 +183,8 @@ rect.text{fill:none;stroke-width:0;}
         <text x="1069.5508" y="679" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="679" dy="-0.6em">Test 3 Waits</tspan><tspan x="1069.5508" dy="1.2em">max 2s retry loop</tspan></text>
       </g>
       <g class="node default" id="node-Works">
-        <rect x="103.62501600000002" y="780" width="180.570288" height="54"/>
-        <text x="193.91016000000002" y="807" class="label" dominant-baseline="central" text-anchor="middle">Test 1 completes</text>
+        <rect x="103.62501599999999" y="780" width="180.570288" height="54"/>
+        <text x="193.91016" y="807" class="label" text-anchor="middle" dominant-baseline="central">Test 1 completes</text>
       </g>
       <g class="node default" id="node-Timeout2">
         <rect x="527.015632" y="768" width="209.429696" height="78"/>
@@ -192,15 +192,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Timeout3">
         <rect x="964.835952" y="768" width="209.429696" height="78"/>
-        <text x="1069.5508" y="807" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1069.5508" y="807" dy="-0.6em">WouldBlock Error</tspan><tspan x="1069.5508" dy="1.2em">or TimedOut after 2s</tspan></text>
+        <text x="1069.5508" y="807" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1069.5508" y="807" dy="-0.6em">WouldBlock Error</tspan><tspan x="1069.5508" dy="1.2em">or TimedOut after 2s</tspan></text>
       </g>
       <g class="node default" id="node-Pass">
-        <rect x="135.51172000000003" y="896" width="116.79688000000002" height="54" style="fill:#00cc00 !important"/>
-        <text x="193.91016000000002" y="923" class="label" text-anchor="middle" dominant-baseline="central">✅ PASS</text>
+        <rect x="135.51171999999997" y="896" width="116.79688000000002" height="54" style="fill:#00cc00 !important"/>
+        <text x="193.91015999999996" y="923" class="label" text-anchor="middle" dominant-baseline="central">✅ PASS</text>
       </g>
       <g class="node default" id="node-Fail2">
         <rect x="550.5664079999999" y="896" width="162.328144" height="54" style="fill:#cc0000 !important;color:#fff !important"/>
-        <text x="631.73048" y="923" class="label" text-anchor="middle" style="fill: #fff" dominant-baseline="central">❌ FLAKY FAIL</text>
+        <text x="631.73048" y="923" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">❌ FLAKY FAIL</text>
       </g>
       <g class="node default" id="node-Fail3">
         <rect x="988.386728" y="896" width="162.328144" height="54" style="fill:#cc0000 !important;color:#fff !important"/>

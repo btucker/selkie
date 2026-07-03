@@ -47,7 +47,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
@@ -117,7 +117,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-Assert2-RenderNormal-0">
         <rect x="248.79501903944393" y="1091.9413508037806" width="36.8" height="22" class="edge-label-bg"/>
-        <text x="267.19501903944393" y="1102.9413508037806" class="edge-label" dominant-baseline="central" text-anchor="middle">Pass</text>
+        <text x="267.19501903944393" y="1102.9413508037806" class="edge-label" text-anchor="middle" dominant-baseline="central">Pass</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Assert3-Assert4-0">
         <rect x="154.67526506947164" y="1874.3757690208529" width="36.8" height="22" class="edge-label-bg"/>
@@ -133,7 +133,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-Assert2-Failure-0">
         <rect x="476.34413600000005" y="1655.9841527698736" width="36.8" height="22" class="edge-label-bg"/>
-        <text x="494.744136" y="1666.9841527698736" class="edge-label" dominant-baseline="central" text-anchor="middle">Fail</text>
+        <text x="494.744136" y="1666.9841527698736" class="edge-label" text-anchor="middle" dominant-baseline="central">Fail</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Assert3-Failure-0">
         <rect x="355.301168" y="2077.2733188037305" width="36.8" height="22" class="edge-label-bg"/>
@@ -151,7 +151,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-RenderAction">
         <rect x="296.425784" y="104" width="260" height="78"/>
-        <text x="426.425784" y="143" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="426.425784" y="143" dy="-0.6em">Render action message</tspan><tspan x="426.425784" dy="1.2em">with Mermaid</tspan></text>
+        <text x="426.425784" y="143" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="426.425784" y="143" dy="-0.6em">Render action message</tspan><tspan x="426.425784" dy="1.2em">with Mermaid</tspan></text>
       </g>
       <g class="node default" id="node-BuildActionIndent">
         <rect x="290.62890400000003" y="232" width="271.59376000000003" height="102" style="fill:#fff4e1 !important"/>
@@ -167,15 +167,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Assert2">
         <polygon points="345.765624,838.64064 472.08594400000004,964.96096 345.765624,1091.28128 219.44530400000002,964.96096"/>
-        <text x="345.765624" y="964.96096" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="345.765624" y="964.96096" dy="-0.6em">Assert: all_text contains</tspan><tspan x="345.765624" dy="1.2em">&apos; --- press 1 to open ---&apos;</tspan></text>
+        <text x="345.765624" y="964.96096" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="345.765624" y="964.96096" dy="-0.6em">Assert: all_text contains</tspan><tspan x="345.765624" dy="1.2em">&apos; --- press 1 to open ---&apos;</tspan></text>
       </g>
       <g class="node default" id="node-RenderNormal">
         <rect x="122.765624" y="1165.28128" width="260" height="78"/>
-        <text x="252.765624" y="1204.28128" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="252.765624" y="1204.28128" dy="-0.6em">Render normal message</tspan><tspan x="252.765624" dy="1.2em">with same Mermaid</tspan></text>
+        <text x="252.765624" y="1204.28128" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="252.765624" y="1204.28128" dy="-0.6em">Render normal message</tspan><tspan x="252.765624" dy="1.2em">with same Mermaid</tspan></text>
       </g>
       <g class="node default" id="node-BuildNormalIndent">
         <rect x="116.44139999999999" y="1293.28128" width="272.64844800000003" height="78" style="fill:#fff4e1 !important"/>
-        <text x="252.765624" y="1332.28128" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="252.765624" y="1332.28128" dy="-0.6em">normal_indent = 7 spaces</tspan><tspan x="252.765624" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH)</tspan></text>
+        <text x="252.765624" y="1332.28128" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="252.765624" y="1332.28128" dy="-0.6em">normal_indent = 7 spaces</tspan><tspan x="252.765624" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH)</tspan></text>
       </g>
       <g class="node default" id="node-CollectNormalText">
         <rect x="122.765624" y="1445.28128" width="260" height="78"/>
@@ -191,7 +191,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-Success">
         <rect x="0" y="2325.28128" width="260" height="78" style="fill:#e8f5e9 !important"/>
-        <text x="130" y="2364.28128" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="130" y="2364.28128" dy="-0.6em">Test passes: indents are</tspan><tspan x="130" dy="1.2em">different</tspan></text>
+        <text x="130" y="2364.28128" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="130" y="2364.28128" dy="-0.6em">Test passes: indents are</tspan><tspan x="130" dy="1.2em">different</tspan></text>
       </g>
       <g class="node default" id="node-Failure">
         <rect x="429.404304" y="2337.28128" width="123.742176" height="54" style="fill:#ffebee !important"/>

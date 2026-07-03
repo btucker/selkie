@@ -1,14 +1,16 @@
 //! SVG element types
 
-use std::collections::HashMap;
 use std::fmt::Write;
 
 use crate::layout::Point;
 
 /// SVG attributes
+///
+/// Attributes are stored in insertion order so that rendering the same
+/// diagram always produces byte-identical SVG output.
 #[derive(Debug, Clone, Default)]
 pub struct Attrs {
-    attrs: HashMap<String, String>,
+    attrs: Vec<(String, String)>,
     classes: Vec<String>,
 }
 
@@ -17,23 +19,32 @@ impl Attrs {
         Self::default()
     }
 
+    /// Insert or replace an attribute, preserving insertion order.
+    fn set(&mut self, key: &str, value: String) {
+        if let Some(entry) = self.attrs.iter_mut().find(|(k, _)| k == key) {
+            entry.1 = value;
+        } else {
+            self.attrs.push((key.to_string(), value));
+        }
+    }
+
     pub fn with_class(mut self, class: &str) -> Self {
         self.classes.push(class.to_string());
         self
     }
 
     pub fn with_id(mut self, id: &str) -> Self {
-        self.attrs.insert("id".to_string(), id.to_string());
+        self.set("id", id.to_string());
         self
     }
 
     pub fn with_attr(mut self, key: &str, value: &str) -> Self {
-        self.attrs.insert(key.to_string(), value.to_string());
+        self.set(key, value.to_string());
         self
     }
 
     pub fn with_style(mut self, style: &str) -> Self {
-        self.attrs.insert("style".to_string(), style.to_string());
+        self.set("style", style.to_string());
         self
     }
 
@@ -47,30 +58,27 @@ impl Attrs {
     }
 
     pub fn with_transform(mut self, transform: &str) -> Self {
-        self.attrs
-            .insert("transform".to_string(), transform.to_string());
+        self.set("transform", transform.to_string());
         self
     }
 
     pub fn with_fill(mut self, fill: &str) -> Self {
-        self.attrs.insert("fill".to_string(), fill.to_string());
+        self.set("fill", fill.to_string());
         self
     }
 
     pub fn with_stroke(mut self, stroke: &str) -> Self {
-        self.attrs.insert("stroke".to_string(), stroke.to_string());
+        self.set("stroke", stroke.to_string());
         self
     }
 
     pub fn with_stroke_width(mut self, width: f64) -> Self {
-        self.attrs
-            .insert("stroke-width".to_string(), format!("{}", width));
+        self.set("stroke-width", format!("{}", width));
         self
     }
 
     pub fn with_stroke_dasharray(mut self, dasharray: &str) -> Self {
-        self.attrs
-            .insert("stroke-dasharray".to_string(), dasharray.to_string());
+        self.set("stroke-dasharray", dasharray.to_string());
         self
     }
 
@@ -652,6 +660,34 @@ mod tests {
         assert!(svg.contains("<tspan x=\"10\" y=\"20\" dy=\"-0.6em\">Line 1</tspan>"));
         assert!(svg.contains("<tspan x=\"10\" dy=\"1.2em\">Line 2</tspan>"));
         assert!(!svg.contains("<br/>"));
+    }
+
+    #[test]
+    fn attrs_serialize_in_insertion_order() {
+        // Repeated construction must always produce the same byte output;
+        // attributes appear in the order they were inserted.
+        for _ in 0..64 {
+            let attrs = Attrs::new()
+                .with_fill("none")
+                .with_stroke("black")
+                .with_stroke_width(2.0)
+                .with_attr("dominant-baseline", "central")
+                .with_attr("text-anchor", "middle");
+            assert_eq!(
+                attrs.to_string(),
+                " fill=\"none\" stroke=\"black\" stroke-width=\"2\" \
+                 dominant-baseline=\"central\" text-anchor=\"middle\""
+            );
+        }
+    }
+
+    #[test]
+    fn attrs_duplicate_key_replaces_value_in_place() {
+        let attrs = Attrs::new()
+            .with_fill("none")
+            .with_stroke("black")
+            .with_fill("red");
+        assert_eq!(attrs.to_string(), " fill=\"red\" stroke=\"black\"");
     }
 
     #[test]

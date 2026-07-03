@@ -57,7 +57,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
@@ -112,7 +112,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-ci">
         <circle cx="696.753968" cy="512.934828034998" r="51.40235199999999"/>
-        <text x="696.753968" y="512.934828034998" class="label" dominant-baseline="central" text-anchor="middle">Circle shape</text>
+        <text x="696.753968" y="512.934828034998" class="label" text-anchor="middle" dominant-baseline="central">Circle shape</text>
       </g>
       <g class="node default" id="node-od">
         <path d="M 58.617183999999995 46.51176803499799 L 158.06251199999997 46.51176803499799 L 143.14571279999998 66.011768034998 L 158.06251199999997 85.511768034998 L 58.617183999999995 85.511768034998 Z"/>
@@ -132,15 +132,15 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default green" id="node-e">
         <circle cx="1029.028988" cy="190.16115801749902" r="72.46484799999999" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
-        <text x="1029.028988" y="190.16115801749902" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1029.028988" y="190.16115801749902" dy="-1.2em">Inner / circle</tspan><tspan x="1029.028988" dy="1.2em">and some odd</tspan><tspan x="1029.028988" dy="1.2em">special characters</tspan></text>
+        <text x="1029.028988" y="190.16115801749902" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1029.028988" y="190.16115801749902" dy="-1.2em">Inner / circle</tspan><tspan x="1029.028988" dy="1.2em">and some odd</tspan><tspan x="1029.028988" dy="1.2em">special characters</tspan></text>
       </g>
       <g class="node default" id="node-od3">
         <path d="M 798.1563199999999 469.43482803499796 L 1034.90632 469.43482803499796 L 999.39382 512.934828034998 L 1034.90632 556.434828034998 L 798.1563199999999 556.434828034998 Z"/>
-        <text x="916.5313199999999" y="512.934828034998" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="916.5313199999999" y="512.934828034998" dy="-1.2em">Really long text with</tspan><tspan x="916.5313199999999" dy="1.2em">linebreak</tspan><tspan x="916.5313199999999" dy="1.2em">in an Odd shape</tspan></text>
+        <text x="916.5313199999999" y="512.934828034998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="916.5313199999999" y="512.934828034998" dy="-1.2em">Really long text with</tspan><tspan x="916.5313199999999" dy="1.2em">linebreak</tspan><tspan x="916.5313199999999" dy="1.2em">in an Odd shape</tspan></text>
       </g>
       <g class="node default" id="node-f">
         <path d="M 1089.90632 485.93482803499796 H 1193.146992 A 5 5 0 0 1 1198.146992 490.93482803499796 V 534.934828034998 A 5 5 0 0 1 1193.146992 539.934828034998 H 1089.90632 A 5 5 0 0 1 1084.90632 534.934828034998 V 490.93482803499796 A 5 5 0 0 1 1089.90632 485.93482803499796 Z"/>
-        <text x="1141.526656" y="512.934828034998" class="label" dominant-baseline="central" text-anchor="middle">,.?!+-*ز</text>
+        <text x="1141.526656" y="512.934828034998" class="label" text-anchor="middle" dominant-baseline="central">,.?!+-*ز</text>
       </g>
       <g class="node default" id="node-cyr">
         <rect x="1275.677472" y="163.16115801749902" width="110.164064" height="54"/>

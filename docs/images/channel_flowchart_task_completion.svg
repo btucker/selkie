@@ -47,7 +47,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
@@ -98,11 +98,11 @@ rect.text{fill:none;stroke-width:0;}
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-F-G-0">
         <rect x="139.8531926363566" y="511.9090616257407" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="154.6531926363566" y="522.9090616257407" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+        <text x="154.6531926363566" y="522.9090616257407" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F-H-0">
         <rect x="339.77862492633005" y="516.4235643839353" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="350.97862492633004" y="527.4235643839353" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <text x="350.97862492633004" y="527.4235643839353" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
     </g>
     <g class="nodes">
@@ -124,19 +124,19 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-E">
         <rect x="172.82811199999998" y="208" width="156.02347200000003" height="54"/>
-        <text x="250.839848" y="235" class="label" dominant-baseline="central" text-anchor="middle">Scan all tasks</text>
+        <text x="250.839848" y="235" class="label" text-anchor="middle" dominant-baseline="central">Scan all tasks</text>
       </g>
       <g class="node default" id="node-F">
         <polygon points="250.83984800000002,312 351.87503200000003,413.035184 250.83984800000002,514.070368 149.804664,413.035184"/>
-        <text x="250.83984800000002" y="413.035184" class="label" dominant-baseline="central" text-anchor="middle">Has blockedBy: [42]?</text>
+        <text x="250.83984800000002" y="413.035184" class="label" text-anchor="middle" dominant-baseline="central">Has blockedBy: [42]?</text>
       </g>
       <g class="node default" id="node-G">
         <rect x="0" y="588.070368" width="260" height="78"/>
-        <text x="130" y="627.070368" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="130" y="627.070368" dy="-0.6em">Remove 42 from blockedBy</tspan><tspan x="130" dy="1.2em">array</tspan></text>
+        <text x="130" y="627.070368" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="130" y="627.070368" dy="-0.6em">Remove 42 from blockedBy</tspan><tspan x="130" dy="1.2em">array</tspan></text>
       </g>
       <g class="node default" id="node-H">
         <rect x="310" y="600.070368" width="123.359392" height="54"/>
-        <text x="371.679696" y="627.070368" class="label" dominant-baseline="central" text-anchor="middle">Skip task</text>
+        <text x="371.679696" y="627.070368" class="label" text-anchor="middle" dominant-baseline="central">Skip task</text>
       </g>
       <g class="node default" id="node-I">
         <rect x="132.91015199999998" y="716.070368" width="235.85939200000004" height="54" style="fill:#e1ffe1 !important"/>

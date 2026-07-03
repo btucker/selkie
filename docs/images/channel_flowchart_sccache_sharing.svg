@@ -47,7 +47,7 @@ rect.text{fill:none;stroke-width:0;}
       <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
@@ -151,7 +151,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-D2-D3-0">
         <rect x="2617.8796542600403" y="461.59045076725374" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="2654.2796542600404" y="472.59045076725374" class="edge-label" dominant-baseline="central" text-anchor="middle">redundant</text>
+        <text x="2654.2796542600404" y="472.59045076725374" class="edge-label" text-anchor="middle" dominant-baseline="central">redundant</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-SD-SB1-0">
         <rect x="549.6297572028767" y="258" width="72.8" height="22" class="edge-label-bg"/>
@@ -163,7 +163,7 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="edgeLabel" id="edge-label-L-SD-SB3-0">
         <rect x="982.5431441981954" y="519.0388417547041" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="1018.9431441981953" y="530.0388417547041" class="edge-label" dominant-baseline="central" text-anchor="middle">cache hit</text>
+        <text x="1018.9431441981953" y="530.0388417547041" class="edge-label" text-anchor="middle" dominant-baseline="central">cache hit</text>
       </g>
     </g>
     <g class="nodes">
@@ -185,11 +185,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-B2">
         <rect x="2103.5587279999995" y="217.593752" width="139.835952" height="54"/>
-        <text x="2173.4767039999997" y="244.593752" class="label" dominant-baseline="central" text-anchor="middle">cargo build</text>
+        <text x="2173.4767039999997" y="244.593752" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
       </g>
       <g class="node default" id="node-B3">
         <rect x="2424.0587599999994" y="97.593752" width="139.835952" height="54"/>
-        <text x="2493.9767359999996" y="124.593752" class="label" dominant-baseline="central" text-anchor="middle">cargo build</text>
+        <text x="2493.9767359999996" y="124.593752" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
       </g>
       <g class="node default" id="node-D1">
         <rect x="2067.7266879999993" y="431.593752" width="211.50003199999998" height="102" style="fill:#FFB6C1 !important"/>
@@ -201,23 +201,23 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-D2">
         <rect x="2388.2267199999997" y="421.593752" width="211.50003199999998" height="102" style="fill:#FFB6C1 !important"/>
-        <text x="2493.9767359999996" y="472.593752" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="2493.9767359999996" y="472.593752" dy="-1.2em">Dependencies: 95%</tspan><tspan x="2493.9767359999996" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="2493.9767359999996" dy="1.2em">selkie, resvg, etc.</tspan></text>
+        <text x="2493.9767359999996" y="472.593752" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="2493.9767359999996" y="472.593752" dy="-1.2em">Dependencies: 95%</tspan><tspan x="2493.9767359999996" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="2493.9767359999996" dy="1.2em">selkie, resvg, etc.</tspan></text>
       </g>
       <g class="node default" id="node-M2">
         <rect x="2397.2462559999994" y="207.593752" width="193.46096" height="54"/>
-        <text x="2493.9767359999996" y="234.593752" class="label" dominant-baseline="central" text-anchor="middle">midtown crate: 5%</text>
+        <text x="2493.9767359999996" y="234.593752" class="label" text-anchor="middle" dominant-baseline="central">midtown crate: 5%</text>
       </g>
       <g class="node default" id="node-D3">
         <rect x="2708.7267519999996" y="411.593752" width="211.50003199999998" height="102" style="fill:#FFB6C1 !important"/>
-        <text x="2814.4767679999995" y="462.593752" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="2814.4767679999995" y="462.593752" dy="-1.2em">Dependencies: 95%</tspan><tspan x="2814.4767679999995" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="2814.4767679999995" dy="1.2em">selkie, resvg, etc.</tspan></text>
+        <text x="2814.4767679999995" y="462.593752" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="2814.4767679999995" y="462.593752" dy="-1.2em">Dependencies: 95%</tspan><tspan x="2814.4767679999995" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="2814.4767679999995" dy="1.2em">selkie, resvg, etc.</tspan></text>
       </g>
       <g class="node default" id="node-M3">
         <rect x="2717.7462879999994" y="87.593752" width="193.46096" height="54"/>
-        <text x="2814.4767679999995" y="114.593752" class="label" dominant-baseline="central" text-anchor="middle">midtown crate: 5%</text>
+        <text x="2814.4767679999995" y="114.593752" class="label" text-anchor="middle" dominant-baseline="central">midtown crate: 5%</text>
       </g>
       <g class="node default" id="node-S1">
         <rect x="20" y="374.093752" width="196.085952" height="78"/>
-        <text x="118.042976" y="413.093752" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="118.042976" y="413.093752" dy="-0.6em">Coworker 1</tspan><tspan x="118.042976" dy="1.2em">lexington worktree</tspan></text>
+        <text x="118.042976" y="413.093752" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="118.042976" y="413.093752" dy="-0.6em">Coworker 1</tspan><tspan x="118.042976" dy="1.2em">lexington worktree</tspan></text>
       </g>
       <g class="node default" id="node-S2">
         <rect x="802.0664320000001" y="45" width="161.226592" height="78"/>
@@ -229,23 +229,23 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-SB1">
         <rect x="291.085952" y="386.093752" width="139.835952" height="54"/>
-        <text x="361.00392800000003" y="413.093752" class="label" dominant-baseline="central" text-anchor="middle">cargo build</text>
+        <text x="361.00392800000003" y="413.093752" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
       </g>
       <g class="node default" id="node-SB2">
         <rect x="1104.554736" y="131" width="139.835952" height="54"/>
-        <text x="1174.472712" y="158" class="label" dominant-baseline="central" text-anchor="middle">cargo build</text>
+        <text x="1174.472712" y="158" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
       </g>
       <g class="node default" id="node-SB3">
         <rect x="1104.554736" y="449.187504" width="139.835952" height="54"/>
-        <text x="1174.472712" y="476.187504" class="label" dominant-baseline="central" text-anchor="middle">cargo build</text>
+        <text x="1174.472712" y="476.187504" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
       </g>
       <g class="node default" id="node-CACHE">
         <rect x="505.92190400000004" y="496.187504" width="188.882816" height="78" style="fill:#90EE90 !important"/>
-        <text x="600.3633120000001" y="535.187504" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="600.3633120000001" y="535.187504" dy="-0.6em">Shared sccache</tspan><tspan x="600.3633120000001" dy="1.2em">~/.cache/sccache</tspan></text>
+        <text x="600.3633120000001" y="535.187504" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="600.3633120000001" y="535.187504" dy="-0.6em">Shared sccache</tspan><tspan x="600.3633120000001" dy="1.2em">~/.cache/sccache</tspan></text>
       </g>
       <g class="node default" id="node-SD">
         <rect x="769.8047200000001" y="337.093752" width="225.750016" height="78" style="fill:#90EE90 !important"/>
-        <text x="882.6797280000001" y="376.093752" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="882.6797280000001" y="376.093752" dy="-0.6em">Dependencies: 95%</tspan><tspan x="882.6797280000001" dy="1.2em">compiled once, cached</tspan></text>
+        <text x="882.6797280000001" y="376.093752" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="882.6797280000001" y="376.093752" dy="-0.6em">Dependencies: 95%</tspan><tspan x="882.6797280000001" dy="1.2em">compiled once, cached</tspan></text>
       </g>
       <g class="node default" id="node-SM1">
         <rect x="524.851584" y="370.187504" width="151.023456" height="54"/>
@@ -253,11 +253,11 @@ rect.text{fill:none;stroke-width:0;}
       </g>
       <g class="node default" id="node-SM2">
         <rect x="1319.390688" y="131" width="151.023456" height="54"/>
-        <text x="1394.902416" y="158" class="label" dominant-baseline="central" text-anchor="middle">midtown: 5%</text>
+        <text x="1394.902416" y="158" class="label" text-anchor="middle" dominant-baseline="central">midtown: 5%</text>
       </g>
       <g class="node default" id="node-SM3">
         <rect x="1319.390688" y="449.187504" width="151.023456" height="54"/>
-        <text x="1394.902416" y="476.187504" class="label" dominant-baseline="central" text-anchor="middle">midtown: 5%</text>
+        <text x="1394.902416" y="476.187504" class="label" text-anchor="middle" dominant-baseline="central">midtown: 5%</text>
       </g>
       <g class="node default" id="node-RESULT">
         <rect x="2990.2267839999995" y="234.093752" width="260" height="126" style="fill:#FFD700 !important"/>
