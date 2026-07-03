@@ -38,32 +38,39 @@ pub fn render_edge_parts(
         let line_data = apply_marker_offsets(&line_data, start_offset, end_offset);
         let path_d = build_curved_path(&line_data);
 
-        let mut attrs = Attrs::new().with_class("edge-path").with_fill("none");
-
-        // Apply stroke style
-        match flow_edge.stroke {
-            EdgeStroke::Normal => {
-                attrs = attrs.with_stroke_width(1.0);
-            }
-            EdgeStroke::Thick => {
-                attrs = attrs.with_stroke_width(3.5);
-            }
-            EdgeStroke::Dotted => {
-                attrs = attrs.with_stroke_width(2.0).with_stroke_dasharray("3,3");
-            }
-            EdgeStroke::Invisible => {
-                attrs = attrs.with_stroke_width(0.0);
-            }
+        // Stroke classes - port of mermaid insertEdge (rendering-elements/edges.js):
+        // edge.thickness and edge.pattern both derive from the flowDb stroke.
+        let stroke_classes = match flow_edge.stroke {
+            EdgeStroke::Normal => "edge-thickness-normal edge-pattern-solid",
+            EdgeStroke::Thick => "edge-thickness-thick edge-pattern-solid",
+            EdgeStroke::Dotted => "edge-thickness-normal edge-pattern-dotted",
+            EdgeStroke::Invisible => "edge-thickness-invisible edge-pattern-solid",
+        };
+        let mut attrs = Attrs::new().with_class(stroke_classes);
+        // flowDb getData: invisible edges get no flowchart-link classes
+        if flow_edge.stroke != EdgeStroke::Invisible {
+            attrs = attrs.with_class("edge-thickness-normal edge-pattern-solid flowchart-link");
         }
 
-        // Apply arrow markers
-        if let Some(marker_url) = markers::get_marker_url(flow_edge.edge_type.as_deref()) {
-            attrs = attrs.with_attr("marker-end", &marker_url);
+        // linkStyle / class styles applied inline, like mermaid's pathStyle
+        if !flow_edge.style.is_empty() {
+            let style = flow_edge
+                .style
+                .iter()
+                .fold(String::new(), |acc, s| acc + s + ";");
+            attrs = attrs.with_style(&style);
         }
-        if let Some(start_marker_url) =
-            markers::get_start_marker_url(flow_edge.edge_type.as_deref())
-        {
-            attrs = attrs.with_attr("marker-start", &start_marker_url);
+
+        // Apply arrow markers (suppressed for invisible edges, per flowDb)
+        if flow_edge.stroke != EdgeStroke::Invisible {
+            if let Some(marker_url) = markers::get_marker_url(flow_edge.edge_type.as_deref()) {
+                attrs = attrs.with_attr("marker-end", &marker_url);
+            }
+            if let Some(start_marker_url) =
+                markers::get_start_marker_url(flow_edge.edge_type.as_deref())
+            {
+                attrs = attrs.with_attr("marker-start", &start_marker_url);
+            }
         }
 
         let path_element = SvgElement::path(path_d).with_attrs(attrs);
@@ -753,6 +760,132 @@ mod tests {
         assert!(
             svg.contains("M100,0"),
             "start point must be untouched, got: {}",
+            svg
+        );
+    }
+
+    fn make_edge(stroke: EdgeStroke) -> (LayoutEdge, FlowEdge) {
+        use std::collections::HashMap;
+
+        let layout_edge = LayoutEdge {
+            id: "e1".to_string(),
+            sources: vec!["a".to_string()],
+            targets: vec!["b".to_string()],
+            label: None,
+            bend_points: vec![Point::new(0.0, 0.0), Point::new(100.0, 100.0)],
+            label_position: None,
+            label_width: 0.0,
+            label_height: 0.0,
+            weight: 1,
+            reversed: false,
+            metadata: HashMap::new(),
+        };
+
+        let flow_edge = FlowEdge {
+            id: None,
+            is_user_defined_id: false,
+            start: "a".to_string(),
+            end: "b".to_string(),
+            interpolate: None,
+            edge_type: Some("arrow_point".to_string()),
+            stroke,
+            style: vec![],
+            length: None,
+            text: String::new(),
+            label_type: FlowTextType::Text,
+            classes: vec![],
+            animation: None,
+            animate: None,
+        };
+
+        (layout_edge, flow_edge)
+    }
+
+    use crate::diagrams::flowchart::FlowTextType;
+
+    #[test]
+    fn test_dotted_edge_emits_mermaid_pattern_classes() {
+        // Port of mermaid insertEdge: dotted edges are styled via CSS classes
+        // (edge-pattern-dotted => stroke-dasharray: 2), not inline attributes.
+        let (layout_edge, flow_edge) = make_edge(EdgeStroke::Dotted);
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+        let svg = result.path.expect("edge path").to_svg(0);
+
+        assert!(
+            svg.contains(
+                "edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link"
+            ),
+            "dotted edge must carry mermaid stroke classes plus flowDb edge classes, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("stroke-dasharray=\""),
+            "dotted edge must not use an inline stroke-dasharray attribute, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("stroke-width=\""),
+            "edge stroke width must come from CSS classes, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_thick_edge_emits_mermaid_thickness_classes() {
+        let (layout_edge, flow_edge) = make_edge(EdgeStroke::Thick);
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+        let svg = result.path.expect("edge path").to_svg(0);
+
+        assert!(
+            svg.contains(
+                "edge-thickness-thick edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+            ),
+            "thick edge must carry edge-thickness-thick class, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_invisible_edge_emits_invisible_class_only() {
+        // flowDb getData: invisible edges get empty flowDb classes (no
+        // flowchart-link) and arrow markers are suppressed.
+        let (layout_edge, flow_edge) = make_edge(EdgeStroke::Invisible);
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+        let svg = result.path.expect("edge path").to_svg(0);
+
+        assert!(
+            svg.contains("edge-thickness-invisible edge-pattern-solid"),
+            "invisible edge must carry edge-thickness-invisible class, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("flowchart-link"),
+            "invisible edge must not carry flowchart-link class, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("marker-end"),
+            "invisible edge must not have arrow markers, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_edge_inline_styles_from_link_style() {
+        // mermaid insertEdge applies edge.style entries as an inline style
+        // attribute on the path.
+        let (layout_edge, mut flow_edge) = make_edge(EdgeStroke::Normal);
+        flow_edge.style = vec!["stroke:#ff3".to_string(), "stroke-width:4px".to_string()];
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+        let svg = result.path.expect("edge path").to_svg(0);
+
+        assert!(
+            svg.contains("style=\"stroke:#ff3;stroke-width:4px;\""),
+            "linkStyle styles must be applied inline on the path, got: {}",
             svg
         );
     }

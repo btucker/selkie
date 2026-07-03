@@ -3,7 +3,7 @@
 use crate::diagrams::flowchart::{FlowVertex, FlowVertexType};
 use crate::layout::{LayoutNode, Point};
 
-use super::color::text_color_for_styles;
+use super::color::extract_style_property;
 use super::elements::{Attrs, SvgElement};
 use super::theme::Theme;
 
@@ -262,7 +262,9 @@ pub fn render_shape(
         shape
     };
 
-    // Create label with contrasting text color when custom styles are present
+    // Create the label. mermaid never invents contrast label colors: only an
+    // explicit `color:` declaration (from classDef/style, routed via flowDb's
+    // textStyles/labelStyle handling) changes the label fill.
     let label_text = vertex
         .text
         .as_deref()
@@ -274,19 +276,25 @@ pub fn render_shape(
         .with_attr("dominant-baseline", "central");
 
     if let Some(s) = style {
-        if let Some(text_fill) = text_color_for_styles(s) {
+        if let Some(color_val) = extract_style_property(s, "color") {
             // Use inline style (not presentation attribute) so it takes
-            // precedence over theme CSS rules like `.node text { fill: ... }`.
-            label_attrs = label_attrs.with_style(&format!("fill: {}", text_fill));
+            // precedence over theme CSS rules.
+            label_attrs = label_attrs.with_style(&format!("fill: {}", color_val));
         }
     }
 
     let label = SvgElement::text(cx, cy, label_text).with_attrs(label_attrs);
 
-    // Wrap shape and label in a group with class="node"
-    // This allows CSS selectors like ".node rect" to work correctly
+    // Wrap shape and label in a group. mermaid flowDb assigns
+    // cssClasses = 'default ' + vertex.classes, so classDef CSS rules like
+    // `.myClass rect { ... }` can match.
+    let mut group_class = String::from("node default");
+    for class in &vertex.classes {
+        group_class.push(' ');
+        group_class.push_str(class);
+    }
     let group_attrs = Attrs::new()
-        .with_class("node")
+        .with_class(&group_class)
         .with_id(&format!("node-{}", node.id));
 
     SvgElement::group(vec![shape, label]).with_attrs(group_attrs)
@@ -297,9 +305,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_dark_fill_gets_white_text() {
-        // When a node has a dark custom fill, the text label should
-        // get a contrasting white fill to remain legible.
+    fn test_custom_fill_keeps_theme_label_color() {
+        // mermaid never invents WCAG contrast label colors: a custom fill
+        // leaves the label using the theme text color.
         let mut node = LayoutNode::new("test", 100.0, 60.0);
         node.x = Some(0.0);
         node.y = Some(0.0);
@@ -313,35 +321,36 @@ mod tests {
         let shape_element = render_shape(&node, &vertex, &theme, Some(style));
         let svg = shape_element.to_svg(0);
 
-        // The text element should have inline style fill for legibility
+        // The text element must NOT get an invented contrast fill
+        let text_start = svg.find("<text").expect("should have text element");
+        let text_end = svg[text_start..].find('>').unwrap() + text_start;
+        let text_tag = &svg[text_start..=text_end];
         assert!(
-            svg.contains("style=\"fill: #ffffff\""),
-            "Dark background node text should have white fill via inline style, got: {}",
-            svg
+            !text_tag.contains("fill"),
+            "Custom fill must not invent a label color, got: {}",
+            text_tag
         );
     }
 
     #[test]
-    fn test_light_fill_gets_dark_text() {
-        // When a node has a light custom fill, the text label should
-        // get black fill to remain legible.
+    fn test_node_group_includes_user_classes() {
+        // mermaid flowDb: cssClasses = 'default ' + vertex.classes
         let mut node = LayoutNode::new("test", 100.0, 60.0);
         node.x = Some(0.0);
         node.y = Some(0.0);
 
         let mut vertex = FlowVertex::new("test", "test");
-        vertex.text = Some("Light Node".to_string());
+        vertex.text = Some("Styled".to_string());
         vertex.vertex_type = Some(FlowVertexType::Square);
+        vertex.classes = vec!["orange".to_string(), "big".to_string()];
 
         let theme = Theme::default();
-        let style = "fill:#eeeeee !important";
-        let shape_element = render_shape(&node, &vertex, &theme, Some(style));
+        let shape_element = render_shape(&node, &vertex, &theme, None);
         let svg = shape_element.to_svg(0);
 
-        // The text element should have inline style fill for legibility
         assert!(
-            svg.contains("style=\"fill: #000000\""),
-            "Light background node text should have black fill via inline style, got: {}",
+            svg.contains("class=\"node default orange big\""),
+            "node group must carry default and user classes, got: {}",
             svg
         );
     }
@@ -368,36 +377,6 @@ mod tests {
             svg.contains("style=\"fill: #ff0000\""),
             "Explicit color should be used for text fill via inline style, got: {}",
             svg
-        );
-    }
-
-    #[test]
-    fn test_text_color_uses_inline_style_over_presentation_attr() {
-        // Text color must use inline style (style="fill:...") rather than
-        // a presentation attribute (fill="..."), because theme CSS rules
-        // like `.node text { fill: ... }` override presentation attributes.
-        // Inline styles have highest CSS specificity.
-        let mut node = LayoutNode::new("test", 100.0, 60.0);
-        node.x = Some(0.0);
-        node.y = Some(0.0);
-
-        let mut vertex = FlowVertex::new("test", "test");
-        vertex.text = Some("Styled Node".to_string());
-        vertex.vertex_type = Some(FlowVertexType::Square);
-
-        let theme = Theme::default();
-        let style = "fill:#333333 !important;stroke:#000 !important";
-        let shape_element = render_shape(&node, &vertex, &theme, Some(style));
-        let svg = shape_element.to_svg(0);
-
-        // The text element should use inline style, NOT a presentation attribute
-        let text_start = svg.find("<text").expect("should have text element");
-        let text_end = svg[text_start..].find('>').unwrap() + text_start;
-        let text_tag = &svg[text_start..=text_end];
-        assert!(
-            text_tag.contains("style=\"fill:"),
-            "Text color should use inline style for CSS specificity, got: {}",
-            text_tag
         );
     }
 

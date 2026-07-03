@@ -455,10 +455,10 @@ mod tests {
             svg
         );
 
-        // Check for edge-path class
+        // Check for mermaid's edge classes
         assert!(
-            svg.contains("edge-path"),
-            "SVG should contain edge-path class. SVG:\n{}",
+            svg.contains("flowchart-link"),
+            "SVG should contain flowchart-link class. SVG:\n{}",
             svg
         );
 

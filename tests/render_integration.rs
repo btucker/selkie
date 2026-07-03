@@ -534,11 +534,12 @@ fn test_flowchart_nodes_have_proper_styling_class() {
     let diagram = parse(input).expect("Failed to parse flowchart");
     let svg = render(&diagram).expect("Failed to render flowchart");
 
-    // Shapes should be wrapped in a group with class="node"
-    // Pattern: <g class="node" ...><rect .../></g>
+    // Shapes should be wrapped in a group with class="node default"
+    // (mermaid: cssClasses = 'default ' + vertex.classes)
+    // Pattern: <g class="node default" ...><rect .../></g>
     assert!(
-        svg.contains(r#"<g class="node""#),
-        "Should have group elements with class='node'"
+        svg.contains(r#"<g class="node default"#),
+        "Should have group elements with class='node default'"
     );
 
     // The rect should NOT have class="node" directly (which breaks CSS)
@@ -785,19 +786,16 @@ fn test_flowchart_edge_stroke_width() {
     let diagram = parse(input).expect("Failed to parse flowchart");
     let svg = render(&diagram).expect("Failed to render flowchart");
 
-    // Edge paths should use stroke-width of 1, and CSS should specify 1px
-    // (Note: markers like cross may still use stroke-width: 2 for their internal paths)
+    // Edge paths are styled via mermaid's CSS classes: normal edges carry
+    // edge-thickness-normal, whose rule declares stroke-width 1px
     assert!(
-        svg.contains("stroke-width: 1px") || svg.contains("stroke-width=\"1\""),
-        "Edge stroke-width should be 1px. SVG:\n{}",
+        svg.contains(".edge-thickness-normal{stroke-width:1px;}"),
+        "CSS should declare 1px stroke for normal edges. SVG:\n{}",
         svg
     );
-
-    // The edge path element specifically should have stroke-width 1
     assert!(
-        svg.contains(r#"class="edge-path""#)
-            && (svg.contains("stroke-width=\"1\"") || svg.contains("stroke-width: 1px")),
-        "Edge path should have stroke-width 1. SVG:\n{}",
+        svg.contains("edge-thickness-normal") && svg.contains("flowchart-link"),
+        "Edge path should carry mermaid's stroke classes. SVG:\n{}",
         svg
     );
 }
@@ -2256,7 +2254,7 @@ fn test_flowchart_nodes_use_theme_primary_color() {
     // Default theme primary color is #ECECFF - should appear in CSS
     // Nodes should use CSS class styling, not hardcoded colors
     assert!(
-        svg.contains("class=\"node\"") || svg.contains("class=\"default\""),
+        svg.contains("class=\"node default\""),
         "Nodes should have CSS class for styling"
     );
     // CSS should define node styling
@@ -3815,7 +3813,10 @@ fn test_state_nested_composite_centered_in_parent_with_siblings() {
 }
 
 #[test]
-fn test_flowchart_classdef_dark_fill_gets_legible_text() {
+fn test_flowchart_classdef_fill_does_not_invent_label_color() {
+    // mermaid never invents WCAG contrast label colors: a classDef with only
+    // fill/stroke leaves the label using the theme text color. Only an
+    // explicit `color:` declaration changes the label fill.
     let input = r#"flowchart TD
     A[Dark Node]:::dark --> B[Light Node]:::light
     classDef dark fill:#1a1a2e,stroke:#16213e
@@ -3824,18 +3825,29 @@ fn test_flowchart_classdef_dark_fill_gets_legible_text() {
     let diagram = parse(input).expect("Failed to parse flowchart");
     let svg = render(&diagram).expect("Failed to render flowchart");
 
-    // Node A has a very dark fill (#1a1a2e) — its text should have white fill via inline style
-    // (inline style beats theme CSS rules like `.node text { fill: ... }`)
+    // No invented contrast fills on the labels
     assert!(
-        svg.contains("style=\"fill: #ffffff\""),
-        "Dark background node should have white text fill via inline style.\nSVG:\n{}",
+        !svg.contains("style=\"fill: #ffffff\"") && !svg.contains("style=\"fill: #000000\""),
+        "Labels must not get invented contrast colors.\nSVG:\n{}",
         svg
     );
 
-    // Node B has a light fill (#f0f0f0) — its text should have black fill via inline style
+    // classDef styles are emitted as !important CSS rules for shape elements
     assert!(
-        svg.contains("style=\"fill: #000000\""),
-        "Light background node should have black text fill via inline style.\nSVG:\n{}",
+        svg.contains(".dark rect { fill:#1a1a2e !important; stroke:#16213e !important; }"),
+        "classDef must be emitted as CSS shape rules.\nSVG:\n{}",
+        svg
+    );
+
+    // An explicit color: declaration does set the label fill
+    let input_with_color = r#"flowchart TD
+    A[Dark Node]:::dark
+    classDef dark fill:#1a1a2e,color:#fff"#;
+    let diagram = parse(input_with_color).expect("Failed to parse flowchart");
+    let svg = render(&diagram).expect("Failed to render flowchart");
+    assert!(
+        svg.contains("style=\"fill: #fff\""),
+        "classDef color must set the label fill.\nSVG:\n{}",
         svg
     );
 }

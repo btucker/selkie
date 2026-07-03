@@ -1032,6 +1032,79 @@ marker path {{
         )
     }
 
+    /// Generate the flowchart stylesheet for embedding in SVG.
+    ///
+    /// Port of mermaid's flowchart `getStyles` (diagrams/flowchart/styles.ts)
+    /// combined with the shared rules from `src/styles.ts` (error icon and
+    /// edge-thickness/edge-pattern classes), compiled the way mermaid
+    /// serializes them into the SVG `<style>` block.
+    ///
+    /// HTML-only rules (tooltips, keyframe animations) are omitted since the
+    /// output is standalone SVG. Mermaid's literal color forms (#333, #000)
+    /// come from the theme variables which carry the same defaults.
+    pub fn generate_flowchart_css(&self) -> String {
+        // Mermaid theme variable mapping (theme-default.js):
+        //   mainBkg -> primary_color, nodeBorder -> primary_border_color,
+        //   clusterBkg -> secondary_color, clusterBorder -> cluster_border_color,
+        //   lineColor/arrowheadColor -> line_color,
+        //   textColor/nodeTextColor/titleColor -> primary_text_color,
+        //   edgeLabelBackground -> edge_label_background.
+        let ff = &self.font_family;
+        let fs = &self.font_size;
+        let text = &self.primary_text_color;
+        let line = &self.line_color;
+        let main_bkg = &self.primary_color;
+        let node_border = &self.primary_border_color;
+        let cluster_bkg = &self.secondary_color;
+        let cluster_border = &self.cluster_border_color;
+        let elb = &self.edge_label_background;
+        // styles.ts `fade(edgeLabelBackground, 0.5)` via khroma channels
+        let label_bkg = super::color::Color::parse(elb)
+            .map(|c| format!("rgba({}, {}, {}, 0.5)", c.r, c.g, c.b))
+            .unwrap_or_else(|| elb.clone());
+
+        format!(
+            "\
+.mermaid{{font-family:{ff};font-size:{fs};fill:{text};}}
+.error-icon{{fill:#552222;}}
+.error-text{{fill:#552222;stroke:#552222;}}
+.edge-thickness-normal{{stroke-width:1px;}}
+.edge-thickness-thick{{stroke-width:3.5px;}}
+.edge-pattern-solid{{stroke-dasharray:0;}}
+.edge-thickness-invisible{{stroke-width:0;fill:none;}}
+.edge-pattern-dashed{{stroke-dasharray:3;}}
+.edge-pattern-dotted{{stroke-dasharray:2;}}
+.marker{{fill:{line};stroke:{line};}}
+.marker.cross{{stroke:{line};}}
+svg{{font-family:{ff};font-size:{fs};}}
+p{{margin:0;}}
+.label{{font-family:{ff};color:{text};}}
+.cluster-label text{{fill:{text};}}
+.cluster-label span{{color:{text};}}
+.cluster-label span p{{background-color:transparent;}}
+.label text,span{{fill:{text};color:{text};}}
+.node rect,.node circle,.node ellipse,.node polygon,.node path{{fill:{main_bkg};stroke:{node_border};stroke-width:1px;}}
+.rough-node .label text,.node .label text,.image-shape .label,.icon-shape .label{{text-anchor:middle;}}
+.node .katex path{{fill:#000;stroke:#000;stroke-width:1px;}}
+.rough-node .label,.node .label,.image-shape .label,.icon-shape .label{{text-align:center;}}
+.node.clickable{{cursor:pointer;}}
+.root .anchor path{{fill:{line}!important;stroke-width:0;stroke:{line};}}
+.arrowheadPath{{fill:{line};}}
+.edgePath .path{{stroke:{line};stroke-width:2.0px;}}
+.flowchart-link{{stroke:{line};fill:none;}}
+.edgeLabel{{background-color:{elb};text-align:center;}}
+.edgeLabel p{{background-color:{elb};}}
+.edgeLabel rect{{opacity:0.5;background-color:{elb};fill:{elb};}}
+.labelBkg{{background-color:{label_bkg};}}
+.cluster rect{{fill:{cluster_bkg};stroke:{cluster_border};stroke-width:1px;}}
+.cluster text{{fill:{text};}}
+.cluster span{{color:{text};}}
+.flowchartTitleText{{text-anchor:middle;font-size:18px;fill:{text};}}
+rect.text{{fill:none;stroke-width:0;}}
+"
+        )
+    }
+
     /// Create a theme from base colors with automatic derivation
     ///
     /// This follows the mermaid.js pattern where setting just a few base colors

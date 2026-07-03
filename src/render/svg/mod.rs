@@ -85,9 +85,11 @@ impl SvgRenderer {
 
         doc.set_size_with_origin(view_min_x, view_min_y, view_width, view_height);
 
-        // Add theme styles
+        // Add theme styles (port of mermaid's flowchart stylesheet) followed
+        // by user classDef styles (port of mermaidAPI createCssStyles)
         if self.config.embed_css {
-            let mut css = self.config.theme.generate_css();
+            let mut css = self.config.theme.generate_flowchart_css();
+            css.push_str(&flowchart_class_css(db));
 
             // Append custom CSS if provided (sanitized)
             if let Some(ref custom_css) = self.config.theme_css {
@@ -382,13 +384,73 @@ impl SvgRenderer {
                 .with_attr("text-anchor", "middle"),
         };
 
-        // Wrap in a group
+        // Wrap in a group. mermaid clusters use class "cluster" (plus any
+        // user classes) so the `.cluster rect` / `.cluster text` CSS applies.
+        let mut group_class = String::from("cluster");
+        for class in &subgraph.classes {
+            group_class.push(' ');
+            group_class.push_str(class);
+        }
         let group_attrs = Attrs::new()
-            .with_class("subgraph")
+            .with_class(&group_class)
             .with_id(&format!("subgraph-{}", subgraph.id));
 
         Some(SvgElement::group(vec![rect, label]).with_attrs(group_attrs))
     }
+}
+
+/// Create a CSS rule `.cssClass element { styles !important; }`.
+///
+/// Port of mermaidAPI `cssImportantStyles`.
+fn css_important_styles(css_class: &str, element: &str, styles: &[String]) -> String {
+    format!(
+        "\n.{} {} {{ {} !important; }}",
+        css_class,
+        element,
+        styles.join(" !important; ")
+    )
+}
+
+/// Create the user classDef styles for the `<style>` block.
+///
+/// Port of mermaidAPI `createCssStyles`. Since selkie renders labels as SVG
+/// text (mermaid's htmlLabels:false mode), classDef styles target the shape
+/// elements and textStyles target the label text/tspan elements.
+fn flowchart_class_css(db: &FlowchartDb) -> String {
+    const CSS_SHAPE_ELEMENTS: [&str; 5] = ["rect", "polygon", "ellipse", "circle", "path"];
+
+    let mut css = String::new();
+
+    // HashMap iteration order is non-deterministic; sort for stable output
+    let mut ids: Vec<&String> = db.get_classes().keys().collect();
+    ids.sort();
+
+    for id in ids {
+        let class_def = &db.get_classes()[id];
+
+        if !class_def.styles.is_empty() {
+            for element in CSS_SHAPE_ELEMENTS {
+                css.push_str(&css_important_styles(id, element, &class_def.styles));
+            }
+        }
+
+        // textStyles carry the label color (flowDb routes `color:` there);
+        // mermaid maps color -> fill for SVG text
+        if !class_def.text_styles.is_empty() {
+            let text_styles: Vec<String> = class_def
+                .text_styles
+                .iter()
+                .map(|s| s.replace("color", "fill"))
+                .collect();
+            css.push_str(&css_important_styles(
+                id,
+                &format!("tspan, .{} text", id),
+                &text_styles,
+            ));
+        }
+    }
+
+    css
 }
 
 fn architecture_css() -> String {
@@ -1068,6 +1130,126 @@ mod tests {
                 );
             }
         }
+    }
+
+    fn render_svg(input: &str) -> String {
+        use crate::diagrams::flowchart::parse;
+        use crate::layout;
+        use crate::layout::CharacterSizeEstimator;
+        use crate::layout::ToLayoutGraph;
+
+        let db = parse(input).unwrap();
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+        let graph = layout::layout(graph).unwrap();
+
+        let renderer = SvgRenderer::new(RenderConfig::default());
+        renderer.render_flowchart(&db, &graph).unwrap()
+    }
+
+    #[test]
+    fn test_flowchart_css_ports_mermaid_stylesheet() {
+        // The embedded stylesheet must be a port of mermaid's flowchart
+        // styles.ts + global styles.ts rules.
+        let svg = render_svg("flowchart TD\n    A -.-> B");
+
+        assert!(
+            svg.contains(".edge-pattern-dotted{stroke-dasharray:2;}"),
+            "CSS must declare mermaid's dotted edge pattern, got: {}",
+            svg
+        );
+        assert!(
+            svg.contains(".edge-thickness-thick{stroke-width:3.5px;}"),
+            "CSS must declare mermaid's thick edge rule"
+        );
+        assert!(
+            svg.contains(".error-icon{fill:#552222;}"),
+            "CSS must include mermaid's global error-icon rule"
+        );
+        assert!(
+            svg.contains(".flowchart-link{stroke:#333333;fill:none;}"),
+            "CSS must include mermaid's flowchart-link rule"
+        );
+        assert!(
+            svg.contains(
+                ".node rect,.node circle,.node ellipse,.node polygon,.node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}"
+            ),
+            "CSS must include mermaid's node shape rule"
+        );
+        assert!(
+            svg.contains(".marker{fill:#333333;stroke:#333333;}"),
+            "CSS must include mermaid's marker rule"
+        );
+        assert!(
+            svg.contains(".cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}"),
+            "CSS must include mermaid's cluster rule"
+        );
+    }
+
+    #[test]
+    fn test_classdef_fill_keeps_default_label_color() {
+        // Port of mermaidAPI createCssStyles: classDef styles become
+        // shape-element CSS rules; the label is NOT given an invented
+        // contrast color (mermaid keeps the theme text color).
+        let svg = render_svg(
+            "flowchart TD\n    A[Start]\n    classDef orange fill:#f96\n    class A orange",
+        );
+
+        assert!(
+            svg.contains(".orange rect { fill:#f96 !important; }"),
+            "classDef must be emitted as CSS rules for shape elements, got: {}",
+            svg
+        );
+        assert!(
+            svg.contains(".orange polygon { fill:#f96 !important; }"),
+            "classDef CSS must cover all shape elements"
+        );
+        // Node group carries the user class (mermaid: 'default ' + classes)
+        assert!(
+            svg.contains("class=\"node default orange\""),
+            "node group must carry default and user class names, got: {}",
+            svg
+        );
+        // The label must NOT get an invented contrast fill
+        let text_start = svg.find("<text").expect("should have text");
+        let text_end = svg[text_start..].find('>').unwrap() + text_start;
+        let text_tag = &svg[text_start..=text_end];
+        assert!(
+            !text_tag.contains("fill"),
+            "label must keep the theme text color, got: {}",
+            text_tag
+        );
+    }
+
+    #[test]
+    fn test_classdef_color_styles_label() {
+        // flowDb addClass routes color declarations into textStyles;
+        // createCssStyles emits them (color -> fill) for label text.
+        let svg = render_svg(
+            "flowchart TD\n    A[Start]\n    classDef white color:#fff\n    class A white",
+        );
+
+        assert!(
+            svg.contains(".white tspan, .white text { fill:#fff !important; }"),
+            "classDef color must become a label text fill rule, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_style_statement_color_routes_to_label() {
+        // Inline `style` statements with a color declaration set the label
+        // fill (mermaid routes color into labelStyle).
+        let svg = render_svg("flowchart TD\n    A[Start]\n    style A fill:#333,color:#fff");
+
+        let text_start = svg.find("<text").expect("should have text");
+        let text_end = svg[text_start..].find('>').unwrap() + text_start;
+        let text_tag = &svg[text_start..=text_end];
+        assert!(
+            text_tag.contains("fill: #fff"),
+            "style statement color must be applied to the label, got: {}",
+            text_tag
+        );
     }
 
     #[test]

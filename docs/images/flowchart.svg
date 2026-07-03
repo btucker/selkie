@@ -1,102 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1127.312512" height="174" viewBox="-8 -8 1127.312512 174" class="mermaid">
   <style>
-
-.mermaid {
-  font-family: trebuchet ms, verdana, arial, sans-serif;
-  font-size: 16px;
-}
-
-.node rect,
-.node polygon,
-.node circle,
-.node ellipse,
-.node path {
-  fill: #ECECFF;
-  stroke: #9370DB;
-  stroke-width: 1px;
-}
-
-.node line {
-  stroke: #9370DB;
-  stroke-width: 1px;
-}
-
-.node .label {
-  fill: #333333;
-}
-
-.node text {
-  fill: #333333;
-  font-family: trebuchet ms, verdana, arial, sans-serif;
-  font-size: 16px;
-}
-
-.edge-path {
-  fill: none;
-  stroke: #333333;
-  stroke-width: 1px;
-}
-
-.edge-label {
-  fill: #333333;
-  font-family: trebuchet ms, verdana, arial, sans-serif;
-}
-
-.edge-label-bg {
-  fill: rgba(232, 232, 232, 0.8);
-}
-
-.subgraph {
-  fill: #ffffde;
-  stroke: #aaaa33;
-  stroke-width: 1px;
-}
-
-.subgraph-title {
-  fill: #333333;
-  font-weight: bold;
-}
-
-.cluster rect {
-  fill: #ffffde;
-  stroke: #aaaa33;
-  stroke-width: 1px;
-  rx: 5px;
-  ry: 5px;
-}
-
-.cluster-label {
-  fill: #333333;
-  font-family: trebuchet ms, verdana, arial, sans-serif;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-marker path {
-  fill: #333333;
-  stroke: #333333;
-}
+.mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
+.error-icon{fill:#552222;}
+.error-text{fill:#552222;stroke:#552222;}
+.edge-thickness-normal{stroke-width:1px;}
+.edge-thickness-thick{stroke-width:3.5px;}
+.edge-pattern-solid{stroke-dasharray:0;}
+.edge-thickness-invisible{stroke-width:0;fill:none;}
+.edge-pattern-dashed{stroke-dasharray:3;}
+.edge-pattern-dotted{stroke-dasharray:2;}
+.marker{fill:#333333;stroke:#333333;}
+.marker.cross{stroke:#333333;}
+svg{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;}
+p{margin:0;}
+.label{font-family:trebuchet ms, verdana, arial, sans-serif;color:#333333;}
+.cluster-label text{fill:#333333;}
+.cluster-label span{color:#333333;}
+.cluster-label span p{background-color:transparent;}
+.label text,span{fill:#333333;color:#333333;}
+.node rect,.node circle,.node ellipse,.node polygon,.node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}
+.rough-node .label text,.node .label text,.image-shape .label,.icon-shape .label{text-anchor:middle;}
+.node .katex path{fill:#000;stroke:#000;stroke-width:1px;}
+.rough-node .label,.node .label,.image-shape .label,.icon-shape .label{text-align:center;}
+.node.clickable{cursor:pointer;}
+.root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}
+.arrowheadPath{fill:#333333;}
+.edgePath .path{stroke:#333333;stroke-width:2.0px;}
+.flowchart-link{stroke:#333333;fill:none;}
+.edgeLabel{background-color:rgba(232, 232, 232, 0.8);text-align:center;}
+.edgeLabel p{background-color:rgba(232, 232, 232, 0.8);}
+.edgeLabel rect{opacity:0.5;background-color:rgba(232, 232, 232, 0.8);fill:rgba(232, 232, 232, 0.8);}
+.labelBkg{background-color:rgba(232, 232, 232, 0.5);}
+.cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}
+.cluster text{fill:#333333;}
+.cluster span{color:#333333;}
+.flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333333;}
+rect.text{fill:none;stroke-width:0;}
 
   </style>
   <defs>
     <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 0 0 L 10 5 L 0 10 z"/>
+      <path d="M 0 0 L 10 5 L 0 10 z" class="marker"/>
     </marker>
     <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 0 5 L 10 10 L 10 0 z"/>
+      <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <circle cx="5" cy="5" r="5"/>
+      <circle cx="5" cy="5" r="5" class="marker"/>
     </marker>
     <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <circle cx="5" cy="5" r="5"/>
+      <circle cx="5" cy="5" r="5" class="marker"/>
     </marker>
   </defs>
   <g class="root">
@@ -105,31 +65,31 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M95.00780800000001,79L99.17447466666668,79C103.34114133333334,79,111.67447466666668,79,119.34114133333337,79C127.00780800000001,79,134.007808,79,137.50780800000004,79L141.007808,79" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M95.00780800000001,79L99.17447466666668,79C103.34114133333334,79,111.67447466666668,79,119.34114133333337,79C127.00780800000001,79,134.007808,79,137.50780800000004,79L141.007808,79" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M238.83472868032084,59.43631268032081L249.09534323360072,54.03026056693401C259.35595778688054,48.624208453547205,279.8771868934403,37.812104226773606,296.4711347800535,32.4060521133868C313.0650826666667,27,325.7317493333333,27,332.0650826666667,27L338.398416,27" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M238.83472868032084,59.43631268032081L249.09534323360072,54.03026056693401C259.35595778688054,48.624208453547205,279.8771868934403,37.812104226773606,296.4711347800535,32.4060521133868C313.0650826666667,27,325.7317493333333,27,332.0650826666667,27L338.398416,27" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B-D-0">
-        <path d="M238.83472868032084,98.56368731967919L249.09534323360072,103.96973943306598C259.35595778688054,109.37579154645279,279.8771868934403,120.18789577322639,296.4711347800535,125.5939478866132C313.0650826666667,131,325.7317493333333,131,332.0650826666667,131L338.398416,131" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M238.83472868032084,98.56368731967919L249.09534323360072,103.96973943306598C259.35595778688054,109.37579154645279,279.8771868934403,120.18789577322639,296.4711347800535,125.5939478866132C313.0650826666667,131,325.7317493333333,131,332.0650826666667,131L338.398416,131" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-C-E-0">
-        <path d="M461.20310399999994,27L465.3697706666667,27C469.53643733333325,27,477.8697706666667,27,486.9643359176617,30.76212533426777C496.0589011686568,34.524250668535544,505.9146983373136,42.04850133707109,510.84259692164204,45.81062667133886L515.7704955059704,49.57275200560663" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M461.20310399999994,27L465.3697706666667,27C469.53643733333325,27,477.8697706666667,27,486.9643359176617,30.76212533426777C496.0589011686568,34.524250668535544,505.9146983373136,42.04850133707109,510.84259692164204,45.81062667133886L515.7704955059704,49.57275200560663" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-D-E-0">
-        <path d="M461.20310399999994,131L465.3697706666667,131C469.53643733333325,131,477.8697706666667,131,486.9643359176617,127.23787466573224C496.0589011686568,123.47574933146446,505.9146983373136,115.95149866292893,510.84259692164204,112.18937332866115L515.7704955059704,108.42724799439337" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M461.20310399999994,131L465.3697706666667,131C469.53643733333325,131,477.8697706666667,131,486.9643359176617,127.23787466573224C496.0589011686568,123.47574933146446,505.9146983373136,115.95149866292893,510.84259692164204,112.18937332866115L515.7704955059704,108.42724799439337" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-E-F-0">
-        <path d="M597.42968,79L601.5963466666667,79C605.7630133333333,79,614.0963466666666,79,621.7630133333333,79C629.42968,79,636.42968,79,639.9296800000001,79L643.42968,79" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M597.42968,79L601.5963466666667,79C605.7630133333333,79,614.0963466666666,79,621.7630133333333,79C629.42968,79,636.42968,79,639.9296800000001,79L643.42968,79" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-F-G-0">
-        <path d="M715.8281279999999,79L719.9947946666666,79C724.1614613333332,79,732.4947946666666,79,740.1614613333332,79C747.828128,79,754.828128,79,758.328128,79L761.828128,79" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M715.8281279999999,79L719.9947946666666,79C724.1614613333332,79,732.4947946666666,79,740.1614613333332,79C747.828128,79,754.828128,79,758.328128,79L761.828128,79" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-G-H-0">
-        <path d="M874.1015679999999,79L878.2682346666666,79C882.4349013333334,79,890.7682346666667,79,898.4349013333334,79C906.101568,79,913.101568,79,916.601568,79L920.101568,79" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M874.1015679999999,79L878.2682346666666,79C882.4349013333334,79,890.7682346666667,79,898.4349013333334,79C906.101568,79,913.101568,79,916.601568,79L920.101568,79" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-H-I-0">
-        <path d="M1004.59376,79L1008.7604266666666,79C1012.9270933333333,79,1021.2604266666667,79,1029.59376,79C1037.9270933333335,79,1046.2604266666667,79,1050.4270933333332,79L1054.59376,79" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_circle)" marker-start="url(#arrow_circle_start)"/>
+        <path d="M1004.59376,79L1008.7604266666666,79C1012.9270933333333,79,1021.2604266666667,79,1029.59376,79C1037.9270933333335,79,1046.2604266666667,79,1050.4270933333332,79L1054.59376,79" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_circle)" marker-start="url(#arrow_circle_start)"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -139,45 +99,45 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-B-D-0">
         <rect x="276.99557804764146" y="113.57064067077958" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="288.19557804764145" y="124.57064067077958" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+        <text x="288.19557804764145" y="124.57064067077958" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
     </g>
     <g class="nodes">
-      <g class="node" id="node-A">
+      <g class="node default" id="node-A">
         <rect x="0" y="52" width="95.00780800000001" height="54"/>
         <text x="47.503904000000006" y="79" class="label" text-anchor="middle" dominant-baseline="central">Start</text>
       </g>
-      <g class="node" id="node-B">
+      <g class="node default" id="node-B">
         <polygon points="201.703112,22.304696 258.398416,79 201.703112,135.695304 145.007808,79"/>
-        <text x="201.703112" y="79" class="label" dominant-baseline="central" text-anchor="middle">Decision</text>
+        <text x="201.703112" y="79" class="label" text-anchor="middle" dominant-baseline="central">Decision</text>
       </g>
-      <g class="node" id="node-C">
+      <g class="node default" id="node-C">
         <rect x="342.398416" y="0" width="118.804688" height="54"/>
-        <text x="401.80075999999997" y="27" class="label" dominant-baseline="central" text-anchor="middle">Action 1</text>
+        <text x="401.80075999999997" y="27" class="label" text-anchor="middle" dominant-baseline="central">Action 1</text>
       </g>
-      <g class="node" id="node-D">
+      <g class="node default" id="node-D">
         <rect x="342.398416" y="104" width="118.804688" height="54"/>
         <text x="401.80075999999997" y="131" class="label" dominant-baseline="central" text-anchor="middle">Action 2</text>
       </g>
-      <g class="node" id="node-E">
+      <g class="node default" id="node-E">
         <rect x="511.20310399999994" y="52" width="86.226576" height="54"/>
-        <text x="554.316392" y="79" class="label" dominant-baseline="central" text-anchor="middle">End</text>
+        <text x="554.316392" y="79" class="label" text-anchor="middle" dominant-baseline="central">End</text>
       </g>
-      <g class="node" id="node-F">
+      <g class="node default" id="node-F">
         <path d="M 666.92968 59.5 H 696.328128 A 19.5 19.5 0 0 1 696.328128 98.5 H 666.92968 A 19.5 19.5 0 0 1 666.92968 59.5 Z"/>
         <text x="681.6289039999999" y="79" class="label" text-anchor="middle" dominant-baseline="central">Round</text>
       </g>
-      <g class="node" id="node-G">
+      <g class="node default" id="node-G">
         <polygon points="775.828128,59.5 864.101568,59.5 864.101568,98.5 775.828128,98.5 775.828128,59.5 765.828128,59.5 874.101568,59.5 874.101568,98.5 765.828128,98.5 765.828128,59.5"/>
         <text x="819.964848" y="79" class="label" text-anchor="middle" dominant-baseline="central">Subroutine</text>
       </g>
-      <g class="node" id="node-H">
+      <g class="node default" id="node-H">
         <path d="M 924.101568 55.067759981848845 a 40.246096 10.256674293493353 0 0 0 80.492192 0 a 40.246096 10.256674293493353 0 0 0 -80.492192 0 l 0 47.86448003630231 a 40.246096 10.256674293493353 0 0 0 80.492192 0 l 0 -47.86448003630231"/>
         <text x="964.347664" y="79" class="label" text-anchor="middle" dominant-baseline="central">Database</text>
       </g>
-      <g class="node" id="node-I">
+      <g class="node default" id="node-I">
         <circle cx="1082.953136" cy="79" r="28.359376"/>
-        <text x="1082.953136" y="79" class="label" text-anchor="middle" dominant-baseline="central">Circle</text>
+        <text x="1082.953136" y="79" class="label" dominant-baseline="central" text-anchor="middle">Circle</text>
       </g>
     </g>
   </g>

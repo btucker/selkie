@@ -18,7 +18,8 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             marker_height: 8.0,
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
-            children: vec![SvgElement::path("M 0 0 L 10 5 L 0 10 z")],
+            children: vec![SvgElement::path("M 0 0 L 10 5 L 0 10 z")
+                .with_attrs(super::elements::Attrs::new().with_class("marker"))],
         },
         // Arrow point start (filled triangle) - like mermaid.js pointStart marker
         SvgElement::Marker {
@@ -30,7 +31,8 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             marker_height: 8.0,
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
-            children: vec![SvgElement::path("M 0 5 L 10 10 L 10 0 z")],
+            children: vec![SvgElement::path("M 0 5 L 10 10 L 10 0 z")
+                .with_attrs(super::elements::Attrs::new().with_class("marker"))],
         },
         // Arrow cross end (X shape) - like mermaid.js crossEnd marker
         SvgElement::Marker {
@@ -45,6 +47,7 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             children: vec![SvgElement::Path {
                 d: "M 1 1 L 10 10 M 10 1 L 1 10".to_string(), // mermaid.js path
                 attrs: super::elements::Attrs::new()
+                    .with_class("marker cross")
                     .with_fill("none")
                     .with_stroke_width(2.0), // mermaid.js uses stroke-width: 2
             }],
@@ -62,6 +65,7 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             children: vec![SvgElement::Path {
                 d: "M 1 1 L 10 10 M 10 1 L 1 10".to_string(),
                 attrs: super::elements::Attrs::new()
+                    .with_class("marker cross")
                     .with_fill("none")
                     .with_stroke_width(2.0),
             }],
@@ -76,7 +80,8 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             marker_height: 11.0, // mermaid.js uses 11
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
-            children: vec![SvgElement::circle(5.0, 5.0, 5.0)], // mermaid.js uses r=5
+            children: vec![SvgElement::circle(5.0, 5.0, 5.0)
+                .with_attrs(super::elements::Attrs::new().with_class("marker"))], // mermaid.js uses r=5
         },
         // Arrow circle start (filled circle) - like mermaid.js circleStart marker
         SvgElement::Marker {
@@ -88,7 +93,8 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             marker_height: 11.0,
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
-            children: vec![SvgElement::circle(5.0, 5.0, 5.0)],
+            children: vec![SvgElement::circle(5.0, 5.0, 5.0)
+                .with_attrs(super::elements::Attrs::new().with_class("marker"))],
         },
     ]
 }
