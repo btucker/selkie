@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="421.1" height="1611.5999999999997" viewBox="-8 -8 421.1 1611.5999999999997" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="400.34379599999994" height="1508.148448" viewBox="-8 -8 400.34379599999994 1508.148448" class="mermaid">
   <style>
 
 .mermaid {
@@ -105,96 +105,96 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 214.30 52.80 C 214.30 61.13, 214.30 69.47, 214.30 77.80 C 214.30 86.13, 214.30 94.47, 214.30 102.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 199.60 54.00 C 199.60 62.33, 199.60 70.67, 199.60 79.00 C 199.60 87.33, 199.60 95.67, 199.60 104.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 214.30 192.40 C 214.30 200.73, 214.30 209.07, 214.30 217.40 C 214.30 225.73, 214.30 234.07, 214.30 242.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 199.60 182.00 C 199.60 190.33, 199.60 198.67, 199.60 207.00 C 199.60 215.33, 199.60 223.67, 199.60 232.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-C-D-0">
-        <path d="M 214.30 295.20 C 214.30 303.53, 214.30 311.87, 214.30 320.20 C 214.30 328.53, 214.30 336.87, 214.30 345.20" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 199.60 286.00 C 199.60 294.33, 199.60 302.67, 199.60 311.00 C 199.60 319.33, 199.60 327.67, 199.60 336.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-D-E-0">
-        <path d="M 214.30 398.00 C 214.30 406.33, 214.30 414.67, 214.30 423.00 C 214.30 431.33, 214.30 439.67, 214.30 448.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 199.60 390.00 C 199.60 398.33, 199.60 406.67, 199.60 415.00 C 199.60 423.33, 199.60 431.67, 199.60 440.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-E-F-0">
-        <path d="M 214.30 672.00 C 214.30 683.67, 214.30 695.33, 214.30 707.00 C 214.30 718.67, 214.30 730.33, 214.30 742.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 199.60 620.15 C 199.60 632.48, 199.60 644.82, 199.60 657.15 C 199.60 669.48, 199.60 681.82, 199.60 694.15" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-F-G-0">
-        <path d="M 214.30 831.60 C 214.30 839.93, 214.30 848.27, 214.30 856.60 C 214.30 864.93, 214.30 873.27, 214.30 881.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 199.60 772.15 C 199.60 780.48, 199.60 788.82, 199.60 797.15 C 199.60 805.48, 199.60 813.82, 199.60 822.15" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-G-H-0">
-        <path d="M 160.96 971.20 L 131.20 1021.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 151.95 900.15 L 121.40 950.15" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-H-I-0">
-        <path d="M 131.20 1110.80 C 131.20 1119.13, 131.20 1127.47, 131.20 1135.80 C 131.20 1144.13, 131.20 1152.47, 131.20 1160.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 121.40 1028.15 C 121.40 1036.48, 121.40 1044.82, 121.40 1053.15 C 121.40 1061.48, 121.40 1069.82, 121.40 1078.15" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-I-J-0">
-        <path d="M 131.20 1213.60 C 131.20 1221.93, 131.20 1230.27, 131.20 1238.60 C 131.20 1246.93, 131.20 1255.27, 131.20 1263.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 121.40 1132.15 C 121.40 1140.48, 121.40 1148.82, 121.40 1157.15 C 121.40 1165.48, 121.40 1173.82, 121.40 1182.15" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-J-K-0">
-        <path d="M 131.20 1353.20 C 131.20 1361.53, 131.20 1369.87, 131.20 1378.20 C 131.20 1386.53, 131.20 1394.87, 131.20 1403.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 121.40 1260.15 C 121.40 1268.48, 121.40 1276.82, 121.40 1285.15 C 121.40 1293.48, 121.40 1301.82, 121.40 1310.15" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-K-L-0">
-        <path d="M 131.20 1492.80 L 171.62 1542.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 121.40 1388.15 L 158.99 1438.15" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-L-G-0">
-        <path d="M 256.98 1542.80 C 270.45 1534.47, 283.93 1526.13, 290.66 1435.03 C 297.40 1343.93, 297.40 1170.07, 292.44 1078.97 C 277.56 979.53, 267.64 971.20, 267.64 971.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 240.20 1438.15 C 252.73 1429.82, 265.26 1421.48, 271.53 1335.98 C 277.80 1250.48, 277.80 1087.82, 272.71 1002.32 C 257.43 908.48, 247.25 900.15, 247.25 900.15" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-E-F-0">
-        <rect x="203.1" y="696" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="214.29999999999998" y="707" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+        <rect x="188.39768399999997" y="646.1484479999999" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="199.59768399999996" y="657.1484479999999" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-A">
-        <rect x="73.49999999999997" y="0" width="281.6" height="52.8"/>
-        <text x="214.29999999999998" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">gather_orphan_cleanup_data</text>
+        <rect x="64.85157199999998" y="0" width="269.49222399999996" height="54"/>
+        <text x="199.59768399999996" y="27" class="label" text-anchor="middle" dominant-baseline="central">gather_orphan_cleanup_data</text>
       </g>
       <g class="node" id="node-B">
-        <rect x="73.49999999999997" y="102.8" width="281.6" height="89.6"/>
-        <text x="214.29999999999998" y="147.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="214.29999999999998" y="147.6" dy="-0.6em">cleanup_orphaned_worktrees</tspan><tspan x="214.29999999999998" dy="1.2em">limit: Some&lt;b&gt;2&lt;/b&gt;</tspan></text>
+        <rect x="63.85938799999997" y="104" width="271.476592" height="78"/>
+        <text x="199.59768399999996" y="143" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="199.59768399999996" y="143" dy="-0.6em">cleanup_orphaned_worktrees</tspan><tspan x="199.59768399999996" dy="1.2em">limit: Some&lt;b&gt;2&lt;/b&gt;</tspan></text>
       </g>
       <g class="node" id="node-C">
-        <rect x="64.29999999999998" y="242.39999999999995" width="300" height="52.8"/>
-        <text x="214.29999999999998" y="268.79999999999995" class="label" dominant-baseline="central" text-anchor="middle">unmerged: Vec of 2 worktrees</text>
+        <rect x="61.738291999999944" y="232" width="275.718784" height="54"/>
+        <text x="199.59768399999996" y="259" class="label" text-anchor="middle" dominant-baseline="central">unmerged: Vec of 2 worktrees</text>
       </g>
       <g class="node" id="node-D">
-        <rect x="64.29999999999998" y="345.2" width="300" height="52.8"/>
-        <text x="214.29999999999998" y="371.59999999999997" class="label" text-anchor="middle" dominant-baseline="central">OrphanTracker::prune&lt;b&gt;&amp;unmerged&lt;/b&gt;</text>
+        <rect x="19.371092000000004" y="336" width="360.4531839999999" height="54"/>
+        <text x="199.59768399999996" y="363" class="label" dominant-baseline="central" text-anchor="middle">OrphanTracker::prune&lt;b&gt;&amp;unmerged&lt;/b&gt;</text>
       </g>
       <g class="node" id="node-E">
-        <polygon points="214.29999999999998,448 326.29999999999995,560 214.29999999999998,672 102.29999999999998,560"/>
-        <text x="214.29999999999998" y="560" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="214.29999999999998" y="560" dy="-0.6em">Is worktree #3</tspan><tspan x="214.29999999999998" dy="1.2em">in unmerged?</tspan></text>
+        <polygon points="199.59768399999996,439.99999999999994 289.671908,530.074224 199.59768399999996,620.1484479999999 109.52345999999994,530.074224"/>
+        <text x="199.59768399999996" y="530.074224" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="199.59768399999996" y="530.074224" dy="-0.6em">Is worktree #3</tspan><tspan x="199.59768399999996" dy="1.2em">in unmerged?</tspan></text>
       </g>
       <g class="node" id="node-F">
-        <rect x="97.49999999999999" y="742" width="233.6" height="89.6" style="fill:#f99 !important"/>
-        <text x="214.29999999999998" y="786.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="214.29999999999998" y="786.8" dy="-0.6em">Entry for worktree #3</tspan><tspan x="214.29999999999998" dy="1.2em">REMOVED from tracker</tspan></text>
+        <rect x="87.92579599999995" y="694.148448" width="223.34377600000002" height="78" style="fill:#f99 !important"/>
+        <text x="199.59768399999996" y="733.148448" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #ffffff"><tspan x="199.59768399999996" y="733.148448" dy="-0.6em">Entry for worktree #3</tspan><tspan x="199.59768399999996" dy="1.2em">REMOVED from tracker</tspan></text>
       </g>
       <g class="node" id="node-G">
-        <rect x="97.49999999999999" y="881.6" width="233.6" height="89.6"/>
-        <text x="214.29999999999998" y="926.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="214.29999999999998" y="926.4" dy="-0.6em">Next tick:</tspan><tspan x="214.29999999999998" dy="1.2em">worktree #3 processed</tspan></text>
+        <rect x="88.50783599999995" y="822.148448" width="222.179696" height="78"/>
+        <text x="199.59768399999996" y="861.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="199.59768399999996" y="861.148448" dy="-0.6em">Next tick:</tspan><tspan x="199.59768399999996" dy="1.2em">worktree #3 processed</tspan></text>
       </g>
       <g class="node" id="node-H">
-        <rect x="9.599999999999994" y="1021.2" width="243.2" height="89.6" style="fill:#f99 !important"/>
-        <text x="131.2" y="1066" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="131.2" y="1066" dy="-0.6em">Re-tracked with</tspan><tspan x="131.2" dy="1.2em">&lt;b&gt;warned_at: None&lt;/b&gt;</tspan></text>
+        <rect x="0" y="950.148448" width="242.79691199999996" height="78" style="fill:#f99 !important"/>
+        <text x="121.39845599999998" y="989.148448" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #ffffff"><tspan x="121.39845599999998" y="989.148448" dy="-0.6em">Re-tracked with</tspan><tspan x="121.39845599999998" dy="1.2em">&lt;b&gt;warned_at: None&lt;/b&gt;</tspan></text>
       </g>
       <g class="node" id="node-I">
-        <rect x="0" y="1160.8" width="262.4" height="52.8"/>
-        <text x="131.2" y="1187.2" class="label" dominant-baseline="central" text-anchor="middle">60s grace period expires</text>
+        <rect x="4.105479999999986" y="1078.148448" width="234.585952" height="54"/>
+        <text x="121.39845599999998" y="1105.148448" class="label" dominant-baseline="central" text-anchor="middle">60s grace period expires</text>
       </g>
       <g class="node" id="node-J">
-        <rect x="19.19999999999999" y="1263.6" width="224" height="89.6" style="fill:#f99 !important"/>
-        <text x="131.2" y="1308.3999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="131.2" y="1308.3999999999999" dy="-0.6em">Warn AGAIN</tspan><tspan x="131.2" dy="1.2em">bypasses 1h cooldown</tspan></text>
+        <rect x="12.890631999999982" y="1182.148448" width="217.015648" height="78" style="fill:#f99 !important"/>
+        <text x="121.39845599999998" y="1221.148448" class="label" dominant-baseline="central" style="fill: #ffffff" text-anchor="middle"><tspan x="121.39845599999998" y="1221.148448" dy="-0.6em">Warn AGAIN</tspan><tspan x="121.39845599999998" dy="1.2em">bypasses 1h cooldown</tspan></text>
       </g>
       <g class="node" id="node-K">
-        <rect x="23.999999999999986" y="1403.1999999999998" width="214.4" height="89.6"/>
-        <text x="131.2" y="1447.9999999999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="131.2" y="1447.9999999999998" dy="-0.6em">Tick after that:</tspan><tspan x="131.2" dy="1.2em">limit reached again</tspan></text>
+        <rect x="21.94141599999999" y="1310.148448" width="198.91407999999998" height="78"/>
+        <text x="121.39845599999998" y="1349.148448" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="121.39845599999998" y="1349.148448" dy="-0.6em">Tick after that:</tspan><tspan x="121.39845599999998" dy="1.2em">limit reached again</tspan></text>
       </g>
       <g class="node" id="node-L">
-        <rect x="107.09999999999998" y="1542.7999999999997" width="214.4" height="52.8"/>
-        <text x="214.29999999999998" y="1569.1999999999998" class="label" dominant-baseline="central" text-anchor="middle">prune removes entry</text>
+        <rect x="95.21877199999997" y="1438.148448" width="208.75782399999997" height="54"/>
+        <text x="199.59768399999996" y="1465.148448" class="label" text-anchor="middle" dominant-baseline="central">prune removes entry</text>
       </g>
     </g>
   </g>

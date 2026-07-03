@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="916" height="961.1999999999998" viewBox="-8 -27.999999999999993 916 961.1999999999998" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="844.4609520000001" height="972" viewBox="-8 -28 844.4609520000001 972" class="mermaid">
   <style>
 
 .mermaid {
@@ -90,7 +90,7 @@ marker path {
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -102,56 +102,56 @@ marker path {
   <g class="root">
     <g class="clusters">
       <g class="subgraph" id="subgraph-">
-        <rect x="19.999999999999986" y="-19.999999999999993" width="292.79999999999995" height="940.1999999999998" class="cluster"/>
-        <text x="166.39999999999998" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
+        <rect x="20.000000000000014" y="-20" width="264.289056" height="951" class="cluster"/>
+        <text x="152.14452800000004" y="-4" class="cluster-label" text-anchor="middle"></text>
       </g>
       <g class="subgraph" id="subgraph-">
-        <rect x="303.5999999999999" y="-19.999999999999993" width="576.4" height="426.20000000000005" class="cluster"/>
-        <text x="591.8" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
+        <rect x="281.343752" y="-20" width="527.1172000000003" height="431" class="cluster"/>
+        <text x="544.9023520000001" y="-4" class="cluster-label" text-anchor="middle"></text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A1-B1-0">
-        <path d="M 166.40 77.80 C 166.40 86.13, 166.40 94.47, 166.40 102.80 C 166.40 111.13, 166.40 119.47, 166.40 127.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 152.14 79.00 C 152.14 87.33, 152.14 95.67, 152.14 104.00 C 152.14 112.33, 152.14 120.67, 152.14 129.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-B1-C1-0">
-        <path d="M 166.40 180.60 C 166.40 188.93, 166.40 197.27, 166.40 205.60 C 166.40 213.93, 166.40 222.27, 166.40 230.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 152.14 183.00 C 152.14 191.33, 152.14 199.67, 152.14 208.00 C 152.14 216.33, 152.14 224.67, 152.14 233.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-C1-D1-0">
-        <path d="M 166.40 283.40 C 166.40 291.73, 166.40 300.07, 166.40 308.40 C 166.40 316.73, 166.40 325.07, 166.40 333.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 152.14 287.00 C 152.14 295.33, 152.14 303.67, 152.14 312.00 C 152.14 320.33, 152.14 328.67, 152.14 337.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-D1-E1-0">
-        <path d="M 166.40 386.20 C 166.40 394.53, 166.40 402.87, 166.40 411.20 C 166.40 419.53, 166.40 427.87, 166.40 436.20" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 152.14 391.00 C 152.14 399.33, 152.14 407.67, 152.14 416.00 C 152.14 424.33, 152.14 432.67, 152.14 441.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-E1-F1-0">
-        <path d="M 166.40 489.00 C 166.40 497.33, 166.40 505.67, 166.40 514.00 C 166.40 522.33, 166.40 530.67, 166.40 539.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 152.14 495.00 C 152.14 503.33, 152.14 511.67, 152.14 520.00 C 152.14 528.33, 152.14 536.67, 152.14 545.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-F1-G1-0">
-        <path d="M 166.40 591.80 C 166.40 600.13, 166.40 608.47, 166.40 616.80 C 166.40 625.13, 166.40 633.47, 166.40 641.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 152.14 599.00 C 152.14 607.33, 152.14 615.67, 152.14 624.00 C 152.14 632.33, 152.14 640.67, 152.14 649.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-G1-H1-0">
-        <path d="M 166.40 694.60 C 166.40 702.93, 166.40 711.27, 166.40 719.60 C 166.40 727.93, 166.40 736.27, 166.40 744.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 152.14 703.00 C 152.14 711.33, 152.14 719.67, 152.14 728.00 C 152.14 736.33, 152.14 744.67, 152.14 753.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-H1-I1-0">
-        <path d="M 166.40 797.40 C 166.40 805.73, 166.40 814.07, 166.40 822.40 C 166.40 830.73, 166.40 839.07, 166.40 847.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 152.14 807.00 C 152.14 815.33, 152.14 823.67, 152.14 832.00 C 152.14 840.33, 152.14 848.67, 152.14 857.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-A2-B2-0">
-        <path d="M 530.90 77.80 C 507.14 86.13, 483.37 94.47, 471.48 102.80 C 459.60 111.13, 459.60 119.47, 459.60 127.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 485.26 79.00 L 420.70 129.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-B2-C2-0">
-        <path d="M 459.60 180.60 C 459.60 188.93, 459.60 197.27, 459.60 205.60 C 459.60 213.93, 459.60 222.27, 459.60 230.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 420.70 183.00 C 420.70 191.33, 420.70 199.67, 420.70 208.00 C 420.70 216.33, 420.70 224.67, 420.70 233.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-C2-D2-0">
-        <path d="M 459.60 283.40 C 459.60 291.73, 459.60 300.07, 459.60 308.40 C 459.60 316.73, 459.60 325.07, 459.60 333.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 420.70 287.00 C 420.70 295.33, 420.70 303.67, 420.70 312.00 C 420.70 320.33, 420.70 328.67, 420.70 337.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-A2-E2-0">
-        <path d="M 681.50 77.80 C 705.26 86.13, 729.03 94.47, 740.92 102.80 C 752.80 111.13, 752.80 119.47, 752.80 127.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 624.70 79.00 L 689.26 129.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-E2-F2-0">
-        <path d="M 752.80 180.60 C 752.80 188.93, 752.80 197.27, 752.80 205.60 C 752.80 213.93, 752.80 222.27, 752.80 230.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 689.26 183.00 C 689.26 191.33, 689.26 199.67, 689.26 208.00 C 689.26 216.33, 689.26 224.67, 689.26 233.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-F2-G2-0">
-        <path d="M 752.80 283.40 C 752.80 291.73, 752.80 300.07, 752.80 308.40 C 752.80 316.73, 752.80 325.07, 752.80 333.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 689.26 287.00 C 689.26 295.33, 689.26 303.67, 689.26 312.00 C 689.26 320.33, 689.26 328.67, 689.26 337.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -159,68 +159,68 @@ marker path {
     </g>
     <g class="nodes">
       <g class="node" id="node-A1">
-        <rect x="83.19999999999997" y="25.000000000000007" width="166.4" height="52.8"/>
-        <text x="166.39999999999998" y="51.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">Mermaid Source</text>
+        <rect x="65.05858400000001" y="25" width="174.171888" height="54"/>
+        <text x="152.144528" y="52" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
       </g>
       <g class="node" id="node-A2">
-        <rect x="522.9999999999999" y="25.000000000000007" width="166.4" height="52.8"/>
-        <text x="606.1999999999999" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
+        <rect x="467.89648400000004" y="25" width="174.171888" height="54"/>
+        <text x="554.982428" y="52" class="label" dominant-baseline="central" text-anchor="middle">Mermaid Source</text>
       </g>
       <g class="node" id="node-B1">
-        <rect x="59.199999999999974" y="127.80000000000001" width="214.4" height="52.8"/>
-        <text x="166.39999999999998" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">selkie::render_text</text>
+        <rect x="52.94530400000001" y="129" width="198.398448" height="54"/>
+        <text x="152.144528" y="156" class="label" dominant-baseline="central" text-anchor="middle">selkie::render_text</text>
       </g>
       <g class="node" id="node-B2">
-        <rect x="323.5999999999999" y="127.80000000000001" width="272" height="52.8"/>
-        <text x="459.5999999999999" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">selkie::render_text_ascii</text>
+        <rect x="301.343752" y="129" width="238.71875200000005" height="54"/>
+        <text x="420.703128" y="156" class="label" text-anchor="middle" dominant-baseline="central">selkie::render_text_ascii</text>
       </g>
       <g class="node" id="node-C1">
-        <rect x="102.39999999999998" y="230.6" width="128" height="52.8"/>
-        <text x="166.39999999999998" y="257" class="label" dominant-baseline="central" text-anchor="middle">SVG String</text>
+        <rect x="84.980464" y="233" width="134.32812800000002" height="54"/>
+        <text x="152.144528" y="260" class="label" text-anchor="middle" dominant-baseline="central">SVG String</text>
       </g>
       <g class="node" id="node-C2">
-        <rect x="400.3999999999999" y="230.6" width="118.39999999999999" height="52.8" style="fill:#51cf66 !important"/>
-        <text x="459.5999999999999" y="257" class="label" text-anchor="middle" dominant-baseline="central">ASCII Art</text>
+        <rect x="359.92968800000006" y="233" width="121.54688" height="54" style="fill:#51cf66 !important"/>
+        <text x="420.70312800000005" y="260" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff">ASCII Art</text>
       </g>
       <g class="node" id="node-D1">
-        <rect x="54.39999999999998" y="333.40000000000003" width="224" height="52.8" style="fill:#ff6b6b !important"/>
-        <text x="166.39999999999998" y="359.8" class="label" dominant-baseline="central" text-anchor="middle">svg_to_png via resvg</text>
+        <rect x="48.406248000000005" y="337" width="207.47656" height="54" style="fill:#ff6b6b !important"/>
+        <text x="152.144528" y="364" class="label" text-anchor="middle" style="fill: #ffffff" dominant-baseline="central">svg_to_png via resvg</text>
       </g>
       <g class="node" id="node-D2">
-        <rect x="366.7999999999999" y="333.40000000000003" width="185.6" height="52.8"/>
-        <text x="459.5999999999999" y="359.8" class="label" dominant-baseline="central" text-anchor="middle">Terminal Display</text>
+        <rect x="331.925784" y="337" width="177.554688" height="54"/>
+        <text x="420.703128" y="364" class="label" text-anchor="middle" dominant-baseline="central">Terminal Display</text>
       </g>
       <g class="node" id="node-E1">
-        <rect x="102.39999999999998" y="436.20000000000005" width="128" height="52.8" style="fill:#ff6b6b !important"/>
-        <text x="166.39999999999998" y="462.6" class="label" dominant-baseline="central" text-anchor="middle">usvg Parse</text>
+        <rect x="85.1914" y="441" width="133.906256" height="54" style="fill:#ff6b6b !important"/>
+        <text x="152.144528" y="468" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff">usvg Parse</text>
       </g>
       <g class="node" id="node-E2">
-        <rect x="645.5999999999999" y="127.80000000000001" width="214.4" height="52.8"/>
-        <text x="752.8" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">selkie::render_text</text>
+        <rect x="590.0625040000002" y="129" width="198.398448" height="54"/>
+        <text x="689.2617280000002" y="156" class="label" text-anchor="middle" dominant-baseline="central">selkie::render_text</text>
       </g>
       <g class="node" id="node-F1">
-        <rect x="59.199999999999974" y="539" width="214.4" height="52.8" style="fill:#ff6b6b !important"/>
-        <text x="166.39999999999998" y="565.4" class="label" text-anchor="middle" dominant-baseline="central">tiny-skia Rasterize</text>
+        <rect x="56.085936000000004" y="545" width="192.117184" height="54" style="fill:#ff6b6b !important"/>
+        <text x="152.144528" y="572" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff">tiny-skia Rasterize</text>
       </g>
       <g class="node" id="node-F2">
-        <rect x="688.8" y="230.6" width="128" height="52.8"/>
-        <text x="752.8" y="257" class="label" dominant-baseline="central" text-anchor="middle">SVG String</text>
+        <rect x="622.0976640000001" y="233" width="134.32812800000002" height="54"/>
+        <text x="689.2617280000002" y="260" class="label" text-anchor="middle" dominant-baseline="central">SVG String</text>
       </g>
       <g class="node" id="node-G1">
-        <rect x="107.19999999999999" y="641.8" width="118.39999999999999" height="52.8"/>
-        <text x="166.39999999999998" y="668.1999999999999" class="label" dominant-baseline="central" text-anchor="middle">PNG bytes</text>
+        <rect x="85.582024" y="649" width="133.125008" height="54"/>
+        <text x="152.144528" y="676" class="label" dominant-baseline="central" text-anchor="middle">PNG bytes</text>
       </g>
       <g class="node" id="node-G2">
-        <rect x="669.5999999999999" y="333.40000000000003" width="166.4" height="52.8" style="fill:#51cf66 !important"/>
-        <text x="752.8" y="359.8" class="label" text-anchor="middle" dominant-baseline="central">Browser Viewer</text>
+        <rect x="603.6328160000002" y="337" width="171.257824" height="54" style="fill:#51cf66 !important"/>
+        <text x="689.2617280000002" y="364" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff">Browser Viewer</text>
       </g>
       <g class="node" id="node-H1">
-        <rect x="39.999999999999986" y="744.5999999999999" width="252.79999999999998" height="52.8" style="fill:#ff6b6b !important"/>
-        <text x="166.39999999999998" y="770.9999999999999" class="label" text-anchor="middle" dominant-baseline="central">Kitty Terminal Protocol</text>
+        <rect x="40.000000000000014" y="753" width="224.289056" height="54" style="fill:#ff6b6b !important"/>
+        <text x="152.144528" y="780" class="label" text-anchor="middle" style="fill: #ffffff" dominant-baseline="central">Kitty Terminal Protocol</text>
       </g>
       <g class="node" id="node-I1">
-        <rect x="54.39999999999998" y="847.3999999999999" width="224" height="52.8"/>
-        <text x="166.39999999999998" y="873.7999999999998" class="label" dominant-baseline="central" text-anchor="middle">Inline Image Display</text>
+        <rect x="50.51171200000002" y="857" width="203.26563199999998" height="54"/>
+        <text x="152.144528" y="884" class="label" text-anchor="middle" dominant-baseline="central">Inline Image Display</text>
       </g>
     </g>
   </g>

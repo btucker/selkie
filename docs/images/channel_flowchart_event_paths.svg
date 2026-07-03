@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1085.4" height="497.2000000000001" viewBox="-8 -27.999999999999993 1085.4 497.2000000000001" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1079.29886" height="502" viewBox="-8 -28 1079.29886 502" class="mermaid">
   <style>
 
 .mermaid {
@@ -90,7 +90,7 @@ marker path {
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -102,66 +102,66 @@ marker path {
   <g class="root">
     <g class="clusters">
       <g class="subgraph" id="subgraph-Mouse">
-        <rect x="172.7" y="-19.999999999999993" width="683" height="323.4" class="cluster"/>
-        <text x="514.2" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Mouse Event Path</text>
+        <rect x="157.92186400000003" y="-20" width="712.4316960000001" height="327" class="cluster"/>
+        <text x="514.1377120000001" y="-4" class="cluster-label" text-anchor="middle">Mouse Event Path</text>
       </g>
       <g class="subgraph" id="subgraph-Touch">
-        <rect x="314.7" y="-19.999999999999993" width="480.2" height="323.4" class="cluster"/>
-        <text x="554.8" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Touch Event Path</text>
+        <rect x="305.31446" y="-20" width="476.3261800000001" height="327" class="cluster"/>
+        <text x="543.4775500000001" y="-4" class="cluster-label" text-anchor="middle">Touch Event Path</text>
       </g>
       <g class="subgraph" id="subgraph-Shared">
-        <rect x="232.49999999999994" y="338.40000000000003" width="642.8" height="117.80000000000001" class="cluster"/>
-        <text x="553.8999999999999" y="354.40000000000003" class="cluster-label" text-anchor="middle">Shared Logic</text>
+        <rect x="237.9101799999999" y="342" width="612.4296800000002" height="119" class="cluster"/>
+        <text x="544.12502" y="358" class="cluster-label" text-anchor="middle">Shared Logic</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-M1-M2-0">
-        <path d="M 659.70 61.09 C 533.37 74.99, 407.03 88.90, 343.87 100.01 C 280.70 111.13, 280.70 119.47, 280.70 127.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 659.17 62.30 C 530.20 76.20, 401.22 90.10, 336.73 101.22 C 272.24 112.33, 272.24 120.67, 272.24 129.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-M2-M3-0">
-        <path d="M 280.70 180.60 C 280.70 188.93, 280.70 197.27, 280.70 205.60 C 280.70 213.93, 280.70 222.27, 280.70 230.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 272.24 183.00 C 272.24 191.33, 272.24 199.67, 272.24 208.00 C 272.24 216.33, 272.24 224.67, 272.24 233.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T1-T2-0">
-        <path d="M 520.30 69.79 C 575.83 80.79, 631.37 91.80, 659.13 101.46 C 686.90 111.13, 686.90 119.47, 686.90 127.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 509.86 71.11 C 562.78 82.08, 615.70 93.04, 642.16 102.69 C 668.62 112.33, 668.62 120.67, 668.62 129.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-T2-T3-0">
-        <path d="M 669.13 180.60 L 652.30 230.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 661.98 183.00 C 659.93 191.33, 657.88 199.67, 656.86 208.00 C 655.83 216.33, 655.83 224.67, 655.83 233.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-M1-S1-0">
-        <path d="M 659.70 64.96 C 577.83 77.57, 495.97 90.19, 454.09 143.26 C 412.22 196.33, 410.34 289.87, 408.46 383.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+        <path d="M 659.17 66.54 C 577.10 79.03, 495.02 91.51, 453.44 144.92 C 411.86 198.33, 410.78 292.67, 409.69 387.00" class="edge-path" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-M2-S1-0">
-        <path d="M 192.70 180.32 C 164.30 188.74, 135.90 197.17, 121.70 226.85 C 107.50 256.53, 107.50 307.47, 131.67 337.14 C 204.17 375.24, 252.50 383.66, 252.50 383.66" class="edge-path" stroke-dasharray="3,3" fill="none" stroke-width="2" marker-end="url(#arrow_point)"/>
+        <path d="M 186.25 183.00 C 159.71 191.33, 133.17 199.67, 119.90 229.50 C 106.63 259.33, 106.63 310.67, 131.84 340.71 C 207.48 379.51, 257.91 388.26, 257.91 388.26" class="edge-path" marker-end="url(#arrow_point)" stroke-dasharray="3,3" fill="none" stroke-width="2"/>
       </g>
       <g class="edge" id="edge-L-M3-S1-0">
-        <path d="M 256.71 283.40 C 249.14 308.40, 241.57 333.40, 251.44 350.07 C 261.32 366.73, 288.64 375.07, 315.96 383.40" class="edge-path" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 246.09 287.00 C 238.02 312.00, 229.95 337.00, 240.68 353.67 C 251.42 370.33, 280.95 378.67, 310.48 387.00" class="edge-path" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-T1-S1-0">
-        <path d="M 520.30 63.63 C 619.37 76.69, 718.43 89.74, 767.97 138.87 C 817.50 188.00, 817.50 273.20, 773.33 321.27 C 640.83 380.28, 552.50 391.22, 552.50 391.22" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3" stroke-width="2"/>
+        <path d="M 509.86 64.42 C 607.93 77.61, 706.00 90.81, 755.04 140.40 C 804.07 190.00, 804.07 276.00, 762.47 324.44 C 637.65 383.75, 554.43 394.62, 554.43 394.62" class="edge-path" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2"/>
       </g>
       <g class="edge" id="edge-L-T2-S1-0">
-        <path d="M 608.42 180.60 C 583.65 188.93, 558.87 197.27, 535.82 231.07 C 512.76 264.87, 491.43 324.13, 470.09 383.40" class="edge-path" fill="none" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)"/>
+        <path d="M 598.18 183.00 C 576.43 191.33, 554.69 199.67, 533.66 233.67 C 512.63 267.67, 492.32 327.33, 472.00 387.00" class="edge-path" stroke-width="2" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T3-S1-0">
-        <path d="M 627.08 283.40 C 619.12 308.40, 611.16 333.40, 590.91 350.07 C 570.66 366.73, 538.12 375.07, 505.58 383.40" class="edge-path" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 629.12 287.00 C 620.88 312.00, 612.63 337.00, 592.63 353.67 C 572.62 370.33, 540.86 378.67, 509.09 387.00" class="edge-path" fill="none" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-M1-S2-0">
-        <path d="M 659.70 65.82 C 584.50 78.15, 509.30 90.47, 471.70 139.24 C 434.10 188.00, 434.10 273.20, 462.17 320.69 C 546.37 377.97, 602.50 387.76, 602.50 387.76" class="edge-path" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2"/>
+        <path d="M 659.17 67.45 C 583.77 79.63, 508.36 91.82, 470.65 140.91 C 432.95 190.00, 432.95 276.00, 461.53 324.23 C 547.27 382.90, 604.43 393.35, 604.43 393.35" class="edge-path" stroke-width="2" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-M2-S2-0">
-        <path d="M 338.94 180.60 C 357.33 188.93, 375.71 197.27, 384.91 226.90 C 394.10 256.53, 394.10 307.47, 428.83 338.27 C 533.03 379.73, 602.50 390.39, 602.50 390.39" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3" stroke-width="2"/>
+        <path d="M 334.92 183.00 C 354.26 191.33, 373.60 199.67, 383.28 229.50 C 392.95 259.33, 392.95 310.67, 428.20 341.98 C 533.94 384.60, 604.43 395.90, 604.43 395.90" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-dasharray="3,3" stroke-width="2"/>
       </g>
       <g class="edge" id="edge-L-M3-S2-0">
-        <path d="M 304.69 283.40 C 312.26 308.40, 319.83 333.40, 369.46 351.77 C 419.10 370.14, 510.80 381.88, 602.50 393.62" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3" stroke-width="2"/>
+        <path d="M 298.38 287.00 C 306.45 312.00, 314.52 337.00, 365.53 355.69 C 416.54 374.37, 510.49 386.75, 604.43 399.12" class="edge-path" fill="none" stroke-width="2" marker-end="url(#arrow_point)" stroke-dasharray="3,3"/>
       </g>
       <g class="edge" id="edge-L-T1-S2-0">
-        <path d="M 520.30 60.30 C 668.10 74.46, 815.90 88.63, 889.80 138.32 C 963.70 188.00, 963.70 273.20, 944.67 319.97 C 887.57 375.07, 849.50 383.40, 849.50 383.40" class="edge-path" fill="none" stroke-width="2" marker-end="url(#arrow_point)" stroke-dasharray="3,3"/>
+        <path d="M 509.86 60.78 C 661.35 75.18, 812.84 89.59, 888.58 139.80 C 964.32 190.00, 964.32 276.00, 941.99 323.70 C 875.00 380.81, 830.34 390.21, 830.34 390.21" class="edge-path" stroke-width="2" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T2-S2-0">
-        <path d="M 729.84 180.60 C 743.39 188.93, 756.95 197.27, 760.35 231.07 C 763.76 264.87, 757.01 324.13, 750.27 383.40" class="edge-path" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2"/>
+        <path d="M 725.79 183.00 C 743.43 191.33, 761.07 199.67, 764.98 233.67 C 768.89 267.67, 759.06 327.33, 749.23 387.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
       </g>
       <g class="edge" id="edge-L-T3-S2-0">
-        <path d="M 677.52 283.40 L 714.78 383.40" class="edge-path" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none" stroke-width="2"/>
+        <path d="M 682.54 287.00 L 712.14 387.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -169,36 +169,36 @@ marker path {
     </g>
     <g class="nodes">
       <g class="node" id="node-M1">
-        <rect x="659.7" y="25.000000000000007" width="176" height="52.8" style="fill:#9cf !important;stroke:#333 !important"/>
-        <text x="747.7" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">handleMouseDown</text>
+        <rect x="659.1738480000001" y="25" width="191.179712" height="54" style="fill:#9cf !important;stroke:#333 !important"/>
+        <text x="754.7637040000002" y="52" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle">handleMouseDown</text>
       </g>
       <g class="node" id="node-M2">
-        <rect x="192.7" y="127.80000000000001" width="176" height="52.8" style="fill:#9cf !important;stroke:#333 !important"/>
-        <text x="280.7" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">handleMouseMove</text>
+        <rect x="177.92186400000003" y="129" width="188.632832" height="54" style="fill:#9cf !important;stroke:#333 !important"/>
+        <text x="272.23828000000003" y="156" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000">handleMouseMove</text>
       </g>
       <g class="node" id="node-M3">
-        <rect x="202.29999999999998" y="230.6" width="156.8" height="52.8" style="fill:#9cf !important;stroke:#333 !important"/>
-        <text x="280.7" y="257" class="label" text-anchor="middle" dominant-baseline="central">handleMouseUp</text>
+        <rect x="186.52732800000004" y="233" width="171.42190399999998" height="54" style="fill:#9cf !important;stroke:#333 !important"/>
+        <text x="272.23828000000003" y="260" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">handleMouseUp</text>
       </g>
       <g class="node" id="node-S1">
-        <rect x="252.49999999999994" y="383.40000000000003" width="300" height="52.8" style="fill:#f96 !important;stroke:#333 !important;stroke-width:2px !important"/>
-        <text x="402.49999999999994" y="409.8" class="label" dominant-baseline="central" text-anchor="middle">mouseMovedDuringPress tracking</text>
+        <rect x="257.9101799999999" y="387" width="296.52344000000005" height="54" style="fill:#f96 !important;stroke:#333 !important;stroke-width:2px !important"/>
+        <text x="406.17189999999994" y="414" class="label" style="fill: #ffffff" text-anchor="middle" dominant-baseline="central">mouseMovedDuringPress tracking</text>
       </g>
       <g class="node" id="node-S2">
-        <rect x="602.5" y="383.40000000000003" width="252.79999999999998" height="52.8"/>
-        <text x="728.9" y="409.8" class="label" dominant-baseline="central" text-anchor="middle">Other interaction state</text>
+        <rect x="604.43362" y="387" width="225.90624" height="54"/>
+        <text x="717.38674" y="414" class="label" text-anchor="middle" dominant-baseline="central">Other interaction state</text>
       </g>
       <g class="node" id="node-T1">
-        <rect x="334.7" y="25.000000000000007" width="185.6" height="52.8" style="fill:#9f9 !important;stroke:#333 !important"/>
-        <text x="427.5" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">handleTouchStart</text>
+        <rect x="325.31446" y="25" width="184.54688" height="54" style="fill:#9f9 !important;stroke:#333 !important"/>
+        <text x="417.5879" y="52" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000">handleTouchStart</text>
       </g>
       <g class="node" id="node-T2">
-        <rect x="598.9" y="127.80000000000001" width="176" height="52.8" style="fill:#9f9 !important;stroke:#333 !important"/>
-        <text x="686.9" y="154.20000000000002" class="label" text-anchor="middle" dominant-baseline="central">handleTouchMove</text>
+        <rect x="575.601568" y="129" width="186.039072" height="54" style="fill:#9f9 !important;stroke:#333 !important"/>
+        <text x="668.6211040000001" y="156" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">handleTouchMove</text>
       </g>
       <g class="node" id="node-T3">
-        <rect x="569.1" y="230.6" width="166.4" height="52.8" style="fill:#9f9 !important;stroke:#333 !important"/>
-        <text x="652.3000000000001" y="257" class="label" text-anchor="middle" dominant-baseline="central">handleTouchEnd</text>
+        <rect x="567.949232" y="233" width="175.765648" height="54" style="fill:#9f9 !important;stroke:#333 !important"/>
+        <text x="655.8320560000001" y="260" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle">handleTouchEnd</text>
       </g>
     </g>
   </g>

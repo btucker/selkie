@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1140.2" height="2549.7999999999997" viewBox="-8 -27.999999999999993 1140.2 2549.7999999999997" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1221.035232" height="2447.19536" viewBox="-8 -28 1221.035232 2447.19536" class="mermaid">
   <style>
 
 .mermaid {
@@ -87,7 +87,7 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
@@ -102,218 +102,218 @@ marker path {
   <g class="root">
     <g class="clusters">
       <g class="subgraph" id="subgraph-Tick1">
-        <rect x="432.19999999999993" y="-19.999999999999993" width="672.0000000000001" height="1376.7999999999997" class="cluster"/>
-        <text x="768.2" y="-3.999999999999993" class="cluster-label" text-anchor="middle"> Tick 1 - Assignment Generated</text>
+        <rect x="505.476592" y="-20" width="679.55864" height="1346.367216" class="cluster"/>
+        <text x="845.255912" y="-4" class="cluster-label" text-anchor="middle"> Tick 1 - Assignment Generated</text>
       </g>
       <g class="subgraph" id="subgraph-Tick2">
-        <rect x="273.79999999999995" y="1411.7999999999997" width="662" height="1097" class="cluster"/>
-        <text x="604.8" y="1427.7999999999997" class="cluster-label" text-anchor="middle"> Tick 2 - Deduplication Check</text>
+        <rect x="371.0761999999999" y="1385.367216" width="612.679744" height="1020.8281440000001" class="cluster"/>
+        <text x="677.416072" y="1401.367216" class="cluster-label" text-anchor="middle"> Tick 2 - Deduplication Check</text>
       </g>
       <g class="subgraph" id="subgraph-Test">
-        <rect x="20" y="-19.999999999999993" width="340" height="797.8" class="cluster"/>
-        <text x="190" y="-3.999999999999993" class="cluster-label" text-anchor="middle"> E2E Test Coverage</text>
+        <rect x="20" y="-20" width="415.476592" height="753.367216" class="cluster"/>
+        <text x="227.738296" y="-4" class="cluster-label" text-anchor="middle"> E2E Test Coverage</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-T1_Start-T1_Snap-0">
-        <path d="M 766.00 77.80 C 766.00 86.13, 766.00 94.47, 766.00 102.80 C 766.00 111.13, 766.00 119.47, 766.00 127.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 829.74 79.00 C 829.74 87.33, 829.74 95.67, 829.74 104.00 C 829.74 112.33, 829.74 120.67, 829.74 129.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T1_Snap-T1_Eval-0">
-        <path d="M 766.00 180.60 C 766.00 188.93, 766.00 197.27, 766.00 205.60 C 766.00 213.93, 766.00 222.27, 766.00 230.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 829.74 183.00 C 829.74 191.33, 829.74 199.67, 829.74 208.00 C 829.74 216.33, 829.74 224.67, 829.74 233.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T1_Eval-T1_Loop-0">
-        <path d="M 766.00 283.40 C 766.00 291.73, 766.00 300.07, 766.00 308.40 C 766.00 316.73, 766.00 325.07, 766.00 333.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 829.74 287.00 C 829.74 295.33, 829.74 303.67, 829.74 312.00 C 829.74 320.33, 829.74 328.67, 829.74 337.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-T1_Loop-T1_Task1-0">
-        <path d="M 692.12 575.81 L 597.80 705.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 760.71 540.33 L 664.04 659.37" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-T1_Task1-T1_Assign1-0">
-        <path d="M 597.80 757.80 C 597.80 766.13, 597.80 774.47, 597.80 782.80 C 597.80 791.13, 597.80 799.47, 597.80 807.80 C 597.80 824.47, 597.80 832.80, 597.80 832.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 664.04 713.37 C 664.04 721.70, 664.04 730.03, 664.04 738.37 C 664.04 746.70, 664.04 755.03, 664.04 763.37 C 664.04 780.03, 664.04 788.37, 664.04 788.37" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T1_Assign1-T1_Effect1-0">
-        <path d="M 597.80 885.60 C 597.80 897.27, 597.80 908.93, 597.80 920.60 C 597.80 932.27, 597.80 943.93, 597.80 955.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 664.04 842.37 C 664.04 854.70, 664.04 867.03, 664.04 879.37 C 664.04 891.70, 664.04 904.03, 664.04 916.37" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T1_Loop-T1_Task2-0">
-        <path d="M 839.88 575.81 L 934.20 705.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 898.77 540.33 L 995.44 659.37" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-T1_Task2-T1_Check-0">
-        <path d="M 934.20 757.80 C 934.20 766.13, 934.20 774.47, 934.20 782.80 C 934.20 791.13, 934.20 799.47, 934.20 807.80 C 934.20 824.47, 934.20 832.80, 934.20 832.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 995.44 713.37 C 995.44 721.70, 995.44 730.03, 995.44 738.37 C 995.44 746.70, 995.44 755.03, 995.44 763.37 C 995.44 780.03, 995.44 788.37, 995.44 788.37" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-T1_Check-T1_Skip-0">
-        <path d="M 934.20 885.60 C 934.20 897.27, 934.20 908.93, 934.20 920.60 C 934.20 932.27, 934.20 943.93, 934.20 955.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 995.44 842.37 C 995.44 854.70, 995.44 867.03, 995.44 879.37 C 995.44 891.70, 995.44 904.03, 995.44 916.37" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-T1_Effect1-T1_Mark-0">
-        <path d="M 597.80 1008.40 C 597.80 1016.73, 597.80 1025.07, 597.80 1033.40 C 597.80 1041.73, 597.80 1050.07, 597.80 1058.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 664.04 970.37 C 664.04 978.70, 664.04 987.03, 664.04 995.37 C 664.04 1003.70, 664.04 1012.03, 664.04 1020.37" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T1_Mark-T1_Execute-0">
-        <path d="M 597.80 1111.20 C 597.80 1119.53, 597.80 1127.87, 597.80 1136.20 C 597.80 1144.53, 597.80 1152.87, 597.80 1161.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 664.04 1074.37 C 664.04 1082.70, 664.04 1091.03, 664.04 1099.37 C 664.04 1107.70, 664.04 1116.03, 664.04 1124.37" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-T1_Execute-T1_End-0">
-        <path d="M 597.80 1214.00 C 597.80 1225.67, 597.80 1237.33, 597.80 1249.00 C 597.80 1260.67, 597.80 1272.33, 597.80 1284.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 664.04 1178.37 C 664.04 1190.70, 664.04 1203.03, 664.04 1215.37 C 664.04 1227.70, 664.04 1240.03, 664.04 1252.37" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-T2_Start-T2_Snap-0">
-        <path d="M 597.80 1546.40 C 597.80 1554.73, 597.80 1563.07, 597.80 1571.40 C 597.80 1579.73, 597.80 1588.07, 597.80 1596.40" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 664.04 1508.37 C 664.04 1516.70, 664.04 1525.03, 664.04 1533.37 C 664.04 1541.70, 664.04 1550.03, 664.04 1558.37" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T2_Snap-T2_Still-0">
-        <path d="M 597.80 1649.20 C 597.80 1657.53, 597.80 1665.87, 597.80 1674.20 C 597.80 1682.53, 597.80 1690.87, 597.80 1699.20" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 664.04 1612.37 C 664.04 1620.70, 664.04 1629.03, 664.04 1637.37 C 664.04 1645.70, 664.04 1654.03, 664.04 1662.37" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T2_Still-T2_Eval-0">
-        <path d="M 597.80 1788.80 C 597.80 1797.13, 597.80 1805.47, 597.80 1813.80 C 597.80 1822.13, 597.80 1830.47, 597.80 1838.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 664.04 1740.37 C 664.04 1748.70, 664.04 1757.03, 664.04 1765.37 C 664.04 1773.70, 664.04 1782.03, 664.04 1790.37" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-T2_Eval-T2_Check-0">
-        <path d="M 597.80 1891.60 C 597.80 1899.93, 597.80 1908.27, 597.80 1916.60 C 597.80 1924.93, 597.80 1933.27, 597.80 1941.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 664.04 1844.37 C 664.04 1852.70, 664.04 1861.03, 664.04 1869.37 C 664.04 1877.70, 664.04 1886.03, 664.04 1894.37" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T2_Check-T2_Skip-0">
-        <path d="M 525.93 2186.16 L 429.80 2333.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 601.35 2091.50 C 570.35 2124.73, 539.36 2157.96, 523.87 2180.75 C 508.37 2203.53, 508.37 2215.86, 508.37 2228.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-T2_Check-T2_Bug-0">
-        <path d="M 669.67 2186.16 L 765.80 2333.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 726.73 2091.50 C 757.72 2124.73, 788.72 2157.96, 804.21 2180.75 C 819.71 2203.53, 819.71 2215.86, 819.71 2228.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T2_Skip-T2_End-0">
-        <path d="M 429.80 2386.00 C 429.80 2394.33, 429.80 2402.67, 429.80 2411.00 C 429.80 2419.33, 429.80 2427.67, 429.80 2436.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 508.37 2282.20 C 508.37 2290.53, 508.37 2298.86, 508.37 2307.20 C 508.37 2315.53, 508.37 2323.86, 508.37 2332.20" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-T1_End-T2_Start-0">
-        <path d="M 597.80 1336.80 C 597.80 1345.13, 597.80 1353.47, 597.80 1363.47 C 597.80 1373.47, 597.80 1385.13, 597.80 1396.80 C 597.80 1408.47, 597.80 1420.13, 597.80 1430.13 C 597.80 1448.47, 597.80 1456.80, 597.80 1456.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+        <path d="M 664.04 1306.37 C 664.04 1314.70, 664.04 1323.03, 664.04 1333.37 C 664.04 1343.70, 664.04 1356.03, 664.04 1368.37 C 664.04 1380.70, 664.04 1393.03, 664.04 1403.37 C 664.04 1422.03, 664.04 1430.37, 664.04 1430.37" class="edge-path" fill="none" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-TestSetup-TestTick1-0">
-        <path d="M 190.00 77.80 C 190.00 86.13, 190.00 94.47, 190.00 102.80 C 190.00 111.13, 190.00 119.47, 190.00 127.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 227.74 79.00 C 227.74 87.33, 227.74 95.67, 227.74 104.00 C 227.74 112.33, 227.74 120.67, 227.74 129.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-TestTick1-TestMark-0">
-        <path d="M 190.00 180.60 C 190.00 188.93, 190.00 197.27, 190.00 205.60 C 190.00 213.93, 190.00 222.27, 190.00 230.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 227.74 183.00 C 227.74 191.33, 227.74 199.67, 227.74 208.00 C 227.74 216.33, 227.74 224.67, 227.74 233.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-TestMark-TestTick2-0">
-        <path d="M 190.00 283.40 C 190.00 291.73, 190.00 300.07, 190.00 330.80 C 190.00 361.53, 190.00 414.67, 190.00 467.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 227.74 287.00 C 227.74 295.33, 227.74 303.67, 227.74 330.20 C 227.74 356.73, 227.74 401.46, 227.74 446.18" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-TestTick2-TestAssert-0">
-        <path d="M 190.00 520.60 C 190.00 573.73, 190.00 626.87, 190.00 657.60 C 190.00 688.33, 190.00 696.67, 190.00 705.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 227.74 500.18 C 227.74 544.91, 227.74 589.64, 227.74 616.17 C 227.74 642.70, 227.74 651.03, 227.74 659.37" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-T1_Check-T1_Skip-0">
-        <rect x="919.4000000000001" y="909.5999999999999" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="934.2" y="920.5999999999999" class="edge-label" dominant-baseline="central" text-anchor="middle">YES</text>
+        <rect x="980.63756" y="868.367216" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="995.43756" y="879.367216" class="edge-label" text-anchor="middle" dominant-baseline="central">YES</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-T1_Execute-T1_End-0">
-        <rect x="518.1999999999999" y="1238" width="159.2" height="22" class="edge-label-bg"/>
-        <text x="597.8" y="1249" class="edge-label" dominant-baseline="central" text-anchor="middle">disk write pending...</text>
+        <rect x="584.4391119999999" y="1204.367216" width="159.2" height="22" class="edge-label-bg"/>
+        <text x="664.0391119999999" y="1215.367216" class="edge-label" dominant-baseline="central" text-anchor="middle">disk write pending...</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-T2_Check-T2_Skip-0">
-        <rect x="451.67110588349254" y="2244.4606992143576" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="466.47110588349256" y="2255.4606992143576" class="edge-label" text-anchor="middle" dominant-baseline="central">YES</text>
+        <rect x="527.4398733945236" y="2143.8781611312365" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="542.2398733945236" y="2154.8781611312365" class="edge-label" text-anchor="middle" dominant-baseline="central">YES</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-T2_Check-T2_Bug-0">
-        <rect x="717.9288941165073" y="2244.4606992143576" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="729.1288941165074" y="2255.4606992143576" class="edge-label" text-anchor="middle" dominant-baseline="central">NO</text>
+        <rect x="774.6383506054763" y="2143.8781611312365" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="785.8383506054763" y="2154.8781611312365" class="edge-label" text-anchor="middle" dominant-baseline="central">NO</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-T1_End-T2_Start-0">
-        <rect x="543.4" y="1385.7999999999997" width="108.8" height="22" class="edge-label-bg"/>
-        <text x="597.8" y="1396.7999999999997" class="edge-label" text-anchor="middle" dominant-baseline="central">race condition</text>
+        <rect x="609.639112" y="1357.367216" width="108.8" height="22" class="edge-label-bg"/>
+        <text x="664.0391119999999" y="1368.367216" class="edge-label" dominant-baseline="central" text-anchor="middle">race condition</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-T1_Assign1">
-        <rect x="471.4" y="832.8" width="252.79999999999998" height="52.8" style="fill:#90EE90 !important"/>
-        <text x="597.8" y="859.1999999999999" class="label" text-anchor="middle" dominant-baseline="central">assigned_this_tick: Set</text>
+        <rect x="552.2383359999999" y="788.367216" width="223.60155200000003" height="54" style="fill:#90EE90 !important"/>
+        <text x="664.0391119999999" y="815.367216" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle">assigned_this_tick: Set</text>
       </g>
       <g class="node" id="node-T1_Check">
-        <rect x="784.2" y="832.8" width="300" height="52.8"/>
-        <text x="934.2" y="859.1999999999999" class="label" text-anchor="middle" dominant-baseline="central">assigned_this_tick: Contains coworker?</text>
+        <rect x="825.839888" y="788.367216" width="339.19534400000003" height="54"/>
+        <text x="995.43756" y="815.367216" class="label" dominant-baseline="central" text-anchor="middle">assigned_this_tick: Contains coworker?</text>
       </g>
       <g class="node" id="node-T1_Effect1">
-        <rect x="452.19999999999993" y="955.5999999999999" width="291.2" height="52.8"/>
-        <text x="597.8" y="981.9999999999999" class="label" text-anchor="middle" dominant-baseline="central">Generate AssignAndSpawn #42</text>
+        <rect x="525.476592" y="916.367216" width="277.12504" height="54"/>
+        <text x="664.0391119999999" y="943.367216" class="label" text-anchor="middle" dominant-baseline="central">Generate AssignAndSpawn #42</text>
       </g>
       <g class="node" id="node-T1_End">
-        <rect x="509.79999999999995" y="1283.9999999999998" width="176" height="52.8"/>
-        <text x="597.8" y="1310.3999999999999" class="label" dominant-baseline="central" text-anchor="middle">Tick 1 Complete</text>
+        <rect x="576.0000479999999" y="1252.367216" width="176.078128" height="54"/>
+        <text x="664.0391119999999" y="1279.367216" class="label" text-anchor="middle" dominant-baseline="central">Tick 1 Complete</text>
       </g>
       <g class="node" id="node-T1_Eval">
-        <rect x="687.6" y="230.6" width="156.8" height="52.8"/>
-        <text x="766" y="257" class="label" dominant-baseline="central" text-anchor="middle">evaluate_tick</text>
+        <rect x="751.1406799999999" y="233" width="157.195312" height="54"/>
+        <text x="829.7383359999999" y="260" class="label" text-anchor="middle" dominant-baseline="central">evaluate_tick</text>
       </g>
       <g class="node" id="node-T1_Execute">
-        <rect x="509.79999999999995" y="1161.1999999999998" width="176" height="52.8"/>
-        <text x="597.8" y="1187.6" class="label" text-anchor="middle" dominant-baseline="central">execute_effects</text>
+        <rect x="576.2305279999999" y="1124.367216" width="175.617168" height="54"/>
+        <text x="664.0391119999999" y="1151.367216" class="label" text-anchor="middle" dominant-baseline="central">execute_effects</text>
       </g>
       <g class="node" id="node-T1_Loop">
-        <polygon points="766,333.40000000000003 916,494.20000000000005 766,655 616,494.20000000000005"/>
-        <text x="766" y="494.20000000000005" class="label" text-anchor="middle" dominant-baseline="central">spawn_for_pending_tasks loop</text>
+        <polygon points="829.7383359999999,337 965.9219439999998,473.183608 829.7383359999999,609.367216 693.5547279999998,473.183608"/>
+        <text x="829.7383359999999" y="473.183608" class="label" text-anchor="middle" dominant-baseline="central">spawn_for_pending_tasks loop</text>
       </g>
       <g class="node" id="node-T1_Mark">
-        <rect x="456.99999999999994" y="1058.3999999999999" width="281.6" height="52.8"/>
-        <text x="597.8" y="1084.8" class="label" text-anchor="middle" dominant-baseline="central">mark_in_flight_spawns: #42</text>
+        <rect x="534.2617519999999" y="1020.3672160000001" width="259.5547200000001" height="54"/>
+        <text x="664.0391119999999" y="1047.367216" class="label" dominant-baseline="central" text-anchor="middle">mark_in_flight_spawns: #42</text>
       </g>
       <g class="node" id="node-T1_Skip">
-        <rect x="793.4000000000001" y="955.5999999999999" width="281.6" height="52.8" style="fill:#FFB6C1 !important"/>
-        <text x="934.2" y="981.9999999999999" class="label" text-anchor="middle" dominant-baseline="central">Skip duplicate within tick</text>
+        <rect x="874.08208" y="916.367216" width="242.71095999999997" height="54" style="fill:#FFB6C1 !important"/>
+        <text x="995.43756" y="943.367216" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">Skip duplicate within tick</text>
       </g>
       <g class="node" id="node-T1_Snap">
-        <rect x="673.2" y="127.80000000000001" width="185.6" height="52.8"/>
-        <text x="766" y="154.20000000000002" class="label" text-anchor="middle" dominant-baseline="central">collect_snapshot</text>
+        <rect x="739.7305279999998" y="129" width="180.01561600000002" height="54"/>
+        <text x="829.7383359999999" y="156" class="label" dominant-baseline="central" text-anchor="middle">collect_snapshot</text>
       </g>
       <g class="node" id="node-T1_Start">
-        <rect x="644.4" y="25.000000000000007" width="243.2" height="52.8"/>
-        <text x="766" y="51.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">TaskDispatchTick fires</text>
+        <rect x="721.0742799999999" y="25" width="217.328112" height="54"/>
+        <text x="829.7383359999999" y="52" class="label" text-anchor="middle" dominant-baseline="central">TaskDispatchTick fires</text>
       </g>
       <g class="node" id="node-T1_Task1">
-        <rect x="452.19999999999993" y="705" width="291.2" height="52.8"/>
-        <text x="597.8" y="731.4" class="label" text-anchor="middle" dominant-baseline="central">Task #42: pending, no owner</text>
+        <rect x="531.7422079999999" y="659.367216" width="264.593808" height="54"/>
+        <text x="664.0391119999999" y="686.367216" class="label" text-anchor="middle" dominant-baseline="central">Task #42: pending, no owner</text>
       </g>
       <g class="node" id="node-T1_Task2">
-        <rect x="807.8000000000001" y="705" width="252.79999999999998" height="52.8"/>
-        <text x="934.2" y="731.4" class="label" dominant-baseline="central" text-anchor="middle">Task #43: same coworker</text>
+        <rect x="875.996136" y="659.367216" width="238.88284800000002" height="54"/>
+        <text x="995.43756" y="686.367216" class="label" text-anchor="middle" dominant-baseline="central">Task #43: same coworker</text>
       </g>
       <g class="node" id="node-T2_Bug">
-        <rect x="615.8" y="2333.1999999999994" width="300" height="52.8" style="fill:#FF6B6B !important"/>
-        <text x="765.8" y="2359.5999999999995" class="label" dominant-baseline="central" text-anchor="middle">BUG: Generate duplicate effect</text>
+        <rect x="675.6621519999999" y="2228.19536" width="288.093792" height="54" style="fill:#FF6B6B !important"/>
+        <text x="819.7090479999999" y="2255.19536" class="label" style="fill: #ffffff" text-anchor="middle" dominant-baseline="central">BUG: Generate duplicate effect</text>
       </g>
       <g class="node" id="node-T2_Check">
-        <polygon points="597.8,1941.5999999999997 747.8,2102.3999999999996 597.8,2263.2 447.79999999999995,2102.3999999999996"/>
-        <text x="597.8" y="2102.3999999999996" class="label" text-anchor="middle" dominant-baseline="central">is_task_spawn_in_flight #42?</text>
+        <polygon points="664.0391119999999,1894.367216 793.953184,2024.2812880000001 664.0391119999999,2154.19536 534.1250399999999,2024.2812880000001"/>
+        <text x="664.0391119999999" y="2024.2812880000001" class="label" dominant-baseline="central" text-anchor="middle">is_task_spawn_in_flight #42?</text>
       </g>
       <g class="node" id="node-T2_End">
-        <rect x="322.59999999999997" y="2435.9999999999995" width="214.4" height="52.8"/>
-        <text x="429.79999999999995" y="2462.3999999999996" class="label" text-anchor="middle" dominant-baseline="central">No duplicate effect</text>
+        <rect x="408.75198399999994" y="2332.19536" width="199.23438399999998" height="54"/>
+        <text x="508.3691759999999" y="2359.19536" class="label" dominant-baseline="central" text-anchor="middle">No duplicate effect</text>
       </g>
       <g class="node" id="node-T2_Eval">
-        <rect x="519.4" y="1838.7999999999995" width="156.8" height="52.8"/>
-        <text x="597.8" y="1865.1999999999996" class="label" text-anchor="middle" dominant-baseline="central">evaluate_tick</text>
+        <rect x="585.4414559999999" y="1790.367216" width="157.195312" height="54"/>
+        <text x="664.0391119999999" y="1817.367216" class="label" text-anchor="middle" dominant-baseline="central">evaluate_tick</text>
       </g>
       <g class="node" id="node-T2_Skip">
-        <rect x="293.79999999999995" y="2333.1999999999994" width="272" height="52.8" style="fill:#90EE90 !important"/>
-        <text x="429.79999999999995" y="2359.5999999999995" class="label" dominant-baseline="central" text-anchor="middle">Skip cross-tick duplicate</text>
+        <rect x="391.0761999999999" y="2228.19536" width="234.585952" height="54" style="fill:#90EE90 !important"/>
+        <text x="508.3691759999999" y="2255.19536" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle">Skip cross-tick duplicate</text>
       </g>
       <g class="node" id="node-T2_Snap">
-        <rect x="504.99999999999994" y="1596.3999999999996" width="185.6" height="52.8"/>
-        <text x="597.8" y="1622.7999999999997" class="label" text-anchor="middle" dominant-baseline="central">collect_snapshot</text>
+        <rect x="574.0313039999999" y="1558.367216" width="180.01561600000002" height="54"/>
+        <text x="664.0391119999999" y="1585.367216" class="label" text-anchor="middle" dominant-baseline="central">collect_snapshot</text>
       </g>
       <g class="node" id="node-T2_Start">
-        <rect x="447.79999999999995" y="1456.7999999999997" width="300" height="89.6"/>
-        <text x="597.8" y="1501.5999999999997" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="597.8" y="1501.5999999999997" dy="-0.6em">TaskDispatchTick fires</tspan><tspan x="597.8" dy="1.2em">before Tick 1 effect completes</tspan></text>
+        <rect x="523.5937999999999" y="1430.367216" width="280.890624" height="78"/>
+        <text x="664.0391119999999" y="1469.367216" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="664.0391119999999" y="1469.367216" dy="-0.6em">TaskDispatchTick fires</tspan><tspan x="664.0391119999999" dy="1.2em">before Tick 1 effect completes</tspan></text>
       </g>
       <g class="node" id="node-T2_Still">
-        <rect x="485.79999999999995" y="1699.1999999999996" width="224" height="89.6"/>
-        <text x="597.8" y="1743.9999999999995" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="597.8" y="1743.9999999999995" dy="-0.6em">Task #42 still shows</tspan><tspan x="597.8" dy="1.2em">pending on disk</tspan></text>
+        <rect x="564.5937919999999" y="1662.367216" width="198.89064000000002" height="78"/>
+        <text x="664.0391119999999" y="1701.367216" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="664.0391119999999" y="1701.367216" dy="-0.6em">Task #42 still shows</tspan><tspan x="664.0391119999999" dy="1.2em">pending on disk</tspan></text>
       </g>
       <g class="node" id="node-TestAssert">
-        <rect x="40" y="705" width="300" height="52.8" style="fill:#87CEEB !important"/>
-        <text x="190" y="731.4" class="label" dominant-baseline="central" text-anchor="middle">Assert: is_task_spawn_in_flight returns true</text>
+        <rect x="40" y="659.367216" width="375.476592" height="54" style="fill:#87CEEB !important"/>
+        <text x="227.738296" y="686.367216" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">Assert: is_task_spawn_in_flight returns true</text>
       </g>
       <g class="node" id="node-TestMark">
-        <rect x="40" y="230.6" width="300" height="52.8"/>
-        <text x="190" y="257" class="label" dominant-baseline="central" text-anchor="middle">Verify in_flight_spawns has #42</text>
+        <rect x="85.60937599999994" y="233" width="284.2578400000001" height="54"/>
+        <text x="227.738296" y="260" class="label" text-anchor="middle" dominant-baseline="central">Verify in_flight_spawns has #42</text>
       </g>
       <g class="node" id="node-TestSetup">
-        <rect x="63.60000000000001" y="25.000000000000007" width="252.79999999999998" height="52.8"/>
-        <text x="190" y="51.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">Setup: Task #42 pending</text>
+        <rect x="111.47655999999999" y="25" width="232.523472" height="54"/>
+        <text x="227.738296" y="52" class="label" text-anchor="middle" dominant-baseline="central">Setup: Task #42 pending</text>
       </g>
       <g class="node" id="node-TestTick1">
-        <rect x="54" y="127.80000000000001" width="272" height="52.8"/>
-        <text x="190" y="154.20000000000002" class="label" text-anchor="middle" dominant-baseline="central">Simulate Tick 1 iteration</text>
+        <rect x="109.382824" y="129" width="236.71094399999998" height="54"/>
+        <text x="227.738296" y="156" class="label" dominant-baseline="central" text-anchor="middle">Simulate Tick 1 iteration</text>
       </g>
       <g class="node" id="node-TestTick2">
-        <rect x="54" y="467.80000000000007" width="272" height="52.8"/>
-        <text x="190" y="494.20000000000005" class="label" dominant-baseline="central" text-anchor="middle">Simulate Tick 2 iteration</text>
+        <rect x="109.382824" y="446.183608" width="236.71094399999998" height="54"/>
+        <text x="227.738296" y="473.183608" class="label" text-anchor="middle" dominant-baseline="central">Simulate Tick 2 iteration</text>
       </g>
     </g>
   </g>

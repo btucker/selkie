@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="666" height="1161.9999999999998" viewBox="-8 -8 666 1161.9999999999998" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="756.2188000000001" height="1083.867184" viewBox="-8 -8 756.2188000000001 1083.867184" class="mermaid">
   <style>
 
 .mermaid {
@@ -87,7 +87,7 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
@@ -105,107 +105,107 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-Start-IsAction-0">
-        <path d="M 325.00 52.80 C 325.00 61.13, 325.00 69.47, 325.00 77.80 C 325.00 86.13, 325.00 94.47, 325.00 102.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 388.96 54.00 C 388.96 62.33, 388.96 70.67, 388.96 79.00 C 388.96 87.33, 388.96 95.67, 388.96 104.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-IsAction-ActionPath-0">
-        <path d="M 279.22 205.82 C 236.15 232.75, 193.07 259.67, 171.54 278.97 C 150.00 298.27, 150.00 309.93, 150.00 321.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 349.30 188.21 C 296.67 217.76, 244.04 247.31, 217.72 270.26 C 191.41 293.20, 191.41 309.53, 191.41 325.87" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-IsAction-NormalPath-0">
-        <path d="M 370.78 205.82 C 413.85 232.75, 456.93 259.67, 478.46 278.97 C 500.00 298.27, 500.00 309.93, 500.00 321.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 428.62 188.21 C 481.25 217.76, 533.88 247.31, 560.20 270.26 C 586.52 293.20, 586.52 309.53, 586.52 325.87" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-ActionPath-ActionIndent-0">
-        <path d="M 150.00 374.40 C 150.00 382.73, 150.00 391.07, 150.00 399.40 C 150.00 407.73, 150.00 416.07, 150.00 424.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 191.41 379.87 C 191.41 388.20, 191.41 396.53, 191.41 404.87 C 191.41 413.20, 191.41 421.53, 191.41 429.87" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-NormalPath-NormalIndent-0">
-        <path d="M 500.00 374.40 C 500.00 382.73, 500.00 391.07, 500.00 399.40 C 500.00 407.73, 500.00 416.07, 500.00 424.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 586.52 379.87 C 586.52 388.20, 586.52 396.53, 586.52 404.87 C 586.52 413.20, 586.52 421.53, 586.52 429.87" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-ActionIndent-ActionFirst-0">
-        <path d="M 150.00 514.00 C 150.00 522.33, 150.00 530.67, 150.00 539.00 C 150.00 547.33, 150.00 555.67, 150.00 564.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 191.41 507.87 C 191.41 516.20, 191.41 524.53, 191.41 532.87 C 191.41 541.20, 191.41 549.53, 191.41 557.87" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-NormalIndent-NormalFirst-0">
-        <path d="M 500.00 514.00 C 500.00 522.33, 500.00 530.67, 500.00 539.00 C 500.00 547.33, 500.00 555.67, 500.00 564.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 586.52 507.87 C 586.52 516.20, 586.52 524.53, 586.52 532.87 C 586.52 541.20, 586.52 549.53, 586.52 557.87" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-ActionFirst-ActionCont-0">
-        <path d="M 150.00 690.40 C 150.00 698.73, 150.00 707.07, 150.00 715.40 C 150.00 723.73, 150.00 732.07, 150.00 740.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 191.41 659.87 C 191.41 668.20, 191.41 676.53, 191.41 684.87 C 191.41 693.20, 191.41 701.53, 191.41 709.87" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-NormalFirst-NormalCont-0">
-        <path d="M 500.00 690.40 C 500.00 698.73, 500.00 707.07, 500.00 715.40 C 500.00 723.73, 500.00 732.07, 500.00 740.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 586.52 659.87 C 586.52 668.20, 586.52 676.53, 586.52 684.87 C 586.52 693.20, 586.52 701.53, 586.52 709.87" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-ActionCont-ActionMermaid-0">
-        <path d="M 150.00 866.80 C 150.00 875.13, 150.00 883.47, 150.00 891.80 C 150.00 900.13, 150.00 908.47, 150.00 916.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 191.41 811.87 C 191.41 820.20, 191.41 828.53, 191.41 836.87 C 191.41 845.20, 191.41 853.53, 191.41 861.87" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-NormalCont-NormalMermaid-0">
-        <path d="M 500.00 866.80 C 500.00 875.13, 500.00 883.47, 500.00 891.80 C 500.00 900.13, 500.00 908.47, 500.00 916.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 586.52 811.87 C 586.52 820.20, 586.52 828.53, 586.52 836.87 C 586.52 845.20, 586.52 853.53, 586.52 861.87" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-ActionMermaid-Result-0">
-        <path d="M 150.00 1043.20 C 150.00 1051.53, 150.00 1059.87, 164.19 1068.20 C 178.37 1076.53, 206.74 1084.87, 235.12 1093.20" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 191.41 963.87 C 191.41 972.20, 191.41 980.53, 207.24 988.87 C 223.07 997.20, 254.73 1005.53, 286.38 1013.87" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-NormalMermaid-Result-0">
-        <path d="M 500.00 1043.20 C 500.00 1051.53, 500.00 1059.87, 485.81 1068.20 C 471.63 1076.53, 443.26 1084.87, 414.88 1093.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 586.52 963.87 C 586.52 972.20, 586.52 980.53, 570.69 988.87 C 554.86 997.20, 523.20 1005.53, 491.54 1013.87" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-IsAction-ActionPath-0">
-        <rect x="127.37068714546234" y="235.48621043592243" width="144.79999999999998" height="40" class="edge-label-bg"/>
-        <text x="199.77068714546232" y="255.48621043592243" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="199.77068714546232" y="255.48621043592243" dy="-0.6em">Yes</tspan><tspan x="199.77068714546232" dy="1.2em">MessageType::Action</tspan></text>
+        <rect x="176.5901817156173" y="224.5318822652103" width="144.79999999999998" height="40" class="edge-label-bg"/>
+        <text x="248.9901817156173" y="244.5318822652103" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="248.9901817156173" y="244.5318822652103" dy="-0.6em">Yes</tspan><tspan x="248.9901817156173" dy="1.2em">MessageType::Action</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-IsAction-NormalPath-0">
-        <rect x="406.62931285453766" y="235.48621043592243" width="87.2" height="40" class="edge-label-bg"/>
-        <text x="450.2293128545377" y="255.48621043592243" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="450.2293128545377" y="255.48621043592243" dy="-0.6em">No</tspan><tspan x="450.2293128545377" dy="1.2em">Normal text</tspan></text>
+        <rect x="485.3317462843828" y="224.5318822652103" width="87.2" height="40" class="edge-label-bg"/>
+        <text x="528.9317462843828" y="244.5318822652103" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="528.9317462843828" y="244.5318822652103" dy="-0.6em">No</tspan><tspan x="528.9317462843828" dy="1.2em">Normal text</tspan></text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-ActionCont">
-        <rect x="42.8" y="740.4" width="214.4" height="126.39999999999999" style="fill:#e1f5ff !important"/>
-        <text x="150" y="803.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="150" y="803.6" dy="-1.2em">Continuation lines:</tspan><tspan x="150" dy="1.2em">&apos;         content&apos;</tspan><tspan x="150" dy="1.2em">(9 spaces)</tspan></text>
+        <rect x="93.48047200000002" y="709.867184" width="195.851584" height="102" style="fill:#e1f5ff !important"/>
+        <text x="191.40626400000002" y="760.867184" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="191.40626400000002" y="760.867184" dy="-1.2em">Continuation lines:</tspan><tspan x="191.40626400000002" dy="1.2em">&apos;         content&apos;</tspan><tspan x="191.40626400000002" dy="1.2em">(9 spaces)</tspan></text>
       </g>
       <g class="node" id="node-ActionFirst">
-        <rect x="0" y="564" width="300" height="126.39999999999999" style="fill:#e1f5ff !important"/>
-        <text x="150" y="627.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="150" y="627.2" dy="-1.2em">First line:</tspan><tspan x="150" dy="1.2em">&apos; HH:MM * content&apos;</tspan><tspan x="150" dy="1.2em">(7 chars gutter + 2 for &apos;* &apos;)</tspan></text>
+        <rect x="69.136696" y="557.867184" width="244.53913600000004" height="102" style="fill:#e1f5ff !important"/>
+        <text x="191.40626400000002" y="608.867184" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="191.40626400000002" y="608.867184" dy="-1.2em">First line:</tspan><tspan x="191.40626400000002" dy="1.2em">&apos; HH:MM * content&apos;</tspan><tspan x="191.40626400000002" dy="1.2em">(7 chars gutter + 2 for &apos;* &apos;)</tspan></text>
       </g>
       <g class="node" id="node-ActionIndent">
-        <rect x="0" y="424.40000000000003" width="300" height="89.6" style="fill:#e1f5ff !important"/>
-        <text x="150" y="469.20000000000005" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="150" y="469.20000000000005" dy="-0.6em">indent_width = 7 + 2 = 9</tspan><tspan x="150" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH + extra_indent)</tspan></text>
+        <rect x="0" y="429.867184" width="382.81252800000004" height="78" style="fill:#e1f5ff !important"/>
+        <text x="191.40626400000002" y="468.867184" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="191.40626400000002" y="468.867184" dy="-0.6em">indent_width = 7 + 2 = 9</tspan><tspan x="191.40626400000002" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH + extra_indent)</tspan></text>
       </g>
       <g class="node" id="node-ActionMermaid">
-        <rect x="4.400000000000006" y="916.8" width="291.2" height="126.39999999999999" style="fill:#e1f5ff !important"/>
-        <text x="150" y="980" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="150" y="980" dy="-1.2em">Mermaid placeholder:</tspan><tspan x="150" dy="1.2em">&apos;         [1] Diagram: ...&apos;</tspan><tspan x="150" dy="1.2em">(9 spaces via indent_width)</tspan></text>
+        <rect x="62.796872000000036" y="861.867184" width="257.21878399999997" height="102" style="fill:#e1f5ff !important"/>
+        <text x="191.40626400000002" y="912.867184" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="191.40626400000002" y="912.867184" dy="-1.2em">Mermaid placeholder:</tspan><tspan x="191.40626400000002" dy="1.2em">&apos;         [1] Diagram: ...&apos;</tspan><tspan x="191.40626400000002" dy="1.2em">(9 spaces via indent_width)</tspan></text>
       </g>
       <g class="node" id="node-ActionPath">
-        <rect x="57.2" y="321.6" width="185.6" height="52.8" style="fill:#e1f5ff !important"/>
-        <text x="150" y="348" class="label" dominant-baseline="central" text-anchor="middle">extra_indent = 2</text>
+        <rect x="102.12891200000003" y="325.867184" width="178.554704" height="54" style="fill:#e1f5ff !important"/>
+        <text x="191.40626400000002" y="352.867184" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">extra_indent = 2</text>
       </g>
       <g class="node" id="node-IsAction">
-        <polygon points="325,102.79999999999998 399.4,177.2 325,251.6 250.6,177.2"/>
-        <text x="325" y="177.2" class="label" dominant-baseline="central" text-anchor="middle">is_action?</text>
+        <polygon points="388.960964,104 450.894556,165.933592 388.960964,227.867184 327.027372,165.933592"/>
+        <text x="388.960964" y="165.933592" class="label" dominant-baseline="central" text-anchor="middle">is_action?</text>
       </g>
       <g class="node" id="node-NormalCont">
-        <rect x="392.8" y="740.4" width="214.4" height="126.39999999999999" style="fill:#fff4e1 !important"/>
-        <text x="500" y="803.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="500" y="803.6" dy="-1.2em">Continuation lines:</tspan><tspan x="500" dy="1.2em">&apos;       content&apos;</tspan><tspan x="500" dy="1.2em">(7 spaces)</tspan></text>
+        <rect x="488.589872" y="709.867184" width="195.851584" height="102" style="fill:#fff4e1 !important"/>
+        <text x="586.515664" y="760.867184" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle"><tspan x="586.515664" y="760.867184" dy="-1.2em">Continuation lines:</tspan><tspan x="586.515664" dy="1.2em">&apos;       content&apos;</tspan><tspan x="586.515664" dy="1.2em">(7 spaces)</tspan></text>
       </g>
       <g class="node" id="node-NormalFirst">
-        <rect x="407.2" y="564" width="185.6" height="126.39999999999999" style="fill:#fff4e1 !important"/>
-        <text x="500" y="627.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="627.2" dy="-1.2em">First line:</tspan><tspan x="500" dy="1.2em">&apos; HH:MM content&apos;</tspan><tspan x="500" dy="1.2em">(7 chars gutter)</tspan></text>
+        <rect x="496.679712" y="557.867184" width="179.671904" height="102" style="fill:#fff4e1 !important"/>
+        <text x="586.515664" y="608.867184" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="586.515664" y="608.867184" dy="-1.2em">First line:</tspan><tspan x="586.515664" dy="1.2em">&apos; HH:MM content&apos;</tspan><tspan x="586.515664" dy="1.2em">(7 chars gutter)</tspan></text>
       </g>
       <g class="node" id="node-NormalIndent">
-        <rect x="350" y="424.40000000000003" width="300" height="89.6" style="fill:#fff4e1 !important"/>
-        <text x="500" y="469.20000000000005" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="500" y="469.20000000000005" dy="-0.6em">indent_width = 7 + 0 = 7</tspan><tspan x="500" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH only)</tspan></text>
+        <rect x="432.812528" y="429.867184" width="307.40627200000006" height="78" style="fill:#fff4e1 !important"/>
+        <text x="586.515664" y="468.867184" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central"><tspan x="586.515664" y="468.867184" dy="-0.6em">indent_width = 7 + 0 = 7</tspan><tspan x="586.515664" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH only)</tspan></text>
       </g>
       <g class="node" id="node-NormalMermaid">
-        <rect x="354.4" y="916.8" width="291.2" height="126.39999999999999" style="fill:#fff4e1 !important"/>
-        <text x="500" y="980" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="980" dy="-1.2em">Mermaid placeholder:</tspan><tspan x="500" dy="1.2em">&apos;       [1] Diagram: ...&apos;</tspan><tspan x="500" dy="1.2em">(7 spaces via indent_width)</tspan></text>
+        <rect x="457.90627200000006" y="861.867184" width="257.21878399999997" height="102" style="fill:#fff4e1 !important"/>
+        <text x="586.515664" y="912.867184" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central"><tspan x="586.515664" y="912.867184" dy="-1.2em">Mermaid placeholder:</tspan><tspan x="586.515664" dy="1.2em">&apos;       [1] Diagram: ...&apos;</tspan><tspan x="586.515664" dy="1.2em">(7 spaces via indent_width)</tspan></text>
       </g>
       <g class="node" id="node-NormalPath">
-        <rect x="407.2" y="321.6" width="185.6" height="52.8" style="fill:#fff4e1 !important"/>
-        <text x="500" y="348" class="label" text-anchor="middle" dominant-baseline="central">extra_indent = 0</text>
+        <rect x="497.238312" y="325.867184" width="178.554704" height="54" style="fill:#fff4e1 !important"/>
+        <text x="586.515664" y="352.867184" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">extra_indent = 0</text>
       </g>
       <g class="node" id="node-Result">
-        <rect x="193.8" y="1093.1999999999998" width="262.4" height="52.8"/>
-        <text x="325" y="1119.6" class="label" text-anchor="middle" dominant-baseline="central">Aligned with &apos;* &apos; prefix</text>
+        <rect x="280.308596" y="1013.867184" width="217.30473600000002" height="54"/>
+        <text x="388.96096400000005" y="1040.867184" class="label" dominant-baseline="central" text-anchor="middle">Aligned with &apos;* &apos; prefix</text>
       </g>
       <g class="node" id="node-Start">
-        <rect x="222.60000000000002" y="0" width="204.79999999999998" height="52.8"/>
-        <text x="325" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">Message Type Check</text>
+        <rect x="287.18360400000006" y="0" width="203.55472" height="54"/>
+        <text x="388.96096400000005" y="27" class="label" dominant-baseline="central" text-anchor="middle">Message Type Check</text>
       </g>
     </g>
   </g>

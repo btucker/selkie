@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="2395.7000000000003" height="987.1999999999998" viewBox="-8 -28 2395.7000000000003 987.1999999999998" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="2461.6291799999995" height="900" viewBox="-8 -28 2461.6291799999995 900" class="mermaid">
   <style>
 
 .mermaid {
@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -102,206 +102,206 @@ marker path {
   <g class="root">
     <g class="clusters">
       <g class="subgraph" id="subgraph-">
-        <rect x="817.8000000000001" y="-20" width="1201.9000000000005" height="863.3999999999999" class="cluster"/>
-        <text x="1418.7500000000005" y="-4" class="cluster-label" text-anchor="middle"></text>
+        <rect x="839.0078719999999" y="-20" width="1128.300892" height="775" class="cluster"/>
+        <text x="1403.1583179999998" y="-4" class="cluster-label" text-anchor="middle"></text>
       </g>
       <g class="subgraph" id="subgraph-">
-        <rect x="24.800000000000367" y="-20" width="1267.7999999999997" height="966.1999999999998" class="cluster"/>
-        <text x="658.7000000000003" y="-4" class="cluster-label" text-anchor="middle"></text>
+        <rect x="21.800784000000164" y="-20" width="1289.2539999999997" height="879" class="cluster"/>
+        <text x="666.427784" y="-4" class="cluster-label" text-anchor="middle"></text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-W1-B1-0">
-        <path d="M 1228.60 114.60 C 1228.60 122.93, 1228.60 131.27, 1228.60 142.67 C 1228.60 154.07, 1228.60 168.53, 1228.60 183.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 1228.22 103.00 C 1228.22 111.33, 1228.22 119.67, 1228.22 130.00 C 1228.22 140.33, 1228.22 152.67, 1228.22 165.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-W2-B2-0">
-        <path d="M 1445.00 254.20 C 1445.00 262.53, 1445.00 270.87, 1445.00 285.33 C 1445.00 299.80, 1445.00 320.40, 1445.00 341.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 1446.80 231.00 C 1446.80 239.33, 1446.80 247.67, 1446.80 260.00 C 1446.80 272.33, 1446.80 288.67, 1446.80 305.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-W3-B3-0">
-        <path d="M 1892.10 412.20 C 1892.10 430.00, 1892.10 447.80, 1892.10 468.67 C 1892.10 489.53, 1892.10 513.47, 1892.10 537.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 1840.58 371.00 C 1840.58 387.33, 1840.58 403.67, 1840.58 422.00 C 1840.58 440.33, 1840.58 460.67, 1840.58 481.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-B1-D1-0">
-        <path d="M 1159.80 227.24 C 1093.00 244.56, 1026.20 261.88, 992.80 274.71 C 959.40 287.53, 959.40 295.87, 959.40 304.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 1158.30 209.72 C 1097.45 225.15, 1036.59 240.57, 1006.17 252.45 C 975.74 264.33, 975.74 272.67, 975.74 281.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-B1-M1-0">
-        <path d="M 1228.60 235.80 C 1228.60 250.27, 1228.60 264.73, 1228.60 282.27 C 1228.60 299.80, 1228.60 320.40, 1228.60 341.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 1228.22 219.00 C 1228.22 231.33, 1228.22 243.67, 1228.22 258.00 C 1228.22 272.33, 1228.22 288.67, 1228.22 305.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B2-D2-0">
-        <path d="M 1488.26 393.80 C 1527.47 417.73, 1566.69 441.67, 1576.73 459.47 C 1586.78 477.27, 1567.67 488.93, 1548.55 500.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 1487.95 359.00 C 1518.93 379.33, 1549.91 399.67, 1556.01 416.00 C 1562.10 432.33, 1543.31 444.67, 1524.52 457.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-B2-M2-0">
-        <path d="M 1376.20 380.76 C 1230.60 409.04, 1085.00 437.32, 1012.20 463.43 C 939.40 489.53, 939.40 513.47, 939.40 537.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 1376.89 344.53 C 1236.50 369.69, 1096.12 394.84, 1025.93 417.59 C 955.74 440.33, 955.74 460.67, 955.74 481.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B3-D3-0">
-        <path d="M 1855.91 590.20 L 1684.60 698.81" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 1801.85 535.00 L 1645.47 633.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B3-M3-0">
-        <path d="M 1894.79 590.20 C 1897.23 614.13, 1899.66 638.07, 1900.88 662.00 C 1902.10 685.93, 1902.10 709.87, 1902.10 733.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 1843.65 535.00 C 1845.96 555.33, 1848.27 575.67, 1849.42 596.00 C 1850.58 616.33, 1850.58 636.67, 1850.58 657.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-D1-D2-0">
-        <path d="M 1062.95 430.60 L 1323.40 527.02" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+        <path d="M 1054.01 383.00 L 1341.05 480.30" class="edge-path" fill="none" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-D2-D3-0">
-        <path d="M 1445.00 627.00 L 1487.06 697.00" class="edge-path" marker-end="url(#arrow_point)" stroke-dasharray="3,3" fill="none" stroke-width="2"/>
+        <path d="M 1446.80 559.00 L 1490.43 633.00" class="edge-path" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-S1-SB1-0">
-        <path d="M 384.00 114.60 C 384.00 122.93, 384.00 131.27, 384.00 142.67 C 384.00 154.07, 384.00 168.53, 384.00 183.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 409.36 103.00 C 409.36 111.33, 409.36 119.67, 409.36 130.00 C 409.36 140.33, 409.36 152.67, 409.36 165.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-S2-SB2-0">
-        <path d="M 638.31 608.60 C 621.30 626.40, 604.30 644.20, 554.93 665.88 C 505.57 687.56, 423.83 713.12, 342.10 738.68" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 663.45 547.00 C 644.75 563.33, 626.05 579.67, 574.13 599.35 C 522.21 619.03, 437.07 642.06, 351.93 665.09" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S3-SB3-0">
-        <path d="M 1179.80 608.60 C 1179.80 626.40, 1179.80 644.20, 1150.10 665.07 C 1120.41 685.93, 1061.01 709.87, 1001.62 733.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 1196.76 547.00 C 1196.76 563.33, 1196.76 579.67, 1162.86 598.75 C 1128.96 617.83, 1061.15 639.66, 993.34 661.49" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-SB1-CACHE-0">
-        <path d="M 315.20 228.89 C 256.00 245.66, 196.80 262.43, 167.20 278.05 C 137.60 293.67, 137.60 308.13, 137.60 322.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 339.45 208.38 C 271.71 224.26, 203.98 240.13, 170.11 254.23 C 136.24 268.33, 136.24 280.67, 136.24 293.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-SB2-CACHE-0">
-        <path d="M 217.81 733.80 C 167.51 709.87, 117.20 685.93, 92.05 641.23 C 66.90 596.53, 66.90 531.07, 73.31 489.43 C 92.53 430.00, 105.35 412.20, 105.35 412.20" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 217.04 657.00 C 168.11 636.67, 119.18 616.33, 94.72 576.83 C 70.26 537.33, 70.26 478.67, 76.38 441.17 C 94.75 387.33, 107.00 371.00, 107.00 371.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-SB3-CACHE-0">
-        <path d="M 901.34 733.80 C 869.83 709.87, 838.31 685.93, 822.56 641.23 C 806.80 596.53, 806.80 531.07, 710.73 484.24 C 422.53 409.21, 230.40 381.02, 230.40 381.02" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 892.92 657.00 C 869.95 636.67, 846.98 616.33, 835.49 576.83 C 824.01 537.33, 824.01 478.67, 725.12 436.68 C 428.46 369.39, 230.68 344.08, 230.68 344.08" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-CACHE-SD-0">
-        <path d="M 164.56 412.20 C 175.27 430.00, 185.99 447.80, 212.55 465.60 C 239.12 483.40, 281.53 501.20, 323.95 519.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 164.02 371.00 C 175.65 387.33, 187.28 403.67, 217.20 420.07 C 247.12 436.48, 295.33 452.95, 343.54 469.43" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-SB1-SM1-0">
-        <path d="M 370.84 235.80 L 349.20 341.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 386.93 219.00 L 356.20 305.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-SB2-SM2-0">
-        <path d="M 273.30 786.60 C 273.30 807.20, 273.30 827.80, 273.30 842.27 C 273.30 856.73, 273.30 865.07, 273.30 873.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 282.01 711.00 C 282.01 727.33, 282.01 743.67, 282.01 756.00 C 282.01 768.33, 282.01 776.67, 282.01 785.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-SB3-SM3-0">
-        <path d="M 936.10 786.60 C 936.10 807.20, 936.10 827.80, 936.10 842.27 C 936.10 856.73, 936.10 865.07, 936.10 873.40" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 923.43 711.00 C 923.43 727.33, 923.43 743.67, 923.43 756.00 C 923.43 768.33, 923.43 776.67, 923.43 785.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-SD-SB1-0">
-        <path d="M 440.87 519.00 C 444.92 439.07, 448.96 359.13, 443.83 311.93 C 438.70 264.73, 424.40 250.27, 410.10 235.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3" stroke-width="2"/>
+        <path d="M 460.98 469.00 C 462.89 398.00, 464.80 327.00, 460.23 285.33 C 455.66 243.67, 444.61 231.33, 433.56 219.00" class="edge-path" stroke-width="2" marker-end="url(#arrow_point)" stroke-dasharray="3,3" fill="none"/>
       </g>
       <g class="edge" id="edge-L-SD-SB2-0">
-        <path d="M 390.28 608.60 C 374.22 626.40, 358.16 644.20, 341.75 665.07 C 325.33 685.93, 308.56 709.87, 291.80 733.80" class="edge-path" fill="none" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)"/>
+        <path d="M 411.89 547.00 L 304.70 657.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
       </g>
       <g class="edge" id="edge-L-SD-SB3-0">
-        <path d="M 511.27 608.60 L 867.30 739.65" class="edge-path" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none" stroke-width="2"/>
+        <path d="M 532.17 547.00 L 853.51 663.22" class="edge-path" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-D1-D2-0">
-        <rect x="1153.2962492144072" y="475.5877168859094" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="1189.6962492144073" y="486.5877168859094" class="edge-label" text-anchor="middle" dominant-baseline="central">redundant</text>
+        <rect x="1156.7439393191207" y="430.56617685248017" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="1193.1439393191208" y="441.56617685248017" class="edge-label" text-anchor="middle" dominant-baseline="central">redundant</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-D2-D3-0">
-        <rect x="1416.1771687923085" y="657.3057455542771" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="1452.5771687923086" y="668.3057455542771" class="edge-label" text-anchor="middle" dominant-baseline="central">redundant</text>
+        <rect x="1418.1074303189143" y="591.5333143472911" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="1454.5074303189144" y="602.5333143472911" class="edge-label" dominant-baseline="central" text-anchor="middle">redundant</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-SD-SB1-0">
-        <rect x="416.6000000000005" y="358.26671307329053" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="453.00000000000045" y="369.26671307329053" class="edge-label" dominant-baseline="central" text-anchor="middle">cache hit</text>
+        <rect x="430.3070560000002" y="326.82711841808316" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="466.7070560000002" y="337.82711841808316" class="edge-label" text-anchor="middle" dominant-baseline="central">cache hit</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-SD-SB2-0">
-        <rect x="301.1825456742226" y="657.447878121967" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="337.58254567422256" y="668.447878121967" class="edge-label" text-anchor="middle" dominant-baseline="central">cache hit</text>
+        <rect x="317.84152401482214" y="587.0301906688068" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="354.2415240148221" y="598.0301906688068" class="edge-label" text-anchor="middle" dominant-baseline="central">cache hit</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-SD-SB3-0">
-        <rect x="648.25706107217" y="674.1035991401674" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="684.65706107217" y="685.1035991401674" class="edge-label" dominant-baseline="central" text-anchor="middle">cache hit</text>
+        <rect x="652.7216865416893" y="603.3603906616867" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="689.1216865416893" y="614.3603906616867" class="edge-label" dominant-baseline="central" text-anchor="middle">cache hit</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-B1">
-        <rect x="1159.8000000000002" y="182.99999999999997" width="137.6" height="52.8"/>
-        <text x="1228.6000000000001" y="209.39999999999998" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
+        <rect x="1158.300872" y="165" width="139.835952" height="54"/>
+        <text x="1228.218848" y="192" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
       </g>
       <g class="node" id="node-B2">
-        <rect x="1376.2" y="341" width="137.6" height="52.8"/>
-        <text x="1445" y="367.4" class="label" dominant-baseline="central" text-anchor="middle">cargo build</text>
+        <rect x="1376.886824" y="305" width="139.835952" height="54"/>
+        <text x="1446.8048" y="332" class="label" dominant-baseline="central" text-anchor="middle">cargo build</text>
       </g>
       <g class="node" id="node-B3">
-        <rect x="1823.3000000000004" y="537.4" width="137.6" height="52.8"/>
-        <text x="1892.1000000000004" y="563.8" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
+        <rect x="1770.660308" y="481" width="139.835952" height="54"/>
+        <text x="1840.578284" y="508" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
       </g>
       <g class="node" id="node-CACHE">
-        <rect x="44.80000000000037" y="322.59999999999997" width="185.6" height="89.6" style="fill:#90EE90 !important"/>
-        <text x="137.60000000000036" y="367.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="137.60000000000036" y="367.4" dy="-0.6em">Shared sccache</tspan><tspan x="137.60000000000036" dy="1.2em">~/.cache/sccache</tspan></text>
+        <rect x="41.800784000000164" y="293" width="188.882816" height="78" style="fill:#90EE90 !important"/>
+        <text x="136.24219200000016" y="332" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="136.24219200000016" y="332" dy="-0.6em">Shared sccache</tspan><tspan x="136.24219200000016" dy="1.2em">~/.cache/sccache</tspan></text>
       </g>
       <g class="node" id="node-D1">
-        <rect x="837.8000000000001" y="304.2" width="243.2" height="126.39999999999999" style="fill:#FFB6C1 !important"/>
-        <text x="959.4000000000001" y="367.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="959.4000000000001" y="367.4" dy="-1.2em">Dependencies: 95%</tspan><tspan x="959.4000000000001" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="959.4000000000001" dy="1.2em">selkie, resvg, etc.</tspan></text>
+        <rect x="869.9883359999999" y="281" width="211.50003199999998" height="102" style="fill:#FFB6C1 !important"/>
+        <text x="975.7383519999998" y="332" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="975.7383519999998" y="332" dy="-1.2em">Dependencies: 95%</tspan><tspan x="975.7383519999998" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="975.7383519999998" dy="1.2em">selkie, resvg, etc.</tspan></text>
       </g>
       <g class="node" id="node-D2">
-        <rect x="1323.4" y="500.59999999999997" width="243.2" height="126.39999999999999" style="fill:#FFB6C1 !important"/>
-        <text x="1445" y="563.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1445" y="563.8" dy="-1.2em">Dependencies: 95%</tspan><tspan x="1445" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="1445" dy="1.2em">selkie, resvg, etc.</tspan></text>
+        <rect x="1341.054784" y="457" width="211.50003199999998" height="102" style="fill:#FFB6C1 !important"/>
+        <text x="1446.8048" y="508" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="1446.8048" y="508" dy="-1.2em">Dependencies: 95%</tspan><tspan x="1446.8048" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="1446.8048" dy="1.2em">selkie, resvg, etc.</tspan></text>
       </g>
       <g class="node" id="node-D3">
-        <rect x="1441.4" y="696.9999999999999" width="243.2" height="126.39999999999999" style="fill:#FFB6C1 !important"/>
-        <text x="1563" y="760.1999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1563" y="760.1999999999999" dy="-1.2em">Dependencies: 95%</tspan><tspan x="1563" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="1563" dy="1.2em">selkie, resvg, etc.</tspan></text>
+        <rect x="1444.8048" y="633" width="211.50003199999998" height="102" style="fill:#FFB6C1 !important"/>
+        <text x="1550.5548159999998" y="684" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="1550.5548159999998" y="684" dy="-1.2em">Dependencies: 95%</tspan><tspan x="1550.5548159999998" dy="1.2em">tokio, serde, ratatui,</tspan><tspan x="1550.5548159999998" dy="1.2em">selkie, resvg, etc.</tspan></text>
       </g>
       <g class="node" id="node-M1">
-        <rect x="1131.0000000000002" y="341" width="195.2" height="52.8"/>
-        <text x="1228.6000000000001" y="367.4" class="label" text-anchor="middle" dominant-baseline="central">midtown crate: 5%</text>
+        <rect x="1131.488368" y="305" width="193.46096" height="54"/>
+        <text x="1228.218848" y="332" class="label" dominant-baseline="central" text-anchor="middle">midtown crate: 5%</text>
       </g>
       <g class="node" id="node-M2">
-        <rect x="841.8000000000001" y="537.4" width="195.2" height="52.8"/>
-        <text x="939.4000000000001" y="563.8" class="label" text-anchor="middle" dominant-baseline="central">midtown crate: 5%</text>
+        <rect x="859.0078719999999" y="481" width="193.46096" height="54"/>
+        <text x="955.7383519999998" y="508" class="label" dominant-baseline="central" text-anchor="middle">midtown crate: 5%</text>
       </g>
       <g class="node" id="node-M3">
-        <rect x="1804.5000000000005" y="733.8" width="195.2" height="52.8"/>
-        <text x="1902.1000000000004" y="760.1999999999999" class="label" text-anchor="middle" dominant-baseline="central">midtown crate: 5%</text>
+        <rect x="1753.847804" y="657" width="193.46096" height="54"/>
+        <text x="1850.578284" y="684" class="label" text-anchor="middle" dominant-baseline="central">midtown crate: 5%</text>
       </g>
       <g class="node" id="node-RESULT">
-        <rect x="2079.7000000000003" y="25" width="300" height="89.6" style="fill:#FFD700 !important"/>
-        <text x="2229.7000000000003" y="69.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="2229.7000000000003" y="69.8" dy="-0.6em">Result: 3x coworkers = 1x deps + 3x delta</tspan><tspan x="2229.7000000000003" dy="1.2em">Same pattern for pnpm, GOMODCACHE, pip cache</tspan></text>
+        <rect x="2027.3087639999997" y="25" width="418.32041599999997" height="78" style="fill:#FFD700 !important"/>
+        <text x="2236.4689719999997" y="64" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="2236.4689719999997" y="64" dy="-0.6em">Result: 3x coworkers = 1x deps + 3x delta</tspan><tspan x="2236.4689719999997" dy="1.2em">Same pattern for pnpm, GOMODCACHE, pip cache</tspan></text>
       </g>
       <g class="node" id="node-S1">
-        <rect x="281.6" y="25" width="204.79999999999998" height="89.6"/>
-        <text x="384" y="69.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="384" y="69.8" dy="-0.6em">Coworker 1</tspan><tspan x="384" dy="1.2em">lexington worktree</tspan></text>
+        <rect x="311.32032799999996" y="25" width="196.085952" height="78"/>
+        <text x="409.36330399999997" y="64" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="409.36330399999997" y="64" dy="-0.6em">Coworker 1</tspan><tspan x="409.36330399999997" dy="1.2em">lexington worktree</tspan></text>
       </g>
       <g class="node" id="node-S2">
-        <rect x="602.7000000000002" y="519" width="156.8" height="89.6"/>
-        <text x="681.1000000000001" y="563.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="681.1000000000001" y="563.8" dy="-0.6em">Coworker 2</tspan><tspan x="681.1000000000001" dy="1.2em">park worktree</tspan></text>
+        <rect x="627.4941759999999" y="469" width="161.226592" height="78"/>
+        <text x="708.1074719999999" y="508" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="708.1074719999999" y="508" dy="-0.6em">Coworker 2</tspan><tspan x="708.1074719999999" dy="1.2em">park worktree</tspan></text>
       </g>
       <g class="node" id="node-S3">
-        <rect x="1087.0000000000002" y="519" width="185.6" height="89.6"/>
-        <text x="1179.8000000000002" y="563.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1179.8000000000002" y="563.8" dy="-0.6em">Coworker 3</tspan><tspan x="1179.8000000000002" dy="1.2em">madison worktree</tspan></text>
+        <rect x="1102.4688319999998" y="469" width="188.58595200000002" height="78"/>
+        <text x="1196.7618079999997" y="508" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1196.7618079999997" y="508" dy="-0.6em">Coworker 3</tspan><tspan x="1196.7618079999997" dy="1.2em">madison worktree</tspan></text>
       </g>
       <g class="node" id="node-SB1">
-        <rect x="315.2" y="182.99999999999997" width="137.6" height="52.8"/>
-        <text x="384" y="209.39999999999998" class="label" dominant-baseline="central" text-anchor="middle">cargo build</text>
+        <rect x="339.44532799999996" y="165" width="139.835952" height="54"/>
+        <text x="409.36330399999997" y="192" class="label" dominant-baseline="central" text-anchor="middle">cargo build</text>
       </g>
       <g class="node" id="node-SB2">
-        <rect x="204.5000000000004" y="733.8" width="137.6" height="52.8"/>
-        <text x="273.3000000000004" y="760.1999999999999" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
+        <rect x="212.09180800000007" y="657" width="139.835952" height="54"/>
+        <text x="282.0097840000001" y="684" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
       </g>
       <g class="node" id="node-SB3">
-        <rect x="867.3000000000004" y="733.8" width="137.6" height="52.8"/>
-        <text x="936.1000000000004" y="760.1999999999999" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
+        <rect x="853.5078760000001" y="657" width="139.835952" height="54"/>
+        <text x="923.4258520000001" y="684" class="label" text-anchor="middle" dominant-baseline="central">cargo build</text>
       </g>
       <g class="node" id="node-SD">
-        <rect x="313.90000000000026" y="519" width="233.6" height="89.6" style="fill:#90EE90 !important"/>
-        <text x="430.7000000000003" y="563.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="430.7000000000003" y="563.8" dy="-0.6em">Dependencies: 95%</tspan><tspan x="430.7000000000003" dy="1.2em">compiled once, cached</tspan></text>
+        <rect x="343.5449440000002" y="469" width="225.750016" height="78" style="fill:#90EE90 !important"/>
+        <text x="456.4199520000002" y="508" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="456.4199520000002" y="508" dy="-0.6em">Dependencies: 95%</tspan><tspan x="456.4199520000002" dy="1.2em">compiled once, cached</tspan></text>
       </g>
       <g class="node" id="node-SM1">
-        <rect x="280.40000000000026" y="341" width="137.6" height="52.8"/>
-        <text x="349.2000000000003" y="367.4" class="label" dominant-baseline="central" text-anchor="middle">midtown: 5%</text>
+        <rect x="280.68360000000024" y="305" width="151.023456" height="54"/>
+        <text x="356.19532800000025" y="332" class="label" text-anchor="middle" dominant-baseline="central">midtown: 5%</text>
       </g>
       <g class="node" id="node-SM2">
-        <rect x="204.5000000000004" y="873.3999999999999" width="137.6" height="52.8"/>
-        <text x="273.3000000000004" y="899.7999999999998" class="label" text-anchor="middle" dominant-baseline="central">midtown: 5%</text>
+        <rect x="206.49805600000008" y="785" width="151.023456" height="54"/>
+        <text x="282.0097840000001" y="812" class="label" dominant-baseline="central" text-anchor="middle">midtown: 5%</text>
       </g>
       <g class="node" id="node-SM3">
-        <rect x="867.3000000000004" y="873.3999999999999" width="137.6" height="52.8"/>
-        <text x="936.1000000000004" y="899.7999999999998" class="label" dominant-baseline="central" text-anchor="middle">midtown: 5%</text>
+        <rect x="847.9141240000001" y="785" width="151.023456" height="54"/>
+        <text x="923.4258520000001" y="812" class="label" text-anchor="middle" dominant-baseline="central">midtown: 5%</text>
       </g>
       <g class="node" id="node-W1">
-        <rect x="1126.2" y="25" width="204.79999999999998" height="89.6"/>
-        <text x="1228.6000000000001" y="69.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1228.6000000000001" y="69.8" dy="-0.6em">Coworker 1</tspan><tspan x="1228.6000000000001" dy="1.2em">lexington worktree</tspan></text>
+        <rect x="1130.175872" y="25" width="196.085952" height="78"/>
+        <text x="1228.218848" y="64" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1228.218848" y="64" dy="-0.6em">Coworker 1</tspan><tspan x="1228.218848" dy="1.2em">lexington worktree</tspan></text>
       </g>
       <g class="node" id="node-W2">
-        <rect x="1366.6" y="164.59999999999997" width="156.8" height="89.6"/>
-        <text x="1445" y="209.39999999999998" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1445" y="209.39999999999998" dy="-0.6em">Coworker 2</tspan><tspan x="1445" dy="1.2em">park worktree</tspan></text>
+        <rect x="1366.191504" y="153" width="161.226592" height="78"/>
+        <text x="1446.8048" y="192" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1446.8048" y="192" dy="-0.6em">Coworker 2</tspan><tspan x="1446.8048" dy="1.2em">park worktree</tspan></text>
       </g>
       <g class="node" id="node-W3">
-        <rect x="1799.3000000000004" y="322.59999999999997" width="185.6" height="89.6"/>
-        <text x="1892.1000000000004" y="367.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1892.1000000000004" y="367.4" dy="-0.6em">Coworker 3</tspan><tspan x="1892.1000000000004" dy="1.2em">madison worktree</tspan></text>
+        <rect x="1746.285308" y="293" width="188.58595200000002" height="78"/>
+        <text x="1840.578284" y="332" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1840.578284" y="332" dy="-0.6em">Coworker 3</tspan><tspan x="1840.578284" dy="1.2em">madison worktree</tspan></text>
       </g>
     </g>
   </g>
