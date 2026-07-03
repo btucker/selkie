@@ -135,6 +135,13 @@ pub struct EdgeGeometry {
     pub horizontal_attachments: usize,
     /// Detailed edge attachment information
     pub edge_details: Vec<EdgeDetail>,
+    /// Edge identifiers, parallel to `edge_endpoints`.
+    ///
+    /// Reference (mermaid) paths carry `id="L_<src>_<dst>_<n>"`; selkie wraps
+    /// each path in `<g class="edge" id="edge-L-<src>-<dst>-<n>">`. Storing the
+    /// raw identifier lets eval pair the same logical edge across renderers
+    /// instead of relying on document order.
+    pub edge_ids: Vec<Option<String>>,
 }
 
 impl EdgeGeometry {
@@ -850,6 +857,12 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                 // Parse transform="translate(x, y)"
                 if let Some(transform) = node.attribute("transform") {
                     if let Some((cx, cy)) = parse_translate(transform) {
+                        // Lift into absolute coordinates: mermaid nests cluster
+                        // nodes under a translated <g class="root">, so the node's
+                        // own translate is only relative to that group.
+                        let (anc_x, anc_y) = accumulate_ancestor_translate(&node);
+                        let cx = cx + anc_x;
+                        let cy = cy + anc_y;
                         let mut found_bounds = false;
 
                         // Find path element in children or grandchildren (timeline nodes nest paths deeper)
@@ -1012,10 +1025,18 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                 if let Some(d) = node.attribute("d") {
                     // Use parse_path_with_directions to capture initial direction for curved paths
                     if let Some((start, second_point, end)) = parse_path_with_directions(d) {
+                        // Lift path endpoints into absolute coordinates: mermaid
+                        // nests in-cluster edges under a translated <g class="root">,
+                        // so their `d` coordinates are relative to that group.
+                        let (anc_x, anc_y) = accumulate_ancestor_translate(&node);
+                        let start = (start.0 + anc_x, start.1 + anc_y);
+                        let end = (end.0 + anc_x, end.1 + anc_y);
+                        let second_point = second_point.map(|(x, y)| (x + anc_x, y + anc_y));
                         geometry
                             .edge_endpoints
                             .push((start.0, start.1, end.0, end.1));
                         geometry.edge_initial_directions.push(second_point);
+                        geometry.edge_ids.push(extract_edge_id(&node));
 
                         // Find best matching nodes for start and end
                         let mut best_start: Option<AttachmentInfo> = None;
@@ -1326,6 +1347,57 @@ fn classify_attachment(point: (f64, f64), bounds: &NodeBounds) -> (AttachmentTyp
 }
 
 /// Parse transform="translate(x, y)" or "translate(x,y)"
+/// Sum the `translate()` offsets of every ancestor group of `node`.
+///
+/// Walks from the node's parent upward, so the node's OWN transform is not
+/// included. Mermaid nests cluster/subgraph content under
+/// `<g class="root" transform="translate(...)">`, so geometry parsed from a
+/// path or node inside such a group is expressed in a local frame; adding the
+/// accumulated ancestor offset lifts it back into absolute coordinates so it
+/// can be compared against selkie output (which is already absolute).
+fn accumulate_ancestor_translate(node: &roxmltree::Node) -> (f64, f64) {
+    let mut tx = 0.0;
+    let mut ty = 0.0;
+    let mut current = node.parent();
+    while let Some(parent) = current {
+        if let Some(transform) = parent.attribute("transform") {
+            if let Some((dx, dy)) = parse_translate(transform) {
+                tx += dx;
+                ty += dy;
+            }
+        }
+        current = parent.parent();
+    }
+    (tx, ty)
+}
+
+/// Extract a stable edge identifier for cross-renderer pairing.
+///
+/// Prefers an explicit `data-id`/`id` on the path itself (mermaid emits
+/// `id="L_<src>_<dst>_<n>"`), then falls back to a wrapping
+/// `<g class="edge" id="edge-L-<src>-<dst>-<n>">` (selkie's structure).
+fn extract_edge_id(node: &roxmltree::Node) -> Option<String> {
+    if let Some(id) = node.attribute("data-id") {
+        return Some(id.to_string());
+    }
+    if let Some(id) = node.attribute("id") {
+        return Some(id.to_string());
+    }
+    let mut current = node.parent();
+    while let Some(parent) = current {
+        if parent.tag_name().name() == "g" {
+            let class = parent.attribute("class").unwrap_or("");
+            if class.contains("edge") {
+                if let Some(id) = parent.attribute("id") {
+                    return Some(id.to_string());
+                }
+            }
+        }
+        current = parent.parent();
+    }
+    None
+}
+
 fn parse_translate(transform: &str) -> Option<(f64, f64)> {
     // Look for translate(x, y) pattern
     if let Some(start) = transform.find("translate(") {
@@ -3005,6 +3077,64 @@ mod tests {
         assert_eq!(
             zero.edge_geometry.edge_endpoints[0],
             (90.0, 50.0, 210.0, 150.0)
+        );
+    }
+
+    #[test]
+    fn test_in_cluster_geometry_lifted_to_absolute_coords() {
+        // Mermaid nests cluster/subgraph content under a translated
+        // <g class="root" transform="translate(...)">. An in-cluster edge path
+        // and node carry coordinates that are LOCAL to that group; geometry
+        // extraction must lift them into absolute coordinates so they line up
+        // with selkie output (which is already absolute). Without accumulating
+        // the ancestor translate, endpoints stay at their local values and the
+        // comparison is off by the cluster offset (the source of the 8-51x
+        // eval-similarity inflation on multi-cluster diagrams).
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+            <g class="root">
+                <g class="nodes">
+                    <g class="root" transform="translate(100, 50)">
+                        <g class="edgePaths">
+                            <path class="edge" id="L_A_B_0" d="M10,10L60,10"/>
+                        </g>
+                        <g class="nodes">
+                            <g class="node" id="id-A" transform="translate(10, 10)">
+                                <path d="M-40 -20 L40 -20 L40 20 L-40 20"/>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </svg>"##;
+
+        let s = SvgStructure::from_svg(svg).unwrap();
+
+        // Edge endpoints: local (10,10)->(60,10) + ancestor translate(100,50).
+        assert_eq!(
+            s.edge_geometry.edge_endpoints[0],
+            (110.0, 60.0, 160.0, 60.0),
+            "In-cluster edge endpoints must be lifted into absolute coordinates"
+        );
+
+        // Edge identifier preserved for cross-renderer pairing.
+        assert_eq!(
+            s.edge_geometry.edge_ids[0].as_deref(),
+            Some("L_A_B_0"),
+            "Edge id must be captured for id-based pairing"
+        );
+
+        // Node bounds: own translate(10,10) + ancestor translate(100,50) =
+        // center (110,60); rect half-extents 40x20 -> top-left (70,40), 80x40.
+        let node = s
+            .edge_geometry
+            .node_bounds
+            .iter()
+            .find(|b| b.id == "id-A")
+            .expect("in-cluster node should be extracted");
+        assert_eq!(
+            (node.x, node.y, node.width, node.height),
+            (70.0, 40.0, 80.0, 40.0),
+            "In-cluster node bounds must be lifted into absolute coordinates"
         );
     }
 }

@@ -1053,13 +1053,20 @@ fn check_edge_attachments(
             );
         }
 
-        // Build concise edge comparison
-        let min_count = selkie_count.min(ref_count);
+        // Build concise edge comparison. Pair edges by identifier so the same
+        // logical edge is compared across renderers; fall back to positional
+        // pairing only when identifiers are unavailable.
+        let edge_pairs = pair_edges_by_id(
+            &selkie_geo.edge_ids,
+            &ref_geo.edge_ids,
+            selkie_count,
+            ref_count,
+        );
         let mut edge_diffs = Vec::new();
 
-        for i in 0..min_count {
-            let (sx1, sy1, sx2, sy2) = selkie_geo.edge_endpoints[i];
-            let (rx1, ry1, rx2, ry2) = ref_geo.edge_endpoints[i];
+        for (label, (si, ri)) in edge_pairs.iter().enumerate() {
+            let (sx1, sy1, sx2, sy2) = selkie_geo.edge_endpoints[*si];
+            let (rx1, ry1, rx2, ry2) = ref_geo.edge_endpoints[*ri];
 
             // Check if edge paths differ significantly (>10px)
             let start_diff = ((sx1 - rx1).powi(2) + (sy1 - ry1).powi(2)).sqrt();
@@ -1072,7 +1079,7 @@ fn check_edge_attachments(
 
                 edge_diffs.push(format!(
                     "Edge {}: selkie={} ref={} (start diff={:.0}px, end diff={:.0}px)",
-                    i + 1,
+                    label + 1,
                     selkie_dir,
                     ref_dir,
                     start_diff,
@@ -1261,6 +1268,61 @@ fn check_edge_attachments(
 }
 
 /// Classify edge direction based on start and end points
+/// Normalize an edge identifier so the same logical edge matches across
+/// renderers. Reference emits `id="L_<src>_<dst>_<n>"`; selkie emits
+/// `id="edge-L-<src>-<dst>-<n>"`. Dropping the `edge-`/`edge_` prefix and
+/// collapsing `-`/`_` separators to a single canonical marker makes the two
+/// encodings identical.
+fn normalize_edge_id(raw: &str) -> String {
+    let trimmed = raw.trim();
+    let trimmed = trimmed
+        .strip_prefix("edge-")
+        .or_else(|| trimmed.strip_prefix("edge_"))
+        .unwrap_or(trimmed);
+    trimmed.replace(['-', '_'], "|").to_lowercase()
+}
+
+/// Pair selkie and reference edges by identifier, returning `(selkie_idx,
+/// ref_idx)` pairs into their respective `edge_endpoints` vectors. Falls back
+/// to positional pairing when identifiers are missing on either side or no id
+/// matches (e.g. renderers that omit edge ids).
+fn pair_edges_by_id(
+    selkie_ids: &[Option<String>],
+    ref_ids: &[Option<String>],
+    selkie_count: usize,
+    ref_count: usize,
+) -> Vec<(usize, usize)> {
+    let selkie_has_ids = selkie_ids.iter().any(|id| id.is_some());
+    let ref_has_ids = ref_ids.iter().any(|id| id.is_some());
+
+    if selkie_has_ids && ref_has_ids {
+        let mut ref_map: std::collections::HashMap<String, usize> =
+            std::collections::HashMap::new();
+        for (i, id) in ref_ids.iter().enumerate() {
+            if let Some(id) = id {
+                ref_map.entry(normalize_edge_id(id)).or_insert(i);
+            }
+        }
+
+        let mut pairs = Vec::new();
+        for (si, id) in selkie_ids.iter().enumerate() {
+            if let Some(id) = id {
+                if let Some(&ri) = ref_map.get(&normalize_edge_id(id)) {
+                    pairs.push((si, ri));
+                }
+            }
+        }
+
+        if !pairs.is_empty() {
+            return pairs;
+        }
+    }
+
+    // Fall back to positional pairing.
+    let min_count = selkie_count.min(ref_count);
+    (0..min_count).map(|i| (i, i)).collect()
+}
+
 fn classify_edge_direction(start: (f64, f64), end: (f64, f64)) -> &'static str {
     let dx = (end.0 - start.0).abs();
     let dy = (end.1 - start.1).abs();
@@ -3606,5 +3668,50 @@ mod tests {
                 .any(|i| i.check == "aspect_ratio" && i.level == Level::Error),
             "a real orientation flip must remain an error, got {issues:?}"
         );
+    }
+
+    #[test]
+    fn test_normalize_edge_id_matches_across_renderers() {
+        // Reference "L_A_B_0" and selkie "edge-L-A-B-0" describe the same edge.
+        assert_eq!(
+            normalize_edge_id("L_A_B_0"),
+            normalize_edge_id("edge-L-A-B-0"),
+            "reference and selkie edge ids must normalize equal"
+        );
+        assert_ne!(
+            normalize_edge_id("L_A_B_0"),
+            normalize_edge_id("L_A_C_0"),
+            "distinct edges must not collide"
+        );
+    }
+
+    #[test]
+    fn test_pair_edges_by_id_ignores_document_order() {
+        // Same two logical edges, emitted in opposite order by each renderer.
+        let selkie_ids = vec![
+            Some("edge-L-A-B-0".to_string()),
+            Some("edge-L-B-C-0".to_string()),
+        ];
+        let ref_ids = vec![Some("L_B_C_0".to_string()), Some("L_A_B_0".to_string())];
+
+        let pairs = pair_edges_by_id(&selkie_ids, &ref_ids, 2, 2);
+
+        // selkie[0] (A-B) must pair with ref[1] (A-B), not ref[0].
+        assert!(
+            pairs.contains(&(0, 1)),
+            "A->B must pair by id regardless of order, got {pairs:?}"
+        );
+        assert!(
+            pairs.contains(&(1, 0)),
+            "B->C must pair by id regardless of order, got {pairs:?}"
+        );
+    }
+
+    #[test]
+    fn test_pair_edges_by_id_falls_back_to_position() {
+        // No ids available: pair positionally over the shared prefix.
+        let none: Vec<Option<String>> = vec![None, None, None];
+        let pairs = pair_edges_by_id(&none, &none, 3, 2);
+        assert_eq!(pairs, vec![(0, 0), (1, 1)]);
     }
 }
