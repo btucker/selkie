@@ -218,7 +218,7 @@ def _stretch() -> list[Case]:
         "flowchart TD\n"
         "  %% STRETCH: mermaid v11 @{shape:...}, fa: icons, and img shapes are\n"
         "  %% out of scope until selkie's grammar supports them. Placeholder:\n"
-        "  A[Legacy shape stands in for future @{shape} coverage] --> B[B]\n"
+        '  A["Legacy shape stands in for future @{shape} coverage"] --> B[B]\n'
     )
     return [Case("stretch", "future_shapes", src)]
 
@@ -241,7 +241,7 @@ def validate(paths: list[Path]) -> int:
     failures = 0
     for path in paths:
         result = subprocess.run(
-            ["cargo", "run", "--quiet", "--bin", "selkie", "--", "render", str(path), "-f", "svg"],
+            ["cargo", "run", "--quiet", "--bin", "selkie", "--", "render", str(path), "-e", "svg", "-o", "-"],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
