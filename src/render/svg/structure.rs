@@ -559,10 +559,32 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
     for node in doc.descendants() {
         let tag = node.tag_name().name();
 
+        // Skip subtrees that are not rendered directly (arrowhead markers,
+        // defs content, clip paths); their strokes would skew the averages
+        if node
+            .ancestors()
+            .any(|a| matches!(a.tag_name().name(), "defs" | "marker" | "clipPath" | "mask"))
+        {
+            continue;
+        }
+
         // Get stroke-width from inline attribute
         let inline_stroke_width = node
             .attribute("stroke-width")
-            .and_then(|s| s.parse::<f64>().ok());
+            .and_then(|s| s.trim().trim_end_matches("px").parse::<f64>().ok());
+
+        // Get stroke/stroke-width from the inline style attribute (selkie
+        // inlines classDef styles, often with an "!important" suffix)
+        let style = node.attribute("style").unwrap_or("");
+        let style_stroke =
+            extract_style_property(style, "stroke").map(|v| strip_important(&v).to_string());
+        let style_stroke_width = extract_style_property(style, "stroke-width").and_then(|v| {
+            strip_important(&v)
+                .trim_end_matches("px")
+                .trim()
+                .parse::<f64>()
+                .ok()
+        });
 
         // Get stroke-width from CSS class or element type selector
         let class = node.attribute("class").unwrap_or("");
@@ -575,11 +597,14 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
                     .copied()
             });
 
-        // Use inline if present, otherwise CSS, otherwise check if has stroke
-        let stroke_width = inline_stroke_width.or(css_stroke_width);
+        // Inline style wins over the presentation attribute, which wins
+        // over CSS class rules for our purposes
+        let stroke_width = style_stroke_width
+            .or(inline_stroke_width)
+            .or(css_stroke_width);
 
         // Skip elements with stroke explicitly set to "none"
-        if node.attribute("stroke") == Some("none") {
+        if node.attribute("stroke") == Some("none") || style_stroke.as_deref() == Some("none") {
             continue;
         }
 
@@ -588,6 +613,7 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
             .attribute("stroke")
             .map(|s| s != "none")
             .unwrap_or(false)
+            || style_stroke.is_some()
             || stroke_width.is_some()
             || class
                 .split_whitespace()
@@ -601,7 +627,13 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
 
         match tag {
             "rect" => analysis.rect_stroke_widths.push(width),
-            "path" => analysis.path_stroke_widths.push(width),
+            "path" => {
+                // Only average actual edge paths; node-shape outlines and
+                // decorations rendered as <path> would skew the edge signal
+                if is_edge_path_class(class) {
+                    analysis.path_stroke_widths.push(width);
+                }
+            }
             "line" => analysis.line_stroke_widths.push(width),
             _ => {}
         }
@@ -618,6 +650,13 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
     }
 
     analysis
+}
+
+/// Whether a class attribute marks a <path> as an actual edge/link path
+/// (mermaid uses "flowchart-link" plus "edge-*" classes; selkie uses
+/// "edge-path")
+fn is_edge_path_class(class: &str) -> bool {
+    class.contains("flowchart-link") || class.contains("edge")
 }
 
 /// Extract stroke-width values from CSS <style> blocks
@@ -652,19 +691,27 @@ fn extract_css_stroke_widths(doc: &roxmltree::Document) -> std::collections::Has
                     if let Some(width) = stroke_width {
                         let selector_str = rule.selector.to_string();
 
-                        // Extract class names from selector
-                        for part in selector_str.split(&[' ', ',', '>', '+', '~'][..]) {
-                            let part = part.trim();
-                            if part.starts_with('.') {
-                                let class = part.trim_start_matches('.');
-                                css_strokes.insert(class.to_string(), width);
-                            }
-                            // Also track element type selectors
-                            match part {
+                        for selector in selector_str.split(',') {
+                            let selector = selector.trim();
+
+                            // Bare element type selectors (e.g. "path") match
+                            // every such element. Compound selectors like
+                            // ".root .anchor path" only match specific
+                            // subtrees, so they must NOT map to __element_path
+                            match selector {
                                 "rect" | "path" | "line" | "circle" | "ellipse" => {
-                                    css_strokes.insert(format!("__element_{}", part), width);
+                                    css_strokes.insert(format!("__element_{}", selector), width);
+                                    continue;
                                 }
                                 _ => {}
+                            }
+
+                            // Extract class names from the selector
+                            for part in selector.split(&[' ', '>', '+', '~'][..]) {
+                                let part = part.trim();
+                                if let Some(class) = part.strip_prefix('.') {
+                                    css_strokes.insert(class.to_string(), width);
+                                }
                             }
                         }
                     }
@@ -1782,18 +1829,22 @@ fn analyze_colors(doc: &roxmltree::Document) -> ColorAnalysis {
         }
 
         // Also check inline style attribute for fill/stroke
+        // Strip "!important" (selkie inlines classDef styles with it) so the
+        // color matches the reference's CSS-declared color after normalization
         if let Some(style) = node.attribute("style") {
             if let Some(fill) = extract_style_property(style, "fill") {
+                let fill = strip_important(&fill);
                 if fill != "none" && !fill.is_empty() {
-                    fill_colors.insert(normalize_color(&fill));
+                    fill_colors.insert(normalize_color(fill));
                     if shape_tags.contains(&tag) {
                         fill_count += 1;
                     }
                 }
             }
             if let Some(stroke) = extract_style_property(style, "stroke") {
+                let stroke = strip_important(&stroke);
                 if stroke != "none" && !stroke.is_empty() {
-                    stroke_colors.insert(normalize_color(&stroke));
+                    stroke_colors.insert(normalize_color(stroke));
                     if shape_tags.contains(&tag) {
                         stroke_count += 1;
                     }
@@ -1825,6 +1876,11 @@ fn extract_css_colors(
     fill_colors: &mut std::collections::HashSet<String>,
     stroke_colors: &mut std::collections::HashSet<String>,
 ) {
+    // Selectors that only match elements never rendered in a successful
+    // diagram (mermaid ships these rules in every stylesheet). Colors from
+    // rules that exclusively target them must not count as rendered colors.
+    const DEAD_RULE_CLASSES: [&str; 4] = [".error-icon", ".error-text", ".katex", ".label-icon"];
+
     // Parse CSS rules to extract fill and stroke colors
     // Format: selector { property: value; ... }
     for rule in css_text.split('}') {
@@ -1834,7 +1890,18 @@ fn extract_css_colors(
         }
 
         if let Some(brace_pos) = rule.find('{') {
+            let selector = rule[..brace_pos].trim();
             let properties = rule[brace_pos + 1..].trim();
+
+            // Skip rules whose every selector targets a dead (never-rendered)
+            // element class
+            if !selector.is_empty()
+                && selector
+                    .split(',')
+                    .all(|sel| DEAD_RULE_CLASSES.iter().any(|dead| sel.contains(dead)))
+            {
+                continue;
+            }
 
             for prop in properties.split(';') {
                 let prop = prop.trim();
@@ -1857,7 +1924,7 @@ fn extract_css_colors(
                     }
 
                     // Extract color value (handle "!important" suffix)
-                    let color_value = value.split('!').next().unwrap_or(value).trim();
+                    let color_value = strip_important(value);
                     if color_value.is_empty() {
                         continue;
                     }
@@ -1902,7 +1969,7 @@ fn detect_text_visibility_issues(doc: &roxmltree::Document) -> Vec<TextVisibilit
                         for prop in properties.split(';') {
                             let prop = prop.trim();
                             if let Some(fill_value) = prop.strip_prefix("fill:") {
-                                let fill_value = fill_value.trim().to_lowercase();
+                                let fill_value = normalize_color(strip_important(fill_value));
 
                                 // Handle multiple selectors (e.g., ".class1, .class2")
                                 for sel in selector.split(',') {
@@ -2007,9 +2074,24 @@ fn get_text_content(node: &roxmltree::Node) -> String {
 }
 
 /// Normalize a color string for comparison
-/// Converts to lowercase and handles common formats
+/// Converts to lowercase, expands shorthand hex (#333 -> #333333),
+/// and handles common formats
 fn normalize_color(color: &str) -> String {
     let color = color.trim().to_lowercase();
+
+    // Expand 3/4-digit hex shorthand to 6/8-digit so #333 == #333333
+    if let Some(hex) = color.strip_prefix('#') {
+        if (hex.len() == 3 || hex.len() == 4) && hex.chars().all(|c| c.is_ascii_hexdigit()) {
+            let mut expanded = String::with_capacity(1 + hex.len() * 2);
+            expanded.push('#');
+            for c in hex.chars() {
+                expanded.push(c);
+                expanded.push(c);
+            }
+            return expanded;
+        }
+        return color;
+    }
 
     // Handle rgb/rgba by converting to canonical form
     if color.starts_with("rgb") {
@@ -2029,6 +2111,11 @@ fn normalize_color(color: &str) -> String {
     } else {
         color
     }
+}
+
+/// Strip a trailing "!important" (and surrounding whitespace) from a CSS value
+fn strip_important(value: &str) -> &str {
+    value.split('!').next().unwrap_or(value).trim()
 }
 
 /// Extract a property value from an inline style string
@@ -2629,6 +2716,209 @@ mod tests {
             !has_partial,
             "Should not extract partial label from first text node only. Got: {:?}",
             structure.labels
+        );
+    }
+
+    #[test]
+    fn test_normalize_color_expands_short_hex() {
+        // Shorthand hex must compare equal to its full form:
+        // mermaid CSS uses #333 while selkie inlines #333333
+        assert_eq!(normalize_color("#333"), "#333333");
+        assert_eq!(normalize_color("#FFF"), "#ffffff");
+        assert_eq!(normalize_color("#000"), "#000000");
+        assert_eq!(normalize_color("#9f6"), "#99ff66");
+        // 4-digit hex (with alpha) expands to 8 digits
+        assert_eq!(normalize_color("#000f"), "#000000ff");
+        // Full-length hex is just lowercased
+        assert_eq!(normalize_color("#EcEcFF"), "#ececff");
+        // Non-hex values are unaffected
+        assert_eq!(normalize_color("red"), "red");
+    }
+
+    #[test]
+    fn test_analyze_colors_strips_important_from_inline_styles() {
+        // Selkie inlines classDef styles with !important; the analyzer must
+        // strip the suffix so the color matches the reference's CSS color.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <rect style="fill:#9f6 !important;stroke:#333 !important" width="80" height="40"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let colors = &structure.color_analysis;
+
+        assert!(
+            colors.fill_colors.contains(&"#99ff66".to_string()),
+            "Inline style fill with !important should normalize to #99ff66. Got: {:?}",
+            colors.fill_colors
+        );
+        assert!(
+            colors.stroke_colors.contains(&"#333333".to_string()),
+            "Inline style stroke with !important should normalize to #333333. Got: {:?}",
+            colors.stroke_colors
+        );
+        assert!(
+            !colors
+                .fill_colors
+                .iter()
+                .chain(colors.stroke_colors.iter())
+                .any(|c| c.contains('!')),
+            "No extracted color should retain the !important suffix. fills: {:?}, strokes: {:?}",
+            colors.fill_colors,
+            colors.stroke_colors
+        );
+    }
+
+    #[test]
+    fn test_css_colors_from_dead_rules_are_skipped() {
+        // Mermaid stylesheets always contain rules for elements that never
+        // appear in a successful render (.error-icon, .error-text, .katex,
+        // .label-icon). Their colors must not count as "rendered" colors.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <style>
+                #m .error-icon { fill: #552222; }
+                #m .error-text { fill: #552222; stroke: #552222; }
+                #m .katex { fill: #111111; }
+                #m .label-icon { fill: #222222; }
+                #m .node rect { fill: #ECECFF; stroke: #9370DB; }
+            </style>
+            <g class="node"><rect width="80" height="40"/></g>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let colors = &structure.color_analysis;
+
+        assert!(
+            colors.fill_colors.contains(&"#ececff".to_string()),
+            "Live CSS rule colors should be extracted. Got: {:?}",
+            colors.fill_colors
+        );
+        for dead in ["#552222", "#111111", "#222222"] {
+            assert!(
+                !colors.fill_colors.contains(&dead.to_string()),
+                "Dead-rule color {} should not be extracted. Got: {:?}",
+                dead,
+                colors.fill_colors
+            );
+        }
+        assert!(
+            !colors.stroke_colors.contains(&"#552222".to_string()),
+            "Dead-rule stroke color should not be extracted. Got: {:?}",
+            colors.stroke_colors
+        );
+    }
+
+    #[test]
+    fn test_stroke_analysis_skips_defs_and_marker_paths() {
+        // Arrowhead marker paths live in <defs> and are not part of the
+        // rendered edge strokes; they must not pollute path averages.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <defs>
+                <marker id="arrow"><path d="M0,0 L10,5 L0,10 z" stroke="#333" stroke-width="1"/></marker>
+            </defs>
+            <marker id="arrow2"><path d="M0,0 L10,5" stroke="#333" stroke-width="0.5"/></marker>
+            <path class="edge-thickness-normal flowchart-link" d="M0,0 L50,50" stroke="#333" stroke-width="2"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![2.0],
+            "Only the rendered edge path should be counted. Got: {:?}",
+            strokes.path_stroke_widths
+        );
+        assert!(
+            (strokes.avg_path_stroke - 2.0).abs() < 1e-9,
+            "Average path stroke should be 2.0, got {}",
+            strokes.avg_path_stroke
+        );
+    }
+
+    #[test]
+    fn test_stroke_analysis_only_counts_edge_paths() {
+        // Node-shape paths (e.g. rough.js outlines, decorations) must not be
+        // averaged with edge strokes.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <path class="basic label-container" d="M0,0 L10,10" stroke="#9370db" stroke-width="1.3"/>
+            <path class="edge-path" d="M0,0 L50,50" stroke="#333" stroke-width="2"/>
+            <path class="edge-thickness-normal edge-pattern-solid flowchart-link" d="M0,0 L60,60" stroke="#333" stroke-width="2"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![2.0, 2.0],
+            "Only edge paths should be counted. Got: {:?}",
+            strokes.path_stroke_widths
+        );
+    }
+
+    #[test]
+    fn test_stroke_analysis_reads_inline_style_stroke_width() {
+        // Selkie inlines classDef stroke-widths in the style attribute.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <path class="edge-path" d="M0,0 L50,50" style="stroke:#333 !important;stroke-width:2px !important"/>
+            <rect width="80" height="40" style="stroke:#333;stroke-width:4px"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![2.0],
+            "Edge path stroke-width should be parsed from inline style. Got: {:?}",
+            strokes.path_stroke_widths
+        );
+        assert_eq!(
+            strokes.rect_stroke_widths,
+            vec![4.0],
+            "Rect stroke-width should be parsed from inline style. Got: {:?}",
+            strokes.rect_stroke_widths
+        );
+    }
+
+    #[cfg(feature = "eval")]
+    #[test]
+    fn test_css_element_stroke_width_ignores_compound_selectors() {
+        // '.root .anchor path { stroke-width: 10 }' only matches specific
+        // subtrees; it must not apply to every <path> in the document.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <style>.root .anchor path { stroke-width: 10px; }</style>
+            <path class="flowchart-link" d="M0,0 L50,50" stroke="#333"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![1.0],
+            "Compound selector stroke-width must not apply to unrelated paths. Got: {:?}",
+            strokes.path_stroke_widths
+        );
+    }
+
+    #[cfg(feature = "eval")]
+    #[test]
+    fn test_css_bare_element_stroke_width_still_applies() {
+        // A bare 'path' selector does match every path.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <style>path { stroke-width: 3px; }</style>
+            <path class="flowchart-link" d="M0,0 L50,50" stroke="#333"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![3.0],
+            "Bare element selector stroke-width should apply. Got: {:?}",
+            strokes.path_stroke_widths
         );
     }
 }
