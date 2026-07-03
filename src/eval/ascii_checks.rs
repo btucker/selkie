@@ -536,7 +536,7 @@ fn check_ascii_edges(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut V
         .nodes
         .iter()
         .filter_map(|n| n.label.as_deref().or(Some(&n.id)))
-        .map(|l| clean_label(l))
+        .map(clean_label)
         .collect();
     for edge in &graph.edges {
         if let Some(ref raw_label) = edge.label {

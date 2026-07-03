@@ -2892,6 +2892,65 @@ mod tests {
     }
 
     #[test]
+    fn check_colors_treats_shorthand_hex_and_important_as_equal() {
+        // Reference: mermaid applies colors via CSS with shorthand hex.
+        // Selkie: inlines the same colors with full hex and !important.
+        // These render identically, so no color issue may be reported.
+        let reference_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <style>
+                #m .error-icon { fill: #552222; }
+                #m .error-text { fill: #552222; stroke: #552222; }
+                #m .node rect { fill: #ECECFF; stroke: #333; }
+            </style>
+            <g class="node"><rect width="80" height="40"/></g>
+        </svg>"##;
+        let selkie_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <g class="node"><rect width="80" height="40" style="fill:#ececff !important;stroke:#333333 !important"/></g>
+        </svg>"##;
+
+        let reference = SvgStructure::from_svg(reference_svg).unwrap();
+        let selkie = SvgStructure::from_svg(selkie_svg).unwrap();
+
+        let mut issues = Vec::new();
+        check_colors(&selkie, &reference, &mut issues);
+        assert!(
+            issues.is_empty(),
+            "Equivalent colors (shorthand hex, !important, dead rules) must not be flagged: {:?}",
+            issues
+        );
+    }
+
+    #[test]
+    fn check_stroke_widths_ignores_marker_and_shape_paths() {
+        // Reference: edge path stroke-width 2 plus thin arrowhead marker
+        // paths in <defs> and a rough.js-style node outline path.
+        // Selkie: single edge path with stroke-width 2 via inline style.
+        // Rendered edge strokes match, so no stroke_width warning.
+        let reference_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <defs>
+                <marker id="arrow"><path d="M0,0 L10,5 L0,10 z" stroke="#333" stroke-width="1"/></marker>
+                <marker id="cross"><path d="M0,0 L10,10" stroke="#333" stroke-width="0.1"/></marker>
+            </defs>
+            <path class="basic label-container" d="M0,0 L10,10" stroke="#9370db" stroke-width="0.3"/>
+            <path class="edge-thickness-normal edge-pattern-solid flowchart-link" d="M0,0 L50,50" stroke="#333" stroke-width="2"/>
+        </svg>"##;
+        let selkie_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <path class="edge-path" d="M0,0 L50,50" style="stroke:#333 !important;stroke-width:2px !important"/>
+        </svg>"##;
+
+        let reference = SvgStructure::from_svg(reference_svg).unwrap();
+        let selkie = SvgStructure::from_svg(selkie_svg).unwrap();
+
+        let mut issues = Vec::new();
+        check_stroke_widths(&selkie, &reference, &mut issues);
+        assert!(
+            issues.is_empty(),
+            "Matching edge strokes must not be flagged when reference has marker/shape paths: {:?}",
+            issues
+        );
+    }
+
+    #[test]
     fn test_identical_structures() {
         let s1 = make_structure(3, 2, vec!["A", "B", "C"]);
         let s2 = make_structure(3, 2, vec!["A", "B", "C"]);
