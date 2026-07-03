@@ -590,7 +590,7 @@ impl FlowchartDb {
 
     /// Add a subgraph
     pub fn add_sub_graph(&mut self, nodes: Vec<String>, id: &str, title: &str, dir: &str) {
-        let subgraph = FlowSubGraph {
+        let mut subgraph = FlowSubGraph {
             id: id.to_string(),
             title: title.to_string(),
             label_type: "text".to_string(),
@@ -602,6 +602,12 @@ impl FlowchartDb {
                 Some(dir.to_string())
             },
         };
+
+        // Remove members that already belong to an earlier subgraph, mirroring
+        // mermaid's flowDb.addSubGraph (flowDb.ts:711 `makeUniq`). This makes
+        // subgraph membership first-wins: a node is owned by the first subgraph
+        // that claims it, so downstream node->parent resolution is unambiguous.
+        self.make_uniq(&mut subgraph, &self.subgraphs);
 
         let idx = self.subgraphs.len();
         self.subgraph_lookup.insert(id.to_string(), idx);

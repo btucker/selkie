@@ -52,6 +52,15 @@ impl ToLayoutGraph for FlowchartDb {
                 .metadata
                 .insert("is_group".to_string(), "true".to_string());
 
+            // Nest this subgraph inside its parent subgraph when it is a member
+            // of one. Mermaid lists a nested subgraph as a node in its parent's
+            // node list, so the parent cluster encloses it; without this the
+            // inner cluster detaches and the outer cluster collapses to only its
+            // direct leaf nodes.
+            if let Some(&parent_id) = node_to_subgraph.get(subgraph.id.as_str()) {
+                sg_node = sg_node.with_parent(parent_id);
+            }
+
             // Store subgraph direction if specified. Like mermaid, the
             // direction only takes effect when the subgraph has no external
             // connections (it is then extracted and laid out recursively).

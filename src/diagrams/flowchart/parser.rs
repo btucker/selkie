@@ -607,7 +607,26 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
                                 if stmt_inner.as_rule() == Rule::vertex_statement {
                                     collect_vertex_ids(stmt_inner.clone(), &mut subgraph_nodes);
                                 }
+                                let is_nested_subgraph =
+                                    stmt_inner.as_rule() == Rule::subgraph_stmt;
+                                let sub_count_before = db.subgraphs().len();
                                 process_rule(stmt_inner, db)?;
+                                // Record a directly-nested subgraph as a member of this
+                                // subgraph, mirroring mermaid where a nested subgraph
+                                // appears as a node id in its parent's node list (flowDb
+                                // addSubGraph). The inner subgraph's `end` is reached
+                                // first, so it is the most recently added subgraph. This
+                                // lets node->parent resolution nest the inner cluster
+                                // inside this one rather than detaching it.
+                                if is_nested_subgraph && db.subgraphs().len() > sub_count_before {
+                                    if let Some(child_id) =
+                                        db.subgraphs().last().map(|s| s.id.clone())
+                                    {
+                                        if !subgraph_nodes.contains(&child_id) {
+                                            subgraph_nodes.push(child_id);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -774,6 +793,45 @@ end"#;
         assert!(result.is_ok(), "Failed to parse: {:?}", result);
         let db = result.unwrap();
         assert!(!db.subgraphs().is_empty(), "Should have subgraphs");
+    }
+
+    #[test]
+    fn nested_subgraph_is_member_of_parent_and_leaves_stay_inner() {
+        // Mirrors mermaid: a nested subgraph appears as a node id in its
+        // parent's node list, while the inner leaf nodes belong ONLY to the
+        // inner subgraph (first-wins via makeUniq). Without this the inner
+        // cluster detaches from its parent and the outer cluster collapses.
+        let input = r#"flowchart TB
+subgraph Outer
+    a --> b
+    subgraph Inner
+        c --> d
+    end
+end"#;
+        let db = parse(input).expect("parse failed");
+        let sgs = db.subgraphs();
+        let outer = sgs.iter().find(|s| s.id == "Outer").expect("Outer missing");
+        let inner = sgs.iter().find(|s| s.id == "Inner").expect("Inner missing");
+
+        // Inner owns its own leaves.
+        assert!(inner.nodes.contains(&"c".to_string()));
+        assert!(inner.nodes.contains(&"d".to_string()));
+
+        // Outer lists the Inner subgraph as a member so it nests inside Outer.
+        assert!(
+            outer.nodes.contains(&"Inner".to_string()),
+            "Outer should contain the nested subgraph id 'Inner', got {:?}",
+            outer.nodes
+        );
+        // Outer must NOT claim the inner leaves (they belong to Inner).
+        assert!(
+            !outer.nodes.contains(&"c".to_string()) && !outer.nodes.contains(&"d".to_string()),
+            "Inner leaves must not leak into Outer, got {:?}",
+            outer.nodes
+        );
+        // Outer still owns its own direct leaves.
+        assert!(outer.nodes.contains(&"a".to_string()));
+        assert!(outer.nodes.contains(&"b".to_string()));
     }
 
     #[test]
