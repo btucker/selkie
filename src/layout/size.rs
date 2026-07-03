@@ -1,7 +1,6 @@
 //! Size estimation for layout
 
-use super::adapter::{NodeSizeConfig, SizeEstimator};
-use super::NodeShape;
+use super::{NodeShape, NodeSizeConfig, SizeEstimator};
 
 /// Character-width based size estimator
 ///
