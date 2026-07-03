@@ -14,13 +14,13 @@ Source: `src/diagrams/flowchart/parser.rs:767`
 
 When a subgraph declares its own direction, the application shall preserve that direction without changing the parent flowchart direction.
 
-Source: `src/render/flowchart.rs:398`
+Source: `src/render/flowchart.rs:474`
 
 ### FLOW-1.3
 
 When a flowchart contains subgraph member nodes, the application shall preserve parent-child relationships in the layout graph.
 
-Source: `src/render/flowchart.rs:193`
+Source: `src/render/flowchart.rs:269`
 
 ### FLOW-1.4
 
@@ -38,7 +38,7 @@ Source: `tests/render_integration.rs:471`
 
 When a flowchart edge has a Mermaid label, the application shall preserve that label in the layout graph edge model.
 
-Source: `src/render/flowchart.rs:265`
+Source: `src/render/flowchart.rs:341`
 
 ### FLOW-2.2
 
@@ -56,13 +56,13 @@ Source: `src/eval/failure_families.rs:344`
 
 When Selkie renders flowchart label text with raw HTML tags, double-escaped entities, or unnormalized Mermaid escapes, the eval report shall flag the label as a visible markup artifact.
 
-Source: `src/eval/checks.rs:2977`
+Source: `src/eval/checks.rs:3040`
 
 ### FLOW-3.1
 
 When a flowchart edge is rendered to SVG, the application shall emit an SVG path for the edge route.
 
-Source: `src/render/flowchart.rs:358`
+Source: `src/render/flowchart.rs:434`
 
 ### FLOW-3.2
 
