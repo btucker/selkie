@@ -144,6 +144,18 @@ impl EvalRunner {
             self.cache.render_batch_named(&named_diagrams)
         };
 
+        // Pre-render all reference PNGs in one mmdc batch (fills the PNG
+        // cache) so per-diagram visual comparison doesn't spawn mmdc once
+        // per uncached diagram.
+        #[cfg(feature = "png")]
+        if !self.config.skip_visual && !self.config.use_repo_svgs {
+            let texts: Vec<&str> = filtered.iter().map(|i| i.text.as_str()).collect();
+            if !texts.is_empty() {
+                eprintln!("Pre-rendering reference PNGs for visual comparison...");
+                let _ = super::png::sources_to_rgba_batch_cached(&texts, &self.cache);
+            }
+        }
+
         // Evaluate each diagram with pre-rendered reference
         for (i, input) in filtered.iter().enumerate() {
             eprint!(
@@ -306,9 +318,21 @@ impl EvalRunner {
                 reference.clone(),
             ));
 
-            // Calculate visual similarity if not skipped
+            // Calculate visual similarity if not skipped.
+            // Prefer comparing against the mmdc-rendered reference PNG at a
+            // matched raster scale: resvg drops mermaid's foreignObject HTML
+            // labels, so rasterizing the reference SVG in-process would
+            // guarantee a deflated score even for pixel-perfect output.
+            // Fall back to SVG-vs-SVG rasterization when mmdc is unavailable
+            // (e.g. CI running with pre-committed repo SVGs).
             if !self.config.skip_visual {
-                match super::png::compare_svgs(selkie, reference) {
+                let comparison = if self.config.use_repo_svgs {
+                    super::png::compare_svgs(selkie, reference)
+                } else {
+                    super::png::compare_svg_to_reference_source(selkie, &input.text, &self.cache)
+                        .or_else(|_| super::png::compare_svgs(selkie, reference))
+                };
+                match comparison {
                     Ok(comparison) => {
                         result.visual_similarity = Some(comparison.ssim);
                     }

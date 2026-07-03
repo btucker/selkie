@@ -2204,8 +2204,14 @@ fn check_aspect_ratio(selkie: &SvgStructure, reference: &SvgStructure, issues: &
         "square"
     };
 
-    // Report if orientation category differs
-    if ref_orientation != selkie_orientation {
+    // Relative difference between the aspect ratios. Category labels have
+    // hard boundaries (1.2 / 0.8), so two nearly identical ratios can land
+    // in different categories (e.g. 1.201 "landscape" vs 1.197 "square").
+    // Only report an orientation flip when the categories differ AND the
+    // ratios are actually far apart.
+    let ratio_diff = (ref_aspect - selkie_aspect).abs() / ref_aspect;
+
+    if ref_orientation != selkie_orientation && ratio_diff > 0.10 {
         issues.push(
             Issue::error(
                 "aspect_ratio",
@@ -2226,21 +2232,18 @@ fn check_aspect_ratio(selkie: &SvgStructure, reference: &SvgStructure, issues: &
                 format!("{} ({:.2})", selkie_orientation, selkie_aspect),
             ),
         );
-    } else {
-        // Same orientation but check for significant aspect ratio difference
-        let ratio_diff = (ref_aspect - selkie_aspect).abs() / ref_aspect;
-        if ratio_diff > 0.3 {
-            issues.push(
-                Issue::warning(
-                    "aspect_ratio",
-                    format!(
-                        "Aspect ratio differs significantly: reference {:.2}, selkie {:.2} ({:.0}% difference)",
-                        ref_aspect, selkie_aspect, ratio_diff * 100.0
-                    ),
-                )
-                .with_values(format!("{:.2}", ref_aspect), format!("{:.2}", selkie_aspect)),
-            );
-        }
+    } else if ratio_diff > 0.3 {
+        // Same (or near-boundary) orientation with a significant ratio difference
+        issues.push(
+            Issue::warning(
+                "aspect_ratio",
+                format!(
+                    "Aspect ratio differs significantly: reference {:.2}, selkie {:.2} ({:.0}% difference)",
+                    ref_aspect, selkie_aspect, ratio_diff * 100.0
+                ),
+            )
+            .with_values(format!("{:.2}", ref_aspect), format!("{:.2}", selkie_aspect)),
+        );
     }
 }
 
@@ -2916,6 +2919,7 @@ mod tests {
         SvgStructure {
             width: 400.0,
             height: 300.0,
+            viewbox_origin: (0.0, 0.0),
             node_count: nodes,
             edge_count: edges,
             labels: labels.into_iter().map(String::from).collect(),
@@ -3529,6 +3533,78 @@ mod tests {
                 .iter()
                 .any(|i| i.check == "sequence_self_message_label"),
             "did not expect sequence_self_message_label issue, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn edge_positions_not_flagged_for_viewbox_origin_shift() {
+        // Identical drawings that differ only in viewBox origin convention:
+        // mermaid bakes padding into coordinates (origin "0 0"), selkie uses
+        // a negative origin ("-8 -8") with content starting at 0. Both render
+        // pixel-identically, so no edge_positions issue may be reported.
+        let reference_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+            <rect class="node" id="a" x="10" y="10" width="80" height="40"/>
+            <rect class="node" id="b" x="210" y="150" width="80" height="40"/>
+            <path class="edge" d="M90,50L210,150"/>
+        </svg>"##;
+        let selkie_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 300 200">
+            <rect class="node" id="a" x="2" y="2" width="80" height="40"/>
+            <rect class="node" id="b" x="202" y="142" width="80" height="40"/>
+            <path class="edge" d="M82,42L202,142"/>
+        </svg>"##;
+
+        let reference = SvgStructure::from_svg(reference_svg).unwrap();
+        let selkie = SvgStructure::from_svg(selkie_svg).unwrap();
+        let mut issues = Vec::new();
+
+        check_edge_attachments(&selkie, &reference, &mut issues);
+
+        assert!(
+            !issues.iter().any(|i| i.check == "edge_positions"),
+            "viewBox origin shift alone must not flag edge_positions, got {issues:?}"
+        );
+    }
+
+    fn structure_with_dims(width: f64, height: f64) -> SvgStructure {
+        let mut s = make_structure(0, 0, vec![]);
+        s.width = width;
+        s.height = height;
+        s
+    }
+
+    #[test]
+    fn aspect_ratio_near_category_boundary_is_not_error() {
+        // Reference 1237x1030 (ratio 1.2009, "landscape") vs selkie 1197x1000
+        // (ratio 1.197, "square"): dimensions are within 3.3%, so this is not
+        // an orientation flip and must not be a structural error.
+        let reference = structure_with_dims(1237.0, 1030.0);
+        let selkie = structure_with_dims(1197.0, 1000.0);
+        let mut issues = Vec::new();
+
+        check_aspect_ratio(&selkie, &reference, &mut issues);
+
+        assert!(
+            !issues
+                .iter()
+                .any(|i| i.check == "aspect_ratio" && i.level == Level::Error),
+            "near-boundary aspect ratios must not be an error, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn aspect_ratio_real_orientation_flip_is_error() {
+        // Reference clearly landscape (1.69), selkie clearly portrait (0.54).
+        let reference = structure_with_dims(1690.0, 1000.0);
+        let selkie = structure_with_dims(540.0, 1000.0);
+        let mut issues = Vec::new();
+
+        check_aspect_ratio(&selkie, &reference, &mut issues);
+
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "aspect_ratio" && i.level == Level::Error),
+            "a real orientation flip must remain an error, got {issues:?}"
         );
     }
 }

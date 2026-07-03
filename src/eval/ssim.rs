@@ -11,46 +11,107 @@ const K1: f64 = 0.01;
 const K2: f64 = 0.03;
 const L: f64 = 255.0; // Dynamic range for 8-bit images
 
-/// Calculate SSIM between two images represented as grayscale pixel arrays
+/// Local window size for SSIM (8x8 as in the original paper's block variant)
+const WINDOW: u32 = 8;
+/// Stride between windows (overlapping windows, half-window step)
+const STRIDE: u32 = 4;
+
+/// Calculate mean SSIM between two images represented as grayscale pixel arrays
+///
+/// Follows Wang et al. (2004): SSIM is computed over local windows and the
+/// per-window scores are averaged. A single global statistic is NOT SSIM and
+/// collapses when images differ in a localized region, understating
+/// similarity of otherwise identical renders.
 ///
 /// Both images must have the same dimensions.
 /// Returns a value between 0 and 1 (1 = identical).
-pub fn calculate_ssim(img1: &[u8], img2: &[u8], _width: u32, _height: u32) -> f64 {
-    if img1.len() != img2.len() {
+pub fn calculate_ssim(img1: &[u8], img2: &[u8], width: u32, height: u32) -> f64 {
+    if img1.len() != img2.len() || img1.len() != (width as usize) * (height as usize) {
         return 0.0;
     }
+    if img1.is_empty() {
+        return 1.0;
+    }
 
-    let n = img1.len() as f64;
+    // Images smaller than the window get a single window over the whole image
+    let win_w = WINDOW.min(width);
+    let win_h = WINDOW.min(height);
+
+    let mut sum = 0.0;
+    let mut count = 0usize;
+
+    let mut y = 0;
+    loop {
+        let y_end = (y + win_h).min(height);
+        let y_start = y_end.saturating_sub(win_h);
+        let mut x = 0;
+        loop {
+            let x_end = (x + win_w).min(width);
+            let x_start = x_end.saturating_sub(win_w);
+
+            sum += window_ssim(img1, img2, width, x_start, y_start, x_end, y_end);
+            count += 1;
+
+            if x_end >= width {
+                break;
+            }
+            x += STRIDE;
+        }
+        if y_end >= height {
+            break;
+        }
+        y += STRIDE;
+    }
+
+    if count == 0 {
+        return 1.0;
+    }
+    sum / count as f64
+}
+
+/// SSIM statistic for a single window [x_start, x_end) x [y_start, y_end)
+fn window_ssim(
+    img1: &[u8],
+    img2: &[u8],
+    width: u32,
+    x_start: u32,
+    y_start: u32,
+    x_end: u32,
+    y_end: u32,
+) -> f64 {
+    let n = ((x_end - x_start) * (y_end - y_start)) as f64;
     if n == 0.0 {
         return 1.0;
     }
 
-    // Calculate means
-    let mean1 = img1.iter().map(|&x| x as f64).sum::<f64>() / n;
-    let mean2 = img2.iter().map(|&x| x as f64).sum::<f64>() / n;
+    let mut sum1 = 0.0;
+    let mut sum2 = 0.0;
+    let mut sum1_sq = 0.0;
+    let mut sum2_sq = 0.0;
+    let mut sum12 = 0.0;
 
-    // Calculate variances and covariance
-    let mut var1 = 0.0;
-    let mut var2 = 0.0;
-    let mut covar = 0.0;
-
-    for (&p1, &p2) in img1.iter().zip(img2.iter()) {
-        let d1 = p1 as f64 - mean1;
-        let d2 = p2 as f64 - mean2;
-        var1 += d1 * d1;
-        var2 += d2 * d2;
-        covar += d1 * d2;
+    for y in y_start..y_end {
+        let row = (y * width) as usize;
+        for x in x_start..x_end {
+            let p1 = img1[row + x as usize] as f64;
+            let p2 = img2[row + x as usize] as f64;
+            sum1 += p1;
+            sum2 += p2;
+            sum1_sq += p1 * p1;
+            sum2_sq += p2 * p2;
+            sum12 += p1 * p2;
+        }
     }
 
-    var1 /= n - 1.0;
-    var2 /= n - 1.0;
-    covar /= n - 1.0;
+    let mean1 = sum1 / n;
+    let mean2 = sum2 / n;
+    let var1 = (sum1_sq / n - mean1 * mean1).max(0.0);
+    let var2 = (sum2_sq / n - mean2 * mean2).max(0.0);
+    let covar = sum12 / n - mean1 * mean2;
 
-    // SSIM constants
     let c1 = (K1 * L).powi(2);
     let c2 = (K2 * L).powi(2);
 
-    // SSIM formula
     let numerator = (2.0 * mean1 * mean2 + c1) * (2.0 * covar + c2);
     let denominator = (mean1.powi(2) + mean2.powi(2) + c1) * (var1 + var2 + c2);
 
@@ -84,9 +145,12 @@ pub fn calculate_ssim_rgba(img1_rgba: &[u8], img2_rgba: &[u8], width: u32, heigh
     calculate_ssim(&gray1, &gray2, width, height)
 }
 
-/// Resize image to target dimensions using simple nearest-neighbor
+/// Resize image to target dimensions using area-averaging (box filter)
 ///
-/// This is a basic implementation for normalizing image sizes before comparison.
+/// Each destination pixel is the area-weighted average of the source pixels
+/// it covers. Unlike nearest-neighbor point sampling, this preserves thin
+/// (1px) strokes as gray instead of dropping them, which keeps SSIM honest
+/// when comparing rasters produced at different scales.
 pub fn resize_grayscale(
     src: &[u8],
     src_width: u32,
@@ -94,18 +158,57 @@ pub fn resize_grayscale(
     dst_width: u32,
     dst_height: u32,
 ) -> Vec<u8> {
-    let mut dst = vec![0u8; (dst_width * dst_height) as usize];
+    let mut dst = vec![0u8; (dst_width as usize) * (dst_height as usize)];
+    if src_width == 0 || src_height == 0 || dst_width == 0 || dst_height == 0 {
+        return dst;
+    }
+
+    let x_ratio = src_width as f64 / dst_width as f64;
+    let y_ratio = src_height as f64 / dst_height as f64;
 
     for y in 0..dst_height {
-        for x in 0..dst_width {
-            let src_x = (x as f64 * src_width as f64 / dst_width as f64) as u32;
-            let src_y = (y as f64 * src_height as f64 / dst_height as f64) as u32;
-            let src_idx = (src_y * src_width + src_x) as usize;
-            let dst_idx = (y * dst_width + x) as usize;
+        // Source row span covered by this destination row
+        let y0 = y as f64 * y_ratio;
+        let y1 = (y as f64 + 1.0) * y_ratio;
+        let sy_start = y0.floor() as u32;
+        let sy_end = (y1.ceil() as u32).min(src_height);
 
-            if src_idx < src.len() {
-                dst[dst_idx] = src[src_idx];
+        for x in 0..dst_width {
+            // Source column span covered by this destination column
+            let x0 = x as f64 * x_ratio;
+            let x1 = (x as f64 + 1.0) * x_ratio;
+            let sx_start = x0.floor() as u32;
+            let sx_end = (x1.ceil() as u32).min(src_width);
+
+            let mut sum = 0.0;
+            let mut area = 0.0;
+
+            for sy in sy_start..sy_end {
+                // Overlap of source row sy with [y0, y1)
+                let wy = (y1.min(sy as f64 + 1.0) - y0.max(sy as f64)).max(0.0);
+                if wy == 0.0 {
+                    continue;
+                }
+                let row_base = (sy * src_width) as usize;
+                for sx in sx_start..sx_end {
+                    // Overlap of source column sx with [x0, x1)
+                    let wx = (x1.min(sx as f64 + 1.0) - x0.max(sx as f64)).max(0.0);
+                    let weight = wx * wy;
+                    if weight > 0.0 {
+                        if let Some(&pixel) = src.get(row_base + sx as usize) {
+                            sum += pixel as f64 * weight;
+                            area += weight;
+                        }
+                    }
+                }
             }
+
+            let dst_idx = (y * dst_width + x) as usize;
+            dst[dst_idx] = if area > 0.0 {
+                (sum / area).round().clamp(0.0, 255.0) as u8
+            } else {
+                0
+            };
         }
     }
 
@@ -180,6 +283,30 @@ mod tests {
     }
 
     #[test]
+    fn test_localized_difference_does_not_collapse_score() {
+        // Wang et al. SSIM is computed over local windows and averaged.
+        // A single global-covariance statistic collapses when one image has
+        // a localized feature the other lacks, even though the images are
+        // 98% identical. Windowed SSIM must score this pair high.
+        let w = 64u32;
+        let h = 64u32;
+        let img1 = vec![255u8; (w * h) as usize];
+        let mut img2 = img1.clone();
+        // 8x8 black square in one corner (~1.5% of the image)
+        for y in 0..8 {
+            for x in 0..8 {
+                img2[(y * w + x) as usize] = 0;
+            }
+        }
+
+        let ssim = calculate_ssim(&img1, &img2, w, h);
+        assert!(
+            ssim > 0.7,
+            "images identical except a tiny patch must score high, got {ssim}"
+        );
+    }
+
+    #[test]
     fn test_rgba_to_grayscale() {
         let rgba = vec![255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255];
         let gray = rgba_to_grayscale(&rgba);
@@ -197,5 +324,50 @@ mod tests {
         let src = vec![0, 1, 2, 3, 4, 5, 6, 7, 8];
         let resized = resize_grayscale(&src, 3, 3, 2, 2);
         assert_eq!(resized.len(), 4);
+    }
+
+    #[test]
+    fn test_resize_averages_source_pixels() {
+        // 4x4 image with alternating 0/255 columns. A 2x downscale must
+        // average neighboring pixels (box filter) instead of point sampling,
+        // which would drop every 255 column and return solid black.
+        #[rustfmt::skip]
+        let src = vec![
+            0, 255, 0, 255,
+            0, 255, 0, 255,
+            0, 255, 0, 255,
+            0, 255, 0, 255,
+        ];
+        let out = resize_grayscale(&src, 4, 4, 2, 2);
+        assert_eq!(out.len(), 4);
+        for &v in &out {
+            assert!(
+                (v as i32 - 128).abs() <= 5,
+                "downscale must average 0/255 columns to ~128, got {v} in {out:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_resize_preserves_thin_lines_as_gray() {
+        // A 1px black line in a white image must survive a downscale as a
+        // gray line, not vanish entirely (point sampling loses it).
+        let src_w = 30u32;
+        let src_h = 30u32;
+        let mut src = vec![255u8; (src_w * src_h) as usize];
+        // Horizontal black line on row 10
+        for x in 0..src_w {
+            src[(10 * src_w + x) as usize] = 0;
+        }
+        // 30 -> 13 point sampling hits rows 0,2,4,6,9,11,... and skips row 10,
+        // so nearest-neighbor loses the line entirely.
+        let dst_w = 13u32;
+        let dst_h = 13u32;
+        let out = resize_grayscale(&src, src_w, src_h, dst_w, dst_h);
+        let min = *out.iter().min().unwrap();
+        assert!(
+            min < 250,
+            "thin line must remain visible after downscale, got min {min}"
+        );
     }
 }

@@ -12,6 +12,12 @@ pub struct SvgStructure {
     pub width: f64,
     /// Height of the SVG (from viewBox or height attribute)
     pub height: f64,
+    /// viewBox origin (min-x, min-y). Selkie emits viewBox="-8 -8 w h" while
+    /// mermaid emits viewBox="0 0 w h" with padding baked into coordinates;
+    /// both render identically. All extracted geometry is normalized by
+    /// subtracting this origin so coordinates are comparable across renderers.
+    #[serde(default)]
+    pub viewbox_origin: (f64, f64),
     /// Number of node elements detected
     pub node_count: usize,
     /// Number of edge elements detected
@@ -131,6 +137,40 @@ pub struct EdgeGeometry {
     pub edge_details: Vec<EdgeDetail>,
 }
 
+impl EdgeGeometry {
+    /// Translate all absolute coordinates by (dx, dy).
+    ///
+    /// Used to normalize out the viewBox origin so geometry extracted from
+    /// SVGs with different viewBox conventions lives in the same space.
+    /// Relative measurements (widths, heights, offsets) are unaffected.
+    pub fn translate(&mut self, dx: f64, dy: f64) {
+        for (x1, y1, x2, y2) in &mut self.edge_endpoints {
+            *x1 += dx;
+            *y1 += dy;
+            *x2 += dx;
+            *y2 += dy;
+        }
+        for dir in self.edge_initial_directions.iter_mut().flatten() {
+            dir.0 += dx;
+            dir.1 += dy;
+        }
+        for bounds in &mut self.node_bounds {
+            bounds.x += dx;
+            bounds.y += dy;
+        }
+        for text in &mut self.text_bounds {
+            text.x += dx;
+            text.y += dy;
+        }
+        for detail in &mut self.edge_details {
+            detail.start.0 += dx;
+            detail.start.1 += dy;
+            detail.end.0 += dx;
+            detail.end.1 += dy;
+        }
+    }
+}
+
 /// Detailed information about a single edge
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct EdgeDetail {
@@ -206,8 +246,8 @@ impl SvgStructure {
             return Err("Root element is not <svg>".to_string());
         }
 
-        // Parse dimensions
-        let (width, height) = parse_dimensions(&root);
+        // Parse dimensions and viewBox origin
+        let (origin_x, origin_y, width, height) = parse_dimensions(&root);
 
         // Count shapes
         let shapes = count_shapes(&doc);
@@ -231,8 +271,13 @@ impl SvgStructure {
         // Analyze stroke widths
         let stroke_analysis = analyze_stroke_widths(&doc);
 
-        // Analyze edge geometry
-        let edge_geometry = analyze_edge_geometry(&doc);
+        // Analyze edge geometry, normalized to a zero viewBox origin so
+        // geometry from renderers with different viewBox conventions
+        // (mermaid "0 0 w h" vs selkie "-8 -8 w h") is directly comparable.
+        let mut edge_geometry = analyze_edge_geometry(&doc);
+        if origin_x != 0.0 || origin_y != 0.0 {
+            edge_geometry.translate(-origin_x, -origin_y);
+        }
 
         // Analyze font styles
         let font_analysis = analyze_fonts(&doc);
@@ -243,6 +288,7 @@ impl SvgStructure {
         Ok(SvgStructure {
             width,
             height,
+            viewbox_origin: (origin_x, origin_y),
             node_count,
             edge_count,
             labels,
@@ -262,7 +308,9 @@ impl SvgStructure {
 
 // Helper functions
 
-fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64) {
+/// Parse (min-x, min-y, width, height) from the viewBox, falling back to
+/// width/height attributes with a (0, 0) origin.
+fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64, f64, f64) {
     // Try viewBox first
     if let Some(viewbox) = root.attribute("viewBox") {
         let parts: Vec<f64> = viewbox
@@ -270,7 +318,7 @@ fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64) {
             .filter_map(|s| s.parse().ok())
             .collect();
         if parts.len() >= 4 {
-            return (parts[2], parts[3]);
+            return (parts[0], parts[1], parts[2], parts[3]);
         }
     }
 
@@ -284,7 +332,7 @@ fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64) {
         .and_then(|s| s.trim_end_matches("px").parse().ok())
         .unwrap_or(0.0);
 
-    (width, height)
+    (0.0, 0.0, width, height)
 }
 
 fn count_shapes(doc: &roxmltree::Document) -> ShapeCounts {
@@ -2919,6 +2967,44 @@ mod tests {
             vec![3.0],
             "Bare element selector stroke-width should apply. Got: {:?}",
             strokes.path_stroke_widths
+        );
+    }
+
+    #[test]
+    fn test_viewbox_origin_normalized_out_of_geometry() {
+        // Mermaid convention: viewBox origin "0 0" with padding baked into
+        // element coordinates. Selkie convention: viewBox origin "-8 -8" with
+        // content starting at 0. Both render identically, so the extracted
+        // geometry must be identical after normalization.
+        let zero_origin = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+            <rect class="node" id="a" x="10" y="10" width="80" height="40"/>
+            <rect class="node" id="b" x="210" y="150" width="80" height="40"/>
+            <path class="edge" d="M90,50L210,150"/>
+        </svg>"##;
+        let negative_origin = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 300 200">
+            <rect class="node" id="a" x="2" y="2" width="80" height="40"/>
+            <rect class="node" id="b" x="202" y="142" width="80" height="40"/>
+            <path class="edge" d="M82,42L202,142"/>
+        </svg>"##;
+
+        let zero = SvgStructure::from_svg(zero_origin).unwrap();
+        let neg = SvgStructure::from_svg(negative_origin).unwrap();
+
+        assert_eq!(zero.viewbox_origin, (0.0, 0.0));
+        assert_eq!(neg.viewbox_origin, (-8.0, -8.0));
+
+        assert_eq!(
+            zero.edge_geometry.edge_endpoints, neg.edge_geometry.edge_endpoints,
+            "Edge endpoints must be identical after viewBox origin normalization"
+        );
+        assert_eq!(
+            zero.edge_geometry.node_bounds, neg.edge_geometry.node_bounds,
+            "Node bounds must be identical after viewBox origin normalization"
+        );
+        // Both must be in the zero-origin coordinate space
+        assert_eq!(
+            zero.edge_geometry.edge_endpoints[0],
+            (90.0, 50.0, 210.0, 150.0)
         );
     }
 }
