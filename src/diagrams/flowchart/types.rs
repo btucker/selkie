@@ -1,6 +1,6 @@
 //! Flowchart types
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 
 use crate::common::CommonDb;
@@ -206,6 +206,7 @@ pub struct FlowSubGraph {
     pub nodes: Vec<String>,
     pub classes: Vec<String>,
     pub dir: Option<String>,
+    pub generated_id: bool,
 }
 
 /// Link type information from parser
@@ -328,6 +329,17 @@ fn parse_arrow(arrow: &str) -> (String, EdgeStroke, u32) {
     };
 
     (edge_type, stroke, length)
+}
+
+fn next_available_generated_subgraph_id(used: &HashSet<String>) -> String {
+    let mut index = 0;
+    loop {
+        let candidate = format!("subGraph{index}");
+        if !used.contains(&candidate) {
+            return candidate;
+        }
+        index += 1;
+    }
 }
 
 impl FlowchartDb {
@@ -582,6 +594,17 @@ impl FlowchartDb {
 
     /// Add a subgraph
     pub fn add_sub_graph(&mut self, nodes: Vec<String>, id: &str, title: &str, dir: &str) {
+        self.add_sub_graph_with_generated_id(nodes, id, title, dir, false);
+    }
+
+    fn add_sub_graph_with_generated_id(
+        &mut self,
+        nodes: Vec<String>,
+        id: &str,
+        title: &str,
+        dir: &str,
+        generated_id: bool,
+    ) {
         let subgraph = FlowSubGraph {
             id: id.to_string(),
             title: title.to_string(),
@@ -593,6 +616,7 @@ impl FlowchartDb {
             } else {
                 Some(dir.to_string())
             },
+            generated_id,
         };
 
         let idx = self.subgraphs.len();
@@ -672,6 +696,42 @@ impl FlowchartDb {
         &self.subgraphs
     }
 
+    /// Rename generated subgraph IDs that collide with later user-defined IDs.
+    ///
+    /// Generated IDs are internal implementation details for title-only
+    /// subgraphs, so they can move aside without changing user-authored node or
+    /// subgraph references. Explicit subgraph IDs and vertex IDs are preserved.
+    pub(crate) fn resolve_generated_subgraph_id_collisions(&mut self) {
+        let mut reserved: HashSet<String> = self.vertices.keys().cloned().collect();
+        reserved.extend(
+            self.subgraphs
+                .iter()
+                .filter(|subgraph| !subgraph.generated_id)
+                .map(|subgraph| subgraph.id.clone()),
+        );
+
+        let mut used = reserved;
+        for subgraph in &mut self.subgraphs {
+            if !subgraph.generated_id {
+                continue;
+            }
+
+            if used.contains(&subgraph.id) {
+                subgraph.id = next_available_generated_subgraph_id(&used);
+            }
+            used.insert(subgraph.id.clone());
+        }
+
+        self.rebuild_subgraph_lookup();
+    }
+
+    fn rebuild_subgraph_lookup(&mut self) {
+        self.subgraph_lookup.clear();
+        for (idx, subgraph) in self.subgraphs.iter().enumerate() {
+            self.subgraph_lookup.insert(subgraph.id.clone(), idx);
+        }
+    }
+
     /// Simplified add_vertex for parser - just id, optional text and type
     pub fn add_vertex_simple(
         &mut self,
@@ -741,6 +801,23 @@ impl FlowchartDb {
         dir: Option<String>,
     ) {
         self.add_sub_graph(nodes, id, title, dir.as_deref().unwrap_or(""));
+    }
+
+    pub(crate) fn add_generated_subgraph_with_dir(
+        &mut self,
+        id: &str,
+        title: &str,
+        nodes: Vec<String>,
+        dir: Option<String>,
+        generated_id: bool,
+    ) {
+        self.add_sub_graph_with_generated_id(
+            nodes,
+            id,
+            title,
+            dir.as_deref().unwrap_or(""),
+            generated_id,
+        );
     }
 
     /// Set link on a vertex (for click handler)

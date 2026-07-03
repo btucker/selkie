@@ -1,5 +1,6 @@
 [workspace]
 members = ["crates/selkie-layout"]
+default-members = [".", "crates/selkie-layout"]
 resolver = "2"
 
 [package]

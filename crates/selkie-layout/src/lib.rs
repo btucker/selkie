@@ -6,6 +6,14 @@
 //! `selkie-layout` expects callers to provide node dimensions. Text measurement,
 //! font lookup, parsing, and rendering are intentionally outside this crate.
 //!
+//! Most callers should build graphs with [`LayoutGraph::add_node`],
+//! [`LayoutGraph::add_edge`], [`LayoutNode::new`], and [`LayoutEdge::new`], then
+//! read results through accessors such as [`LayoutNode::position`] and
+//! [`LayoutEdge::points`]. The core graph structs also expose their fields for
+//! renderers and adapters that need to attach metadata or inspect intermediate
+//! layout state; that low-level surface is intentionally more flexible and
+//! should be treated as an advanced API.
+//!
 //! Node positions returned by [`LayoutNode::position`] are top-left coordinates
 //! for rendering. The internal Dagre-compatible layout uses center coordinates,
 //! but this crate converts them before exposing results.

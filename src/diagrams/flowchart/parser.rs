@@ -32,6 +32,8 @@ pub fn parse_into(input: &str, db: &mut FlowchartDb) -> Result<()> {
         }
     }
 
+    db.resolve_generated_subgraph_id_collisions();
+
     Ok(())
 }
 
@@ -621,15 +623,17 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
         .cloned()
         .collect();
 
-    if id.is_empty() {
+    let generated_id = id.is_empty();
+    if generated_id {
         id = next_generated_subgraph_id(db);
     }
 
-    db.add_subgraph_with_dir(
+    db.add_generated_subgraph_with_dir(
         &id,
         title.as_deref().unwrap_or(&id),
         new_vertices,
         subgraph_dir,
+        generated_id,
     );
     Ok(())
 }
@@ -804,6 +808,25 @@ end"#;
         assert_eq!(subgraphs[1].title, "Fix Location");
         assert_ne!(subgraphs[0].id, subgraphs[1].id);
         assert!(subgraphs.iter().all(|subgraph| !subgraph.id.is_empty()));
+    }
+
+    #[test]
+    fn test_generated_subgraph_id_does_not_collide_with_later_explicit_subgraph() {
+        let input = r#"flowchart TD
+subgraph "First"
+    A --> B
+end
+subgraph subGraph0[Second]
+    C --> D
+end"#;
+        let db = parse(input).expect("subgraphs should parse");
+
+        let subgraphs = db.subgraphs();
+        assert_eq!(subgraphs.len(), 2);
+        assert_eq!(subgraphs[0].title, "First");
+        assert_eq!(subgraphs[1].id, "subGraph0");
+        assert_eq!(subgraphs[1].title, "Second");
+        assert_ne!(subgraphs[0].id, subgraphs[1].id);
     }
 
     #[test]
