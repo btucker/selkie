@@ -56,7 +56,7 @@ Source: `src/eval/failure_families.rs:344`
 
 When Selkie renders flowchart label text with raw HTML tags, double-escaped entities, or unnormalized Mermaid escapes, the eval report shall flag the label as a visible markup artifact.
 
-Source: `src/eval/checks.rs:3040`
+Source: `src/eval/checks.rs:3262`
 
 ### FLOW-3.1
 
