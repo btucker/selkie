@@ -580,6 +580,10 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
                             let flow_text = process_text(i)?;
                             title = Some(flow_text.text);
                         }
+                        Rule::quoted_string => {
+                            let text = quoted_string_contents(i.as_str()).to_string();
+                            title = Some(text);
+                        }
                         _ => {}
                     }
                 }
@@ -617,6 +621,10 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
         .cloned()
         .collect();
 
+    if id.is_empty() {
+        id = next_generated_subgraph_id(db);
+    }
+
     db.add_subgraph_with_dir(
         &id,
         title.as_deref().unwrap_or(&id),
@@ -624,6 +632,25 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
         subgraph_dir,
     );
     Ok(())
+}
+
+fn quoted_string_contents(value: &str) -> &str {
+    &value[1..value.len() - 1]
+}
+
+fn next_generated_subgraph_id(db: &FlowchartDb) -> String {
+    let mut index = db.subgraphs().len();
+    loop {
+        let candidate = format!("subGraph{index}");
+        if db
+            .subgraphs()
+            .iter()
+            .all(|subgraph| subgraph.id != candidate)
+        {
+            return candidate;
+        }
+        index += 1;
+    }
 }
 
 #[cfg(test)]
@@ -739,6 +766,42 @@ end"#;
         assert!(result.is_ok(), "Failed to parse: {:?}", result);
         let db = result.unwrap();
         assert!(!db.subgraphs().is_empty(), "Should have subgraphs");
+    }
+
+    #[test]
+    fn test_parse_quoted_title_only_subgraph() {
+        let input = r#"flowchart TD
+subgraph "Current Code"
+    A --> B
+end"#;
+        let db = parse(input).expect("quoted-title-only subgraph should parse");
+
+        let subgraphs = db.subgraphs();
+        assert_eq!(subgraphs.len(), 1);
+        assert_eq!(subgraphs[0].id, "subGraph0");
+        assert_eq!(subgraphs[0].title, "Current Code");
+        assert!(!subgraphs[0].id.is_empty());
+    }
+
+    #[test]
+    fn test_parse_multiple_quoted_title_only_subgraphs_have_distinct_ids() {
+        let input = r#"flowchart TD
+subgraph "Current Code"
+    A --> B
+end
+subgraph "Fix Location"
+    C --> D
+end"#;
+        let db = parse(input).expect("quoted-title-only subgraphs should parse");
+
+        let subgraphs = db.subgraphs();
+        assert_eq!(subgraphs.len(), 2);
+        assert_eq!(subgraphs[0].id, "subGraph0");
+        assert_eq!(subgraphs[0].title, "Current Code");
+        assert_eq!(subgraphs[1].id, "subGraph1");
+        assert_eq!(subgraphs[1].title, "Fix Location");
+        assert_ne!(subgraphs[0].id, subgraphs[1].id);
+        assert!(subgraphs.iter().all(|subgraph| !subgraph.id.is_empty()));
     }
 
     #[test]

@@ -5,7 +5,70 @@
 
 pub(crate) mod internal;
 
-pub use internal::{Acyclicer, DagreConfig, RankDir, Ranker};
+pub use internal::{Acyclicer, RankDir};
+
+/// Configuration for the Dagre layout algorithm.
+#[derive(Debug, Clone)]
+pub struct DagreConfig {
+    /// Direction of the layout: TB, BT, LR, RL.
+    pub rankdir: RankDir,
+    /// Separation between nodes on the same rank.
+    pub nodesep: f64,
+    /// Separation between edges.
+    pub edgesep: f64,
+    /// Separation between ranks.
+    pub ranksep: f64,
+    /// Horizontal margin around the graph.
+    pub marginx: f64,
+    /// Vertical margin around the graph.
+    pub marginy: f64,
+    /// Method for breaking cycles.
+    pub acyclicer: Acyclicer,
+    /// Method for assigning ranks.
+    pub ranker: Ranker,
+}
+
+impl Default for DagreConfig {
+    fn default() -> Self {
+        Self {
+            rankdir: RankDir::TB,
+            nodesep: 50.0,
+            edgesep: 20.0,
+            ranksep: 50.0,
+            marginx: 0.0,
+            marginy: 0.0,
+            acyclicer: Acyclicer::Greedy,
+            ranker: Ranker::NetworkSimplex,
+        }
+    }
+}
+
+impl DagreConfig {
+    fn to_internal(&self) -> internal::DagreConfig {
+        internal::DagreConfig {
+            rankdir: self.rankdir,
+            nodesep: self.nodesep,
+            edgesep: self.edgesep,
+            ranksep: self.ranksep,
+            marginx: self.marginx,
+            marginy: self.marginy,
+            acyclicer: self.acyclicer,
+            ranker: match self.ranker {
+                Ranker::NetworkSimplex => internal::Ranker::NetworkSimplex,
+                Ranker::LongestPath => internal::Ranker::LongestPath,
+            },
+        }
+    }
+}
+
+/// Stable public ranking algorithms supported by the expert API.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Ranker {
+    /// Network simplex algorithm.
+    NetworkSimplex,
+    /// Longest-path rank assignment.
+    LongestPath,
+}
 
 #[derive(Debug, Clone)]
 pub struct DagreGraph {
@@ -104,5 +167,5 @@ impl DagreEdge<'_> {
 }
 
 pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
-    internal::layout(graph.inner_mut(), config);
+    internal::layout(graph.inner_mut(), &config.to_internal());
 }

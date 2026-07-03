@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="746.8" height="876.8000000000001" viewBox="-8 -27.999999999999993 746.8 876.8000000000001" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="801.7000000000002" height="976.8000000000001" viewBox="-8 -28 801.7000000000002 976.8000000000001" class="mermaid">
   <style>
 
 .mermaid {
@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -101,98 +101,98 @@ marker path {
   </defs>
   <g class="root">
     <g class="clusters">
-      <g class="subgraph" id="subgraph-">
-        <rect x="73.99999999999996" y="102.80000000000001" width="225.60000000000002" height="593.4000000000001" class="cluster"/>
-        <text x="186.79999999999995" y="118.80000000000001" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph0">
+        <rect x="34.39999999999998" y="152.8" width="451.19999999999993" height="618.4000000000001" class="cluster"/>
+        <text x="259.99999999999994" y="168.8" class="cluster-label" text-anchor="middle">Current Code (line 612)</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="64.39999999999996" y="-19.999999999999993" width="646.4" height="259" class="cluster"/>
-        <text x="387.59999999999997" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph1">
+        <rect x="19.999999999999986" y="-20" width="547.5999999999999" height="117.8" class="cluster"/>
+        <text x="293.79999999999995" y="-4" class="cluster-label" text-anchor="middle">Clippy&apos;s Concern</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="309.59999999999997" y="262.4" width="225.59999999999997" height="573.4000000000001" class="cluster"/>
-        <text x="422.4" y="278.4" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph2">
+        <rect x="296" y="337.4" width="489.70000000000016" height="598.4000000000001" class="cluster"/>
+        <text x="540.8500000000001" y="353.4" class="cluster-label" text-anchor="middle">Fix: Use Array</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 152.44 237.40 C 143.49 249.07, 134.55 260.73, 134.55 272.40 C 134.55 284.07, 143.49 295.73, 152.44 307.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 113.49 287.40 C 105.96 310.73, 98.43 334.07, 126.18 353.54 C 153.93 373.01, 216.97 388.61, 280.00 404.22" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 186.80 397.00 C 186.80 405.33, 186.80 413.67, 186.80 422.00 C 186.80 430.33, 186.80 438.67, 186.80 447.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 372.80 472.00 C 372.80 480.33, 372.80 488.67, 372.80 497.00 C 372.80 505.33, 372.80 513.67, 372.80 522.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-C-D-0">
-        <path d="M 186.80 536.60 C 186.80 544.93, 186.80 553.27, 186.80 561.60 C 186.80 569.93, 186.80 578.27, 186.80 586.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 372.80 611.60 C 372.80 619.93, 372.80 628.27, 372.80 636.60 C 372.80 644.93, 372.80 653.27, 372.80 661.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-E-A-0">
-        <path d="M 186.80 77.80 C 186.80 89.47, 186.80 101.13, 186.80 112.80 C 186.80 124.47, 186.80 136.13, 186.80 147.80" class="edge-path" fill="none" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)"/>
+        <path d="M 142.40 77.80 C 142.40 86.13, 142.40 94.47, 142.40 104.47 C 142.40 114.47, 142.40 126.13, 142.40 137.80 C 142.40 149.47, 142.40 161.13, 142.40 171.13 C 142.40 189.47, 142.40 197.80, 142.40 197.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="2" stroke-dasharray="3,3" fill="none"/>
       </g>
       <g class="edge" id="edge-L-F-B-0">
-        <path d="M 564.40 219.00 C 564.40 236.80, 564.40 254.60, 516.93 273.53 C 469.47 292.46, 374.53 312.53, 279.60 332.59" class="edge-path" stroke-dasharray="3,3" stroke-width="2" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 421.20 77.80 L 403.86 382.40" class="edge-path" marker-end="url(#arrow_point)" stroke-dasharray="3,3" fill="none" stroke-width="2"/>
       </g>
       <g class="edge" id="edge-L-G-H-0">
-        <path d="M 422.40 397.00 C 422.40 405.33, 422.40 413.67, 422.40 422.00 C 422.40 430.33, 422.40 438.67, 422.40 447.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 672.90 472.00 C 672.90 480.33, 672.90 488.67, 672.90 497.00 C 672.90 505.33, 672.90 513.67, 672.90 522.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-H-I-0">
-        <path d="M 422.40 536.60 C 422.40 544.93, 422.40 553.27, 422.40 561.60 C 422.40 569.93, 422.40 578.27, 422.40 586.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 672.90 611.60 C 672.90 619.93, 672.90 628.27, 672.90 636.60 C 672.90 644.93, 672.90 653.27, 672.90 661.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-I-J-0">
-        <path d="M 422.40 676.20 C 422.40 684.53, 422.40 692.87, 422.40 701.20 C 422.40 709.53, 422.40 717.87, 422.40 726.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 594.50 725.39 C 524.60 742.33, 454.70 759.26, 419.75 776.07 C 384.80 792.87, 384.80 809.53, 384.80 826.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A-G-0">
-        <path d="M 274.80 232.87 L 388.04 307.40" class="edge-path" marker-end="url(#arrow_point)" stroke-width="2" stroke-dasharray="3,3" fill="none"/>
+        <path d="M 180.80 287.40 C 190.80 310.73, 200.80 334.07, 267.35 355.03 C 333.90 375.99, 457.00 394.59, 580.10 413.18" class="edge-path" stroke-width="2" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-E-A-0">
-        <rect x="117.99999999999996" y="101.80000000000001" width="137.6" height="22" class="edge-label-bg"/>
-        <text x="186.79999999999995" y="112.80000000000001" class="edge-label" dominant-baseline="central" text-anchor="middle">Why heap allocate?</text>
+        <rect x="73.59999999999998" y="126.80000000000001" width="137.6" height="22" class="edge-label-bg"/>
+        <text x="142.39999999999998" y="137.8" class="edge-label" text-anchor="middle" dominant-baseline="central">Why heap allocate?</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-A-G-0">
-        <rect x="290.8542309903209" y="250.80921807928672" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="338.0542309903209" y="261.8092180792867" class="edge-label" text-anchor="middle" dominant-baseline="central">Replace with</text>
+        <rect x="308.15595151335026" y="368.2351123471799" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="355.35595151335025" y="379.2351123471799" class="edge-label" text-anchor="middle" dominant-baseline="central">Replace with</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-A">
-        <rect x="98.79999999999995" y="147.8" width="176" height="89.6" style="fill:#ff9999 !important"/>
-        <text x="186.79999999999995" y="192.60000000000002" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="186.79999999999995" y="192.60000000000002" dy="-0.6em">vec!</tspan><tspan x="186.79999999999995" dy="1.2em">Heap allocation</tspan></text>
+        <rect x="54.39999999999998" y="197.8" width="176" height="89.6" style="fill:#ff9999 !important"/>
+        <text x="142.39999999999998" y="242.60000000000002" class="label" dominant-baseline="central" style="fill: #ffffff" text-anchor="middle"><tspan x="142.39999999999998" y="242.60000000000002" dy="-0.6em">vec!</tspan><tspan x="142.39999999999998" dy="1.2em">Heap allocation</tspan></text>
       </g>
       <g class="node" id="node-B">
-        <rect x="93.99999999999996" y="307.4" width="185.6" height="89.6"/>
-        <text x="186.79999999999995" y="352.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="186.79999999999995" y="352.2" dy="-0.6em">.iter</tspan><tspan x="186.79999999999995" dy="1.2em">Immutable borrow</tspan></text>
+        <rect x="279.99999999999994" y="382.4" width="185.6" height="89.6"/>
+        <text x="372.79999999999995" y="427.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="372.79999999999995" y="427.2" dy="-0.6em">.iter</tspan><tspan x="372.79999999999995" dy="1.2em">Immutable borrow</tspan></text>
       </g>
       <g class="node" id="node-C">
-        <rect x="127.59999999999997" y="446.99999999999994" width="118.39999999999999" height="89.6"/>
-        <text x="186.79999999999995" y="491.79999999999995" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="186.79999999999995" y="491.79999999999995" dy="-0.6em">.filter</tspan><tspan x="186.79999999999995" dy="1.2em">Read-only</tspan></text>
+        <rect x="313.59999999999997" y="522" width="118.39999999999999" height="89.6"/>
+        <text x="372.79999999999995" y="566.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="372.79999999999995" y="566.8" dy="-0.6em">.filter</tspan><tspan x="372.79999999999995" dy="1.2em">Read-only</tspan></text>
       </g>
       <g class="node" id="node-D">
-        <rect x="132.39999999999995" y="586.6" width="108.8" height="89.6"/>
-        <text x="186.79999999999995" y="631.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="186.79999999999995" y="631.4" dy="-0.6em">.collect</tspan><tspan x="186.79999999999995" dy="1.2em">New Vec</tspan></text>
+        <rect x="318.4" y="661.6" width="108.8" height="89.6"/>
+        <text x="372.79999999999995" y="706.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="372.79999999999995" y="706.4" dy="-0.6em">.collect</tspan><tspan x="372.79999999999995" dy="1.2em">New Vec</tspan></text>
       </g>
       <g class="node" id="node-E">
-        <rect x="84.39999999999996" y="25.000000000000007" width="204.79999999999998" height="52.8" style="fill:#ffcccc !important"/>
-        <text x="186.79999999999995" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">vec! never mutated</text>
+        <rect x="39.999999999999986" y="25" width="204.79999999999998" height="52.8" style="fill:#ffcccc !important"/>
+        <text x="142.39999999999998" y="51.4" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle">vec! never mutated</text>
       </g>
       <g class="node" id="node-F">
-        <rect x="438" y="166.20000000000002" width="252.79999999999998" height="52.8" style="fill:#ffcccc !important"/>
-        <text x="564.4" y="192.60000000000002" class="label" text-anchor="middle" dominant-baseline="central">Only used for iteration</text>
+        <rect x="294.79999999999995" y="25" width="252.79999999999998" height="52.8" style="fill:#ffcccc !important"/>
+        <text x="421.19999999999993" y="51.4" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">Only used for iteration</text>
       </g>
       <g class="node" id="node-G">
-        <rect x="329.59999999999997" y="307.4" width="185.6" height="89.6" style="fill:#99ff99 !important"/>
-        <text x="422.4" y="352.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="422.4" y="352.2" dy="-0.6em">[...]</tspan><tspan x="422.4" dy="1.2em">Stack allocation</tspan></text>
+        <rect x="580.1000000000001" y="382.4" width="185.6" height="89.6" style="fill:#99ff99 !important"/>
+        <text x="672.9000000000001" y="427.2" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="672.9000000000001" y="427.2" dy="-0.6em">[...]</tspan><tspan x="672.9000000000001" dy="1.2em">Stack allocation</tspan></text>
       </g>
       <g class="node" id="node-H">
-        <rect x="344" y="446.99999999999994" width="156.8" height="89.6"/>
-        <text x="422.4" y="491.79999999999995" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="422.4" y="491.79999999999995" dy="-0.6em">.iter</tspan><tspan x="422.4" dy="1.2em">Same behavior</tspan></text>
+        <rect x="594.5000000000001" y="522" width="156.8" height="89.6"/>
+        <text x="672.9000000000001" y="566.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="672.9000000000001" y="566.8" dy="-0.6em">.iter</tspan><tspan x="672.9000000000001" dy="1.2em">Same behavior</tspan></text>
       </g>
       <g class="node" id="node-I">
-        <rect x="344" y="586.6" width="156.8" height="89.6"/>
-        <text x="422.4" y="631.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="422.4" y="631.4" dy="-0.6em">.filter</tspan><tspan x="422.4" dy="1.2em">Same behavior</tspan></text>
+        <rect x="594.5000000000001" y="661.6" width="156.8" height="89.6"/>
+        <text x="672.9000000000001" y="706.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="672.9000000000001" y="706.4" dy="-0.6em">.filter</tspan><tspan x="672.9000000000001" dy="1.2em">Same behavior</tspan></text>
       </g>
       <g class="node" id="node-J">
-        <rect x="353.59999999999997" y="726.2" width="137.6" height="89.6"/>
-        <text x="422.4" y="771" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="422.4" y="771" dy="-0.6em">.collect</tspan><tspan x="422.4" dy="1.2em">Same result</tspan></text>
+        <rect x="316" y="826.2" width="137.6" height="89.6"/>
+        <text x="384.8" y="871" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="384.8" y="871" dy="-0.6em">.collect</tspan><tspan x="384.8" dy="1.2em">Same result</tspan></text>
       </g>
     </g>
   </g>

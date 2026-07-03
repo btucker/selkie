@@ -1,6 +1,6 @@
 //! Flowchart adapter for layout
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::diagrams::flowchart::{Direction, FlowVertexType, FlowchartDb};
 use crate::error::Result;
@@ -25,6 +25,11 @@ impl ToLayoutGraph for FlowchartDb {
         };
 
         // Build map of node_id -> subgraph_id for setting parent relationships
+        let subgraph_ids: HashSet<&str> = self
+            .subgraphs()
+            .iter()
+            .map(|subgraph| subgraph.id.as_str())
+            .collect();
         let mut node_to_subgraph: HashMap<&str, &str> = HashMap::new();
         for subgraph in self.subgraphs() {
             for node_id in &subgraph.nodes {
@@ -61,6 +66,10 @@ impl ToLayoutGraph for FlowchartDb {
         let mut vertex_ids: Vec<&String> = self.vertices().keys().collect();
         vertex_ids.sort();
         for id in vertex_ids {
+            if subgraph_ids.contains(id.as_str()) {
+                continue;
+            }
+
             let vertex = self.vertices().get(id).unwrap();
             let shape = vertex
                 .vertex_type
@@ -307,6 +316,35 @@ mod tests {
             "Flowchart edge should have bend points after layout, got: {:?}",
             edge
         );
+    }
+
+    #[test]
+    fn test_edge_to_subgraph_does_not_duplicate_group_node() {
+        use crate::diagrams::flowchart::parse;
+        use crate::layout;
+
+        let input = r#"flowchart TB
+subgraph Terminal["Terminal Output Layers"]
+    Layer1["Text Buffer"]
+end
+subgraph Problem["The Fragility"]
+    P1["Scroll Event"]
+end
+Terminal -.->|"current approach"| Problem
+"#;
+
+        let db = parse(input).expect("flowchart should parse");
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        let problem_nodes = graph
+            .all_node_ids()
+            .into_iter()
+            .filter(|id| *id == "Problem")
+            .count();
+        assert_eq!(problem_nodes, 1, "Problem should be only the subgraph node");
+
+        layout::layout(graph).expect("layout should accept edge between subgraphs");
     }
 
     #[test]

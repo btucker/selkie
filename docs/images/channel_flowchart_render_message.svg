@@ -105,68 +105,68 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-Start-CheckType-0">
-        <path d="M 210.60 52.80 C 210.60 61.13, 210.60 69.47, 210.60 77.80 C 210.60 86.13, 210.60 94.47, 210.60 102.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 210.60 52.80 C 210.60 61.13, 210.60 69.47, 210.60 77.80 C 210.60 86.13, 210.60 94.47, 210.60 102.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-CheckType-CalcIndent-0">
-        <path d="M 151.98 353.84 L 92.80 484.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 151.98 353.84 L 92.80 484.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CheckType-NoIndent-0">
-        <path d="M 269.22 353.84 L 328.40 484.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M 269.22 353.84 L 328.40 484.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CalcIndent-CalcWidth-0">
-        <path d="M 92.80 537.60 L 150.10 587.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M 92.80 537.60 L 150.10 587.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-NoIndent-CalcWidth-0">
-        <path d="M 328.40 537.60 L 271.10 587.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 328.40 537.60 L 271.10 587.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CalcWidth-Action-0">
-        <path d="M 150.10 640.40 L 92.80 690.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 150.10 640.40 L 92.80 690.40" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-CalcWidth-Normal-0">
-        <path d="M 271.10 640.40 L 328.40 690.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M 271.10 640.40 L 328.40 690.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Action-RenderMermaid-0">
         <path d="M 92.80 743.20 L 150.10 793.20" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Normal-RenderMermaid-0">
-        <path d="M 328.40 743.20 L 271.10 793.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M 328.40 743.20 L 271.10 793.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-RenderMermaid-Placeholder-0">
-        <path d="M 210.60 846.00 C 210.60 854.33, 210.60 862.67, 210.60 871.00 C 210.60 879.33, 210.60 887.67, 210.60 896.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M 210.60 846.00 C 210.60 854.33, 210.60 862.67, 210.60 871.00 C 210.60 879.33, 210.60 887.67, 210.60 896.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Placeholder-ActionLine-0">
         <path d="M 152.56 948.80 L 97.60 998.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Placeholder-NormalLine-0">
-        <path d="M 268.64 948.80 L 323.60 998.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M 268.64 948.80 L 323.60 998.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-CheckType-CalcIndent-0">
-        <rect x="98.40553699893611" y="405.714621674051" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="113.20553699893611" y="416.714621674051" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <rect x="98.40553699893613" y="405.714621674051" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="113.20553699893613" y="416.714621674051" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CheckType-NoIndent-0">
         <rect x="296.79446300106395" y="405.714621674051" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="307.99446300106393" y="416.714621674051" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+        <text x="307.99446300106393" y="416.714621674051" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-Action">
-        <rect x="0" y="690.4" width="185.6" height="52.8" style="fill:#e1f5ff !important"/>
-        <text x="92.8" y="716.8" class="label" text-anchor="middle" dominant-baseline="central">indent_width = 9</text>
+        <rect x="0.000000000000014210854715202004" y="690.4" width="185.6" height="52.8" style="fill:#e1f5ff !important"/>
+        <text x="92.80000000000001" y="716.8" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">indent_width = 9</text>
       </g>
       <g class="node" id="node-ActionLine">
-        <rect x="9.600000000000009" y="998.8" width="176" height="89.6"/>
-        <text x="97.60000000000001" y="1043.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="97.60000000000001" y="1043.6" dy="-0.6em">HH:MM * content</tspan><tspan x="97.60000000000001" dy="1.2em">(9-char indent)</tspan></text>
+        <rect x="9.600000000000023" y="998.8" width="176" height="89.6"/>
+        <text x="97.60000000000002" y="1043.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="97.60000000000002" y="1043.6" dy="-0.6em">HH:MM * content</tspan><tspan x="97.60000000000002" dy="1.2em">(9-char indent)</tspan></text>
       </g>
       <g class="node" id="node-CalcIndent">
-        <rect x="0" y="484.8" width="185.6" height="52.8"/>
-        <text x="92.8" y="511.2" class="label" text-anchor="middle" dominant-baseline="central">extra_indent = 2</text>
+        <rect x="0.000000000000014210854715202004" y="484.8" width="185.6" height="52.8"/>
+        <text x="92.80000000000001" y="511.2" class="label" dominant-baseline="central" text-anchor="middle">extra_indent = 2</text>
       </g>
       <g class="node" id="node-CalcWidth">
         <rect x="60.60000000000002" y="587.6" width="300" height="52.8"/>
-        <text x="210.60000000000002" y="614" class="label" text-anchor="middle" dominant-baseline="central">indent_width = TIMESTAMP_GUTTER_WIDTH + extra_indent</text>
+        <text x="210.60000000000002" y="614" class="label" dominant-baseline="central" text-anchor="middle">indent_width = TIMESTAMP_GUTTER_WIDTH + extra_indent</text>
       </g>
       <g class="node" id="node-CheckType">
         <polygon points="210.60000000000002,102.80000000000001 360.6,258.8 210.60000000000002,414.8 60.60000000000002,258.8"/>
@@ -178,7 +178,7 @@ marker path {
       </g>
       <g class="node" id="node-Normal">
         <rect x="235.60000000000002" y="690.4" width="185.6" height="52.8" style="fill:#fff5e1 !important"/>
-        <text x="328.40000000000003" y="716.8" class="label" text-anchor="middle" dominant-baseline="central">indent_width = 7</text>
+        <text x="328.40000000000003" y="716.8" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">indent_width = 7</text>
       </g>
       <g class="node" id="node-NormalLine">
         <rect x="235.60000000000002" y="998.8" width="176" height="89.6"/>
@@ -186,7 +186,7 @@ marker path {
       </g>
       <g class="node" id="node-Placeholder">
         <rect x="60.60000000000002" y="895.9999999999999" width="300" height="52.8" style="fill:#d4edda !important"/>
-        <text x="210.60000000000002" y="922.3999999999999" class="label" dominant-baseline="central" text-anchor="middle">format!(&apos;{}[1] Diagram...&apos;, &apos; &apos;.repeat(indent_width))</text>
+        <text x="210.60000000000002" y="922.3999999999999" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle">format!(&apos;{}[1] Diagram...&apos;, &apos; &apos;.repeat(indent_width))</text>
       </g>
       <g class="node" id="node-RenderMermaid">
         <rect x="69.80000000000001" y="793.1999999999999" width="281.6" height="52.8"/>
