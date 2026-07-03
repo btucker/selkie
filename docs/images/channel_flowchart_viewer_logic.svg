@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="925.203208" height="944.664096" viewBox="-8 -28 925.203208 944.664096" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1500.0040720000002" height="955" viewBox="-8 -8 1500.0040720000002 955" class="mermaid">
   <style>
 
 .mermaid {
@@ -87,7 +87,7 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
@@ -102,105 +102,105 @@ marker path {
   <g class="root">
     <g class="clusters">
       <g class="subgraph" id="subgraph-subGraph0">
-        <rect x="575.363328" y="-20" width="292.30473600000005" height="431.832048" class="cluster"/>
-        <text x="721.515696" y="-4" class="cluster-label" text-anchor="middle">Chat Event Loop (mod.rs)</text>
+        <rect x="41.535143999999946" y="88.5" width="292.30473600000005" height="483.5" class="cluster"/>
+        <text x="187.68751199999997" y="104.5" class="cluster-label" text-anchor="middle">Chat Event Loop (mod.rs)</text>
       </g>
       <g class="subgraph" id="subgraph-subGraph1">
-        <rect x="28.886719999999983" y="-20" width="439.35942399999993" height="690.664096" class="cluster"/>
-        <text x="248.56643199999996" y="-4" class="cluster-label" text-anchor="middle">UI Rendering (ui.rs)</text>
+        <rect x="393.8398800000001" y="25" width="1090.1641919999997" height="271" class="cluster"/>
+        <text x="938.921976" y="41" class="cluster-label" text-anchor="middle">UI Rendering (ui.rs)</text>
       </g>
       <g class="subgraph" id="subgraph-subGraph2">
-        <rect x="553.828184" y="539.664096" width="335.37502400000005" height="364" class="cluster"/>
-        <text x="721.5156959999999" y="555.664096" class="cluster-label" text-anchor="middle">Kitty Protocol (kitty.rs)</text>
+        <rect x="19.999999999999943" y="607" width="335.37502400000005" height="327" class="cluster"/>
+        <text x="187.68751199999997" y="623" class="cluster-label" text-anchor="middle">Kitty Protocol (kitty.rs)</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-RenderMsg-DiagramNum-0">
-        <path d="M255.26175199999997,79L255.26175199999997,83.16666666666667C255.26175199999997,87.33333333333333,255.26175199999997,95.66666666666667,255.26175199999997,103.33333333333333C255.26175199999997,111,255.26175199999997,118,255.26175199999997,121.5L255.26175199999997,125" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M601.6523920000001,173L607.9023920000001,173C614.1523920000001,173,626.6523920000001,173,638.4857253333333,173C650.3190586666668,173,661.4857253333334,173,667.0690586666667,173L672.6523920000001,173" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-DiagramNum-CapCheck-0">
-        <path d="M255.26175199999997,183L255.26175199999997,189.16666666666666C255.26175199999997,195.33333333333334,255.26175199999997,207.66666666666666,255.26175199999997,219.33333333333334C255.26175199999997,231,255.26175199999997,242,255.26175199999997,247.5L255.26175199999997,253" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M900.2696240000001,173L906.5196240000001,173C912.7696240000001,173,925.2696240000001,173,937.1029573333335,173C948.9362906666669,173,960.1029573333335,173,965.6862906666669,173L971.2696240000001,173" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-CapCheck-Numbered-0">
-        <path d="M209.09084423700855,402.49318823700855L198.06268619750713,414.3550061975072C187.0345281580057,426.2168241580057,164.97821207900282,449.94046007900283,153.9500540395014,467.96894470616803C142.92189599999998,485.9974293333333,142.92189599999998,498.33076266666666,142.92189599999998,510.664096C142.92189599999998,522.9974293333333,142.92189599999998,535.3307626666666,142.92189599999998,544.9974293333333C142.92189599999998,554.664096,142.92189599999998,561.664096,142.92189599999998,565.164096L142.92189599999998,568.664096" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M1138.31806905451,144.38434905451004L1152.1706775454252,138.48695754542504C1166.02328603634,132.58956603634002,1193.72850301817,120.79478301817001,1215.9977781757518,114.89739150908501C1238.2670533333333,109,1255.1003866666667,109,1263.5170533333333,109L1271.93372,109" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CapCheck-Unnumbered-0">
-        <path d="M301.4326597629914,402.49318823700855L312.46081780249284,414.3550061975072C323.48897584199426,426.2168241580057,345.54529192099716,449.94046007900283,356.5734499604985,467.96894470616803C367.60160799999994,485.9974293333333,367.60160799999994,498.33076266666666,367.60160799999994,510.664096C367.60160799999994,522.9974293333333,367.60160799999994,535.3307626666666,367.60160799999994,544.9974293333333C367.60160799999994,554.664096,367.60160799999994,561.664096,367.60160799999994,565.164096L367.60160799999994,568.664096" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M1138.31806905451,201.61565094548996L1152.1706775454252,207.51304245457496C1166.02328603634,213.41043396365998,1193.72850301817,225.20521698182998,1218.2295515090852,231.102608490915C1242.7306,237,1264.02748,237,1274.67592,237L1285.32436,237" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-KeyPress-HandleEvent-0">
-        <path d="M721.515696,79L721.515696,83.16666666666667C721.515696,87.33333333333333,721.515696,95.66666666666667,721.515696,103.33333333333333C721.515696,111,721.515696,118,721.515696,121.5L721.515696,125" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M187.68751199999997,187.5L187.68751199999997,209.75C187.68751199999997,232,187.68751199999997,276.5,187.68751199999997,302.25C187.68751199999997,328,187.68751199999997,335,187.68751199999997,338.5L187.68751199999997,342" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-HandleEvent-ViewMode-0">
-        <path d="M721.515696,183L721.515696,189.16666666666666C721.515696,195.33333333333334,721.515696,207.66666666666666,721.515696,228.80534133333333C721.515696,249.944016,721.515696,279.888032,721.515696,294.86003999999997L721.515696,309.832048" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M187.68751199999997,400L187.68751199999997,406.1666666666667C187.68751199999997,412.3333333333333,187.68751199999997,424.6666666666667,187.68751199999997,436.3333333333333C187.68751199999997,448,187.68751199999997,459,187.68751199999997,464.5L187.68751199999997,470" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-ViewMode-RenderFull-0">
-        <path d="M721.515696,391.832048L721.515696,405.47072266666663C721.515696,419.10939733333333,721.515696,446.3867466666666,721.515696,466.192088C721.515696,485.9974293333333,721.515696,498.33076266666666,721.515696,510.664096C721.515696,522.9974293333333,721.515696,535.3307626666666,721.515696,546.9974293333333C721.515696,558.664096,721.515696,569.664096,721.515696,575.164096L721.515696,580.664096" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M187.68751199999997,552L187.68751199999997,556.1666666666666C187.68751199999997,560.3333333333334,187.68751199999997,568.6666666666666,187.68751199999997,577C187.68751199999997,585.3333333333334,187.68751199999997,593.6666666666666,187.68751199999997,602C187.68751199999997,610.3333333333334,187.68751199999997,618.6666666666666,187.68751199999997,626.3333333333334C187.68751199999997,634,187.68751199999997,641,187.68751199999997,644.5L187.68751199999997,648" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-RenderFull-TmuxCheck-0">
-        <path d="M721.515696,638.664096L721.515696,644.8307626666666C721.515696,650.9974293333333,721.515696,663.3307626666666,721.515696,673.664096C721.515696,683.9974293333333,721.515696,692.3307626666666,721.515696,699.9974293333333C721.515696,707.664096,721.515696,714.664096,721.515696,718.164096L721.515696,721.664096" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M187.68751199999997,706L187.68751199999997,710.1666666666666C187.68751199999997,714.3333333333334,187.68751199999997,722.6666666666666,187.68751199999997,730.3333333333334C187.68751199999997,738,187.68751199999997,745,187.68751199999997,748.5L187.68751199999997,752" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-TmuxCheck-Inner-0">
-        <path d="M721.515696,779.664096L721.515696,783.8307626666666C721.515696,787.9974293333333,721.515696,796.3307626666666,721.515696,803.9974293333333C721.515696,811.664096,721.515696,818.664096,721.515696,822.1640960000001L721.515696,825.664096" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M187.68751199999997,810L187.68751199999997,814.1666666666666C187.68751199999997,818.3333333333334,187.68751199999997,826.6666666666666,187.68751199999997,834.3333333333334C187.68751199999997,842,187.68751199999997,849,187.68751199999997,852.5L187.68751199999997,856" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-CapCheck-Numbered-0">
-        <rect x="128.12189599999996" y="463.57493099739844" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="142.92189599999998" y="474.57493099739844" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <rect x="1190.1483704796935" y="105.01821323753686" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="1204.9483704796935" y="116.01821323753686" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CapCheck-Unnumbered-0">
-        <rect x="356.40160799999995" y="463.57493099739844" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="367.60160799999994" y="474.57493099739844" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+        <rect x="1199.9086732207531" y="221.6043770928219" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="1211.1086732207532" y="232.6043770928219" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-HandleEvent-ViewMode-0">
-        <rect x="685.1156960000001" y="237.416024" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="721.515696" y="248.416024" class="edge-label" text-anchor="middle" dominant-baseline="central">idx &lt; len</text>
+        <rect x="151.28751199999996" y="426" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="187.68751199999997" y="437" class="edge-label" text-anchor="middle" dominant-baseline="central">idx &lt; len</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-ViewMode">
-        <rect x="595.363328" y="313.832048" width="252.30473600000005" height="78"/>
-        <text x="721.515696" y="352.832048" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="721.515696" y="352.832048" dy="-0.6em">ViewMode enum</tspan><tspan x="721.515696" dy="1.2em">Chat | DiagramViewer(idx)</tspan></text>
+        <rect x="61.535143999999946" y="474" width="252.30473600000005" height="78"/>
+        <text x="187.68751199999997" y="513" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="187.68751199999997" y="513" dy="-0.6em">ViewMode enum</tspan><tspan x="187.68751199999997" dy="1.2em">Chat | DiagramViewer(idx)</tspan></text>
       </g>
       <g class="node" id="node-HandleEvent">
-        <rect x="637.132872" y="129" width="168.765648" height="54"/>
-        <text x="721.515696" y="156" class="label" text-anchor="middle" dominant-baseline="central">handle_event()</text>
+        <rect x="103.30468799999997" y="346" width="168.765648" height="54"/>
+        <text x="187.68751199999997" y="373" class="label" dominant-baseline="central" text-anchor="middle">handle_event()</text>
       </g>
       <g class="node" id="node-KeyPress">
-        <rect x="647.0781920000001" y="25" width="148.87500799999998" height="54"/>
-        <text x="721.515696" y="52" class="label" text-anchor="middle" dominant-baseline="central">KeyPress 1-9</text>
+        <rect x="113.25000799999998" y="133.5" width="148.87500799999998" height="54"/>
+        <text x="187.68751199999997" y="160.5" class="label" dominant-baseline="central" text-anchor="middle">KeyPress 1-9</text>
       </g>
       <g class="node" id="node-RenderMsg">
-        <rect x="161.35549599999996" y="25" width="187.812512" height="54"/>
-        <text x="255.26175199999994" y="52" class="label" text-anchor="middle" dominant-baseline="central">render_message()</text>
+        <rect x="413.8398800000001" y="146" width="187.812512" height="54"/>
+        <text x="507.7461360000001" y="173" class="label" text-anchor="middle" dominant-baseline="central">render_message()</text>
       </g>
       <g class="node" id="node-DiagramNum">
-        <rect x="143.45313599999997" y="129" width="223.617232" height="54"/>
-        <text x="255.26175199999997" y="156" class="label" text-anchor="middle" dominant-baseline="central">diagram_num = len + 1</text>
+        <rect x="676.6523920000001" y="146" width="223.617232" height="54"/>
+        <text x="788.4610080000001" y="173" class="label" text-anchor="middle" dominant-baseline="central">diagram_num = len + 1</text>
       </g>
       <g class="node" id="node-CapCheck">
-        <polygon points="255.26175199999994,257 351.0938,352.832048 255.26175199999994,448.664096 159.42970399999996,352.832048" style="fill:#f96 !important"/>
-        <text x="255.26175199999994" y="352.832048" class="label" style="fill: #ffffff" text-anchor="middle" dominant-baseline="central">diagram_num &lt;= 9?</text>
+        <polygon points="1071.1016720000002,77.167952 1166.9337200000002,173 1071.1016720000002,268.832048 975.2696240000001,173" style="fill:#f96 !important"/>
+        <text x="1071.1016720000002" y="173" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff">diagram_num &lt;= 9?</text>
       </g>
       <g class="node" id="node-Numbered">
-        <rect x="48.88671999999998" y="572.664096" width="188.07035199999999" height="78"/>
-        <text x="142.92189599999998" y="611.664096" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="142.92189599999998" y="611.664096" dy="-0.6em">[N] Diagram: type</tspan><tspan x="142.92189599999998" dy="1.2em">(press N to view)</tspan></text>
+        <rect x="1275.93372" y="70" width="188.07035199999999" height="78"/>
+        <text x="1369.968896" y="109" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1369.968896" y="109" dy="-0.6em">[N] Diagram: type</tspan><tspan x="1369.968896" dy="1.2em">(press N to view)</tspan></text>
       </g>
       <g class="node" id="node-Unnumbered">
-        <rect x="286.9570719999999" y="572.664096" width="161.28907199999998" height="78"/>
-        <text x="367.60160799999994" y="611.664096" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="367.60160799999994" y="611.664096" dy="-0.6em">Diagram: type</tspan><tspan x="367.60160799999994" dy="1.2em">(no shortcut)</tspan></text>
+        <rect x="1289.32436" y="198" width="161.28907199999998" height="78"/>
+        <text x="1369.968896" y="237" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1369.968896" y="237" dy="-0.6em">Diagram: type</tspan><tspan x="1369.968896" dy="1.2em">(no shortcut)</tspan></text>
       </g>
       <g class="node" id="node-RenderFull">
-        <rect x="596.519592" y="584.664096" width="249.99220800000003" height="54"/>
-        <text x="721.515696" y="611.664096" class="label" dominant-baseline="central" text-anchor="middle">render_fullscreen_image()</text>
+        <rect x="62.69140799999995" y="652" width="249.99220800000003" height="54"/>
+        <text x="187.68751199999997" y="679" class="label" text-anchor="middle" dominant-baseline="central">render_fullscreen_image()</text>
       </g>
       <g class="node" id="node-TmuxCheck">
-        <rect x="632.546944" y="725.664096" width="177.937504" height="54" style="fill:#f96 !important"/>
-        <text x="721.515696" y="752.664096" class="label" dominant-baseline="central" style="fill: #ffffff" text-anchor="middle">is_inside_tmux()</text>
+        <rect x="98.71875999999997" y="756" width="177.937504" height="54" style="fill:#f96 !important"/>
+        <text x="187.68751199999997" y="783" class="label" dominant-baseline="central" style="fill: #ffffff" text-anchor="middle">is_inside_tmux()</text>
       </g>
       <g class="node" id="node-Inner">
-        <rect x="573.828184" y="829.664096" width="295.37502400000005" height="54" style="fill:#9f6 !important"/>
-        <text x="721.5156959999999" y="856.664096" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">render_fullscreen_image_inner()</text>
+        <rect x="39.99999999999994" y="860" width="295.37502400000005" height="54" style="fill:#9f6 !important"/>
+        <text x="187.68751199999997" y="887" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">render_fullscreen_image_inner()</text>
       </g>
     </g>
   </g>

@@ -52,8 +52,9 @@ impl ToLayoutGraph for FlowchartDb {
                 .metadata
                 .insert("is_group".to_string(), "true".to_string());
 
-            // Store subgraph direction if specified
-            // Note: Full subgraph direction support requires recursive layout (like mermaid.js)
+            // Store subgraph direction if specified. Like mermaid, the
+            // direction only takes effect when the subgraph has no external
+            // connections (it is then extracted and laid out recursively).
             if let Some(ref dir) = subgraph.dir {
                 sg_node.metadata.insert("dir".to_string(), dir.clone());
             }
@@ -475,14 +476,15 @@ mod tests {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
 
-        // Parse a flowchart with TB direction but a subgraph with LR direction
-        // This tests the full flow from parsing to layout
+        // Parse a flowchart with TB direction but a subgraph with LR direction.
+        // The subgraph has no external connections, so (like mermaid) it is
+        // extracted and laid out with its declared direction.
         let input = r#"flowchart TB
     subgraph sub1[LR Subgraph]
         direction LR
         A[Node A] --> B[Node B]
     end
-    C[External] --> A"#;
+    C[External] --> D[Other]"#;
 
         let db = parse(input).unwrap();
 
@@ -513,11 +515,9 @@ mod tests {
         // Get positions
         let a = graph.get_node("A").unwrap();
         let b = graph.get_node("B").unwrap();
-        let c = graph.get_node("C").unwrap();
 
         eprintln!("A: x={:?}, y={:?}", a.x, a.y);
         eprintln!("B: x={:?}, y={:?}", b.x, b.y);
-        eprintln!("C: x={:?}, y={:?}", c.x, c.y);
 
         // A and B are in the LR subgraph, so they should be side-by-side
         // (B to the right of A, similar y)
@@ -536,15 +536,6 @@ mod tests {
             "B should be to the right of A in LR subgraph. A.x={:.1}, B.x={:.1}",
             a.x.unwrap(),
             b.x.unwrap()
-        );
-
-        // C is in the TB main graph, so it should be above the subgraph (lower y)
-        let c_center_y = c.y.unwrap() + c.height / 2.0;
-        assert!(
-            c_center_y < a_center_y,
-            "C should be above the subgraph in TB layout. C.y={:.1}, A.y={:.1}",
-            c_center_y,
-            a_center_y
         );
     }
 }

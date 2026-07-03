@@ -87,7 +87,7 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
@@ -118,39 +118,39 @@ marker path {
         <path d="M656.4719079999998,90.69329447268198L682.3814126666664,98.911078727235C708.2909173333331,107.128862981788,760.1099266666664,123.564431490894,786.019431333333,137.94888241211365C811.9289359999997,152.33333333333334,811.9289359999997,164.66666666666666,811.9289359999997,183.71392112526243C811.9289359999997,202.76117558385818,811.9289359999997,228.52235116771632,811.9289359999997,241.4029389596454L811.9289359999997,254.28352675157447" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-TmuxPath-SharedLogic-0">
-        <path d="M224.99725599999965,102.43932667344194L208.29296199999965,108.69943889453494C191.58866799999964,114.95955111562796,158.18007999999966,127.47977555781398,141.47578599999966,139.90655444557365C124.77149199999967,152.33333333333334,124.77149199999967,164.66666666666666,127.34448918842281,174.4564525982232C129.91748637684597,184.24623852977967,135.0634807536923,191.49247705955932,137.63647794211548,195.11559632444917L140.20947513053864,198.73871558933902" class="edge-path" stroke-width="2" marker-end="url(#arrow_point)" fill="none" stroke-dasharray="3,3"/>
+        <path d="M224.99725599999965,102.43932667344194L208.29296199999965,108.69943889453494C191.58866799999964,114.95955111562796,158.18007999999966,127.47977555781398,141.47578599999966,139.90655444557365C124.77149199999967,152.33333333333334,124.77149199999967,164.66666666666666,127.34448918842281,174.4564525982232C129.91748637684597,184.24623852977967,135.0634807536923,191.49247705955932,137.63647794211548,195.11559632444917L140.20947513053864,198.73871558933902" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="2" stroke-dasharray="3,3"/>
       </g>
       <g class="edge" id="edge-L-HeadlessPath-SharedLogic-0">
-        <path d="M488.1515879999997,91.53197264425202L463.4586186666664,99.60997720354335C438.7656493333331,107.68798176283468,389.37971066666637,123.84399088141735,364.68674133333303,138.08866210737534C339.9937719999997,152.33333333333334,339.9937719999997,164.66666666666666,336.62422669724486,174.50860056103485C333.25468139449004,184.35053445540305,326.51559078898043,191.70106891080613,323.14604548622555,195.37633613850764L319.7765001834708,199.05160336620915" class="edge-path" marker-end="url(#arrow_point)" stroke-dasharray="3,3" fill="none" stroke-width="2"/>
+        <path d="M488.1515879999997,91.53197264425202L463.4586186666664,99.60997720354335C438.7656493333331,107.68798176283468,389.37971066666637,123.84399088141735,364.68674133333303,138.08866210737534C339.9937719999997,152.33333333333334,339.9937719999997,164.66666666666666,336.62422669724486,174.50860056103485C333.25468139449004,184.35053445540305,326.51559078898043,191.70106891080613,323.14604548622555,195.37633613850764L319.7765001834708,199.05160336620915" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="2" stroke-dasharray="3,3"/>
       </g>
       <g class="edge" id="edge-L-NewLaunch-HeadlessOut-0">
-        <path d="M1553.7744251172094,348.28352675157447L1547.2421102643411,363.83078121017024C1540.7097954114731,379.37803566876596,1527.6451657057362,410.47254458595745,1521.1128508528682,432.18646571121985C1514.5805360000002,453.90038683648226,1514.5805360000002,466.23372016981557,1514.5805359999997,488.65752025748816C1514.5805360000002,511.0813203451606,1514.5805360000002,543.5955871871723,1514.5805359999997,559.8527206081782L1514.580536,576.109854029184" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M1553.7744251172094,348.28352675157447L1547.2421102643411,363.83078121017024C1540.7097954114731,379.37803566876596,1527.6451657057362,410.47254458595745,1521.1128508528682,432.18646571121985C1514.5805360000002,453.90038683648226,1514.5805360000002,466.23372016981557,1514.5805359999997,488.65752025748816C1514.5805360000002,511.0813203451606,1514.5805360000002,543.5955871871723,1514.5805359999997,559.8527206081782L1514.580536,576.109854029184" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-NewLaunch-ShellOut-0">
         <path d="M1618.1744541850662,348.28352675157447L1637.3150531542217,363.83078121017024C1656.4556521233774,379.37803566876596,1694.7368500616885,410.47254458595745,1713.8774490308442,432.18646571121985C1733.018048,453.90038683648226,1733.018048,466.23372016981557,1733.018048,488.65752025748816C1733.018048,511.0813203451606,1733.018048,543.5955871871723,1733.018048,559.8527206081782L1733.018048,576.109854029184" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-NewLaunch-UnifiedLogic-0">
-        <path d="M1484.266056,346.98194290004784L1448.347896,362.74612800056474C1412.429736,378.5103131010815,1340.593416,410.03868330211526,1304.6752559999998,431.96953506929873C1268.7570959999998,453.90038683648226,1268.7570959999998,466.23372016981557,1268.7570959999996,477.9003868364823C1268.7570959999998,489.5670535031489,1268.7570959999998,500.5670535031489,1268.7570959999996,506.067053503149L1268.7570959999998,511.56705350314894" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M1484.266056,346.98194290004784L1448.347896,362.74612800056474C1412.429736,378.5103131010815,1340.593416,410.03868330211526,1304.6752559999998,431.96953506929873C1268.7570959999998,453.90038683648226,1268.7570959999998,466.23372016981557,1268.7570959999996,477.9003868364823C1268.7570959999998,489.5670535031489,1268.7570959999998,500.5670535031489,1268.7570959999996,506.067053503149L1268.7570959999998,511.56705350314894" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-SharedLogic-UnifiedLogic-0">
-        <path d="M218.71406399999995,416.56705350314894L218.71406399999998,420.7337201698156C218.71406399999992,424.90038683648226,218.71406399999992,433.23372016981557,362.93738266666657,443.567053503149C507.16070133333324,453.90038683648226,795.6073386666664,466.23372016981557,951.4734223588997,481.2595052019961C1107.339506051133,496.2852902341765,1130.625036102266,514.0035269652041,1142.2678011278329,522.862645330718L1153.9105661533993,531.7217636962317" class="edge-path" stroke-dasharray="3,3" fill="none" stroke-width="2" marker-end="url(#arrow_point)"/>
+        <path d="M218.71406399999995,416.56705350314894L218.71406399999998,420.7337201698156C218.71406399999992,424.90038683648226,218.71406399999992,433.23372016981557,362.93738266666657,443.567053503149C507.16070133333324,453.90038683648226,795.6073386666664,466.23372016981557,951.4734223588997,481.2595052019961C1107.339506051133,496.2852902341765,1130.625036102266,514.0035269652041,1142.2678011278329,522.862645330718L1153.9105661533993,531.7217636962317" class="edge-path" stroke-width="2" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Risk-UnifiedLogic-0">
-        <path d="M1953.9946239999995,337.20441671257026L1861.538629333333,354.59818951100004C1769.0826346666663,371.9919623094299,1584.170645333333,406.7795079062894,1491.7146506666666,430.3399473713858C1399.258656,453.90038683648226,1399.258656,466.23372016981557,1393.9862033174877,478.07852022922697C1388.7137506349754,489.9233202886382,1378.1688452699511,501.27958707412745,1372.8963925874389,506.95772046687216L1367.6239399049268,512.6358538596168" class="edge-path" fill="none" stroke-width="2" marker-end="url(#arrow_point)" stroke-dasharray="3,3"/>
+        <path d="M1953.9946239999995,337.20441671257026L1861.538629333333,354.59818951100004C1769.0826346666663,371.9919623094299,1584.170645333333,406.7795079062894,1491.7146506666666,430.3399473713858C1399.258656,453.90038683648226,1399.258656,466.23372016981557,1393.9862033174877,478.07852022922697C1388.7137506349754,489.9233202886382,1378.1688452699511,501.27958707412745,1372.8963925874389,506.95772046687216L1367.6239399049268,512.6358538596168" class="edge-path" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-TmuxPath-ShellCmd-0">
         <rect x="476.34723823760186" y="124.39810544707146" width="137.6" height="22" class="edge-label-bg"/>
-        <text x="545.1472382376019" y="135.39810544707146" class="edge-label" dominant-baseline="central" text-anchor="middle">to_shell_command()</text>
+        <text x="545.1472382376019" y="135.39810544707146" class="edge-label" text-anchor="middle" dominant-baseline="central">to_shell_command()</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-HeadlessPath-TokioCmd-0">
         <rect x="700.1745481149944" y="122.22697385439477" width="180.79999999999998" height="22" class="edge-label-bg"/>
-        <text x="790.5745481149944" y="133.22697385439477" class="edge-label" text-anchor="middle" dominant-baseline="central">HeadlessSession::spawn()</text>
+        <text x="790.5745481149944" y="133.22697385439477" class="edge-label" dominant-baseline="central" text-anchor="middle">HeadlessSession::spawn()</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-TmuxPath-SharedLogic-0">
         <rect x="103.20457097679173" y="122.09200718240538" width="80" height="22" class="edge-label-bg"/>
-        <text x="143.20457097679173" y="133.09200718240538" class="edge-label" text-anchor="middle" dominant-baseline="central">duplicates</text>
+        <text x="143.20457097679173" y="133.09200718240538" class="edge-label" dominant-baseline="central" text-anchor="middle">duplicates</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-HeadlessPath-SharedLogic-0">
         <rect x="340.3718037017142" y="115.79081807543682" width="80" height="22" class="edge-label-bg"/>
@@ -158,7 +158,7 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-NewLaunch-HeadlessOut-0">
         <rect x="1438.580536" y="449.24700857198417" width="152" height="22" class="edge-label-bg"/>
-        <text x="1514.580536" y="460.24700857198417" class="edge-label" text-anchor="middle" dominant-baseline="central">to_headless_config()</text>
+        <text x="1514.580536" y="460.24700857198417" class="edge-label" dominant-baseline="central" text-anchor="middle">to_headless_config()</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-NewLaunch-ShellOut-0">
         <rect x="1660.5649163654132" y="427.59973951338344" width="137.6" height="22" class="edge-label-bg"/>
@@ -174,7 +174,7 @@ marker path {
       </g>
       <g class="edgeLabel" id="edge-label-L-Risk-UnifiedLogic-0">
         <rect x="1593.6351869170717" y="386.47372950881544" width="80" height="22" class="edge-label-bg"/>
-        <text x="1633.6351869170717" y="397.47372950881544" class="edge-label" dominant-baseline="central" text-anchor="middle">avoided by</text>
+        <text x="1633.6351869170717" y="397.47372950881544" class="edge-label" text-anchor="middle" dominant-baseline="central">avoided by</text>
       </g>
     </g>
     <g class="nodes">
@@ -192,19 +192,19 @@ marker path {
       </g>
       <g class="node" id="node-TokioCmd">
         <rect x="715.0851919999997" y="258.28352675157447" width="193.687488" height="102"/>
-        <text x="811.9289359999997" y="309.28352675157447" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="811.9289359999997" y="309.28352675157447" dy="-1.2em">tokio::Command</tspan><tspan x="811.9289359999997" dy="1.2em">structured args</tspan><tspan x="811.9289359999997" dy="1.2em">piped stdin/stdout</tspan></text>
+        <text x="811.9289359999997" y="309.28352675157447" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="811.9289359999997" y="309.28352675157447" dy="-1.2em">tokio::Command</tspan><tspan x="811.9289359999997" dy="1.2em">structured args</tspan><tspan x="811.9289359999997" dy="1.2em">piped stdin/stdout</tspan></text>
       </g>
       <g class="node" id="node-SharedLogic">
         <path d="M 39.99999999999994 234.18505802547236 a 178.714064 32.185058025472344 0 0 0 357.428128 0 a 178.714064 32.185058025472344 0 0 0 -357.428128 0 l 0 150.19693745220428 a 178.714064 32.185058025472344 0 0 0 357.428128 0 l 0 -150.19693745220428" style="fill:#ffd43b !important;stroke:#fab005 !important;color:#000 !important"/>
-        <text x="218.71406399999995" y="309.28352675157447" class="label" dominant-baseline="central" style="fill: #000" text-anchor="middle"><tspan x="218.71406399999995" y="309.28352675157447" dy="-3em">Shared Logic:</tspan><tspan x="218.71406399999995" dy="1.2em">• System prompt (role → agents.rs)</tspan><tspan x="218.71406399999995" dy="1.2em">• Session mode (Fresh/Resume/ResumeSession)</tspan><tspan x="218.71406399999995" dy="1.2em">• Task mode (Shared/Isolated)</tspan><tspan x="218.71406399999995" dy="1.2em">• Agent teams setup</tspan><tspan x="218.71406399999995" dy="1.2em">• Auth profile env var</tspan></text>
+        <text x="218.71406399999995" y="309.28352675157447" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000"><tspan x="218.71406399999995" y="309.28352675157447" dy="-3em">Shared Logic:</tspan><tspan x="218.71406399999995" dy="1.2em">• System prompt (role → agents.rs)</tspan><tspan x="218.71406399999995" dy="1.2em">• Session mode (Fresh/Resume/ResumeSession)</tspan><tspan x="218.71406399999995" dy="1.2em">• Task mode (Shared/Isolated)</tspan><tspan x="218.71406399999995" dy="1.2em">• Agent teams setup</tspan><tspan x="218.71406399999995" dy="1.2em">• Auth profile env var</tspan></text>
       </g>
       <g class="node" id="node-NewLaunch">
         <rect x="1484.2660559999997" y="270.28352675157447" width="171.78912" height="78"/>
-        <text x="1570.1606159999997" y="309.28352675157447" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1570.1606159999997" y="309.28352675157447" dy="-0.6em">LaunchConfig</tspan><tspan x="1570.1606159999997" dy="1.2em">(new launch.rs)</tspan></text>
+        <text x="1570.1606159999997" y="309.28352675157447" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1570.1606159999997" y="309.28352675157447" dy="-0.6em">LaunchConfig</tspan><tspan x="1570.1606159999997" dy="1.2em">(new launch.rs)</tspan></text>
       </g>
       <g class="node" id="node-HeadlessOut">
         <rect x="1430.420376" y="580.109854029184" width="168.32031999999998" height="78"/>
-        <text x="1514.580536" y="619.109854029184" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1514.580536" y="619.109854029184" dy="-0.6em">HeadlessConfig</tspan><tspan x="1514.580536" dy="1.2em">(structured)</tspan></text>
+        <text x="1514.580536" y="619.109854029184" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1514.580536" y="619.109854029184" dy="-0.6em">HeadlessConfig</tspan><tspan x="1514.580536" dy="1.2em">(structured)</tspan></text>
       </g>
       <g class="node" id="node-ShellOut">
         <rect x="1648.7406959999998" y="580.109854029184" width="168.55470400000002" height="78"/>
@@ -212,11 +212,11 @@ marker path {
       </g>
       <g class="node" id="node-UnifiedLogic">
         <path d="M 1157.0938159999998 546.6298936609595 a 111.66328000000001 31.06284015781053 0 0 0 223.32656000000003 0 a 111.66328000000001 31.06284015781053 0 0 0 -223.32656000000003 0 l 0 144.95992073644916 a 111.66328000000001 31.06284015781053 0 0 0 223.32656000000003 0 l 0 -144.95992073644916" style="fill:#51cf66 !important;stroke:#2f9e44 !important;color:#000 !important"/>
-        <text x="1268.7570959999998" y="619.109854029184" class="label" dominant-baseline="central" style="fill: #000" text-anchor="middle"><tspan x="1268.7570959999998" y="619.109854029184" dy="-3em">Unified Logic:</tspan><tspan x="1268.7570959999998" dy="1.2em">• generate_system_prompt()</tspan><tspan x="1268.7570959999998" dy="1.2em">• build_session_flags()</tspan><tspan x="1268.7570959999998" dy="1.2em">• build_task_env()</tspan><tspan x="1268.7570959999998" dy="1.2em">• build_team_flags()</tspan><tspan x="1268.7570959999998" dy="1.2em">• build_auth_env()</tspan></text>
+        <text x="1268.7570959999998" y="619.109854029184" class="label" style="fill: #000" dominant-baseline="central" text-anchor="middle"><tspan x="1268.7570959999998" y="619.109854029184" dy="-3em">Unified Logic:</tspan><tspan x="1268.7570959999998" dy="1.2em">• generate_system_prompt()</tspan><tspan x="1268.7570959999998" dy="1.2em">• build_session_flags()</tspan><tspan x="1268.7570959999998" dy="1.2em">• build_task_env()</tspan><tspan x="1268.7570959999998" dy="1.2em">• build_team_flags()</tspan><tspan x="1268.7570959999998" dy="1.2em">• build_auth_env()</tspan></text>
       </g>
       <g class="node" id="node-Risk">
         <rect x="1953.9946239999997" y="258.28352675157447" width="296.82504000000006" height="102" style="fill:#ff6b6b !important;stroke:#c92a2a !important;color:#fff !important"/>
-        <text x="2102.407144" y="309.28352675157447" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="2102.407144" y="309.28352675157447" dy="-1.2em">⚠️ Risk: Two paths to same thing</tspan><tspan x="2102.407144" dy="1.2em">if shared logic not extracted</tspan><tspan x="2102.407144" dy="1.2em">into launch.rs</tspan></text>
+        <text x="2102.407144" y="309.28352675157447" class="label" style="fill: #fff" text-anchor="middle" dominant-baseline="central"><tspan x="2102.407144" y="309.28352675157447" dy="-1.2em">⚠️ Risk: Two paths to same thing</tspan><tspan x="2102.407144" dy="1.2em">if shared logic not extracted</tspan><tspan x="2102.407144" dy="1.2em">into launch.rs</tspan></text>
       </g>
     </g>
   </g>
