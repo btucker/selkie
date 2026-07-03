@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -105,16 +105,16 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 121.41 61.00 L 248.80 32.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M121.4065934065934,60.99999999999999L130.77216117216116,56.29999999999999C140.13772893772895,51.599999999999994,158.86886446886447,42.199999999999996,179.43443223443225,37.5C200,32.8,222.4,32.8,233.6,32.800000000000004L244.8,32.8" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-A-C-0">
-        <path d="M 121.41 113.80 L 217.60 142.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M121.4065934065934,113.79999999999998L130.77216117216116,118.49999999999999C140.13772893772895,123.19999999999999,158.86886446886447,132.6,174.23443223443223,137.29999999999998C189.6,142,201.60000000000002,142,207.6,142L213.60000000000002,142" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B-D-0">
-        <path d="M 314.40 32.80 L 419.07 63.93" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M314.40000000000003,32.8L323.7666666666667,32.800000000000004C333.1333333333334,32.8,351.86666666666673,32.8,368.7502605259587,37.628520290792274C385.63385438525074,42.45704058158456,400.6677087705014,52.11408116316911,408.1846359631267,56.942601453961394L415.70156315575207,61.77112174475367" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-C-D-0">
-        <path d="M 345.60 142.00 L 419.07 110.87" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M345.6,142L349.76666666666665,142C353.9333333333334,142,362.2666666666667,142,373.95026052595864,137.17147970920772C385.63385438525074,132.34295941841546,400.6677087705014,122.68591883683088,408.1846359631267,117.85739854603861L415.70156315575207,113.02887825524633" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -134,11 +134,11 @@ marker path {
       </g>
       <g class="node" id="node-C">
         <path d="M 222.60000000000002 115.6 H 340.6 A 5 5 0 0 1 345.6 120.6 V 163.39999999999998 A 5 5 0 0 1 340.6 168.39999999999998 H 222.60000000000002 A 5 5 0 0 1 217.60000000000002 163.39999999999998 V 120.6 A 5 5 0 0 1 222.60000000000002 115.6 Z"/>
-        <text x="281.6" y="142" class="label" text-anchor="middle" dominant-baseline="central">Round Rect</text>
+        <text x="281.6" y="142" class="label" dominant-baseline="central" text-anchor="middle">Round Rect</text>
       </g>
       <g class="node" id="node-D">
         <polygon points="455.6,27.39999999999999 515.6,87.39999999999999 455.6,147.39999999999998 395.6,87.39999999999999"/>
-        <text x="455.6" y="87.39999999999999" class="label" dominant-baseline="central" text-anchor="middle">Rhombus</text>
+        <text x="455.6" y="87.39999999999999" class="label" text-anchor="middle" dominant-baseline="central">Rhombus</text>
       </g>
     </g>
   </g>

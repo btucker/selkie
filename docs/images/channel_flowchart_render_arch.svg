@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="920.8000000000001" height="788.1999999999999" viewBox="-28 -27.999999999999993 920.8000000000001 788.1999999999999" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="898.5999999999999" height="763.1999999999999" viewBox="-8 -27.999999999999993 898.5999999999999 763.1999999999999" class="mermaid">
   <style>
 
 .mermaid {
@@ -90,7 +90,7 @@ marker path {
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -101,45 +101,45 @@ marker path {
   </defs>
   <g class="root">
     <g class="clusters">
-      <g class="subgraph" id="subgraph-subGraph0">
-        <rect x="-20" y="-19.999999999999993" width="725.5999999999999" height="767.1999999999999" class="cluster"/>
-        <text x="342.79999999999995" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Current Architecture</text>
+      <g class="subgraph" id="subgraph-">
+        <rect x="20" y="-19.999999999999993" width="340" height="742.1999999999999" class="cluster"/>
+        <text x="190" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
       </g>
-      <g class="subgraph" id="subgraph-subGraph1">
-        <rect x="32.400000000000006" y="-19.999999999999993" width="852.4000000000001" height="518.2" class="cluster"/>
-        <text x="458.6" y="-3.999999999999993" class="cluster-label" text-anchor="middle">New Architecture</text>
+      <g class="subgraph" id="subgraph-">
+        <rect x="382.2" y="-19.999999999999993" width="480.40000000000003" height="518.2" class="cluster"/>
+        <text x="622.4" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A1-B1-0">
-        <path d="M 540.00 77.80 C 540.00 86.13, 540.00 94.47, 540.00 105.87 C 540.00 117.27, 540.00 131.73, 540.00 146.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M190,77.80000000000001L190,81.96666666666668C190,86.13333333333334,190,94.46666666666665,190,105.2C190,115.93333333333334,190,129.0666666666667,190,135.63333333333335L190,142.20000000000002" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-B1-C1-0">
-        <path d="M 394.40 198.66 C 312.93 213.24, 231.47 227.82, 190.73 242.34 C 150.00 256.87, 150.00 271.33, 150.00 285.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M190,199.00000000000003L190,206.23333333333335C190,213.4666666666667,190,227.9333333333333,190,241.73333333333332C190,255.5333333333333,190,268.6666666666667,190,275.2333333333333L190,281.8" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-C1-D1-0">
-        <path d="M 150.00 338.60 C 150.00 353.07, 150.00 367.53, 150.00 378.93 C 150.00 390.33, 150.00 398.67, 150.00 407.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M190,338.59999999999997L190,345.8333333333333C190,353.0666666666666,190,367.5333333333333,190,378.26666666666665C190,389,190,396,190,399.5L190,403" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-D1-E1-0">
-        <path d="M 298.14 496.60 C 325.69 504.93, 353.25 513.27, 367.02 525.77 C 380.80 538.27, 380.80 554.93, 380.80 571.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M190,496.6L190,500.76666666666665C190,504.9333333333334,190,513.2666666666668,190,520.9333333333333C190,528.6,190,535.6,190,539.1L190,542.6" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-E1-F1-0">
-        <path d="M 380.80 624.40 C 380.80 632.73, 380.80 641.07, 380.80 649.40 C 380.80 657.73, 380.80 666.07, 380.80 674.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M190,599.4L190,603.5666666666667C190,607.7333333333332,190,616.0666666666666,190,623.7333333333333C190,631.4,190,638.4,190,641.9L190,645.4" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-A2-B2-0">
-        <path d="M 150.00 77.80 C 150.00 86.13, 150.00 94.47, 150.00 102.80 C 150.00 111.13, 150.00 119.47, 150.00 127.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M593.6,77.80000000000001L593.6,81.96666666666668C593.6,86.13333333333334,593.6,94.46666666666665,593.6,102.13333333333333C593.6,109.8,593.6,116.80000000000001,593.6,120.3L593.6,123.80000000000001" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B2-C2-0">
-        <path d="M 247.60 192.45 C 329.47 209.10, 411.33 225.75, 452.27 238.24 C 493.20 250.73, 493.20 259.07, 493.20 267.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M514.9111747851002,217.40000000000003L507.5926456542502,221.5666666666667C500.27411652340015,225.73333333333335,485.6370582617001,234.0666666666667,478.31852913085004,241.73333333333335C471,249.39999999999998,471,256.4,471,259.90000000000003L471,263.4" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B2-C3-0">
-        <path d="M 247.60 184.18 C 411.20 203.59, 574.80 222.99, 656.60 236.86 C 738.40 250.73, 738.40 259.07, 738.40 267.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M672.2888252148998,217.40000000000003L679.6073543457497,221.5666666666667C686.9258834766,225.73333333333335,701.5629417383001,234.0666666666667,708.8814708691499,241.73333333333335C716.2000000000002,249.39999999999998,716.2000000000002,256.4,716.1999999999999,259.90000000000003L716.2,263.4" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-C2-D2-0">
-        <path d="M 493.20 357.00 C 493.20 365.33, 493.20 373.67, 493.20 385.07 C 493.20 396.47, 493.20 410.93, 493.20 425.40" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M471,357L471,361.1666666666667C471,365.3333333333333,471,373.6666666666667,471,384.40000000000003C471,395.1333333333334,471,408.2666666666667,471,414.8333333333334L471,421.40000000000003" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-C3-D3-0">
-        <path d="M 738.40 357.00 C 738.40 365.33, 738.40 373.67, 738.40 385.07 C 738.40 396.47, 738.40 410.93, 738.40 425.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M716.2,357L716.1999999999999,361.1666666666667C716.2000000000002,365.3333333333333,716.2000000000002,373.6666666666667,716.1999999999999,384.40000000000003C716.2000000000002,395.1333333333334,716.2000000000002,408.2666666666667,716.1999999999999,414.8333333333334L716.2,421.40000000000003" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
@@ -147,52 +147,52 @@ marker path {
     </g>
     <g class="nodes">
       <g class="node" id="node-A1">
-        <rect x="456.8" y="25.000000000000007" width="166.4" height="52.8"/>
-        <text x="540" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
+        <rect x="106.8" y="25.000000000000007" width="166.4" height="52.8"/>
+        <text x="190" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
       </g>
       <g class="node" id="node-A2">
-        <rect x="66.8" y="25.000000000000007" width="166.4" height="52.8"/>
-        <text x="150" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
+        <rect x="510.40000000000003" y="25.000000000000007" width="166.4" height="52.8"/>
+        <text x="593.6" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
       </g>
       <g class="node" id="node-B1">
-        <rect x="394.4" y="146.20000000000002" width="291.2" height="52.8"/>
-        <text x="540" y="172.60000000000002" class="label" dominant-baseline="central" text-anchor="middle">selkie::render::render_text</text>
+        <rect x="44.400000000000006" y="146.20000000000002" width="291.2" height="52.8"/>
+        <text x="190" y="172.60000000000002" class="label" text-anchor="middle" dominant-baseline="central">selkie::render::render_text</text>
       </g>
       <g class="node" id="node-B2">
-        <rect x="52.400000000000006" y="127.80000000000003" width="195.2" height="89.6" style="fill:#4a4 !important;stroke:#282 !important"/>
-        <text x="150" y="172.60000000000002" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff"><tspan x="150" y="172.60000000000002" dy="-0.6em">selkie parser</tspan><tspan x="150" dy="1.2em">single parse step</tspan></text>
+        <rect x="496" y="127.80000000000003" width="195.2" height="89.6" style="fill:#4a4 !important;stroke:#282 !important"/>
+        <text x="593.6" y="172.60000000000002" class="label" style="fill: #ffffff" text-anchor="middle" dominant-baseline="central"><tspan x="593.6" y="172.60000000000002" dy="-0.6em">selkie parser</tspan><tspan x="593.6" dy="1.2em">single parse step</tspan></text>
       </g>
       <g class="node" id="node-C1">
-        <rect x="86" y="285.8" width="128" height="52.8"/>
-        <text x="150" y="312.2" class="label" dominant-baseline="central" text-anchor="middle">SVG String</text>
+        <rect x="126" y="285.8" width="128" height="52.8"/>
+        <text x="190" y="312.2" class="label" text-anchor="middle" dominant-baseline="central">SVG String</text>
       </g>
       <g class="node" id="node-C2">
-        <rect x="424.40000000000003" y="267.4" width="137.6" height="89.6"/>
-        <text x="493.20000000000005" y="312.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="493.20000000000005" y="312.2" dy="-0.6em">render_text</tspan><tspan x="493.20000000000005" dy="1.2em">SVG output</tspan></text>
+        <rect x="402.2" y="267.4" width="137.6" height="89.6"/>
+        <text x="471" y="312.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="471" y="312.2" dy="-0.6em">render_text</tspan><tspan x="471" dy="1.2em">SVG output</tspan></text>
       </g>
       <g class="node" id="node-C3">
-        <rect x="621.6000000000001" y="267.4" width="233.6" height="89.6"/>
-        <text x="738.4000000000001" y="312.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="738.4000000000001" y="312.2" dy="-0.6em">render_text_ascii</tspan><tspan x="738.4000000000001" dy="1.2em">box-drawing + braille</tspan></text>
+        <rect x="599.4000000000001" y="267.4" width="233.6" height="89.6"/>
+        <text x="716.2" y="312.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="716.2" y="312.2" dy="-0.6em">render_text_ascii</tspan><tspan x="716.2" dy="1.2em">box-drawing + braille</tspan></text>
       </g>
       <g class="node" id="node-D1">
-        <rect x="0" y="407" width="300" height="89.6" style="fill:#a44 !important;stroke:#822 !important"/>
-        <text x="150" y="451.8" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #ffffff"><tspan x="150" y="451.8" dy="-0.6em">svg_to_png</tspan><tspan x="150" dy="1.2em">resvg + usvg + tiny-skia + fontdb</tspan></text>
+        <rect x="40" y="407" width="300" height="89.6" style="fill:#a44 !important;stroke:#822 !important"/>
+        <text x="190" y="451.8" class="label" style="fill: #ffffff" text-anchor="middle" dominant-baseline="central"><tspan x="190" y="451.8" dy="-0.6em">svg_to_png</tspan><tspan x="190" dy="1.2em">resvg + usvg + tiny-skia + fontdb</tspan></text>
       </g>
       <g class="node" id="node-D2">
-        <rect x="424.40000000000003" y="425.40000000000003" width="137.6" height="52.8"/>
-        <text x="493.20000000000005" y="451.8" class="label" text-anchor="middle" dominant-baseline="central">Web browser</text>
+        <rect x="402.2" y="425.40000000000003" width="137.6" height="52.8"/>
+        <text x="471" y="451.8" class="label" text-anchor="middle" dominant-baseline="central">Web browser</text>
       </g>
       <g class="node" id="node-D3">
-        <rect x="612.0000000000001" y="425.40000000000003" width="252.79999999999998" height="52.8"/>
-        <text x="738.4000000000001" y="451.8" class="label" text-anchor="middle" dominant-baseline="central">Terminal inline display</text>
+        <rect x="589.8000000000001" y="425.40000000000003" width="252.79999999999998" height="52.8"/>
+        <text x="716.2" y="451.8" class="label" dominant-baseline="central" text-anchor="middle">Terminal inline display</text>
       </g>
       <g class="node" id="node-E1">
-        <rect x="321.6000000000002" y="571.6" width="118.39999999999999" height="52.8"/>
-        <text x="380.8000000000002" y="598" class="label" text-anchor="middle" dominant-baseline="central">PNG bytes</text>
+        <rect x="130.8" y="546.6" width="118.39999999999999" height="52.8"/>
+        <text x="190" y="573" class="label" text-anchor="middle" dominant-baseline="central">PNG bytes</text>
       </g>
       <g class="node" id="node-F1">
-        <rect x="259.20000000000016" y="674.4" width="243.2" height="52.8"/>
-        <text x="380.8000000000002" y="700.8" class="label" text-anchor="middle" dominant-baseline="central">Kitty terminal display</text>
+        <rect x="68.4" y="649.4" width="243.2" height="52.8"/>
+        <text x="190" y="675.8" class="label" text-anchor="middle" dominant-baseline="central">Kitty terminal display</text>
       </g>
     </g>
   </g>

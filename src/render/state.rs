@@ -9,7 +9,7 @@ use crate::layout::{
     create_size_estimator, layout, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode,
     LayoutOptions, LayoutRanker, NodeShape, NodeSizeConfig, Padding, SizeEstimator, ToLayoutGraph,
 };
-use crate::render::svg::edges::{build_curved_path, build_curved_path_with_options};
+use crate::render::svg::edges::build_curved_path;
 use crate::render::svg::{Attrs, RenderConfig, SvgDocument, SvgElement};
 
 /// Generate SVG path for a rounded rectangle
@@ -1928,15 +1928,10 @@ fn render_transition(
     // Use bend points from layout if available, otherwise calculate connection points
     let (path_d, label_x, label_y) = if let Some(points) = bend_points {
         if !points.is_empty() {
-            // Check if this edge involves a fork/join state
-            // Fork/join edges need curves, so skip simplification (matching mermaid behavior)
-            let is_fork_join_edge =
-                matches!(state1_type, Some(StateType::Fork) | Some(StateType::Join))
-                    || matches!(state2_type, Some(StateType::Fork) | Some(StateType::Join));
-
-            // Use dagre's bend points to create a curved path
-            // Skip simplification for fork/join edges to preserve the fan-out curve
-            let curved_path = build_curved_path_with_options(points, !is_fork_join_edge);
+            // Use dagre's bend points to create a curved path.
+            // All points are rendered through curveBasis - mermaid performs
+            // no bend-point simplification.
+            let curved_path = build_curved_path(points);
 
             // Use layout-provided label position if available, otherwise calculate midpoint
             let (lx, ly) = if let Some(pos) = label_position {

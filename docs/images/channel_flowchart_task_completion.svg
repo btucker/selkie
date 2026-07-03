@@ -90,7 +90,7 @@ marker path {
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -105,40 +105,40 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 228.40 52.80 C 202.27 61.13, 176.13 69.47, 163.07 77.80 C 150.00 86.13, 150.00 94.47, 150.00 102.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M228.4046692607004,52.8L215.337224383917,56.96666666666667C202.26977950713362,61.133333333333326,176.1348897535668,69.46666666666665,163.0674448767834,77.13333333333333C150,84.8,150,91.8,150,95.3L150,98.79999999999998" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 150.00 155.60 C 150.00 163.93, 150.00 172.27, 150.00 180.60 C 150.00 188.93, 150.00 197.27, 150.00 205.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M150,155.6L150,159.76666666666668C150,163.9333333333333,150,172.26666666666665,150,179.9333333333333C150,187.6,150,194.6,150,198.1L150,201.6" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A-D-0">
-        <path d="M 394.00 52.80 C 420.13 61.13, 446.27 69.47, 459.33 77.80 C 472.40 86.13, 472.40 94.47, 472.40 102.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M393.99533073929956,52.8L407.06277561608294,56.96666666666667C420.1302204928664,61.133333333333326,446.26511024643315,69.46666666666665,459.33255512321654,77.13333333333333C472.3999999999999,84.8,472.3999999999999,91.8,472.40000000000003,95.3L472.4,98.79999999999998" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-D-E-0">
-        <path d="M 472.40 155.60 C 472.40 163.93, 472.40 172.27, 472.40 180.60 C 472.40 188.93, 472.40 197.27, 472.40 205.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M472.4,155.6L472.40000000000003,159.76666666666668C472.3999999999999,163.9333333333333,472.3999999999999,172.26666666666665,472.40000000000003,179.9333333333333C472.3999999999999,187.6,472.3999999999999,194.6,472.40000000000003,198.1L472.4,201.6" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-E-F-0">
-        <path d="M 472.40 258.40 C 472.40 266.73, 472.40 275.07, 472.40 283.40 C 472.40 291.73, 472.40 300.07, 472.40 308.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M472.4,258.4L472.40000000000003,262.56666666666666C472.3999999999999,266.7333333333333,472.3999999999999,275.06666666666666,472.40000000000003,282.7333333333333C472.3999999999999,290.3999999999999,472.3999999999999,297.3999999999999,472.40000000000003,300.8999999999999L472.4,304.3999999999999" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-F-G-0">
-        <path d="M 417.13 497.93 L 342.80 623.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M417.1280836236934,497.9280836236934L404.74006968641123,512.9734030197445C392.35205574912897,528.0187224157957,367.57602787456443,558.1093612078979,355.18801393728216,578.3213472706157C342.79999999999995,598.5333333333334,342.79999999999995,608.8666666666667,342.79999999999995,614.0333333333333L342.79999999999995,619.2" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-F-H-0">
-        <path d="M 527.67 497.93 L 602.00 623.20" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M527.6719163763066,497.9280836236934L540.0599303135888,512.9734030197445C552.447944250871,528.0187224157957,577.2239721254356,558.1093612078979,589.6119860627177,578.3213472706157C602,598.5333333333334,602,608.8666666666667,602,614.0333333333333L602,619.2" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-G-I-0">
-        <path d="M 342.80 676.00 L 405.84 726.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M342.79999999999995,676L342.79999999999995,680.1666666666666C342.79999999999995,684.3333333333334,342.79999999999995,692.6666666666666,352.68612927448703,700.7542210239864C362.57225854897405,708.8417753813061,382.3445170979482,716.6835507626123,392.2306463724353,720.6044384532652L402.1167756469223,724.5253261439183" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-H-I-0">
-        <path d="M 602.00 676.00 L 538.96 726.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M602,676L602,680.1666666666666C602,684.3333333333334,602,692.6666666666666,592.1138707255129,700.7542210239864C582.2277414510258,708.8417753813061,562.4554829020518,716.6835507626123,552.5693536275647,720.6044384532652L542.6832243530777,724.5253261439183" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-C-J-0">
-        <path d="M 150.00 258.40 C 150.00 266.73, 150.00 275.07, 150.00 296.33 C 150.00 317.60, 150.00 351.80, 150.00 386.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M150,258.4L150,262.56666666666666C150,266.7333333333333,150,275.06666666666666,150,295.6666666666667C150,316.26666666666665,150,349.13333333333327,150,365.5666666666666L150,381.99999999999994" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-F-G-0">
         <rect x="354.0403683320215" y="545.5738119177455" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="368.8403683320215" y="556.5738119177455" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <text x="368.8403683320215" y="556.5738119177455" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F-H-0">
         <rect x="564.7596316679784" y="545.5738119177454" width="22.4" height="22" class="edge-label-bg"/>
@@ -148,11 +148,11 @@ marker path {
     <g class="nodes">
       <g class="node" id="node-A">
         <rect x="208.8" y="0" width="204.79999999999998" height="52.8" style="fill:#e1f5ff !important"/>
-        <text x="311.2" y="26.4" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">Task #42 Completed</text>
+        <text x="311.2" y="26.4" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000">Task #42 Completed</text>
       </g>
       <g class="node" id="node-B">
         <rect x="38" y="102.79999999999998" width="224" height="52.8" style="fill:#fff4e1 !important"/>
-        <text x="150" y="129.2" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle">Effect::CompleteTask</text>
+        <text x="150" y="129.2" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">Effect::CompleteTask</text>
       </g>
       <g class="node" id="node-C">
         <rect x="33.2" y="205.6" width="233.6" height="52.8"/>
@@ -160,11 +160,11 @@ marker path {
       </g>
       <g class="node" id="node-D">
         <rect x="350.79999999999995" y="102.79999999999998" width="243.2" height="52.8" style="fill:#fff4e1 !important"/>
-        <text x="472.4" y="129.2" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">Effect::ClearBlockedBy</text>
+        <text x="472.4" y="129.2" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">Effect::ClearBlockedBy</text>
       </g>
       <g class="node" id="node-E">
         <rect x="389.2" y="205.6" width="166.4" height="52.8"/>
-        <text x="472.4" y="232" class="label" text-anchor="middle" dominant-baseline="central">Scan all tasks</text>
+        <text x="472.4" y="232" class="label" dominant-baseline="central" text-anchor="middle">Scan all tasks</text>
       </g>
       <g class="node" id="node-F">
         <polygon points="472.4,308.4 594.8,430.79999999999995 472.4,553.2 350,430.79999999999995"/>
@@ -172,7 +172,7 @@ marker path {
       </g>
       <g class="node" id="node-G">
         <rect x="192.79999999999995" y="623.2" width="300" height="52.8"/>
-        <text x="342.79999999999995" y="649.6" class="label" dominant-baseline="central" text-anchor="middle">Remove 42 from blockedBy array</text>
+        <text x="342.79999999999995" y="649.6" class="label" text-anchor="middle" dominant-baseline="central">Remove 42 from blockedBy array</text>
       </g>
       <g class="node" id="node-H">
         <rect x="542.8" y="623.2" width="118.39999999999999" height="52.8"/>
@@ -180,11 +180,11 @@ marker path {
       </g>
       <g class="node" id="node-I">
         <rect x="350.79999999999995" y="726" width="243.2" height="52.8" style="fill:#e1ffe1 !important"/>
-        <text x="472.4" y="752.4" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000">Task becomes unblocked</text>
+        <text x="472.4" y="752.4" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">Task becomes unblocked</text>
       </g>
       <g class="node" id="node-J">
         <rect x="0" y="385.99999999999994" width="300" height="89.6" style="fill:#ffe1e1 !important"/>
-        <text x="150" y="430.79999999999995" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="150" y="430.79999999999995" dy="-0.6em">Without ClearBlockedBy:</tspan><tspan x="150" dy="1.2em">Dependent tasks stuck forever</tspan></text>
+        <text x="150" y="430.79999999999995" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle"><tspan x="150" y="430.79999999999995" dy="-0.6em">Without ClearBlockedBy:</tspan><tspan x="150" dy="1.2em">Dependent tasks stuck forever</tspan></text>
       </g>
     </g>
   </g>
