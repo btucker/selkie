@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="842.2161" height="1886.671872" viewBox="-8 -28 842.2161 1886.671872" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1093.5481400000003" height="2061.671872" viewBox="-28 -28 1093.5481400000003 2061.671872" class="mermaid">
   <style>
 
 .mermaid {
@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -101,180 +101,180 @@ marker path {
   </defs>
   <g class="root">
     <g class="clusters">
-      <g class="subgraph" id="subgraph-">
-        <rect x="199.98828400000005" y="-20" width="273.59377600000005" height="327" class="cluster"/>
-        <text x="336.7851720000001" y="-4" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph0">
+        <rect x="299.6730520000002" y="-20" width="273.59377600000005" height="377" class="cluster"/>
+        <text x="436.46994000000024" y="-4" class="cluster-label" text-anchor="middle">Tick N: Evaluate</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="20" y="292" width="768.4075" height="672.343744" class="cluster"/>
-        <text x="404.20375" y="308" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph1">
+        <rect x="-20" y="238" width="1039.0204000000003" height="801.343744" class="cluster"/>
+        <text x="499.51020000000017" y="254" class="cluster-label" text-anchor="middle">Within-Tick Deduplication</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="151.88789200000002" y="949.343744" width="654.3282080000001" height="143" class="cluster"/>
-        <text x="479.0519960000001" y="965.343744" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph2">
+        <rect x="120.73748000000006" y="920.343744" width="898.2829200000001" height="297" class="cluster"/>
+        <text x="569.8789400000001" y="936.343744" class="cluster-label" text-anchor="middle">Effect Generation</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="155.856652" y="1077.343744" width="598.246144" height="247" class="cluster"/>
-        <text x="454.979724" y="1093.343744" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph3">
+        <rect x="120.73748000000006" y="1074.343744" width="649.539168" height="425" class="cluster"/>
+        <text x="445.50706400000007" y="1090.343744" class="cluster-label" text-anchor="middle">Cross-Tick Tracking</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="344.9531400000001" y="1309.343744" width="224.84220800000003" height="536.3281279999999" class="cluster"/>
-        <text x="457.3742440000001" y="1325.343744" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph4">
+        <rect x="226.20744000000002" y="1380.343744" width="224.84220800000003" height="640.3281279999999" class="cluster"/>
+        <text x="338.62854400000003" y="1396.343744" class="cluster-label" text-anchor="middle">Tick N+1: Next Evaluation</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-Event-Snapshot-0">
-        <path d="M 336.79 79.00 C 336.79 87.33, 336.79 95.67, 336.79 104.00 C 336.79 112.33, 336.79 120.67, 336.79 129.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M436.4699400000002,79L436.4699400000001,83.16666666666667C436.4699400000002,87.33333333333333,436.4699400000002,95.66666666666667,436.4699400000001,103.33333333333333C436.4699400000002,111,436.4699400000002,118,436.4699400000001,121.5L436.4699400000002,125" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Snapshot-Rules-0">
-        <path d="M 336.79 183.00 C 336.79 191.33, 336.79 199.67, 336.79 208.00 C 336.79 216.33, 336.79 224.67, 336.79 233.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M436.4699400000002,183L436.4699400000001,187.16666666666666C436.4699400000002,191.33333333333334,436.4699400000002,199.66666666666666,436.4699400000001,208C436.4699400000002,216.33333333333334,436.4699400000002,224.66666666666666,436.4699400000001,233C436.4699400000002,241.33333333333334,436.4699400000002,249.66666666666666,436.4699400000001,257.3333333333333C436.4699400000002,265,436.4699400000002,272,436.4699400000001,275.5L436.4699400000002,279" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Rules-Check-0">
-        <path d="M 336.79 287.00 C 336.79 295.33, 336.79 303.67, 336.79 312.00 C 336.79 320.33, 336.79 328.67, 336.79 337.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M436.4699400000002,337L436.4699400000001,341.1666666666667C436.4699400000002,345.3333333333333,436.4699400000002,353.6666666666667,436.4699400000001,361.3333333333333C436.4699400000002,369,436.4699400000002,376,436.4699400000001,379.5L436.4699400000002,383" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Check-Bypass-0">
-        <path d="M 301.67 413.21 C 260.58 437.25, 219.50 461.29, 198.95 479.48 C 178.41 497.66, 178.41 509.99, 178.41 522.33" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M394.0071650132095,455.86535301320924L351.4076641776746,469.10914884434106C308.80816334213966,482.3529446754728,223.60916167106984,508.8405363377364,181.0096608355349,527.5843321688682C138.41016000000002,546.328128,138.41016000000002,557.328128,138.41016000000002,562.828128L138.41016000000002,568.328128" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Check-BlockSnap-0">
-        <path d="M 379.42 405.69 C 466.30 432.24, 553.19 458.78, 596.63 478.22 C 640.07 497.66, 640.07 509.99, 640.07 522.33" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M445.8128649112807,488.98520308871946L447.3707514260673,496.70902390726627C448.92863794085383,504.4328447258129,452.04441097042695,519.8804863629065,453.6022974852135,533.1043071814532C455.1601840000001,546.328128,455.1601840000001,557.328128,455.16018400000013,562.828128L455.1601840000001,568.328128" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Bypass-AssignCheck-0">
-        <path d="M 178.41 576.33 L 282.73 680.38" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M138.41016000000002,626.328128L138.41016000000002,630.4947946666667C138.41016000000002,634.6614613333332,138.41016000000002,642.9947946666666,176.17912225942464,662.3683784530745C213.94808451884924,681.7419622394823,289.4860090376985,712.1557964789645,327.2549712971232,727.3627135987057L365.0239335565478,742.5696307184468" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-BlockSnap-AssignCheck-0">
-        <path d="M 640.07 576.33 C 640.07 584.66, 640.07 592.99, 600.87 612.67 C 561.66 632.35, 483.26 663.38, 404.86 694.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M455.1601840000001,626.328128L455.16018400000013,630.4947946666667C455.1601840000001,634.6614613333332,455.1601840000001,642.9947946666666,454.28152934360554,652.8031971663651C453.4028746872109,662.6115996660635,451.6455653744218,673.895071332127,450.7669107180272,679.5368071651588L449.88825606163266,685.1785429981906" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-AssignCheck-Block1-0">
-        <path d="M 281.80 761.36 C 239.67 792.02, 197.54 822.68, 176.48 844.18 C 155.42 865.68, 155.42 878.01, 155.42 890.34" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M369.1443681306522,799.018172130652L326.8562454422102,816.40576744221C284.56812275376814,833.7933627537681,199.99187737688405,868.5685533768841,157.703754688442,892.1228153551086C115.41563199999996,915.6770773333334,115.41563199999996,928.0104106666668,115.41563199999996,937.6770773333333C115.41563199999996,947.3437440000001,115.41563199999996,954.3437440000001,115.41563199999996,957.8437439999999L115.41563199999996,961.343744" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-AssignCheck-Allow1-0">
-        <path d="M 382.14 770.99 L 457.37 890.34" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M471.1719347749404,831.6417492250598L478.0485583124503,843.5920816875499C484.9251818499603,855.5424141500398,498.6784289249802,879.4430790750199,505.5550524624902,897.5600782041765C512.4316760000002,915.6770773333334,512.4316760000002,928.0104106666668,559.9500294373976,940.5482803079326C607.468382874795,953.0861499491988,702.5050897495898,965.8285558983974,750.0234431869873,972.1997588729965L797.5417966243847,978.570961847596" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Allow1-Effect1-0">
-        <path d="M 369.27 944.34 C 342.08 952.68, 314.89 961.01, 301.30 971.34 C 287.70 981.68, 287.70 994.01, 287.70 1006.34" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M801.5063200000002,1000.3214657611268L710.6802666666669,1007.6585121342723C619.8542133333335,1014.995558507418,438.2021066666668,1029.669651253709,347.3760533333334,1041.1733642935212C256.55000000000007,1052.6770773333335,256.55000000000007,1061.0104106666668,256.5500000000001,1069.343744C256.55000000000007,1077.6770773333335,256.55000000000007,1086.0104106666668,256.5500000000001,1095.6770773333333C256.55000000000007,1105.343744,256.55000000000007,1116.343744,256.5500000000001,1121.843744L256.55000000000007,1127.343744" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Allow1-Effect2-0">
-        <path d="M 542.99 944.34 C 569.41 952.68, 595.84 961.01, 609.05 969.34 C 622.26 977.68, 622.26 986.01, 622.26 994.34" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M801.5063200000002,1008.7013419923233L765.6418640000002,1014.641742326936C729.7774080000003,1020.5821426615488,658.0484960000001,1032.4629433307744,622.1840400000001,1042.570010332054C586.3195840000001,1052.6770773333335,586.3195840000001,1061.0104106666668,586.319584,1069.343744C586.3195840000001,1077.6770773333335,586.3195840000001,1086.0104106666668,586.319584,1093.6770773333333C586.3195840000001,1101.343744,586.3195840000001,1108.343744,586.319584,1111.843744L586.3195840000001,1115.343744" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Effect1-Track1-0">
-        <path d="M 287.70 1060.34 C 287.70 1072.68, 287.70 1085.01, 287.70 1097.34 C 287.70 1109.68, 287.70 1122.01, 287.70 1134.34" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M256.55000000000007,1185.343744L256.5500000000001,1191.5104106666665C256.55000000000007,1197.6770773333335,256.55000000000007,1210.0104106666668,256.5500000000001,1221.6770773333333C256.55000000000007,1233.343744,256.55000000000007,1244.343744,256.5500000000001,1249.843744L256.55000000000007,1255.343744" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Effect2-Track2-0">
-        <path d="M 622.26 1072.34 C 622.26 1080.68, 622.26 1089.01, 622.26 1097.34 C 622.26 1105.68, 622.26 1114.01, 622.26 1122.34" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M586.3195840000001,1197.343744L586.319584,1201.5104106666665C586.3195840000001,1205.6770773333335,586.3195840000001,1214.0104106666668,586.319584,1221.6770773333333C586.3195840000001,1229.343744,586.3195840000001,1236.343744,586.319584,1239.843744L586.3195840000001,1243.343744" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Track1-InFlight-0">
-        <path d="M 287.70 1188.34 C 287.70 1200.68, 287.70 1213.01, 301.30 1223.34 C 314.89 1233.68, 342.08 1242.01, 369.27 1250.34" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M256.55000000000007,1313.343744L256.5500000000001,1319.5104106666665C256.55000000000007,1325.6770773333335,256.55000000000007,1338.0104106666668,256.5500000000001,1348.343744C256.55000000000007,1358.6770773333335,256.55000000000007,1367.0104106666668,256.5500000000001,1375.343744C256.55000000000007,1383.6770773333335,256.55000000000007,1392.0104106666668,262.5636461821429,1399.9869597487843C268.5772923642857,1407.9635088309021,280.6045847285713,1415.5832736618042,286.6182309107141,1419.3931560772553L292.6318770928569,1423.2030384927064" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Track2-InFlight-0">
-        <path d="M 622.26 1200.34 C 622.26 1208.68, 622.26 1217.01, 609.05 1225.34 C 595.84 1233.68, 569.41 1242.01, 542.99 1250.34" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M586.3195840000001,1325.343744L586.319584,1329.5104106666665C586.3195840000001,1333.6770773333335,586.3195840000001,1342.0104106666668,586.319584,1350.343744C586.3195840000001,1358.6770773333335,586.3195840000001,1367.0104106666668,586.319584,1375.343744C586.3195840000001,1383.6770773333335,586.3195840000001,1392.0104106666668,560.6335476729774,1401.569577154906C534.9475113459548,1411.1287436431455,483.5754386919095,1421.913743286291,457.88940236488685,1427.306243107864L432.2033660378642,1432.6987429294368" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-InFlight-NextSnapshot-0">
-        <path d="M 457.37 1304.34 C 457.37 1312.68, 457.37 1321.01, 457.37 1329.34 C 457.37 1337.68, 457.37 1346.01, 457.37 1354.34" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M338.62854400000003,1479.343744L338.6285440000001,1483.5104106666668C338.62854400000003,1487.6770773333335,338.62854400000003,1496.0104106666668,338.6285440000001,1503.6770773333335C338.62854400000003,1511.343744,338.62854400000003,1518.343744,338.6285440000001,1521.843744L338.62854400000003,1525.343744" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-NextSnapshot-NextRules-0">
-        <path d="M 457.37 1432.34 C 457.37 1440.68, 457.37 1449.01, 457.37 1457.34 C 457.37 1465.68, 457.37 1474.01, 457.37 1482.34" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M338.62854400000003,1607.343744L338.6285440000001,1611.5104106666668C338.62854400000003,1615.6770773333335,338.62854400000003,1624.0104106666668,338.6285440000001,1631.6770773333335C338.62854400000003,1639.343744,338.62854400000003,1646.343744,338.6285440000001,1649.843744L338.62854400000003,1653.343744" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-NextRules-Check2-0">
-        <path d="M 457.37 1536.34 C 457.37 1544.68, 457.37 1553.01, 457.37 1561.34 C 457.37 1569.68, 457.37 1578.01, 457.37 1586.34" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M338.62854400000003,1711.343744L338.6285440000001,1715.5104106666668C338.62854400000003,1719.6770773333335,338.62854400000003,1728.0104106666668,338.6285440000001,1735.6770773333335C338.62854400000003,1743.343744,338.62854400000003,1750.343744,338.6285440000001,1753.843744L338.62854400000003,1757.343744" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Check2-Block2-0">
-        <path d="M 457.37 1697.67 C 457.37 1710.01, 457.37 1722.34, 457.37 1734.67 C 457.37 1747.01, 457.37 1759.34, 457.37 1771.67" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M338.62854400000003,1872.6718720000001L338.6285440000001,1878.8385386666669C338.62854400000003,1885.0052053333336,338.62854400000003,1897.3385386666666,338.6285440000001,1909.0052053333336C338.62854400000003,1920.671872,338.62854400000003,1931.671872,338.6285440000001,1937.1718719999997L338.62854400000003,1942.671872" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-Check-Bypass-0">
-        <rect x="166.07138243812966" y="447.61207990066293" width="116" height="22" class="edge-label-bg"/>
-        <text x="224.07138243812966" y="458.61207990066293" class="edge-label" dominant-baseline="central" text-anchor="middle">Grouped PR task</text>
+        <rect x="190.54270885527677" y="490.088924187904" width="116" height="22" class="edge-label-bg"/>
+        <text x="248.54270885527677" y="501.088924187904" class="edge-label" text-anchor="middle" dominant-baseline="central">Grouped PR task</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Check-BlockSnap-0">
-        <rect x="480.23745148016366" y="439.91542081928435" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="527.4374514801636" y="450.91542081928435" class="edge-label" text-anchor="middle" dominant-baseline="central">Regular task</text>
+        <rect x="406.9442931432583" y="519.2914588497129" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="454.14429314325827" y="530.2914588497129" class="edge-label" text-anchor="middle" dominant-baseline="central">Regular task</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-AssignCheck-Block1-0">
-        <rect x="188.84956559675146" y="807.237210425924" width="29.599999999999998" height="22" class="edge-label-bg"/>
-        <text x="203.64956559675147" y="818.237210425924" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+        <rect x="198.80897673513275" y="851.9696145281936" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="213.60897673513276" y="862.9696145281936" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-AssignCheck-Allow1-0">
-        <rect x="421.03532423444767" y="814.8243872398912" width="22.4" height="22" class="edge-label-bg"/>
-        <text x="432.23532423444766" y="825.8243872398912" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+        <rect x="586.4370783845866" y="940.7679806129079" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="597.6370783845866" y="951.7679806129079" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Check2-Block2-0">
-        <rect x="392.1742440000001" y="1723.671872" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="457.3742440000001" y="1734.671872" class="edge-label" text-anchor="middle" dominant-baseline="central">in_flight tracked</text>
+        <rect x="273.42854400000004" y="1898.671872" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="338.62854400000003" y="1909.671872" class="edge-label" dominant-baseline="central" text-anchor="middle">in_flight tracked</text>
       </g>
     </g>
     <g class="nodes">
-      <g class="node" id="node-Allow1">
-        <rect x="358.6172040000001" y="890.343744" width="197.51408" height="54" style="fill:#ccffcc !important"/>
-        <text x="457.3742440000001" y="917.343744" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">✓ Allow assignment</text>
-      </g>
-      <g class="node" id="node-AssignCheck">
-        <polygon points="336.78517200000005,626.3281279999999 431.79298000000006,721.335936 336.78517200000005,816.3437439999999 241.77736400000003,721.335936"/>
-        <text x="336.78517200000005" y="721.335936" class="label" dominant-baseline="central" text-anchor="middle">assigned_this_tick?</text>
-      </g>
-      <g class="node" id="node-Block1">
-        <rect x="62.994528000000074" y="890.343744" width="184.842208" height="54" style="fill:#ffcccc !important"/>
-        <text x="155.41563200000007" y="917.343744" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">❌ Block duplicate</text>
-      </g>
-      <g class="node" id="node-Block2">
-        <rect x="364.9531400000001" y="1771.671872" width="184.842208" height="54" style="fill:#ffcccc !important"/>
-        <text x="457.3742440000001" y="1798.671872" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">❌ Block duplicate</text>
-      </g>
-      <g class="node" id="node-BlockSnap">
-        <rect x="511.72777199999996" y="522.328128" width="256.679728" height="54"/>
-        <text x="640.067636" y="549.328128" class="label" dominant-baseline="central" text-anchor="middle">block if busy from snapshot</text>
-      </g>
-      <g class="node" id="node-Bypass">
-        <rect x="40" y="522.328128" width="276.82032000000004" height="54"/>
-        <text x="178.41016000000002" y="549.328128" class="label" text-anchor="middle" dominant-baseline="central">bypass is_busy_from_snapshot</text>
-      </g>
-      <g class="node" id="node-Check">
-        <polygon points="336.78517200000005,337 392.44923600000004,392.664064 336.78517200000005,448.328128 281.12110800000005,392.664064"/>
-        <text x="336.78517200000005" y="392.664064" class="label" text-anchor="middle" dominant-baseline="central">is_busy?</text>
-      </g>
-      <g class="node" id="node-Check2">
-        <polygon points="457.3742440000001,1586.343744 513.0383080000001,1642.007808 457.3742440000001,1697.6718720000001 401.7101800000001,1642.007808"/>
-        <text x="457.3742440000001" y="1642.007808" class="label" text-anchor="middle" dominant-baseline="central">is_busy?</text>
-      </g>
-      <g class="node" id="node-Effect1">
-        <rect x="171.88789200000002" y="1006.343744" width="231.62504000000004" height="54"/>
-        <text x="287.70041200000003" y="1033.343744" class="label" dominant-baseline="central" text-anchor="middle">Effect::AssignAndSpawn</text>
-      </g>
-      <g class="node" id="node-Effect2">
-        <rect x="458.30197200000003" y="994.343744" width="327.914128" height="78"/>
-        <text x="622.259036" y="1033.343744" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="622.259036" y="1033.343744" dy="-0.6em">Effect::NudgeCoworkerWithCallbacks</tspan><tspan x="622.259036" dy="1.2em">└─ RecordTaskAssignment</tspan></text>
-      </g>
       <g class="node" id="node-Event">
-        <rect x="257.898452" y="25" width="157.77344" height="54"/>
-        <text x="336.785172" y="52" class="label" dominant-baseline="central" text-anchor="middle">DaemonEvent</text>
-      </g>
-      <g class="node" id="node-InFlight">
-        <rect x="367.71408400000007" y="1250.343744" width="179.32032" height="54" style="fill:#ffffcc !important"/>
-        <text x="457.3742440000001" y="1277.343744" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">in_flight_spawns</text>
-      </g>
-      <g class="node" id="node-NextRules">
-        <rect x="378.77658800000006" y="1482.343744" width="157.195312" height="54"/>
-        <text x="457.3742440000001" y="1509.343744" class="label" text-anchor="middle" dominant-baseline="central">evaluate_tick</text>
-      </g>
-      <g class="node" id="node-NextSnapshot">
-        <rect x="365.55783600000007" y="1354.343744" width="183.632816" height="78"/>
-        <text x="457.3742440000001" y="1393.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="457.3742440000001" y="1393.343744" dy="-0.6em">collect_snapshot</tspan><tspan x="457.3742440000001" dy="1.2em">includes in_flight</tspan></text>
-      </g>
-      <g class="node" id="node-Rules">
-        <rect x="219.98828400000005" y="233" width="233.593776" height="54"/>
-        <text x="336.78517200000005" y="260" class="label" text-anchor="middle" dominant-baseline="central">evaluate_tick in rules.rs</text>
+        <rect x="357.5832200000002" y="25" width="157.77344" height="54"/>
+        <text x="436.4699400000002" y="52" class="label" dominant-baseline="central" text-anchor="middle">DaemonEvent</text>
       </g>
       <g class="node" id="node-Snapshot">
-        <rect x="246.77736400000003" y="129" width="180.01561600000002" height="54"/>
-        <text x="336.78517200000005" y="156" class="label" dominant-baseline="central" text-anchor="middle">collect_snapshot</text>
+        <rect x="346.46213200000017" y="129" width="180.01561600000002" height="54"/>
+        <text x="436.4699400000002" y="156" class="label" dominant-baseline="central" text-anchor="middle">collect_snapshot</text>
+      </g>
+      <g class="node" id="node-Rules">
+        <rect x="319.6730520000002" y="283" width="233.593776" height="54"/>
+        <text x="436.4699400000002" y="310" class="label" dominant-baseline="central" text-anchor="middle">evaluate_tick in rules.rs</text>
+      </g>
+      <g class="node" id="node-Check">
+        <polygon points="436.4699400000002,387 492.1340040000002,442.664064 436.4699400000002,498.328128 380.8058760000002,442.664064"/>
+        <text x="436.4699400000002" y="442.664064" class="label" dominant-baseline="central" text-anchor="middle">is_busy?</text>
+      </g>
+      <g class="node" id="node-Bypass">
+        <rect x="0" y="572.328128" width="276.82032000000004" height="54"/>
+        <text x="138.41016000000002" y="599.328128" class="label" text-anchor="middle" dominant-baseline="central">bypass is_busy_from_snapshot</text>
+      </g>
+      <g class="node" id="node-BlockSnap">
+        <rect x="326.82032000000004" y="572.328128" width="256.679728" height="54"/>
+        <text x="455.1601840000001" y="599.328128" class="label" dominant-baseline="central" text-anchor="middle">block if busy from snapshot</text>
+      </g>
+      <g class="node" id="node-AssignCheck">
+        <polygon points="436.4699400000002,676.3281279999999 531.4777480000002,771.335936 436.4699400000002,866.3437439999999 341.46213200000017,771.335936"/>
+        <text x="436.4699400000002" y="771.335936" class="label" text-anchor="middle" dominant-baseline="central">assigned_this_tick?</text>
+      </g>
+      <g class="node" id="node-Block1">
+        <rect x="22.99452799999996" y="965.343744" width="184.842208" height="54" style="fill:#ffcccc !important"/>
+        <text x="115.41563199999996" y="992.343744" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">❌ Block duplicate</text>
+      </g>
+      <g class="node" id="node-Allow1">
+        <rect x="801.5063200000002" y="965.343744" width="197.51408" height="54" style="fill:#ccffcc !important"/>
+        <text x="900.2633600000001" y="992.343744" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">✓ Allow assignment</text>
+      </g>
+      <g class="node" id="node-Effect1">
+        <rect x="140.73748000000006" y="1131.343744" width="231.62504000000004" height="54"/>
+        <text x="256.55000000000007" y="1158.343744" class="label" dominant-baseline="central" text-anchor="middle">Effect::AssignAndSpawn</text>
+      </g>
+      <g class="node" id="node-Effect2">
+        <rect x="422.3625200000001" y="1119.343744" width="327.914128" height="78"/>
+        <text x="586.3195840000001" y="1158.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="586.3195840000001" y="1158.343744" dy="-0.6em">Effect::NudgeCoworkerWithCallbacks</tspan><tspan x="586.3195840000001" dy="1.2em">└─ RecordTaskAssignment</tspan></text>
       </g>
       <g class="node" id="node-Track1">
-        <rect x="175.856652" y="1134.343744" width="223.68752000000003" height="54"/>
-        <text x="287.70041200000003" y="1161.343744" class="label" text-anchor="middle" dominant-baseline="central">mark_in_flight_spawns</text>
+        <rect x="144.70624000000004" y="1259.343744" width="223.68752000000003" height="54"/>
+        <text x="256.55000000000007" y="1286.343744" class="label" dominant-baseline="central" text-anchor="middle">mark_in_flight_spawns</text>
       </g>
       <g class="node" id="node-Track2">
-        <rect x="510.415276" y="1122.343744" width="223.68752000000003" height="78"/>
-        <text x="622.259036" y="1161.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="622.259036" y="1161.343744" dy="-0.6em">mark_in_flight_spawns</tspan><tspan x="622.259036" dy="1.2em">scans sub-effects</tspan></text>
+        <rect x="474.47582400000005" y="1247.343744" width="223.68752000000003" height="78"/>
+        <text x="586.3195840000001" y="1286.343744" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="586.3195840000001" y="1286.343744" dy="-0.6em">mark_in_flight_spawns</tspan><tspan x="586.3195840000001" dy="1.2em">scans sub-effects</tspan></text>
+      </g>
+      <g class="node" id="node-InFlight">
+        <rect x="248.96838400000001" y="1425.343744" width="179.32032" height="54" style="fill:#ffffcc !important"/>
+        <text x="338.62854400000003" y="1452.343744" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000">in_flight_spawns</text>
+      </g>
+      <g class="node" id="node-NextSnapshot">
+        <rect x="246.81213600000004" y="1529.343744" width="183.632816" height="78"/>
+        <text x="338.62854400000003" y="1568.343744" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="338.62854400000003" y="1568.343744" dy="-0.6em">collect_snapshot</tspan><tspan x="338.62854400000003" dy="1.2em">includes in_flight</tspan></text>
+      </g>
+      <g class="node" id="node-NextRules">
+        <rect x="260.030888" y="1657.343744" width="157.195312" height="54"/>
+        <text x="338.62854400000003" y="1684.343744" class="label" dominant-baseline="central" text-anchor="middle">evaluate_tick</text>
+      </g>
+      <g class="node" id="node-Check2">
+        <polygon points="338.62854400000003,1761.343744 394.29260800000003,1817.007808 338.62854400000003,1872.6718720000001 282.96448000000004,1817.007808"/>
+        <text x="338.62854400000003" y="1817.007808" class="label" text-anchor="middle" dominant-baseline="central">is_busy?</text>
+      </g>
+      <g class="node" id="node-Block2">
+        <rect x="246.20744000000002" y="1946.671872" width="184.842208" height="54" style="fill:#ffcccc !important"/>
+        <text x="338.62854400000003" y="1973.671872" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">❌ Block duplicate</text>
       </g>
     </g>
   </g>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1384.781352" height="900" viewBox="-8 -28 1384.781352 900" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1197.7657279999999" height="1000" viewBox="-8 -28 1197.7657279999999 1000" class="mermaid">
   <style>
 
 .mermaid {
@@ -90,7 +90,7 @@ marker path {
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -101,174 +101,174 @@ marker path {
   </defs>
   <g class="root">
     <g class="clusters">
-      <g class="subgraph" id="subgraph-">
-        <rect x="20.00000000000002" y="-20" width="1328.781352" height="119" class="cluster"/>
-        <text x="684.390676" y="-4" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph0">
+        <rect x="190.3339959999999" y="-20" width="788.9375679999998" height="119" class="cluster"/>
+        <text x="584.8027799999998" y="-4" class="cluster-label" text-anchor="middle">Event Sources</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="96.50587600000006" y="412" width="1145.87898" height="143" class="cluster"/>
-        <text x="669.445366" y="428" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph1">
+        <rect x="71.27930000000003" y="462" width="1051.9102439999997" height="143" class="cluster"/>
+        <text x="597.2344219999999" y="478" class="cluster-label" text-anchor="middle">Pure Decision Logic</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="96.50587600000006" y="84" width="1145.87898" height="647" class="cluster"/>
-        <text x="669.445366" y="100" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph2">
+        <rect x="71.27930000000003" y="134" width="1051.9102439999997" height="647" class="cluster"/>
+        <text x="597.2344219999999" y="150" class="cluster-label" text-anchor="middle">Core State Machine</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="20" y="716" width="1328.781352" height="143" class="cluster"/>
-        <text x="684.390676" y="732" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph3">
+        <rect x="43.572259999999915" y="816" width="1042.46104" height="143" class="cluster"/>
+        <text x="564.8027799999999" y="832" class="cluster-label" text-anchor="middle">Infrastructure</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-Timer-Events-0">
-        <path d="M 1022.31 79.00 C 1022.31 87.33, 1022.31 95.67, 986.08 106.88 C 949.86 118.10, 877.41 132.21, 804.96 146.31" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M281.1347719999999,79L281.1347719999999,83.16666666666667C281.1347719999999,87.33333333333333,281.1347719999999,95.66666666666667,281.1347719999999,104C281.1347719999999,112.33333333333333,281.1347719999999,120.66666666666667,281.1347719999999,129C281.1347719999999,137.33333333333334,281.1347719999999,145.66666666666666,314.69421353890885,156.6148400807713C348.2536550778179,167.56301349487595,415.3725381556358,181.12602698975192,448.93197969454474,187.90753373718994L482.49142123345376,194.6890404846279" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Webhook-Events-0">
-        <path d="M 1235.95 79.00 C 1235.95 87.33, 1235.95 95.67, 1164.11 108.31 C 1092.28 120.95, 948.62 137.90, 804.96 154.85" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M494.77149999999983,79L494.77149999999983,83.16666666666667C494.77149999999983,87.33333333333333,494.77149999999983,95.66666666666667,494.77149999999983,104C494.77149999999983,112.33333333333333,494.77149999999983,120.66666666666667,494.77149999999983,129C494.77149999999983,137.33333333333334,494.77149999999983,145.66666666666666,500.91594230714963,153.64834367710958C507.06038461429944,161.63002068755247,519.3492692285992,169.26004137510498,525.493711535749,173.0750517188812L531.6381538428988,176.89006206265745" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-RPC-Events-0">
-        <path d="M 103.26 79.00 C 103.26 87.33, 103.26 95.67, 183.06 108.49 C 262.87 121.31, 422.47 138.61, 582.08 155.92" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M700.8652759999998,79L700.8652759999997,83.16666666666667C700.8652759999999,87.33333333333333,700.8652759999999,95.66666666666667,700.8652759999997,104C700.8652759999999,112.33333333333333,700.8652759999999,120.66666666666667,700.8652759999997,129C700.8652759999999,137.33333333333334,700.8652759999999,145.66666666666666,694.7248119205068,153.6481895404277C688.5843478410138,161.6297124141887,676.303419682028,169.25942482837743,670.162955602535,173.07428103547178L664.022491523042,176.88913724256614" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Signal-Events-0">
-        <path d="M 289.09 79.00 C 289.09 87.33, 289.09 95.67, 337.92 107.56 C 386.75 119.46, 484.42 134.91, 582.08 150.37" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M886.6973319999997,79L886.6973319999997,83.16666666666667C886.6973319999997,87.33333333333333,886.6973319999997,95.66666666666667,886.6973319999997,104C886.6973319999997,112.33333333333333,886.6973319999997,120.66666666666667,886.6973319999997,129C886.6973319999997,137.33333333333334,886.6973319999997,145.66666666666666,857.7798544673955,156.24058131905585C828.8623769347913,166.81449597144504,771.0274218695828,179.6289919428901,742.1099443369785,186.03623992861262L713.1924668043744,192.44348791433515" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Events-Snapshot-0">
-        <path d="M 693.52 207.00 C 693.52 219.33, 693.52 231.67, 693.52 244.00 C 693.52 256.33, 693.52 268.67, 693.52 281.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M597.8496759999999,257L597.8496759999999,263.1666666666667C597.8496759999999,269.3333333333333,597.8496759999999,281.6666666666667,597.8496759999999,293.3333333333333C597.8496759999999,305,597.8496759999999,316,597.8496759999999,321.5L597.8496759999999,327" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Snapshot-Health-0">
-        <path d="M 585.55 351.76 C 461.23 374.50, 336.90 397.25, 274.74 414.79 C 212.58 432.33, 212.58 444.67, 212.58 457.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M489.8770199999999,405.1468286533879L439.45708799999994,415.9556905444899C389.0371559999999,426.76455243559195,288.197292,448.382276217796,237.77736000000002,464.691138108898C187.35742800000003,481,187.35742800000003,492,187.35742800000003,497.5L187.35742800000003,503" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Snapshot-PR-0">
-        <path d="M 585.55 371.91 C 542.17 387.94, 498.80 403.97, 477.11 418.15 C 455.42 432.33, 455.42 444.67, 455.42 457.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M500.68749427272724,433L488.9391258939393,439.1666666666667C477.19075751515146,445.3333333333333,453.69402075757574,457.6666666666667,441.9456523787878,469.3333333333333C430.197284,481,430.197284,492,430.1972839999999,497.5L430.19728399999997,503" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Snapshot-Dispatch-0">
-        <path d="M 801.49 378.45 C 833.69 392.30, 865.88 406.15, 881.98 419.24 C 898.07 432.33, 898.07 444.67, 898.07 457.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M702.7632619545453,433L715.4488916287877,439.1666666666667C728.1345213030303,445.3333333333333,753.505780651515,457.6666666666667,766.1914103257574,469.3333333333333C778.8770399999999,481,778.8770399999999,492,778.8770399999999,497.5L778.8770399999999,503" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Snapshot-Chat-0">
-        <path d="M 801.49 353.83 C 910.56 375.89, 1019.63 397.94, 1074.17 415.14 C 1128.71 432.33, 1128.71 444.67, 1128.71 457.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M705.822332,405.08115817274336L756.4369193333332,415.9009651439528C807.0515066666667,426.7207721151622,908.2806813333333,448.36038605758114,958.8952686666665,464.6801930287906C1009.509856,481,1009.509856,492,1009.5098559999998,497.5L1009.5098559999999,503" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Health-Effects-0">
-        <path d="M 212.58 535.00 C 212.58 547.33, 212.58 559.67, 265.51 576.78 C 318.43 593.90, 424.28 615.80, 530.13 637.70" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M187.35742800000003,585L187.35742800000003,591.1666666666666C187.35742800000003,597.3333333333334,187.35742800000003,609.6666666666666,238.1729343641581,626.5682009822647C288.98844072831616,643.4697352978627,390.61945345663236,664.9394705957254,441.4349598207904,675.6743382446567L492.2504661849485,686.4092058935881" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-PR-Effects-0">
-        <path d="M 455.42 535.00 C 455.42 547.33, 455.42 559.67, 468.21 572.00 C 481.00 584.33, 506.57 596.67, 532.14 609.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M430.19728399999997,585L430.1972839999999,591.1666666666666C430.197284,597.3333333333334,430.197284,609.6666666666666,441.7764498607471,621.6987459172498C453.3556157214943,633.7308251678329,476.5139474429886,645.4616503356657,488.0931133037357,651.3270629195822L499.6722791644829,657.1924755034986" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Dispatch-Effects-0">
-        <path d="M 898.07 535.00 C 898.07 547.33, 898.07 559.67, 872.67 574.43 C 847.26 589.18, 796.45 606.37, 745.64 623.55" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M778.8770399999999,585L778.8770399999999,591.1666666666666C778.8770399999999,597.3333333333334,778.8770399999999,609.6666666666666,767.2124983046302,621.7004357009994C755.5479566092605,633.7342047353321,732.2188732185214,645.4684094706643,720.5543315231517,651.3355118383303L708.8897898277821,657.2026142059964" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Chat-Effects-0">
-        <path d="M 1128.71 535.00 C 1128.71 547.33, 1128.71 559.67, 1064.86 577.28 C 1001.02 594.89, 873.33 617.79, 745.64 640.68" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M1009.5098559999999,585L1009.5098559999998,591.1666666666666C1009.509856,597.3333333333334,1009.509856,609.6666666666666,960.5230086395858,626.4619592305615C911.5361612791717,643.2572517944565,813.5624665583433,664.5145035889128,764.5756191979293,675.143129486141L715.5887718375152,685.7717553833693" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Effects-Tmux-0">
-        <path d="M 530.13 677.49 C 409.96 696.99, 289.80 716.50, 229.72 730.41 C 169.63 744.33, 169.63 752.67, 169.63 761.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M496.16409199999987,729.9397582396529L445.6709253333332,739.2831318663774C395.17775866666653,748.6265054931018,294.19142533333326,767.3132527465509,243.6982586666666,780.8232930399421C193.20509199999992,794.3333333333334,193.20509199999992,802.6666666666666,193.20509199999992,811C193.20509199999992,819.3333333333334,193.20509199999992,827.6666666666666,193.20509199999992,835.3333333333334C193.20509199999992,843,193.20509199999992,850,193.20509199999992,853.5L193.20509199999992,857" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Effects-Channel-0">
-        <path d="M 530.13 703.15 C 502.78 714.10, 475.44 725.05, 461.77 734.69 C 448.10 744.33, 448.10 752.67, 448.10 761.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M515.1738983157893,761L507.92324392982437,765.1666666666666C500.67258954385943,769.3333333333334,486.1712807719296,777.6666666666666,478.9206263859647,786C471.66997199999986,794.3333333333334,471.66997199999986,802.6666666666666,471.66997199999975,811C471.66997199999986,819.3333333333334,471.66997199999986,827.6666666666666,471.66997199999975,835.3333333333334C471.66997199999986,843,471.66997199999986,850,471.66997199999975,853.5L471.6699719999998,857" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-Effects-Tasks-0">
-        <path d="M 745.64 684.32 C 821.95 701.55, 898.26 718.77, 936.42 731.55 C 974.57 744.33, 974.57 752.67, 974.57 761.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M676.3287768421052,761L682.2443707017543,765.1666666666666C688.1599645614034,769.3333333333334,699.9911522807016,777.6666666666666,705.9067461403507,786C711.82234,794.3333333333334,711.82234,802.6666666666666,711.8223399999998,811C711.82234,819.3333333333334,711.82234,827.6666666666666,711.8223399999998,835.3333333333334C711.82234,843,711.82234,850,711.8223399999998,853.5L711.8223399999999,857" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-Effects-WebSocket-0">
-        <path d="M 745.64 674.01 C 904.54 694.67, 1063.44 715.34, 1142.89 729.84 C 1222.34 744.33, 1222.34 752.67, 1222.34 761.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+        <path d="M711.679724,733.0260760323521L752.9977666666667,741.8550633602935C794.3158093333333,750.6840506882348,876.9518946666666,768.3420253441174,918.2699373333334,781.3376793387255C959.5879799999999,794.3333333333334,959.5879799999999,802.6666666666666,959.5879799999999,811C959.5879799999999,819.3333333333334,959.5879799999999,827.6666666666666,959.5879799999999,835.3333333333334C959.5879799999999,843,959.5879799999999,850,959.5879799999999,853.5L959.5879799999999,857" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-Events-Snapshot-0">
-        <rect x="646.319592" y="233" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="693.519592" y="244" class="edge-label" text-anchor="middle" dominant-baseline="central">collect once</text>
+        <rect x="550.6496759999999" y="283" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="597.8496759999999" y="294" class="edge-label" text-anchor="middle" dominant-baseline="central">collect once</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-Health-0">
-        <rect x="344.46759858982875" y="378.2080255788745" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="380.86759858982873" y="389.2080255788745" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
+        <rect x="284.1282168440821" y="430.45127715474126" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="320.52821684408207" y="441.45127715474126" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-PR-0">
-        <rect x="466.732691708613" y="391.36685237869807" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="503.132691708613" y="402.36685237869807" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
+        <rect x="412.6618240459449" y="449.0980862590785" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="449.0618240459449" y="460.0980862590785" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-Dispatch-0">
-        <rect x="830.3764039907229" y="395.53626856554575" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="866.7764039907229" y="406.53626856554575" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
+        <rect x="721.0584350672639" y="448.58810871222335" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="757.4584350672638" y="459.58810871222335" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Snapshot-Chat-0">
-        <rect x="946.8316939501015" y="379.58343285626023" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="983.2316939501014" y="390.58343285626023" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
+        <rect x="839.357353316988" y="430.4079213682872" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="875.757353316988" y="441.4079213682872" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Health-Effects-0">
-        <rect x="288.03924110601514" y="590.1033088018871" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="353.23924110601513" y="601.1033088018871" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&amp;lt;Effect&amp;gt;</text>
+        <rect x="280.0602406053873" y="639.7942157460811" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="323.66024060538734" y="650.7942157460811" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&lt;Effect&gt;</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-PR-Effects-0">
-        <rect x="411.9189002133422" y="571.4634086142469" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="477.1189002133422" y="582.4634086142469" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&amp;lt;Effect&amp;gt;</text>
+        <rect x="406.6154918857337" y="621.1401992036809" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="450.21549188573374" y="632.1401992036809" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&lt;Effect&gt;</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Dispatch-Effects-0">
-        <rect x="774.1822852953835" y="580.8500126078532" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="839.3822852953836" y="591.8500126078532" class="edge-label" dominant-baseline="central" text-anchor="middle">Vec&amp;lt;Effect&amp;gt;</text>
+        <rect x="715.0238150159927" y="621.187090702733" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="758.6238150159927" y="632.187090702733" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&lt;Effect&gt;</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Chat-Effects-0">
-        <rect x="890.1835360655555" y="592.0751246318146" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="955.3835360655555" y="603.0751246318146" class="edge-label" dominant-baseline="central" text-anchor="middle">Vec&amp;lt;Effect&amp;gt;</text>
+        <rect x="835.0741362485079" y="639.3872915724096" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="878.6741362485079" y="650.3872915724096" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&lt;Effect&gt;</text>
       </g>
     </g>
     <g class="nodes">
-      <g class="node" id="node-Channel">
-        <rect x="349.265664" y="761" width="197.66409600000003" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="448.097712" y="800" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="448.097712" y="800" dy="-0.6em">channel.rs</tspan><tspan x="448.097712" dy="1.2em">append-only JSONL</tspan></text>
-      </g>
-      <g class="node" id="node-Chat">
-        <rect x="1035.02548" y="457" width="187.359376" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="1128.705168" y="496" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="1128.705168" y="496" dy="-0.6em">chat.rs</tspan><tspan x="1128.705168" dy="1.2em">@mention routing</tspan></text>
-      </g>
-      <g class="node" id="node-Dispatch">
-        <rect x="811.1192239999999" y="457" width="173.906256" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="898.0723519999999" y="496" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="898.0723519999999" y="496" dy="-0.6em">dispatch.rs</tspan><tspan x="898.0723519999999" dy="1.2em">task assignment</tspan></text>
-      </g>
-      <g class="node" id="node-Effects">
-        <rect x="530.127" y="609" width="215.515632" height="102" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
-        <text x="637.884816" y="660" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="637.884816" y="660" dy="-1.2em">effects.rs</tspan><tspan x="637.884816" dy="1.2em">Effect execution</tspan><tspan x="637.884816" dy="1.2em">only side effects here</tspan></text>
-      </g>
-      <g class="node" id="node-Events">
-        <rect x="582.082088" y="129" width="222.87500799999998" height="78" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
-        <text x="693.519592" y="168" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="693.519592" y="168" dy="-0.6em">events.rs</tspan><tspan x="693.519592" dy="1.2em">DaemonEvent dispatch</tspan></text>
-      </g>
-      <g class="node" id="node-Health">
-        <rect x="116.50587600000006" y="457" width="192.15625599999998" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="212.58400400000005" y="496" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="212.58400400000005" y="496" dy="-0.6em">health.rs</tspan><tspan x="212.58400400000005" dy="1.2em">coworker lifecycle</tspan></text>
-      </g>
-      <g class="node" id="node-PR">
-        <rect x="358.662132" y="457" width="193.52345599999998" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="455.42386" y="496" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="455.42386" y="496" dy="-0.6em">pr.rs</tspan><tspan x="455.42386" dy="1.2em">reviewer spawning</tspan></text>
-      </g>
-      <g class="node" id="node-RPC">
-        <rect x="40.00000000000002" y="25" width="126.51564800000001" height="54"/>
-        <text x="103.25782400000003" y="52" class="label" text-anchor="middle" dominant-baseline="central">RPC Calls</text>
-      </g>
-      <g class="node" id="node-Signal">
-        <rect x="216.515648" y="25" width="145.148464" height="54"/>
-        <text x="289.08988" y="52" class="label" text-anchor="middle" dominant-baseline="central">Unix Signals</text>
-      </g>
-      <g class="node" id="node-Snapshot">
-        <rect x="585.546936" y="281" width="215.945312" height="102" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
-        <text x="693.519592" y="332" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="693.519592" y="332" dy="-1.2em">snapshot.rs</tspan><tspan x="693.519592" dy="1.2em">WorldSnapshot</tspan><tspan x="693.519592" dy="1.2em">immutable state view</tspan></text>
-      </g>
-      <g class="node" id="node-Tasks">
-        <rect x="883.2500719999998" y="761" width="182.64064000000002" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="974.5703919999999" y="800" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="974.5703919999999" y="800" dy="-0.6em">tasks.rs</tspan><tspan x="974.5703919999999" dy="1.2em">~/.claude/tasks/</tspan></text>
-      </g>
       <g class="node" id="node-Timer">
-        <rect x="951.5078959999998" y="25" width="141.601552" height="54"/>
-        <text x="1022.3086719999999" y="52" class="label" text-anchor="middle" dominant-baseline="central">Timer Ticks</text>
-      </g>
-      <g class="node" id="node-Tmux">
-        <rect x="40" y="761" width="259.265664" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="169.632832" y="800" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="169.632832" y="800" dy="-0.6em">tmux.rs</tspan><tspan x="169.632832" dy="1.2em">spawn/nudge/pane capture</tspan></text>
-      </g>
-      <g class="node" id="node-WebSocket">
-        <rect x="1115.890712" y="761" width="212.89064" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
-        <text x="1222.336032" y="800" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle"><tspan x="1222.336032" y="800" dy="-0.6em">web.rs</tspan><tspan x="1222.336032" dy="1.2em">WebSocket broadcast</tspan></text>
+        <rect x="210.3339959999999" y="25" width="141.601552" height="54"/>
+        <text x="281.1347719999999" y="52" class="label" text-anchor="middle" dominant-baseline="central">Timer Ticks</text>
       </g>
       <g class="node" id="node-Webhook">
-        <rect x="1143.109448" y="25" width="185.67190399999998" height="54"/>
-        <text x="1235.9453999999998" y="52" class="label" dominant-baseline="central" text-anchor="middle">GitHub Webhooks</text>
+        <rect x="401.9355479999998" y="25" width="185.67190399999998" height="54"/>
+        <text x="494.77149999999983" y="52" class="label" dominant-baseline="central" text-anchor="middle">GitHub Webhooks</text>
+      </g>
+      <g class="node" id="node-RPC">
+        <rect x="637.6074519999997" y="25" width="126.51564800000001" height="54"/>
+        <text x="700.8652759999998" y="52" class="label" text-anchor="middle" dominant-baseline="central">RPC Calls</text>
+      </g>
+      <g class="node" id="node-Signal">
+        <rect x="814.1230999999998" y="25" width="145.148464" height="54"/>
+        <text x="886.6973319999997" y="52" class="label" text-anchor="middle" dominant-baseline="central">Unix Signals</text>
+      </g>
+      <g class="node" id="node-Events">
+        <rect x="486.41217199999994" y="179" width="222.87500799999998" height="78" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
+        <text x="597.8496759999999" y="218" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="597.8496759999999" y="218" dy="-0.6em">events.rs</tspan><tspan x="597.8496759999999" dy="1.2em">DaemonEvent dispatch</tspan></text>
+      </g>
+      <g class="node" id="node-Snapshot">
+        <rect x="489.8770199999999" y="331" width="215.945312" height="102" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="597.8496759999999" y="382" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="597.8496759999999" y="382" dy="-1.2em">snapshot.rs</tspan><tspan x="597.8496759999999" dy="1.2em">WorldSnapshot</tspan><tspan x="597.8496759999999" dy="1.2em">immutable state view</tspan></text>
+      </g>
+      <g class="node" id="node-Health">
+        <rect x="91.27930000000003" y="507" width="192.15625599999998" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="187.35742800000003" y="546" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="187.35742800000003" y="546" dy="-0.6em">health.rs</tspan><tspan x="187.35742800000003" dy="1.2em">coworker lifecycle</tspan></text>
+      </g>
+      <g class="node" id="node-PR">
+        <rect x="333.43555599999996" y="507" width="193.52345599999998" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="430.19728399999997" y="546" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="430.19728399999997" y="546" dy="-0.6em">pr.rs</tspan><tspan x="430.19728399999997" dy="1.2em">reviewer spawning</tspan></text>
+      </g>
+      <g class="node" id="node-Dispatch">
+        <rect x="691.9239119999999" y="507" width="173.906256" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="778.8770399999999" y="546" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="778.8770399999999" y="546" dy="-0.6em">dispatch.rs</tspan><tspan x="778.8770399999999" dy="1.2em">task assignment</tspan></text>
+      </g>
+      <g class="node" id="node-Chat">
+        <rect x="915.830168" y="507" width="187.359376" height="78" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="1009.5098559999999" y="546" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="1009.5098559999999" y="546" dy="-0.6em">chat.rs</tspan><tspan x="1009.5098559999999" dy="1.2em">@mention routing</tspan></text>
+      </g>
+      <g class="node" id="node-Effects">
+        <rect x="496.1640919999999" y="659" width="215.515632" height="102" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
+        <text x="603.9219079999999" y="710" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="603.9219079999999" y="710" dy="-1.2em">effects.rs</tspan><tspan x="603.9219079999999" dy="1.2em">Effect execution</tspan><tspan x="603.9219079999999" dy="1.2em">only side effects here</tspan></text>
+      </g>
+      <g class="node" id="node-Tmux">
+        <rect x="63.572259999999915" y="861" width="259.265664" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="193.20509199999992" y="900" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="193.20509199999992" y="900" dy="-0.6em">tmux.rs</tspan><tspan x="193.20509199999992" dy="1.2em">spawn/nudge/pane capture</tspan></text>
+      </g>
+      <g class="node" id="node-Channel">
+        <rect x="372.8379239999998" y="861" width="197.66409600000003" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="471.6699719999998" y="900" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central"><tspan x="471.6699719999998" y="900" dy="-0.6em">channel.rs</tspan><tspan x="471.6699719999998" dy="1.2em">append-only JSONL</tspan></text>
+      </g>
+      <g class="node" id="node-Tasks">
+        <rect x="620.5020199999999" y="861" width="182.64064000000002" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="711.8223399999999" y="900" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central"><tspan x="711.8223399999999" y="900" dy="-0.6em">tasks.rs</tspan><tspan x="711.8223399999999" dy="1.2em">~/.claude/tasks/</tspan></text>
+      </g>
+      <g class="node" id="node-WebSocket">
+        <rect x="853.1426599999999" y="861" width="212.89064" height="78" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="959.5879799999999" y="900" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000"><tspan x="959.5879799999999" y="900" dy="-0.6em">web.rs</tspan><tspan x="959.5879799999999" dy="1.2em">WebSocket broadcast</tspan></text>
       </g>
     </g>
   </g>

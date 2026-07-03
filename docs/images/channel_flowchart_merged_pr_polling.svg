@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="716.5014946388873" height="903.1953120000001" viewBox="-8 -8 716.5014946388873 903.1953120000001" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="673.9336160000001" height="903.1953120000001" viewBox="-8 -8 673.9336160000001 903.1953120000001" class="mermaid">
   <style>
 
 .mermaid {
@@ -105,99 +105,99 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 103.46 78.00 C 103.46 94.33, 103.46 110.67, 103.46 127.00 C 103.46 143.33, 103.46 159.67, 103.46 176.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M201.0742160000001,78L201.0742160000001,86.16666666666667C201.0742160000001,94.33333333333333,201.0742160000001,110.66666666666667,201.0742160000001,126.33333333333333C201.0742160000001,142,201.0742160000001,157,201.0742160000001,164.5L201.0742160000001,172" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-B-C-0">
-        <path d="M 103.46 254.00 C 103.46 262.33, 103.46 270.67, 103.46 279.00 C 103.46 287.33, 103.46 295.67, 103.46 304.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M201.0742160000001,254L201.0742160000001,258.1666666666667C201.0742160000001,262.3333333333333,201.0742160000001,270.6666666666667,201.0742160000001,278.3333333333333C201.0742160000001,286,201.0742160000001,293,201.0742160000001,296.5L201.0742160000001,300" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-C-D-0">
-        <path d="M 76.77 452.51 C 65.72 477.74, 54.67 502.97, 62.92 523.75 C 71.16 544.53, 98.70 560.86, 126.23 577.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M156.10629580632389,434.2273918063238L139.5859731719366,449.8887118386031C123.06565053754927,465.55003187088255,90.02500526877465,496.8726719354413,79.52162006527469,520.1768409287027C69.01823486177473,543.4810099219643,81.0521097235494,558.7667078439284,87.06904715443676,566.4095568049105L93.0859845853241,574.0524057658926" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-D-E-0">
-        <path d="M 171.75 631.20 C 171.75 643.53, 171.75 655.86, 186.60 668.20 C 201.45 680.53, 231.14 692.86, 260.84 705.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M116.81640000000004,631.1953120000001L116.81640000000004,637.3619786666667C116.81640000000004,643.5286453333334,116.81640000000004,655.8619786666667,135.43952688198922,667.9920057261379C154.06265376397843,680.1220327856091,191.3089075279568,692.0487535712183,209.93203440994603,698.0121139640229L228.55516129193518,703.9754743568275" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-C-F-0">
-        <path d="M 149.89 432.76 C 185.78 464.57, 221.67 496.38, 263.51 520.46 C 305.35 544.53, 353.15 560.86, 400.94 577.20" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M253.10906533663325,427.16046266336684L277.74778978052774,443.99960421947236C302.3865142244222,460.83874577557793,351.66396311221115,494.51702888778897,388.1685505319734,519.1566238860456C424.67313795173567,543.7962188843022,448.40486390347115,559.3971257686043,460.27072687933895,567.1975792107554L472.1365898552067,574.9980326529064" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-F-E-0">
-        <path d="M 479.95 631.20 C 479.95 643.53, 479.95 655.86, 465.10 668.20 C 450.25 680.53, 420.56 692.86, 390.86 705.20" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M516.5507920000001,631.1953120000001L516.5507920000001,637.3619786666667C516.5507920000001,643.5286453333334,516.5507920000001,655.8619786666667,497.9276651180109,667.9920057261379C479.30453823602176,680.1220327856091,442.0582844720434,692.0487535712183,423.43515759005413,698.0121139640229L404.812030708065,703.9754743568275" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-E-G-0">
-        <path d="M 325.85 759.20 C 325.85 771.53, 325.85 783.86, 325.85 796.20 C 325.85 808.53, 325.85 820.86, 325.85 833.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M316.6835960000001,759.1953120000001L316.6835960000001,765.3619786666667C316.6835960000001,771.5286453333334,316.6835960000001,783.8619786666668,316.6835960000001,795.5286453333333C316.6835960000001,807.1953120000002,316.6835960000001,818.1953120000002,316.6835960000001,823.695312L316.6835960000001,829.1953120000001" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-H-D-0">
-        <path d="M 504.25 430.60 C 467.54 463.13, 430.84 495.66, 388.60 520.10 C 346.35 544.53, 298.55 560.86, 250.76 577.20" class="edge-path" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)" stroke-width="2"/>
+        <path d="M375.22888813600343,430.59765600000003L351.42837011333626,446.86393200000003C327.62785209066897,463.13020800000004,280.02681604533456,495.66276,244.36043504679955,519.7294894421511C208.69405404826455,543.7962188843022,184.96232809652898,559.3971257686043,173.09646512066124,567.1975792107554L161.23060214479344,574.9980326529064" class="edge-path" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)" stroke-width="2"/>
       </g>
       <g class="edge" id="edge-L-H-F-0">
-        <path d="M 572.30 430.60 C 592.37 463.13, 612.43 495.66, 606.07 520.10 C 599.71 544.53, 566.93 560.86, 534.14 577.20" class="edge-path" stroke-dasharray="3,3" fill="none" stroke-width="2" marker-end="url(#arrow_point)"/>
+        <path d="M475.84775852130485,430.59765600000003L494.01376143442076,446.86393200000003C512.1797643475365,463.13020800000004,548.5117701737682,495.66276,559.7848631943801,519.5998261917175C571.0579562149918,543.536892383435,557.2721364299836,558.8784727668698,550.3792265374794,566.5492629585873L543.4863166449752,574.2200531503047" class="edge-path" marker-end="url(#arrow_point)" stroke-dasharray="3,3" fill="none" stroke-width="2"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-A-B-0">
-        <rect x="9.457032000000027" y="107" width="188" height="40" class="edge-label-bg"/>
-        <text x="103.45703200000003" y="127" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="103.45703200000003" y="127" dy="-0.6em">gh pr list --state merged</tspan><tspan x="103.45703200000003" dy="1.2em">→ Vec&amp;lt;u64&amp;gt;</tspan></text>
+        <rect x="107.07421600000009" y="107" width="188" height="40" class="edge-label-bg"/>
+        <text x="201.0742160000001" y="127" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="201.0742160000001" y="127" dy="-0.6em">gh pr list --state merged</tspan><tspan x="201.0742160000001" dy="1.2em">→ Vec&lt;u64&gt;</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-C-D-0">
-        <rect x="5.797181529941348" y="511.61920524567506" width="87.2" height="40" class="edge-label-bg"/>
-        <text x="49.39718152994135" y="531.6192052456751" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="49.39718152994135" y="531.6192052456751" dy="-0.6em">Case 1:</tspan><tspan x="49.39718152994135" dy="1.2em">Owned tasks</tspan></text>
+        <rect x="40.31633076316782" y="482.6637153988538" width="87.2" height="40" class="edge-label-bg"/>
+        <text x="83.91633076316782" y="502.6637153988538" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="83.91633076316782" y="502.6637153988538" dy="-0.6em">Case 1:</tspan><tspan x="83.91633076316782" dy="1.2em">Owned tasks</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-D-E-0">
-        <rect x="101.60932922098957" y="668.599597989658" width="195.2" height="22" class="edge-label-bg"/>
-        <text x="199.20932922098956" y="679.599597989658" class="edge-label" text-anchor="middle" dominant-baseline="central">if pr_number in merged_prs</text>
+        <rect x="59.37175238926247" y="670.0535629003268" width="195.2" height="22" class="edge-label-bg"/>
+        <text x="156.97175238926246" y="681.0535629003268" class="edge-label" dominant-baseline="central" text-anchor="middle">if pr_number in merged_prs</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-C-F-0">
-        <rect x="210.37753690831823" y="509.4327086848797" width="101.6" height="40" class="edge-label-bg"/>
-        <text x="261.17753690831825" y="529.4327086848797" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="261.17753690831825" y="529.4327086848797" dy="-0.6em">Case 2:</tspan><tspan x="261.17753690831825" dy="1.2em">Unowned tasks</tspan></text>
+        <rect x="313.04762789222553" y="482.843858321268" width="101.6" height="40" class="edge-label-bg"/>
+        <text x="363.84762789222555" y="502.843858321268" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="363.84762789222555" y="502.843858321268" dy="-0.6em">Case 2:</tspan><tspan x="363.84762789222555" dy="1.2em">Unowned tasks</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-F-E-0">
-        <rect x="354.8899267790106" y="668.599597989658" width="195.2" height="22" class="edge-label-bg"/>
-        <text x="452.4899267790106" y="679.599597989658" class="edge-label" text-anchor="middle" dominant-baseline="central">if pr_number in merged_prs</text>
+        <rect x="378.79543961073773" y="670.0535629003268" width="195.2" height="22" class="edge-label-bg"/>
+        <text x="476.3954396107377" y="681.0535629003268" class="edge-label" text-anchor="middle" dominant-baseline="central">if pr_number in merged_prs</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-E-G-0">
-        <rect x="267.84962800000005" y="785.1953120000001" width="116" height="22" class="edge-label-bg"/>
-        <text x="325.84962800000005" y="796.1953120000001" class="edge-label" dominant-baseline="central" text-anchor="middle">execute_effects</text>
+        <rect x="258.6835960000001" y="785.1953120000001" width="116" height="22" class="edge-label-bg"/>
+        <text x="316.6835960000001" y="796.1953120000001" class="edge-label" dominant-baseline="central" text-anchor="middle">execute_effects</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-H-D-0">
-        <rect x="326.86369375319754" y="517.9057573547411" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="392.0636937531975" y="528.9057573547411" class="edge-label" text-anchor="middle" dominant-baseline="central">extract_pr_number</text>
+        <rect x="201.80494484409292" y="493.5624549895846" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="267.0049448440929" y="504.5624549895846" class="edge-label" text-anchor="middle" dominant-baseline="central">extract_pr_number</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-H-F-0">
-        <rect x="566.0436786388872" y="515.1585155914985" width="130.39999999999998" height="22" class="edge-label-bg"/>
-        <text x="631.2436786388872" y="526.1585155914985" class="edge-label" dominant-baseline="central" text-anchor="middle">extract_pr_number</text>
+        <rect x="489.6843755613742" y="490.3689441600303" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="554.8843755613742" y="501.3689441600303" class="edge-label" text-anchor="middle" dominant-baseline="central">extract_pr_number</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-A">
-        <rect x="9.769528000000037" y="0" width="187.37500799999998" height="78" style="fill:#fff3cd !important"/>
-        <text x="103.45703200000003" y="39" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="103.45703200000003" y="39" dy="-0.6em">Merged PR Polling</tspan><tspan x="103.45703200000003" dy="1.2em">5min interval</tspan></text>
+        <rect x="107.3867120000001" y="0" width="187.37500799999998" height="78" style="fill:#fff3cd !important"/>
+        <text x="201.0742160000001" y="39" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle"><tspan x="201.0742160000001" y="39" dy="-0.6em">Merged PR Polling</tspan><tspan x="201.0742160000001" dy="1.2em">5min interval</tspan></text>
       </g>
       <g class="node" id="node-B">
-        <rect x="0.00000000000002842170943040401" y="176" width="206.914064" height="78" style="fill:#e1f5ff !important"/>
-        <text x="103.45703200000003" y="215" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000000"><tspan x="103.45703200000003" y="215" dy="-0.6em">WorldSnapshot</tspan><tspan x="103.45703200000003" dy="1.2em">merged_pr_numbers</tspan></text>
+        <rect x="97.6171840000001" y="176" width="206.914064" height="78" style="fill:#e1f5ff !important"/>
+        <text x="201.0742160000001" y="215" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central"><tspan x="201.0742160000001" y="215" dy="-0.6em">WorldSnapshot</tspan><tspan x="201.0742160000001" dy="1.2em">merged_pr_numbers</tspan></text>
       </g>
       <g class="node" id="node-C">
-        <polygon points="103.45703200000003,304 191.05468800000003,391.59765600000003 103.45703200000003,479.195312 15.859376000000026,391.59765600000003"/>
-        <text x="103.45703200000003" y="391.59765600000003" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="103.45703200000003" y="391.59765600000003" dy="-0.6em">Task Dispatch</tspan><tspan x="103.45703200000003" dy="1.2em">evaluate_tick</tspan></text>
+        <polygon points="201.0742160000001,304 288.6718720000001,391.59765600000003 201.0742160000001,479.195312 113.47656000000009,391.59765600000003"/>
+        <text x="201.0742160000001" y="391.59765600000003" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="201.0742160000001" y="391.59765600000003" dy="-0.6em">Task Dispatch</tspan><tspan x="201.0742160000001" dy="1.2em">evaluate_tick</tspan></text>
       </g>
       <g class="node" id="node-D">
-        <rect x="54.93361600000007" y="577.1953120000001" width="233.6328" height="54"/>
-        <text x="171.75001600000007" y="604.1953120000001" class="label" dominant-baseline="central" text-anchor="middle">decide_task_assignment</text>
+        <rect x="0.00000000000004263256414560601" y="577.1953120000001" width="233.6328" height="54"/>
+        <text x="116.81640000000004" y="604.1953120000001" class="label" text-anchor="middle" dominant-baseline="central">decide_task_assignment</text>
       </g>
       <g class="node" id="node-E">
-        <rect x="218.72071600000004" y="705.1953120000001" width="214.25782400000003" height="54" style="fill:#d4edda !important"/>
-        <text x="325.84962800000005" y="732.1953120000001" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000">Effect::CompleteTask</text>
+        <rect x="209.55468400000007" y="705.1953120000001" width="214.25782400000003" height="54" style="fill:#d4edda !important"/>
+        <text x="316.6835960000001" y="732.1953120000001" class="label" style="fill: #000000" dominant-baseline="central" text-anchor="middle">Effect::CompleteTask</text>
       </g>
       <g class="node" id="node-F">
-        <rect x="338.56641600000006" y="577.1953120000001" width="282.76564800000006" height="54"/>
-        <text x="479.9492400000001" y="604.1953120000001" class="label" text-anchor="middle" dominant-baseline="central">decide_unowned_task_cleanup</text>
+        <rect x="375.1679680000001" y="577.1953120000001" width="282.76564800000006" height="54"/>
+        <text x="516.5507920000001" y="604.1953120000001" class="label" text-anchor="middle" dominant-baseline="central">decide_unowned_task_cleanup</text>
       </g>
       <g class="node" id="node-G">
-        <rect x="211.60353200000006" y="833.1953120000001" width="228.492192" height="54" style="fill:#d4edda !important"/>
-        <text x="325.84962800000005" y="860.1953120000001" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central">midtown task complete</text>
+        <rect x="202.43750000000009" y="833.1953120000001" width="228.492192" height="54" style="fill:#d4edda !important"/>
+        <text x="316.6835960000001" y="860.1953120000001" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">midtown task complete</text>
       </g>
       <g class="node" id="node-H">
-        <rect x="454.6211200000001" y="352.59765600000003" width="187.242208" height="78"/>
-        <text x="548.2422240000001" y="391.59765600000003" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="548.2422240000001" y="391.59765600000003" dy="-0.6em">Task Subject</tspan><tspan x="548.2422240000001" dy="1.2em">e.g. &apos;Review #123&apos;</tspan></text>
+        <rect x="338.6718720000001" y="352.59765600000003" width="187.242208" height="78"/>
+        <text x="432.2929760000001" y="391.59765600000003" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="432.2929760000001" y="391.59765600000003" dy="-0.6em">Task Subject</tspan><tspan x="432.2929760000001" dy="1.2em">e.g. &apos;Review #123&apos;</tspan></text>
       </g>
     </g>
   </g>

@@ -167,12 +167,20 @@ fn compute_level_layout(
     let states = db.get_states();
     let relations = db.get_relations();
 
-    // Find states at this level (direct children of parent_id, or root-level if None)
-    let level_state_ids: HashSet<&str> = states
+    // Find states at this level (direct children of parent_id, or root-level
+    // if None), in document insertion order — dagre layout is insertion-order
+    // sensitive and mermaid feeds it nodes in document order.
+    let level_state_order: Vec<&str> = db
+        .state_ids_in_order()
         .iter()
-        .filter(|(_, s)| s.parent.as_deref() == parent_id)
-        .map(|(id, _)| id.as_str())
+        .filter(|id| {
+            states
+                .get(id.as_str())
+                .is_some_and(|s| s.parent.as_deref() == parent_id)
+        })
+        .map(|id| id.as_str())
         .collect();
+    let level_state_ids: HashSet<&str> = level_state_order.iter().copied().collect();
 
     if level_state_ids.is_empty() {
         return Ok(None);
@@ -184,9 +192,15 @@ fn compute_level_layout(
         .filter_map(|s| s.parent.as_deref())
         .filter(|parent| level_state_ids.contains(parent))
         .collect();
+    // Iterate composites in document order for deterministic recursion
+    let composite_order: Vec<&str> = level_state_order
+        .iter()
+        .copied()
+        .filter(|id| composite_ids.contains(id))
+        .collect();
 
     // First, recursively compute layouts for composite children at this level
-    for composite_id in &composite_ids {
+    for composite_id in &composite_order {
         if let Some(mut inner_layout) = compute_level_layout(
             Some(composite_id),
             db,
@@ -266,8 +280,8 @@ fn compute_level_layout(
 
     let start_end_states = determine_start_end_states(db);
 
-    // Add nodes for states at this level
-    for state_id in &level_state_ids {
+    // Add nodes for states at this level, in document insertion order
+    for state_id in &level_state_order {
         let state = states.get(*state_id).unwrap();
 
         let (shape, label) = match state.state_type {
@@ -523,7 +537,14 @@ impl ToLayoutGraph for StateDb {
 
         // Add composite state nodes FIRST (like flowchart subgraphs)
         // These have zero dimensions initially - dagre expands them based on children
-        for composite_id in &composite_states {
+        // Iterate in document order for deterministic, mermaid-matching layout
+        let composite_order: Vec<&str> = self
+            .state_ids_in_order()
+            .iter()
+            .map(|id| id.as_str())
+            .filter(|id| composite_states.contains(id))
+            .collect();
+        for composite_id in &composite_order {
             if let Some(state) = states.get(*composite_id) {
                 let mut node = LayoutNode::new(*composite_id, 0.0, 0.0)
                     .with_shape(NodeShape::Rectangle)
@@ -544,11 +565,10 @@ impl ToLayoutGraph for StateDb {
             }
         }
 
-        // Convert non-composite states to layout nodes (sorted for deterministic order)
-        let mut state_ids: Vec<&String> = states.keys().collect();
-        state_ids.sort();
-
-        for id in state_ids {
+        // Convert non-composite states to layout nodes in document insertion
+        // order (mermaid feeds dagre in document order and dagre's ordering
+        // phase is insertion-order sensitive)
+        for id in self.state_ids_in_order() {
             // Skip composite states - already added above
             if composite_states.contains(id.as_str()) {
                 continue;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1100.3028399999998" height="530.7250399999999" viewBox="-8 -28.000000000000014 1100.3028399999998 530.7250399999999" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1398.1259680000003" height="530.7250399999999" viewBox="-8 -28.000000000000014 1398.1259680000003 530.7250399999999" class="mermaid">
   <style>
 
 .mermaid {
@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -102,83 +102,83 @@ marker path {
   <g class="root">
     <g class="clusters">
       <g class="subgraph" id="subgraph-A">
-        <rect x="17.256660000000267" y="-20.000000000000014" width="283.83011999999974" height="503.11252799999994" class="cluster"/>
-        <text x="159.17172000000014" y="-4.000000000000014" class="cluster-label" text-anchor="middle">A</text>
+        <rect x="25.46093599999996" y="-20.000000000000014" width="488.097704" height="478.11252799999994" class="cluster"/>
+        <text x="269.50978799999996" y="-4.000000000000014" class="cluster-label" text-anchor="middle">A</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-sq-ci-0">
-        <path d="M 1044.16 142.75 C 1044.16 172.33, 1044.16 201.92, 963.14 224.88 C 882.11 247.83, 720.06 264.17, 696.88 291.57 C 789.41 357.43, 905.11 395.90, 905.11 395.90" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M650.953184,142.75000799999998L650.953184,161.54167599999997C650.953184,180.33334399999998,650.953184,217.91667999999996,650.953184,249.4100413333333C650.953184,280.90340266666664,650.953184,306.30678933333326,650.953184,319.0084826666666L650.953184,331.71017599999993" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-od-ro-0">
-        <path d="M 231.36 135.25 C 231.36 167.33, 231.36 199.42, 300.01 223.63 C 368.66 247.83, 505.96 264.17, 496.18 291.76 C 329.56 358.22, 172.72 397.09, 172.72 397.09" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M95.18359999999996,135.25000799999998L95.18359999999996,155.29167599999997C95.18359999999996,175.33334399999998,95.18359999999996,215.41667999999996,101.82424258548694,248.30157629720725C108.4648851709739,281.1864725944145,121.74617034194785,306.8729291888291,128.38681292743482,319.71615748603637L135.0274555129218,332.55938578324367" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-di-ro-0">
-        <path d="M 147.10 206.50 C 147.10 214.83, 147.10 223.17, 211.41 235.50 C 275.73 247.83, 404.35 264.17, 408.62 291.11 C 292.81 355.60, 172.72 393.15, 172.72 393.15" class="edge-path" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2"/>
+        <path d="M333.69960655477627,166.48084655477632L321.9957681289802,181.31737479564694C310.29192970318417,196.15390303651756,286.88425285159207,225.82695951825875,265.3513178722829,253.56855257313393C243.81838289297366,281.31014562800914,224.16018978594732,307.12027525601826,214.33109323243414,320.0253400700229L204.501996678921,332.93040488402744" class="edge-path" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-di-ro2-0">
-        <path d="M 147.09652400000027 115.75000799999998 L 147.09652400000027 115.75000799999998" class="edge-path" stroke-width="3.5" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M379.7788763774236,200.43991562257628L380.4355263145197,209.61659901881356C381.09217625161574,218.79328241505084,382.4054761258078,237.14664920752543,383.06212606290387,263.09208460376266C383.71877599999993,289.0375199999999,383.71877599999993,322.5750239999999,383.71877599999993,339.34377599999993L383.71877599999993,356.11252799999994" class="edge-path" fill="none" stroke-width="3.5" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-e-od3-0">
-        <path d="M 803.54 175.66 C 790.87 194.27, 778.20 212.89, 672.23 230.36 C 566.26 247.83, 366.98 264.17, 317.54 289.02 C 368.47 347.24, 468.85 380.61, 468.85 380.61" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M947.8292157974249,171.48214636465417L936.1923304978541,185.4851246372118C924.5554451982833,199.48810290976942,901.2816745991416,227.4940594548847,889.6447892995708,257.5157897274423C878.0079039999999,287.5375199999999,878.0079039999999,319.5750239999999,878.0079039999999,335.59377599999993L878.0079039999999,351.61252799999994" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-e-f-0">
-        <path d="M 888.76 172.97 C 903.92 192.48, 919.08 211.99, 837.61 229.91 C 756.15 247.83, 578.07 264.17, 545.57 291.13 C 626.16 355.69, 739.25 393.29, 739.25 393.29" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M1040.459296202575,171.48214636465417L1052.0961815021458,185.4851246372118C1063.7330668017166,199.48810290976942,1087.0068374008583,227.4940594548847,1098.6437227004292,258.2657897274423C1110.280608,289.0375199999999,1110.280608,322.5750239999999,1110.280608,339.34377599999993L1110.280608,356.11252799999994" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-cyr-cyr2-0">
-        <path d="M 666.76 142.75 C 666.76 172.33, 666.76 201.92, 555.63 224.88 C 444.51 247.83, 222.25 264.17, 149.37 288.82 C 152.98 346.44, 229.47 379.41, 229.47 379.41" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M1299.5134560000001,142.75000799999998L1299.5134560000004,161.54167599999997C1299.5134560000001,180.33334399999998,1299.5134560000001,217.91667999999996,1299.5134560000004,244.20834799999997C1299.5134560000001,270.50001599999996,1299.5134560000001,285.50001599999996,1299.5134560000004,293.00001599999996L1299.5134560000001,300.50001599999996" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-od-ro-0">
-        <rect x="583.00778821639" y="258.9477241322668" width="94.39999999999999" height="40" class="edge-label-bg"/>
-        <text x="630.2077882163901" y="278.9477241322668" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="630.2077882163901" y="278.9477241322668" dy="-0.6em">Two line</tspan><tspan x="630.2077882163901" dy="1.2em">edge comment</tspan></text>
+        <rect x="47.98359999999996" y="220.7503485794586" width="94.39999999999999" height="40" class="edge-label-bg"/>
+        <text x="95.18359999999996" y="240.7503485794586" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="95.18359999999996" y="240.7503485794586" dy="-0.6em">Two line</tspan><tspan x="95.18359999999996" dy="1.2em">edge comment</tspan></text>
       </g>
     </g>
     <g class="nodes">
+      <g class="node" id="node-sq">
+        <rect x="573.55864" y="88.75000799999998" width="154.789088" height="54" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
+        <text x="650.953184" y="115.75000799999998" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central">Square shape</text>
+      </g>
       <g class="node" id="node-ci">
-        <circle cx="953.891932" cy="412.11252799999994" r="51.40235199999999"/>
-        <text x="953.891932" y="412.11252799999994" class="label" text-anchor="middle" dominant-baseline="central">Circle shape</text>
-      </g>
-      <g class="node" id="node-cyr">
-        <rect x="611.6766520000001" y="88.75000799999998" width="110.164064" height="54"/>
-        <text x="666.7586840000001" y="115.75000799999998" class="label" dominant-baseline="central" text-anchor="middle">Cyrillic</text>
-      </g>
-      <g class="node" id="node-cyr2">
-        <circle cx="305.33166000000006" cy="412.11252799999994" r="82.61251199999998"/>
-        <text x="305.33166000000006" y="412.11252799999994" class="label" dominant-baseline="central" text-anchor="middle">Circle shape Начало</text>
-      </g>
-      <g class="node" id="node-di">
-        <polygon points="147.09652400000027,24.999999999999986 237.84653200000025,115.75000799999998 147.09652400000027,206.50001599999996 56.34651600000028,115.75000799999998" style="fill:#f96 !important;stroke:#333 !important;stroke-width:4px !important"/>
-        <text x="147.09652400000027" y="115.75000799999998" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff"><tspan x="147.09652400000027" y="115.75000799999998" dy="-0.6em">Diamond with </tspan><tspan x="147.09652400000027" dy="1.2em"> line break</tspan></text>
-      </g>
-      <g class="node" id="node-e">
-        <circle cx="844.3055640000002" cy="115.75000799999998" r="72.46484799999999" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
-        <text x="844.3055640000002" y="115.75000799999998" class="label" style="fill: #000000" text-anchor="middle" dominant-baseline="central"><tspan x="844.3055640000002" y="115.75000799999998" dy="-1.2em">Inner / circle</tspan><tspan x="844.3055640000002" dy="1.2em">and some odd </tspan><tspan x="844.3055640000002" dy="1.2em">special characters</tspan></text>
-      </g>
-      <g class="node" id="node-f">
-        <path d="M 744.248908 385.11252799999994 H 847.48958 A 5 5 0 0 1 852.48958 390.11252799999994 V 434.11252799999994 A 5 5 0 0 1 847.48958 439.11252799999994 H 744.248908 A 5 5 0 0 1 739.248908 434.11252799999994 V 390.11252799999994 A 5 5 0 0 1 744.248908 385.11252799999994 Z"/>
-        <text x="795.869244" y="412.11252799999994" class="label" text-anchor="middle" dominant-baseline="central">,.?!+-*ز</text>
+        <circle cx="650.953184" cy="387.11252799999994" r="51.40235199999999"/>
+        <text x="650.953184" y="387.11252799999994" class="label" text-anchor="middle" dominant-baseline="central">Circle shape</text>
       </g>
       <g class="node" id="node-od">
-        <path d="M 181.64145199999996 96.25000799999998 L 281.08678 96.25000799999998 L 266.16998079999996 115.75000799999998 L 281.08678 135.25000799999998 L 181.64145199999996 135.25000799999998 Z"/>
-        <text x="231.36411599999997" y="115.75000799999998" class="label" text-anchor="middle" dominant-baseline="central">Odd shape</text>
-      </g>
-      <g class="node" id="node-od3">
-        <path d="M 437.944172 380.61252799999994 L 689.248908 380.61252799999994 L 651.5531976 412.11252799999994 L 689.248908 443.61252799999994 L 437.944172 443.61252799999994 Z"/>
-        <text x="563.59654" y="412.11252799999994" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="563.59654" y="412.11252799999994" dy="-0.6em">Really long text with linebreak</tspan><tspan x="563.59654" dy="1.2em">in an Odd shape</tspan></text>
+        <path d="M 45.46093599999996 96.25000799999998 L 144.90626399999996 96.25000799999998 L 129.98946479999998 115.75000799999998 L 144.90626399999996 135.25000799999998 L 45.46093599999996 135.25000799999998 Z"/>
+        <text x="95.18359999999996" y="115.75000799999998" class="label" dominant-baseline="central" text-anchor="middle">Odd shape</text>
       </g>
       <g class="node" id="node-ro">
-        <path d="M 56.430075999999886 361.11252799999994 H 167.7191479999999 A 5 5 0 0 1 172.7191479999999 366.11252799999994 V 458.11252799999994 A 5 5 0 0 1 167.7191479999999 463.11252799999994 H 56.430075999999886 A 5 5 0 0 1 51.430075999999886 458.11252799999994 V 366.11252799999994 A 5 5 0 0 1 56.430075999999886 361.11252799999994 Z"/>
-        <text x="112.07461199999989" y="412.11252799999994" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="112.07461199999989" y="412.11252799999994" dy="-1.2em">Rounded</tspan><tspan x="112.07461199999989" dy="1.2em">square</tspan><tspan x="112.07461199999989" dy="1.2em">shape</tspan></text>
+        <path d="M 107.58984 336.11252799999994 H 218.878912 A 5 5 0 0 1 223.878912 341.11252799999994 V 433.11252799999994 A 5 5 0 0 1 218.878912 438.11252799999994 H 107.58984 A 5 5 0 0 1 102.58984 433.11252799999994 V 341.11252799999994 A 5 5 0 0 1 107.58984 336.11252799999994 Z"/>
+        <text x="163.234376" y="387.11252799999994" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="163.234376" y="387.11252799999994" dy="-1.2em">Rounded</tspan><tspan x="163.234376" dy="1.2em">square</tspan><tspan x="163.234376" dy="1.2em">shape</tspan></text>
+      </g>
+      <g class="node" id="node-di">
+        <polygon points="373.71877599999993,24.999999999999986 464.4687839999999,115.75000799999998 373.71877599999993,206.50001599999996 282.96876799999995,115.75000799999998" style="fill:#f96 !important;stroke:#333 !important;stroke-width:4px !important"/>
+        <text x="373.71877599999993" y="115.75000799999998" class="label" dominant-baseline="central" style="fill: #ffffff" text-anchor="middle"><tspan x="373.71877599999993" y="115.75000799999998" dy="-0.6em">Diamond with </tspan><tspan x="373.71877599999993" dy="1.2em"> line break</tspan></text>
       </g>
       <g class="node" id="node-ro2">
-        <path d="M 42.25666000000027 88.75000799999998 H 251.9363880000003 A 5 5 0 0 1 256.9363880000003 93.75000799999998 V 137.75000799999998 A 5 5 0 0 1 251.9363880000003 142.75000799999998 H 42.25666000000027 A 5 5 0 0 1 37.25666000000027 137.75000799999998 V 93.75000799999998 A 5 5 0 0 1 42.25666000000027 88.75000799999998 Z"/>
-        <text x="147.09652400000027" y="115.75000799999998" class="label" text-anchor="middle" dominant-baseline="central">Rounded square shape</text>
+        <path d="M 278.8789119999999 360.11252799999994 H 488.5586399999999 A 5 5 0 0 1 493.5586399999999 365.11252799999994 V 409.11252799999994 A 5 5 0 0 1 488.5586399999999 414.11252799999994 H 278.8789119999999 A 5 5 0 0 1 273.8789119999999 409.11252799999994 V 365.11252799999994 A 5 5 0 0 1 278.8789119999999 360.11252799999994 Z"/>
+        <text x="383.71877599999993" y="387.11252799999994" class="label" dominant-baseline="central" text-anchor="middle">Rounded square shape</text>
       </g>
-      <g class="node" id="node-sq">
-        <rect x="966.7704120000001" y="88.75000799999998" width="154.789088" height="54" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
-        <text x="1044.164956" y="115.75000799999998" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle">Square shape</text>
+      <g class="node" id="node-e">
+        <circle cx="994.1442559999999" cy="115.75000799999998" r="72.46484799999999" style="fill:#9f6 !important;stroke:#333 !important;stroke-width:2px !important"/>
+        <text x="994.1442559999999" y="115.75000799999998" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle"><tspan x="994.1442559999999" y="115.75000799999998" dy="-1.2em">Inner / circle</tspan><tspan x="994.1442559999999" dy="1.2em">and some odd </tspan><tspan x="994.1442559999999" dy="1.2em">special characters</tspan></text>
+      </g>
+      <g class="node" id="node-od3">
+        <path d="M 752.3555359999999 355.61252799999994 L 1003.660272 355.61252799999994 L 965.9645615999999 387.11252799999994 L 1003.660272 418.61252799999994 L 752.3555359999999 418.61252799999994 Z"/>
+        <text x="878.0079039999999" y="387.11252799999994" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="878.0079039999999" y="387.11252799999994" dy="-0.6em">Really long text with linebreak</tspan><tspan x="878.0079039999999" dy="1.2em">in an Odd shape</tspan></text>
+      </g>
+      <g class="node" id="node-f">
+        <path d="M 1058.660272 360.11252799999994 H 1161.900944 A 5 5 0 0 1 1166.900944 365.11252799999994 V 409.11252799999994 A 5 5 0 0 1 1161.900944 414.11252799999994 H 1058.660272 A 5 5 0 0 1 1053.660272 409.11252799999994 V 365.11252799999994 A 5 5 0 0 1 1058.660272 360.11252799999994 Z"/>
+        <text x="1110.280608" y="387.11252799999994" class="label" text-anchor="middle" dominant-baseline="central">,.?!+-*ز</text>
+      </g>
+      <g class="node" id="node-cyr">
+        <rect x="1244.431424" y="88.75000799999998" width="110.164064" height="54"/>
+        <text x="1299.5134560000001" y="115.75000799999998" class="label" text-anchor="middle" dominant-baseline="central">Cyrillic</text>
+      </g>
+      <g class="node" id="node-cyr2">
+        <circle cx="1299.5134560000001" cy="387.11252799999994" r="82.61251199999998"/>
+        <text x="1299.5134560000001" y="387.11252799999994" class="label" text-anchor="middle" dominant-baseline="central">Circle shape Начало</text>
       </g>
     </g>
   </g>

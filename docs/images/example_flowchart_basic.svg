@@ -87,10 +87,10 @@ marker path {
       <path d="M 0 5 L 10 10 L 10 0 z"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -105,28 +105,28 @@ marker path {
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A-B-0">
-        <path d="M 131.32 54.04 L 270.88 28.36" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M131.32075574569507,54.039063999999996L140.63057912141255,49.759116C149.94040249713004,45.479167999999994,168.560049248565,36.919272,191.15372729094918,32.639323999999995C213.7474053333333,28.359376,240.31511466666666,28.359376,253.59896933333332,28.359376L266.88282399999997,28.359376" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-A-C-0">
-        <path d="M 131.32 108.04 L 229.18 133.72" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M131.32075574569507,108.039064L140.63057912141255,112.319012C149.94040249713004,116.59895999999999,168.560049248565,125.158856,184.20320595761584,129.438804C199.84636266666666,133.718752,212.51302933333332,133.718752,218.84636266666664,133.718752L225.17969599999998,133.718752" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-B-D-0">
-        <path d="M 327.60 28.36 L 442.05 58.29" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M327.60157599999997,28.359376L338.71876399999996,28.359376C349.83595199999996,28.359376,372.07032799999996,28.359376,390.58034702012304,32.99420096336911C409.090366040246,37.629025926738215,423.87602808049206,46.89867585347642,431.26885910061515,51.533500816845525L438.66169012073817,56.16832578021463" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-C-D-0">
-        <path d="M 369.30 133.72 L 442.05 103.79" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M369.30470399999996,133.718752L373.47137066666664,133.718752C377.63803733333333,133.718752,385.97137066666664,133.718752,397.5308683534563,129.08392703663088C409.090366040246,124.44910207326178,423.87602808049206,115.17945214652359,431.26885910061515,110.54462718315447L438.66169012073817,105.90980221978536" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-A-B-0">
         <rect x="161.89175942618064" y="17.359376" width="72.8" height="22" class="edge-label-bg"/>
-        <text x="198.29175942618065" y="28.359376" class="edge-label" dominant-baseline="central" text-anchor="middle">Link text</text>
+        <text x="198.29175942618065" y="28.359376" class="edge-label" text-anchor="middle" dominant-baseline="central">Link text</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-A">
         <rect x="0" y="54.039063999999996" width="145.17969599999998" height="54"/>
-        <text x="72.58984799999999" y="81.039064" class="label" text-anchor="middle" dominant-baseline="central">Square Rect</text>
+        <text x="72.58984799999999" y="81.039064" class="label" dominant-baseline="central" text-anchor="middle">Square Rect</text>
       </g>
       <g class="node" id="node-B">
         <circle cx="299.24219999999997" cy="28.359376" r="28.359376"/>

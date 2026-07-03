@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1747.3810600000002" height="906.695328" viewBox="-8 -28 1747.3810600000002 906.695328" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="2709.7053199999996" height="956.695328" viewBox="-28 -28 2709.7053199999996 956.695328" class="mermaid">
   <style>
 
 .mermaid {
@@ -90,7 +90,7 @@ marker path {
       <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
       <circle cx="5" cy="5" r="5"/>
@@ -101,179 +101,179 @@ marker path {
   </defs>
   <g class="root">
     <g class="clusters">
-      <g class="subgraph" id="subgraph-">
-        <rect x="56.46289199999998" y="-20" width="1654.9181680000002" height="781.695328" class="cluster"/>
-        <text x="883.9219760000001" y="-4" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph0">
+        <rect x="2016.8731919999996" y="-20" width="636.832128" height="806.695328" class="cluster"/>
+        <text x="2335.2892559999996" y="-4" class="cluster-label" text-anchor="middle">❌ Broken: Backdrop Click</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="618.8145240000001" y="-8" width="307.437536" height="873.695328" class="cluster"/>
-        <text x="772.5332920000001" y="8" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph1">
+        <rect x="601.998092" y="-8" width="889.8106319999999" height="923.695328" class="cluster"/>
+        <text x="1046.9034080000001" y="8" class="cluster-label" text-anchor="middle">❌ Broken: Empty Area Click</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="390.65042800000003" y="-8" width="246.05471999999997" height="490.347664" class="cluster"/>
-        <text x="513.677788" y="8" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph2">
+        <rect x="-20" y="-8" width="246.05472000000003" height="490.347664" class="cluster"/>
+        <text x="103.02736000000002" y="8" class="cluster-label" text-anchor="middle">⚠️ Subtle: Close Button</text>
       </g>
-      <g class="subgraph" id="subgraph-">
-        <rect x="919.2012760000002" y="-20" width="619.8711519999999" height="781.695328" class="cluster"/>
-        <text x="1229.136852" y="-4" class="cluster-label" text-anchor="middle"></text>
+      <g class="subgraph" id="subgraph-subGraph3">
+        <rect x="628.2656919999998" y="-20" width="823.4902840000001" height="806.695328" class="cluster"/>
+        <text x="1040.010834" y="-4" class="cluster-label" text-anchor="middle">✅ Working Mechanisms</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-BC-HBC-0">
-        <path d="M 245.82 91.00 C 245.82 103.33, 245.82 115.67, 245.82 128.00 C 245.82 140.33, 245.82 152.67, 245.82 165.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M2206.232576,91L2206.232576,97.16666666666667C2206.232576,103.33333333333333,2206.232576,115.66666666666667,2206.232576,127.33333333333333C2206.232576,139,2206.232576,150,2206.232576,155.5L2206.232576,161" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-HBC-CHK-0">
-        <path d="M 245.82 219.00 C 245.82 231.33, 245.82 243.67, 245.82 257.57 C 245.82 271.47, 245.82 286.93, 245.82 302.40" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M2206.232576,219L2206.232576,225.16666666666666C2206.232576,231.33333333333334,2206.232576,243.66666666666666,2206.232576,256.89974C2206.232576,270.13281333333333,2206.232576,284.26562666666666,2206.232576,291.3320333333333L2206.232576,298.39844" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-CHK-NOOP1-0">
-        <path d="M 199.33 521.81 L 136.49 687.70" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M2155.879426367384,517.943738367384L2146.0489606394867,534.0690033061533C2136.218494911589,550.1942682449227,2116.557563455794,582.4447981224613,2106.727097727897,606.7367297278973C2096.8966319999995,631.0286613333334,2096.8966319999995,647.3619946666666,2096.8966319999995,663.0286613333333C2096.8966319999995,678.695328,2096.8966319999995,693.6953280000001,2096.8966319999995,701.1953279999999L2096.8966319999995,708.695328" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CHK-CLOSE1-0">
-        <path d="M 305.90 508.22 C 341.77 551.71, 377.63 595.20, 395.56 625.12 C 413.49 655.03, 413.49 671.36, 413.49 687.70" class="edge-path" marker-end="url(#arrow_point)" stroke-dasharray="3,3" fill="none" stroke-width="2"/>
+        <path d="M2264.184136807067,510.34532719293327L2277.6228786725555,527.736993994111C2291.0616205380443,545.1286607952889,2317.9391042690218,579.9119943976444,2331.3778461345105,605.4703278654889C2344.8165879999992,631.0286613333334,2344.8165879999992,647.3619946666666,2344.8165879999992,663.0286613333333C2344.8165879999992,678.695328,2344.8165879999992,693.6953280000001,2344.8165879999992,701.1953279999999L2344.8165879999992,708.695328" class="edge-path" stroke-width="2" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3"/>
       </g>
       <g class="edge" id="edge-L-EMP-MD-0">
-        <path d="M 772.53 91.00 C 772.53 103.33, 772.53 115.67, 772.53 128.00 C 772.53 140.33, 772.53 152.67, 772.53 165.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M889.435628,78.0234473581356L968.8597866666665,86.35287279844634C1048.2839453333333,94.68229823875707,1207.1322626666667,111.34114911937854,1286.5564213333334,125.17057455968927C1365.9805800000001,139,1365.9805800000001,150,1365.9805799999997,155.5L1365.98058,161" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-MD-PRV-0">
-        <path d="M 772.53 219.00 C 772.53 231.33, 772.53 243.67, 772.53 275.22 C 772.53 306.78, 772.53 357.57, 772.53 408.35" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M1365.98058,219L1365.9805799999997,225.16666666666666C1365.9805800000001,231.33333333333334,1365.9805800000001,243.66666666666666,1365.9805799999997,274.55794399999996C1365.9805800000001,305.44922133333336,1365.9805800000001,354.89844266666665,1365.9805799999997,379.6230533333333L1365.98058,404.347664" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-PRV-DRAG-0">
-        <path d="M 772.53 462.35 C 772.53 521.13, 772.53 579.91, 772.53 617.47 C 772.53 655.03, 772.53 671.36, 772.53 687.70" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M1365.98058,462.347664L1365.9805799999997,487.73894133333334C1365.9805800000001,513.1302186666667,1365.9805800000001,563.9127733333333,1258.7937226666666,597.4707173333333C1151.6068653333332,631.0286613333334,937.2331506666666,647.3619946666666,830.0462933333333,663.0286613333333C722.8594360000001,678.695328,722.8594360000001,693.6953280000001,722.8594359999998,701.1953279999999L722.859436,708.695328" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-DRAG-NOOP2-0">
-        <path d="M 772.53 741.70 C 772.53 750.03, 772.53 758.36, 772.53 766.70 C 772.53 775.03, 772.53 783.36, 772.53 791.70" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M807.3594439999999,761.6947618025184L826.564848,766.6948561687653C845.7702519999999,771.6949505350123,884.1810599999999,781.6951392675061,903.3864639999998,790.8619003004197C922.591868,800.0286613333334,922.591868,808.3619946666668,922.5918679999999,816.0286613333333C922.591868,823.6953280000001,922.591868,830.6953280000001,922.5918679999999,834.1953279999999L922.591868,837.695328" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CB-TINY-0">
-        <path d="M 513.68 91.00 C 513.68 103.33, 513.68 115.67, 513.68 126.00 C 513.68 136.33, 513.68 144.67, 513.68 153.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M103.02736000000002,91L103.02736000000003,97.16666666666667C103.02736,103.33333333333333,103.02736,115.66666666666667,103.02736000000003,125.33333333333333C103.02736,135,103.02736,142,103.02736000000003,145.5L103.02736000000002,149" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-TINY-OK-0">
-        <path d="M 513.68 231.00 C 513.68 239.33, 513.68 247.67, 513.68 277.22 C 513.68 306.78, 513.68 357.57, 513.68 408.35" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M103.02736000000002,231L103.02736000000003,235.16666666666666C103.02736,239.33333333333334,103.02736,247.66666666666666,103.02736000000003,276.55794399999996C103.02736,305.44922133333336,103.02736,354.89844266666665,103.02736000000003,379.6230533333333L103.02736000000002,404.347664" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-ESC-KD-0">
-        <path d="M 1025.51 91.00 C 1025.51 103.33, 1025.51 115.67, 1025.51 128.00 C 1025.51 140.33, 1025.51 152.67, 1025.51 165.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M1293.23252,78.84241223308054L1255.0004206666665,87.03534352756712C1216.7683213333332,95.2282748220537,1140.3041226666667,111.61413741102685,1102.0720233333332,125.30706870551342C1063.8399239999999,139,1063.8399239999999,150,1063.8399239999999,155.5L1063.8399239999999,161" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
       <g class="edge" id="edge-L-KD-CLOSE2-0">
-        <path d="M 1025.51 219.00 C 1025.51 231.33, 1025.51 243.67, 1025.51 275.22 C 1025.51 306.78, 1025.51 357.57, 1025.51 408.35" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M1063.8399239999999,219L1063.8399239999999,225.16666666666666C1063.8399239999999,231.33333333333334,1063.8399239999999,243.66666666666666,1063.8399239999999,274.55794399999996C1063.8399239999999,305.44922133333336,1063.8399239999999,354.89844266666665,1063.8399239999999,379.6230533333333L1063.8399239999999,404.347664" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
       </g>
       <g class="edge" id="edge-L-NODRG-MU-0">
-        <path d="M 1286.74 103.00 C 1286.74 111.33, 1286.74 119.67, 1286.74 130.00 C 1286.74 140.33, 1286.74 152.67, 1286.74 165.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M1028.7891399999999,83.02016337115224L991.0931759999999,90.51680280929354C953.3972119999999,98.01344224743484,878.0052839999998,113.00672112371741,840.3093199999998,126.0033605618587C802.6133559999998,139,802.6133559999998,150,802.6133559999998,155.5L802.6133559999998,161" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-MU-CHK2-0">
-        <path d="M 1286.74 219.00 C 1286.74 231.33, 1286.74 243.67, 1286.74 254.00 C 1286.74 264.33, 1286.74 272.67, 1286.74 281.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M802.6133559999998,219L802.6133559999998,225.16666666666666C802.6133559999998,231.33333333333334,802.6133559999998,243.66666666666666,802.6133559999998,253.33333333333334C802.6133559999998,263,802.6133559999998,270,802.6133559999998,273.5L802.6133559999998,277" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-CHK2-CLOSE3-0">
-        <path d="M 1218.44 521.39 C 1187.40 560.49, 1156.36 599.59, 1140.84 627.31 C 1125.33 655.03, 1125.33 671.36, 1125.33 687.70" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M705.9919663829323,493.0739383829325L672.0639506524436,513.3441699857771C638.1359349219549,533.6144015886217,570.2799034609775,574.1548647943108,618.3597043971554,602.591763063822C666.4395053333334,631.0286613333334,830.4551386666666,647.3619946666666,912.4629553333333,663.0286613333333C994.470772,678.695328,994.470772,693.6953280000001,994.4707719999998,701.1953279999999L994.4707719999999,708.695328" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
       </g>
       <g class="edge" id="edge-L-CHK2-NOOP3-0">
-        <path d="M 1357.54 518.90 C 1391.37 558.83, 1425.21 598.76, 1442.13 626.90 C 1459.05 655.03, 1459.05 671.36, 1459.05 687.70" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M737.1571932327099,524.2391652327102L726.0558070272582,539.3151923605918C714.9544208218066,554.3912194884734,692.7516484109033,584.5432737442367,763.4543022054517,607.785967538785C834.1569559999999,631.0286613333334,997.7650359999999,647.3619946666666,1079.569076,663.0286613333333C1161.373116,678.695328,1161.373116,693.6953280000001,1161.373116,701.1953279999999L1161.373116,708.695328" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-CHK-NOOP1-0">
-        <rect x="58.707787360171125" y="581.8305377296468" width="195.2" height="40" class="edge-label-bg"/>
-        <text x="156.30778736017112" y="601.8305377296468" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="156.30778736017112" y="601.8305377296468" dy="-0.6em">✗ Always FALSE</tspan><tspan x="156.30778736017112" dy="1.2em">(target is zoom-container)</tspan></text>
+        <rect x="2003.2820726214177" y="588.1578670396592" width="195.2" height="40" class="edge-label-bg"/>
+        <text x="2100.8820726214176" y="608.1578670396592" class="edge-label" dominant-baseline="central" text-anchor="middle"><tspan x="2100.8820726214176" y="608.1578670396592" dy="-0.6em">✗ Always FALSE</tspan><tspan x="2100.8820726214176" dy="1.2em">(target is zoom-container)</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CHK-CLOSE1-0">
-        <rect x="295.6821512101511" y="572.3583581249844" width="159.2" height="40" class="edge-label-bg"/>
-        <text x="375.28215121015114" y="592.3583581249844" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="375.28215121015114" y="592.3583581249844" dy="-0.6em">✓ Never TRUE</tspan><tspan x="375.28215121015114" dy="1.2em">(backdrop is covered)</tspan></text>
+        <rect x="2254.8609083273927" y="581.2935875567061" width="159.2" height="40" class="edge-label-bg"/>
+        <text x="2334.4609083273926" y="601.2935875567061" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="2334.4609083273926" y="601.2935875567061" dy="-0.6em">✓ Never TRUE</tspan><tspan x="2334.4609083273926" dy="1.2em">(backdrop is covered)</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CHK2-CLOSE3-0">
-        <rect x="1149.050231909999" y="588.233760545706" width="15.2" height="22" class="edge-label-bg"/>
-        <text x="1156.6502319099989" y="599.233760545706" class="edge-label" text-anchor="middle" dominant-baseline="central">✓</text>
+        <rect x="647.2441530959072" y="618.8739497405281" width="15.2" height="22" class="edge-label-bg"/>
+        <text x="654.8441530959072" y="629.8739497405281" class="edge-label" text-anchor="middle" dominant-baseline="central">✓</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-CHK2-NOOP3-0">
-        <rect x="1416.5320168987907" y="586.4885444223412" width="15.2" height="22" class="edge-label-bg"/>
-        <text x="1424.1320168987907" y="597.4885444223412" class="edge-label" dominant-baseline="central" text-anchor="middle">✗</text>
+        <rect x="876.8505019297905" y="625.0495701428896" width="15.2" height="22" class="edge-label-bg"/>
+        <text x="884.4505019297906" y="636.0495701428896" class="edge-label" text-anchor="middle" dominant-baseline="central">✗</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node" id="node-BC">
-        <rect x="127.34959600000002" y="37" width="236.94536" height="54" style="fill:#333 !important;color:#fff !important"/>
-        <text x="245.82227600000002" y="64" class="label" dominant-baseline="central" style="fill: #fff" text-anchor="middle">.modal-backdrop onclick</text>
-      </g>
-      <g class="node" id="node-CB">
-        <rect x="440.3777800000001" y="37" width="146.60001599999998" height="54"/>
-        <text x="513.6777880000001" y="64" class="label" text-anchor="middle" dominant-baseline="central">.close-btn ×</text>
-      </g>
-      <g class="node" id="node-CHK">
-        <polygon points="245.82227600000002,302.39844 378.77150000000006,435.347664 245.82227600000002,568.2968880000001 112.873052,435.347664" style="fill:#ff5555 !important;color:#fff !important"/>
-        <text x="245.82227600000002" y="435.347664" class="label" style="fill: #fff" text-anchor="middle" dominant-baseline="central">e.target === e.currentTarget?</text>
-      </g>
-      <g class="node" id="node-CHK2">
-        <polygon points="1286.7403560000002,281 1441.0880200000004,435.347664 1286.7403560000002,589.695328 1132.3926920000004,435.347664"/>
-        <text x="1286.7403560000002" y="435.347664" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1286.7403560000002" y="435.347664" dy="-1.2em">wasDragging &amp;&amp;</tspan><tspan x="1286.7403560000002" dy="1.2em">!mouseMovedDuringPress &amp;&amp;</tspan><tspan x="1286.7403560000002" dy="1.2em">e.target === containerEl</tspan></text>
-      </g>
-      <g class="node" id="node-CLOSE1">
-        <rect x="356.60942400000005" y="687.695328" width="113.757808" height="54"/>
-        <text x="413.488328" y="714.695328" class="label" dominant-baseline="central" text-anchor="middle">onclose</text>
-      </g>
-      <g class="node" id="node-CLOSE2">
-        <rect x="968.6348840000002" y="408.347664" width="113.757808" height="54" style="fill:#55ff55 !important;color:#000 !important"/>
-        <text x="1025.5137880000002" y="435.347664" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000">onclose</text>
-      </g>
-      <g class="node" id="node-CLOSE3">
-        <rect x="1068.4473760000003" y="687.695328" width="113.757808" height="54" style="fill:#55ff55 !important;color:#000 !important"/>
-        <text x="1125.3262800000002" y="714.695328" class="label" style="fill: #000" dominant-baseline="central" text-anchor="middle">onclose</text>
-      </g>
-      <g class="node" id="node-DRAG">
-        <rect x="688.0332840000001" y="687.695328" width="169.000016" height="54" style="fill:#ff5555 !important;color:#fff !important"/>
-        <text x="772.5332920000001" y="714.695328" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">dragging = true</text>
-      </g>
-      <g class="node" id="node-EMP">
-        <rect x="638.8145240000001" y="37" width="267.437536" height="54" style="fill:#333 !important;color:#fff !important"/>
-        <text x="772.5332920000001" y="64" class="label" dominant-baseline="central" style="fill: #fff" text-anchor="middle">Click in empty viewport area</text>
-      </g>
-      <g class="node" id="node-ESC">
-        <rect x="956.2520600000003" y="37" width="138.523456" height="54" style="fill:#55ff55 !important;color:#000 !important"/>
-        <text x="1025.5137880000002" y="64" class="label" dominant-baseline="central" style="fill: #000" text-anchor="middle">Escape key</text>
-      </g>
-      <g class="node" id="node-HBC">
-        <rect x="130.994124" y="165" width="229.65630400000003" height="54"/>
-        <text x="245.82227600000002" y="192" class="label" dominant-baseline="central" text-anchor="middle">handleBackdropClick(e)</text>
-      </g>
-      <g class="node" id="node-KD">
-        <rect x="939.2012760000002" y="165" width="172.625024" height="54"/>
-        <text x="1025.5137880000002" y="192" class="label" text-anchor="middle" dominant-baseline="central">handleKeyDown</text>
-      </g>
-      <g class="node" id="node-MD">
-        <rect x="666.705148" y="165" width="211.65628800000002" height="54"/>
-        <text x="772.5332920000001" y="192" class="label" text-anchor="middle" dominant-baseline="central">handleMouseDown(e)</text>
-      </g>
-      <g class="node" id="node-MU">
-        <rect x="1201.0294040000003" y="165" width="171.42190399999998" height="54"/>
-        <text x="1286.7403560000002" y="192" class="label" text-anchor="middle" dominant-baseline="central">handleMouseUp</text>
-      </g>
-      <g class="node" id="node-NODRG">
-        <rect x="1191.0997160000002" y="25" width="191.28128" height="78" style="fill:#55ff55 !important;color:#000 !important"/>
-        <text x="1286.7403560000002" y="64" class="label" style="fill: #000" dominant-baseline="central" text-anchor="middle"><tspan x="1286.7403560000002" y="64" dy="-0.6em">Click without drag</tspan><tspan x="1286.7403560000002" dy="1.2em">on containerEl</tspan></text>
-      </g>
-      <g class="node" id="node-NOOP1">
-        <rect x="76.46289199999998" y="687.695328" width="120.04688" height="54" style="fill:#ff5555 !important;color:#fff !important"/>
-        <text x="136.48633199999998" y="714.695328" class="label" dominant-baseline="central" style="fill: #fff" text-anchor="middle">No close</text>
-      </g>
-      <g class="node" id="node-NOOP2">
-        <rect x="647.568436" y="791.695328" width="249.92971200000005" height="54" style="fill:#ff5555 !important;color:#fff !important"/>
-        <text x="772.5332920000001" y="818.695328" class="label" style="fill: #fff" text-anchor="middle" dominant-baseline="central">Starts pan instead of close</text>
-      </g>
-      <g class="node" id="node-NOOP3">
-        <rect x="1399.025548" y="687.695328" width="120.04688" height="54"/>
-        <text x="1459.048988" y="714.695328" class="label" dominant-baseline="central" text-anchor="middle">No close</text>
-      </g>
-      <g class="node" id="node-OK">
-        <rect x="433.75981200000007" y="408.347664" width="159.83595200000002" height="54"/>
-        <text x="513.6777880000001" y="435.347664" class="label" text-anchor="middle" dominant-baseline="central">onclose works</text>
-      </g>
-      <g class="node" id="node-PRV">
-        <rect x="675.2715640000001" y="408.347664" width="194.52345599999998" height="54"/>
-        <text x="772.5332920000001" y="435.347664" class="label" dominant-baseline="central" text-anchor="middle">e.preventDefault()</text>
-      </g>
-      <g class="node" id="node-TINY">
-        <rect x="410.65042800000003" y="153" width="206.05472000000003" height="78" style="fill:#ffaa00 !important;color:#000 !important"/>
-        <text x="513.6777880000001" y="192" class="label" style="fill: #000" dominant-baseline="central" text-anchor="middle"><tspan x="513.6777880000001" y="192" dy="-0.6em">0.8rem font</tspan><tspan x="513.6777880000001" dy="1.2em">#d0d0d0 on #2a2a2a</tspan></text>
+        <rect x="2087.759896" y="37" width="236.94536" height="54" style="fill:#333 !important;color:#fff !important"/>
+        <text x="2206.232576" y="64" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #fff">.modal-backdrop onclick</text>
       </g>
       <g class="node" id="node-ZC">
-        <rect x="1432.3809960000003" y="25" width="259.00006399999995" height="78" style="fill:#ff5555 !important;color:#fff !important"/>
-        <text x="1561.8810280000002" y="64" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #fff"><tspan x="1561.8810280000002" y="64" dy="-0.6em">.zoom-container</tspan><tspan x="1561.8810280000002" dy="1.2em">(width: 100%, height: 100%)</tspan></text>
+        <rect x="2374.7052559999997" y="25" width="259.00006399999995" height="78" style="fill:#ff5555 !important;color:#fff !important"/>
+        <text x="2504.2052879999997" y="64" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="2504.2052879999997" y="64" dy="-0.6em">.zoom-container</tspan><tspan x="2504.2052879999997" dy="1.2em">(width: 100%, height: 100%)</tspan></text>
+      </g>
+      <g class="node" id="node-HBC">
+        <rect x="2091.404424" y="165" width="229.65630400000003" height="54"/>
+        <text x="2206.232576" y="192" class="label" text-anchor="middle" dominant-baseline="central">handleBackdropClick(e)</text>
+      </g>
+      <g class="node" id="node-CHK">
+        <polygon points="2206.232576,302.39844 2339.1818,435.347664 2206.232576,568.2968880000001 2073.283352,435.347664" style="fill:#ff5555 !important;color:#fff !important"/>
+        <text x="2206.232576" y="435.347664" class="label" style="fill: #fff" text-anchor="middle" dominant-baseline="central">e.target === e.currentTarget?</text>
+      </g>
+      <g class="node" id="node-NOOP1">
+        <rect x="2036.8731919999996" y="712.695328" width="120.04688" height="54" style="fill:#ff5555 !important;color:#fff !important"/>
+        <text x="2096.8966319999995" y="739.695328" class="label" style="fill: #fff" dominant-baseline="central" text-anchor="middle">No close</text>
+      </g>
+      <g class="node" id="node-CLOSE1">
+        <rect x="2287.937683999999" y="712.695328" width="113.757808" height="54"/>
+        <text x="2344.8165879999992" y="739.695328" class="label" text-anchor="middle" dominant-baseline="central">onclose</text>
+      </g>
+      <g class="node" id="node-EMP">
+        <rect x="621.998092" y="37" width="267.437536" height="54" style="fill:#333 !important;color:#fff !important"/>
+        <text x="755.71686" y="64" class="label" text-anchor="middle" style="fill: #fff" dominant-baseline="central">Click in empty viewport area</text>
+      </g>
+      <g class="node" id="node-MD">
+        <rect x="1260.1524359999999" y="165" width="211.65628800000002" height="54"/>
+        <text x="1365.98058" y="192" class="label" text-anchor="middle" dominant-baseline="central">handleMouseDown(e)</text>
+      </g>
+      <g class="node" id="node-PRV">
+        <rect x="1268.718852" y="408.347664" width="194.52345599999998" height="54"/>
+        <text x="1365.98058" y="435.347664" class="label" text-anchor="middle" dominant-baseline="central">e.preventDefault()</text>
+      </g>
+      <g class="node" id="node-DRAG">
+        <rect x="638.359428" y="712.695328" width="169.000016" height="54" style="fill:#ff5555 !important;color:#fff !important"/>
+        <text x="722.859436" y="739.695328" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #fff">dragging = true</text>
+      </g>
+      <g class="node" id="node-NOOP2">
+        <rect x="797.6270119999999" y="841.695328" width="249.92971200000005" height="54" style="fill:#ff5555 !important;color:#fff !important"/>
+        <text x="922.591868" y="868.695328" class="label" text-anchor="middle" style="fill: #fff" dominant-baseline="central">Starts pan instead of close</text>
+      </g>
+      <g class="node" id="node-CB">
+        <rect x="29.727352000000025" y="37" width="146.60001599999998" height="54"/>
+        <text x="103.02736000000002" y="64" class="label" text-anchor="middle" dominant-baseline="central">.close-btn ×</text>
+      </g>
+      <g class="node" id="node-TINY">
+        <rect x="0" y="153" width="206.05472000000003" height="78" style="fill:#ffaa00 !important;color:#000 !important"/>
+        <text x="103.02736000000002" y="192" class="label" style="fill: #000" text-anchor="middle" dominant-baseline="central"><tspan x="103.02736000000002" y="192" dy="-0.6em">0.8rem font</tspan><tspan x="103.02736000000002" dy="1.2em">#d0d0d0 on #2a2a2a</tspan></text>
+      </g>
+      <g class="node" id="node-OK">
+        <rect x="23.109384000000006" y="408.347664" width="159.83595200000002" height="54"/>
+        <text x="103.02736000000002" y="435.347664" class="label" text-anchor="middle" dominant-baseline="central">onclose works</text>
+      </g>
+      <g class="node" id="node-ESC">
+        <rect x="1293.23252" y="37" width="138.523456" height="54" style="fill:#55ff55 !important;color:#000 !important"/>
+        <text x="1362.494248" y="64" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000">Escape key</text>
+      </g>
+      <g class="node" id="node-KD">
+        <rect x="977.5274119999999" y="165" width="172.625024" height="54"/>
+        <text x="1063.8399239999999" y="192" class="label" dominant-baseline="central" text-anchor="middle">handleKeyDown</text>
+      </g>
+      <g class="node" id="node-CLOSE2">
+        <rect x="1006.9610199999998" y="408.347664" width="113.757808" height="54" style="fill:#55ff55 !important;color:#000 !important"/>
+        <text x="1063.8399239999999" y="435.347664" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #000">onclose</text>
+      </g>
+      <g class="node" id="node-NODRG">
+        <rect x="1028.7891399999999" y="25" width="191.28128" height="78" style="fill:#55ff55 !important;color:#000 !important"/>
+        <text x="1124.42978" y="64" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000"><tspan x="1124.42978" y="64" dy="-0.6em">Click without drag</tspan><tspan x="1124.42978" dy="1.2em">on containerEl</tspan></text>
+      </g>
+      <g class="node" id="node-MU">
+        <rect x="716.9024039999998" y="165" width="171.42190399999998" height="54"/>
+        <text x="802.6133559999998" y="192" class="label" text-anchor="middle" dominant-baseline="central">handleMouseUp</text>
+      </g>
+      <g class="node" id="node-CHK2">
+        <polygon points="802.6133559999998,281 956.9610199999998,435.347664 802.6133559999998,589.695328 648.2656919999998,435.347664"/>
+        <text x="802.6133559999998" y="435.347664" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="802.6133559999998" y="435.347664" dy="-1.2em">wasDragging &amp;&amp;</tspan><tspan x="802.6133559999998" dy="1.2em">!mouseMovedDuringPress &amp;&amp;</tspan><tspan x="802.6133559999998" dy="1.2em">e.target === containerEl</tspan></text>
+      </g>
+      <g class="node" id="node-CLOSE3">
+        <rect x="937.5918679999999" y="712.695328" width="113.757808" height="54" style="fill:#55ff55 !important;color:#000 !important"/>
+        <text x="994.4707719999999" y="739.695328" class="label" dominant-baseline="central" style="fill: #000" text-anchor="middle">onclose</text>
+      </g>
+      <g class="node" id="node-NOOP3">
+        <rect x="1101.349676" y="712.695328" width="120.04688" height="54"/>
+        <text x="1161.373116" y="739.695328" class="label" dominant-baseline="central" text-anchor="middle">No close</text>
       </g>
     </g>
   </g>

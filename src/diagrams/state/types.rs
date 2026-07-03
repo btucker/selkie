@@ -171,6 +171,9 @@ pub enum Statement {
 pub struct StateDb {
     /// States in the diagram
     states: HashMap<String, State>,
+    /// State ids in document insertion order (mermaid's StateDB uses
+    /// insertion-ordered objects; dagre layout is insertion-order sensitive)
+    state_order: Vec<String>,
     /// Relations between states
     relations: Vec<Relation>,
     /// Style class definitions
@@ -205,6 +208,7 @@ impl StateDb {
     pub fn new() -> Self {
         Self {
             states: HashMap::new(),
+            state_order: Vec::new(),
             relations: Vec::new(),
             classes: HashMap::new(),
             root_doc: Vec::new(),
@@ -221,6 +225,7 @@ impl StateDb {
 
     pub fn clear(&mut self) {
         self.states.clear();
+        self.state_order.clear();
         self.relations.clear();
         self.classes.clear();
         self.root_doc.clear();
@@ -283,13 +288,16 @@ impl StateDb {
                 State::new(id.to_string())
             };
             self.states.insert(id.to_string(), state);
+            self.state_order.push(id.to_string());
         }
     }
 
     /// Add a state with a specific type
     pub fn add_state_with_type(&mut self, id: &str, state_type: StateType) {
         let state = State::with_type(id.to_string(), state_type);
-        self.states.insert(id.to_string(), state);
+        if self.states.insert(id.to_string(), state).is_none() {
+            self.state_order.push(id.to_string());
+        }
     }
 
     /// Get a state by ID
@@ -305,6 +313,11 @@ impl StateDb {
     /// Get all states
     pub fn get_states(&self) -> &HashMap<String, State> {
         &self.states
+    }
+
+    /// Get state ids in document insertion order
+    pub fn state_ids_in_order(&self) -> &[String] {
+        &self.state_order
     }
 
     /// Add a description to a state
@@ -353,6 +366,7 @@ impl StateDb {
                     state.parent = Some(p.to_string());
                 }
                 self.states.insert(id.clone(), state);
+                self.state_order.push(id.clone());
             }
             id
         } else {
@@ -373,6 +387,7 @@ impl StateDb {
                     state.parent = Some(p.to_string());
                 }
                 self.states.insert(id.clone(), state);
+                self.state_order.push(id.clone());
             }
             id
         } else {

@@ -16,16 +16,20 @@ pub struct DagreGraph {
     graph_label: GraphLabel,
     /// Node labels indexed by node id
     pub(crate) nodes: HashMap<String, NodeLabel>,
+    /// Node ids in insertion order (matches graphlib's JS object key order)
+    node_order: Vec<String>,
     /// Edges indexed by (v, w, name)
     pub(crate) edges: HashMap<EdgeKey, EdgeLabel>,
+    /// Edge keys in insertion order (matches graphlib's JS object key order)
+    edge_order: Vec<EdgeKey>,
     /// Outgoing edges from each node
     pub(crate) out_edges: HashMap<String, Vec<EdgeKey>>,
     /// Incoming edges to each node
     pub(crate) in_edges: HashMap<String, Vec<EdgeKey>>,
     /// Parent relationships for compound graphs
     parent: HashMap<String, String>,
-    /// Children for each parent node
-    children: HashMap<String, HashSet<String>>,
+    /// Children for each parent node, in insertion order
+    children: HashMap<String, Vec<String>>,
     /// Counter for generating unique edge names
     edge_counter: usize,
 }
@@ -225,7 +229,9 @@ impl DagreGraph {
                 max_rank: None,
             },
             nodes: HashMap::new(),
+            node_order: Vec::new(),
             edges: HashMap::new(),
+            edge_order: Vec::new(),
             out_edges: HashMap::new(),
             in_edges: HashMap::new(),
             parent: HashMap::new(),
@@ -251,11 +257,13 @@ impl DagreGraph {
 
     // --- Node operations ---
 
-    /// Get all node ids (sorted for deterministic iteration order)
+    /// Get all node ids in insertion order
+    ///
+    /// graphlib's `g.nodes()` returns `Object.keys(this._nodes)`, which is JS
+    /// object insertion order. Dagre's ordering phase is insertion-order
+    /// sensitive, so we must preserve it rather than sorting alphabetically.
     pub fn nodes(&self) -> Vec<&String> {
-        let mut nodes: Vec<&String> = self.nodes.keys().collect();
-        nodes.sort();
-        nodes
+        self.node_order.iter().collect()
     }
 
     /// Get number of nodes
@@ -284,6 +292,7 @@ impl DagreGraph {
         if !self.nodes.contains_key(&v) {
             self.out_edges.insert(v.clone(), Vec::new());
             self.in_edges.insert(v.clone(), Vec::new());
+            self.node_order.push(v.clone());
         }
         self.nodes.insert(v, label);
     }
@@ -298,10 +307,12 @@ impl DagreGraph {
     /// Remove a node and its edges
     pub fn remove_node(&mut self, v: &str) {
         if self.nodes.remove(v).is_some() {
+            self.node_order.retain(|n| n != v);
             // Remove all edges connected to this node
             if let Some(out) = self.out_edges.remove(v) {
                 for key in out {
                     self.edges.remove(&key);
+                    self.edge_order.retain(|k| k != &key);
                     if let Some(in_list) = self.in_edges.get_mut(&key.w) {
                         in_list.retain(|k| k != &key);
                     }
@@ -310,6 +321,7 @@ impl DagreGraph {
             if let Some(in_list) = self.in_edges.remove(v) {
                 for key in in_list {
                     self.edges.remove(&key);
+                    self.edge_order.retain(|k| k != &key);
                     if let Some(out_list) = self.out_edges.get_mut(&key.v) {
                         out_list.retain(|k| k != &key);
                     }
@@ -318,7 +330,7 @@ impl DagreGraph {
             // Clean up parent/child relationships
             if let Some(parent) = self.parent.remove(v) {
                 if let Some(children) = self.children.get_mut(&parent) {
-                    children.remove(v);
+                    children.retain(|c| c != v);
                 }
             }
             self.children.remove(v);
@@ -327,17 +339,13 @@ impl DagreGraph {
 
     // --- Edge operations ---
 
-    /// Get all edges (sorted for deterministic iteration order)
     /// Get all edge keys in insertion order
     ///
-    /// Preserves the order edges were added to maintain proper edge ordering
-    /// through normalization and other phases.
+    /// graphlib's `g.edges()` returns `Object.values(this._edgeObjs)`, which is
+    /// JS object insertion order. Edge definition order matters for fork/join
+    /// layout where the first defined edge target should appear on the left.
     pub fn edges(&self) -> Vec<&EdgeKey> {
-        // Note: We no longer sort alphabetically here because it breaks edge
-        // definition order when normalize creates dummy edges. The edge order
-        // is important for fork/join layout where the first defined edge target
-        // should appear on the left.
-        self.edges.keys().collect()
+        self.edge_order.iter().collect()
     }
 
     /// Get number of edges
@@ -396,10 +404,13 @@ impl DagreGraph {
             self.set_node(w.clone(), NodeLabel::default());
         }
 
-        // Add edge
-        self.edges.insert(key.clone(), label);
-        self.out_edges.get_mut(&v).unwrap().push(key.clone());
-        self.in_edges.get_mut(&w).unwrap().push(key);
+        // Re-setting an existing edge only updates its label (graphlib behavior);
+        // insertion order and adjacency lists are unchanged.
+        if self.edges.insert(key.clone(), label).is_none() {
+            self.edge_order.push(key.clone());
+            self.out_edges.get_mut(&v).unwrap().push(key.clone());
+            self.in_edges.get_mut(&w).unwrap().push(key);
+        }
     }
 
     /// Set an edge with a specific name (for multigraph support)
@@ -422,10 +433,13 @@ impl DagreGraph {
             self.set_node(w.clone(), NodeLabel::default());
         }
 
-        // Add edge
-        self.edges.insert(key.clone(), label);
-        self.out_edges.get_mut(&v).unwrap().push(key.clone());
-        self.in_edges.get_mut(&w).unwrap().push(key);
+        // Re-setting an existing edge only updates its label (graphlib behavior);
+        // insertion order and adjacency lists are unchanged.
+        if self.edges.insert(key.clone(), label).is_none() {
+            self.edge_order.push(key.clone());
+            self.out_edges.get_mut(&v).unwrap().push(key.clone());
+            self.in_edges.get_mut(&w).unwrap().push(key);
+        }
     }
 
     /// Remove an edge
@@ -445,6 +459,7 @@ impl DagreGraph {
     /// Remove edge by key
     pub fn remove_edge_by_key(&mut self, key: &EdgeKey) {
         if self.edges.remove(key).is_some() {
+            self.edge_order.retain(|k| k != key);
             if let Some(out_list) = self.out_edges.get_mut(&key.v) {
                 out_list.retain(|k| k != key);
             }
@@ -504,12 +519,16 @@ impl DagreGraph {
             .unwrap_or_default()
     }
 
-    /// Get neighbor nodes (predecessors + successors, sorted for deterministic iteration)
+    /// Get neighbor nodes (union of predecessors then successors, in edge
+    /// insertion order, deduplicated — matches graphlib's `neighbors`)
     pub fn neighbors(&self, v: &str) -> Vec<&String> {
+        let mut seen: HashSet<&String> = HashSet::new();
         let mut result: Vec<&String> = Vec::new();
-        result.extend(self.predecessors(v));
-        result.extend(self.successors(v));
-        result.sort();
+        for n in self.predecessors(v).into_iter().chain(self.successors(v)) {
+            if seen.insert(n) {
+                result.push(n);
+            }
+        }
         result
     }
 
@@ -540,13 +559,16 @@ impl DagreGraph {
         // Remove from old parent if any
         if let Some(old_parent) = self.parent.get(&v).cloned() {
             if let Some(children) = self.children.get_mut(&old_parent) {
-                children.remove(&v);
+                children.retain(|c| c != &v);
             }
         }
 
-        // Set new parent
+        // Set new parent (children kept in insertion order, like graphlib)
         self.parent.insert(v.clone(), parent.clone());
-        self.children.entry(parent).or_default().insert(v);
+        let children = self.children.entry(parent).or_default();
+        if !children.contains(&v) {
+            children.push(v);
+        }
     }
 
     /// Get parent of a node
@@ -554,26 +576,20 @@ impl DagreGraph {
         self.parent.get(v)
     }
 
-    /// Get children of a node (sorted for deterministic iteration)
+    /// Get children of a node in insertion order (matches graphlib)
     pub fn children(&self, v: &str) -> Vec<&String> {
-        let mut children: Vec<&String> = self
-            .children
+        self.children
             .get(v)
             .map(|c| c.iter().collect())
-            .unwrap_or_default();
-        children.sort();
-        children
+            .unwrap_or_default()
     }
 
-    /// Get root-level nodes (nodes without parents, sorted for deterministic iteration)
+    /// Get root-level nodes (nodes without parents) in insertion order
     pub fn root_children(&self) -> Vec<&String> {
-        let mut roots: Vec<&String> = self
-            .nodes
-            .keys()
+        self.node_order
+            .iter()
             .filter(|v| !self.parent.contains_key(*v))
-            .collect();
-        roots.sort();
-        roots
+            .collect()
     }
 
     /// Check if this is a compound graph (any node has children)
@@ -713,6 +729,76 @@ mod tests {
         assert!(!g.has_edge("b", "c"));
         assert!(g.has_node("a"));
         assert!(g.has_node("c"));
+    }
+
+    #[test]
+    fn test_nodes_insertion_order() {
+        // graphlib's g.nodes() returns nodes in insertion order (JS object key
+        // order), which dagre's ordering phase depends on.
+        let mut g = DagreGraph::new();
+        g.set_node("b", NodeLabel::default());
+        g.set_node("a", NodeLabel::default());
+        g.set_node("c", NodeLabel::default());
+
+        let nodes: Vec<&str> = g.nodes().into_iter().map(|s| s.as_str()).collect();
+        assert_eq!(nodes, vec!["b", "a", "c"]);
+
+        // Re-setting an existing node must not change its position
+        g.set_node("a", NodeLabel::default());
+        let nodes: Vec<&str> = g.nodes().into_iter().map(|s| s.as_str()).collect();
+        assert_eq!(nodes, vec!["b", "a", "c"]);
+    }
+
+    #[test]
+    fn test_nodes_insertion_order_after_remove() {
+        let mut g = DagreGraph::new();
+        g.set_node("b", NodeLabel::default());
+        g.set_node("a", NodeLabel::default());
+        g.set_node("c", NodeLabel::default());
+        g.remove_node("a");
+        g.set_node("a", NodeLabel::default());
+
+        let nodes: Vec<&str> = g.nodes().into_iter().map(|s| s.as_str()).collect();
+        assert_eq!(nodes, vec!["b", "c", "a"]);
+    }
+
+    #[test]
+    fn test_edges_insertion_order() {
+        // graphlib's g.edges() returns edges in insertion order.
+        let mut g = DagreGraph::new();
+        g.set_edge("b", "c", EdgeLabel::default());
+        g.set_edge("a", "b", EdgeLabel::default());
+        g.set_edge("a", "c", EdgeLabel::default());
+
+        let edges: Vec<(&str, &str)> = g
+            .edges()
+            .into_iter()
+            .map(|k| (k.v.as_str(), k.w.as_str()))
+            .collect();
+        assert_eq!(edges, vec![("b", "c"), ("a", "b"), ("a", "c")]);
+    }
+
+    #[test]
+    fn test_children_insertion_order() {
+        let mut g = DagreGraph::new();
+        g.set_parent("z", "sg");
+        g.set_parent("a", "sg");
+        g.set_parent("m", "sg");
+
+        let children: Vec<&str> = g.children("sg").into_iter().map(|s| s.as_str()).collect();
+        assert_eq!(children, vec!["z", "a", "m"]);
+    }
+
+    #[test]
+    fn test_root_children_insertion_order() {
+        let mut g = DagreGraph::new();
+        g.set_node("z", NodeLabel::default());
+        g.set_node("a", NodeLabel::default());
+        g.set_node("m", NodeLabel::default());
+        g.set_parent("a", "z");
+
+        let roots: Vec<&str> = g.root_children().into_iter().map(|s| s.as_str()).collect();
+        assert_eq!(roots, vec!["z", "m"]);
     }
 
     #[test]

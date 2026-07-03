@@ -233,6 +233,9 @@ pub struct FlowchartDb {
     common: CommonDb,
     vertex_counter: u32,
     vertices: HashMap<String, FlowVertex>,
+    /// Vertex ids in document insertion order (mermaid's FlowDB uses an
+    /// insertion-ordered Map; dagre layout is insertion-order sensitive)
+    vertex_order: Vec<String>,
     edges: Vec<FlowEdge>,
     default_interpolate: Option<String>,
     default_style: Option<Vec<String>>,
@@ -338,6 +341,7 @@ impl FlowchartDb {
             common: CommonDb::new(),
             vertex_counter: 0,
             vertices: HashMap::new(),
+            vertex_order: Vec::new(),
             edges: Vec::new(),
             default_interpolate: None,
             default_style: None,
@@ -353,6 +357,7 @@ impl FlowchartDb {
         self.common.clear();
         self.vertex_counter = 0;
         self.vertices.clear();
+        self.vertex_order.clear();
         self.edges.clear();
         self.default_interpolate = None;
         self.default_style = None;
@@ -392,6 +397,9 @@ impl FlowchartDb {
             return;
         }
 
+        if !self.vertices.contains_key(id) {
+            self.vertex_order.push(id.to_string());
+        }
         let vertex = self.vertices.entry(id.to_string()).or_insert_with(|| {
             let dom_id = format!("{}{}-{}", Self::DOM_ID_PREFIX, id, self.vertex_counter);
             FlowVertex::new(id, dom_id)
@@ -603,6 +611,11 @@ impl FlowchartDb {
     /// Get all vertices
     pub fn vertices(&self) -> &HashMap<String, FlowVertex> {
         &self.vertices
+    }
+
+    /// Get vertex ids in document insertion order
+    pub fn vertex_ids_in_order(&self) -> &[String] {
+        &self.vertex_order
     }
 
     /// Get vertices (alias for compatibility with parser)

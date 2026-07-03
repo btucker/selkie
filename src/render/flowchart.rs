@@ -34,9 +34,11 @@ impl ToLayoutGraph for FlowchartDb {
             }
         }
 
-        // Add subgraph nodes first (compound parent nodes)
+        // Add subgraph nodes first (compound parent nodes) in REVERSE
+        // definition order, matching mermaid's flowDb.getData() which pushes
+        // subgraphs with `for (let i = subGraphs.length - 1; i >= 0; i--)`.
         // These have zero dimensions initially - they're calculated from children by layout
-        for subgraph in self.subgraphs() {
+        for subgraph in self.subgraphs().iter().rev() {
             let mut sg_node =
                 LayoutNode::new(&subgraph.id, 0.0, 0.0).with_shape(NodeShape::Rectangle);
 
@@ -59,10 +61,10 @@ impl ToLayoutGraph for FlowchartDb {
             graph.add_node(sg_node);
         }
 
-        // Convert vertices to layout nodes (sorted for deterministic order)
-        let mut vertex_ids: Vec<&String> = self.vertices().keys().collect();
-        vertex_ids.sort();
-        for id in vertex_ids {
+        // Convert vertices to layout nodes in document insertion order.
+        // mermaid adds nodes to dagre in data4Layout.nodes order and dagre's
+        // ordering phase is insertion-order sensitive, so we must not sort.
+        for id in self.vertex_ids_in_order() {
             if subgraph_ids.contains(id.as_str()) {
                 continue;
             }
@@ -193,6 +195,43 @@ mod tests {
 
         let node_c = graph.get_node("C").unwrap();
         assert_eq!(node_c.shape, NodeShape::Diamond);
+    }
+
+    #[test]
+    fn test_layout_graph_preserves_document_order() {
+        // mermaid feeds nodes to dagre in document order (data4Layout.nodes
+        // insertion order); dagre's ordering phase is insertion-order
+        // sensitive, so the adapter must not alphabetize vertices.
+        let mut db = FlowchartDb::new();
+        db.add_vertex_simple("B", None, None);
+        db.add_vertex_simple("A", None, None);
+        db.add_vertex_simple("C", None, None);
+        db.add_edge("B", "A", "-->", None, None);
+        db.add_edge("B", "C", "-->", None, None);
+
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        let ids: Vec<&str> = graph.nodes.iter().map(|n| n.id.as_str()).collect();
+        assert_eq!(ids, vec!["B", "A", "C"]);
+    }
+
+    #[test]
+    fn test_layout_graph_subgraphs_in_reverse_definition_order() {
+        // mermaid's flowDb.getData() pushes subgraph nodes in REVERSE
+        // definition order (for i = subGraphs.length - 1; i >= 0; i--),
+        // then vertices in document order.
+        let mut db = FlowchartDb::new();
+        db.add_vertex_simple("A", None, None);
+        db.add_vertex_simple("B", None, None);
+        db.add_subgraph_with_nodes("First", "First", vec!["A".to_string()]);
+        db.add_subgraph_with_nodes("Second", "Second", vec!["B".to_string()]);
+
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        let ids: Vec<&str> = graph.nodes.iter().map(|n| n.id.as_str()).collect();
+        assert_eq!(ids, vec!["Second", "First", "A", "B"]);
     }
 
     #[test]

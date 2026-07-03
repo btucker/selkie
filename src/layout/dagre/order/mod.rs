@@ -57,7 +57,10 @@ pub fn order(g: &mut DagreGraph) {
 
         let bias_right = (i % 4) >= 2;
 
-        if i % 2 == 0 {
+        // dagre: `sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, ...)`
+        // Even iterations sweep UP (successors), odd iterations sweep DOWN
+        // (predecessors).
+        if i % 2 == 1 {
             // Down sweep (top to bottom) - uses predecessors
             sweep_down_hierarchical(g, max_rank, bias_right);
         } else {
@@ -73,6 +76,11 @@ pub fn order(g: &mut DagreGraph) {
             best_cc = cc;
             best_layering = current_layering;
             last_best = 0;
+        } else if cc == best_cc {
+            // dagre keeps the LATEST layering on ties (cc === bestCC =>
+            // best = structuredClone(layering)) without resetting lastBest
+            best_layering = current_layering;
+            last_best += 1;
         } else {
             last_best += 1;
         }
@@ -180,17 +188,24 @@ fn sort_layer_hierarchical(
 ) -> Vec<String> {
     use std::collections::HashMap;
 
-    // Group nodes by their parent subgraph
+    // Group nodes by their parent subgraph, iterating parent groups in order
+    // of first appearance in the layer (deterministic, insertion-order based)
     let mut by_parent: HashMap<Option<String>, Vec<String>> = HashMap::new();
+    let mut parent_order: Vec<Option<String>> = Vec::new();
     for v in layer_nodes {
         let parent = g.parent(v).map(|s| s.to_string());
-        by_parent.entry(parent).or_default().push(v.clone());
+        let group = by_parent.entry(parent.clone()).or_default();
+        if group.is_empty() {
+            parent_order.push(parent);
+        }
+        group.push(v.clone());
     }
 
     // For each parent, get barycenters and sort
     let mut parent_entries: Vec<ParentGroupEntry> = Vec::new();
 
-    for (parent, mut nodes) in by_parent {
+    for parent in parent_order {
+        let mut nodes = by_parent.remove(&parent).unwrap_or_default();
         // Sort nodes within this parent by current order for stability
         nodes.sort_by_key(|v| g.node(v).and_then(|n| n.order).unwrap_or(usize::MAX));
 

@@ -16,9 +16,16 @@ use std::collections::HashSet;
 pub fn init_order(g: &DagreGraph) -> Vec<Vec<String>> {
     let mut visited = HashSet::new();
 
-    // Find max rank
-    let max_rank = g
+    // dagre's initOrder considers only simple nodes (no children); compound
+    // parents never appear in the layering.
+    let simple_nodes: Vec<&String> = g
         .nodes()
+        .into_iter()
+        .filter(|v| g.children(v).is_empty())
+        .collect();
+
+    // Find max rank among simple nodes
+    let max_rank = simple_nodes
         .iter()
         .filter_map(|v| g.node(v).and_then(|n| n.rank))
         .max()
@@ -48,31 +55,14 @@ pub fn init_order(g: &DagreGraph) -> Vec<Vec<String>> {
         }
     }
 
-    // Get all nodes sorted by rank, with connected nodes before disconnected.
-    // dagre.js iterates nodes in insertion order, which typically places connected
-    // nodes first. Our graph returns nodes alphabetically, so we approximate
-    // insertion order by sorting: (rank, disconnected, name). This prevents
-    // disconnected nodes from appearing between connected ones at the same rank,
-    // which would force unnecessary width in the final layout.
-    let mut nodes: Vec<&String> = g.nodes();
-    nodes.sort_by(|a, b| {
-        let rank_a = g.node(a).and_then(|n| n.rank).unwrap_or(i32::MAX);
-        let rank_b = g.node(b).and_then(|n| n.rank).unwrap_or(i32::MAX);
-        let disc_a = if g.in_edges(a).is_empty() && g.out_edges(a).is_empty() {
-            1
-        } else {
-            0
-        };
-        let disc_b = if g.in_edges(b).is_empty() && g.out_edges(b).is_empty() {
-            1
-        } else {
-            0
-        };
-        rank_a.cmp(&rank_b).then(disc_a.cmp(&disc_b)).then(a.cmp(b))
-    });
+    // dagre sorts start nodes by rank ONLY; the sort is stable, so nodes with
+    // equal rank keep graph insertion order. This matches
+    // reference-implementations/dagre/lib/order/init-order.js.
+    let mut ordered: Vec<&String> = simple_nodes;
+    ordered.sort_by_key(|v| g.node(v).and_then(|n| n.rank).unwrap_or(0));
 
     // Perform DFS from each node
-    for v in nodes {
+    for v in ordered {
         dfs(g, v, &mut visited, &mut layers);
     }
 
@@ -158,6 +148,67 @@ mod tests {
         assert!(g.node("b").unwrap().order.is_some());
         assert!(g.node("c").unwrap().order.is_some());
         assert_eq!(g.node("d").unwrap().order, Some(0));
+    }
+
+    #[test]
+    fn test_init_order_roots_in_insertion_order() {
+        // dagre's initOrder iterates nodes in insertion order (stable-sorted by
+        // rank only). Roots inserted later must NOT be reordered alphabetically.
+        use crate::layout::dagre::graph::EdgeLabel;
+
+        let mut g = DagreGraph::new();
+        // Two disjoint chains; "z" chain is defined first in the document.
+        g.set_edge("z", "z1", EdgeLabel::default());
+        g.set_edge("a", "a1", EdgeLabel::default());
+        rank::assign_ranks(&mut g, Ranker::LongestPath);
+
+        let layers = init_order(&g);
+
+        assert_eq!(layers[0], vec!["z", "a"]);
+        assert_eq!(layers[1], vec!["z1", "a1"]);
+    }
+
+    #[test]
+    fn test_init_order_excludes_compound_nodes() {
+        // dagre's initOrder filters to simple nodes (no children); compound
+        // parents never appear in the layering.
+        use crate::layout::dagre::graph::EdgeLabel;
+
+        let mut g = DagreGraph::new();
+        g.set_edge("a", "b", EdgeLabel::default());
+        g.set_parent("a", "sg");
+        g.node_mut("a").unwrap().rank = Some(0);
+        g.node_mut("b").unwrap().rank = Some(1);
+        g.node_mut("sg").unwrap().rank = Some(0);
+
+        let layers = init_order(&g);
+
+        assert_eq!(layers[0], vec!["a"]);
+        assert_eq!(layers[1], vec!["b"]);
+        assert!(!layers.iter().any(|l| l.contains(&"sg".to_string())));
+    }
+
+    #[test]
+    fn test_init_order_no_alphabetical_tiebreak() {
+        // Anchor from mermaid parity: 'B; A; C' with edges B->A then B->C must
+        // keep B's successors in edge-insertion order, not alphabetical order.
+        use crate::layout::dagre::graph::EdgeLabel;
+
+        let mut g = DagreGraph::new();
+        g.set_edge("B", "A", EdgeLabel::default());
+        g.set_edge("B", "C", EdgeLabel::default());
+        rank::assign_ranks(&mut g, Ranker::LongestPath);
+        let layers = init_order(&g);
+        assert_eq!(layers[0], vec!["B"]);
+        assert_eq!(layers[1], vec!["A", "C"]);
+
+        // Reversed edge definition order must flip the layer order.
+        let mut g = DagreGraph::new();
+        g.set_edge("B", "C", EdgeLabel::default());
+        g.set_edge("B", "A", EdgeLabel::default());
+        rank::assign_ranks(&mut g, Ranker::LongestPath);
+        let layers = init_order(&g);
+        assert_eq!(layers[1], vec!["C", "A"]);
     }
 
     #[test]
