@@ -4,8 +4,16 @@
   "closed_reason": null,
   "created_at": "2026-07-03T05:33:01Z",
   "dependencies": [],
-  "description": "After the faithful dagre-d3-es order() port (0 order mismatches vs reference on flowchart_complex/dedup_logic/subgraphs_styled), several cluster diagrams still render wider than mermaid: data_collection 1929 vs ref 1339, dedup_logic 1261 vs ref 823, clippy_fix 1113 vs ref 815, subgraphs_styled 1649 vs ref 1102, flowchart_complex 1538 vs ref 1274. Since orders match, the gap is in position (bk.rs) / node separation / cluster margins. Also SMSWorker/EmailWorker end up swapped vs reference despite matching dagre orders, pointing at mermaid's pre-dagre cluster-edge rewiring (anchor nodes) changing the input graph. See also follow-ups: anchor-node redirection + cutPathAtIntersect (mermaid-graphlib.js:252-288, edges.js:260-336), cluster rect bounds/padding constants (compute_bounds src/layout/graph.rs:169-210, render_subgraph src/render/svg/mod.rs:331-366 padding 20/title 25 vs mermaid 8/measured).",
+  "description": "RESIDUAL PLATEAU ISSUE (2026-07-03). After the full parity push (visual 15.3%->72.8%, parity 0->8/33, structural 99%), the last remaining large real layout defect is subgraphs_styled rendering 1452px wide vs reference 1102px (data_collection now essentially matched at 1356 vs 1339 after the membership fix b86b2934). Two independent deep investigators + a fix agent verified selkie's Brandes-Kopf conflict detection, vertical_alignment, ordering (build_layer_graph/sort_subgraph/add_subgraph_constraints/init_order), and border-node ranks/orders are ALL faithful transliterations of dagre. The subgraph-membership first-wins bug (mermaid makeUniq) was found and fixed (b86b2934), which corrected data_collection and clippy_fix. The subgraphs_styled residual is a subtle multi-cluster compound-feed compaction gap that survives even with reference-correct node orders; candidate: se-32e0d6dc (buildLayerMatrix collision for out-of-span dummies). Low ROI: fractional SSIM per unit effort. FLOW-3.3 edge-routing issues are proven inherited 1:1 from node placement (zero pure routing defects) so they clear only as this closes.",
   "design": "",
+  "history": [
+    {
+      "at": "2026-07-03T14:53:31Z",
+      "field": "description",
+      "new": "(changed)",
+      "old": "(changed)"
+    }
+  ],
   "id": "se-2b7ce1fd",
   "labels": [],
   "notes": "",
@@ -13,5 +21,5 @@
   "status": "open",
   "title": "Position/BK parity: cluster diagrams widen with reference-correct orders",
   "type": "task",
-  "updated_at": "2026-07-03T05:33:01Z"
+  "updated_at": "2026-07-03T14:53:31Z"
 }

@@ -1,7 +1,7 @@
 {
   "acceptance_criteria": "",
-  "closed_at": "2026-07-03T03:06:24Z",
-  "closed_reason": "Insertion order preserved through flowchart/state adapters, DagreGraph, init_order, acyclic, network simplex, and order sweeps; eval avg visual similarity 17.7% -> 17.8% and compound layout now deterministic. flowchart_complex mirror persists - requires mermaid-style recursive cluster rendering (follow-up).",
+  "closed_at": "2026-07-03T14:53:16Z",
+  "closed_reason": "Landed: document insertion order preserved through DagreGraph, flowchart adapter, and init_order (commit a631cc86).",
   "created_at": "2026-07-03T02:03:31Z",
   "dependencies": [],
   "description": "Fix 5 of parity plan. Selkie alphabetizes node order in 3 places (src/render/flowchart.rs vertex sort, DagreGraph::nodes() sorted HashMap keys, init_order (rank,disconnected,name) tiebreak). Dagre's order() is insertion-order sensitive -> mirrored/reversed layouts (flowchart_complex horizontally flipped). Match dagre/lib/order/init-order.js: simple nodes only, stable sort by rank, insertion order preserved. Plan: memory/flowchart-parity-plan-2026-07-02.json",
@@ -12,6 +12,12 @@
       "field": "status",
       "new": "closed",
       "old": "open"
+    },
+    {
+      "at": "2026-07-03T14:53:16Z",
+      "field": "status",
+      "new": "closed",
+      "old": "closed"
     }
   ],
   "id": "se-522832c6",
@@ -21,5 +27,5 @@
   "status": "closed",
   "title": "flowchart: preserve document insertion order through adapter, DagreGraph, init_order",
   "type": "bug",
-  "updated_at": "2026-07-03T03:06:24Z"
+  "updated_at": "2026-07-03T14:53:16Z"
 }

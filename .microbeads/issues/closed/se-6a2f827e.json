@@ -1,7 +1,7 @@
 {
   "acceptance_criteria": "",
-  "closed_at": "2026-07-03T05:32:45Z",
-  "closed_reason": "order() one-level approximation replaced with faithful dagre-d3-es port: per-rank layer graphs (build_layer_graph.rs), recursive sort_subgraph with merged barycenters and border nodes, Forster resolve_conflicts, single ConstraintGraph per sweep. Verified 0 order mismatches vs dagre-d3-es on flowchart_complex/dedup_logic/subgraphs_styled.",
+  "closed_at": "2026-07-03T14:53:16Z",
+  "closed_reason": "Landed: faithful dagre order() port with buildLayerGraph + recursive sortSubgraph + sweep parity + latest-tie-wins (commit 0cb817b3).",
   "created_at": "2026-07-03T02:03:31Z",
   "dependencies": [],
   "description": "Fix 8 of parity plan. Only if residual ordering divergence after fixes 5-6: replace sort_layer_hierarchical approximation with real dagre port; up sweep first (i%2?down:up), keep LATEST layering on cc tie; transliterate dagre order tests.",
@@ -12,6 +12,12 @@
       "field": "status",
       "new": "closed",
       "old": "open"
+    },
+    {
+      "at": "2026-07-03T14:53:16Z",
+      "field": "status",
+      "new": "closed",
+      "old": "closed"
     }
   ],
   "id": "se-6a2f827e",
@@ -21,5 +27,5 @@
   "status": "closed",
   "title": "flowchart: faithful dagre order() port (buildLayerGraph + sortSubgraph, sweep parity, tie handling)",
   "type": "task",
-  "updated_at": "2026-07-03T05:32:45Z"
+  "updated_at": "2026-07-03T14:53:16Z"
 }
