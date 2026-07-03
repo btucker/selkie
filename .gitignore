@@ -23,3 +23,7 @@ eval-report/
 .claude/
 .beads/
 .logs/
+
+# Python
+__pycache__/
+*.pyc
