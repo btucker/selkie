@@ -39,9 +39,94 @@ def write_cases(diagram_type: str, cases: list[Case], out_dir: Path) -> list[Pat
     return written
 
 
+FLOWCHART_SHAPES = [
+    ("square", "A[Square]"),
+    ("round", "A(Round)"),
+    ("stadium", "A([Stadium])"),
+    ("subroutine", "A[[Subroutine]]"),
+    ("cylinder", "A[(Database)]"),
+    ("circle", "A((Circle))"),
+    ("double_circle", "A(((Double)))"),
+    ("ellipse", "A(-Ellipse-)"),
+    ("diamond", "A{Diamond}"),
+    ("hexagon", "A{{Hexagon}}"),
+    ("lean_right", "A[/Lean right/]"),
+    ("lean_left", "A[\\Lean left\\]"),
+    ("trapezoid", "A[/Trapezoid\\]"),
+    ("inv_trapezoid", "A[\\Inv trap/]"),
+    ("odd", "A>Odd shape]"),
+]
+
+
+def _shapes() -> list[Case]:
+    cases = []
+    for name, decl in FLOWCHART_SHAPES:
+        src = f"flowchart TD\n  {decl} --> B[Next]\n"
+        cases.append(Case("shapes", name, src))
+    grid_nodes = "\n".join(
+        f"  N{i}{decl[1:]}" for i, (_, decl) in enumerate(FLOWCHART_SHAPES)
+    )
+    cases.append(Case("shapes", "all_grid", f"flowchart TD\n{grid_nodes}\n"))
+    return cases
+
+
+def _directions() -> list[Case]:
+    cases = []
+    for d in ("TB", "TD", "LR", "RL", "BT"):
+        src = f"flowchart {d}\n  A[Start] --> B[Middle]\n  B --> C[End]\n  B --> D[Side]\n"
+        cases.append(Case("directions", d.lower(), src))
+    return cases
+
+
+FLOWCHART_EDGES = [
+    ("arrow", "A --> B"),
+    ("cross", "A --x B"),
+    ("circle_end", "A --o B"),
+    ("open", "A --- B"),
+    ("bi_arrow", "A <--> B"),
+    ("bi_cross", "A x--x B"),
+    ("bi_circle", "A o--o B"),
+    ("dotted_arrow", "A -.-> B"),
+    ("dotted_open", "A -.- B"),
+    ("thick_arrow", "A ==> B"),
+    ("thick_open", "A === B"),
+    ("text_pipe", "A -->|label| B"),
+    ("text_inline", "A -- label --> B"),
+    ("chain", "A --> B --> C"),
+    ("length", "A ----> B"),
+]
+
+
+def _edges() -> list[Case]:
+    cases = []
+    for name, edge in FLOWCHART_EDGES:
+        src = f"flowchart LR\n  {edge}\n"
+        cases.append(Case("edges", name, src))
+    return cases
+
+
+FLOWCHART_LABELS = [
+    ("plain", "A[Plain text]"),
+    ("quoted", 'A["Quoted, with comma"]'),
+    ("br", 'A["Line one<br>Line two"]'),
+    ("entity", 'A["Vec&lt;T&gt; &amp; Co"]'),
+    ("escape", 'A["path\\to\\file"]'),
+    ("markdown", 'A["`**bold** and _em_`"]'),
+    ("wrap", 'A["This is a deliberately long label that should exceed the two hundred pixel wrapping width and wrap onto multiple lines"]'),
+    ("unicode", 'A["café ✅ 日本語"]'),
+]
+
+
+def _labels() -> list[Case]:
+    cases = []
+    for name, decl in FLOWCHART_LABELS:
+        src = f"flowchart TD\n  {decl} --> B[Next]\n"
+        cases.append(Case("labels", name, src))
+    return cases
+
+
 def emit_flowchart() -> list[Case]:
-    # Replaced with full feature families in Tasks 2-3.
-    return [Case("shapes", "square", "flowchart TD\n  A[Square]\n")]
+    return _shapes() + _directions() + _edges() + _labels()
 
 
 EMITTERS: dict[str, Callable[[], list[Case]]] = {

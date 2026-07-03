@@ -40,3 +40,28 @@ def test_no_duplicate_filenames():
     cases = gc.EMITTERS["flowchart"]()
     names = [gc.filename("flowchart", c) for c in cases]
     assert len(names) == len(set(names)), "duplicate generated filenames"
+
+
+def test_flowchart_families_present():
+    cases = gc.EMITTERS["flowchart"]()
+    families = {c.family for c in cases}
+    for required in ("shapes", "directions", "edges", "labels"):
+        assert required in families, f"missing family {required}"
+
+
+def test_all_15_shapes_covered():
+    cases = gc.EMITTERS["flowchart"]()
+    shape_cases = [c for c in cases if c.family == "shapes"]
+    # 15 individual shapes + 1 grid
+    assert len(shape_cases) >= 16
+
+
+def test_all_5_directions_covered():
+    cases = gc.EMITTERS["flowchart"]()
+    dir_names = {c.name for c in cases if c.family == "directions"}
+    assert dir_names == {"tb", "td", "lr", "rl", "bt"}
+
+
+def test_every_case_starts_with_flowchart_keyword():
+    for c in gc.EMITTERS["flowchart"]():
+        assert c.source.lstrip().startswith(("flowchart", "graph", "%%{")), c.name
