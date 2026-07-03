@@ -169,17 +169,18 @@ fn extract_isolated_clusters(graph: &LayoutGraph, depth: usize) -> Result<Vec<Cl
         descendants.insert(cluster_id, set);
     }
 
-    // Mark external connections: an edge with exactly one endpoint inside the
-    // cluster, or an edge referencing the cluster id itself.
+    // Mark external connections: an edge with exactly one endpoint among the
+    // cluster's DESCENDANTS (mermaid-graphlib.js adjustClustersAndEdges sets
+    // externalConnections via `d1 XOR d2` over extractDescendants; the cluster
+    // id is not among its own descendants, so an edge whose endpoint IS the
+    // cluster id does not mark it external).
     let mut external: HashSet<&str> = HashSet::new();
     for cluster_id in &cluster_ids {
         let desc = &descendants[cluster_id];
         for edge in &graph.edges {
-            let references_cluster = edge.sources.iter().any(|s| s == cluster_id)
-                || edge.targets.iter().any(|t| t == cluster_id);
             let d1 = edge.sources.iter().any(|s| desc.contains(s));
             let d2 = edge.targets.iter().any(|t| desc.contains(t));
-            if references_cluster || (d1 != d2) {
+            if d1 != d2 {
                 external.insert(cluster_id);
                 break;
             }
@@ -676,6 +677,73 @@ mod tests {
             "B should be below A in TB sub-layout. A.y={:.1}, B.y={:.1}",
             a.y.unwrap(),
             b.y.unwrap()
+        );
+    }
+
+    #[test]
+    fn test_cluster_id_edges_do_not_block_extraction() {
+        // Mermaid marks externalConnections only when an edge has exactly one
+        // endpoint among a cluster's DESCENDANTS (d1 XOR d2); the cluster id is
+        // not among its own descendants, so an edge whose endpoint IS the
+        // cluster id (e.g. `Terminal -.-> Problem`) does not block extraction.
+        // The extracted cluster must still honor its explicit `direction`.
+        // Mirrors channel_flowchart_terminal_layers.
+        let mut graph = LayoutGraph::new("test_cluster_id_edges");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        // Cluster sub1 with explicit LR direction, children A -> B
+        let mut sub1 = LayoutNode::new("sub1", 0.0, 0.0);
+        sub1.metadata
+            .insert("is_group".to_string(), "true".to_string());
+        sub1.metadata.insert("dir".to_string(), "LR".to_string());
+        graph.add_node(sub1);
+        graph.add_node(LayoutNode::new("A", 50.0, 30.0).with_parent("sub1"));
+        graph.add_node(LayoutNode::new("B", 50.0, 30.0).with_parent("sub1"));
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+
+        // Cluster sub2, children X -> Y
+        let mut sub2 = LayoutNode::new("sub2", 0.0, 0.0);
+        sub2.metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(sub2);
+        graph.add_node(LayoutNode::new("X", 50.0, 30.0).with_parent("sub2"));
+        graph.add_node(LayoutNode::new("Y", 50.0, 30.0).with_parent("sub2"));
+        graph.add_edge(LayoutEdge::new("e2", "X", "Y"));
+
+        // Edge between the CLUSTER IDS themselves (no descendant endpoints)
+        graph.add_edge(LayoutEdge::new("e3", "sub1", "sub2"));
+
+        let result = layout(graph).unwrap();
+
+        let a = result.get_node("A").unwrap();
+        let b = result.get_node("B").unwrap();
+
+        // sub1's explicit LR direction must be honored: A and B side-by-side
+        let a_cy = a.y.unwrap() + a.height / 2.0;
+        let b_cy = b.y.unwrap() + b.height / 2.0;
+        assert!(
+            (a_cy - b_cy).abs() < 10.0,
+            "Cluster-id edges must not block extraction: sub1's LR direction \
+             should be honored. A.cy={:.1}, B.cy={:.1}",
+            a_cy,
+            b_cy
+        );
+        assert!(
+            b.x.unwrap() > a.x.unwrap(),
+            "B should be right of A in LR cluster. A.x={:.1}, B.x={:.1}",
+            a.x.unwrap(),
+            b.x.unwrap()
+        );
+
+        // The cluster-id edge keeps the clusters connected in the outer TB
+        // graph: sub2 should be laid out below sub1.
+        let s1 = result.get_node("sub1").unwrap();
+        let s2 = result.get_node("sub2").unwrap();
+        assert!(
+            s2.y.unwrap() > s1.y.unwrap() + s1.height / 2.0,
+            "sub2 should be below sub1 in outer TB layout. sub1.y={:.1} sub2.y={:.1}",
+            s1.y.unwrap(),
+            s2.y.unwrap()
         );
     }
 
