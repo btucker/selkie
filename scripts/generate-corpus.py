@@ -47,7 +47,10 @@ FLOWCHART_SHAPES = [
     ("cylinder", "A[(Database)]"),
     ("circle", "A((Circle))"),
     ("double_circle", "A(((Double)))"),
-    ("ellipse", "A(-Ellipse-)"),
+    # NOTE: ellipse `A(-t-)` is intentionally omitted. Selkie's grammar parses
+    # it, but mermaid v11 rejects it at render time ("No such shape: ellipse"),
+    # so there is no reference to compare against. Tracked as a selkie/mermaid
+    # grammar-superset divergence; keep out of the parity corpus.
     ("diamond", "A{Diamond}"),
     ("hexagon", "A{{Hexagon}}"),
     ("lean_right", "A[/Lean right/]"),
@@ -248,7 +251,35 @@ def validate(paths: list[Path]) -> int:
         )
         if result.returncode != 0:
             failures += 1
-            print(f"INVALID: {path.name}\n{result.stderr.strip()}", file=sys.stderr)
+            print(f"INVALID (selkie): {path.name}\n{result.stderr.strip()}", file=sys.stderr)
+    return failures
+
+
+def validate_reference(paths: list[Path]) -> int:
+    """Render every file through mmdc (mermaid). A parity corpus case is only
+    useful if mermaid can produce a reference for it; mermaid's grammar is a
+    subset of selkie's in places (e.g. the ellipse `A(-t-)` shape), so a case
+    that selkie renders may still have no mermaid reference. Returns the count
+    of files mermaid cannot render. Skips gracefully if mmdc is absent."""
+    from shutil import which
+
+    if which("mmdc") is None:
+        print("mmdc not found; skipping mermaid reference validation", file=sys.stderr)
+        return 0
+    failures = 0
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "ref.svg"
+        for path in paths:
+            result = subprocess.run(
+                ["mmdc", "-i", str(path), "-o", str(out), "-q"],
+                capture_output=True,
+                text=True,
+            )
+            err = result.stderr or ""
+            if result.returncode != 0 or "No such shape" in err or "Error" in err:
+                failures += 1
+                first = next((ln for ln in err.splitlines() if "Error" in ln or "No such" in ln), err.strip()[:120])
+                print(f"NO MERMAID REFERENCE: {path.name} :: {first}", file=sys.stderr)
     return failures
 
 
@@ -258,6 +289,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--all", action="store_true", help="generate every registered type")
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     parser.add_argument("--validate", action="store_true", help="render each file via selkie; fail on errors")
+    parser.add_argument("--validate-reference", action="store_true", help="render each file via mmdc (mermaid); fail if mermaid cannot produce a reference")
     parser.add_argument("--check", action="store_true", help="fail if committed corpus is stale")
     args = parser.parse_args(argv)
 
@@ -302,7 +334,14 @@ def main(argv: list[str] | None = None) -> int:
         if failures:
             print(f"{failures} invalid file(s)", file=sys.stderr)
             return 1
-        print(f"validated {len(all_written)} files, all render OK")
+        print(f"validated {len(all_written)} files, all render OK under selkie")
+
+    if args.validate_reference:
+        failures = validate_reference(all_written)
+        if failures:
+            print(f"{failures} file(s) have no mermaid reference", file=sys.stderr)
+            return 1
+        print(f"validated {len(all_written)} files, all render OK under mermaid")
 
     return 0
 

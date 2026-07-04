@@ -49,11 +49,13 @@ def test_flowchart_families_present():
         assert required in families, f"missing family {required}"
 
 
-def test_all_15_shapes_covered():
+def test_all_mermaid_supported_shapes_covered():
     cases = gc.EMITTERS["flowchart"]()
     shape_cases = [c for c in cases if c.family == "shapes"]
-    # 15 individual shapes + 1 grid
-    assert len(shape_cases) >= 16
+    # 14 mermaid-renderable shapes + 1 grid (ellipse A(-t-) excluded: selkie
+    # parses it but mermaid v11 rejects it, so there is no reference).
+    assert len(shape_cases) >= 15
+    assert not any(c.name == "ellipse" for c in shape_cases)
 
 
 def test_all_5_directions_covered():
