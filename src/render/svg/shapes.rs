@@ -87,7 +87,7 @@ pub fn render_shape(
         FlowVertexType::DoubleCircle => {
             // Double circle - we'll use a group with two circles
             let r = w.max(h) / 2.0;
-            let inner_r = r - 4.0;
+            let inner_r = r - 5.0;
             SvgElement::group(vec![
                 SvgElement::circle(cx, cy, r),
                 SvgElement::circle(cx, cy, inner_r),
@@ -543,6 +543,38 @@ mod tests {
         assert!(
             svg.contains("<text x=\"55\" y=\"20\""),
             "Odd shape label must be offset by h/8 to x=55, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_double_circle_inner_radius_gap_is_five() {
+        // mermaid doubleCircle.ts: gap = 5, so innerRadius = outerRadius - 5.
+        // For a 24x24 node, outer r = 12 and inner r = 12 - 5 = 7.
+        let mut node = LayoutNode::new("test", 24.0, 24.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.vertex_type = Some(FlowVertexType::DoubleCircle);
+
+        let theme = Theme::default();
+        let shape_element = render_shape(&node, &vertex, &theme, None);
+        let svg = shape_element.to_svg(0);
+
+        assert!(
+            svg.contains("r=\"12\""),
+            "Double circle outer radius must be 12, got: {}",
+            svg
+        );
+        assert!(
+            svg.contains("r=\"7\""),
+            "Double circle inner radius must be outer - 5 = 7, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("r=\"8\""),
+            "Double circle inner radius must not be outer - 4 = 8, got: {}",
             svg
         );
     }
