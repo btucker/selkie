@@ -62,8 +62,8 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="1039.7734560000001" y="52" width="2241.07816" height="119" class="cluster"/>
-        <text x="2160.3125360000004" y="68" class="cluster-label" text-anchor="middle"><tspan x="2160.3125360000004" y="68" dy="-0.75em">Current Architecture (with</tspan><tspan x="2160.3125360000004" dy="1.5em">resvg)</tspan></text>
+        <rect x="1039.7734560000001" y="52" width="2241.0781599999996" height="119" class="cluster"/>
+        <text x="2160.312536" y="68" class="cluster-label" text-anchor="middle"><tspan x="2160.312536" y="68" dy="-0.75em">Current Architecture (with</tspan><tspan x="2160.312536" dy="1.5em">resvg)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
         <rect x="0" y="0" width="989.7734560000001" height="223" class="cluster"/>

@@ -72,8 +72,8 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-A">
-        <rect x="0" y="4.5" width="559.359424" height="352.28516" class="cluster"/>
-        <text x="279.679712" y="20.5" class="cluster-label" text-anchor="middle">A</text>
+        <rect x="0" y="0" width="559.359424" height="356.78516" class="cluster"/>
+        <text x="279.679712" y="16" class="cluster-label" text-anchor="middle">A</text>
       </g>
     </g>
     <g class="edgePaths">

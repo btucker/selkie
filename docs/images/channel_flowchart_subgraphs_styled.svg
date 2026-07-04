@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1451.855488" height="1180.695328" viewBox="-8 -28 1451.855488 1180.695328" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1451.855488" height="1160.695328" viewBox="-8 -8 1451.855488 1160.695328" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,20 +62,20 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="382.99414" y="512" width="569.125008" height="167" class="cluster"/>
-        <text x="667.556644" y="528" class="cluster-label" text-anchor="middle">Daemon State (In-Memory)</text>
+        <rect x="367.9941399999999" y="532" width="599.125008" height="152" class="cluster"/>
+        <text x="667.5566439999999" y="548" class="cluster-label" text-anchor="middle">Daemon State (In-Memory)</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="408.5195279999999" y="-20" width="333.3711040000002" height="473" class="cluster"/>
-        <text x="575.20508" y="-4" class="cluster-label" text-anchor="middle">Lifecycle</text>
+        <rect x="349.99999999999994" y="0" width="527.7832159999999" height="458" class="cluster"/>
+        <text x="613.8916079999999" y="16" class="cluster-label" text-anchor="middle">Lifecycle</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="1002.119148" y="524" width="418.7363399999999" height="615.695328" class="cluster"/>
-        <text x="1211.487318" y="540" class="cluster-label" text-anchor="middle">Deduplication Flow</text>
+        <rect x="987.119148" y="532" width="448.73634" height="612.695328" class="cluster"/>
+        <text x="1211.487318" y="548" class="cluster-label" text-anchor="middle">Deduplication Flow</text>
       </g>
       <g class="cluster" id="subgraph-subGraph3">
-        <rect x="15" y="133" width="300" height="167" class="cluster"/>
-        <text x="165" y="149" class="cluster-label" text-anchor="middle">Bounded Growth</text>
+        <rect x="0" y="153" width="330" height="152" class="cluster"/>
+        <text x="165" y="169" class="cluster-label" text-anchor="middle">Bounded Growth</text>
       </g>
     </g>
     <g class="edgePaths">

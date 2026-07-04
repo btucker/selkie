@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="822.861404" height="2110.671872" viewBox="-8 -28 822.861404 2110.671872" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="822.861404" height="2090.671872" viewBox="-8 -8 822.861404 2090.671872" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,24 +62,24 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="182.37304400000002" y="-20" width="273.59377599999993" height="327" class="cluster"/>
-        <text x="319.169932" y="-4" class="cluster-label" text-anchor="middle">Tick N: Evaluate</text>
+        <rect x="167.37304400000002" y="0" width="303.593776" height="312" class="cluster"/>
+        <text x="319.169932" y="16" class="cluster-label" text-anchor="middle">Tick N: Evaluate</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="15" y="342" width="669.5742720000001" height="696.343744" class="cluster"/>
-        <text x="349.78713600000003" y="358" class="cluster-label" text-anchor="middle">Within-Tick Deduplication</text>
+        <rect x="0" y="362" width="699.5742720000001" height="681.343744" class="cluster"/>
+        <text x="349.78713600000003" y="378" class="cluster-label" text-anchor="middle">Within-Tick Deduplication</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="142.32223599999992" y="1073.343744" width="649.539168" height="143" class="cluster"/>
-        <text x="467.0918199999999" y="1089.343744" class="cluster-label" text-anchor="middle">Effect Generation</text>
+        <rect x="127.32223599999998" y="1093.343744" width="679.539168" height="128" class="cluster"/>
+        <text x="467.09182" y="1109.343744" class="cluster-label" text-anchor="middle">Effect Generation</text>
       </g>
       <g class="cluster" id="subgraph-subGraph3">
-        <rect x="146.2909959999999" y="1251.343744" width="593.4571040000001" height="247" class="cluster"/>
-        <text x="443.01954799999993" y="1267.343744" class="cluster-label" text-anchor="middle">Cross-Tick Tracking</text>
+        <rect x="131.29099599999995" y="1271.343744" width="623.4571040000001" height="232" class="cluster"/>
+        <text x="443.019548" y="1287.343744" class="cluster-label" text-anchor="middle">Cross-Tick Tracking</text>
       </g>
       <g class="cluster" id="subgraph-subGraph4">
-        <rect x="325.39454" y="1533.343744" width="235.25001599999996" height="536.3281279999999" class="cluster"/>
-        <text x="443.019548" y="1549.343744" class="cluster-label" text-anchor="middle">Tick N+1: Next Evaluation</text>
+        <rect x="310.39454" y="1553.3437439999998" width="265.25001599999996" height="521.3281279999999" class="cluster"/>
+        <text x="443.019548" y="1569.3437439999998" class="cluster-label" text-anchor="middle">Tick N+1: Next Evaluation</text>
       </g>
     </g>
     <g class="edgePaths">

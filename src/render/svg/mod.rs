@@ -204,8 +204,6 @@ impl SvgRenderer {
         graph: &LayoutGraph,
     ) -> (f64, f64, f64, f64) {
         let padding = self.config.padding;
-        let subgraph_padding = 20.0;
-        let title_height = 25.0;
 
         // Start with graph dimensions
         let mut min_x: f64 = 0.0;
@@ -213,39 +211,30 @@ impl SvgRenderer {
         let mut max_x = graph.width.unwrap_or(800.0);
         let mut max_y = graph.height.unwrap_or(600.0);
 
-        // Include bounds from each subgraph
+        // Include bounds from each subgraph. Draw from the laid-out cluster node
+        // geometry so the viewBox matches the drawn cluster rects (and mermaid).
+        // Only fall back to recomputing from member nodes when the cluster node
+        // lacks usable dimensions.
         for subgraph in db.subgraphs() {
-            let mut sg_min_x = f64::MAX;
-            let mut sg_min_y = f64::MAX;
-            let mut sg_max_x = f64::MIN;
-            let mut sg_max_y = f64::MIN;
-            let mut found_nodes = false;
+            let (box_min_x, box_min_y, box_max_x, box_max_y) = match graph.get_node(&subgraph.id) {
+                Some(node) if node.width > 0.0 && node.height > 0.0 => match (node.x, node.y) {
+                    (Some(x), Some(y)) => (x, y, x + node.width, y + node.height),
+                    _ => match self.subgraph_box_from_members(subgraph, graph) {
+                        Some((x, y, w, h)) => (x, y, x + w, y + h),
+                        None => continue,
+                    },
+                },
+                _ => match self.subgraph_box_from_members(subgraph, graph) {
+                    Some((x, y, w, h)) => (x, y, x + w, y + h),
+                    None => continue,
+                },
+            };
 
-            for node_id in &subgraph.nodes {
-                if let Some(node) = graph.get_node(node_id) {
-                    if let (Some(x), Some(y)) = (node.x, node.y) {
-                        found_nodes = true;
-                        sg_min_x = sg_min_x.min(x);
-                        sg_min_y = sg_min_y.min(y);
-                        sg_max_x = sg_max_x.max(x + node.width);
-                        sg_max_y = sg_max_y.max(y + node.height);
-                    }
-                }
-            }
-
-            if found_nodes {
-                // Apply subgraph padding and title height
-                let box_min_x = sg_min_x - subgraph_padding;
-                let box_min_y = sg_min_y - subgraph_padding - title_height;
-                let box_max_x = sg_max_x + subgraph_padding;
-                let box_max_y = sg_max_y + subgraph_padding;
-
-                // Expand overall bounds if needed
-                min_x = min_x.min(box_min_x);
-                min_y = min_y.min(box_min_y);
-                max_x = max_x.max(box_max_x);
-                max_y = max_y.max(box_max_y);
-            }
+            // Expand overall bounds if needed
+            min_x = min_x.min(box_min_x);
+            min_y = min_y.min(box_min_y);
+            max_x = max_x.max(box_max_x);
+            max_y = max_y.max(box_max_y);
         }
 
         // Apply global padding
@@ -329,7 +318,75 @@ impl SvgRenderer {
 
     /// Render a subgraph as a labeled container box
     fn render_subgraph(&self, subgraph: &FlowSubGraph, graph: &LayoutGraph) -> Option<SvgElement> {
-        // Calculate bounding box from member nodes
+        // Prefer the laid-out cluster node geometry. Dagre already reserves the
+        // correct cluster space (its border-node separation reproduces
+        // mermaid's per-side cluster padding), so the renderer must draw the box
+        // straight from that node instead of recomputing it from member bounds
+        // with a hardcoded padding + title band. Mermaid draws the cluster rect
+        // directly from node.x/y/width/height (clusters.js:57-59); LayoutNode
+        // x/y are already top-left, so they are the rect origin as-is.
+        let (min_x, min_y, width, height) = match graph.get_node(&subgraph.id) {
+            Some(node) if node.width > 0.0 && node.height > 0.0 => match (node.x, node.y) {
+                (Some(x), Some(y)) => (x, y, node.width, node.height),
+                _ => self.subgraph_box_from_members(subgraph, graph)?,
+            },
+            // Fallback: recompute from member nodes when the cluster node is
+            // missing dimensions (e.g. layout could not size it).
+            _ => self.subgraph_box_from_members(subgraph, graph)?,
+        };
+
+        // Create the background rect
+        let rect = SvgElement::rect(min_x, min_y, width, height)
+            .with_attrs(Attrs::new().with_class("cluster"));
+
+        // Create the title label
+        let title = if !subgraph.title.is_empty() {
+            &subgraph.title
+        } else {
+            &subgraph.id
+        };
+
+        // Cluster titles go through the same createText path in mermaid and
+        // wrap at flowchart.wrappingWidth (200px).
+        let title = crate::render::text_utils::wrap_label_text_mermaid(title, 16.0);
+
+        // Place the label at the top of the box, centered on the cluster
+        // center. Mermaid positions the cluster label group at
+        // translate(center_x - bbox.width/2, box_top + subGraphTitleTopMargin)
+        // (clusters.js:96-100), with subGraphTitleTopMargin defaulting to 0.
+        // Using text-anchor="middle" at center_x matches that horizontal
+        // centering; the +16 baseline drops the text into the top title band.
+        let label = SvgElement::Text {
+            x: min_x + width / 2.0,
+            y: min_y + 16.0,
+            content: title,
+            attrs: Attrs::new()
+                .with_class("cluster-label")
+                .with_attr("text-anchor", "middle"),
+        };
+
+        // Wrap in a group. mermaid clusters use class "cluster" (plus any
+        // user classes) so the `.cluster rect` / `.cluster text` CSS applies.
+        let mut group_class = String::from("cluster");
+        for class in &subgraph.classes {
+            group_class.push(' ');
+            group_class.push_str(class);
+        }
+        let group_attrs = Attrs::new()
+            .with_class(&group_class)
+            .with_id(&format!("subgraph-{}", subgraph.id));
+
+        Some(SvgElement::group(vec![rect, label]).with_attrs(group_attrs))
+    }
+
+    /// Fallback cluster box computed from member node bounds, used only when the
+    /// laid-out cluster node is missing usable geometry. Returns
+    /// `(min_x, min_y, width, height)` with mermaid-like padding + title band.
+    fn subgraph_box_from_members(
+        &self,
+        subgraph: &FlowSubGraph,
+        graph: &LayoutGraph,
+    ) -> Option<(f64, f64, f64, f64)> {
         let mut min_x = f64::MAX;
         let mut min_y = f64::MAX;
         let mut max_x = f64::MIN;
@@ -352,7 +409,6 @@ impl SvgRenderer {
             return None;
         }
 
-        // Add padding around the nodes
         let padding = 20.0;
         let title_height = 25.0;
         min_x -= padding;
@@ -360,46 +416,7 @@ impl SvgRenderer {
         max_x += padding;
         max_y += padding;
 
-        let width = max_x - min_x;
-        let height = max_y - min_y;
-
-        // Create the background rect
-        let rect = SvgElement::rect(min_x, min_y, width, height)
-            .with_attrs(Attrs::new().with_class("cluster"));
-
-        // Create the title label
-        let title = if !subgraph.title.is_empty() {
-            &subgraph.title
-        } else {
-            &subgraph.id
-        };
-
-        // Cluster titles go through the same createText path in mermaid and
-        // wrap at flowchart.wrappingWidth (200px).
-        let title = crate::render::text_utils::wrap_label_text_mermaid(title, 16.0);
-
-        // Center the label horizontally within the subgraph box
-        let label = SvgElement::Text {
-            x: min_x + width / 2.0,
-            y: min_y + 16.0,
-            content: title,
-            attrs: Attrs::new()
-                .with_class("cluster-label")
-                .with_attr("text-anchor", "middle"),
-        };
-
-        // Wrap in a group. mermaid clusters use class "cluster" (plus any
-        // user classes) so the `.cluster rect` / `.cluster text` CSS applies.
-        let mut group_class = String::from("cluster");
-        for class in &subgraph.classes {
-            group_class.push(' ');
-            group_class.push_str(class);
-        }
-        let group_attrs = Attrs::new()
-            .with_class(&group_class)
-            .with_id(&format!("subgraph-{}", subgraph.id));
-
-        Some(SvgElement::group(vec![rect, label]).with_attrs(group_attrs))
+        Some((min_x, min_y, max_x - min_x, max_y - min_y))
     }
 }
 
@@ -953,8 +970,7 @@ mod tests {
     fn test_subgraph_viewbox_includes_all_content() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
-        use crate::layout::CharacterSizeEstimator;
-        use crate::layout::ToLayoutGraph;
+        use crate::layout::{ToLayoutGraph, TrebuchetSizeEstimator};
 
         // Parse a flowchart with a subgraph
         let input = r#"flowchart TB
@@ -965,7 +981,7 @@ mod tests {
     A --> B"#;
 
         let db = parse(input).unwrap();
-        let estimator = CharacterSizeEstimator::default();
+        let estimator = TrebuchetSizeEstimator::new();
         let graph = db.to_layout_graph(&estimator).unwrap();
         let graph = layout::layout(graph).unwrap();
 
@@ -1022,6 +1038,75 @@ mod tests {
     }
 
     #[test]
+    fn test_cluster_rect_matches_laid_out_cluster_node() {
+        // The drawn subgraph cluster rect must come from the laid-out cluster
+        // node geometry (dagre already reserves mermaid's cluster padding via
+        // the border-node separation) rather than being recomputed from member
+        // node bounds with a hardcoded padding/title band. Mermaid draws the
+        // cluster rect directly from node.x/y/width/height (clusters.js:57-59).
+        use crate::diagrams::flowchart::parse;
+        use crate::layout;
+        use crate::layout::{ToLayoutGraph, TrebuchetSizeEstimator};
+
+        let input =
+            "flowchart TB\n  subgraph S1 [Connected]\n    A[A] --> B[B]\n  end\n  Z[Ext] --> A";
+
+        let db = parse(input).unwrap();
+        let estimator = TrebuchetSizeEstimator::new();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+        let graph = layout::layout(graph).unwrap();
+
+        // The laid-out cluster node carries dagre's reserved cluster geometry.
+        let cluster = graph.get_node("S1").expect("cluster node S1 should exist");
+        let (cx, cy) = (cluster.x.unwrap(), cluster.y.unwrap());
+        let (cw, ch) = (cluster.width, cluster.height);
+
+        // Sanity-check against mermaid's reference geometry for this fixture:
+        // rect width 139.4375, height 208 (docs/images/reference).
+        assert!(
+            (cw - 139.437_504).abs() < 0.01,
+            "expected cluster width ~139.4375, got {cw}"
+        );
+        assert!(
+            (ch - 208.0).abs() < 0.01,
+            "expected cluster height 208, got {ch}"
+        );
+
+        let renderer = SvgRenderer::new(RenderConfig::default());
+        let svg = renderer.render_flowchart(&db, &graph).unwrap();
+
+        // Extract the cluster rect (attributes are emitted in x,y,width,height order).
+        let rect_re = regex::Regex::new(
+            r#"<rect x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)" class="cluster""#,
+        )
+        .unwrap();
+        let caps = rect_re
+            .captures(&svg)
+            .expect("SVG should contain a cluster rect");
+        let rx: f64 = caps[1].parse().unwrap();
+        let ry: f64 = caps[2].parse().unwrap();
+        let rw: f64 = caps[3].parse().unwrap();
+        let rh: f64 = caps[4].parse().unwrap();
+
+        assert!(
+            (rx - cx).abs() < 0.01,
+            "rect x {rx} should equal cluster x {cx}"
+        );
+        assert!(
+            (ry - cy).abs() < 0.01,
+            "rect y {ry} should equal cluster y {cy}"
+        );
+        assert!(
+            (rw - cw).abs() < 0.01,
+            "rect width {rw} should equal cluster width {cw}"
+        );
+        assert!(
+            (rh - ch).abs() < 0.01,
+            "rect height {rh} should equal cluster height {ch}"
+        );
+    }
+
+    #[test]
     fn test_node_label_text_wraps_like_layout() {
         // The drawn label must use the same 200px word-wrap as the layout
         // measurement (mermaid wrappingWidth), so text stays inside the node.
@@ -1057,14 +1142,13 @@ mod tests {
     fn test_svg_has_container_groups() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
-        use crate::layout::CharacterSizeEstimator;
-        use crate::layout::ToLayoutGraph;
+        use crate::layout::{ToLayoutGraph, TrebuchetSizeEstimator};
 
         let input = r#"flowchart TB
     A[Start] --> B[End]"#;
 
         let db = parse(input).unwrap();
-        let estimator = CharacterSizeEstimator::default();
+        let estimator = TrebuchetSizeEstimator::new();
         let graph = db.to_layout_graph(&estimator).unwrap();
         let graph = layout::layout(graph).unwrap();
 
@@ -1118,8 +1202,7 @@ mod tests {
     fn test_subgraph_label_is_centered() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
-        use crate::layout::CharacterSizeEstimator;
-        use crate::layout::ToLayoutGraph;
+        use crate::layout::{ToLayoutGraph, TrebuchetSizeEstimator};
 
         let input = r#"flowchart TB
     subgraph sg1 [My Subgraph Title]
@@ -1127,7 +1210,7 @@ mod tests {
     end"#;
 
         let db = parse(input).unwrap();
-        let estimator = CharacterSizeEstimator::default();
+        let estimator = TrebuchetSizeEstimator::new();
         let graph = db.to_layout_graph(&estimator).unwrap();
         let graph = layout::layout(graph).unwrap();
 
@@ -1171,11 +1254,10 @@ mod tests {
     fn render_svg(input: &str) -> String {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
-        use crate::layout::CharacterSizeEstimator;
-        use crate::layout::ToLayoutGraph;
+        use crate::layout::{ToLayoutGraph, TrebuchetSizeEstimator};
 
         let db = parse(input).unwrap();
-        let estimator = CharacterSizeEstimator::default();
+        let estimator = TrebuchetSizeEstimator::new();
         let graph = db.to_layout_graph(&estimator).unwrap();
         let graph = layout::layout(graph).unwrap();
 
@@ -1346,14 +1428,13 @@ mod tests {
     fn test_theme_css_appended_to_output() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
-        use crate::layout::CharacterSizeEstimator;
-        use crate::layout::ToLayoutGraph;
+        use crate::layout::{ToLayoutGraph, TrebuchetSizeEstimator};
 
         let input = r#"flowchart TB
     A[Node A] --> B[Node B]"#;
 
         let db = parse(input).unwrap();
-        let estimator = CharacterSizeEstimator::default();
+        let estimator = TrebuchetSizeEstimator::new();
         let graph = db.to_layout_graph(&estimator).unwrap();
         let graph = layout::layout(graph).unwrap();
 
@@ -1380,14 +1461,13 @@ mod tests {
     fn test_theme_css_sanitized_in_output() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
-        use crate::layout::CharacterSizeEstimator;
-        use crate::layout::ToLayoutGraph;
+        use crate::layout::{ToLayoutGraph, TrebuchetSizeEstimator};
 
         let input = r#"flowchart TB
     A[Node A]"#;
 
         let db = parse(input).unwrap();
-        let estimator = CharacterSizeEstimator::default();
+        let estimator = TrebuchetSizeEstimator::new();
         let graph = db.to_layout_graph(&estimator).unwrap();
         let graph = layout::layout(graph).unwrap();
 

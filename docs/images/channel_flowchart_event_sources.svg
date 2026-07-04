@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1237.7657279999999" height="1050" viewBox="-8 -28 1237.7657279999999 1050" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1237.7657279999999" height="1030" viewBox="-8 -8 1237.7657279999999 1030" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -77,20 +77,20 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="215.3339959999999" y="-20" width="788.9375679999998" height="119" class="cluster"/>
-        <text x="609.8027799999998" y="-4" class="cluster-label" text-anchor="middle">Event Sources</text>
+        <rect x="200.3339959999998" y="0" width="818.9375679999999" height="104" class="cluster"/>
+        <text x="609.8027799999998" y="16" class="cluster-label" text-anchor="middle">Event Sources</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="153.14649599999973" y="487" width="936.9453440000003" height="143" class="cluster"/>
-        <text x="621.619168" y="503" class="cluster-label" text-anchor="middle">Pure Decision Logic</text>
+        <rect x="138.1464959999999" y="507" width="966.9453440000001" height="128" class="cluster"/>
+        <text x="621.619168" y="523" class="cluster-label" text-anchor="middle">Pure Decision Logic</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="118.1464959999999" y="134" width="1006.9453440000002" height="697" class="cluster"/>
-        <text x="621.619168" y="150" class="cluster-label" text-anchor="middle">Core State Machine</text>
+        <rect x="0" y="154" width="1221.7657279999999" height="682" class="cluster"/>
+        <text x="610.8828639999999" y="170" class="cluster-label" text-anchor="middle">Core State Machine</text>
       </g>
       <g class="cluster" id="subgraph-subGraph3">
-        <rect x="78.57225999999991" y="866" width="1042.46104" height="143" class="cluster"/>
-        <text x="599.8027799999999" y="882" class="cluster-label" text-anchor="middle">Infrastructure</text>
+        <rect x="63.57225999999969" y="886" width="1072.4610400000001" height="128" class="cluster"/>
+        <text x="599.8027799999998" y="902" class="cluster-label" text-anchor="middle">Infrastructure</text>
       </g>
     </g>
     <g class="edgePaths">

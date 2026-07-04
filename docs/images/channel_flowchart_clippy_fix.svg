@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="815.226612" height="928" viewBox="-8 -28 815.226612 928" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="815.226612" height="908" viewBox="-8 -8 815.226612 908" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,16 +62,16 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="284.894548" y="158" width="428.5293240000001" height="576" class="cluster"/>
-        <text x="499.15921000000003" y="174" class="cluster-label" text-anchor="middle">Current Code (line 612)</text>
+        <rect x="264.250016" y="178" width="464.173856" height="561" class="cluster"/>
+        <text x="496.336944" y="194" class="cluster-label" text-anchor="middle">Current Code (line 612)</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="270.554708" y="-20" width="513.6719039999999" height="119" class="cluster"/>
-        <text x="527.39066" y="-4" class="cluster-label" text-anchor="middle">Clippy&apos;s Concern</text>
+        <rect x="255.554708" y="0" width="543.671904" height="104" class="cluster"/>
+        <text x="527.39066" y="16" class="cluster-label" text-anchor="middle">Clippy&apos;s Concern</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="14.999999999999986" y="335" width="214.25001600000002" height="552" class="cluster"/>
-        <text x="122.125008" y="351" class="cluster-label" text-anchor="middle">Fix: Use Array</text>
+        <rect x="0" y="355" width="244.250016" height="537" class="cluster"/>
+        <text x="122.125008" y="371" class="cluster-label" text-anchor="middle">Fix: Use Array</text>
       </g>
     </g>
     <g class="edgePaths">

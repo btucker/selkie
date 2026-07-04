@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1503.4179600000002" height="1108.9485298704353" viewBox="-8 -28 1503.4179600000002 1108.9485298704353" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1503.4179600000002" height="1088.9485298704353" viewBox="-8 -8 1503.4179600000002 1088.9485298704353" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,20 +62,20 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-Frontend">
-        <rect x="787.9570080000001" y="-20" width="554.7187839999999" height="119" class="cluster"/>
-        <text x="1065.3164000000002" y="-4" class="cluster-label" text-anchor="middle">Frontend Layer</text>
+        <rect x="772.9570080000001" y="0" width="584.7187840000001" height="104" class="cluster"/>
+        <text x="1065.3164000000002" y="16" class="cluster-label" text-anchor="middle">Frontend Layer</text>
       </g>
       <g class="cluster" id="subgraph-API">
-        <rect x="828.5117040000001" y="134" width="363.9765720000004" height="500.6346038052785" class="cluster"/>
-        <text x="1010.4999900000003" y="150" class="cluster-label" text-anchor="middle">API Gateway</text>
+        <rect x="810.812484" y="154" width="473.941428" height="485.6346038052785" class="cluster"/>
+        <text x="1047.783198" y="170" class="cluster-label" text-anchor="middle">API Gateway</text>
       </g>
       <g class="cluster" id="subgraph-Services">
-        <rect x="15.000000000000085" y="506.41886190263926" width="713.2617040000001" height="281.21574190263925" class="cluster"/>
-        <text x="371.6308520000001" y="522.4188619026393" class="cluster-label" text-anchor="middle">Microservices</text>
+        <rect x="0" y="517.20312" width="790.812484" height="275.4314838052785" class="cluster"/>
+        <text x="395.406242" y="533.20312" class="cluster-label" text-anchor="middle">Microservices</text>
       </g>
       <g class="cluster" id="subgraph-Data">
-        <rect x="184.45898800000015" y="822.6346038052785" width="477.63280400000014" height="141.3139260651568" class="cluster"/>
-        <text x="423.27539000000024" y="838.6346038052785" class="cluster-label" text-anchor="middle">Data Layer</text>
+        <rect x="38.11133199999995" y="842.6346038052784" width="688.6679800000002" height="126.3139260651568" class="cluster"/>
+        <text x="382.44532200000003" y="858.6346038052784" class="cluster-label" text-anchor="middle">Data Layer</text>
       </g>
     </g>
     <g class="edgePaths">

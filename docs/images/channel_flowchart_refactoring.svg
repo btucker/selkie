@@ -62,20 +62,20 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="1472.0077920000003" y="183.28614800000003" width="460.2656240000001" height="755.286148" class="cluster"/>
-        <text x="1702.1406040000004" y="199.28614800000003" class="cluster-label" text-anchor="middle"><tspan x="1702.1406040000004" y="199.28614800000003" dy="-0.75em">Before Refactoring</tspan><tspan x="1702.1406040000004" dy="1.5em">(daemon/mod.rs)</tspan></text>
+        <rect x="1282.0077920000003" y="0" width="665.265624" height="943.572296" class="cluster"/>
+        <text x="1614.6406040000004" y="16" class="cluster-label" text-anchor="middle"><tspan x="1614.6406040000004" y="16" dy="-0.75em">Before Refactoring</tspan><tspan x="1614.6406040000004" dy="1.5em">(daemon/mod.rs)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="613.7538800000002" y="619.572296" width="633.2539120000001" height="576" class="cluster"/>
-        <text x="930.3808360000003" y="635.572296" class="cluster-label" text-anchor="middle"><tspan x="930.3808360000003" y="635.572296" dy="-0.75em">After Refactoring (chat.rs,</tspan><tspan x="930.3808360000003" dy="1.5em">health.rs)</tspan></text>
+        <rect x="598.0839520000002" y="639.572296" width="663.92384" height="561" class="cluster"/>
+        <text x="930.0458720000001" y="655.572296" class="cluster-label" text-anchor="middle"><tspan x="930.0458720000001" y="655.572296" dy="-0.75em">After Refactoring (chat.rs,</tspan><tspan x="930.0458720000001" dy="1.5em">health.rs)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="0" y="103.8418" width="1247.007792" height="381.730496" class="cluster"/>
-        <text x="623.503896" y="119.8418" class="cluster-label" text-anchor="middle">Coworker Lifecycle States</text>
+        <rect x="0" y="25.00000000000003" width="1247.0077920000003" height="460.572296" class="cluster"/>
+        <text x="623.5038960000002" y="41.00000000000003" class="cluster-label" text-anchor="middle">Coworker Lifecycle States</text>
       </g>
       <g class="cluster" id="subgraph-subGraph3">
-        <rect x="769.8515400000001" y="1254.572296" width="300" height="479" class="cluster"/>
-        <text x="919.8515400000001" y="1270.572296" class="cluster-label" text-anchor="middle">PR #722 Fix</text>
+        <rect x="754.8515400000001" y="1274.572296" width="330.0000000000001" height="464" class="cluster"/>
+        <text x="919.8515400000001" y="1290.572296" class="cluster-label" text-anchor="middle">PR #722 Fix</text>
       </g>
     </g>
     <g class="edgePaths">

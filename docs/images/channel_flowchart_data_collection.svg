@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1356.2774040000004" height="1519.835968" viewBox="-8 -28 1356.2774040000004 1519.835968" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1356.2774040000004" height="1499.835968" viewBox="-8.000000000000114 -8 1356.2774040000004 1499.835968" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,20 +62,20 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="988.8399160000001" y="-20" width="336.43748800000003" height="351" class="cluster"/>
-        <text x="1157.0586600000001" y="-4" class="cluster-label" text-anchor="middle"><tspan x="1157.0586600000001" y="-4" dy="-0.75em">Data Collection</tspan><tspan x="1157.0586600000001" dy="1.5em">(snapshot.rs)</tspan></text>
+        <rect x="973.8399160000001" y="0" width="366.43748800000003" height="336" class="cluster"/>
+        <text x="1157.0586600000001" y="16" class="cluster-label" text-anchor="middle"><tspan x="1157.0586600000001" y="16" dy="-0.75em">Data Collection</tspan><tspan x="1157.0586600000001" dy="1.5em">(snapshot.rs)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="422.6562680000002" y="-20" width="516.183648" height="1498.835968" class="cluster"/>
-        <text x="680.7480920000002" y="-4" class="cluster-label" text-anchor="middle">Task Dispatch (dispatch.rs)</text>
+        <rect x="378.8203200000001" y="0" width="575.019596" height="1483.835968" class="cluster"/>
+        <text x="666.3301180000001" y="16" class="cluster-label" text-anchor="middle">Task Dispatch (dispatch.rs)</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="1059.1367679999998" y="390" width="237.30468799999994" height="143" class="cluster"/>
-        <text x="1177.789112" y="406" class="cluster-label" text-anchor="middle">The Bug</text>
+        <rect x="1044.1367679999998" y="410" width="267.304688" height="128" class="cluster"/>
+        <text x="1177.789112" y="426" class="cluster-label" text-anchor="middle">The Bug</text>
       </g>
       <g class="cluster" id="subgraph-subGraph3">
-        <rect x="14.999999999999886" y="402" width="328.82032000000004" height="733.3281440000001" class="cluster"/>
-        <text x="179.4101599999999" y="418" class="cluster-label" text-anchor="middle">Fix Location</text>
+        <rect x="-0.00000000000011368683772161603" y="410" width="358.82032000000004" height="792.8359680000001" class="cluster"/>
+        <text x="179.4101599999999" y="426" class="cluster-label" text-anchor="middle">Fix Location</text>
       </g>
     </g>
     <g class="edgePaths">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="2006.0086960000003" height="872.9227721357395" viewBox="-8 -28 2006.0086960000003 872.9227721357395" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="2006.0086960000003" height="852.9227721357395" viewBox="-8 -8 2006.0086960000003 852.9227721357395" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -80,12 +80,12 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="1161.8797680000002" y="-20" width="813.1289279999999" height="522.4963015475041" class="cluster"/>
-        <text x="1568.4442320000003" y="-4" class="cluster-label" text-anchor="middle"><tspan x="1568.4442320000003" y="-4" dy="-0.75em">Current State - Two Parallel</tspan><tspan x="1568.4442320000003" dy="1.5em">Paths</tspan></text>
+        <rect x="1146.8797680000002" y="0" width="843.1289280000001" height="507.4963015475041" class="cluster"/>
+        <text x="1568.4442320000003" y="16" class="cluster-label" text-anchor="middle"><tspan x="1568.4442320000003" y="16" dy="-0.75em">Current State - Two Parallel</tspan><tspan x="1568.4442320000003" dy="1.5em">Paths</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="15.000000000000142" y="258.24815077375206" width="695.4883199999998" height="573.6746213619874" class="cluster"/>
-        <text x="362.7441600000001" y="274.24815077375206" class="cluster-label" text-anchor="middle">Phase 4 Risk - Unification</text>
+        <rect x="0.00000000000011368683772161603" y="177" width="816.4765999999997" height="659.9227721357395" class="cluster"/>
+        <text x="408.2383" y="193" class="cluster-label" text-anchor="middle">Phase 4 Risk - Unification</text>
       </g>
     </g>
     <g class="edgePaths">

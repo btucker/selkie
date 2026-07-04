@@ -67,12 +67,12 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="52.035160000000005" y="435" width="663.183672" height="327.865228" class="cluster"/>
-        <text x="383.626996" y="451" class="cluster-label" text-anchor="middle">app.rs</text>
+        <rect x="20" y="445" width="712.718832" height="447.148432" class="cluster"/>
+        <text x="376.359416" y="461" class="cluster-label" text-anchor="middle">app.rs</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="37.499999999999986" y="35" width="281.25784" height="375" class="cluster"/>
-        <text x="178.12892" y="51" class="cluster-label" text-anchor="middle">mod.rs</text>
+        <rect x="20" y="45" width="316.25784" height="380" class="cluster"/>
+        <text x="178.12892" y="61" class="cluster-label" text-anchor="middle">mod.rs</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
         <rect x="0" y="0" width="956.523536" height="1110.226576" class="cluster"/>

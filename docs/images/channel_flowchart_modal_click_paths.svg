@@ -62,7 +62,7 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="3376.553344" y="68" width="1199.7032479999998" height="359" class="cluster"/>
+        <rect x="3376.553344" y="68" width="1199.703248" height="359" class="cluster"/>
         <text x="3976.404968" y="84" class="cluster-label" text-anchor="middle">❌ Broken: Backdrop Click</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
@@ -70,7 +70,7 @@ rect.text{fill:none;stroke-width:0;}
         <text x="2613.998608" y="192" class="cluster-label" text-anchor="middle"><tspan x="2613.998608" y="192" dy="-0.75em">❌ Broken: Empty Area</tspan><tspan x="2613.998608" dy="1.5em">Click</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="1148.953184" y="176" width="702.4906879999999" height="143" class="cluster"/>
+        <rect x="1148.953184" y="176" width="702.4906880000001" height="143" class="cluster"/>
         <text x="1500.198528" y="192" class="cluster-label" text-anchor="middle">⚠️ Subtle: Close Button</text>
       </g>
       <g class="cluster" id="subgraph-subGraph3">

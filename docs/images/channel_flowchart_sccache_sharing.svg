@@ -62,11 +62,11 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="1530.4141439999994" y="49.593751999999995" width="1379.81264" height="513" class="cluster"/>
+        <rect x="1530.4141439999994" y="49.593751999999995" width="1379.8126399999999" height="513" class="cluster"/>
         <text x="2220.3204639999994" y="65.593752" class="cluster-label" text-anchor="middle">Without sccache</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="0" y="0" width="1480.4141439999999" height="576.093752" class="cluster"/>
+        <rect x="0" y="0" width="1480.4141439999999" height="612.187504" class="cluster"/>
         <text x="740.2070719999999" y="16" class="cluster-label" text-anchor="middle"><tspan x="740.2070719999999" y="16" dy="-0.75em">With sccache</tspan><tspan x="740.2070719999999" dy="1.5em">(RUSTC_WRAPPER)</tspan></text>
       </g>
     </g>

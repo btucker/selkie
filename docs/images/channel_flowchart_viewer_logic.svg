@@ -62,16 +62,16 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="1130.1641920000002" y="88.5" width="292.30473600000005" height="483.5" class="cluster"/>
-        <text x="1276.3165600000002" y="104.5" class="cluster-label" text-anchor="middle">Chat Event Loop (mod.rs)</text>
+        <rect x="1115.1641920000002" y="0" width="322.30473600000005" height="577" class="cluster"/>
+        <text x="1276.3165600000002" y="16" class="cluster-label" text-anchor="middle">Chat Event Loop (mod.rs)</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
         <rect x="0" y="25" width="1080.164192" height="271" class="cluster"/>
         <text x="540.082096" y="41" class="cluster-label" text-anchor="middle">UI Rendering (ui.rs)</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="1108.6290480000002" y="607" width="335.37502399999994" height="327" class="cluster"/>
-        <text x="1276.3165600000002" y="623" class="cluster-label" text-anchor="middle">Kitty Protocol (kitty.rs)</text>
+        <rect x="1093.6290479999998" y="627" width="365.37502400000017" height="312" class="cluster"/>
+        <text x="1276.3165599999998" y="643" class="cluster-label" text-anchor="middle">Kitty Protocol (kitty.rs)</text>
       </g>
     </g>
     <g class="edgePaths">

@@ -62,7 +62,7 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-current">
-        <rect x="1382.109424" y="0" width="2704.1406880000004" height="223" class="cluster"/>
+        <rect x="1382.109424" y="0" width="2704.140688" height="223" class="cluster"/>
         <text x="2734.179768" y="16" class="cluster-label" text-anchor="middle">Current: Kitty Protocol Path</text>
       </g>
       <g class="cluster" id="subgraph-proposed">

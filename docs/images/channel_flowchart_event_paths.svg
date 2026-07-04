@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1021.9160680000001" height="526" viewBox="-8 -28 1021.9160680000001 526" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1021.9160680000001" height="506" viewBox="-8 -8 1021.9160680000001 506" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,16 +62,16 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-Mouse">
-        <rect x="39.58397600000001" y="-20" width="366.31449200000003" height="327" class="cluster"/>
-        <text x="222.74122200000002" y="-4" class="cluster-label" text-anchor="middle">Mouse Event Path</text>
+        <rect x="0" y="0" width="455.959016" height="312" class="cluster"/>
+        <text x="227.979508" y="16" class="cluster-label" text-anchor="middle">Mouse Event Path</text>
       </g>
       <g class="cluster" id="subgraph-Touch">
-        <rect x="493.527372" y="-20" width="365.6074440000001" height="327" class="cluster"/>
-        <text x="676.3310940000001" y="-4" class="cluster-label" text-anchor="middle">Touch Event Path</text>
+        <rect x="475.959016" y="0" width="485.9804920000001" height="312" class="cluster"/>
+        <text x="718.9492620000001" y="16" class="cluster-label" text-anchor="middle">Touch Event Path</text>
       </g>
       <g class="cluster" id="subgraph-Shared">
-        <rect x="272.88480400000003" y="342" width="575.9062400000001" height="143" class="cluster"/>
-        <text x="560.8379240000002" y="358" class="cluster-label" text-anchor="middle">Shared Logic</text>
+        <rect x="38.19728399999997" y="362" width="967.7187840000001" height="128" class="cluster"/>
+        <text x="522.056676" y="378" class="cluster-label" text-anchor="middle">Shared Logic</text>
       </g>
     </g>
     <g class="edgePaths">

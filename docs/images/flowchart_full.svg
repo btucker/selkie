@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="995.437488" height="1844.238974374589" viewBox="-8 -28 995.437488 1844.238974374589" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="995.437488" height="1824.238974374589" viewBox="-8 -8 995.437488 1824.238974374589" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,16 +62,16 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-main">
-        <rect x="353.05076800000006" y="-20" width="280.968752" height="688.4811503745889" class="cluster"/>
-        <text x="493.53514400000006" y="-4" class="cluster-label" text-anchor="middle">Main Flow</text>
+        <rect x="313.595692" y="0" width="353.484372" height="673.4811503745889" class="cluster"/>
+        <text x="490.337878" y="16" class="cluster-label" text-anchor="middle">Main Flow</text>
       </g>
       <g class="cluster" id="subgraph-shapes">
-        <rect x="377.63279600000004" y="703.4811503745889" width="219.01563199999993" height="841.757824" class="cluster"/>
-        <text x="487.14061200000003" y="719.4811503745889" class="cluster-label" text-anchor="middle">All Shapes</text>
+        <rect x="362.632796" y="723.4811503745888" width="249.0156320000001" height="826.757824" class="cluster"/>
+        <text x="487.14061200000003" y="739.4811503745888" class="cluster-label" text-anchor="middle">All Shapes</text>
       </g>
       <g class="cluster" id="subgraph-edges">
-        <rect x="14.999999999999972" y="1580.238974374589" width="949.437488" height="223" class="cluster"/>
-        <text x="489.718744" y="1596.238974374589" class="cluster-label" text-anchor="middle">Edge Types</text>
+        <rect x="0" y="1600.238974374589" width="979.437488" height="208" class="cluster"/>
+        <text x="489.718744" y="1616.238974374589" class="cluster-label" text-anchor="middle">Edge Types</text>
       </g>
     </g>
     <g class="edgePaths">

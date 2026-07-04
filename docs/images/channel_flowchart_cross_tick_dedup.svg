@@ -62,16 +62,16 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-Tick1">
-        <rect x="1620.44536" y="36.5" width="601.35548" height="1455.5" class="cluster"/>
-        <text x="1921.1230999999998" y="52.5" class="cluster-label" text-anchor="middle"><tspan x="1921.1230999999998" y="52.5" dy="-0.75em">Tick 1 - Assignment</tspan><tspan x="1921.1230999999998" dy="1.5em">Generated</tspan></text>
+        <rect x="1600.9453599999997" y="0" width="640.35548" height="1497" class="cluster"/>
+        <text x="1921.1230999999998" y="16" class="cluster-label" text-anchor="middle"><tspan x="1921.1230999999998" y="16" dy="-0.75em">Tick 1 - Assignment</tspan><tspan x="1921.1230999999998" dy="1.5em">Generated</tspan></text>
       </g>
       <g class="cluster" id="subgraph-Tick2">
-        <rect x="1484.505896" y="1551" width="584.5859520000001" height="1087" class="cluster"/>
-        <text x="1776.7988719999998" y="1567" class="cluster-label" text-anchor="middle"><tspan x="1776.7988719999998" y="1567" dy="-0.75em">Tick 2 - Deduplication</tspan><tspan x="1776.7988719999998" dy="1.5em">Check</tspan></text>
+        <rect x="1458.652384" y="1571" width="629.939464" height="1072" class="cluster"/>
+        <text x="1773.622116" y="1587" class="cluster-label" text-anchor="middle"><tspan x="1773.622116" y="1587" dy="-0.75em">Tick 2 - Deduplication</tspan><tspan x="1773.622116" dy="1.5em">Check</tspan></text>
       </g>
       <g class="cluster" id="subgraph-Test">
-        <rect x="-0.00000000000011368683772161603" y="25" width="1565.9453599999997" height="167" class="cluster"/>
-        <text x="782.9726799999997" y="41" class="cluster-label" text-anchor="middle">E2E Test Coverage</text>
+        <rect x="-0.00000000000011368683772161603" y="25" width="1565.94536" height="167" class="cluster"/>
+        <text x="782.9726799999999" y="41" class="cluster-label" text-anchor="middle">E2E Test Coverage</text>
       </g>
     </g>
     <g class="edgePaths">

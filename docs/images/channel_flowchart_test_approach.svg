@@ -62,7 +62,7 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="1835.7188159999998" y="0" width="1706.3203999999998" height="143" class="cluster"/>
+        <rect x="1835.7188159999998" y="0" width="1706.3204" height="143" class="cluster"/>
         <text x="2688.879016" y="16" class="cluster-label" text-anchor="middle"><tspan x="2688.879016" y="16" dy="-0.75em">Current Test Approach</tspan><tspan x="2688.879016" dy="1.5em">(Weak)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">

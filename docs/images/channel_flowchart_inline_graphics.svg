@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="3278.9924000000005" height="388.52734399999997" viewBox="-8 -8 3278.9924000000005 388.52734399999997" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="3278.9924" height="388.52734399999997" viewBox="-8 -8 3278.9924 388.52734399999997" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,12 +62,12 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="1405.742304" y="62.763671999999985" width="1857.2500960000004" height="247" class="cluster"/>
+        <rect x="1405.742304" y="62.763671999999985" width="1857.2500960000002" height="247" class="cluster"/>
         <text x="2334.367352" y="78.76367199999999" class="cluster-label" text-anchor="middle"><tspan x="2334.367352" y="78.76367199999999" dy="-0.75em">OLD: Inline Graphics</tspan><tspan x="2334.367352" dy="1.5em">(Problematic)</tspan></text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
-        <rect x="0.00000000000011368683772161603" y="0" width="1355.7423039999999" height="372.52734399999997" class="cluster"/>
-        <text x="677.871152" y="16" class="cluster-label" text-anchor="middle"><tspan x="677.871152" y="16" dy="-0.75em">NEW: Text Placeholders +</tspan><tspan x="677.871152" dy="1.5em">Fullscreen View</tspan></text>
+        <rect x="0.00000000000011368683772161603" y="0" width="1355.742304" height="372.52734399999997" class="cluster"/>
+        <text x="677.8711520000002" y="16" class="cluster-label" text-anchor="middle"><tspan x="677.8711520000002" y="16" dy="-0.75em">NEW: Text Placeholders +</tspan><tspan x="677.8711520000002" dy="1.5em">Fullscreen View</tspan></text>
       </g>
     </g>
     <g class="edgePaths">
