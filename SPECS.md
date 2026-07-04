@@ -14,13 +14,13 @@ Source: `src/diagrams/flowchart/parser.rs:786`
 
 When a subgraph declares its own direction, the application shall preserve that direction without changing the parent flowchart direction.
 
-Source: `src/render/flowchart.rs:483`
+Source: `src/render/flowchart.rs:518`
 
 ### FLOW-1.3
 
 When a flowchart contains subgraph member nodes, the application shall preserve parent-child relationships in the layout graph.
 
-Source: `src/render/flowchart.rs:278`
+Source: `src/render/flowchart.rs:280`
 
 ### FLOW-1.4
 
@@ -38,7 +38,7 @@ Source: `tests/render_integration.rs:471`
 
 When a flowchart edge has a Mermaid label, the application shall preserve that label in the layout graph edge model.
 
-Source: `src/render/flowchart.rs:350`
+Source: `src/render/flowchart.rs:352`
 
 ### FLOW-2.2
 
@@ -62,7 +62,7 @@ Source: `src/eval/checks.rs:3262`
 
 When a flowchart edge is rendered to SVG, the application shall emit an SVG path for the edge route.
 
-Source: `src/render/flowchart.rs:443`
+Source: `src/render/flowchart.rs:478`
 
 ### FLOW-3.2
 
