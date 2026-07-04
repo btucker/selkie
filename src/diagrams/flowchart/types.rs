@@ -255,13 +255,20 @@ impl Default for FlowchartDb {
 /// Parse an arrow string to extract edge type, stroke style, and length.
 /// Returns (edge_type, stroke, length).
 ///
+/// `arrow` is the combined start+end string used to detect the edge TYPE (and
+/// stroke). `length_arrow` is the END segment only, used to compute the edge
+/// length. For simple links the two are identical; for inline-label edges
+/// (`A -- text --> B`) the start segment contributes only the arrow type, so
+/// the length comes solely from the end segment (mirrors mermaid destructLink).
+///
 /// Arrow formats:
 /// - Normal: `-->`, `---`, `-->`
 /// - Thick: `==>`, `===`, `==>`
 /// - Dotted: `-.->`, `-.-`, `-..->`
 /// - With starts: `<-->`, `x--x`, `o--o`
-fn parse_arrow(arrow: &str) -> (String, EdgeStroke, u32) {
+fn parse_arrow(arrow: &str, length_arrow: &str) -> (String, EdgeStroke, u32) {
     let arrow = arrow.trim();
+    let length_arrow = length_arrow.trim();
 
     // Determine stroke type based on characters
     let stroke = if arrow.contains("-.") || arrow.contains(".-") {
@@ -312,20 +319,23 @@ fn parse_arrow(arrow: &str) -> (String, EdgeStroke, u32) {
     let is_open_edge = edge_type == "arrow_open";
     let length = match stroke {
         EdgeStroke::Normal | EdgeStroke::Invisible => {
-            // Count consecutive dashes or tildes
-            let dash_count = arrow.chars().filter(|&c| c == '-' || c == '~').count();
+            // Count consecutive dashes or tildes in the END segment only.
+            let dash_count = length_arrow
+                .chars()
+                .filter(|&c| c == '-' || c == '~')
+                .count();
             // Open edges subtract 2 (like mermaid's slice(-1) then length-1)
             // Arrow edges subtract 1
             let subtract = if is_open_edge { 2 } else { 1 };
             dash_count.saturating_sub(subtract).clamp(1, 10) as u32
         }
         EdgeStroke::Thick => {
-            let eq_count = arrow.chars().filter(|&c| c == '=').count();
+            let eq_count = length_arrow.chars().filter(|&c| c == '=').count();
             let subtract = if is_open_edge { 2 } else { 1 };
             eq_count.saturating_sub(subtract).clamp(1, 10) as u32
         }
         EdgeStroke::Dotted => {
-            let dot_count = arrow.chars().filter(|&c| c == '.').count();
+            let dot_count = length_arrow.chars().filter(|&c| c == '.').count();
             dot_count.clamp(1, 10) as u32
         }
     };
@@ -716,6 +726,7 @@ impl FlowchartDb {
         start: &str,
         end: &str,
         arrow: &str,
+        length_arrow: &str,
         text: Option<&str>,
         link_id: Option<&str>,
     ) {
@@ -727,8 +738,11 @@ impl FlowchartDb {
             self.add_vertex_simple(end, None, None);
         }
 
-        // Parse arrow string to extract edge type, stroke, and length
-        let (edge_type, stroke, length) = parse_arrow(arrow);
+        // Parse arrow string to extract edge type, stroke, and length.
+        // Type/stroke come from the combined `arrow`, but length is derived
+        // solely from the END segment (`length_arrow`), mirroring mermaid's
+        // destructLink: for `A -- text --> B`, `-->` yields length 1.
+        let (edge_type, stroke, length) = parse_arrow(arrow, length_arrow);
 
         let flow_link = FlowLink {
             text: text.map(FlowText::new),

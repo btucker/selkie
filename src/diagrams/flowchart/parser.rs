@@ -99,7 +99,10 @@ fn process_rule(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> Resu
 
 fn process_vertex_statement(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> Result<()> {
     let mut nodes: Vec<String> = Vec::new();
-    let mut pending_link: Option<(String, Option<String>, Option<String>)> = None; // (arrow, text, id)
+    // (arrow, length_arrow, text, id) - `length_arrow` is the END segment used
+    // to derive edge length (mermaid destructLink), which for inline-label edges
+    // differs from `arrow` (the combined start+end used for type detection).
+    let mut pending_link: Option<(String, String, Option<String>, Option<String>)> = None;
 
     for inner in pair.into_inner() {
         match inner.as_rule() {
@@ -107,10 +110,17 @@ fn process_vertex_statement(pair: pest::iterators::Pair<Rule>, db: &mut Flowchar
                 let node_ids = process_node(inner, db)?;
 
                 // If we have a pending link, connect previous nodes to current nodes
-                if let Some((arrow, text, link_id)) = pending_link.take() {
+                if let Some((arrow, length_arrow, text, link_id)) = pending_link.take() {
                     for from in &nodes {
                         for to in &node_ids {
-                            db.add_edge(from, to, &arrow, text.as_deref(), link_id.as_deref());
+                            db.add_edge(
+                                from,
+                                to,
+                                &arrow,
+                                &length_arrow,
+                                text.as_deref(),
+                                link_id.as_deref(),
+                            );
                         }
                     }
                 }
@@ -267,8 +277,12 @@ fn process_text(pair: pest::iterators::Pair<Rule>) -> Result<FlowText> {
 
 fn process_link(
     pair: pest::iterators::Pair<Rule>,
-) -> Result<(String, Option<String>, Option<String>)> {
+) -> Result<(String, String, Option<String>, Option<String>)> {
     let mut arrow = String::new();
+    // The END segment of the link. Mermaid's destructLink derives the edge
+    // length solely from this end segment; the start segment contributes only
+    // the arrow TYPE, never the length. For simple links it equals `arrow`.
+    let mut length_arrow = String::new();
     let mut text = None;
     let mut link_id = None;
 
@@ -279,6 +293,7 @@ fn process_link(
                     match link_inner.as_rule() {
                         Rule::link_arrow => {
                             arrow = link_inner.as_str().to_string();
+                            length_arrow = arrow.clone();
                         }
                         Rule::link_id => {
                             let id_str = link_inner.as_str();
@@ -296,10 +311,12 @@ fn process_link(
                             arrow = link_inner.as_str().to_string();
                         }
                         Rule::link_end => {
-                            arrow.push_str(link_inner.as_str());
+                            length_arrow = link_inner.as_str().to_string();
+                            arrow.push_str(&length_arrow);
                         }
                         Rule::link_arrow => {
                             arrow = link_inner.as_str().to_string();
+                            length_arrow = arrow.clone();
                         }
                         Rule::edge_text => {
                             text = Some(link_inner.as_str().trim().to_string());
@@ -320,7 +337,12 @@ fn process_link(
         }
     }
 
-    Ok((arrow, text, link_id))
+    // Fall back to the combined arrow if no distinct end segment was captured.
+    if length_arrow.is_empty() {
+        length_arrow = arrow.clone();
+    }
+
+    Ok((arrow, length_arrow, text, link_id))
 }
 
 fn process_acc_descr(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> Result<()> {
@@ -1321,6 +1343,53 @@ A[Hard] -->|Text| B(Round)"#;
             assert!(result.is_ok(), "Failed to parse: {:?}", result);
             let db = result.unwrap();
             assert_eq!(db.get_edges().len(), 1);
+        }
+
+        #[test]
+        fn should_derive_length_from_end_segment_for_inline_label() {
+            // Mermaid's destructLink computes edge length solely from the END
+            // segment (`-->`), not the start+end concatenation. `-->` yields
+            // length 1; the start `--` contributes only the arrow type.
+            let input = "graph TD;\nA -- label --> B;";
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            let edges = db.get_edges();
+            assert_eq!(edges.len(), 1);
+            assert_eq!(edges[0].length, Some(1));
+        }
+
+        #[test]
+        fn should_derive_length_2_from_longer_end_segment_for_inline_label() {
+            // `---> ` end segment yields length 2 regardless of the start length.
+            let input = "graph TD;\nA -- x ---> B;";
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            let edges = db.get_edges();
+            assert_eq!(edges.len(), 1);
+            assert_eq!(edges[0].length, Some(2));
+        }
+
+        #[test]
+        fn should_derive_length_1_for_simple_arrow() {
+            // Simple (non-inline) links are unaffected: `-->` is length 1.
+            let input = "graph TD;\nA --> B;";
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            let edges = db.get_edges();
+            assert_eq!(edges[0].length, Some(1));
+        }
+
+        #[test]
+        fn should_derive_length_3_for_simple_long_arrow() {
+            let input = "graph TD;\nA ----> B;";
+            let result = parse(input);
+            assert!(result.is_ok(), "Failed to parse: {:?}", result);
+            let db = result.unwrap();
+            let edges = db.get_edges();
+            assert_eq!(edges[0].length, Some(3));
         }
 
         #[test]

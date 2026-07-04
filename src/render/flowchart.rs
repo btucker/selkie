@@ -191,8 +191,8 @@ mod tests {
         db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Round));
         db.add_vertex_simple("B", Some("Process"), Some(FlowVertexType::Rect));
         db.add_vertex_simple("C", Some("Decision"), Some(FlowVertexType::Diamond));
-        db.add_edge("A", "B", "-->", None, None);
-        db.add_edge("B", "C", "-->", None, None);
+        db.add_edge("A", "B", "-->", "-->", None, None);
+        db.add_edge("B", "C", "-->", "-->", None, None);
 
         let estimator = CharacterSizeEstimator::default();
         let graph = db.to_layout_graph(&estimator).unwrap();
@@ -218,8 +218,8 @@ mod tests {
         db.add_vertex_simple("B", None, None);
         db.add_vertex_simple("A", None, None);
         db.add_vertex_simple("C", None, None);
-        db.add_edge("B", "A", "-->", None, None);
-        db.add_edge("B", "C", "-->", None, None);
+        db.add_edge("B", "A", "-->", "-->", None, None);
+        db.add_edge("B", "C", "-->", "-->", None, None);
 
         let estimator = CharacterSizeEstimator::default();
         let graph = db.to_layout_graph(&estimator).unwrap();
@@ -257,7 +257,7 @@ mod tests {
         db.set_direction("TB");
         db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Rect));
         db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
-        db.add_edge("A", "B", "-->", Some("Link text"), None);
+        db.add_edge("A", "B", "-->", "-->", Some("Link text"), None);
 
         let estimator = TrebuchetSizeEstimator::new();
         let graph = db.to_layout_graph(&estimator).unwrap();
@@ -354,7 +354,7 @@ mod tests {
         let mut db = FlowchartDb::new();
         db.add_vertex_simple("A", Some("Start"), None);
         db.add_vertex_simple("B", Some("End"), None);
-        db.add_edge("A", "B", "-->", Some("Yes"), None);
+        db.add_edge("A", "B", "-->", "-->", Some("Yes"), None);
 
         let estimator = CharacterSizeEstimator::default();
         let graph = db.to_layout_graph(&estimator).unwrap();
@@ -371,7 +371,7 @@ mod tests {
         db.set_direction("LR");
         db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Round));
         db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
-        db.add_edge("A", "B", "-->", None, None);
+        db.add_edge("A", "B", "-->", "-->", None, None);
 
         let estimator = CharacterSizeEstimator::default();
         let graph = db.to_layout_graph(&estimator).unwrap();
@@ -426,7 +426,7 @@ mod tests {
             db.set_direction("LR");
             db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Rect));
             db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
-            db.add_edge("A", "B", arrow, None, None);
+            db.add_edge("A", "B", arrow, arrow, None, None);
 
             let estimator = CharacterSizeEstimator::default();
             let graph = db.to_layout_graph(&estimator).unwrap();
@@ -484,7 +484,7 @@ mod tests {
         db.set_direction("LR");
         db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Round));
         db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
-        db.add_edge("A", "B", "-->", None, None);
+        db.add_edge("A", "B", "-->", "-->", None, None);
 
         // Render to SVG
         let diagram = Diagram::Flowchart(db);
