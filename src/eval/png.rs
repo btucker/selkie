@@ -12,7 +12,7 @@ use std::path::Path;
 pub type RgbaImage = (Vec<u8>, u32, u32);
 
 #[cfg(feature = "png")]
-use super::ssim::{calculate_ssim_with_resize, rgba_to_grayscale};
+use super::ssim::{calculate_ssim_registered, calculate_ssim_with_resize, rgba_to_grayscale};
 
 /// Result of visual comparison between two images
 #[derive(Debug, Clone)]
@@ -25,6 +25,22 @@ pub struct VisualComparison {
     pub reference_dims: (u32, u32),
 }
 
+/// Point resvg's generic `sans-serif` family at "Trebuchet MS".
+///
+/// Mermaid's stylesheet uses the lowercase family stack
+/// `trebuchet ms, verdana, arial, sans-serif`. resvg's fontdb (0.23) matches
+/// family names case-sensitively, so none of those lowercase names match the
+/// installed "Trebuchet MS"/"Verdana"/"Arial" faces and resvg falls back to
+/// whatever it resolves generic `sans-serif` to (typically Arial). Chrome —
+/// which mmdc rasterizes the reference with — matches case-insensitively and
+/// lands on the real Trebuchet MS. Aliasing the generic family here makes our
+/// raster use the same glyph metrics Chrome does, so SSIM compares like with
+/// like instead of penalizing an eval-only font substitution.
+#[cfg(feature = "png")]
+fn alias_sans_serif_to_trebuchet(opt: &mut resvg::usvg::Options) {
+    opt.fontdb_mut().set_sans_serif_family("Trebuchet MS");
+}
+
 /// Convert SVG string to PNG bytes
 #[cfg(feature = "png")]
 pub fn svg_to_png(svg: &str) -> Result<(Vec<u8>, u32, u32), String> {
@@ -34,6 +50,7 @@ pub fn svg_to_png(svg: &str) -> Result<(Vec<u8>, u32, u32), String> {
     // Set up options with font database
     let mut opt = usvg::Options::default();
     opt.fontdb_mut().load_system_fonts();
+    alias_sans_serif_to_trebuchet(&mut opt);
 
     // Parse SVG
     let tree =
@@ -75,6 +92,7 @@ pub fn svg_to_rgba(svg: &str) -> Result<(Vec<u8>, u32, u32), String> {
     // Set up options with font database
     let mut opt = usvg::Options::default();
     opt.fontdb_mut().load_system_fonts();
+    alias_sans_serif_to_trebuchet(&mut opt);
 
     // Parse SVG
     let tree =
@@ -101,6 +119,79 @@ pub fn svg_to_rgba(svg: &str) -> Result<(Vec<u8>, u32, u32), String> {
 
     // Get RGBA data
     Ok((pixmap.data().to_vec(), width, height))
+}
+
+/// Get raw RGBA pixels from SVG, rendered scaled to a target pixel width.
+///
+/// Used to rasterize at the same scale as a reference raster (e.g. an mmdc
+/// PNG limited by the puppeteer viewport) so SSIM compares two properly
+/// anti-aliased images instead of point-sampling one down to the other.
+#[cfg(feature = "png")]
+pub fn svg_to_rgba_at_width(svg: &str, target_width: u32) -> Result<(Vec<u8>, u32, u32), String> {
+    use resvg::tiny_skia;
+    use resvg::usvg;
+
+    // Set up options with font database
+    let mut opt = usvg::Options::default();
+    opt.fontdb_mut().load_system_fonts();
+    alias_sans_serif_to_trebuchet(&mut opt);
+
+    // Parse SVG
+    let tree =
+        usvg::Tree::from_str(svg, &opt).map_err(|e| format!("Failed to parse SVG: {}", e))?;
+
+    let size = tree.size();
+    if size.width() <= 0.0 || size.height() <= 0.0 {
+        return Err("SVG has zero intrinsic size".to_string());
+    }
+
+    let scale = target_width as f32 / size.width();
+    let width = target_width.max(1);
+    let height = ((size.height() * scale).round() as u32).max(1);
+
+    let mut pixmap = tiny_skia::Pixmap::new(width, height)
+        .ok_or_else(|| "Failed to create pixmap".to_string())?;
+
+    // Fill with white background
+    pixmap.fill(tiny_skia::Color::WHITE);
+
+    // Render scaled
+    resvg::render(
+        &tree,
+        tiny_skia::Transform::from_scale(scale, scale),
+        &mut pixmap.as_mut(),
+    );
+
+    Ok((pixmap.data().to_vec(), width, height))
+}
+
+/// Calculate visual similarity between a selkie SVG and the reference
+/// rendered from mermaid source by mmdc (accurate text rendering).
+///
+/// The selkie SVG is rasterized at the reference PNG's pixel width so both
+/// images are compared at a matched raster scale.
+#[cfg(feature = "png")]
+pub fn compare_svg_to_reference_source(
+    selkie_svg: &str,
+    reference_source: &str,
+    cache: &super::cache::ReferenceCache,
+) -> Result<VisualComparison, String> {
+    let (reference_rgba, rw, rh) = sources_to_rgba_batch_cached(&[reference_source], cache)
+        .into_iter()
+        .next()
+        .unwrap()?;
+
+    let (selkie_rgba, sw, sh) = svg_to_rgba_at_width(selkie_svg, rw)?;
+
+    let selkie_gray = rgba_to_grayscale(&selkie_rgba);
+    let reference_gray = rgba_to_grayscale(&reference_rgba);
+    let ssim = calculate_ssim_registered(&selkie_gray, sw, sh, &reference_gray, rw, rh);
+
+    Ok(VisualComparison {
+        ssim,
+        selkie_dims: (sw, sh),
+        reference_dims: (rw, rh),
+    })
 }
 
 /// Calculate visual similarity between two SVGs
@@ -678,11 +769,17 @@ pub fn write_comparison_pngs(
 
     let reference_rgbas = sources_to_rgba_batch_cached(&source_texts, cache);
 
-    // Render all selkie SVGs to RGBA (fast, uses resvg in-process)
+    // Render all selkie SVGs to RGBA (fast, uses resvg in-process).
+    // Render at the reference PNG's pixel width so SSIM compares two
+    // anti-aliased rasters at a matched scale.
     eprint!(" rendering selkie...");
     let selkie_rgbas: Vec<Result<RgbaImage, String>> = comparisons
         .iter()
-        .map(|(_, _, _, selkie_svg, _)| svg_to_rgba(selkie_svg))
+        .enumerate()
+        .map(|(i, (_, _, _, selkie_svg, _))| match &reference_rgbas[i] {
+            Ok((_, rw, _)) => svg_to_rgba_at_width(selkie_svg, *rw),
+            Err(_) => svg_to_rgba(selkie_svg),
+        })
         .collect();
 
     eprint!(" compositing...");
@@ -719,7 +816,7 @@ pub fn write_comparison_pngs(
         // Calculate visual similarity between renderings
         let selkie_gray = rgba_to_grayscale(selkie_rgba);
         let reference_gray = rgba_to_grayscale(reference_rgba);
-        let ssim = calculate_ssim_with_resize(&selkie_gray, sw, sh, &reference_gray, rw, rh);
+        let ssim = calculate_ssim_registered(&selkie_gray, sw, sh, &reference_gray, rw, rh);
 
         // Create side-by-side comparison PNG from pre-rendered RGBA data
         let png_data =
@@ -766,6 +863,15 @@ pub fn svg_to_rgba(_svg: &str) -> Result<(Vec<u8>, u32, u32), String> {
 
 #[cfg(not(feature = "png"))]
 pub fn compare_svgs(_selkie_svg: &str, _reference_svg: &str) -> Result<VisualComparison, String> {
+    Err("PNG feature not enabled. Build with --features png".to_string())
+}
+
+#[cfg(not(feature = "png"))]
+pub fn compare_svg_to_reference_source(
+    _selkie_svg: &str,
+    _reference_source: &str,
+    _cache: &super::cache::ReferenceCache,
+) -> Result<VisualComparison, String> {
     Err("PNG feature not enabled. Build with --features png".to_string())
 }
 
@@ -865,6 +971,52 @@ mod tests {
 
         let result = svg_to_png(svg);
         assert!(result.is_ok(), "Mermaid-style foreignObject should render");
+    }
+
+    #[test]
+    #[cfg(feature = "png")]
+    fn test_svg_to_rgba_at_width_scales_to_target() {
+        let svg = r#"<svg xmlns="http://www.w3.org/2000/svg" width="100" height="80">
+            <rect x="10" y="10" width="80" height="60" fill="blue"/>
+        </svg>"#;
+
+        let (data, w, h) = svg_to_rgba_at_width(svg, 50).unwrap();
+        assert_eq!(w, 50);
+        assert_eq!(h, 40);
+        assert_eq!(data.len(), (50 * 40 * 4) as usize);
+    }
+
+    #[test]
+    #[cfg(feature = "png")]
+    fn test_matched_scale_ssim_high_for_identical_content() {
+        use super::super::ssim::calculate_ssim_with_resize;
+
+        // Fine 1px strokes alias badly when one raster is point-sampled down
+        // to the other's size. Rendering at matched scale (anti-aliased) plus
+        // box-filter resizing must keep SSIM near 1.0 for identical content.
+        let mut svg =
+            String::from(r#"<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">"#);
+        for i in 0..40 {
+            svg.push_str(&format!(
+                r#"<line x1="0" y1="{y}" x2="200" y2="{y}" stroke="black" stroke-width="1"/>"#,
+                y = i * 5
+            ));
+        }
+        svg.push_str("</svg>");
+
+        // Intrinsic-size render vs a render simulating the reference raster
+        // scale (e.g. mmdc's ~784px viewport vs a wider SVG).
+        let (a_rgba, aw, ah) = svg_to_rgba(&svg).unwrap();
+        let (b_rgba, bw, bh) = svg_to_rgba_at_width(&svg, 117).unwrap();
+
+        let a_gray = rgba_to_grayscale(&a_rgba);
+        let b_gray = rgba_to_grayscale(&b_rgba);
+        let ssim = calculate_ssim_with_resize(&a_gray, aw, ah, &b_gray, bw, bh);
+
+        assert!(
+            ssim > 0.9,
+            "identical content at different raster scales must score near 1.0, got {ssim}"
+        );
     }
 
     #[test]

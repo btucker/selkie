@@ -1,8 +1,8 @@
 //! Flowchart adapter for layout
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-use crate::diagrams::flowchart::{Direction, FlowVertexType, FlowchartDb};
+use crate::diagrams::flowchart::{Direction, FlowTextType, FlowVertexType, FlowchartDb};
 use crate::error::Result;
 use crate::layout::{
     LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode, LayoutOptions, NodeShape, NodeSizeConfig,
@@ -26,15 +26,19 @@ impl ToLayoutGraph for FlowchartDb {
 
         // Build map of node_id -> subgraph_id for setting parent relationships
         let mut node_to_subgraph: HashMap<&str, &str> = HashMap::new();
+        let subgraph_ids: HashSet<&str> =
+            self.subgraphs().iter().map(|sg| sg.id.as_str()).collect();
         for subgraph in self.subgraphs() {
             for node_id in &subgraph.nodes {
                 node_to_subgraph.insert(node_id.as_str(), subgraph.id.as_str());
             }
         }
 
-        // Add subgraph nodes first (compound parent nodes)
+        // Add subgraph nodes first (compound parent nodes) in REVERSE
+        // definition order, matching mermaid's flowDb.getData() which pushes
+        // subgraphs with `for (let i = subGraphs.length - 1; i >= 0; i--)`.
         // These have zero dimensions initially - they're calculated from children by layout
-        for subgraph in self.subgraphs() {
+        for subgraph in self.subgraphs().iter().rev() {
             let mut sg_node =
                 LayoutNode::new(&subgraph.id, 0.0, 0.0).with_shape(NodeShape::Rectangle);
 
@@ -48,8 +52,18 @@ impl ToLayoutGraph for FlowchartDb {
                 .metadata
                 .insert("is_group".to_string(), "true".to_string());
 
-            // Store subgraph direction if specified
-            // Note: Full subgraph direction support requires recursive layout (like mermaid.js)
+            // Nest this subgraph inside its parent subgraph when it is a member
+            // of one. Mermaid lists a nested subgraph as a node in its parent's
+            // node list, so the parent cluster encloses it; without this the
+            // inner cluster detaches and the outer cluster collapses to only its
+            // direct leaf nodes.
+            if let Some(&parent_id) = node_to_subgraph.get(subgraph.id.as_str()) {
+                sg_node = sg_node.with_parent(parent_id);
+            }
+
+            // Store subgraph direction if specified. Like mermaid, the
+            // direction only takes effect when the subgraph has no external
+            // connections (it is then extracted and laid out recursively).
             if let Some(ref dir) = subgraph.dir {
                 sg_node.metadata.insert("dir".to_string(), dir.clone());
             }
@@ -57,10 +71,14 @@ impl ToLayoutGraph for FlowchartDb {
             graph.add_node(sg_node);
         }
 
-        // Convert vertices to layout nodes (sorted for deterministic order)
-        let mut vertex_ids: Vec<&String> = self.vertices().keys().collect();
-        vertex_ids.sort();
-        for id in vertex_ids {
+        // Convert vertices to layout nodes in document insertion order.
+        // mermaid adds nodes to dagre in data4Layout.nodes order and dagre's
+        // ordering phase is insertion-order sensitive, so we must not sort.
+        for id in self.vertex_ids_in_order() {
+            if subgraph_ids.contains(id.as_str()) {
+                continue;
+            }
+
             let vertex = self.vertices().get(id).unwrap();
             let shape = vertex
                 .vertex_type
@@ -68,7 +86,18 @@ impl ToLayoutGraph for FlowchartDb {
                 .map(vertex_type_to_shape)
                 .unwrap_or(NodeShape::Rectangle);
 
-            let label = vertex.text.as_deref();
+            // Markdown labels are measured (and stored) as their rendered
+            // visible text: mermaid strips the `**`/`_` emphasis markers before
+            // measuring the label bbox, so the node is sized from "bold and em",
+            // not the source "**bold** and _em_".
+            let stripped_label = match vertex.label_type {
+                FlowTextType::Markdown => vertex
+                    .text
+                    .as_deref()
+                    .map(crate::render::text_utils::strip_markdown_markers),
+                FlowTextType::Text => None,
+            };
+            let label = stripped_label.as_deref().or(vertex.text.as_deref());
             let (width, height) = size_estimator.estimate_node_size(label, shape, &config);
 
             let mut node = LayoutNode::new(id, width, height).with_shape(shape);
@@ -103,12 +132,27 @@ impl ToLayoutGraph for FlowchartDb {
             let mut layout_edge = LayoutEdge::new(&edge_id, &edge.start, &edge.end);
 
             if !edge.text.is_empty() {
-                layout_edge = layout_edge.with_label(&edge.text);
+                // Measure the label before layout (mermaid's insertEdgeLabel):
+                // the raw text bbox, with no extra padding. Markdown edge labels
+                // are measured/stored as their marker-stripped visible text.
+                let edge_label = match edge.label_type {
+                    FlowTextType::Markdown => {
+                        crate::render::text_utils::strip_markdown_markers(&edge.text)
+                    }
+                    FlowTextType::Text => edge.text.clone(),
+                };
+                let (label_w, label_h) =
+                    size_estimator.estimate_text_size(&edge_label, config.font_size);
+                layout_edge = layout_edge
+                    .with_label(&edge_label)
+                    .with_label_size(label_w, label_h);
             }
 
-            // Set weight based on length hint
+            // Map the edge's dash count (`----`) to the dagre minlen so extra
+            // dashes add rank separation and lengthen the edge, mirroring
+            // mermaid (flowDb.ts: `minlen: rawEdge.length`).
             if let Some(length) = edge.length {
-                layout_edge = layout_edge.with_weight(length);
+                layout_edge = layout_edge.with_minlen(length);
             }
 
             // Store edge type for rendering
@@ -165,8 +209,8 @@ mod tests {
         db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Round));
         db.add_vertex_simple("B", Some("Process"), Some(FlowVertexType::Rect));
         db.add_vertex_simple("C", Some("Decision"), Some(FlowVertexType::Diamond));
-        db.add_edge("A", "B", "-->", None, None);
-        db.add_edge("B", "C", "-->", None, None);
+        db.add_edge("A", "B", "-->", "-->", None, None);
+        db.add_edge("B", "C", "-->", "-->", None, None);
 
         let estimator = CharacterSizeEstimator::default();
         let graph = db.to_layout_graph(&estimator).unwrap();
@@ -184,6 +228,110 @@ mod tests {
     }
 
     #[test]
+    fn test_markdown_label_measured_with_markers_stripped() {
+        // mermaid measures the rendered markdown label ("bold and em"), not the
+        // source markers ("**bold** and _em_"). Reference node A renders as
+        // 149.953 x 54 (bbox 89.953 + 4*15 padding); measuring the raw markers
+        // would inflate the node to ~205px wide.
+        use crate::diagrams::flowchart::FlowText;
+        use crate::layout::TrebuchetSizeEstimator;
+
+        let mut db = FlowchartDb::new();
+        db.set_direction("TD");
+        db.add_vertex(
+            "A",
+            Some(FlowText::markdown("**bold** and _em_")),
+            Some(FlowVertexType::Square),
+            vec![],
+            vec![],
+            None,
+            None,
+        );
+        db.add_vertex_simple("B", Some("Next"), Some(FlowVertexType::Square));
+        db.add_edge("A", "B", "-->", "-->", None, None);
+
+        let estimator = TrebuchetSizeEstimator::new();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        let node_a = graph.get_node("A").unwrap();
+        assert!(
+            (node_a.width - 149.953125).abs() <= 2.0,
+            "markdown node A should be sized from stripped text (~149.95), got {}",
+            node_a.width
+        );
+        // The stored label is the visible text, not the source markers.
+        assert_eq!(node_a.label.as_deref(), Some("bold and em"));
+    }
+
+    #[test]
+    fn test_layout_graph_preserves_document_order() {
+        // mermaid feeds nodes to dagre in document order (data4Layout.nodes
+        // insertion order); dagre's ordering phase is insertion-order
+        // sensitive, so the adapter must not alphabetize vertices.
+        let mut db = FlowchartDb::new();
+        db.add_vertex_simple("B", None, None);
+        db.add_vertex_simple("A", None, None);
+        db.add_vertex_simple("C", None, None);
+        db.add_edge("B", "A", "-->", "-->", None, None);
+        db.add_edge("B", "C", "-->", "-->", None, None);
+
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        let ids: Vec<&str> = graph.nodes.iter().map(|n| n.id.as_str()).collect();
+        assert_eq!(ids, vec!["B", "A", "C"]);
+    }
+
+    #[test]
+    fn test_layout_graph_subgraphs_in_reverse_definition_order() {
+        // mermaid's flowDb.getData() pushes subgraph nodes in REVERSE
+        // definition order (for i = subGraphs.length - 1; i >= 0; i--),
+        // then vertices in document order.
+        let mut db = FlowchartDb::new();
+        db.add_vertex_simple("A", None, None);
+        db.add_vertex_simple("B", None, None);
+        db.add_subgraph_with_nodes("First", "First", vec!["A".to_string()]);
+        db.add_subgraph_with_nodes("Second", "Second", vec!["B".to_string()]);
+
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        let ids: Vec<&str> = graph.nodes.iter().map(|n| n.id.as_str()).collect();
+        assert_eq!(ids, vec!["Second", "First", "A", "B"]);
+    }
+
+    #[test]
+    fn test_edge_labels_measured_with_estimator() {
+        // Edge labels must be measured pre-layout via the size estimator
+        // (mirroring mermaid's insertEdgeLabel), not via char-count heuristics.
+        // Reference bbox for 'Link text' at 16px trebuchet: 63.734375 x 24.
+        use crate::layout::TrebuchetSizeEstimator;
+
+        let mut db = FlowchartDb::new();
+        db.set_direction("TB");
+        db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Rect));
+        db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
+        db.add_edge("A", "B", "-->", "-->", Some("Link text"), None);
+
+        let estimator = TrebuchetSizeEstimator::new();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        let edge = &graph.edges[0];
+        assert_eq!(edge.label.as_deref(), Some("Link text"));
+        assert!(
+            (edge.label_width - 63.734375).abs() <= 2.0,
+            "edge label width should be ~63.73, got {}",
+            edge.label_width
+        );
+        assert!(
+            (edge.label_height - 24.0).abs() <= 0.001,
+            "edge label height should be 24, got {}",
+            edge.label_height
+        );
+    }
+
+    #[test]
+    /// @spec FLOW-1.3: When a flowchart contains subgraph member nodes, the application shall preserve parent-child relationships in the layout graph.
     fn test_compound_graph_structure() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
@@ -255,11 +403,12 @@ mod tests {
     }
 
     #[test]
+    /// @spec FLOW-2.1: When a flowchart edge has a Mermaid label, the application shall preserve that label in the layout graph edge model.
     fn test_edge_labels() {
         let mut db = FlowchartDb::new();
         db.add_vertex_simple("A", Some("Start"), None);
         db.add_vertex_simple("B", Some("End"), None);
-        db.add_edge("A", "B", "-->", Some("Yes"), None);
+        db.add_edge("A", "B", "-->", "-->", Some("Yes"), None);
 
         let estimator = CharacterSizeEstimator::default();
         let graph = db.to_layout_graph(&estimator).unwrap();
@@ -276,7 +425,7 @@ mod tests {
         db.set_direction("LR");
         db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Round));
         db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
-        db.add_edge("A", "B", "-->", None, None);
+        db.add_edge("A", "B", "-->", "-->", None, None);
 
         let estimator = CharacterSizeEstimator::default();
         let graph = db.to_layout_graph(&estimator).unwrap();
@@ -318,6 +467,39 @@ mod tests {
     }
 
     #[test]
+    fn test_edge_extra_length_increases_edge_span() {
+        use crate::layout;
+
+        // Mermaid maps an edge's dash count (`length`) to the dagre edge
+        // minlen (flowDb.ts: `minlen: rawEdge.length`), so extra dashes add
+        // rank separation and lengthen the edge. A short `A --> B` edge
+        // (length 1) must produce a smaller horizontal span than a long
+        // `A ----> B` edge (length 3) in an LR layout.
+        let span = |arrow: &str| -> f64 {
+            let mut db = FlowchartDb::new();
+            db.set_direction("LR");
+            db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Rect));
+            db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
+            db.add_edge("A", "B", arrow, arrow, None, None);
+
+            let estimator = CharacterSizeEstimator::default();
+            let graph = db.to_layout_graph(&estimator).unwrap();
+            let graph = layout::layout(graph).unwrap();
+
+            let a = graph.get_node("A").unwrap();
+            let b = graph.get_node("B").unwrap();
+            b.x.unwrap() - a.x.unwrap()
+        };
+
+        let short = span("-->");
+        let long = span("---->");
+        assert!(
+            long > short + 50.0,
+            "A ----> B (length 3) should span noticeably wider than A --> B (length 1). short={short:.1}, long={long:.1}"
+        );
+    }
+
+    #[test]
     fn test_decision_branch_ordering_from_parsed_flowchart() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
@@ -347,6 +529,7 @@ mod tests {
     }
 
     #[test]
+    /// @spec FLOW-3.1: When a flowchart edge is rendered to SVG, the application shall emit an SVG path for the edge route.
     fn test_flowchart_svg_has_edge_path() {
         use crate::diagrams::Diagram;
         use crate::render;
@@ -355,7 +538,7 @@ mod tests {
         db.set_direction("LR");
         db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Round));
         db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
-        db.add_edge("A", "B", "-->", None, None);
+        db.add_edge("A", "B", "-->", "-->", None, None);
 
         // Render to SVG
         let diagram = Diagram::Flowchart(db);
@@ -370,10 +553,10 @@ mod tests {
             svg
         );
 
-        // Check for edge-path class
+        // Check for mermaid's edge classes
         assert!(
-            svg.contains("edge-path"),
-            "SVG should contain edge-path class. SVG:\n{}",
+            svg.contains("flowchart-link"),
+            "SVG should contain flowchart-link class. SVG:\n{}",
             svg
         );
 
@@ -386,18 +569,20 @@ mod tests {
     }
 
     #[test]
+    /// @spec FLOW-1.2: When a subgraph declares its own direction, the application shall preserve that direction without changing the parent flowchart direction.
     fn test_subgraph_with_different_direction_end_to_end() {
         use crate::diagrams::flowchart::parse;
         use crate::layout;
 
-        // Parse a flowchart with TB direction but a subgraph with LR direction
-        // This tests the full flow from parsing to layout
+        // Parse a flowchart with TB direction but a subgraph with LR direction.
+        // The subgraph has no external connections, so (like mermaid) it is
+        // extracted and laid out with its declared direction.
         let input = r#"flowchart TB
     subgraph sub1[LR Subgraph]
         direction LR
         A[Node A] --> B[Node B]
     end
-    C[External] --> A"#;
+    C[External] --> D[Other]"#;
 
         let db = parse(input).unwrap();
 
@@ -428,11 +613,9 @@ mod tests {
         // Get positions
         let a = graph.get_node("A").unwrap();
         let b = graph.get_node("B").unwrap();
-        let c = graph.get_node("C").unwrap();
 
         eprintln!("A: x={:?}, y={:?}", a.x, a.y);
         eprintln!("B: x={:?}, y={:?}", b.x, b.y);
-        eprintln!("C: x={:?}, y={:?}", c.x, c.y);
 
         // A and B are in the LR subgraph, so they should be side-by-side
         // (B to the right of A, similar y)
@@ -451,15 +634,6 @@ mod tests {
             "B should be to the right of A in LR subgraph. A.x={:.1}, B.x={:.1}",
             a.x.unwrap(),
             b.x.unwrap()
-        );
-
-        // C is in the TB main graph, so it should be above the subgraph (lower y)
-        let c_center_y = c.y.unwrap() + c.height / 2.0;
-        assert!(
-            c_center_y < a_center_y,
-            "C should be above the subgraph in TB layout. C.y={:.1}, A.y={:.1}",
-            c_center_y,
-            a_center_y
         );
     }
 }

@@ -12,6 +12,12 @@ pub struct SvgStructure {
     pub width: f64,
     /// Height of the SVG (from viewBox or height attribute)
     pub height: f64,
+    /// viewBox origin (min-x, min-y). Selkie emits viewBox="-8 -8 w h" while
+    /// mermaid emits viewBox="0 0 w h" with padding baked into coordinates;
+    /// both render identically. All extracted geometry is normalized by
+    /// subtracting this origin so coordinates are comparable across renderers.
+    #[serde(default)]
+    pub viewbox_origin: (f64, f64),
     /// Number of node elements detected
     pub node_count: usize,
     /// Number of edge elements detected
@@ -129,6 +135,47 @@ pub struct EdgeGeometry {
     pub horizontal_attachments: usize,
     /// Detailed edge attachment information
     pub edge_details: Vec<EdgeDetail>,
+    /// Edge identifiers, parallel to `edge_endpoints`.
+    ///
+    /// Reference (mermaid) paths carry `id="L_<src>_<dst>_<n>"`; selkie wraps
+    /// each path in `<g class="edge" id="edge-L-<src>-<dst>-<n>">`. Storing the
+    /// raw identifier lets eval pair the same logical edge across renderers
+    /// instead of relying on document order.
+    pub edge_ids: Vec<Option<String>>,
+}
+
+impl EdgeGeometry {
+    /// Translate all absolute coordinates by (dx, dy).
+    ///
+    /// Used to normalize out the viewBox origin so geometry extracted from
+    /// SVGs with different viewBox conventions lives in the same space.
+    /// Relative measurements (widths, heights, offsets) are unaffected.
+    pub fn translate(&mut self, dx: f64, dy: f64) {
+        for (x1, y1, x2, y2) in &mut self.edge_endpoints {
+            *x1 += dx;
+            *y1 += dy;
+            *x2 += dx;
+            *y2 += dy;
+        }
+        for dir in self.edge_initial_directions.iter_mut().flatten() {
+            dir.0 += dx;
+            dir.1 += dy;
+        }
+        for bounds in &mut self.node_bounds {
+            bounds.x += dx;
+            bounds.y += dy;
+        }
+        for text in &mut self.text_bounds {
+            text.x += dx;
+            text.y += dy;
+        }
+        for detail in &mut self.edge_details {
+            detail.start.0 += dx;
+            detail.start.1 += dy;
+            detail.end.0 += dx;
+            detail.end.1 += dy;
+        }
+    }
 }
 
 /// Detailed information about a single edge
@@ -206,8 +253,8 @@ impl SvgStructure {
             return Err("Root element is not <svg>".to_string());
         }
 
-        // Parse dimensions
-        let (width, height) = parse_dimensions(&root);
+        // Parse dimensions and viewBox origin
+        let (origin_x, origin_y, width, height) = parse_dimensions(&root);
 
         // Count shapes
         let shapes = count_shapes(&doc);
@@ -231,8 +278,13 @@ impl SvgStructure {
         // Analyze stroke widths
         let stroke_analysis = analyze_stroke_widths(&doc);
 
-        // Analyze edge geometry
-        let edge_geometry = analyze_edge_geometry(&doc);
+        // Analyze edge geometry, normalized to a zero viewBox origin so
+        // geometry from renderers with different viewBox conventions
+        // (mermaid "0 0 w h" vs selkie "-8 -8 w h") is directly comparable.
+        let mut edge_geometry = analyze_edge_geometry(&doc);
+        if origin_x != 0.0 || origin_y != 0.0 {
+            edge_geometry.translate(-origin_x, -origin_y);
+        }
 
         // Analyze font styles
         let font_analysis = analyze_fonts(&doc);
@@ -243,6 +295,7 @@ impl SvgStructure {
         Ok(SvgStructure {
             width,
             height,
+            viewbox_origin: (origin_x, origin_y),
             node_count,
             edge_count,
             labels,
@@ -262,7 +315,9 @@ impl SvgStructure {
 
 // Helper functions
 
-fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64) {
+/// Parse (min-x, min-y, width, height) from the viewBox, falling back to
+/// width/height attributes with a (0, 0) origin.
+fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64, f64, f64) {
     // Try viewBox first
     if let Some(viewbox) = root.attribute("viewBox") {
         let parts: Vec<f64> = viewbox
@@ -270,7 +325,7 @@ fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64) {
             .filter_map(|s| s.parse().ok())
             .collect();
         if parts.len() >= 4 {
-            return (parts[2], parts[3]);
+            return (parts[0], parts[1], parts[2], parts[3]);
         }
     }
 
@@ -284,7 +339,7 @@ fn parse_dimensions(root: &roxmltree::Node) -> (f64, f64) {
         .and_then(|s| s.trim_end_matches("px").parse().ok())
         .unwrap_or(0.0);
 
-    (width, height)
+    (0.0, 0.0, width, height)
 }
 
 fn count_shapes(doc: &roxmltree::Document) -> ShapeCounts {
@@ -559,10 +614,32 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
     for node in doc.descendants() {
         let tag = node.tag_name().name();
 
+        // Skip subtrees that are not rendered directly (arrowhead markers,
+        // defs content, clip paths); their strokes would skew the averages
+        if node
+            .ancestors()
+            .any(|a| matches!(a.tag_name().name(), "defs" | "marker" | "clipPath" | "mask"))
+        {
+            continue;
+        }
+
         // Get stroke-width from inline attribute
         let inline_stroke_width = node
             .attribute("stroke-width")
-            .and_then(|s| s.parse::<f64>().ok());
+            .and_then(|s| s.trim().trim_end_matches("px").parse::<f64>().ok());
+
+        // Get stroke/stroke-width from the inline style attribute (selkie
+        // inlines classDef styles, often with an "!important" suffix)
+        let style = node.attribute("style").unwrap_or("");
+        let style_stroke =
+            extract_style_property(style, "stroke").map(|v| strip_important(&v).to_string());
+        let style_stroke_width = extract_style_property(style, "stroke-width").and_then(|v| {
+            strip_important(&v)
+                .trim_end_matches("px")
+                .trim()
+                .parse::<f64>()
+                .ok()
+        });
 
         // Get stroke-width from CSS class or element type selector
         let class = node.attribute("class").unwrap_or("");
@@ -575,11 +652,14 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
                     .copied()
             });
 
-        // Use inline if present, otherwise CSS, otherwise check if has stroke
-        let stroke_width = inline_stroke_width.or(css_stroke_width);
+        // Inline style wins over the presentation attribute, which wins
+        // over CSS class rules for our purposes
+        let stroke_width = style_stroke_width
+            .or(inline_stroke_width)
+            .or(css_stroke_width);
 
         // Skip elements with stroke explicitly set to "none"
-        if node.attribute("stroke") == Some("none") {
+        if node.attribute("stroke") == Some("none") || style_stroke.as_deref() == Some("none") {
             continue;
         }
 
@@ -588,6 +668,7 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
             .attribute("stroke")
             .map(|s| s != "none")
             .unwrap_or(false)
+            || style_stroke.is_some()
             || stroke_width.is_some()
             || class
                 .split_whitespace()
@@ -601,7 +682,13 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
 
         match tag {
             "rect" => analysis.rect_stroke_widths.push(width),
-            "path" => analysis.path_stroke_widths.push(width),
+            "path" => {
+                // Only average actual edge paths; node-shape outlines and
+                // decorations rendered as <path> would skew the edge signal
+                if is_edge_path_class(class) {
+                    analysis.path_stroke_widths.push(width);
+                }
+            }
             "line" => analysis.line_stroke_widths.push(width),
             _ => {}
         }
@@ -618,6 +705,13 @@ fn analyze_stroke_widths(doc: &roxmltree::Document) -> StrokeAnalysis {
     }
 
     analysis
+}
+
+/// Whether a class attribute marks a <path> as an actual edge/link path
+/// (mermaid uses "flowchart-link" plus "edge-*" classes; selkie uses
+/// "edge-path")
+fn is_edge_path_class(class: &str) -> bool {
+    class.contains("flowchart-link") || class.contains("edge")
 }
 
 /// Extract stroke-width values from CSS <style> blocks
@@ -652,19 +746,27 @@ fn extract_css_stroke_widths(doc: &roxmltree::Document) -> std::collections::Has
                     if let Some(width) = stroke_width {
                         let selector_str = rule.selector.to_string();
 
-                        // Extract class names from selector
-                        for part in selector_str.split(&[' ', ',', '>', '+', '~'][..]) {
-                            let part = part.trim();
-                            if part.starts_with('.') {
-                                let class = part.trim_start_matches('.');
-                                css_strokes.insert(class.to_string(), width);
-                            }
-                            // Also track element type selectors
-                            match part {
+                        for selector in selector_str.split(',') {
+                            let selector = selector.trim();
+
+                            // Bare element type selectors (e.g. "path") match
+                            // every such element. Compound selectors like
+                            // ".root .anchor path" only match specific
+                            // subtrees, so they must NOT map to __element_path
+                            match selector {
                                 "rect" | "path" | "line" | "circle" | "ellipse" => {
-                                    css_strokes.insert(format!("__element_{}", part), width);
+                                    css_strokes.insert(format!("__element_{}", selector), width);
+                                    continue;
                                 }
                                 _ => {}
+                            }
+
+                            // Extract class names from the selector
+                            for part in selector.split(&[' ', '>', '+', '~'][..]) {
+                                let part = part.trim();
+                                if let Some(class) = part.strip_prefix('.') {
+                                    css_strokes.insert(class.to_string(), width);
+                                }
                             }
                         }
                     }
@@ -755,6 +857,12 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                 // Parse transform="translate(x, y)"
                 if let Some(transform) = node.attribute("transform") {
                     if let Some((cx, cy)) = parse_translate(transform) {
+                        // Lift into absolute coordinates: mermaid nests cluster
+                        // nodes under a translated <g class="root">, so the node's
+                        // own translate is only relative to that group.
+                        let (anc_x, anc_y) = accumulate_ancestor_translate(&node);
+                        let cx = cx + anc_x;
+                        let cy = cy + anc_y;
                         let mut found_bounds = false;
 
                         // Find path element in children or grandchildren (timeline nodes nest paths deeper)
@@ -917,10 +1025,18 @@ fn analyze_edge_geometry(doc: &roxmltree::Document) -> EdgeGeometry {
                 if let Some(d) = node.attribute("d") {
                     // Use parse_path_with_directions to capture initial direction for curved paths
                     if let Some((start, second_point, end)) = parse_path_with_directions(d) {
+                        // Lift path endpoints into absolute coordinates: mermaid
+                        // nests in-cluster edges under a translated <g class="root">,
+                        // so their `d` coordinates are relative to that group.
+                        let (anc_x, anc_y) = accumulate_ancestor_translate(&node);
+                        let start = (start.0 + anc_x, start.1 + anc_y);
+                        let end = (end.0 + anc_x, end.1 + anc_y);
+                        let second_point = second_point.map(|(x, y)| (x + anc_x, y + anc_y));
                         geometry
                             .edge_endpoints
                             .push((start.0, start.1, end.0, end.1));
                         geometry.edge_initial_directions.push(second_point);
+                        geometry.edge_ids.push(extract_edge_id(&node));
 
                         // Find best matching nodes for start and end
                         let mut best_start: Option<AttachmentInfo> = None;
@@ -1231,6 +1347,57 @@ fn classify_attachment(point: (f64, f64), bounds: &NodeBounds) -> (AttachmentTyp
 }
 
 /// Parse transform="translate(x, y)" or "translate(x,y)"
+/// Sum the `translate()` offsets of every ancestor group of `node`.
+///
+/// Walks from the node's parent upward, so the node's OWN transform is not
+/// included. Mermaid nests cluster/subgraph content under
+/// `<g class="root" transform="translate(...)">`, so geometry parsed from a
+/// path or node inside such a group is expressed in a local frame; adding the
+/// accumulated ancestor offset lifts it back into absolute coordinates so it
+/// can be compared against selkie output (which is already absolute).
+fn accumulate_ancestor_translate(node: &roxmltree::Node) -> (f64, f64) {
+    let mut tx = 0.0;
+    let mut ty = 0.0;
+    let mut current = node.parent();
+    while let Some(parent) = current {
+        if let Some(transform) = parent.attribute("transform") {
+            if let Some((dx, dy)) = parse_translate(transform) {
+                tx += dx;
+                ty += dy;
+            }
+        }
+        current = parent.parent();
+    }
+    (tx, ty)
+}
+
+/// Extract a stable edge identifier for cross-renderer pairing.
+///
+/// Prefers an explicit `data-id`/`id` on the path itself (mermaid emits
+/// `id="L_<src>_<dst>_<n>"`), then falls back to a wrapping
+/// `<g class="edge" id="edge-L-<src>-<dst>-<n>">` (selkie's structure).
+fn extract_edge_id(node: &roxmltree::Node) -> Option<String> {
+    if let Some(id) = node.attribute("data-id") {
+        return Some(id.to_string());
+    }
+    if let Some(id) = node.attribute("id") {
+        return Some(id.to_string());
+    }
+    let mut current = node.parent();
+    while let Some(parent) = current {
+        if parent.tag_name().name() == "g" {
+            let class = parent.attribute("class").unwrap_or("");
+            if class.contains("edge") {
+                if let Some(id) = parent.attribute("id") {
+                    return Some(id.to_string());
+                }
+            }
+        }
+        current = parent.parent();
+    }
+    None
+}
+
 fn parse_translate(transform: &str) -> Option<(f64, f64)> {
     // Look for translate(x, y) pattern
     if let Some(start) = transform.find("translate(") {
@@ -1782,18 +1949,22 @@ fn analyze_colors(doc: &roxmltree::Document) -> ColorAnalysis {
         }
 
         // Also check inline style attribute for fill/stroke
+        // Strip "!important" (selkie inlines classDef styles with it) so the
+        // color matches the reference's CSS-declared color after normalization
         if let Some(style) = node.attribute("style") {
             if let Some(fill) = extract_style_property(style, "fill") {
+                let fill = strip_important(&fill);
                 if fill != "none" && !fill.is_empty() {
-                    fill_colors.insert(normalize_color(&fill));
+                    fill_colors.insert(normalize_color(fill));
                     if shape_tags.contains(&tag) {
                         fill_count += 1;
                     }
                 }
             }
             if let Some(stroke) = extract_style_property(style, "stroke") {
+                let stroke = strip_important(&stroke);
                 if stroke != "none" && !stroke.is_empty() {
-                    stroke_colors.insert(normalize_color(&stroke));
+                    stroke_colors.insert(normalize_color(stroke));
                     if shape_tags.contains(&tag) {
                         stroke_count += 1;
                     }
@@ -1825,6 +1996,11 @@ fn extract_css_colors(
     fill_colors: &mut std::collections::HashSet<String>,
     stroke_colors: &mut std::collections::HashSet<String>,
 ) {
+    // Selectors that only match elements never rendered in a successful
+    // diagram (mermaid ships these rules in every stylesheet). Colors from
+    // rules that exclusively target them must not count as rendered colors.
+    const DEAD_RULE_CLASSES: [&str; 4] = [".error-icon", ".error-text", ".katex", ".label-icon"];
+
     // Parse CSS rules to extract fill and stroke colors
     // Format: selector { property: value; ... }
     for rule in css_text.split('}') {
@@ -1834,7 +2010,18 @@ fn extract_css_colors(
         }
 
         if let Some(brace_pos) = rule.find('{') {
+            let selector = rule[..brace_pos].trim();
             let properties = rule[brace_pos + 1..].trim();
+
+            // Skip rules whose every selector targets a dead (never-rendered)
+            // element class
+            if !selector.is_empty()
+                && selector
+                    .split(',')
+                    .all(|sel| DEAD_RULE_CLASSES.iter().any(|dead| sel.contains(dead)))
+            {
+                continue;
+            }
 
             for prop in properties.split(';') {
                 let prop = prop.trim();
@@ -1857,7 +2044,7 @@ fn extract_css_colors(
                     }
 
                     // Extract color value (handle "!important" suffix)
-                    let color_value = value.split('!').next().unwrap_or(value).trim();
+                    let color_value = strip_important(value);
                     if color_value.is_empty() {
                         continue;
                     }
@@ -1902,7 +2089,7 @@ fn detect_text_visibility_issues(doc: &roxmltree::Document) -> Vec<TextVisibilit
                         for prop in properties.split(';') {
                             let prop = prop.trim();
                             if let Some(fill_value) = prop.strip_prefix("fill:") {
-                                let fill_value = fill_value.trim().to_lowercase();
+                                let fill_value = normalize_color(strip_important(fill_value));
 
                                 // Handle multiple selectors (e.g., ".class1, .class2")
                                 for sel in selector.split(',') {
@@ -2007,9 +2194,24 @@ fn get_text_content(node: &roxmltree::Node) -> String {
 }
 
 /// Normalize a color string for comparison
-/// Converts to lowercase and handles common formats
+/// Converts to lowercase, expands shorthand hex (#333 -> #333333),
+/// and handles common formats
 fn normalize_color(color: &str) -> String {
     let color = color.trim().to_lowercase();
+
+    // Expand 3/4-digit hex shorthand to 6/8-digit so #333 == #333333
+    if let Some(hex) = color.strip_prefix('#') {
+        if (hex.len() == 3 || hex.len() == 4) && hex.chars().all(|c| c.is_ascii_hexdigit()) {
+            let mut expanded = String::with_capacity(1 + hex.len() * 2);
+            expanded.push('#');
+            for c in hex.chars() {
+                expanded.push(c);
+                expanded.push(c);
+            }
+            return expanded;
+        }
+        return color;
+    }
 
     // Handle rgb/rgba by converting to canonical form
     if color.starts_with("rgb") {
@@ -2029,6 +2231,11 @@ fn normalize_color(color: &str) -> String {
     } else {
         color
     }
+}
+
+/// Strip a trailing "!important" (and surrounding whitespace) from a CSS value
+fn strip_important(value: &str) -> &str {
+    value.split('!').next().unwrap_or(value).trim()
 }
 
 /// Extract a property value from an inline style string
@@ -2629,6 +2836,305 @@ mod tests {
             !has_partial,
             "Should not extract partial label from first text node only. Got: {:?}",
             structure.labels
+        );
+    }
+
+    #[test]
+    fn test_normalize_color_expands_short_hex() {
+        // Shorthand hex must compare equal to its full form:
+        // mermaid CSS uses #333 while selkie inlines #333333
+        assert_eq!(normalize_color("#333"), "#333333");
+        assert_eq!(normalize_color("#FFF"), "#ffffff");
+        assert_eq!(normalize_color("#000"), "#000000");
+        assert_eq!(normalize_color("#9f6"), "#99ff66");
+        // 4-digit hex (with alpha) expands to 8 digits
+        assert_eq!(normalize_color("#000f"), "#000000ff");
+        // Full-length hex is just lowercased
+        assert_eq!(normalize_color("#EcEcFF"), "#ececff");
+        // Non-hex values are unaffected
+        assert_eq!(normalize_color("red"), "red");
+    }
+
+    #[test]
+    fn test_analyze_colors_strips_important_from_inline_styles() {
+        // Selkie inlines classDef styles with !important; the analyzer must
+        // strip the suffix so the color matches the reference's CSS color.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <rect style="fill:#9f6 !important;stroke:#333 !important" width="80" height="40"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let colors = &structure.color_analysis;
+
+        assert!(
+            colors.fill_colors.contains(&"#99ff66".to_string()),
+            "Inline style fill with !important should normalize to #99ff66. Got: {:?}",
+            colors.fill_colors
+        );
+        assert!(
+            colors.stroke_colors.contains(&"#333333".to_string()),
+            "Inline style stroke with !important should normalize to #333333. Got: {:?}",
+            colors.stroke_colors
+        );
+        assert!(
+            !colors
+                .fill_colors
+                .iter()
+                .chain(colors.stroke_colors.iter())
+                .any(|c| c.contains('!')),
+            "No extracted color should retain the !important suffix. fills: {:?}, strokes: {:?}",
+            colors.fill_colors,
+            colors.stroke_colors
+        );
+    }
+
+    #[test]
+    fn test_css_colors_from_dead_rules_are_skipped() {
+        // Mermaid stylesheets always contain rules for elements that never
+        // appear in a successful render (.error-icon, .error-text, .katex,
+        // .label-icon). Their colors must not count as "rendered" colors.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <style>
+                #m .error-icon { fill: #552222; }
+                #m .error-text { fill: #552222; stroke: #552222; }
+                #m .katex { fill: #111111; }
+                #m .label-icon { fill: #222222; }
+                #m .node rect { fill: #ECECFF; stroke: #9370DB; }
+            </style>
+            <g class="node"><rect width="80" height="40"/></g>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let colors = &structure.color_analysis;
+
+        assert!(
+            colors.fill_colors.contains(&"#ececff".to_string()),
+            "Live CSS rule colors should be extracted. Got: {:?}",
+            colors.fill_colors
+        );
+        for dead in ["#552222", "#111111", "#222222"] {
+            assert!(
+                !colors.fill_colors.contains(&dead.to_string()),
+                "Dead-rule color {} should not be extracted. Got: {:?}",
+                dead,
+                colors.fill_colors
+            );
+        }
+        assert!(
+            !colors.stroke_colors.contains(&"#552222".to_string()),
+            "Dead-rule stroke color should not be extracted. Got: {:?}",
+            colors.stroke_colors
+        );
+    }
+
+    #[test]
+    fn test_stroke_analysis_skips_defs_and_marker_paths() {
+        // Arrowhead marker paths live in <defs> and are not part of the
+        // rendered edge strokes; they must not pollute path averages.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <defs>
+                <marker id="arrow"><path d="M0,0 L10,5 L0,10 z" stroke="#333" stroke-width="1"/></marker>
+            </defs>
+            <marker id="arrow2"><path d="M0,0 L10,5" stroke="#333" stroke-width="0.5"/></marker>
+            <path class="edge-thickness-normal flowchart-link" d="M0,0 L50,50" stroke="#333" stroke-width="2"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![2.0],
+            "Only the rendered edge path should be counted. Got: {:?}",
+            strokes.path_stroke_widths
+        );
+        assert!(
+            (strokes.avg_path_stroke - 2.0).abs() < 1e-9,
+            "Average path stroke should be 2.0, got {}",
+            strokes.avg_path_stroke
+        );
+    }
+
+    #[test]
+    fn test_stroke_analysis_only_counts_edge_paths() {
+        // Node-shape paths (e.g. rough.js outlines, decorations) must not be
+        // averaged with edge strokes.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <path class="basic label-container" d="M0,0 L10,10" stroke="#9370db" stroke-width="1.3"/>
+            <path class="edge-path" d="M0,0 L50,50" stroke="#333" stroke-width="2"/>
+            <path class="edge-thickness-normal edge-pattern-solid flowchart-link" d="M0,0 L60,60" stroke="#333" stroke-width="2"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![2.0, 2.0],
+            "Only edge paths should be counted. Got: {:?}",
+            strokes.path_stroke_widths
+        );
+    }
+
+    #[test]
+    fn test_stroke_analysis_reads_inline_style_stroke_width() {
+        // Selkie inlines classDef stroke-widths in the style attribute.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <path class="edge-path" d="M0,0 L50,50" style="stroke:#333 !important;stroke-width:2px !important"/>
+            <rect width="80" height="40" style="stroke:#333;stroke-width:4px"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![2.0],
+            "Edge path stroke-width should be parsed from inline style. Got: {:?}",
+            strokes.path_stroke_widths
+        );
+        assert_eq!(
+            strokes.rect_stroke_widths,
+            vec![4.0],
+            "Rect stroke-width should be parsed from inline style. Got: {:?}",
+            strokes.rect_stroke_widths
+        );
+    }
+
+    #[cfg(feature = "eval")]
+    #[test]
+    fn test_css_element_stroke_width_ignores_compound_selectors() {
+        // '.root .anchor path { stroke-width: 10 }' only matches specific
+        // subtrees; it must not apply to every <path> in the document.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <style>.root .anchor path { stroke-width: 10px; }</style>
+            <path class="flowchart-link" d="M0,0 L50,50" stroke="#333"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![1.0],
+            "Compound selector stroke-width must not apply to unrelated paths. Got: {:?}",
+            strokes.path_stroke_widths
+        );
+    }
+
+    #[cfg(feature = "eval")]
+    #[test]
+    fn test_css_bare_element_stroke_width_still_applies() {
+        // A bare 'path' selector does match every path.
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <style>path { stroke-width: 3px; }</style>
+            <path class="flowchart-link" d="M0,0 L50,50" stroke="#333"/>
+        </svg>"##;
+
+        let structure = SvgStructure::from_svg(svg).unwrap();
+        let strokes = &structure.stroke_analysis;
+
+        assert_eq!(
+            strokes.path_stroke_widths,
+            vec![3.0],
+            "Bare element selector stroke-width should apply. Got: {:?}",
+            strokes.path_stroke_widths
+        );
+    }
+
+    #[test]
+    fn test_viewbox_origin_normalized_out_of_geometry() {
+        // Mermaid convention: viewBox origin "0 0" with padding baked into
+        // element coordinates. Selkie convention: viewBox origin "-8 -8" with
+        // content starting at 0. Both render identically, so the extracted
+        // geometry must be identical after normalization.
+        let zero_origin = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+            <rect class="node" id="a" x="10" y="10" width="80" height="40"/>
+            <rect class="node" id="b" x="210" y="150" width="80" height="40"/>
+            <path class="edge" d="M90,50L210,150"/>
+        </svg>"##;
+        let negative_origin = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 300 200">
+            <rect class="node" id="a" x="2" y="2" width="80" height="40"/>
+            <rect class="node" id="b" x="202" y="142" width="80" height="40"/>
+            <path class="edge" d="M82,42L202,142"/>
+        </svg>"##;
+
+        let zero = SvgStructure::from_svg(zero_origin).unwrap();
+        let neg = SvgStructure::from_svg(negative_origin).unwrap();
+
+        assert_eq!(zero.viewbox_origin, (0.0, 0.0));
+        assert_eq!(neg.viewbox_origin, (-8.0, -8.0));
+
+        assert_eq!(
+            zero.edge_geometry.edge_endpoints, neg.edge_geometry.edge_endpoints,
+            "Edge endpoints must be identical after viewBox origin normalization"
+        );
+        assert_eq!(
+            zero.edge_geometry.node_bounds, neg.edge_geometry.node_bounds,
+            "Node bounds must be identical after viewBox origin normalization"
+        );
+        // Both must be in the zero-origin coordinate space
+        assert_eq!(
+            zero.edge_geometry.edge_endpoints[0],
+            (90.0, 50.0, 210.0, 150.0)
+        );
+    }
+
+    #[test]
+    fn test_in_cluster_geometry_lifted_to_absolute_coords() {
+        // Mermaid nests cluster/subgraph content under a translated
+        // <g class="root" transform="translate(...)">. An in-cluster edge path
+        // and node carry coordinates that are LOCAL to that group; geometry
+        // extraction must lift them into absolute coordinates so they line up
+        // with selkie output (which is already absolute). Without accumulating
+        // the ancestor translate, endpoints stay at their local values and the
+        // comparison is off by the cluster offset (the source of the 8-51x
+        // eval-similarity inflation on multi-cluster diagrams).
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+            <g class="root">
+                <g class="nodes">
+                    <g class="root" transform="translate(100, 50)">
+                        <g class="edgePaths">
+                            <path class="edge" id="L_A_B_0" d="M10,10L60,10"/>
+                        </g>
+                        <g class="nodes">
+                            <g class="node" id="id-A" transform="translate(10, 10)">
+                                <path d="M-40 -20 L40 -20 L40 20 L-40 20"/>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </svg>"##;
+
+        let s = SvgStructure::from_svg(svg).unwrap();
+
+        // Edge endpoints: local (10,10)->(60,10) + ancestor translate(100,50).
+        assert_eq!(
+            s.edge_geometry.edge_endpoints[0],
+            (110.0, 60.0, 160.0, 60.0),
+            "In-cluster edge endpoints must be lifted into absolute coordinates"
+        );
+
+        // Edge identifier preserved for cross-renderer pairing.
+        assert_eq!(
+            s.edge_geometry.edge_ids[0].as_deref(),
+            Some("L_A_B_0"),
+            "Edge id must be captured for id-based pairing"
+        );
+
+        // Node bounds: own translate(10,10) + ancestor translate(100,50) =
+        // center (110,60); rect half-extents 40x20 -> top-left (70,40), 80x40.
+        let node = s
+            .edge_geometry
+            .node_bounds
+            .iter()
+            .find(|b| b.id == "id-A")
+            .expect("in-cluster node should be extracted");
+        assert_eq!(
+            (node.x, node.y, node.width, node.height),
+            (70.0, 40.0, 80.0, 40.0),
+            "In-cluster node bounds must be lifted into absolute coordinates"
         );
     }
 }

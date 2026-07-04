@@ -50,4 +50,6 @@ jobs:
             ${{ runner.os }}-cargo-lint-
             ${{ runner.os }}-cargo-
       - run: cargo fmt --check
+      - run: python3 scripts/generate-specs.py --check
+      - run: python3 scripts/generate-corpus.py --all --check
       - run: cargo clippy --features all-formats -- -D warnings

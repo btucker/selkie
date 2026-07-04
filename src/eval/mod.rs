@@ -9,6 +9,7 @@
 pub mod ascii_checks;
 pub mod cache;
 pub mod checks;
+pub mod failure_families;
 pub mod png;
 pub mod report;
 pub mod runner;

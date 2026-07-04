@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1016" height="1046" viewBox="-8 -8 1016 1046" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-Start-Parallel-0">
+        <path d="M 500.00 89.60 C 500.00 97.93, 500.00 106.27, 500.00 114.60 C 500.00 122.93, 500.00 131.27, 500.00 139.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Parallel-T1-0">
+        <path d="M 383.20 183.15 C 305.47 194.57, 227.73 205.98, 188.87 215.86 C 150.00 225.73, 150.00 234.07, 150.00 242.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Parallel-T2-0">
+        <path d="M 500.00 192.40 C 500.00 200.73, 500.00 209.07, 500.00 217.40 C 500.00 225.73, 500.00 234.07, 500.00 242.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Parallel-T3-0">
+        <path d="M 616.80 183.15 C 694.53 194.57, 772.27 205.98, 811.13 215.86 C 850.00 225.73, 850.00 234.07, 850.00 242.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-T1-Same1-0">
+        <path d="M 150.00 332.00 C 150.00 340.33, 150.00 348.67, 150.00 357.00 C 150.00 365.33, 150.00 373.67, 150.00 382.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-T2-Same2-0">
+        <path d="M 500.00 332.00 C 500.00 340.33, 500.00 348.67, 500.00 357.00 C 500.00 365.33, 500.00 373.67, 500.00 382.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-T3-Same3-0">
+        <path d="M 850.00 332.00 C 850.00 340.33, 850.00 348.67, 850.00 357.00 C 850.00 365.33, 850.00 373.67, 850.00 382.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Same1-Lock1-0">
+        <path d="M 150.00 471.60 C 150.00 479.93, 150.00 488.27, 150.00 496.60 C 150.00 504.93, 150.00 513.27, 150.00 521.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Same2-Lock2-0">
+        <path d="M 500.00 471.60 C 500.00 479.93, 500.00 488.27, 500.00 496.60 C 500.00 504.93, 500.00 513.27, 500.00 521.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Same3-Lock3-0">
+        <path d="M 850.00 471.60 C 850.00 479.93, 850.00 488.27, 850.00 496.60 C 850.00 504.93, 850.00 513.27, 850.00 521.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-Lock1-FirstWins-0">
+        <path d="M 150.00 648.00 C 150.00 656.33, 150.00 664.67, 150.00 676.07 C 150.00 687.47, 150.00 701.93, 150.00 716.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Lock2-Starve2-0">
+        <path d="M 500.00 648.00 C 500.00 656.33, 500.00 664.67, 500.00 673.00 C 500.00 681.33, 500.00 689.67, 500.00 698.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Lock3-Starve3-0">
+        <path d="M 850.00 648.00 C 850.00 656.33, 850.00 664.67, 850.00 673.00 C 850.00 681.33, 850.00 689.67, 850.00 698.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-FirstWins-Works-0">
+        <path d="M 150.00 769.20 C 150.00 783.67, 150.00 798.13, 150.00 812.60 C 150.00 827.07, 150.00 841.53, 150.00 856.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Starve2-Timeout2-0">
+        <path d="M 500.00 787.60 C 500.00 795.93, 500.00 804.27, 500.00 812.60 C 500.00 820.93, 500.00 829.27, 500.00 837.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Starve3-Timeout3-0">
+        <path d="M 850.00 787.60 C 850.00 795.93, 850.00 804.27, 850.00 812.60 C 850.00 820.93, 850.00 829.27, 850.00 837.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Works-Pass-0">
+        <path d="M 150.00 908.80 C 150.00 923.27, 150.00 937.73, 150.00 949.13 C 150.00 960.53, 150.00 968.87, 150.00 977.20" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-Timeout2-Fail2-0">
+        <path d="M 500.00 927.20 C 500.00 935.53, 500.00 943.87, 500.00 952.20 C 500.00 960.53, 500.00 968.87, 500.00 977.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Timeout3-Fail3-0">
+        <path d="M 850.00 927.20 C 850.00 935.53, 850.00 943.87, 850.00 952.20 C 850.00 960.53, 850.00 968.87, 850.00 977.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-Fail2">
+        <rect x="426.4" y="977.2" width="147.2" height="52.8" style="fill:#cc0000 !important;color:#fff !important"/>
+        <text x="500" y="1003.6" class="label" dominant-baseline="central" text-anchor="middle">❌ FLAKY FAIL</text>
+      </g>
+      <g class="node" id="node-Fail3">
+        <rect x="776.4" y="977.2" width="147.2" height="52.8" style="fill:#cc0000 !important;color:#fff !important"/>
+        <text x="850" y="1003.6" class="label" dominant-baseline="central" text-anchor="middle">❌ FLAKY FAIL</text>
+      </g>
+      <g class="node" id="node-FirstWins">
+        <rect x="38" y="716.4" width="224" height="52.8"/>
+        <text x="150" y="742.8" class="label" text-anchor="middle" dominant-baseline="central">Test 1 Acquires Lock</text>
+      </g>
+      <g class="node" id="node-Lock1">
+        <rect x="0" y="521.6" width="300" height="126.39999999999999"/>
+        <text x="150" y="584.8000000000001" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="150" y="584.8000000000001" dy="-1.2em">Try to acquire</tspan><tspan x="150" dy="1.2em">exclusive lock on</tspan><tspan x="150" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+      </g>
+      <g class="node" id="node-Lock2">
+        <rect x="350" y="521.6" width="300" height="126.39999999999999"/>
+        <text x="500" y="584.8000000000001" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="584.8000000000001" dy="-1.2em">Try to acquire</tspan><tspan x="500" dy="1.2em">exclusive lock on</tspan><tspan x="500" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+      </g>
+      <g class="node" id="node-Lock3">
+        <rect x="700" y="521.6" width="300" height="126.39999999999999"/>
+        <text x="850" y="584.8000000000001" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="850" y="584.8000000000001" dy="-1.2em">Try to acquire</tspan><tspan x="850" dy="1.2em">exclusive lock on</tspan><tspan x="850" dy="1.2em">~/.midtown/projects/midtown/channel.jsonl</tspan></text>
+      </g>
+      <g class="node" id="node-Parallel">
+        <rect x="383.2" y="139.6" width="233.6" height="52.8"/>
+        <text x="500" y="166" class="label" text-anchor="middle" dominant-baseline="central">Tests Run in Parallel</text>
+      </g>
+      <g class="node" id="node-Pass">
+        <rect x="105.2" y="977.2" width="89.6" height="52.8" style="fill:#00cc00 !important"/>
+        <text x="150" y="1003.6" class="label" dominant-baseline="central" text-anchor="middle">✅ PASS</text>
+      </g>
+      <g class="node" id="node-Same1">
+        <rect x="52.400000000000006" y="382" width="195.2" height="89.6" style="fill:#ff9999 !important"/>
+        <text x="150" y="426.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="150" y="426.8" dy="-0.6em">Channel::for_repo</tspan><tspan x="150" dy="1.2em">&apos;midtown&apos;</tspan></text>
+      </g>
+      <g class="node" id="node-Same2">
+        <rect x="402.4" y="382" width="195.2" height="89.6" style="fill:#ff9999 !important"/>
+        <text x="500" y="426.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="426.8" dy="-0.6em">Channel::for_repo</tspan><tspan x="500" dy="1.2em">&apos;midtown&apos;</tspan></text>
+      </g>
+      <g class="node" id="node-Same3">
+        <rect x="752.4" y="382" width="195.2" height="89.6" style="fill:#ff9999 !important"/>
+        <text x="850" y="426.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="850" y="426.8" dy="-0.6em">Channel::for_repo</tspan><tspan x="850" dy="1.2em">&apos;midtown&apos;</tspan></text>
+      </g>
+      <g class="node" id="node-Start">
+        <rect x="407.2" y="0" width="185.6" height="89.6"/>
+        <text x="500" y="44.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="500" y="44.8" dy="-0.6em">Test Suite Runs</tspan><tspan x="500" dy="1.2em">cargo test --lib</tspan></text>
+      </g>
+      <g class="node" id="node-Starve2">
+        <rect x="402.4" y="698" width="195.2" height="89.6"/>
+        <text x="500" y="742.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="742.8" dy="-0.6em">Test 2 Waits</tspan><tspan x="500" dy="1.2em">max 2s retry loop</tspan></text>
+      </g>
+      <g class="node" id="node-Starve3">
+        <rect x="752.4" y="698" width="195.2" height="89.6"/>
+        <text x="850" y="742.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="850" y="742.8" dy="-0.6em">Test 3 Waits</tspan><tspan x="850" dy="1.2em">max 2s retry loop</tspan></text>
+      </g>
+      <g class="node" id="node-T1">
+        <rect x="76.4" y="242.39999999999998" width="147.2" height="89.6"/>
+        <text x="150" y="287.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="150" y="287.2" dy="-0.6em">Test 1:</tspan><tspan x="150" dy="1.2em">TempDir::new</tspan></text>
+      </g>
+      <g class="node" id="node-T2">
+        <rect x="426.4" y="242.39999999999998" width="147.2" height="89.6"/>
+        <text x="500" y="287.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="287.2" dy="-0.6em">Test 2:</tspan><tspan x="500" dy="1.2em">TempDir::new</tspan></text>
+      </g>
+      <g class="node" id="node-T3">
+        <rect x="776.4" y="242.39999999999998" width="147.2" height="89.6"/>
+        <text x="850" y="287.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="850" y="287.2" dy="-0.6em">Test 3:</tspan><tspan x="850" dy="1.2em">TempDir::new</tspan></text>
+      </g>
+      <g class="node" id="node-Timeout2">
+        <rect x="388" y="837.6" width="224" height="89.6"/>
+        <text x="500" y="882.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="500" y="882.4" dy="-0.6em">WouldBlock Error</tspan><tspan x="500" dy="1.2em">or TimedOut after 2s</tspan></text>
+      </g>
+      <g class="node" id="node-Timeout3">
+        <rect x="738" y="837.6" width="224" height="89.6"/>
+        <text x="850" y="882.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="850" y="882.4" dy="-0.6em">WouldBlock Error</tspan><tspan x="850" dy="1.2em">or TimedOut after 2s</tspan></text>
+      </g>
+      <g class="node" id="node-Works">
+        <rect x="57.2" y="856" width="185.6" height="52.8"/>
+        <text x="150" y="882.4" class="label" dominant-baseline="central" text-anchor="middle">Test 1 completes</text>
+      </g>
+    </g>
+  </g>
+</svg>

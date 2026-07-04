@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1510.2" height="931.28" viewBox="-8 -28 1510.2 931.28" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-">
+        <rect x="20.000000000000043" y="-20" width="1085.2" height="532.4399999999999" class="cluster"/>
+        <text x="562.6" y="-4" class="cluster-label" text-anchor="middle"></text>
+      </g>
+      <g class="subgraph" id="subgraph-">
+        <rect x="44.000000000000014" y="248.71999999999997" width="1052" height="641.56" class="cluster"/>
+        <text x="570" y="264.71999999999997" class="cluster-label" text-anchor="middle"></text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-TmuxPath-ShellCmd-0">
+        <path d="M 832.80 96.40 C 764.53 114.13, 696.27 131.87, 662.13 158.62 C 628.00 185.37, 628.00 221.15, 628.00 256.92" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-HeadlessPath-TokioCmd-0">
+        <path d="M 163.45 114.60 L 142.40 275.32" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-TmuxPath-SharedLogic-0">
+        <path d="M 935.20 114.60 C 935.20 126.27, 935.20 137.93, 935.20 149.60 C 935.20 161.27, 935.20 172.93, 935.20 184.60" class="edge-path" stroke-dasharray="3,3" stroke-width="2" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-HeadlessPath-SharedLogic-0">
+        <path d="M 273.60 96.27 L 785.20 281.16" class="edge-path" fill="none" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-NewLaunch-HeadlessOut-0">
+        <path d="M 326.93 383.32 C 267.02 431.36, 207.11 479.40, 177.16 527.44 C 147.20 575.48, 147.20 623.52, 147.20 671.56" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-NewLaunch-ShellOut-0">
+        <path d="M 382.80 383.32 C 382.80 431.36, 382.80 479.40, 382.80 527.44 C 382.80 575.48, 382.80 623.52, 382.80 671.56" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-NewLaunch-UnifiedLogic-0">
+        <path d="M 453.04 383.32 L 794.40 612.54" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-SharedLogic-UnifiedLogic-0">
+        <path d="M 935.20 492.44 C 935.20 504.11, 935.20 515.77, 935.20 527.44 C 935.20 539.11, 935.20 550.77, 935.20 562.44" class="edge-path" stroke-width="2" marker-end="url(#arrow_point)" fill="none" stroke-dasharray="3,3"/>
+      </g>
+      <g class="edge" id="edge-L-Risk-UnifiedLogic-0">
+        <path d="M 1344.20 401.72 C 1344.20 443.63, 1344.20 485.53, 1299.50 527.13 C 1254.80 568.73, 1165.40 610.03, 1076.00 651.32" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-TmuxPath-ShellCmd-0">
+        <rect x="609.6636810661752" y="125.49127034804434" width="137.6" height="22" class="edge-label-bg"/>
+        <text x="678.4636810661751" y="136.49127034804434" class="edge-label" dominant-baseline="central" text-anchor="middle">to_shell_command()</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-HeadlessPath-TokioCmd-0">
+        <rect x="52.00000000000004" y="181.03811653887618" width="180.79999999999998" height="22" class="edge-label-bg"/>
+        <text x="142.40000000000003" y="192.03811653887618" class="edge-label" text-anchor="middle" dominant-baseline="central">HeadlessSession::spawn()</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-TmuxPath-SharedLogic-0">
+        <rect x="895.2" y="138.6" width="80" height="22" class="edge-label-bg"/>
+        <text x="935.2" y="149.6" class="edge-label" dominant-baseline="central" text-anchor="middle">duplicates</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-HeadlessPath-SharedLogic-0">
+        <rect x="491.0618572336108" y="172.96579366108045" width="80" height="22" class="edge-label-bg"/>
+        <text x="531.0618572336108" y="183.96579366108045" class="edge-label" text-anchor="middle" dominant-baseline="central">duplicates</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-NewLaunch-HeadlessOut-0">
+        <rect x="104.84705814466358" y="489.4595151753402" width="152" height="22" class="edge-label-bg"/>
+        <text x="180.84705814466358" y="500.4595151753402" class="edge-label" text-anchor="middle" dominant-baseline="central">to_headless_config()</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-NewLaunch-ShellOut-0">
+        <rect x="314.00000000000006" y="516.4399999999999" width="137.6" height="22" class="edge-label-bg"/>
+        <text x="382.80000000000007" y="527.4399999999999" class="edge-label" text-anchor="middle" dominant-baseline="central">to_shell_command()</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-NewLaunch-UnifiedLogic-0">
+        <rect x="575.6632066554982" y="482.93138758054255" width="101.6" height="22" class="edge-label-bg"/>
+        <text x="626.4632066554982" y="493.93138758054255" class="edge-label" dominant-baseline="central" text-anchor="middle">single source</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-SharedLogic-UnifiedLogic-0">
+        <rect x="855.6" y="516.4399999999999" width="159.2" height="22" class="edge-label-bg"/>
+        <text x="935.2" y="527.4399999999999" class="edge-label" text-anchor="middle" dominant-baseline="central">must consolidate into</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Risk-UnifiedLogic-0">
+        <rect x="1227.1663202207678" y="552.0224028946027" width="80" height="22" class="edge-label-bg"/>
+        <text x="1267.1663202207678" y="563.0224028946027" class="edge-label" text-anchor="middle" dominant-baseline="central">avoided by</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-HeadlessOut">
+        <rect x="64.00000000000001" y="671.56" width="166.4" height="89.6"/>
+        <text x="147.20000000000002" y="716.3599999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="147.20000000000002" y="716.3599999999999" dy="-0.6em">HeadlessConfig</tspan><tspan x="147.20000000000002" dy="1.2em">(structured)</tspan></text>
+      </g>
+      <g class="node" id="node-HeadlessPath">
+        <rect x="107.19999999999995" y="25" width="166.4" height="89.6"/>
+        <text x="190.39999999999995" y="69.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="190.39999999999995" y="69.8" dy="-0.6em">HeadlessConfig</tspan><tspan x="190.39999999999995" dy="1.2em">(headless.rs)</tspan></text>
+      </g>
+      <g class="node" id="node-NewLaunch">
+        <rect x="294.8" y="293.71999999999997" width="176" height="89.6"/>
+        <text x="382.8" y="338.52" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="382.8" y="338.52" dy="-0.6em">LaunchConfig</tspan><tspan x="382.8" dy="1.2em">(new launch.rs)</tspan></text>
+      </g>
+      <g class="node" id="node-Risk">
+        <rect x="1194.2" y="275.32" width="300" height="126.39999999999999" style="fill:#ff6b6b !important;stroke:#c92a2a !important;color:#fff !important"/>
+        <text x="1344.2" y="338.52" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1344.2" y="338.52" dy="-1.2em">⚠️ Risk: Two paths to same thing</tspan><tspan x="1344.2" dy="1.2em">if shared logic not extracted</tspan><tspan x="1344.2" dy="1.2em">into launch.rs</tspan></text>
+      </g>
+      <g class="node" id="node-SharedLogic">
+        <path d="M 785.2 230.77599999999998 a 150 46.175999999999995 0 0 0 300 0 a 150 46.175999999999995 0 0 0 -300 0 l 0 215.488 a 150 46.175999999999995 0 0 0 300 0 l 0 -215.488" style="fill:#ffd43b !important;stroke:#fab005 !important;color:#000 !important"/>
+        <text x="935.2" y="338.52" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="935.2" y="338.52" dy="-3em">Shared Logic:</tspan><tspan x="935.2" dy="1.2em">• System prompt (role → agents.rs)</tspan><tspan x="935.2" dy="1.2em">• Session mode (Fresh/Resume/ResumeSession)</tspan><tspan x="935.2" dy="1.2em">• Task mode (Shared/Isolated)</tspan><tspan x="935.2" dy="1.2em">• Agent teams setup</tspan><tspan x="935.2" dy="1.2em">• Auth profile env var</tspan></text>
+      </g>
+      <g class="node" id="node-ShellCmd">
+        <rect x="520.8" y="256.91999999999996" width="214.4" height="163.2"/>
+        <text x="628" y="338.52" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="628" y="338.52" dy="-1.7999999999999998em">Bash command string</tspan><tspan x="628" dy="1.2em">+ env vars</tspan><tspan x="628" dy="1.2em">+ temp files</tspan><tspan x="628" dy="1.2em">+ shell escaping</tspan></text>
+      </g>
+      <g class="node" id="node-ShellOut">
+        <rect x="304.4000000000001" y="671.56" width="156.8" height="89.6"/>
+        <text x="382.80000000000007" y="716.3599999999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="382.80000000000007" y="716.3599999999999" dy="-0.6em">Shell command</tspan><tspan x="382.80000000000007" dy="1.2em">(bash string)</tspan></text>
+      </g>
+      <g class="node" id="node-TmuxPath">
+        <rect x="832.8000000000001" y="25" width="204.79999999999998" height="89.6"/>
+        <text x="935.2" y="69.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="935.2" y="69.8" dy="-0.6em">ClaudeLaunchConfig</tspan><tspan x="935.2" dy="1.2em">(tmux.rs)</tspan></text>
+      </g>
+      <g class="node" id="node-TokioCmd">
+        <rect x="40.00000000000004" y="275.32" width="204.79999999999998" height="126.39999999999999"/>
+        <text x="142.40000000000003" y="338.52" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="142.40000000000003" y="338.52" dy="-1.2em">tokio::Command</tspan><tspan x="142.40000000000003" dy="1.2em">structured args</tspan><tspan x="142.40000000000003" dy="1.2em">piped stdin/stdout</tspan></text>
+      </g>
+      <g class="node" id="node-UnifiedLogic">
+        <path d="M 794.4000000000001 608.616 a 140.8 46.175999999999995 0 0 0 281.6 0 a 140.8 46.175999999999995 0 0 0 -281.6 0 l 0 215.488 a 140.8 46.175999999999995 0 0 0 281.6 0 l 0 -215.488" style="fill:#51cf66 !important;stroke:#2f9e44 !important;color:#000 !important"/>
+        <text x="935.2" y="716.3599999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="935.2" y="716.3599999999999" dy="-3em">Unified Logic:</tspan><tspan x="935.2" dy="1.2em">• generate_system_prompt()</tspan><tspan x="935.2" dy="1.2em">• build_session_flags()</tspan><tspan x="935.2" dy="1.2em">• build_task_env()</tspan><tspan x="935.2" dy="1.2em">• build_team_flags()</tspan><tspan x="935.2" dy="1.2em">• build_auth_env()</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

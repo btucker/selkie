@@ -1,244 +1,204 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="966.3999999999999" height="1382.6" viewBox="-8 -27.999999999999993 966.3999999999999 1382.6" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="4236.531344" height="244" viewBox="-8 -8 4236.531344 244" class="mermaid">
   <style>
-
-.mermaid {
-  font-family: trebuchet ms, verdana, arial, sans-serif;
-  font-size: 16px;
-}
-
-.node rect,
-.node polygon,
-.node circle,
-.node ellipse,
-.node path {
-  fill: #ECECFF;
-  stroke: #9370DB;
-  stroke-width: 1px;
-}
-
-.node line {
-  stroke: #9370DB;
-  stroke-width: 1px;
-}
-
-.node .label {
-  fill: #333333;
-}
-
-.node text {
-  fill: #333333;
-  font-family: trebuchet ms, verdana, arial, sans-serif;
-  font-size: 16px;
-}
-
-.edge-path {
-  fill: none;
-  stroke: #333333;
-  stroke-width: 1px;
-}
-
-.edge-label {
-  fill: #333333;
-  font-family: trebuchet ms, verdana, arial, sans-serif;
-}
-
-.edge-label-bg {
-  fill: rgba(232, 232, 232, 0.8);
-}
-
-.subgraph {
-  fill: #ffffde;
-  stroke: #aaaa33;
-  stroke-width: 1px;
-}
-
-.subgraph-title {
-  fill: #333333;
-  font-weight: bold;
-}
-
-.cluster rect {
-  fill: #ffffde;
-  stroke: #aaaa33;
-  stroke-width: 1px;
-  rx: 5px;
-  ry: 5px;
-}
-
-.cluster-label {
-  fill: #333333;
-  font-family: trebuchet ms, verdana, arial, sans-serif;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-marker path {
-  fill: #333333;
-  stroke: #333333;
-}
+.mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
+.error-icon{fill:#552222;}
+.error-text{fill:#552222;stroke:#552222;}
+.edge-thickness-normal{stroke-width:1px;}
+.edge-thickness-thick{stroke-width:3.5px;}
+.edge-pattern-solid{stroke-dasharray:0;}
+.edge-thickness-invisible{stroke-width:0;fill:none;}
+.edge-pattern-dashed{stroke-dasharray:3;}
+.edge-pattern-dotted{stroke-dasharray:2;}
+.marker{fill:#333333;stroke:#333333;}
+.marker.cross{stroke:#333333;}
+svg{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;}
+p{margin:0;}
+.label{font-family:trebuchet ms, verdana, arial, sans-serif;color:#333333;}
+.cluster-label text{fill:#333333;}
+.cluster-label span{color:#333333;}
+.cluster-label span p{background-color:transparent;}
+.label text,span{fill:#333333;color:#333333;}
+.node rect,.node circle,.node ellipse,.node polygon,.node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}
+.rough-node .label text,.node .label text,.image-shape .label,.icon-shape .label{text-anchor:middle;}
+.node .katex path{fill:#000;stroke:#000;stroke-width:1px;}
+.rough-node .label,.node .label,.image-shape .label,.icon-shape .label{text-align:center;}
+.node.clickable{cursor:pointer;}
+.root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}
+.arrowheadPath{fill:#333333;}
+.edgePath .path{stroke:#333333;stroke-width:2.0px;}
+.flowchart-link{stroke:#333333;fill:none;}
+.edgeLabel{background-color:rgba(232, 232, 232, 0.8);text-align:center;}
+.edgeLabel p{background-color:rgba(232, 232, 232, 0.8);}
+.edgeLabel rect{opacity:0.5;background-color:rgba(232, 232, 232, 0.8);fill:rgba(232, 232, 232, 0.8);}
+.labelBkg{background-color:rgba(232, 232, 232, 0.5);}
+.cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}
+.cluster text{fill:#333333;}
+.cluster span{color:#333333;}
+.flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333333;}
+rect.text{fill:none;stroke-width:0;}
 
   </style>
   <defs>
     <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 0 0 L 10 5 L 0 10 z"/>
+      <path d="M 0 0 L 10 5 L 0 10 z" class="marker"/>
     </marker>
     <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 0 5 L 10 10 L 10 0 z"/>
+      <path d="M 0 5 L 10 10 L 10 0 z" class="marker"/>
     </marker>
     <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" class="marker cross" fill="none" stroke-width="2"/>
     </marker>
     <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <circle cx="5" cy="5" r="5"/>
+      <circle cx="5" cy="5" r="5" class="marker"/>
     </marker>
     <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-      <circle cx="5" cy="5" r="5"/>
+      <circle cx="5" cy="5" r="5" class="marker"/>
     </marker>
   </defs>
   <g class="root">
     <g class="clusters">
-      <g class="subgraph" id="subgraph-current">
-        <rect x="24.799999999999955" y="-19.999999999999993" width="538" height="1361.6" class="cluster"/>
-        <text x="293.79999999999995" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Current: Kitty Protocol Path</text>
+      <g class="cluster" id="subgraph-current">
+        <rect x="1451.6562879999994" y="0" width="2768.8750560000003" height="228" class="cluster"/>
+        <text x="2836.0938159999996" y="16" class="cluster-label" text-anchor="middle">Current: Kitty Protocol Path</text>
       </g>
-      <g class="subgraph" id="subgraph-proposed">
-        <rect x="637.5999999999999" y="-19.999999999999993" width="292.79999999999995" height="622.6000000000001" class="cluster"/>
-        <text x="783.9999999999999" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Proposed: ASCII Art Path</text>
+      <g class="cluster" id="subgraph-proposed">
+        <rect x="0" y="28" width="1401.6562879999997" height="172" class="cluster"/>
+        <text x="700.8281439999998" y="44" class="cluster-label" text-anchor="middle">Proposed: ASCII Art Path</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-A1-A2-0">
-        <path d="M 293.80 77.80 C 293.80 86.13, 293.80 94.47, 293.80 102.80 C 293.80 111.13, 293.80 119.47, 293.80 127.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M1663.3281759999995,114L1669.5781759999993,114C1675.8281759999998,114,1688.3281759999998,114,1700.1615093333328,114C1711.9948426666663,114,1723.161509333333,114,1728.744842666666,114L1734.3281759999995,114" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A2-A3-0">
-        <path d="M 293.80 180.60 C 293.80 188.93, 293.80 197.27, 293.80 205.60 C 293.80 213.93, 293.80 222.27, 293.80 230.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M1976.0625279999995,114L1982.3125279999992,114C1988.5625279999995,114,2001.0625279999995,114,2012.8958613333325,114C2024.7291946666662,114,2035.8958613333327,114,2041.4791946666658,114L2047.0625279999995,114" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A3-A4-0">
-        <path d="M 293.80 283.40 C 293.80 291.73, 293.80 300.07, 293.80 308.40 C 293.80 316.73, 293.80 325.07, 293.80 333.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M2215.8906719999995,114L2222.1406719999995,114C2228.3906719999995,114,2240.8906719999995,114,2252.724005333333,114C2264.557338666666,114,2275.724005333333,114,2281.307338666666,114L2286.8906719999995,114" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A4-A5-0">
-        <path d="M 293.80 386.20 C 293.80 397.87, 293.80 409.53, 293.80 427.33 C 293.80 445.13, 293.80 469.07, 293.80 493.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M2463.1094399999993,114L2469.3594399999997,114C2475.6094399999993,114,2488.1094399999993,114,2499.9427733333328,114C2511.776106666666,114,2522.9427733333328,114,2528.5261066666662,114L2534.1094399999993,114" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A5-A6-0">
-        <path d="M 293.80 545.80 C 293.80 566.40, 293.80 587.00, 293.80 601.47 C 293.80 615.93, 293.80 624.27, 293.80 632.60 C 293.80 649.27, 293.80 657.60, 293.80 657.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+        <path d="M2762.8438079999996,114L2769.0938079999996,114C2775.3438079999996,114,2787.8438079999996,114,2799.677141333333,114C2811.510474666666,114,2822.677141333333,114,2828.260474666666,114L2833.8438079999996,114" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A6-A7-0">
-        <path d="M 293.80 710.40 C 293.80 718.73, 293.80 727.07, 293.80 735.40 C 293.80 743.73, 293.80 752.07, 293.80 760.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M3027.554735999999,114L3033.8047359999987,114C3040.0547359999996,114,3052.5547359999996,114,3064.388069333332,114C3076.221402666666,114,3087.3880693333326,114,3092.9714026666657,114L3098.554735999999,114" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A7-A8-0">
-        <path d="M 254.33 860.13 C 221.82 884.96, 189.31 909.78, 173.06 928.02 C 156.80 946.27, 156.80 957.93, 156.80 969.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M3205.5962179295802,95.21335392958065L3218.0092269413167,89.6777949413172C3230.4222359530536,84.14223595305377,3255.248253976526,73.07111797652688,3276.472458988263,67.53555898826345C3297.696663999999,62,3315.319056,62,3324.130251999999,62L3332.9414479999996,62" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A7-A9-0">
-        <path d="M 333.27 860.13 C 365.78 884.96, 398.29 909.78, 414.54 928.02 C 430.80 946.27, 430.80 957.93, 430.80 969.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M3205.5962179295802,132.78664607041935L3218.0092269413167,138.32220505868278C3230.4222359530536,143.85776404694624,3255.248253976526,154.9288820234731,3276.2764976549297,160.46444101173657C3297.304741333333,166,3314.5352106666664,166,3323.1504453333328,166L3331.7656799999995,166" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A8-A10-0">
-        <path d="M 156.80 1022.40 L 223.43 1072.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+        <path d="M3554.7852399999992,62L3561.231201333332,62C3567.6771626666655,62,3580.5690853333326,62,3597.6885695253254,65.9360077314023C3614.8080537173173,69.8720154628046,3636.1550994346358,77.74403092560918,3646.8286222932948,81.68003865701148L3657.5021451519538,85.61604638841378" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A9-A10-0">
-        <path d="M 430.80 1022.40 L 364.17 1072.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M3555.9610079999993,166L3562.211007999999,166C3568.4610079999998,166,3580.9610079999998,166,3597.8845308586583,162.0639922685977C3614.8080537173173,158.1279845371954,3636.1550994346358,150.2559690743908,3646.8286222932948,146.3199613429885L3657.5021451519538,142.3839536115862" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-A10-A11-0">
-        <path d="M 293.80 1125.20 C 293.80 1136.87, 293.80 1148.53, 293.80 1160.20 C 293.80 1171.87, 293.80 1183.53, 293.80 1195.20" class="edge-path" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)" stroke-width="2"/>
+        <path d="M3837.9844319999993,114L3847.680394666666,114C3857.3763573333326,114,3876.768282666666,114,3895.493541333332,114C3914.218799999999,114,3932.2773919999995,114,3941.306687999999,114L3950.3359839999994,114" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B1-B2-0">
-        <path d="M 784.00 77.80 C 784.00 86.13, 784.00 94.47, 784.00 102.80 C 784.00 111.13, 784.00 119.47, 784.00 127.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+        <path d="M211.671888,114L217.921888,114C224.171888,114,236.671888,114,248.50522133333334,114C260.33855466666665,114,271.5052213333333,114,277.08855466666665,114L282.67188799999997,114" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B2-B3-0">
-        <path d="M 784.00 180.60 C 784.00 188.93, 784.00 197.27, 784.00 205.60 C 784.00 213.93, 784.00 222.27, 784.00 230.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+        <path d="M475.38284799999997,114L481.632848,114C487.88284799999997,114,500.38284799999997,114,512.2161813333333,114C524.0495146666666,114,535.2161813333333,114,540.7995146666667,114L546.382848,114" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B3-B4-0">
-        <path d="M 784.00 283.40 C 784.00 291.73, 784.00 300.07, 784.00 308.40 C 784.00 316.73, 784.00 325.07, 784.00 333.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+        <path d="M732.4766079999999,114L738.7266079999999,114C744.9766079999999,114,757.4766079999999,114,769.3099413333333,114C781.1432746666666,114,792.3099413333333,114,797.8932746666666,114L803.4766079999999,114" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-B4-B5-0">
-        <path d="M 784.00 386.20 C 784.00 397.87, 784.00 409.53, 784.00 421.20 C 784.00 432.87, 784.00 444.53, 784.00 456.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+        <path d="M1004.7187999999999,114L1015.8477053333331,114C1026.9766106666666,114,1049.2344213333333,114,1070.825565333333,114C1092.4167093333333,114,1113.3411866666665,114,1123.803425333333,114L1134.2656639999998,114" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-A7-A8-0">
-        <rect x="173.25722918659451" y="896.98637829987" width="36.8" height="22" class="edge-label-bg"/>
-        <text x="191.65722918659452" y="907.98637829987" class="edge-label" text-anchor="middle" dominant-baseline="central">tmux</text>
+        <rect x="3261.6742719999993" y="51" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="3280.0742719999994" y="62" class="edge-label" text-anchor="middle" dominant-baseline="central">tmux</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-A7-A9-0">
-        <rect x="377.5427708134054" y="896.98637829987" width="36.8" height="22" class="edge-label-bg"/>
-        <text x="395.9427708134054" y="907.98637829987" class="edge-label" dominant-baseline="central" text-anchor="middle">bare</text>
+        <rect x="3261.6742719999993" y="155" width="36.8" height="22" class="edge-label-bg"/>
+        <text x="3280.0742719999994" y="166" class="edge-label" text-anchor="middle" dominant-baseline="central">bare</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-A10-A11-0">
-        <rect x="268.19999999999993" y="1149.1999999999998" width="51.199999999999996" height="22" class="edge-label-bg"/>
-        <text x="293.79999999999995" y="1160.1999999999998" class="edge-label" text-anchor="middle" dominant-baseline="central">Issues</text>
+        <rect x="3870.5602079999994" y="103" width="51.199999999999996" height="22" class="edge-label-bg"/>
+        <text x="3896.1602079999993" y="114" class="edge-label" text-anchor="middle" dominant-baseline="central">Issues</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-B4-B5-0">
-        <rect x="751.1999999999999" y="410.20000000000005" width="65.6" height="22" class="edge-label-bg"/>
-        <text x="783.9999999999999" y="421.20000000000005" class="edge-label" text-anchor="middle" dominant-baseline="central">Benefits</text>
+        <rect x="1038.6922319999999" y="103" width="65.6" height="22" class="edge-label-bg"/>
+        <text x="1071.4922319999998" y="114" class="edge-label" text-anchor="middle" dominant-baseline="central">Benefits</text>
       </g>
     </g>
     <g class="nodes">
-      <g class="node" id="node-A1">
-        <rect x="210.59999999999997" y="25.000000000000007" width="166.4" height="52.8"/>
-        <text x="293.79999999999995" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
+      <g class="node default" id="node-A1">
+        <rect x="1489.1562879999994" y="87" width="174.171888" height="54"/>
+        <text x="1576.2422319999994" y="114" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
       </g>
-      <g class="node" id="node-A10">
-        <rect x="186.59999999999997" y="1072.3999999999999" width="214.4" height="52.8"/>
-        <text x="293.79999999999995" y="1098.8" class="label" text-anchor="middle" dominant-baseline="central">render_kitty_images</text>
+      <g class="node default" id="node-A2">
+        <rect x="1738.3281759999995" y="87" width="237.73435200000003" height="54"/>
+        <text x="1857.1953519999995" y="114" class="label" text-anchor="middle" dominant-baseline="central">parse_content_segments</text>
       </g>
-      <g class="node" id="node-A11">
-        <rect x="172.19999999999996" y="1195.1999999999998" width="243.2" height="126.39999999999999" style="fill:#4a1a1a !important;stroke:#a44 !important"/>
-        <text x="293.79999999999995" y="1258.3999999999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="293.79999999999995" y="1258.3999999999999" dy="-1.2em">Terminal compatibility</tspan><tspan x="293.79999999999995" dy="1.2em">Scrollback breaks</tspan><tspan x="293.79999999999995" dy="1.2em">Complex tmux handling</tspan></text>
+      <g class="node default" id="node-A3">
+        <rect x="2051.0625279999995" y="87" width="164.82814399999998" height="54"/>
+        <text x="2133.4765999999995" y="114" class="label" text-anchor="middle" dominant-baseline="central">MermaidCache</text>
       </g>
-      <g class="node" id="node-A2">
-        <rect x="172.19999999999996" y="127.80000000000001" width="243.2" height="52.8"/>
-        <text x="293.79999999999995" y="154.20000000000002" class="label" text-anchor="middle" dominant-baseline="central">parse_content_segments</text>
+      <g class="node default" id="node-A4">
+        <rect x="2290.8906719999995" y="87" width="172.21876799999998" height="54"/>
+        <text x="2377.0000559999994" y="114" class="label" text-anchor="middle" dominant-baseline="central">selkie-rs render</text>
       </g>
-      <g class="node" id="node-A3">
-        <rect x="220.19999999999996" y="230.6" width="147.2" height="52.8"/>
-        <text x="293.79999999999995" y="257" class="label" text-anchor="middle" dominant-baseline="central">MermaidCache</text>
+      <g class="node default" id="node-A5">
+        <rect x="2538.1094399999993" y="87" width="224.73436800000002" height="54"/>
+        <text x="2650.4766239999994" y="114" class="label" text-anchor="middle" dominant-baseline="central">SVG → PNG conversion</text>
       </g>
-      <g class="node" id="node-A4">
-        <rect x="200.99999999999994" y="333.40000000000003" width="185.6" height="52.8"/>
-        <text x="293.79999999999995" y="359.8" class="label" text-anchor="middle" dominant-baseline="central">selkie-rs render</text>
+      <g class="node default" id="node-A6">
+        <rect x="2837.8438079999996" y="87" width="189.710928" height="54"/>
+        <text x="2932.699272" y="114" class="label" text-anchor="middle" dominant-baseline="central">InlineImage struct</text>
       </g>
-      <g class="node" id="node-A5">
-        <rect x="181.79999999999995" y="493.0000000000001" width="224" height="52.8"/>
-        <text x="293.79999999999995" y="519.4000000000001" class="label" dominant-baseline="central" text-anchor="middle">SVG → PNG conversion</text>
+      <g class="node default" id="node-A7">
+        <polygon points="3163.468799999999,53.085936 3224.3828639999992,114 3163.468799999999,174.914064 3102.554735999999,114"/>
+        <text x="3163.468799999999" y="114" class="label" text-anchor="middle" dominant-baseline="central">Terminal?</text>
       </g>
-      <g class="node" id="node-A6">
-        <rect x="191.39999999999998" y="657.6" width="204.79999999999998" height="52.8"/>
-        <text x="293.79999999999995" y="684" class="label" text-anchor="middle" dominant-baseline="central">InlineImage struct</text>
+      <g class="node default" id="node-A8">
+        <rect x="3336.9414479999996" y="35" width="217.843792" height="54"/>
+        <text x="3445.8633439999994" y="62" class="label" text-anchor="middle" dominant-baseline="central">DCS passthrough wrap</text>
       </g>
-      <g class="node" id="node-A7">
-        <polygon points="293.79999999999995,760.4 363.4,830 293.79999999999995,899.5999999999999 224.19999999999996,830"/>
-        <text x="293.79999999999995" y="830" class="label" text-anchor="middle" dominant-baseline="central">Terminal?</text>
+      <g class="node default" id="node-A9">
+        <rect x="3335.7656799999995" y="139" width="220.195328" height="54"/>
+        <text x="3445.8633439999994" y="166" class="label" text-anchor="middle" dominant-baseline="central">APC escape sequences</text>
       </g>
-      <g class="node" id="node-A8">
-        <rect x="44.799999999999955" y="969.5999999999999" width="224" height="52.8"/>
-        <text x="156.79999999999995" y="995.9999999999999" class="label" dominant-baseline="central" text-anchor="middle">DCS passthrough wrap</text>
+      <g class="node default" id="node-A10">
+        <rect x="3630.9610079999993" y="87" width="207.023424" height="54"/>
+        <text x="3734.4727199999993" y="114" class="label" text-anchor="middle" dominant-baseline="central">render_kitty_images</text>
       </g>
-      <g class="node" id="node-A9">
-        <rect x="318.79999999999995" y="969.5999999999999" width="224" height="52.8"/>
-        <text x="430.79999999999995" y="995.9999999999999" class="label" text-anchor="middle" dominant-baseline="central">APC escape sequences</text>
+      <g class="node default" id="node-A11">
+        <rect x="3954.3359839999994" y="63" width="228.69536" height="102" style="fill:#4a1a1a !important;stroke:#a44 !important"/>
+        <text x="4068.683663999999" y="114" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="4068.683663999999" y="114" dy="-1.5em">Terminal compatibility</tspan><tspan x="4068.683663999999" dy="1.5em">Scrollback breaks</tspan><tspan x="4068.683663999999" dy="1.5em">Complex tmux handling</tspan></text>
       </g>
-      <g class="node" id="node-B1">
-        <rect x="700.7999999999998" y="25.000000000000007" width="166.4" height="52.8"/>
-        <text x="783.9999999999999" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
+      <g class="node default" id="node-B1">
+        <rect x="37.5" y="87" width="174.171888" height="54"/>
+        <text x="124.585944" y="114" class="label" text-anchor="middle" dominant-baseline="central">Mermaid Source</text>
       </g>
-      <g class="node" id="node-B2">
-        <rect x="681.5999999999999" y="127.80000000000001" width="204.79999999999998" height="52.8"/>
-        <text x="783.9999999999999" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">ASCII art renderer</text>
+      <g class="node default" id="node-B2">
+        <rect x="286.67188799999997" y="87" width="188.71095999999997" height="54"/>
+        <text x="381.02736799999997" y="114" class="label" text-anchor="middle" dominant-baseline="central">ASCII art renderer</text>
       </g>
-      <g class="node" id="node-B3">
-        <rect x="686.3999999999999" y="230.6" width="195.2" height="52.8"/>
-        <text x="783.9999999999999" y="257" class="label" dominant-baseline="central" text-anchor="middle">Plain text output</text>
+      <g class="node default" id="node-B3">
+        <rect x="550.382848" y="87" width="182.09376" height="54"/>
+        <text x="641.429728" y="114" class="label" text-anchor="middle" dominant-baseline="central">Plain text output</text>
       </g>
-      <g class="node" id="node-B4">
-        <rect x="676.7999999999998" y="333.40000000000003" width="214.4" height="52.8"/>
-        <text x="783.9999999999999" y="359.8" class="label" dominant-baseline="central" text-anchor="middle">ratatui Text widget</text>
+      <g class="node default" id="node-B4">
+        <rect x="807.4766079999999" y="87" width="197.242192" height="54"/>
+        <text x="906.0977039999999" y="114" class="label" text-anchor="middle" dominant-baseline="central">ratatui Text widget</text>
       </g>
-      <g class="node" id="node-B5">
-        <rect x="657.5999999999999" y="456.2000000000001" width="252.79999999999998" height="126.39999999999999" style="fill:#1a4a1a !important;stroke:#4a8 !important"/>
-        <text x="783.9999999999999" y="519.4000000000001" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="783.9999999999999" y="519.4000000000001" dy="-1.2em">Universal compatibility</tspan><tspan x="783.9999999999999" dy="1.2em">Natural scrolling</tspan><tspan x="783.9999999999999" dy="1.2em">Works everywhere</tspan></text>
+      <g class="node default" id="node-B5">
+        <rect x="1138.2656639999998" y="63" width="225.890624" height="102" style="fill:#1a4a1a !important;stroke:#4a8 !important"/>
+        <text x="1251.2109759999998" y="114" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1251.2109759999998" y="114" dy="-1.5em">Universal compatibility</tspan><tspan x="1251.2109759999998" dy="1.5em">Natural scrolling</tspan><tspan x="1251.2109759999998" dy="1.5em">Works everywhere</tspan></text>
       </g>
     </g>
   </g>

@@ -536,7 +536,7 @@ fn check_ascii_edges(ascii: &AsciiStructure, graph: &LayoutGraph, issues: &mut V
         .nodes
         .iter()
         .filter_map(|n| n.label.as_deref().or(Some(&n.id)))
-        .map(|l| clean_label(l))
+        .map(clean_label)
         .collect();
     for edge in &graph.edges {
         if let Some(ref raw_label) = edge.label {
@@ -1938,7 +1938,7 @@ mod tests {
 
     #[test]
     fn integration_three_nodes_chain() {
-        let (output, graph) =
+        let (output, _graph) =
             parse_layout_render_ascii("flowchart TD\n    A[First] --> B[Second] --> C[Third]");
         let ascii_out = parse_ascii(&output);
 

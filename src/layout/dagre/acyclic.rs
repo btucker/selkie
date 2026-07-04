@@ -16,55 +16,35 @@ pub fn run(g: &mut DagreGraph, method: Acyclicer) {
         Acyclicer::Dfs => dfs_fas(g),
     };
 
-    // Reverse each edge in the feedback arc set
+    // Reverse each edge in the feedback arc set (dagre's acyclic run:
+    // removeEdge then setEdge(w, v, label, uniqueId("rev")))
     for edge_key in fas {
-        if let Some(mut label) = g.edges.remove(&edge_key) {
-            // Remove from adjacency lists
-            if let Some(out_list) = g.out_edges.get_mut(&edge_key.v) {
-                out_list.retain(|k| k != &edge_key);
-            }
-            if let Some(in_list) = g.in_edges.get_mut(&edge_key.w) {
-                in_list.retain(|k| k != &edge_key);
-            }
+        if let Some(mut label) = g.edge_by_key(&edge_key).cloned() {
+            g.remove_edge_by_key(&edge_key);
 
             // Mark as reversed and store original name
             label.forward_name = edge_key.name.clone();
             label.reversed = true;
 
-            // Create reversed edge with new unique name
             let rev_name = g.unique_id("rev");
-            let rev_key = EdgeKey::with_name(&edge_key.w, &edge_key.v, &rev_name);
-
-            g.edges.insert(rev_key.clone(), label);
-            g.out_edges
-                .get_mut(&edge_key.w)
-                .unwrap()
-                .push(rev_key.clone());
-            g.in_edges.get_mut(&edge_key.v).unwrap().push(rev_key);
+            g.set_edge_with_name(&edge_key.w, &edge_key.v, label, rev_name);
         }
     }
 }
 
 /// Undo the cycle removal - restore reversed edges to original direction
 pub fn undo(g: &mut DagreGraph) {
-    // Collect reversed edges in sorted order for determinism
-    let mut reversed_edges: Vec<EdgeKey> = g
-        .edges
-        .iter()
-        .filter(|(_, label)| label.reversed)
-        .map(|(key, _)| key.clone())
+    // Collect reversed edges in insertion order (dagre iterates g.edges())
+    let reversed_edges: Vec<EdgeKey> = g
+        .edges()
+        .into_iter()
+        .filter(|key| g.edge_by_key(key).is_some_and(|label| label.reversed))
+        .cloned()
         .collect();
-    reversed_edges.sort();
 
     for edge_key in reversed_edges {
-        if let Some(mut label) = g.edges.remove(&edge_key) {
-            // Remove from adjacency lists
-            if let Some(out_list) = g.out_edges.get_mut(&edge_key.v) {
-                out_list.retain(|k| k != &edge_key);
-            }
-            if let Some(in_list) = g.in_edges.get_mut(&edge_key.w) {
-                in_list.retain(|k| k != &edge_key);
-            }
+        if let Some(mut label) = g.edge_by_key(&edge_key).cloned() {
+            g.remove_edge_by_key(&edge_key);
 
             // Restore original direction
             let forward_name = label.forward_name.take();
@@ -74,24 +54,19 @@ pub fn undo(g: &mut DagreGraph) {
             // BEFORE this function is called, so we don't reverse them here.
             // This matches the reference dagre implementation.
 
-            // Create edge in original direction
-            let key = if let Some(name) = forward_name {
-                EdgeKey::with_name(&edge_key.w, &edge_key.v, &name)
+            if let Some(name) = forward_name {
+                g.set_edge_with_name(&edge_key.w, &edge_key.v, label, name);
             } else {
-                EdgeKey::new(&edge_key.w, &edge_key.v)
-            };
-
-            g.edges.insert(key.clone(), label);
-            g.out_edges.get_mut(&edge_key.w).unwrap().push(key.clone());
-            g.in_edges.get_mut(&edge_key.v).unwrap().push(key.clone());
+                g.set_edge(&edge_key.w, &edge_key.v, label);
+            }
         }
     }
 }
 
 /// Find feedback arc set using DFS
 ///
-/// Starts DFS from source nodes (nodes with no incoming edges) first to ensure
-/// forward edges are not incorrectly identified as back edges.
+/// Matches dagre's dfsFAS: iterate all nodes in insertion order and DFS
+/// out-edges, collecting edges that point back into the active stack.
 fn dfs_fas(g: &DagreGraph) -> Vec<EdgeKey> {
     let mut fas = Vec::new();
     let mut visited = HashSet::new();
@@ -122,25 +97,8 @@ fn dfs_fas(g: &DagreGraph) -> Vec<EdgeKey> {
         stack.remove(v);
     }
 
-    // Collect and sort nodes for deterministic ordering
-    let mut nodes: Vec<String> = g.nodes().into_iter().cloned().collect();
-    nodes.sort();
-
-    // First, identify source nodes (no incoming edges) and process them first
-    // This ensures DFS follows the "natural" flow direction
-    let mut sources: Vec<String> = nodes
-        .iter()
-        .filter(|v| g.in_edges(v).is_empty())
-        .cloned()
-        .collect();
-    sources.sort();
-
-    // Start DFS from source nodes first
-    for v in &sources {
-        dfs(g, v, &mut visited, &mut stack, &mut fas);
-    }
-
-    // Then process any remaining unvisited nodes (disconnected or cyclic components)
+    // dagre's dfsFAS iterates g.nodes() in insertion order
+    let nodes: Vec<String> = g.nodes().into_iter().cloned().collect();
     for v in &nodes {
         dfs(g, v, &mut visited, &mut stack, &mut fas);
     }
@@ -181,10 +139,11 @@ fn greedy_fas(g: &DagreGraph) -> Vec<EdgeKey> {
         sources.clear();
         sinks.clear();
 
-        // Iterate in sorted order for determinism
-        let mut sorted_nodes: Vec<&String> = active_nodes.iter().collect();
-        sorted_nodes.sort();
-        for v in sorted_nodes {
+        // Iterate in insertion order for determinism
+        for v in g.nodes() {
+            if !active_nodes.contains(v) {
+                continue;
+            }
             if *in_degree.get(v).unwrap_or(&0) == 0 {
                 sources.push(v.clone());
             }
@@ -219,10 +178,11 @@ fn greedy_fas(g: &DagreGraph) -> Vec<EdgeKey> {
             let mut best_node: Option<String> = None;
             let mut best_score = i32::MIN;
 
-            // Iterate in sorted order so ties are resolved deterministically
-            let mut sorted_nodes: Vec<&String> = active_nodes.iter().collect();
-            sorted_nodes.sort();
-            for v in sorted_nodes {
+            // Iterate in insertion order so ties are resolved deterministically
+            for v in g.nodes() {
+                if !active_nodes.contains(v) {
+                    continue;
+                }
                 let score = *out_degree.get(v).unwrap_or(&0) - *in_degree.get(v).unwrap_or(&0);
                 if score > best_score {
                     best_score = score;

@@ -101,6 +101,55 @@ mod tests {
         }
 
         #[test]
+        fn add_sub_graph_dedups_shared_nodes_first_wins() {
+            // Mirrors mermaid flowDb.addSubGraph (flowDb.ts:711), which calls
+            // makeUniq before storing so a node claimed by an EARLIER subgraph
+            // never re-appears in a later subgraph's node list. Without this,
+            // node->parent resolution becomes last-wins and clusters merge/split
+            // incorrectly (e.g. channel_flowchart_subgraphs_styled: MERGE lands in
+            // "Bounded Growth" with WINDOW instead of "Lifecycle").
+            let mut db = setup();
+            db.add_sub_graph(
+                vec!["IH".to_string(), "RNT".to_string()],
+                "DaemonState",
+                "Daemon State",
+                "",
+            );
+            db.add_sub_graph(
+                vec![
+                    "START".to_string(),
+                    "IH".to_string(),
+                    "RNT".to_string(),
+                    "MERGE".to_string(),
+                    "RESTART".to_string(),
+                ],
+                "Lifecycle",
+                "Lifecycle",
+                "",
+            );
+            db.add_sub_graph(
+                vec!["MERGE".to_string(), "WINDOW".to_string()],
+                "BoundedGrowth",
+                "Bounded Growth",
+                "",
+            );
+
+            let sgs = db.subgraphs();
+            let by_id = |id: &str| sgs.iter().find(|s| s.id == id).unwrap();
+            assert_eq!(by_id("DaemonState").nodes, vec!["IH", "RNT"]);
+            assert_eq!(
+                by_id("Lifecycle").nodes,
+                vec!["START", "MERGE", "RESTART"],
+                "IH/RNT belong to the earlier DaemonState subgraph and must be removed here"
+            );
+            assert_eq!(
+                by_id("BoundedGrowth").nodes,
+                vec!["WINDOW"],
+                "MERGE belongs to the earlier Lifecycle subgraph and must be removed here"
+            );
+        }
+
+        #[test]
         fn should_not_remove_unique_ids() {
             let db = setup();
             let subgraphs = create_subgraphs();

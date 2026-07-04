@@ -144,6 +144,18 @@ impl EvalRunner {
             self.cache.render_batch_named(&named_diagrams)
         };
 
+        // Pre-render all reference PNGs in one mmdc batch (fills the PNG
+        // cache) so per-diagram visual comparison doesn't spawn mmdc once
+        // per uncached diagram.
+        #[cfg(feature = "png")]
+        if !self.config.skip_visual && !self.config.use_repo_svgs {
+            let texts: Vec<&str> = filtered.iter().map(|i| i.text.as_str()).collect();
+            if !texts.is_empty() {
+                eprintln!("Pre-rendering reference PNGs for visual comparison...");
+                let _ = super::png::sources_to_rgba_batch_cached(&texts, &self.cache);
+            }
+        }
+
         // Evaluate each diagram with pre-rendered reference
         for (i, input) in filtered.iter().enumerate() {
             eprint!(
@@ -293,6 +305,17 @@ impl EvalRunner {
             }
             result.structural_match = !check_issues.iter().any(|i| i.level == Level::Error);
             result.issues.extend(check_issues);
+        } else if selkie_structure.is_some() && reference_structure.is_none() {
+            // Selkie produced a render but there is no reference to compare
+            // against (e.g. mermaid could not render the diagram). No structural
+            // comparison happened, so this cannot count as a parity match.
+            // Flag it as an error so it is excluded from "Overall Parity"
+            // instead of being silently counted as a match.
+            result.structural_match = false;
+            result.issues.push(Issue::error(
+                "reference",
+                "No mermaid reference render available to compare against",
+            ));
         }
 
         // Step 6: Visual similarity (SSIM) and collect SVG pairs
@@ -306,9 +329,21 @@ impl EvalRunner {
                 reference.clone(),
             ));
 
-            // Calculate visual similarity if not skipped
+            // Calculate visual similarity if not skipped.
+            // Prefer comparing against the mmdc-rendered reference PNG at a
+            // matched raster scale: resvg drops mermaid's foreignObject HTML
+            // labels, so rasterizing the reference SVG in-process would
+            // guarantee a deflated score even for pixel-perfect output.
+            // Fall back to SVG-vs-SVG rasterization when mmdc is unavailable
+            // (e.g. CI running with pre-committed repo SVGs).
             if !self.config.skip_visual {
-                match super::png::compare_svgs(selkie, reference) {
+                let comparison = if self.config.use_repo_svgs {
+                    super::png::compare_svgs(selkie, reference)
+                } else {
+                    super::png::compare_svg_to_reference_source(selkie, &input.text, &self.cache)
+                        .or_else(|_| super::png::compare_svgs(selkie, reference))
+                };
+                match comparison {
                     Ok(comparison) => {
                         result.visual_similarity = Some(comparison.ssim);
                     }
@@ -518,5 +553,74 @@ mod tests {
         // Clean up
         let _ = fs::remove_dir_all(&repo_cache_dir);
         let _ = fs::remove_dir_all(temp_dir().join("selkie_test_use_repo_svgs_missing_hash"));
+    }
+
+    /// BUG 2: a diagram where selkie renders but there is NO reference must not
+    /// be counted as a structural/parity match. Previously `structural_match`
+    /// defaulted to `true` and the comparison was simply skipped when the
+    /// reference was absent, silently inflating parity.
+    #[test]
+    fn test_missing_reference_is_not_a_match() {
+        let config = EvalConfig {
+            skip_visual: true,
+            ..Default::default()
+        };
+        let runner = EvalRunner::new(config, ReferenceCache::with_defaults());
+
+        let input = DiagramInput {
+            name: "no_reference".to_string(),
+            source: None,
+            diagram_type: Some("flowchart".to_string()),
+            text: "flowchart LR\n    A --> B".to_string(),
+        };
+
+        let result = runner
+            .evaluate_single_with_reference(&input, Err("mermaid could not render".to_string()));
+
+        // Selkie should have parsed successfully...
+        assert!(
+            result.parse_result.selkie_success,
+            "valid flowchart should parse with selkie"
+        );
+        // ...but with no reference to compare against, this is NOT a match.
+        assert!(
+            !result.structural_match,
+            "a diagram with no reference must not be a structural match"
+        );
+        assert_ne!(
+            result.status,
+            Status::Match,
+            "a diagram with no reference must not count toward parity"
+        );
+    }
+
+    /// Guard against over-correction: when a reference IS present and the
+    /// structures match, `structural_match` must remain true.
+    #[test]
+    fn test_present_matching_reference_is_a_match() {
+        let config = EvalConfig {
+            skip_visual: true,
+            ..Default::default()
+        };
+        let runner = EvalRunner::new(config, ReferenceCache::with_defaults());
+
+        let input = DiagramInput {
+            name: "self_reference".to_string(),
+            source: None,
+            diagram_type: Some("flowchart".to_string()),
+            text: "flowchart LR\n    A --> B".to_string(),
+        };
+
+        // Render selkie's own SVG and feed it back as the "reference" so the
+        // structures are guaranteed to match.
+        let parsed = crate::parse(&input.text).expect("selkie parse");
+        let selkie_svg = crate::render(&parsed).expect("selkie render");
+
+        let result = runner.evaluate_single_with_reference(&input, Ok(selkie_svg.clone()));
+
+        assert!(
+            result.structural_match,
+            "identical selkie/reference structures should be a match"
+        );
     }
 }

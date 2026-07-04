@@ -5,14 +5,16 @@
 
 mod adapter;
 mod graph;
-mod size;
+pub(crate) mod size;
 mod types;
 
 pub mod dagre;
 
 pub use adapter::{NodeSizeConfig, SizeEstimator, ToLayoutGraph};
 pub use graph::LayoutGraph;
-pub use size::{create_size_estimator, CharacterSizeEstimator, FontdueSizeEstimator};
+pub use size::{
+    create_size_estimator, CharacterSizeEstimator, FontdueSizeEstimator, TrebuchetSizeEstimator,
+};
 pub use types::{
     geometric_midpoint, LayoutDirection, LayoutEdge, LayoutNode, LayoutOptions, LayoutRanker,
     NodeShape, Padding, Point,
@@ -21,49 +23,324 @@ pub use types::{
 use crate::error::Result;
 use dagre::graph::{DagreGraph, EdgeLabel, NodeLabel};
 use dagre::{DagreConfig, RankDir, Ranker};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-/// Stored layout result for a subgraph that was laid out with its own direction
-#[derive(Debug, Clone)]
-struct SubgraphLayoutResult {
-    /// Relative positions of child nodes (relative to subgraph origin)
-    child_positions: HashMap<String, (f64, f64)>, // (x, y) relative to subgraph top-left
-    /// Computed width of the subgraph content
-    width: f64,
-    /// Computed height of the subgraph content
-    height: f64,
+/// Horizontal padding between cluster contents and the cluster border. Mermaid's
+/// effective inner horizontal padding (node-left-edge to cluster-left-edge) is a
+/// measured ~37.5px constant in every cluster (leaf and nested, LR and TB),
+/// corresponding to the border-node separation `(nodesep + edgesep)/2`
+/// = `(50 + 25)/2` in the flowchart SVG renderer.
+const CLUSTER_PADDING_X: f64 = 37.5;
+/// Vertical padding between a cluster border and content that is itself a
+/// cluster. Mermaid centers a container cluster's content vertically with a
+/// symmetric ~20px band and does NOT stack an additive title band per nesting
+/// level (evidence: nested `Outer` rect y 8->172 h164 around inner content of
+/// height 124 => (164-124)/2 = 20 each side).
+const CLUSTER_PADDING_Y: f64 = 20.0;
+/// Vertical padding between a leaf cluster border and its plain-node content.
+/// Mermaid centers leaf content vertically and absorbs the title into the top
+/// padding band, giving a symmetric ~35px band (evidence: titled `S1` rect
+/// y 8->132 h124 around node A of height 54 => (124-54)/2 = 35 each side). This
+/// also matches selkie's own dagre compound-cluster padding for a non-extracted
+/// leaf (cf. the nested `Inner` cluster, which renders at height 124).
+const CLUSTER_LEAF_PADDING_Y: f64 = 35.0;
+/// Extra rank separation applied to extracted cluster graphs, mirroring
+/// mermaid's dagre wrapper (`ranksep: ranksep + 25` in
+/// rendering-util/layout-algorithms/dagre/index.js).
+const CLUSTER_EXTRA_RANKSEP: f64 = 25.0;
+/// Maximum cluster extraction recursion depth (mermaid-graphlib.js extractor
+/// bails out at depth > 10).
+const MAX_EXTRACTION_DEPTH: usize = 10;
+
+/// An extracted cluster: a subgraph without external connections that was laid
+/// out recursively as its own graph (mermaid's `extractor` in
+/// mermaid-graphlib.js). The cluster is represented in the outer graph as a
+/// single fixed-size node; its contents are translated into place afterwards.
+#[derive(Debug)]
+struct ClusterExtraction {
+    /// The cluster (subgraph) node id in the outer graph
+    cluster_id: String,
+    /// Ids of all descendant nodes that were moved into the sub-graph
+    descendant_ids: HashSet<String>,
+    /// Indices into the outer graph's edge list of the internal edges
+    internal_edge_indices: Vec<usize>,
+    /// The recursively laid-out sub-graph
+    sub: LayoutGraph,
 }
 
 /// Perform layout on a graph using dagre algorithm
-pub fn layout(mut graph: LayoutGraph) -> Result<LayoutGraph> {
-    // Phase 1: Identify subgraphs with their own directions and lay them out first
-    let subgraph_layouts = layout_subgraphs_with_directions(&graph)?;
+pub fn layout(graph: LayoutGraph) -> Result<LayoutGraph> {
+    layout_with_depth(graph, 0)
+}
 
-    // Phase 2: Update subgraph node dimensions based on their internal layouts
-    for (subgraph_id, layout_result) in &subgraph_layouts {
-        if let Some(node) = graph.get_node_mut(subgraph_id) {
-            // Set subgraph dimensions from internal layout + padding for the cluster
-            let padding = 20.0; // Padding around subgraph content
-            node.width = layout_result.width + padding * 2.0;
-            node.height = layout_result.height + padding * 2.0;
+fn layout_with_depth(mut graph: LayoutGraph, depth: usize) -> Result<LayoutGraph> {
+    // Phase 1: Extract clusters WITHOUT external connections into their own
+    // graphs and lay them out recursively (mermaid's adjustClustersAndEdges +
+    // extractor). Each extracted cluster becomes a fixed-size node here.
+    let extractions = extract_isolated_clusters(&graph, depth)?;
+
+    let mut skip_nodes: HashSet<String> = HashSet::new();
+    let mut skip_edges: HashSet<usize> = HashSet::new();
+    for extraction in &extractions {
+        skip_nodes.extend(extraction.descendant_ids.iter().cloned());
+        skip_edges.extend(extraction.internal_edge_indices.iter().copied());
+
+        // Size the collapsed cluster node from the sub-layout bounds plus the
+        // cluster decoration, mirroring mermaid's updateNodeBounds after
+        // recursiveRender. Mermaid centers content vertically within a symmetric
+        // padding band (title absorbed into it) instead of stacking a title band
+        // per nesting level, so the vertical padding is applied on BOTH sides and
+        // no separate title height is added.
+        let vpad = cluster_vertical_padding(&graph, &extraction.cluster_id);
+        if let Some(node) = graph.get_node_mut(&extraction.cluster_id) {
+            node.width = extraction.sub.width.unwrap_or(0.0) + 2.0 * CLUSTER_PADDING_X;
+            node.height = extraction.sub.height.unwrap_or(0.0) + 2.0 * vpad;
         }
     }
 
-    // Phase 3: Run main layout on the parent graph
-    let mut dagre_graph = to_dagre_graph(&graph);
+    // Phase 2: Run dagre layout on the outer graph (extracted cluster
+    // contents are hidden from it).
+    let mut dagre_graph = to_dagre_graph_filtered(&graph, &skip_nodes, &skip_edges);
     let config = to_dagre_config(&graph.options);
     dagre::layout(&mut dagre_graph, &config);
 
-    // Phase 4: Copy results back to LayoutGraph
+    // Phase 3: Copy results back to LayoutGraph
     apply_dagre_results(&mut graph, &dagre_graph);
 
-    // Phase 5: Apply pre-computed child positions for subgraphs with custom directions
-    apply_subgraph_child_positions(&mut graph, &subgraph_layouts);
+    // Phase 4: Translate extracted cluster contents (node positions, edge
+    // bend points and edge label positions) by the cluster's final origin.
+    for extraction in &extractions {
+        place_extracted_cluster(&mut graph, extraction);
+    }
 
     // Compute graph bounds
     graph.compute_bounds();
 
     Ok(graph)
+}
+
+/// Mermaid's default direction for extracted clusters is the FLIP of the
+/// parent direction: TB -> LR, anything else -> TB
+/// (mermaid-graphlib.js: `dir = graphSettings.rankdir === 'TB' ? 'LR' : 'TB'`).
+fn flip_direction(dir: LayoutDirection) -> LayoutDirection {
+    match dir {
+        LayoutDirection::TopToBottom => LayoutDirection::LeftToRight,
+        _ => LayoutDirection::TopToBottom,
+    }
+}
+
+/// Vertical padding a collapsed cluster reserves around its content. Mermaid
+/// centers cluster content vertically; a container cluster (one whose content
+/// includes another cluster) uses a symmetric `CLUSTER_PADDING_Y` band with no
+/// additive title height, while a leaf cluster (plain-node content) uses the
+/// larger `CLUSTER_LEAF_PADDING_Y` band with the title absorbed into it. Both
+/// the collapsed-node sizing and the content placement must use this same value
+/// so content lands centered.
+fn cluster_vertical_padding(graph: &LayoutGraph, cluster_id: &str) -> f64 {
+    let has_cluster_child = graph.nodes.iter().any(|child| {
+        child.parent_id.as_deref() == Some(cluster_id)
+            && child.metadata.get("is_group") == Some(&"true".to_string())
+            && graph
+                .nodes
+                .iter()
+                .any(|n| n.parent_id.as_deref() == Some(child.id.as_str()))
+    });
+    if has_cluster_child {
+        CLUSTER_PADDING_Y
+    } else {
+        CLUSTER_LEAF_PADDING_Y
+    }
+}
+
+/// Find clusters without external connections and lay each out recursively as
+/// its own graph. Ports mermaid's externalConnections marking
+/// (mermaid-graphlib.js adjustClustersAndEdges) and cluster extraction
+/// (mermaid-graphlib.js extractor).
+fn extract_isolated_clusters(graph: &LayoutGraph, depth: usize) -> Result<Vec<ClusterExtraction>> {
+    if depth > MAX_EXTRACTION_DEPTH {
+        return Ok(Vec::new());
+    }
+
+    // Map parent id -> direct child node ids
+    let mut children_of: HashMap<&str, Vec<&str>> = HashMap::new();
+    for node in &graph.nodes {
+        if let Some(parent_id) = &node.parent_id {
+            children_of
+                .entry(parent_id.as_str())
+                .or_default()
+                .push(node.id.as_str());
+        }
+    }
+
+    // Clusters are group nodes that have children
+    let cluster_ids: Vec<&str> = graph
+        .nodes
+        .iter()
+        .filter(|n| {
+            n.metadata.get("is_group") == Some(&"true".to_string())
+                && children_of.contains_key(n.id.as_str())
+        })
+        .map(|n| n.id.as_str())
+        .collect();
+
+    if cluster_ids.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    // Transitive descendants of each cluster
+    fn collect_descendants(
+        id: &str,
+        children_of: &HashMap<&str, Vec<&str>>,
+        out: &mut HashSet<String>,
+    ) {
+        if let Some(children) = children_of.get(id) {
+            for child in children {
+                if out.insert((*child).to_string()) {
+                    collect_descendants(child, children_of, out);
+                }
+            }
+        }
+    }
+
+    let mut descendants: HashMap<&str, HashSet<String>> = HashMap::new();
+    for cluster_id in &cluster_ids {
+        let mut set = HashSet::new();
+        collect_descendants(cluster_id, &children_of, &mut set);
+        descendants.insert(cluster_id, set);
+    }
+
+    // Mark external connections: an edge with exactly one endpoint among the
+    // cluster's DESCENDANTS (mermaid-graphlib.js adjustClustersAndEdges sets
+    // externalConnections via `d1 XOR d2` over extractDescendants; the cluster
+    // id is not among its own descendants, so an edge whose endpoint IS the
+    // cluster id does not mark it external).
+    let mut external: HashSet<&str> = HashSet::new();
+    for cluster_id in &cluster_ids {
+        let desc = &descendants[cluster_id];
+        for edge in &graph.edges {
+            let d1 = edge.sources.iter().any(|s| desc.contains(s));
+            let d2 = edge.targets.iter().any(|t| desc.contains(t));
+            if d1 != d2 {
+                external.insert(cluster_id);
+                break;
+            }
+        }
+    }
+
+    let mut extractions = Vec::new();
+    let mut already_extracted: HashSet<String> = HashSet::new();
+
+    for cluster_id in &cluster_ids {
+        // Clusters nested inside an already-extracted cluster are handled by
+        // the recursive layout of that cluster's sub-graph.
+        if external.contains(cluster_id) || already_extracted.contains(*cluster_id) {
+            continue;
+        }
+
+        let desc = &descendants[cluster_id];
+
+        // Sub-graph direction: explicit cluster dir if present, otherwise the
+        // flip of the parent graph's direction.
+        let cluster_node = graph
+            .get_node(cluster_id)
+            .expect("cluster node must exist in graph");
+        let dir = match cluster_node.metadata.get("dir") {
+            Some(dir_str) => parse_direction(dir_str),
+            None => flip_direction(graph.options.direction),
+        };
+
+        let mut sub = LayoutGraph::new(format!("{}_extracted", cluster_id));
+        sub.options = graph.options.clone();
+        sub.options.direction = dir;
+        // Mermaid applies the parent's nodesep and ranksep + 25 to extracted
+        // cluster graphs (dagre/index.js recursiveRender).
+        sub.options.layer_spacing = graph.options.layer_spacing + CLUSTER_EXTRA_RANKSEP;
+
+        // Copy descendant nodes in original order. Direct children lose their
+        // parent link (the cluster is the sub-graph root); deeper descendants
+        // keep theirs so nested clusters are handled recursively.
+        for node in &graph.nodes {
+            if desc.contains(&node.id) {
+                let mut cloned = node.clone();
+                if cloned.parent_id.as_deref() == Some(*cluster_id) {
+                    cloned.parent_id = None;
+                }
+                sub.add_node(cloned);
+            }
+        }
+
+        // Copy internal edges (both endpoints inside the cluster)
+        let mut internal_edge_indices = Vec::new();
+        for (index, edge) in graph.edges.iter().enumerate() {
+            let all_inside = !edge.sources.is_empty()
+                && !edge.targets.is_empty()
+                && edge.sources.iter().all(|s| desc.contains(s))
+                && edge.targets.iter().all(|t| desc.contains(t));
+            if all_inside {
+                sub.add_edge(edge.clone());
+                internal_edge_indices.push(index);
+            }
+        }
+
+        // Lay out the extracted cluster recursively
+        let sub = layout_with_depth(sub, depth + 1)?;
+
+        already_extracted.extend(desc.iter().cloned());
+        extractions.push(ClusterExtraction {
+            cluster_id: (*cluster_id).to_string(),
+            descendant_ids: desc.clone(),
+            internal_edge_indices,
+            sub,
+        });
+    }
+
+    Ok(extractions)
+}
+
+/// Translate an extracted cluster's contents into their final positions based
+/// on where the collapsed cluster node ended up in the outer layout.
+fn place_extracted_cluster(graph: &mut LayoutGraph, extraction: &ClusterExtraction) {
+    let (cluster_x, cluster_y) = match graph.get_node(&extraction.cluster_id) {
+        Some(node) => match (node.x, node.y) {
+            (Some(x), Some(y)) => (x, y),
+            _ => return,
+        },
+        None => return,
+    };
+
+    // Center the content vertically within the collapsed cluster node: use the
+    // same symmetric padding the node was sized with (no additive title band),
+    // so the interior content is not pushed down by a per-level title height.
+    let vpad = cluster_vertical_padding(graph, &extraction.cluster_id);
+    let origin_x = extraction.sub.bounds_x.unwrap_or(0.0);
+    let origin_y = extraction.sub.bounds_y.unwrap_or(0.0);
+    let dx = cluster_x + CLUSTER_PADDING_X - origin_x;
+    let dy = cluster_y + vpad - origin_y;
+
+    for sub_node in &extraction.sub.nodes {
+        if let Some(node) = graph.get_node_mut(&sub_node.id) {
+            node.x = sub_node.x.map(|x| x + dx);
+            node.y = sub_node.y.map(|y| y + dy);
+            node.width = sub_node.width;
+            node.height = sub_node.height;
+            node.layer = sub_node.layer;
+            node.order = sub_node.order;
+        }
+    }
+
+    for (sub_index, &outer_index) in extraction.internal_edge_indices.iter().enumerate() {
+        let sub_edge = &extraction.sub.edges[sub_index];
+        if let Some(edge) = graph.edges.get_mut(outer_index) {
+            edge.bend_points = sub_edge
+                .bend_points
+                .iter()
+                .map(|p| Point::new(p.x + dx, p.y + dy))
+                .collect();
+            edge.label_position = sub_edge
+                .label_position
+                .map(|p| Point::new(p.x + dx, p.y + dy));
+        }
+    }
 }
 
 /// Parse direction from string
@@ -76,127 +353,19 @@ fn parse_direction(dir: &str) -> LayoutDirection {
     }
 }
 
-/// Identify and layout subgraphs that have their own direction
-fn layout_subgraphs_with_directions(
-    graph: &LayoutGraph,
-) -> Result<HashMap<String, SubgraphLayoutResult>> {
-    let mut results = HashMap::new();
-
-    // Find subgraphs with custom directions
-    for node in &graph.nodes {
-        if node.metadata.get("is_group") == Some(&"true".to_string()) {
-            if let Some(dir_str) = node.metadata.get("dir") {
-                let subgraph_dir = parse_direction(dir_str);
-
-                // Only process if direction differs from parent
-                if subgraph_dir != graph.options.direction {
-                    // Find all child nodes belonging to this subgraph
-                    let child_ids: Vec<&str> = graph
-                        .nodes
-                        .iter()
-                        .filter(|n| n.parent_id.as_deref() == Some(&node.id))
-                        .map(|n| n.id.as_str())
-                        .collect();
-
-                    if child_ids.is_empty() {
-                        continue;
-                    }
-
-                    // Create a sub-graph with just these nodes
-                    let mut sub_graph = LayoutGraph::new(format!("{}_internal", node.id));
-                    sub_graph.options.direction = subgraph_dir;
-                    sub_graph.options.node_spacing = graph.options.node_spacing;
-                    sub_graph.options.layer_spacing = graph.options.layer_spacing;
-
-                    // Add child nodes (without parent relationship for internal layout)
-                    for child_id in &child_ids {
-                        if let Some(child_node) = graph.get_node(child_id) {
-                            let mut cloned = child_node.clone();
-                            cloned.parent_id = None; // Remove parent for internal layout
-                            sub_graph.add_node(cloned);
-                        }
-                    }
-
-                    // Add edges between children
-                    for edge in &graph.edges {
-                        if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
-                            if child_ids.contains(&source) && child_ids.contains(&target) {
-                                sub_graph.add_edge(edge.clone());
-                            }
-                        }
-                    }
-
-                    // Layout the sub-graph
-                    let mut dagre_graph = to_dagre_graph(&sub_graph);
-                    let config = to_dagre_config(&sub_graph.options);
-                    dagre::layout(&mut dagre_graph, &config);
-                    apply_dagre_results(&mut sub_graph, &dagre_graph);
-                    sub_graph.compute_bounds();
-
-                    // Store relative positions
-                    let mut child_positions = HashMap::new();
-                    let min_x = sub_graph
-                        .nodes
-                        .iter()
-                        .filter_map(|n| n.x)
-                        .fold(f64::MAX, f64::min);
-                    let min_y = sub_graph
-                        .nodes
-                        .iter()
-                        .filter_map(|n| n.y)
-                        .fold(f64::MAX, f64::min);
-
-                    for child in &sub_graph.nodes {
-                        if let (Some(x), Some(y)) = (child.x, child.y) {
-                            // Store position relative to subgraph origin
-                            child_positions.insert(child.id.clone(), (x - min_x, y - min_y));
-                        }
-                    }
-
-                    results.insert(
-                        node.id.clone(),
-                        SubgraphLayoutResult {
-                            child_positions,
-                            width: sub_graph.width.unwrap_or(0.0),
-                            height: sub_graph.height.unwrap_or(0.0),
-                        },
-                    );
-                }
-            }
-        }
-    }
-
-    Ok(results)
-}
-
-/// Apply pre-computed child positions for subgraphs with custom directions
-fn apply_subgraph_child_positions(
-    graph: &mut LayoutGraph,
-    subgraph_layouts: &HashMap<String, SubgraphLayoutResult>,
-) {
-    for (subgraph_id, layout_result) in subgraph_layouts {
-        // Get the subgraph's final position
-        if let Some(subgraph_node) = graph.get_node(subgraph_id).cloned() {
-            if let (Some(sg_x), Some(sg_y)) = (subgraph_node.x, subgraph_node.y) {
-                // Calculate padding offset (center the content in the subgraph)
-                let padding = 20.0;
-                let content_offset_x = padding;
-                let content_offset_y = padding;
-
-                // Apply relative positions to children
-                for (child_id, (rel_x, rel_y)) in &layout_result.child_positions {
-                    if let Some(child) = graph.get_node_mut(child_id) {
-                        child.x = Some(sg_x + content_offset_x + rel_x);
-                        child.y = Some(sg_y + content_offset_y + rel_y);
-                    }
-                }
-            }
-        }
-    }
-}
-
 /// Convert LayoutGraph to DagreGraph for dagre processing
+#[cfg(test)]
 fn to_dagre_graph(graph: &LayoutGraph) -> DagreGraph {
+    to_dagre_graph_filtered(graph, &HashSet::new(), &HashSet::new())
+}
+
+/// Convert LayoutGraph to DagreGraph, skipping the given node ids and edge
+/// indices (used to hide extracted cluster contents from the outer layout).
+fn to_dagre_graph_filtered(
+    graph: &LayoutGraph,
+    skip_nodes: &HashSet<String>,
+    skip_edges: &HashSet<usize>,
+) -> DagreGraph {
     let mut dg = DagreGraph::new();
 
     // Set graph-level options
@@ -210,24 +379,38 @@ fn to_dagre_graph(graph: &LayoutGraph) -> DagreGraph {
     };
 
     // Add nodes (flatten the tree, handling children separately)
-    add_nodes_recursive(&mut dg, &graph.nodes, None);
+    add_nodes_recursive(&mut dg, &graph.nodes, None, skip_nodes);
 
     // Add edges
-    for edge in &graph.edges {
+    for (index, edge) in graph.edges.iter().enumerate() {
+        if skip_edges.contains(&index) {
+            continue;
+        }
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
-            // Estimate label size if present (roughly 8px per char, 16px height)
-            let (label_width, label_height) = if let Some(label) = &edge.label {
-                let width = (label.len() as f64) * 8.0 + 16.0; // padding
-                let height = 20.0;
-                (width, height)
+            if skip_nodes.contains(source) || skip_nodes.contains(target) {
+                continue;
+            }
+            // Use the label dimensions measured before layout (mirroring
+            // mermaid's insertEdgeLabel, which sets edge.width/height from
+            // the label bbox before running dagre).
+            let (label_width, label_height) = if edge.label.is_some() {
+                (edge.label_width, edge.label_height)
             } else {
                 (0.0, 0.0)
             };
 
             let label = EdgeLabel {
                 weight: edge.weight as i32,
+                minlen: edge.minlen as i32,
                 width: label_width,
                 height: label_height,
+                // Mermaid renders flowchart/state/class/requirement edges with
+                // labelpos "c" (see flowDb.ts / stateCommon.ts G_EDGE_LABELPOS),
+                // which centers the label on the edge path. Dagre's default is
+                // "r", which shifts the label right by width/2 + labeloffset and
+                // pulls it off the polyline. Use "c" so the dagre-computed
+                // edge.x/edge.y coincide with the edge-label dummy bend point.
+                labelpos: "c".to_string(),
                 ..Default::default()
             };
             dg.set_edge(source, target, label);
@@ -238,8 +421,16 @@ fn to_dagre_graph(graph: &LayoutGraph) -> DagreGraph {
 }
 
 /// Recursively add nodes to DagreGraph, handling compound nodes
-fn add_nodes_recursive(dg: &mut DagreGraph, nodes: &[LayoutNode], parent: Option<&str>) {
+fn add_nodes_recursive(
+    dg: &mut DagreGraph,
+    nodes: &[LayoutNode],
+    parent: Option<&str>,
+    skip_nodes: &HashSet<String>,
+) {
     for node in nodes {
+        if skip_nodes.contains(&node.id) {
+            continue;
+        }
         let label = NodeLabel {
             width: node.width,
             height: node.height,
@@ -251,14 +442,16 @@ fn add_nodes_recursive(dg: &mut DagreGraph, nodes: &[LayoutNode], parent: Option
         // Set parent relationship for compound graphs
         // Priority: explicit parent_id field, then parent parameter (from nested children)
         if let Some(ref parent_id) = node.parent_id {
-            dg.set_parent(&node.id, parent_id);
+            if !skip_nodes.contains(parent_id) {
+                dg.set_parent(&node.id, parent_id);
+            }
         } else if let Some(parent_id) = parent {
             dg.set_parent(&node.id, parent_id);
         }
 
         // Recursively add children
         if !node.children.is_empty() {
-            add_nodes_recursive(dg, &node.children, Some(&node.id));
+            add_nodes_recursive(dg, &node.children, Some(&node.id), skip_nodes);
         }
     }
 }
@@ -302,16 +495,18 @@ fn apply_dagre_results(graph: &mut LayoutGraph, dg: &DagreGraph) {
                     .map(|p| Point::new(p.x, p.y))
                     .collect();
 
-                // Compute label position from the actual edge path (bend_points)
-                // Use geometric midpoint (point at half the total path length) for accurate
-                // positioning, matching mermaid's traverseEdge approach
-                if edge.label.is_some() && !edge.bend_points.is_empty() {
-                    edge.label_position = types::geometric_midpoint(&edge.bend_points);
-                }
-                // Fallback to dagre's position if no bend points (shouldn't happen)
-                else if edge.label.is_some() {
+                // Position the edge label. Mirror mermaid's positionEdgeLabel
+                // (dagre-wrapper/edges.js): prefer dagre's computed edge label
+                // coordinate (edge.x/edge.y), which comes from the edge-label
+                // dummy node's placement. Only fall back to the geometric
+                // midpoint of the polyline when dagre did not compute one (e.g.
+                // paths cut/rerouted around clusters, matching mermaid's
+                // paths.updatedPath branch).
+                if edge.label.is_some() {
                     if let (Some(x), Some(y)) = (edge_label.x, edge_label.y) {
                         edge.label_position = Some(Point::new(x, y));
+                    } else if !edge.bend_points.is_empty() {
+                        edge.label_position = types::geometric_midpoint(&edge.bend_points);
                     }
                 }
             }
@@ -360,14 +555,12 @@ mod tests {
 
     #[test]
     fn test_subgraph_with_different_direction() {
-        // Test that a subgraph with its own direction lays out nodes differently
+        // Test that an ISOLATED subgraph (no external connections) with its own
+        // direction lays out nodes with that direction.
         // Main graph is TB (top-to-bottom), subgraph is LR (left-to-right)
         //
-        // In TB layout: nodes stack vertically (y increases)
-        // In LR layout: nodes stack horizontally (x increases)
-        //
-        // So nodes inside the LR subgraph should be side-by-side (same y, different x)
-        // while the subgraph itself is positioned vertically relative to other top-level nodes
+        // Mermaid extracts clusters without external connections into their own
+        // graph and honors the explicit direction there.
 
         let mut graph = LayoutGraph::new("test_subgraph_dir");
         graph.options.direction = LayoutDirection::TopToBottom;
@@ -389,21 +582,18 @@ mod tests {
         // Add edge within subgraph
         graph.add_edge(LayoutEdge::new("e1", "A", "B"));
 
-        // Add a node outside the subgraph
+        // Add nodes outside the subgraph (not connected to the subgraph)
         graph.add_node(LayoutNode::new("C", 50.0, 30.0));
-
-        // Add edge from subgraph to external node
-        graph.add_edge(LayoutEdge::new("e2", "B", "C"));
+        graph.add_node(LayoutNode::new("D", 50.0, 30.0));
+        graph.add_edge(LayoutEdge::new("e2", "C", "D"));
 
         let result = layout(graph).unwrap();
 
         let a = result.get_node("A").unwrap();
         let b = result.get_node("B").unwrap();
-        let c = result.get_node("C").unwrap();
 
         eprintln!("Node A: x={:?}, y={:?}", a.x, a.y);
         eprintln!("Node B: x={:?}, y={:?}", b.x, b.y);
-        eprintln!("Node C: x={:?}, y={:?}", c.x, c.y);
 
         // Within the LR subgraph, A and B should be side-by-side (B to the right of A)
         // They should have similar y-coordinates
@@ -422,6 +612,380 @@ mod tests {
             "B should be to the right of A in LR subgraph. A.x={:.1}, B.x={:.1}",
             a.x.unwrap(),
             b.x.unwrap()
+        );
+    }
+
+    #[test]
+    fn test_isolated_subgraph_flips_direction_in_tb_parent() {
+        // Mermaid extracts clusters WITHOUT external connections into their own
+        // graph and lays them out with the FLIPPED default direction:
+        // TB parent -> LR subgraph (mermaid-graphlib.js extractor:
+        // `dir = graphSettings.rankdir === 'TB' ? 'LR' : 'TB'`).
+        let mut graph = LayoutGraph::new("test_flip_tb");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        // Subgraph with NO explicit direction
+        let mut subgraph = LayoutNode::new("sub1", 0.0, 0.0);
+        subgraph
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(subgraph);
+
+        graph.add_node(LayoutNode::new("A", 50.0, 30.0).with_parent("sub1"));
+        graph.add_node(LayoutNode::new("B", 50.0, 30.0).with_parent("sub1"));
+        graph.add_node(LayoutNode::new("C", 50.0, 30.0).with_parent("sub1"));
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+        graph.add_edge(LayoutEdge::new("e2", "B", "C"));
+
+        // Unrelated nodes outside the subgraph
+        graph.add_node(LayoutNode::new("X", 50.0, 30.0));
+        graph.add_node(LayoutNode::new("Y", 50.0, 30.0));
+        graph.add_edge(LayoutEdge::new("e3", "X", "Y"));
+
+        let result = layout(graph).unwrap();
+
+        let a = result.get_node("A").unwrap();
+        let b = result.get_node("B").unwrap();
+        let c = result.get_node("C").unwrap();
+
+        // Chain should be laid out horizontally (LR): same y, increasing x
+        let a_cy = a.y.unwrap() + a.height / 2.0;
+        let b_cy = b.y.unwrap() + b.height / 2.0;
+        let c_cy = c.y.unwrap() + c.height / 2.0;
+        assert!(
+            (a_cy - b_cy).abs() < 10.0 && (b_cy - c_cy).abs() < 10.0,
+            "Isolated subgraph chain in TB parent should be horizontal (LR). \
+             A.cy={:.1}, B.cy={:.1}, C.cy={:.1}",
+            a_cy,
+            b_cy,
+            c_cy
+        );
+        assert!(
+            a.x.unwrap() < b.x.unwrap() && b.x.unwrap() < c.x.unwrap(),
+            "Isolated subgraph chain should flow left-to-right. A.x={:.1}, B.x={:.1}, C.x={:.1}",
+            a.x.unwrap(),
+            b.x.unwrap(),
+            c.x.unwrap()
+        );
+
+        // Children should sit inside the collapsed cluster node bounds
+        let sub = result.get_node("sub1").unwrap();
+        let (sx, sy) = (sub.x.unwrap(), sub.y.unwrap());
+        for id in ["A", "B", "C"] {
+            let n = result.get_node(id).unwrap();
+            assert!(
+                n.x.unwrap() >= sx
+                    && n.y.unwrap() >= sy
+                    && n.x.unwrap() + n.width <= sx + sub.width + 0.01
+                    && n.y.unwrap() + n.height <= sy + sub.height + 0.01,
+                "Child {} should be inside cluster bounds. child=({:.1},{:.1},{:.1},{:.1}) \
+                 cluster=({:.1},{:.1},{:.1},{:.1})",
+                id,
+                n.x.unwrap(),
+                n.y.unwrap(),
+                n.width,
+                n.height,
+                sx,
+                sy,
+                sub.width,
+                sub.height
+            );
+        }
+    }
+
+    #[test]
+    fn test_isolated_subgraph_in_lr_parent_lays_out_tb() {
+        // Flip default: any non-TB parent direction flips extracted clusters to TB.
+        let mut graph = LayoutGraph::new("test_flip_lr");
+        graph.options.direction = LayoutDirection::LeftToRight;
+
+        let mut subgraph = LayoutNode::new("sub1", 0.0, 0.0);
+        subgraph
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(subgraph);
+
+        graph.add_node(LayoutNode::new("A", 50.0, 30.0).with_parent("sub1"));
+        graph.add_node(LayoutNode::new("B", 50.0, 30.0).with_parent("sub1"));
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+
+        graph.add_node(LayoutNode::new("X", 50.0, 30.0));
+        graph.add_node(LayoutNode::new("Y", 50.0, 30.0));
+        graph.add_edge(LayoutEdge::new("e2", "X", "Y"));
+
+        let result = layout(graph).unwrap();
+
+        let a = result.get_node("A").unwrap();
+        let b = result.get_node("B").unwrap();
+
+        let a_cx = a.x.unwrap() + a.width / 2.0;
+        let b_cx = b.x.unwrap() + b.width / 2.0;
+        assert!(
+            (a_cx - b_cx).abs() < 10.0,
+            "Isolated subgraph in LR parent should lay out TB (same x). A.cx={:.1}, B.cx={:.1}",
+            a_cx,
+            b_cx
+        );
+        assert!(
+            b.y.unwrap() > a.y.unwrap(),
+            "B should be below A in TB sub-layout. A.y={:.1}, B.y={:.1}",
+            a.y.unwrap(),
+            b.y.unwrap()
+        );
+    }
+
+    #[test]
+    fn test_leaf_cluster_content_vertically_centered() {
+        // An isolated LEAF cluster (plain-node content) must center its content
+        // vertically with a symmetric ~35px padding band, with the title
+        // absorbed into the top padding rather than stacked above the content.
+        // Mermaid: titled `S1 { A --> B }` -> rect height 124 around node height
+        // 54 => 35px top and bottom (node vertically centered).
+        let mut graph = LayoutGraph::new("test_leaf_centered");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        let mut s1 = LayoutNode::new("S1", 0.0, 0.0);
+        s1.metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(s1);
+        graph.add_node(LayoutNode::new("A", 69.4375, 54.0).with_parent("S1"));
+        graph.add_node(LayoutNode::new("B", 69.0625, 54.0).with_parent("S1"));
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+
+        let result = layout(graph).unwrap();
+
+        let s1 = result.get_node("S1").unwrap();
+        let a = result.get_node("A").unwrap();
+
+        let top_pad = a.y.unwrap() - s1.y.unwrap();
+        let bottom_pad = (s1.y.unwrap() + s1.height) - (a.y.unwrap() + a.height);
+        assert!(
+            (top_pad - bottom_pad).abs() < 2.0,
+            "Leaf cluster content should be vertically centered (title absorbed \
+             into top padding). top_pad={:.1}, bottom_pad={:.1}",
+            top_pad,
+            bottom_pad
+        );
+        assert!(
+            (top_pad - 35.0).abs() < 3.0,
+            "Leaf cluster top padding should be ~35, got {:.1}",
+            top_pad
+        );
+    }
+
+    #[test]
+    fn test_nested_container_cluster_omits_title_band() {
+        // A CONTAINER cluster (whose content includes another cluster) must NOT
+        // add a title band per nesting level. Mermaid centers the inner content
+        // with a symmetric ~20px band: nested `Outer { Inner { A }, B }` renders
+        // Outer rect height 164 around inner content of height 124 => 20px each
+        // side. The extra per-level title height (25) previously inflated this to
+        // ~189 and pushed the interior content down.
+        let mut graph = LayoutGraph::new("test_nested_container");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        let mut outer = LayoutNode::new("Outer", 0.0, 0.0);
+        outer
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(outer);
+
+        let mut inner = LayoutNode::new("Inner", 0.0, 0.0).with_parent("Outer");
+        inner
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(inner);
+
+        graph.add_node(LayoutNode::new("A", 69.4375, 54.0).with_parent("Inner"));
+        graph.add_node(LayoutNode::new("B", 69.0625, 54.0).with_parent("Outer"));
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+
+        let result = layout(graph).unwrap();
+
+        let outer = result.get_node("Outer").unwrap();
+        let inner = result.get_node("Inner").unwrap();
+
+        assert!(
+            (outer.height - 164.0).abs() < 6.0,
+            "Container cluster height should be ~164 (inner content 124 + 2*20), \
+             with no additive title band; got {:.1}",
+            outer.height
+        );
+
+        // Inner should sit vertically centered inside Outer (~20px each side).
+        let top_pad = inner.y.unwrap() - outer.y.unwrap();
+        let bottom_pad = (outer.y.unwrap() + outer.height) - (inner.y.unwrap() + inner.height);
+        assert!(
+            (top_pad - bottom_pad).abs() < 2.0,
+            "Inner should be vertically centered in Outer. top_pad={:.1}, bottom_pad={:.1}",
+            top_pad,
+            bottom_pad
+        );
+        assert!(
+            (top_pad - 20.0).abs() < 3.0,
+            "Container top padding should be ~20 (no title band), got {:.1}",
+            top_pad
+        );
+    }
+
+    #[test]
+    fn test_titled_cluster_horizontal_padding_is_37_5() {
+        // Mermaid's effective inner HORIZONTAL padding (node-left-edge to
+        // cluster-left-edge) is a measured ~37.5px constant in every cluster
+        // (leaf and nested, LR and TB), while VERTICAL padding is ~20px. The
+        // collapsed cluster node width must therefore be content_width + 2*37.5,
+        // not content_width + 2*20. A single-child titled cluster has a content
+        // width equal to that child's width, so the relationship is exact.
+        let mut graph = LayoutGraph::new("test_cluster_hpad");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        let mut subgraph = LayoutNode::new("sub1", 0.0, 0.0);
+        subgraph
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        subgraph
+            .metadata
+            .insert("label".to_string(), "Titled".to_string());
+        graph.add_node(subgraph);
+
+        // Single child of known width; the extracted sub content width equals it.
+        graph.add_node(LayoutNode::new("A", 100.0, 40.0).with_parent("sub1"));
+
+        // Unrelated external nodes so the cluster stays isolated (extractable).
+        graph.add_node(LayoutNode::new("X", 50.0, 30.0));
+        graph.add_node(LayoutNode::new("Y", 50.0, 30.0));
+        graph.add_edge(LayoutEdge::new("e1", "X", "Y"));
+
+        let result = layout(graph).unwrap();
+
+        let sub = result.get_node("sub1").unwrap();
+        let a = result.get_node("A").unwrap();
+
+        // Content width for a single child is its own width.
+        let expected = a.width + 2.0 * 37.5;
+        assert!(
+            (sub.width - expected).abs() < 0.5,
+            "Cluster width should be content + 2*37.5 (horizontal padding). \
+             content={:.1}, expected={:.1}, got={:.1}",
+            a.width,
+            expected,
+            sub.width
+        );
+
+        // The leftmost child's inset from the cluster's left edge is the
+        // horizontal padding constant.
+        let inset = a.x.unwrap() - sub.x.unwrap();
+        assert!(
+            (inset - 37.5).abs() < 0.5,
+            "Left inner padding should be 37.5, got {:.1}",
+            inset
+        );
+    }
+
+    #[test]
+    fn test_cluster_id_edges_do_not_block_extraction() {
+        // Mermaid marks externalConnections only when an edge has exactly one
+        // endpoint among a cluster's DESCENDANTS (d1 XOR d2); the cluster id is
+        // not among its own descendants, so an edge whose endpoint IS the
+        // cluster id (e.g. `Terminal -.-> Problem`) does not block extraction.
+        // The extracted cluster must still honor its explicit `direction`.
+        // Mirrors channel_flowchart_terminal_layers.
+        let mut graph = LayoutGraph::new("test_cluster_id_edges");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        // Cluster sub1 with explicit LR direction, children A -> B
+        let mut sub1 = LayoutNode::new("sub1", 0.0, 0.0);
+        sub1.metadata
+            .insert("is_group".to_string(), "true".to_string());
+        sub1.metadata.insert("dir".to_string(), "LR".to_string());
+        graph.add_node(sub1);
+        graph.add_node(LayoutNode::new("A", 50.0, 30.0).with_parent("sub1"));
+        graph.add_node(LayoutNode::new("B", 50.0, 30.0).with_parent("sub1"));
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+
+        // Cluster sub2, children X -> Y
+        let mut sub2 = LayoutNode::new("sub2", 0.0, 0.0);
+        sub2.metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(sub2);
+        graph.add_node(LayoutNode::new("X", 50.0, 30.0).with_parent("sub2"));
+        graph.add_node(LayoutNode::new("Y", 50.0, 30.0).with_parent("sub2"));
+        graph.add_edge(LayoutEdge::new("e2", "X", "Y"));
+
+        // Edge between the CLUSTER IDS themselves (no descendant endpoints)
+        graph.add_edge(LayoutEdge::new("e3", "sub1", "sub2"));
+
+        let result = layout(graph).unwrap();
+
+        let a = result.get_node("A").unwrap();
+        let b = result.get_node("B").unwrap();
+
+        // sub1's explicit LR direction must be honored: A and B side-by-side
+        let a_cy = a.y.unwrap() + a.height / 2.0;
+        let b_cy = b.y.unwrap() + b.height / 2.0;
+        assert!(
+            (a_cy - b_cy).abs() < 10.0,
+            "Cluster-id edges must not block extraction: sub1's LR direction \
+             should be honored. A.cy={:.1}, B.cy={:.1}",
+            a_cy,
+            b_cy
+        );
+        assert!(
+            b.x.unwrap() > a.x.unwrap(),
+            "B should be right of A in LR cluster. A.x={:.1}, B.x={:.1}",
+            a.x.unwrap(),
+            b.x.unwrap()
+        );
+
+        // The cluster-id edge keeps the clusters connected in the outer TB
+        // graph: sub2 should be laid out below sub1.
+        let s1 = result.get_node("sub1").unwrap();
+        let s2 = result.get_node("sub2").unwrap();
+        assert!(
+            s2.y.unwrap() > s1.y.unwrap() + s1.height / 2.0,
+            "sub2 should be below sub1 in outer TB layout. sub1.y={:.1} sub2.y={:.1}",
+            s1.y.unwrap(),
+            s2.y.unwrap()
+        );
+    }
+
+    #[test]
+    fn test_connected_subgraph_not_extracted_ignores_explicit_direction() {
+        // Mermaid NEVER extracts clusters with external connections, and thus
+        // ignores their explicit direction: children follow the parent direction.
+        let mut graph = LayoutGraph::new("test_connected_dir_ignored");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        let mut subgraph = LayoutNode::new("sub1", 0.0, 0.0);
+        subgraph
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        subgraph
+            .metadata
+            .insert("dir".to_string(), "LR".to_string());
+        graph.add_node(subgraph);
+
+        graph.add_node(LayoutNode::new("A", 50.0, 30.0).with_parent("sub1"));
+        graph.add_node(LayoutNode::new("B", 50.0, 30.0).with_parent("sub1"));
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+
+        // External connection: B -> C where C is outside the subgraph
+        graph.add_node(LayoutNode::new("C", 50.0, 30.0));
+        graph.add_edge(LayoutEdge::new("e2", "B", "C"));
+
+        let result = layout(graph).unwrap();
+
+        let a = result.get_node("A").unwrap();
+        let b = result.get_node("B").unwrap();
+
+        // With external connections the cluster stays in the parent layout:
+        // TB direction applies, so B is below A.
+        assert!(
+            b.y.unwrap() > a.y.unwrap() + a.height / 2.0,
+            "Connected subgraph should follow parent TB direction (dir ignored). \
+             A.y={:.1}, B.y={:.1}",
+            a.y.unwrap(),
+            b.y.unwrap()
         );
     }
 
@@ -686,6 +1250,60 @@ mod tests {
                 midpoint_y
             );
         }
+    }
+
+    #[test]
+    fn test_edge_label_uses_dagre_position_not_midpoint() {
+        // Mermaid's positionEdgeLabel keeps the dagre-computed edge label
+        // coordinate (edge.x/edge.y) unless the path was cut by a cluster.
+        // Dagre computes that coordinate from the edge-label dummy node, which
+        // is also emitted as a bend point. So the label position must coincide
+        // with one of the edge's bend points -- NOT the geometric midpoint of
+        // the polyline, which for a diagonal decision edge falls between
+        // vertices and can be ~50px away.
+        let mut graph = LayoutGraph::new("test_dagre_label_pos");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        // Decision diamond fanning out to two children (message_indent shape).
+        graph.add_node(LayoutNode::new("Start", 200.0, 54.0));
+        graph.add_node(LayoutNode::new("IsAction", 124.0, 124.0));
+        graph.add_node(LayoutNode::new("ActionPath", 178.0, 54.0));
+        graph.add_node(LayoutNode::new("NormalPath", 178.0, 54.0));
+
+        graph.add_edge(LayoutEdge::new("e0", "Start", "IsAction"));
+        graph.add_edge(
+            LayoutEdge::new("e1", "IsAction", "ActionPath").with_label("Yes\nMessageType::Action"),
+        );
+        graph.add_edge(
+            LayoutEdge::new("e2", "IsAction", "NormalPath").with_label("No\nNormal text"),
+        );
+
+        let result = layout(graph).unwrap();
+
+        let edge = result
+            .edges
+            .iter()
+            .find(|e| e.id == "e1")
+            .expect("edge e1 present");
+        let label_pos = edge.label_position.expect("label position set");
+
+        // The label must coincide with one of the bend points (the edge-label
+        // dummy vertex that dagre also uses as edge.x/edge.y).
+        let min_dist = edge
+            .bend_points
+            .iter()
+            .map(|p| ((p.x - label_pos.x).powi(2) + (p.y - label_pos.y).powi(2)).sqrt())
+            .fold(f64::INFINITY, f64::min);
+
+        assert!(
+            min_dist < 1.0,
+            "Edge label at ({:.2},{:.2}) should coincide with a dagre bend point, \
+             but nearest bend point is {:.2}px away. Bend points: {:?}",
+            label_pos.x,
+            label_pos.y,
+            min_dist,
+            edge.bend_points
+        );
     }
 
     #[test]

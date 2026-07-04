@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1113.1999999999998" height="976.8000000000001" viewBox="-8 -27.999999999999993 1113.1999999999998 976.8000000000001" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-subGraph0">
+        <rect x="34.399999999999864" y="102.80000000000001" width="1042.8" height="668.4000000000001" class="cluster"/>
+        <text x="555.7999999999998" y="118.80000000000001" class="cluster-label" text-anchor="middle">Current Code (line 612)</text>
+      </g>
+      <g class="subgraph" id="subgraph-subGraph1">
+        <rect x="19.999999999999872" y="-19.999999999999993" width="533.2" height="462" class="cluster"/>
+        <text x="286.5999999999999" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Clippy&apos;s Concern</text>
+      </g>
+      <g class="subgraph" id="subgraph-subGraph2">
+        <rect x="623.1999999999999" y="287.4" width="225.60000000000002" height="648.4000000000001" class="cluster"/>
+        <text x="736" y="303.4" class="cluster-label" text-anchor="middle">Fix: Use Array</text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-A-B-0">
+        <path d="M 109.45 237.40 C 100.86 260.73, 92.28 284.07, 104.34 301.71 C 116.40 319.36, 149.10 331.31, 181.80 343.27" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-B-C-0">
+        <path d="M 274.60 422.00 C 274.60 438.67, 274.60 455.33, 395.17 467.83 C 515.73 480.33, 756.87 488.67, 877.43 497.00 C 998.00 513.67, 998.00 522.00, 998.00 522.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-C-D-0">
+        <path d="M 998.00 611.60 C 998.00 619.93, 998.00 628.27, 998.00 636.60 C 998.00 644.93, 998.00 653.27, 998.00 661.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-E-A-0">
+        <path d="M 142.40 77.80 C 142.40 89.47, 142.40 101.13, 142.40 112.80 C 142.40 124.47, 142.40 136.13, 142.40 147.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+      </g>
+      <g class="edge" id="edge-L-F-B-0">
+        <path d="M 406.80 219.00 C 406.80 248.47, 406.80 277.93, 398.91 296.83 C 391.02 315.73, 375.23 324.07, 359.45 332.40" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="2" stroke-dasharray="3,3"/>
+      </g>
+      <g class="edge" id="edge-L-G-H-0">
+        <path d="M 736.00 422.00 C 736.00 430.33, 736.00 438.67, 736.00 447.00 C 736.00 455.33, 736.00 463.67, 736.00 472.00 C 736.00 480.33, 736.00 488.67, 736.00 497.00 C 736.00 513.67, 736.00 522.00, 736.00 522.00" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-H-I-0">
+        <path d="M 736.00 611.60 C 736.00 619.93, 736.00 628.27, 736.00 636.60 C 736.00 644.93, 736.00 653.27, 736.00 661.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-I-J-0">
+        <path d="M 736.00 751.20 C 736.00 759.53, 736.00 767.87, 736.00 776.20 C 736.00 784.53, 736.00 792.87, 736.00 801.20 C 736.00 817.87, 736.00 826.20, 736.00 826.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-A-G-0">
+        <path d="M 176.76 237.40 C 185.71 260.73, 194.65 284.07, 272.39 305.34 C 350.13 326.61, 496.67 345.82, 643.20 365.03" class="edge-path" stroke-width="2" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-E-A-0">
+        <rect x="73.59999999999987" y="101.80000000000001" width="137.6" height="22" class="edge-label-bg"/>
+        <text x="142.39999999999986" y="112.80000000000001" class="edge-label" text-anchor="middle" dominant-baseline="central">Why heap allocate?</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-A-G-0">
+        <rect x="336.98170990090847" y="320.07506264290646" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="384.18170990090846" y="331.07506264290646" class="edge-label" text-anchor="middle" dominant-baseline="central">Replace with</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-A">
+        <rect x="54.399999999999864" y="147.8" width="176" height="89.6" style="fill:#ff9999 !important"/>
+        <text x="142.39999999999986" y="192.60000000000002" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #ffffff"><tspan x="142.39999999999986" y="192.60000000000002" dy="-0.6em">vec!</tspan><tspan x="142.39999999999986" dy="1.2em">Heap allocation</tspan></text>
+      </g>
+      <g class="node" id="node-B">
+        <rect x="181.7999999999999" y="332.4" width="185.6" height="89.6"/>
+        <text x="274.5999999999999" y="377.2" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="274.5999999999999" y="377.2" dy="-0.6em">.iter</tspan><tspan x="274.5999999999999" dy="1.2em">Immutable borrow</tspan></text>
+      </g>
+      <g class="node" id="node-C">
+        <rect x="938.7999999999998" y="522" width="118.39999999999999" height="89.6"/>
+        <text x="997.9999999999999" y="566.8" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="997.9999999999999" y="566.8" dy="-0.6em">.filter</tspan><tspan x="997.9999999999999" dy="1.2em">Read-only</tspan></text>
+      </g>
+      <g class="node" id="node-D">
+        <rect x="943.5999999999999" y="661.6" width="108.8" height="89.6"/>
+        <text x="997.9999999999999" y="706.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="997.9999999999999" y="706.4" dy="-0.6em">.collect</tspan><tspan x="997.9999999999999" dy="1.2em">New Vec</tspan></text>
+      </g>
+      <g class="node" id="node-E">
+        <rect x="39.99999999999987" y="25.000000000000007" width="204.79999999999998" height="52.8" style="fill:#ffcccc !important"/>
+        <text x="142.39999999999986" y="51.400000000000006" class="label" dominant-baseline="central" style="fill: #000000" text-anchor="middle">vec! never mutated</text>
+      </g>
+      <g class="node" id="node-F">
+        <rect x="280.4" y="166.20000000000002" width="252.79999999999998" height="52.8" style="fill:#ffcccc !important"/>
+        <text x="406.79999999999995" y="192.60000000000002" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000000">Only used for iteration</text>
+      </g>
+      <g class="node" id="node-G">
+        <rect x="643.1999999999999" y="332.4" width="185.6" height="89.6" style="fill:#99ff99 !important"/>
+        <text x="735.9999999999999" y="377.2" class="label" text-anchor="middle" style="fill: #000000" dominant-baseline="central"><tspan x="735.9999999999999" y="377.2" dy="-0.6em">[...]</tspan><tspan x="735.9999999999999" dy="1.2em">Stack allocation</tspan></text>
+      </g>
+      <g class="node" id="node-H">
+        <rect x="657.5999999999999" y="522" width="156.8" height="89.6"/>
+        <text x="735.9999999999999" y="566.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="735.9999999999999" y="566.8" dy="-0.6em">.iter</tspan><tspan x="735.9999999999999" dy="1.2em">Same behavior</tspan></text>
+      </g>
+      <g class="node" id="node-I">
+        <rect x="657.5999999999999" y="661.6" width="156.8" height="89.6"/>
+        <text x="735.9999999999999" y="706.4" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="735.9999999999999" y="706.4" dy="-0.6em">.filter</tspan><tspan x="735.9999999999999" dy="1.2em">Same behavior</tspan></text>
+      </g>
+      <g class="node" id="node-J">
+        <rect x="667.1999999999999" y="826.2" width="137.6" height="89.6"/>
+        <text x="735.9999999999999" y="871" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="735.9999999999999" y="871" dy="-0.6em">.collect</tspan><tspan x="735.9999999999999" dy="1.2em">Same result</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

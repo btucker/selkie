@@ -9,15 +9,24 @@ use crate::error::Result;
 pub struct NodeSizeConfig {
     /// Base font size for text
     pub font_size: f64,
-    /// Horizontal padding around text
+    /// Node padding around label content, matching mermaid's `node.padding`
+    /// (flowchart default 15, see mermaid config.schema.yaml). Shape formulas
+    /// derive their spacing from this single value (e.g. rects use 2x
+    /// horizontally, 1x vertically).
+    pub padding: f64,
+    /// Label wrapping width, matching mermaid's `flowchart.wrappingWidth`
+    /// (default 200, see mermaid config.schema.yaml). HTML labels wider than
+    /// this are greedily word-wrapped at this pixel width.
+    pub wrapping_width: f64,
+    /// Horizontal padding around text (legacy estimators only)
     pub padding_horizontal: f64,
-    /// Vertical padding around text
+    /// Vertical padding around text (legacy estimators only)
     pub padding_vertical: f64,
-    /// Minimum node width
+    /// Minimum node width (legacy estimators only; mermaid has no clamp)
     pub min_width: f64,
-    /// Minimum node height
+    /// Minimum node height (legacy estimators only; mermaid has no clamp)
     pub min_height: f64,
-    /// Maximum node width (text wraps beyond this)
+    /// Maximum node width (legacy estimators only; mermaid has no clamp)
     pub max_width: Option<f64>,
 }
 
@@ -26,6 +35,10 @@ impl Default for NodeSizeConfig {
         Self {
             // mermaid.js uses 16px as the default node font size
             font_size: 16.0,
+            // mermaid.js flowchart node.padding default
+            padding: 15.0,
+            // mermaid.js flowchart.wrappingWidth default
+            wrapping_width: 200.0,
             padding_horizontal: 16.0,
             padding_vertical: 8.0,
             min_width: 50.0,

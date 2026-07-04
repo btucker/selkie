@@ -110,10 +110,9 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
         graph.is_compound()
     );
 
-    // Adjust coordinate system for LR/RL (swap width/height)
-    adjust_coordinate_system(graph, config.rankdir);
-
     // Phase 1: Make space for edge labels (halve ranksep, double minlen)
+    // Runs in the original orientation, mirroring dagre layout.js where
+    // makeSpaceForEdgeLabels precedes adjustCoordinateSystem.
     edge_labels::make_space_for_edge_labels(graph, config.rankdir);
 
     // Phase 1.5: Remove self-edges (store on nodes before ranking)
@@ -220,6 +219,15 @@ pub fn layout(graph: &mut DagreGraph, config: &DagreConfig) {
     // Phase 12.5: Insert self-edge dummy nodes (after ordering)
     self_edges::insert_self_edges(graph);
 
+    // Adjust coordinate system for LR/RL (swap width/height) immediately before
+    // positioning, mirroring dagre layout.js order:
+    //   order -> insertSelfEdges -> adjustCoordinateSystem -> position.
+    // Running the swap here (rather than at the very start) means the edge-label
+    // dummy nodes created by normalize::run already exist, so their width/height
+    // are swapped too. The label then reserves its WIDTH along the horizontal
+    // rank/flow axis in LR/RL instead of its (smaller) height.
+    adjust_coordinate_system(graph, config.rankdir);
+
     // Phase 13: Assign coordinates
     position::position(graph);
 
@@ -283,10 +291,21 @@ fn adjust_coordinate_system(graph: &mut DagreGraph, rankdir: RankDir) {
     // For LR/RL, swap width and height so the layout algorithm
     // treats it like TB, then we'll swap back afterward
     if rankdir == RankDir::LR || rankdir == RankDir::RL {
-        for v in graph.nodes().into_iter().cloned().collect::<Vec<_>>() {
-            if let Some(node) = graph.node_mut(&v) {
-                std::mem::swap(&mut node.width, &mut node.height);
-            }
+        swap_width_height(graph);
+    }
+}
+
+/// Swap width/height on all nodes and edge labels (dagre coordinate-system.js
+/// `swapWidthHeight`, which applies to both `g.nodes()` and `g.edges()`).
+fn swap_width_height(graph: &mut DagreGraph) {
+    for v in graph.nodes().into_iter().cloned().collect::<Vec<_>>() {
+        if let Some(node) = graph.node_mut(&v) {
+            std::mem::swap(&mut node.width, &mut node.height);
+        }
+    }
+    for key in graph.edges().into_iter().cloned().collect::<Vec<_>>() {
+        if let Some(edge) = graph.edge_by_key_mut(&key) {
+            std::mem::swap(&mut edge.width, &mut edge.height);
         }
     }
 }
@@ -301,12 +320,8 @@ fn undo_coordinate_system(graph: &mut DagreGraph, rankdir: RankDir) {
     // For LR or RL, we need to swap X/Y and restore width/height
     if rankdir == RankDir::LR || rankdir == RankDir::RL {
         swap_xy(graph);
-        // Swap width/height back
-        for v in graph.nodes().into_iter().cloned().collect::<Vec<_>>() {
-            if let Some(node) = graph.node_mut(&v) {
-                std::mem::swap(&mut node.width, &mut node.height);
-            }
-        }
+        // Swap width/height back (nodes and edge labels)
+        swap_width_height(graph);
     }
 }
 
@@ -1130,6 +1145,65 @@ mod tests {
             "Queue should be above EmailWorker (lower y): Queue.y={:?}, EmailWorker.y={:?}",
             queue.y,
             email_worker.y
+        );
+    }
+
+    #[test]
+    fn lr_edge_label_reserves_label_width_in_flow_axis() {
+        // Regression: in LR/RL the coordinate-system swap must run AFTER the
+        // edge-label dummy nodes are created (i.e. just before `position`), so
+        // the label reserves its WIDTH along the horizontal (flow/rank) axis
+        // rather than its HEIGHT. Otherwise the layout is compressed by
+        // (label_width - label_height) per labeled edge.
+        //
+        // A -->|label| B  with a 36x24 label, nodes 100x50, ranksep 50 (LR).
+        //   flow-axis gap = 50 (A half) + 25 (halved ranksep) + 36 (label width)
+        //                   + 25 (halved ranksep) + 50 (B half) = 186
+        // With the bug the label contributes only its height (24), giving 174.
+        let mut g = new_graph();
+        g.graph_mut().rankdir = "LR".to_string();
+        g.set_node(
+            "A",
+            graph::NodeLabel {
+                width: 100.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
+        g.set_node(
+            "B",
+            graph::NodeLabel {
+                width: 100.0,
+                height: 50.0,
+                ..Default::default()
+            },
+        );
+        g.set_edge(
+            "A",
+            "B",
+            graph::EdgeLabel {
+                width: 36.0,
+                height: 24.0,
+                labelpos: "c".to_string(),
+                ..Default::default()
+            },
+        );
+
+        layout(
+            &mut g,
+            &DagreConfig {
+                rankdir: RankDir::LR,
+                ..Default::default()
+            },
+        );
+
+        let a = g.node("A").unwrap();
+        let b = g.node("B").unwrap();
+        let gap = b.x.unwrap() - a.x.unwrap();
+        assert!(
+            (gap - 186.0).abs() < 0.5,
+            "LR edge-label should reserve label WIDTH in the flow axis; expected gap ~186, got {}",
+            gap
         );
     }
 

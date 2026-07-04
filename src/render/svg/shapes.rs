@@ -1,9 +1,9 @@
 //! Shape rendering for flowchart nodes
 
-use crate::diagrams::flowchart::{FlowVertex, FlowVertexType};
+use crate::diagrams::flowchart::{FlowTextType, FlowVertex, FlowVertexType};
 use crate::layout::{LayoutNode, Point};
 
-use super::color::text_color_for_styles;
+use super::color::extract_style_property;
 use super::elements::{Attrs, SvgElement};
 use super::theme::Theme;
 
@@ -87,7 +87,7 @@ pub fn render_shape(
         FlowVertexType::DoubleCircle => {
             // Double circle - we'll use a group with two circles
             let r = w.max(h) / 2.0;
-            let inner_r = r - 4.0;
+            let inner_r = r - 5.0;
             SvgElement::group(vec![
                 SvgElement::circle(cx, cy, r),
                 SvgElement::circle(cx, cy, inner_r),
@@ -140,7 +140,8 @@ pub fn render_shape(
         }
         FlowVertexType::Cylinder => {
             // Cylinder (database) shape using path
-            let ry = h * 0.15; // ellipse height for top/bottom
+            // mermaid cylinder.ts createCylinderPathD: rx = w/2; ry = rx / (2.5 + w/50)
+            let ry = (w / 2.0) / (2.5 + w / 50.0); // ellipse height for top/bottom
             let d = format!(
                 "M {} {} \
                  a {} {} 0 0 0 {} 0 \
@@ -229,14 +230,24 @@ pub fn render_shape(
             SvgElement::polygon(points)
         }
         FlowVertexType::Odd => {
-            // Odd shape (flag-like) - rectangle with notch
-            let notch = w * 0.15;
+            // Odd shape ('>text]') - mermaid rect_left_inv_arrow: a rectangle
+            // with an inward arrow notch on the LEFT edge. In mermaid's
+            // origin-centered coords the point list is
+            //   {x+notch,y},{x,0},{x+notch,-y},{-x,-y},{-x,y}
+            // with x=-w/2, y=-h/2 and notch=y/2=-h/4, then the polygon is
+            // shifted by translate(-notch/2,0)=translate(h/8,0). Mapping that
+            // into selkie's top-left absolute coords (node.width already
+            // includes the +h/4 the notch adds, see layout/size.rs Odd)
+            // collapses to: top-left and bottom-left corners on the left edge,
+            // the notch tip caved inward to x+h/4 at mid-height, and a flat
+            // right edge.
+            let notch = h / 4.0;
             let points = [
-                Point::new(x, y),              // top-left
-                Point::new(x + w, y),          // top-right
-                Point::new(x + w - notch, cy), // right notch
-                Point::new(x + w, y + h),      // bottom-right
-                Point::new(x, y + h),          // bottom-left
+                Point::new(x, y),          // top-left
+                Point::new(x + notch, cy), // left-edge notch tip (caved inward)
+                Point::new(x, y + h),      // bottom-left
+                Point::new(x + w, y + h),  // bottom-right
+                Point::new(x + w, y),      // top-right
             ];
             let d = format!(
                 "M {} {} L {} {} L {} {} L {} {} L {} {} Z",
@@ -262,27 +273,59 @@ pub fn render_shape(
         shape
     };
 
-    // Create label with contrasting text color when custom styles are present
-    let label_text = vertex.text.as_deref().unwrap_or(&node.id);
+    // Create the label. mermaid never invents contrast label colors: only an
+    // explicit `color:` declaration (from classDef/style, routed via flowDb's
+    // textStyles/labelStyle handling) changes the label fill.
+    let label_text = vertex
+        .text
+        .as_deref()
+        .map(crate::render::text_utils::normalize_mermaid_label_markup)
+        .unwrap_or_else(|| node.id.clone());
+    // Apply mermaid's wrappingWidth word-wrap so the drawn text matches the
+    // label bbox the layout was sized with (default node font size 16px).
+    let label_text = crate::render::text_utils::wrap_label_text_mermaid(&label_text, 16.0);
     let mut label_attrs = Attrs::new()
         .with_class("label")
         .with_attr("text-anchor", "middle")
         .with_attr("dominant-baseline", "central");
 
     if let Some(s) = style {
-        if let Some(text_fill) = text_color_for_styles(s) {
+        if let Some(color_val) = extract_style_property(s, "color") {
             // Use inline style (not presentation attribute) so it takes
-            // precedence over theme CSS rules like `.node text { fill: ... }`.
-            label_attrs = label_attrs.with_style(&format!("fill: {}", text_fill));
+            // precedence over theme CSS rules.
+            label_attrs = label_attrs.with_style(&format!("fill: {}", color_val));
         }
     }
 
-    let label = SvgElement::text(cx, cy, label_text).with_attrs(label_attrs);
+    // Some shapes offset their label from the geometric center so the text
+    // stays centered in the visible body. mermaid's rect_left_inv_arrow (the
+    // Odd shape) shifts both the polygon and the label right by -notch/2 = h/8
+    // to compensate for the inward notch that eats into the left edge.
+    let label_dx = match shape_type {
+        FlowVertexType::Odd => h / 8.0,
+        _ => 0.0,
+    };
 
-    // Wrap shape and label in a group with class="node"
-    // This allows CSS selectors like ".node rect" to work correctly
+    // Markdown labels carry emphasis (`**bold**`, `_italic_`) that must render
+    // as styled tspans, so route them through MarkdownText (which strips the
+    // markers and emits font-weight/font-style runs) using the raw source text.
+    let label = if vertex.label_type == FlowTextType::Markdown {
+        let md_text = vertex.text.clone().unwrap_or_else(|| node.id.clone());
+        SvgElement::markdown_text(cx + label_dx, cy, md_text).with_attrs(label_attrs)
+    } else {
+        SvgElement::text(cx + label_dx, cy, label_text).with_attrs(label_attrs)
+    };
+
+    // Wrap shape and label in a group. mermaid flowDb assigns
+    // cssClasses = 'default ' + vertex.classes, so classDef CSS rules like
+    // `.myClass rect { ... }` can match.
+    let mut group_class = String::from("node default");
+    for class in &vertex.classes {
+        group_class.push(' ');
+        group_class.push_str(class);
+    }
     let group_attrs = Attrs::new()
-        .with_class("node")
+        .with_class(&group_class)
         .with_id(&format!("node-{}", node.id));
 
     SvgElement::group(vec![shape, label]).with_attrs(group_attrs)
@@ -293,9 +336,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_dark_fill_gets_white_text() {
-        // When a node has a dark custom fill, the text label should
-        // get a contrasting white fill to remain legible.
+    fn test_custom_fill_keeps_theme_label_color() {
+        // mermaid never invents WCAG contrast label colors: a custom fill
+        // leaves the label using the theme text color.
         let mut node = LayoutNode::new("test", 100.0, 60.0);
         node.x = Some(0.0);
         node.y = Some(0.0);
@@ -309,35 +352,36 @@ mod tests {
         let shape_element = render_shape(&node, &vertex, &theme, Some(style));
         let svg = shape_element.to_svg(0);
 
-        // The text element should have inline style fill for legibility
+        // The text element must NOT get an invented contrast fill
+        let text_start = svg.find("<text").expect("should have text element");
+        let text_end = svg[text_start..].find('>').unwrap() + text_start;
+        let text_tag = &svg[text_start..=text_end];
         assert!(
-            svg.contains("style=\"fill: #ffffff\""),
-            "Dark background node text should have white fill via inline style, got: {}",
-            svg
+            !text_tag.contains("fill"),
+            "Custom fill must not invent a label color, got: {}",
+            text_tag
         );
     }
 
     #[test]
-    fn test_light_fill_gets_dark_text() {
-        // When a node has a light custom fill, the text label should
-        // get black fill to remain legible.
+    fn test_node_group_includes_user_classes() {
+        // mermaid flowDb: cssClasses = 'default ' + vertex.classes
         let mut node = LayoutNode::new("test", 100.0, 60.0);
         node.x = Some(0.0);
         node.y = Some(0.0);
 
         let mut vertex = FlowVertex::new("test", "test");
-        vertex.text = Some("Light Node".to_string());
+        vertex.text = Some("Styled".to_string());
         vertex.vertex_type = Some(FlowVertexType::Square);
+        vertex.classes = vec!["orange".to_string(), "big".to_string()];
 
         let theme = Theme::default();
-        let style = "fill:#eeeeee !important";
-        let shape_element = render_shape(&node, &vertex, &theme, Some(style));
+        let shape_element = render_shape(&node, &vertex, &theme, None);
         let svg = shape_element.to_svg(0);
 
-        // The text element should have inline style fill for legibility
         assert!(
-            svg.contains("style=\"fill: #000000\""),
-            "Light background node text should have black fill via inline style, got: {}",
+            svg.contains("class=\"node default orange big\""),
+            "node group must carry default and user classes, got: {}",
             svg
         );
     }
@@ -364,36 +408,6 @@ mod tests {
             svg.contains("style=\"fill: #ff0000\""),
             "Explicit color should be used for text fill via inline style, got: {}",
             svg
-        );
-    }
-
-    #[test]
-    fn test_text_color_uses_inline_style_over_presentation_attr() {
-        // Text color must use inline style (style="fill:...") rather than
-        // a presentation attribute (fill="..."), because theme CSS rules
-        // like `.node text { fill: ... }` override presentation attributes.
-        // Inline styles have highest CSS specificity.
-        let mut node = LayoutNode::new("test", 100.0, 60.0);
-        node.x = Some(0.0);
-        node.y = Some(0.0);
-
-        let mut vertex = FlowVertex::new("test", "test");
-        vertex.text = Some("Styled Node".to_string());
-        vertex.vertex_type = Some(FlowVertexType::Square);
-
-        let theme = Theme::default();
-        let style = "fill:#333333 !important;stroke:#000 !important";
-        let shape_element = render_shape(&node, &vertex, &theme, Some(style));
-        let svg = shape_element.to_svg(0);
-
-        // The text element should use inline style, NOT a presentation attribute
-        let text_start = svg.find("<text").expect("should have text element");
-        let text_end = svg[text_start..].find('>').unwrap() + text_start;
-        let text_tag = &svg[text_start..=text_end];
-        assert!(
-            text_tag.contains("style=\"fill:"),
-            "Text color should use inline style for CSS specificity, got: {}",
-            text_tag
         );
     }
 
@@ -446,6 +460,121 @@ mod tests {
         assert!(
             !svg.contains("stroke=\"#9370DB\""),
             "Subroutine lines should not have hardcoded stroke '#9370DB', got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_cylinder_cap_ry_derived_from_width() {
+        // mermaid cylinder.ts createCylinderPathD: rx = w/2; ry = rx / (2.5 + w/50).
+        // The cap ellipse depth must be derived from width, not h * 0.15,
+        // otherwise the caps render visibly over-round.
+        let w = 100.0;
+        let h = 68.0;
+        let mut node = LayoutNode::new("A", w, h);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("A", "A");
+        vertex.text = Some("Database".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Cylinder);
+
+        let theme = Theme::default();
+        let shape_element = render_shape(&node, &vertex, &theme, None);
+        let svg = shape_element.to_svg(0);
+
+        let rx = w / 2.0;
+        let expected_ry = rx / (2.5 + w / 50.0);
+        let wrong_ry = h * 0.15;
+        assert_ne!(
+            expected_ry, wrong_ry,
+            "sanity: the two formulas must differ"
+        );
+
+        let expected_arc = format!("a {} {} 0 0 0 {} 0", rx, expected_ry, w);
+        assert!(
+            svg.contains(&expected_arc),
+            "Cylinder cap arc should use width-derived ry {expected_ry}, got: {svg}"
+        );
+
+        let wrong_arc = format!("a {} {} 0 0 0 {} 0", rx, wrong_ry, w);
+        assert!(
+            !svg.contains(&wrong_arc),
+            "Cylinder cap must not use h * 0.15 ry, got: {svg}"
+        );
+    }
+
+    #[test]
+    fn test_odd_shape_left_edge_chevron_and_label_offset() {
+        // mermaid rect_left_inv_arrow puts the arrow notch on the LEFT edge
+        // (caved inward at mid-left, right edge flat) with notch depth = h/4,
+        // then shifts the polygon/label right by -notch/2 = h/8 to keep the
+        // body centered. The old selkie geometry mirrored this: it put the
+        // notch on the RIGHT edge with depth w*0.15 and no label offset.
+        let mut node = LayoutNode::new("test", 100.0, 40.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.text = Some("Odd".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Odd);
+
+        let theme = Theme::default();
+        let shape_element = render_shape(&node, &vertex, &theme, None);
+        let svg = shape_element.to_svg(0);
+
+        // Geometry: notch tip on the LEFT edge at x + h/4 = 10, y-mid = 20.
+        // Right edge flat: bottom-right (100,40) then top-right (100,0).
+        assert!(
+            svg.contains("M 0 0 L 10 20 L 0 40 L 100 40 L 100 0 Z"),
+            "Odd shape must have left-edge chevron notch (h/4 deep) with a \
+             flat right edge, got: {}",
+            svg
+        );
+        // The old mirrored geometry (notch on the right) must be gone.
+        assert!(
+            !svg.contains("L 85 20"),
+            "Odd shape must not put the notch on the right edge, got: {}",
+            svg
+        );
+
+        // Label offset: content is shifted right by h/8 = 5 to stay centered
+        // in the body, so the text is drawn at cx + h/8 = 55.
+        assert!(
+            svg.contains("<text x=\"55\" y=\"20\""),
+            "Odd shape label must be offset by h/8 to x=55, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_double_circle_inner_radius_gap_is_five() {
+        // mermaid doubleCircle.ts: gap = 5, so innerRadius = outerRadius - 5.
+        // For a 24x24 node, outer r = 12 and inner r = 12 - 5 = 7.
+        let mut node = LayoutNode::new("test", 24.0, 24.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.vertex_type = Some(FlowVertexType::DoubleCircle);
+
+        let theme = Theme::default();
+        let shape_element = render_shape(&node, &vertex, &theme, None);
+        let svg = shape_element.to_svg(0);
+
+        assert!(
+            svg.contains("r=\"12\""),
+            "Double circle outer radius must be 12, got: {}",
+            svg
+        );
+        assert!(
+            svg.contains("r=\"7\""),
+            "Double circle inner radius must be outer - 5 = 7, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("r=\"8\""),
+            "Double circle inner radius must not be outer - 4 = 8, got: {}",
             svg
         );
     }

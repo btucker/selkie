@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="666" height="1161.9999999999998" viewBox="-8 -8 666 1161.9999999999998" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-Start-IsAction-0">
+        <path d="M 325.00 52.80 C 325.00 61.13, 325.00 69.47, 325.00 77.80 C 325.00 86.13, 325.00 94.47, 325.00 102.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-IsAction-ActionPath-0">
+        <path d="M 279.22 205.82 C 236.15 232.75, 193.07 259.67, 171.54 278.97 C 150.00 298.27, 150.00 309.93, 150.00 321.60" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-IsAction-NormalPath-0">
+        <path d="M 370.78 205.82 C 413.85 232.75, 456.93 259.67, 478.46 278.97 C 500.00 298.27, 500.00 309.93, 500.00 321.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-ActionPath-ActionIndent-0">
+        <path d="M 150.00 374.40 C 150.00 382.73, 150.00 391.07, 150.00 399.40 C 150.00 407.73, 150.00 416.07, 150.00 424.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-NormalPath-NormalIndent-0">
+        <path d="M 500.00 374.40 C 500.00 382.73, 500.00 391.07, 500.00 399.40 C 500.00 407.73, 500.00 416.07, 500.00 424.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-ActionIndent-ActionFirst-0">
+        <path d="M 150.00 514.00 C 150.00 522.33, 150.00 530.67, 150.00 539.00 C 150.00 547.33, 150.00 555.67, 150.00 564.00" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-NormalIndent-NormalFirst-0">
+        <path d="M 500.00 514.00 C 500.00 522.33, 500.00 530.67, 500.00 539.00 C 500.00 547.33, 500.00 555.67, 500.00 564.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-ActionFirst-ActionCont-0">
+        <path d="M 150.00 690.40 C 150.00 698.73, 150.00 707.07, 150.00 715.40 C 150.00 723.73, 150.00 732.07, 150.00 740.40" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-NormalFirst-NormalCont-0">
+        <path d="M 500.00 690.40 C 500.00 698.73, 500.00 707.07, 500.00 715.40 C 500.00 723.73, 500.00 732.07, 500.00 740.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-ActionCont-ActionMermaid-0">
+        <path d="M 150.00 866.80 C 150.00 875.13, 150.00 883.47, 150.00 891.80 C 150.00 900.13, 150.00 908.47, 150.00 916.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-NormalCont-NormalMermaid-0">
+        <path d="M 500.00 866.80 C 500.00 875.13, 500.00 883.47, 500.00 891.80 C 500.00 900.13, 500.00 908.47, 500.00 916.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-ActionMermaid-Result-0">
+        <path d="M 150.00 1043.20 C 150.00 1051.53, 150.00 1059.87, 164.19 1068.20 C 178.37 1076.53, 206.74 1084.87, 235.12 1093.20" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-NormalMermaid-Result-0">
+        <path d="M 500.00 1043.20 C 500.00 1051.53, 500.00 1059.87, 485.81 1068.20 C 471.63 1076.53, 443.26 1084.87, 414.88 1093.20" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-IsAction-ActionPath-0">
+        <rect x="127.37068714546234" y="235.48621043592243" width="144.79999999999998" height="40" class="edge-label-bg"/>
+        <text x="199.77068714546232" y="255.48621043592243" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="199.77068714546232" y="255.48621043592243" dy="-0.6em">Yes</tspan><tspan x="199.77068714546232" dy="1.2em">MessageType::Action</tspan></text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-IsAction-NormalPath-0">
+        <rect x="406.62931285453766" y="235.48621043592243" width="87.2" height="40" class="edge-label-bg"/>
+        <text x="450.2293128545377" y="255.48621043592243" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="450.2293128545377" y="255.48621043592243" dy="-0.6em">No</tspan><tspan x="450.2293128545377" dy="1.2em">Normal text</tspan></text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-ActionCont">
+        <rect x="42.8" y="740.4" width="214.4" height="126.39999999999999" style="fill:#e1f5ff !important"/>
+        <text x="150" y="803.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="150" y="803.6" dy="-1.2em">Continuation lines:</tspan><tspan x="150" dy="1.2em">&apos;         content&apos;</tspan><tspan x="150" dy="1.2em">(9 spaces)</tspan></text>
+      </g>
+      <g class="node" id="node-ActionFirst">
+        <rect x="0" y="564" width="300" height="126.39999999999999" style="fill:#e1f5ff !important"/>
+        <text x="150" y="627.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="150" y="627.2" dy="-1.2em">First line:</tspan><tspan x="150" dy="1.2em">&apos; HH:MM * content&apos;</tspan><tspan x="150" dy="1.2em">(7 chars gutter + 2 for &apos;* &apos;)</tspan></text>
+      </g>
+      <g class="node" id="node-ActionIndent">
+        <rect x="0" y="424.40000000000003" width="300" height="89.6" style="fill:#e1f5ff !important"/>
+        <text x="150" y="469.20000000000005" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="150" y="469.20000000000005" dy="-0.6em">indent_width = 7 + 2 = 9</tspan><tspan x="150" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH + extra_indent)</tspan></text>
+      </g>
+      <g class="node" id="node-ActionMermaid">
+        <rect x="4.400000000000006" y="916.8" width="291.2" height="126.39999999999999" style="fill:#e1f5ff !important"/>
+        <text x="150" y="980" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="150" y="980" dy="-1.2em">Mermaid placeholder:</tspan><tspan x="150" dy="1.2em">&apos;         [1] Diagram: ...&apos;</tspan><tspan x="150" dy="1.2em">(9 spaces via indent_width)</tspan></text>
+      </g>
+      <g class="node" id="node-ActionPath">
+        <rect x="57.2" y="321.6" width="185.6" height="52.8" style="fill:#e1f5ff !important"/>
+        <text x="150" y="348" class="label" dominant-baseline="central" text-anchor="middle">extra_indent = 2</text>
+      </g>
+      <g class="node" id="node-IsAction">
+        <polygon points="325,102.79999999999998 399.4,177.2 325,251.6 250.6,177.2"/>
+        <text x="325" y="177.2" class="label" dominant-baseline="central" text-anchor="middle">is_action?</text>
+      </g>
+      <g class="node" id="node-NormalCont">
+        <rect x="392.8" y="740.4" width="214.4" height="126.39999999999999" style="fill:#fff4e1 !important"/>
+        <text x="500" y="803.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="500" y="803.6" dy="-1.2em">Continuation lines:</tspan><tspan x="500" dy="1.2em">&apos;       content&apos;</tspan><tspan x="500" dy="1.2em">(7 spaces)</tspan></text>
+      </g>
+      <g class="node" id="node-NormalFirst">
+        <rect x="407.2" y="564" width="185.6" height="126.39999999999999" style="fill:#fff4e1 !important"/>
+        <text x="500" y="627.2" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="627.2" dy="-1.2em">First line:</tspan><tspan x="500" dy="1.2em">&apos; HH:MM content&apos;</tspan><tspan x="500" dy="1.2em">(7 chars gutter)</tspan></text>
+      </g>
+      <g class="node" id="node-NormalIndent">
+        <rect x="350" y="424.40000000000003" width="300" height="89.6" style="fill:#fff4e1 !important"/>
+        <text x="500" y="469.20000000000005" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="500" y="469.20000000000005" dy="-0.6em">indent_width = 7 + 0 = 7</tspan><tspan x="500" dy="1.2em">(TIMESTAMP_GUTTER_WIDTH only)</tspan></text>
+      </g>
+      <g class="node" id="node-NormalMermaid">
+        <rect x="354.4" y="916.8" width="291.2" height="126.39999999999999" style="fill:#fff4e1 !important"/>
+        <text x="500" y="980" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="500" y="980" dy="-1.2em">Mermaid placeholder:</tspan><tspan x="500" dy="1.2em">&apos;       [1] Diagram: ...&apos;</tspan><tspan x="500" dy="1.2em">(7 spaces via indent_width)</tspan></text>
+      </g>
+      <g class="node" id="node-NormalPath">
+        <rect x="407.2" y="321.6" width="185.6" height="52.8" style="fill:#fff4e1 !important"/>
+        <text x="500" y="348" class="label" text-anchor="middle" dominant-baseline="central">extra_indent = 0</text>
+      </g>
+      <g class="node" id="node-Result">
+        <rect x="193.8" y="1093.1999999999998" width="262.4" height="52.8"/>
+        <text x="325" y="1119.6" class="label" text-anchor="middle" dominant-baseline="central">Aligned with &apos;* &apos; prefix</text>
+      </g>
+      <g class="node" id="node-Start">
+        <rect x="222.60000000000002" y="0" width="204.79999999999998" height="52.8"/>
+        <text x="325" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">Message Type Check</text>
+      </g>
+    </g>
+  </g>
+</svg>

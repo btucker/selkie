@@ -1,5 +1,7 @@
 /// Regression test: flowchart edge labels near diamond shapes must not be truncated.
 ///
+/// @spec FLOW-2.2: When an ASCII flowchart edge label is placed near a diamond node, the application shall render the full edge label text without truncation.
+///
 /// Bug: the edge label "Invalid" on `Auth -->|Invalid| Reject` was rendered as
 /// "Inv" because the diamond's bounding box (marked as occupied) overlapped the
 /// label's ideal placement. The `find_clear_label_position` search in edges.rs

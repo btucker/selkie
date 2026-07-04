@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1760" height="1046.8" viewBox="-478.4 -27.999999999999986 1760 1046.8" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-Terminal">
+        <rect x="178.89999999999998" y="-19.999999999999986" width="340" height="437" class="cluster"/>
+        <text x="348.9" y="-3.999999999999986" class="cluster-label" text-anchor="middle">Terminal Output Layers</text>
+      </g>
+      <g class="subgraph" id="subgraph-Problem">
+        <rect x="-470.4" y="851.1999999999999" width="1273.6" height="154.60000000000002" class="cluster"/>
+        <text x="166.39999999999998" y="867.1999999999999" class="cluster-label" text-anchor="middle">The Fragility</text>
+      </g>
+      <g class="subgraph" id="subgraph-Solution">
+        <rect x="382.79999999999995" y="522" width="340" height="483.80000000000007" class="cluster"/>
+        <text x="552.8" y="538" class="cluster-label" text-anchor="middle">Select-to-Open Pattern</text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-Layer1-Calc-0">
+        <path d="M 348.90 114.60 C 348.90 126.27, 348.90 137.93, 348.90 149.60 C 348.90 161.27, 348.90 172.93, 348.90 184.60" class="edge-path" stroke-dasharray="3,3" fill="none" stroke-width="2" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Calc-Layer2-0">
+        <path d="M 348.90 237.40 C 348.90 249.07, 348.90 260.73, 348.90 272.40 C 348.90 284.07, 348.90 295.73, 348.90 307.40" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-P1-P2-0">
+        <path d="M 166.40 638.20 C 166.40 652.67, 166.40 667.13, 166.40 678.53 C 166.40 689.93, 166.40 698.27, 166.40 706.60 C 166.40 723.27, 166.40 731.60, 166.40 731.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-P2-P3-0">
+        <path d="M 166.40 821.20 C 166.40 829.53, 166.40 837.87, 166.40 846.20 C 166.40 854.53, 166.40 862.87, 166.40 871.20 C 166.40 887.87, 166.40 896.20, 166.40 896.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-P3-P4-0">
+        <path d="M 166.40 985.80 C 166.40 994.13, 166.40 1002.47, 166.40 1010.80 C 166.40 1019.13, 166.40 1027.47, 166.40 1035.80 C 166.40 1052.47, 166.40 1060.80, 166.40 1060.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-P4-P5-0">
+        <path d="M 166.40 1150.40 C 166.40 1158.73, 166.40 1167.07, 166.40 1175.40 C 166.40 1183.73, 166.40 1192.07, 166.40 1200.40 C 166.40 1217.07, 166.40 1225.40, 166.40 1225.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-S1-S2-0">
+        <path d="M 552.80 656.60 C 552.80 664.93, 552.80 673.27, 552.80 681.60 C 552.80 689.93, 552.80 698.27, 552.80 709.67 C 552.80 735.53, 552.80 750.00, 552.80 750.00" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-S2-S3-0">
+        <path d="M 552.80 802.80 C 552.80 817.27, 552.80 831.73, 552.80 843.13 C 552.80 854.53, 552.80 862.87, 552.80 871.20 C 552.80 887.87, 552.80 896.20, 552.80 896.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Terminal-Problem-0">
+        <path d="M 513.02 422.00 C 518.61 453.67, 524.21 485.33, 494.17 539.48 C 464.13 593.62, 398.47 670.23, 332.80 746.85" class="edge-path" marker-end="url(#arrow_point)" stroke-dasharray="3,3" stroke-width="2" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-Terminal-Solution-0">
+        <path d="M 386.06 422.00 L 403.70 542.00" class="edge-path" stroke-dasharray="3,3" fill="none" stroke-width="2" marker-end="url(#arrow_point)"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-Layer1-Calc-0">
+        <rect x="262.09999999999997" y="138.6" width="173.6" height="22" class="edge-label-bg"/>
+        <text x="348.9" y="149.6" class="edge-label" text-anchor="middle" dominant-baseline="central">returns (x,y) positions</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Calc-Layer2-0">
+        <rect x="301.7" y="261.4" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="348.9" y="272.4" class="edge-label" text-anchor="middle" dominant-baseline="central">every redraw</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Terminal-Problem-0">
+        <rect x="402.2735882164833" y="582.9201942658533" width="123.19999999999999" height="22" class="edge-label-bg"/>
+        <text x="463.87358821648326" y="593.9201942658533" class="edge-label" dominant-baseline="central" text-anchor="middle">current approach</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Terminal-Solution-0">
+        <rect x="340.59999999999997" y="473.2843425177835" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="387.79999999999995" y="484.2843425177835" class="edge-label" text-anchor="middle" dominant-baseline="central">proposed fix</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-Terminal">
+        <rect x="158.89999999999998" y="0" width="425" height="421.99999999999994"/>
+        <text x="371.4" y="210.99999999999997" class="label" dominant-baseline="central" text-anchor="middle">Terminal</text>
+      </g>
+      <g class="node" id="node-Problem">
+        <rect x="-470.4" y="876.1999999999999" width="1273.6" height="129.6"/>
+        <text x="166.39999999999998" y="940.9999999999999" class="label" text-anchor="middle" dominant-baseline="central">Problem</text>
+      </g>
+      <g class="node" id="node-Solution">
+        <rect x="362.79999999999995" y="542" width="380" height="468.79999999999995"/>
+        <text x="552.8" y="776.4" class="label" text-anchor="middle" dominant-baseline="central">Solution</text>
+      </g>
+      <g class="node" id="node-Calc">
+        <rect x="212.89999999999998" y="184.59999999999997" width="272" height="52.8" style="fill:#805ad5 !important;stroke:#b794f4 !important;color:#fff !important"/>
+        <text x="348.9" y="210.99999999999997" class="label" text-anchor="middle" dominant-baseline="central">resolve_image_placement()</text>
+      </g>
+      <g class="node" id="node-Layer1">
+        <rect x="198.89999999999998" y="25.000000000000014" width="300" height="89.6" style="fill:#4a5568 !important;stroke:#cbd5e0 !important;color:#fff !important"/>
+        <text x="348.9" y="69.80000000000001" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="348.9" y="69.80000000000001" dy="-0.6em">Ratatui Text Buffer</tspan><tspan x="348.9" dy="1.2em">(Lines, Scroll State, Layout)</tspan></text>
+      </g>
+      <g class="node" id="node-Layer2">
+        <rect x="208.09999999999997" y="307.40000000000003" width="281.6" height="89.6" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
+        <text x="348.9" y="352.20000000000005" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="348.9" y="352.20000000000005" dy="-0.6em">Kitty Graphics Layer</tspan><tspan x="348.9" dy="1.2em">(Absolute x,y Coordinates)</tspan></text>
+      </g>
+      <g class="node" id="node-P1">
+        <rect x="-450.4" y="914.5999999999999" width="147.2" height="52.8" style="fill:#2d3748 !important;stroke:#4a5568 !important;color:#fff !important"/>
+        <text x="-376.79999999999995" y="940.9999999999999" class="label" text-anchor="middle" dominant-baseline="central">Scroll Event</text>
+      </g>
+      <g class="node" id="node-P2">
+        <rect x="-253.2" y="896.1999999999999" width="224" height="89.6" style="fill:#2d3748 !important;stroke:#4a5568 !important;color:#fff !important"/>
+        <text x="-141.2" y="940.9999999999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="-141.2" y="940.9999999999999" dy="-0.6em">Text Buffer Redraws</tspan><tspan x="-141.2" dy="1.2em">(new line positions)</tspan></text>
+      </g>
+      <g class="node" id="node-P3">
+        <rect x="20.80000000000001" y="896.1999999999999" width="185.6" height="89.6" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
+        <text x="113.60000000000001" y="940.9999999999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="113.60000000000001" y="940.9999999999999" dy="-0.6em">Must Recalculate</tspan><tspan x="113.60000000000001" dy="1.2em">Image Positions</tspan></text>
+      </g>
+      <g class="node" id="node-P4">
+        <rect x="256.4" y="896.1999999999999" width="252.79999999999998" height="89.6" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
+        <text x="382.79999999999995" y="940.9999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="382.79999999999995" y="940.9999999999999" dy="-0.6em">Tmux DCS Passthrough</tspan><tspan x="382.79999999999995" dy="1.2em">(doubled ESC sequences)</tspan></text>
+      </g>
+      <g class="node" id="node-P5">
+        <rect x="559.1999999999999" y="896.1999999999999" width="224" height="89.6" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
+        <text x="671.1999999999999" y="940.9999999999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="671.1999999999999" y="940.9999999999999" dy="-0.6em">Re-render All Images</tspan><tspan x="671.1999999999999" dy="1.2em">at New Coords</tspan></text>
+      </g>
+      <g class="node" id="node-Problem">
+        <rect x="116.79999999999998" y="914.5999999999999" width="99.2" height="52.8"/>
+        <text x="166.39999999999998" y="940.9999999999999" class="label" dominant-baseline="central" text-anchor="middle">Problem</text>
+      </g>
+      <g class="node" id="node-S1">
+        <rect x="431.19999999999993" y="567" width="243.2" height="89.6" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
+        <text x="552.8" y="611.8" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="552.8" y="611.8" dy="-0.6em">User Sees Placeholder</tspan><tspan x="552.8" dy="1.2em">(text-based reference)</tspan></text>
+      </g>
+      <g class="node" id="node-S2">
+        <rect x="416.79999999999995" y="750" width="272" height="52.8" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
+        <text x="552.8" y="776.4" class="label" text-anchor="middle" dominant-baseline="central">User Presses &apos;s&apos; + Number</text>
+      </g>
+      <g class="node" id="node-S3">
+        <rect x="402.79999999999995" y="896.2" width="300" height="89.6" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
+        <text x="552.8" y="941" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="552.8" y="941" dy="-0.6em">Open Image Fullscreen</tspan><tspan x="552.8" dy="1.2em">(separate rendering context)</tspan></text>
+      </g>
+      <g class="node" id="node-Solution">
+        <rect x="498.4" y="750" width="108.8" height="52.8"/>
+        <text x="552.8" y="776.4" class="label" text-anchor="middle" dominant-baseline="central">Solution</text>
+      </g>
+      <g class="node" id="node-Terminal">
+        <rect x="317" y="184.59999999999997" width="108.8" height="52.8"/>
+        <text x="371.4" y="210.99999999999997" class="label" text-anchor="middle" dominant-baseline="central">Terminal</text>
+      </g>
+    </g>
+  </g>
+</svg>

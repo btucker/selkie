@@ -1,14 +1,16 @@
 //! SVG element types
 
-use std::collections::HashMap;
 use std::fmt::Write;
 
 use crate::layout::Point;
 
 /// SVG attributes
+///
+/// Attributes are stored in insertion order so that rendering the same
+/// diagram always produces byte-identical SVG output.
 #[derive(Debug, Clone, Default)]
 pub struct Attrs {
-    attrs: HashMap<String, String>,
+    attrs: Vec<(String, String)>,
     classes: Vec<String>,
 }
 
@@ -17,23 +19,32 @@ impl Attrs {
         Self::default()
     }
 
+    /// Insert or replace an attribute, preserving insertion order.
+    fn set(&mut self, key: &str, value: String) {
+        if let Some(entry) = self.attrs.iter_mut().find(|(k, _)| k == key) {
+            entry.1 = value;
+        } else {
+            self.attrs.push((key.to_string(), value));
+        }
+    }
+
     pub fn with_class(mut self, class: &str) -> Self {
         self.classes.push(class.to_string());
         self
     }
 
     pub fn with_id(mut self, id: &str) -> Self {
-        self.attrs.insert("id".to_string(), id.to_string());
+        self.set("id", id.to_string());
         self
     }
 
     pub fn with_attr(mut self, key: &str, value: &str) -> Self {
-        self.attrs.insert(key.to_string(), value.to_string());
+        self.set(key, value.to_string());
         self
     }
 
     pub fn with_style(mut self, style: &str) -> Self {
-        self.attrs.insert("style".to_string(), style.to_string());
+        self.set("style", style.to_string());
         self
     }
 
@@ -47,30 +58,27 @@ impl Attrs {
     }
 
     pub fn with_transform(mut self, transform: &str) -> Self {
-        self.attrs
-            .insert("transform".to_string(), transform.to_string());
+        self.set("transform", transform.to_string());
         self
     }
 
     pub fn with_fill(mut self, fill: &str) -> Self {
-        self.attrs.insert("fill".to_string(), fill.to_string());
+        self.set("fill", fill.to_string());
         self
     }
 
     pub fn with_stroke(mut self, stroke: &str) -> Self {
-        self.attrs.insert("stroke".to_string(), stroke.to_string());
+        self.set("stroke", stroke.to_string());
         self
     }
 
     pub fn with_stroke_width(mut self, width: f64) -> Self {
-        self.attrs
-            .insert("stroke-width".to_string(), format!("{}", width));
+        self.set("stroke-width", format!("{}", width));
         self
     }
 
     pub fn with_stroke_dasharray(mut self, dasharray: &str) -> Self {
-        self.attrs
-            .insert("stroke-dasharray".to_string(), dasharray.to_string());
+        self.set("stroke-dasharray", dasharray.to_string());
         self
     }
 
@@ -89,6 +97,30 @@ impl Attrs {
 
         result
     }
+}
+
+/// Render one line of a markdown label into styled `<tspan>` runs.
+///
+/// Bold/italic runs become `<tspan>` elements carrying `font-weight`/
+/// `font-style`; unstyled runs are emitted as bare escaped text so the
+/// concatenated text content stays exactly the visible label. Emphasis
+/// markers are removed by [`parse_markdown_runs`].
+fn render_markdown_runs(line: &str) -> String {
+    crate::render::text_utils::parse_markdown_runs(line)
+        .iter()
+        .map(|run| {
+            let escaped = escape_xml(&run.text);
+            match (run.bold, run.italic) {
+                (true, true) => format!(
+                    "<tspan font-weight=\"bold\" font-style=\"italic\">{}</tspan>",
+                    escaped
+                ),
+                (true, false) => format!("<tspan font-weight=\"bold\">{}</tspan>", escaped),
+                (false, true) => format!("<tspan font-style=\"italic\">{}</tspan>", escaped),
+                (false, false) => escaped,
+            }
+        })
+        .collect()
 }
 
 /// Escape special XML characters
@@ -146,6 +178,15 @@ pub enum SvgElement {
     Polyline { points: Vec<Point>, attrs: Attrs },
     /// Text element
     Text {
+        x: f64,
+        y: f64,
+        content: String,
+        attrs: Attrs,
+    },
+    /// Text element whose content is a markdown label. Emphasis markers
+    /// (`**bold**`, `_italic_`) are parsed into styled `<tspan>` runs and the
+    /// markers themselves are dropped from the rendered output.
+    MarkdownText {
         x: f64,
         y: f64,
         content: String,
@@ -247,6 +288,16 @@ impl SvgElement {
         }
     }
 
+    /// Create a markdown text element (emphasis markers become styled tspans)
+    pub fn markdown_text(x: f64, y: f64, content: impl Into<String>) -> Self {
+        Self::MarkdownText {
+            x,
+            y,
+            content: content.into(),
+            attrs: Attrs::new(),
+        }
+    }
+
     /// Create a group
     pub fn group(children: Vec<SvgElement>) -> Self {
         Self::Group {
@@ -334,6 +385,17 @@ impl SvgElement {
                 content,
                 attrs: attrs.with_style(style),
             },
+            Self::MarkdownText {
+                x,
+                y,
+                content,
+                attrs,
+            } => Self::MarkdownText {
+                x,
+                y,
+                content,
+                attrs: attrs.with_style(style),
+            },
             Self::Group { children, attrs } => Self::Group {
                 children,
                 attrs: attrs.with_style(style),
@@ -382,6 +444,12 @@ impl SvgElement {
             },
             Self::Polyline { points, .. } => Self::Polyline { points, attrs },
             Self::Text { x, y, content, .. } => Self::Text {
+                x,
+                y,
+                content,
+                attrs,
+            },
+            Self::MarkdownText { x, y, content, .. } => Self::MarkdownText {
                 x,
                 y,
                 content,
@@ -507,14 +575,17 @@ impl SvgElement {
                 content,
                 attrs,
             } => {
-                let normalized = crate::render::text_utils::normalize_br_tags(content);
+                let normalized = crate::render::text_utils::normalize_mermaid_label_markup(content);
                 if normalized.contains('\n') {
                     let lines: Vec<&str> = normalized.split('\n').collect();
                     let num_lines = lines.len();
-                    // Calculate vertical offset to center the text block
-                    // For n lines with 1.2em spacing, offset first line by -(n-1)*0.6em
+                    // Calculate vertical offset to center the text block.
+                    // Mermaid renders label HTML with line-height 1.5 (24px at
+                    // the 16px base font), so lines advance by 1.5em and the
+                    // block is centered by offsetting the first line by
+                    // -(n-1)*0.75em (half of 1.5em per extra line).
                     let first_line_offset = if num_lines > 1 {
-                        -((num_lines - 1) as f64 * 0.6)
+                        -((num_lines - 1) as f64 * 0.75)
                     } else {
                         0.0
                     };
@@ -542,7 +613,7 @@ impl SvgElement {
                                 }
                             } else {
                                 format!(
-                                    "<tspan x=\"{}\" dy=\"1.2em\">{}</tspan>",
+                                    "<tspan x=\"{}\" dy=\"1.5em\">{}</tspan>",
                                     x,
                                     escape_xml(line)
                                 )
@@ -568,6 +639,57 @@ impl SvgElement {
                         escape_xml(&normalized)
                     )
                 }
+            }
+            Self::MarkdownText {
+                x,
+                y,
+                content,
+                attrs,
+            } => {
+                // Mirror mermaid's createText markdown path: split on <br/>,
+                // decode entities, then render each line's emphasis runs
+                // (`**bold**`, `_italic_`) as styled tspans with the markers
+                // dropped. Multi-line blocks are centered exactly like the
+                // plain Text path (line-height 1.5, first line offset up).
+                let normalized = crate::render::text_utils::normalize_br_tags(content);
+                let normalized = crate::render::text_utils::decode_html_entities(&normalized);
+                let lines: Vec<&str> = normalized.split('\n').collect();
+                let num_lines = lines.len();
+                let first_line_offset = if num_lines > 1 {
+                    -((num_lines - 1) as f64 * 0.75)
+                } else {
+                    0.0
+                };
+                let tspans = lines
+                    .iter()
+                    .enumerate()
+                    .map(|(idx, line)| {
+                        let runs = render_markdown_runs(line);
+                        if idx == 0 {
+                            if num_lines > 1 {
+                                format!(
+                                    "<tspan x=\"{}\" y=\"{}\" dy=\"{}em\">{}</tspan>",
+                                    x, y, first_line_offset, runs
+                                )
+                            } else {
+                                // Single line: rely on the text element's own
+                                // x/y and text-anchor for centering.
+                                runs
+                            }
+                        } else {
+                            format!("<tspan x=\"{}\" dy=\"1.5em\">{}</tspan>", x, runs)
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join("");
+                format!(
+                    "{}<text x=\"{}\" y=\"{}\"{}>{}</text>",
+                    indent_str,
+                    x,
+                    y,
+                    attrs.to_string(),
+                    tspans
+                )
             }
             Self::Group { children, attrs } => {
                 let children_str: String = children
@@ -648,10 +770,73 @@ mod tests {
         };
         let svg = element.to_svg(0);
 
-        // For 2 lines, first line should be offset by -0.6em to center the block
-        assert!(svg.contains("<tspan x=\"10\" y=\"20\" dy=\"-0.6em\">Line 1</tspan>"));
-        assert!(svg.contains("<tspan x=\"10\" dy=\"1.2em\">Line 2</tspan>"));
+        // Mermaid renders multi-line labels with line-height 1.5 (24px at the
+        // 16px base font), so continuation lines advance by 1.5em and a 2-line
+        // block is centered by offsetting the first line by -(2-1)*0.75em.
+        assert!(svg.contains("<tspan x=\"10\" y=\"20\" dy=\"-0.75em\">Line 1</tspan>"));
+        assert!(svg.contains("<tspan x=\"10\" dy=\"1.5em\">Line 2</tspan>"));
         assert!(!svg.contains("<br/>"));
+    }
+
+    #[test]
+    fn markdown_text_renders_bold_and_italic_tspans() {
+        let element = SvgElement::markdown_text(50.0, 30.0, "**bold** and _em_")
+            .with_attrs(Attrs::new().with_attr("text-anchor", "middle"));
+        let svg = element.to_svg(0);
+
+        // Emphasis becomes styled tspans and the source markers are dropped.
+        assert!(
+            svg.contains("<tspan font-weight=\"bold\">bold</tspan>"),
+            "expected bold tspan, got: {svg}"
+        );
+        assert!(
+            svg.contains("<tspan font-style=\"italic\">em</tspan>"),
+            "expected italic tspan, got: {svg}"
+        );
+        assert!(!svg.contains("**"), "markers must be stripped, got: {svg}");
+        assert!(
+            !svg.contains("_em_"),
+            "italic markers must be stripped, got: {svg}"
+        );
+        // The plain run between them is bare escaped text, so the concatenated
+        // text content reads exactly "bold and em".
+        assert!(
+            svg.contains(">bold</tspan> and <tspan"),
+            "plain run should join the tspans, got: {svg}"
+        );
+        // The attrs passed via with_attrs must survive on the <text> element.
+        assert!(
+            svg.contains("text-anchor=\"middle\""),
+            "attrs must be applied, got: {svg}"
+        );
+    }
+
+    #[test]
+    fn attrs_serialize_in_insertion_order() {
+        // Repeated construction must always produce the same byte output;
+        // attributes appear in the order they were inserted.
+        for _ in 0..64 {
+            let attrs = Attrs::new()
+                .with_fill("none")
+                .with_stroke("black")
+                .with_stroke_width(2.0)
+                .with_attr("dominant-baseline", "central")
+                .with_attr("text-anchor", "middle");
+            assert_eq!(
+                attrs.to_string(),
+                " fill=\"none\" stroke=\"black\" stroke-width=\"2\" \
+                 dominant-baseline=\"central\" text-anchor=\"middle\""
+            );
+        }
+    }
+
+    #[test]
+    fn attrs_duplicate_key_replaces_value_in_place() {
+        let attrs = Attrs::new()
+            .with_fill("none")
+            .with_stroke("black")
+            .with_fill("red");
+        assert_eq!(attrs.to_string(), " fill=\"red\" stroke=\"black\"");
     }
 
     #[test]
@@ -664,13 +849,14 @@ mod tests {
         };
         let svg = element.to_svg(0);
 
-        // For 3 lines, first line should be offset by -1.2em (2 * 0.6) to center
+        // For 3 lines with 1.5em line-height, first line is offset by
+        // -(3-1)*0.75em = -1.5em to center the block.
         assert!(
-            svg.contains("<tspan x=\"50\" y=\"100\" dy=\"-1.2em\">Line 1</tspan>"),
-            "First line should have dy=-1.2em for 3 lines. Got: {}",
+            svg.contains("<tspan x=\"50\" y=\"100\" dy=\"-1.5em\">Line 1</tspan>"),
+            "First line should have dy=-1.5em for 3 lines. Got: {}",
             svg
         );
-        assert!(svg.contains("<tspan x=\"50\" dy=\"1.2em\">Line 2</tspan>"));
-        assert!(svg.contains("<tspan x=\"50\" dy=\"1.2em\">Line 3</tspan>"));
+        assert!(svg.contains("<tspan x=\"50\" dy=\"1.5em\">Line 2</tspan>"));
+        assert!(svg.contains("<tspan x=\"50\" dy=\"1.5em\">Line 3</tspan>"));
     }
 }

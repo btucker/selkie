@@ -17,8 +17,14 @@ type EdgeExchange = ((String, String), (String, String));
 pub struct SpanningTree {
     /// Edges in the tree (undirected)
     edges: HashMap<(String, String), TreeEdge>,
+    /// Edge keys in insertion order (one entry per undirected edge)
+    edge_order: Vec<(String, String)>,
     /// Node data
     nodes: HashMap<String, TreeNode>,
+    /// Node ids in insertion order
+    node_order: Vec<String>,
+    /// Adjacency lists in edge insertion order
+    adjacency: HashMap<String, Vec<String>>,
     /// Root of the tree
     root: Option<String>,
 }
@@ -48,20 +54,43 @@ impl SpanningTree {
     pub fn new() -> Self {
         Self {
             edges: HashMap::new(),
+            edge_order: Vec::new(),
             nodes: HashMap::new(),
+            node_order: Vec::new(),
+            adjacency: HashMap::new(),
             root: None,
         }
     }
 
     pub fn set_edge(&mut self, v: &str, w: &str, edge: TreeEdge) {
+        if !self.edges.contains_key(&(v.to_string(), w.to_string())) {
+            self.edge_order.push((v.to_string(), w.to_string()));
+            self.adjacency
+                .entry(v.to_string())
+                .or_default()
+                .push(w.to_string());
+            self.adjacency
+                .entry(w.to_string())
+                .or_default()
+                .push(v.to_string());
+        }
         self.edges
             .insert((v.to_string(), w.to_string()), edge.clone());
         self.edges.insert((w.to_string(), v.to_string()), edge);
     }
 
     pub fn remove_edge(&mut self, v: &str, w: &str) {
-        self.edges.remove(&(v.to_string(), w.to_string()));
-        self.edges.remove(&(w.to_string(), v.to_string()));
+        if self.edges.remove(&(v.to_string(), w.to_string())).is_some() {
+            self.edges.remove(&(w.to_string(), v.to_string()));
+            self.edge_order
+                .retain(|(a, b)| !((a == v && b == w) || (a == w && b == v)));
+            if let Some(adj) = self.adjacency.get_mut(v) {
+                adj.retain(|n| n != w);
+            }
+            if let Some(adj) = self.adjacency.get_mut(w) {
+                adj.retain(|n| n != v);
+            }
+        }
     }
 
     pub fn has_edge(&self, v: &str, w: &str) -> bool {
@@ -77,6 +106,9 @@ impl SpanningTree {
     }
 
     pub fn set_node(&mut self, v: &str, node: TreeNode) {
+        if !self.nodes.contains_key(v) {
+            self.node_order.push(v.to_string());
+        }
         self.nodes.insert(v.to_string(), node);
     }
 
@@ -88,37 +120,23 @@ impl SpanningTree {
         self.nodes.get_mut(v)
     }
 
+    /// Get node ids in insertion order (graphlib's tree is a Graph whose
+    /// nodes() returns insertion order)
     pub fn nodes(&self) -> Vec<&String> {
-        let mut nodes: Vec<&String> = self.nodes.keys().collect();
-        nodes.sort();
-        nodes
+        self.node_order.iter().collect()
     }
 
+    /// Get undirected edges in insertion order, one entry per edge
     pub fn edges_list(&self) -> Vec<(&str, &str)> {
-        let mut seen = HashSet::new();
-        let mut result = Vec::new();
-        // Sort edge keys for deterministic iteration
-        let mut edge_keys: Vec<&(String, String)> = self.edges.keys().collect();
-        edge_keys.sort();
-        for (v, w) in edge_keys {
-            if !seen.contains(&(w.as_str(), v.as_str())) {
-                result.push((v.as_str(), w.as_str()));
-                seen.insert((v.as_str(), w.as_str()));
-            }
-        }
-        result
+        self.edge_order
+            .iter()
+            .map(|(v, w)| (v.as_str(), w.as_str()))
+            .collect()
     }
 
-    /// Get neighbors of a node in the tree
+    /// Get neighbors of a node in the tree, in edge insertion order
     pub fn neighbors(&self, v: &str) -> Vec<String> {
-        let mut neighbors: Vec<String> = self
-            .edges
-            .keys()
-            .filter(|(a, _)| a == v)
-            .map(|(_, b)| b.clone())
-            .collect();
-        neighbors.sort();
-        neighbors
+        self.adjacency.get(v).cloned().unwrap_or_default()
     }
 }
 
@@ -440,14 +458,14 @@ pub fn calc_cut_value(tree: &SpanningTree, g: &DagreGraph, v: &str, w: &str) -> 
 
     let mut cutvalue = graph_edge.map(|e| e.weight).unwrap_or(0);
 
-    let mut incident_edges: Vec<&EdgeKey> = g
+    // dagre's calcCutValue iterates g.nodeEdges(child) = inEdges then outEdges
+    // in insertion order (self-edges are removed before ranking, so no dupes)
+    let incident_edges: Vec<&EdgeKey> = g
         .in_edges(child)
         .iter()
         .chain(g.out_edges(child).iter())
         .copied()
         .collect();
-    incident_edges.sort();
-    incident_edges.dedup();
 
     for edge_key in incident_edges {
         let is_out_edge = edge_key.v == child;

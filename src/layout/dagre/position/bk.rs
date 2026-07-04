@@ -599,8 +599,18 @@ fn calculate_sep(
     sum
 }
 
+/// The four Brandes-Köpf alignment keys, in the fixed order dagre.js builds and
+/// iterates them (`["u","d"] x ["l","r"]`). Iterating this order — rather than a
+/// HashMap's randomized order — makes tie-breaks between equal-width alignments
+/// deterministic, so `position_x` is byte-reproducible run to run
+/// (matching dagre bk.js `Object.values(xss).reduce`).
+const ALIGNMENT_ORDER: [&str; 4] = ["ul", "ur", "dl", "dr"];
+
 /// Find the alignment with the smallest visual width, accounting for node widths.
 /// This matches dagre.js findSmallestWidthAlignment which uses x ± halfWidth.
+/// Alignments are considered in the fixed `ALIGNMENT_ORDER`, and a strict `<`
+/// comparison keeps the FIRST minimum on ties (matching dagre's reduce, whose
+/// `newMin < currentMinAndXs[0]` retains the earliest of equal widths).
 fn find_smallest_width_alignment<'a>(
     g: &DagreGraph,
     xss: &HashMap<&'a str, HashMap<String, f64>>,
@@ -608,7 +618,10 @@ fn find_smallest_width_alignment<'a>(
     let mut min_width = f64::MAX;
     let mut best: Option<&str> = None;
 
-    for (&name, xs) in xss {
+    for name in ALIGNMENT_ORDER {
+        let Some((&key, xs)) = xss.get_key_value(name) else {
+            continue;
+        };
         let mut max_bound = f64::NEG_INFINITY;
         let mut min_bound = f64::INFINITY;
 
@@ -621,7 +634,7 @@ fn find_smallest_width_alignment<'a>(
         let width = max_bound - min_bound;
         if width < min_width {
             min_width = width;
-            best = Some(name);
+            best = Some(key);
         }
     }
 
@@ -636,14 +649,12 @@ fn align_coordinates(xss: &mut HashMap<&str, HashMap<String, f64>>, align_to_nam
     let align_min: f64 = align_xs.values().copied().fold(f64::INFINITY, f64::min);
     let align_max: f64 = align_xs.values().copied().fold(f64::NEG_INFINITY, f64::max);
 
-    let names: Vec<String> = xss.keys().map(|k| k.to_string()).collect();
-
-    for name in &names {
-        if name == align_to_name {
+    for name in ALIGNMENT_ORDER {
+        if name == align_to_name || !xss.contains_key(name) {
             continue;
         }
 
-        let xs = xss.get(name.as_str()).unwrap();
+        let xs = xss.get(name).unwrap();
         let xs_min: f64 = xs.values().copied().fold(f64::INFINITY, f64::min);
         let xs_max: f64 = xs.values().copied().fold(f64::NEG_INFINITY, f64::max);
 
@@ -656,7 +667,7 @@ fn align_coordinates(xss: &mut HashMap<&str, HashMap<String, f64>>, align_to_nam
         };
 
         if delta != 0.0 {
-            let xs_mut = xss.get_mut(name.as_str()).unwrap();
+            let xs_mut = xss.get_mut(name).unwrap();
             for x in xs_mut.values_mut() {
                 *x += delta;
             }
@@ -919,6 +930,47 @@ mod tests {
             vec!["z".to_string(), "a".to_string(), "m".to_string()],
             "Block graph nodes should follow layer insertion order, not alphabetical"
         );
+    }
+
+    #[test]
+    fn test_find_smallest_width_tie_break_is_deterministic() {
+        // When two alignments have the SAME visual width, the tie must be broken
+        // by the fixed ALIGNMENT_ORDER (ul, ur, dl, dr), keeping the first — not
+        // by randomized HashMap iteration order. dagre bk.js resolves this via
+        // Object.values(xss).reduce with a strict `<`, retaining the earliest.
+        let mut g = DagreGraph::new();
+        g.set_node(
+            "a",
+            NodeLabel {
+                width: 40.0,
+                ..Default::default()
+            },
+        );
+
+        // All four alignments give node "a" the same visual width (single node,
+        // width 40 → span 40 in every alignment): a perfect tie.
+        let make = |x: f64| {
+            let mut m = HashMap::new();
+            m.insert("a".to_string(), x);
+            m
+        };
+
+        // Run many times: HashMap seed varies per instance, so a non-deterministic
+        // implementation would eventually return something other than "ul".
+        for _ in 0..200 {
+            let mut xss: HashMap<&str, HashMap<String, f64>> = HashMap::new();
+            xss.insert("dr", make(300.0));
+            xss.insert("ur", make(200.0));
+            xss.insert("dl", make(100.0));
+            xss.insert("ul", make(0.0));
+
+            let best = find_smallest_width_alignment(&g, &xss);
+            assert_eq!(
+                best,
+                Some("ul"),
+                "tie must resolve to the first alignment in ALIGNMENT_ORDER"
+            );
+        }
     }
 
     #[test]

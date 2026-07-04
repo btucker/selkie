@@ -18,7 +18,8 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             marker_height: 8.0,
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
-            children: vec![SvgElement::path("M 0 0 L 10 5 L 0 10 z")],
+            children: vec![SvgElement::path("M 0 0 L 10 5 L 0 10 z")
+                .with_attrs(super::elements::Attrs::new().with_class("marker"))],
         },
         // Arrow point start (filled triangle) - like mermaid.js pointStart marker
         SvgElement::Marker {
@@ -30,7 +31,8 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             marker_height: 8.0,
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
-            children: vec![SvgElement::path("M 0 5 L 10 10 L 10 0 z")],
+            children: vec![SvgElement::path("M 0 5 L 10 10 L 10 0 z")
+                .with_attrs(super::elements::Attrs::new().with_class("marker"))],
         },
         // Arrow cross end (X shape) - like mermaid.js crossEnd marker
         SvgElement::Marker {
@@ -45,6 +47,7 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             children: vec![SvgElement::Path {
                 d: "M 1 1 L 10 10 M 10 1 L 1 10".to_string(), // mermaid.js path
                 attrs: super::elements::Attrs::new()
+                    .with_class("marker cross")
                     .with_fill("none")
                     .with_stroke_width(2.0), // mermaid.js uses stroke-width: 2
             }],
@@ -62,6 +65,7 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             children: vec![SvgElement::Path {
                 d: "M 1 1 L 10 10 M 10 1 L 1 10".to_string(),
                 attrs: super::elements::Attrs::new()
+                    .with_class("marker cross")
                     .with_fill("none")
                     .with_stroke_width(2.0),
             }],
@@ -76,7 +80,8 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             marker_height: 11.0, // mermaid.js uses 11
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
-            children: vec![SvgElement::circle(5.0, 5.0, 5.0)], // mermaid.js uses r=5
+            children: vec![SvgElement::circle(5.0, 5.0, 5.0)
+                .with_attrs(super::elements::Attrs::new().with_class("marker"))], // mermaid.js uses r=5
         },
         // Arrow circle start (filled circle) - like mermaid.js circleStart marker
         SvgElement::Marker {
@@ -88,7 +93,8 @@ pub fn create_arrow_markers(_theme: &Theme) -> Vec<SvgElement> {
             marker_height: 11.0,
             orient: "auto".to_string(),
             marker_units: Some("userSpaceOnUse".to_string()),
-            children: vec![SvgElement::circle(5.0, 5.0, 5.0)],
+            children: vec![SvgElement::circle(5.0, 5.0, 5.0)
+                .with_attrs(super::elements::Attrs::new().with_class("marker"))],
         },
     ]
 }
@@ -112,6 +118,30 @@ pub fn get_start_marker_url(edge_type: Option<&str>) -> Option<String> {
         Some("double_arrow_point") => Some("url(#arrow_point_start)".to_string()),
         Some("double_arrow_cross") => Some("url(#arrow_cross_start)".to_string()),
         Some("double_arrow_circle") => Some("url(#arrow_circle_start)".to_string()),
+        _ => None,
+    }
+}
+
+/// Marker endpoint offset for the start of an edge.
+///
+/// Port of mermaid's `markerOffsets` table (utils/lineWithOffset.ts): lines are
+/// drawn slightly shorter so they do not show under transparent arrow markers.
+/// For flowcharts only `arrow_point` has an offset (4px); the start of an edge
+/// only carries a marker for `double_` edge types (arrowTypeStart).
+pub fn start_marker_offset(edge_type: Option<&str>) -> Option<f64> {
+    match edge_type {
+        Some("double_arrow_point") => Some(4.0),
+        _ => None,
+    }
+}
+
+/// Marker endpoint offset for the end of an edge.
+///
+/// Port of mermaid's `markerOffsets` table (utils/lineWithOffset.ts):
+/// `arrow_point` => 4. Cross and circle markers have no offset entry.
+pub fn end_marker_offset(edge_type: Option<&str>) -> Option<f64> {
+    match edge_type {
+        Some("arrow_point") | Some("double_arrow_point") => Some(4.0),
         _ => None,
     }
 }

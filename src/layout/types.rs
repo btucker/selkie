@@ -284,6 +284,10 @@ pub struct LayoutEdge {
     pub label_height: f64,
     /// Edge weight for layout prioritization
     pub weight: u32,
+    /// Minimum rank separation between endpoints. Mermaid maps a flowchart
+    /// edge's dash count (`----`) to the dagre edge minlen so extra dashes
+    /// lengthen the edge (flowDb.ts: `minlen: rawEdge.length`).
+    pub minlen: u32,
     /// Whether this edge was reversed for cycle removal
     pub reversed: bool,
     /// Additional metadata
@@ -306,6 +310,7 @@ impl LayoutEdge {
             label_width: 0.0,
             label_height: 0.0,
             weight: 1,
+            minlen: 1,
             reversed: false,
             metadata: HashMap::new(),
         }
@@ -313,15 +318,34 @@ impl LayoutEdge {
 
     pub fn with_label(mut self, label: impl Into<String>) -> Self {
         let text = label.into();
-        // Estimate label dimensions (same as renderer: 16px font, 0.6 char ratio)
-        self.label_width = text.len() as f64 * 16.0 * 0.6 + 4.0; // + padding
-        self.label_height = 16.0 * 1.1 + 4.0; // + padding
+        // Coarse character-count fallback for adapters that do not measure
+        // labels with a size estimator. Adapters aiming for mermaid parity
+        // (e.g. flowchart) should overwrite label_width/label_height with
+        // per-line measurements from a SizeEstimator before layout.
+        self.label_width = text.len() as f64 * 8.0 + 16.0;
+        self.label_height = 20.0;
         self.label = Some(text);
+        self
+    }
+
+    /// Set measured label dimensions (from a size estimator), mirroring
+    /// mermaid's insertEdgeLabel which records the label bbox before layout.
+    pub fn with_label_size(mut self, width: f64, height: f64) -> Self {
+        self.label_width = width;
+        self.label_height = height;
         self
     }
 
     pub fn with_weight(mut self, weight: u32) -> Self {
         self.weight = weight;
+        self
+    }
+
+    /// Set the minimum rank separation between the edge's endpoints. Mermaid
+    /// derives this from a flowchart edge's dash count so `A ----> B` spans
+    /// more ranks than `A --> B` (flowDb.ts: `minlen: rawEdge.length`).
+    pub fn with_minlen(mut self, minlen: u32) -> Self {
+        self.minlen = minlen.max(1);
         self
     }
 

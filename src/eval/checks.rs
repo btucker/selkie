@@ -45,6 +45,7 @@ pub fn check_structure(
     check_node_count(selkie, reference, &mut issues);
     check_edge_count(selkie, reference, &mut issues);
     check_missing_labels(selkie, reference, &mut issues);
+    check_label_markup_artifacts(selkie, &mut issues);
 
     // WARNING checks - significant differences
     check_dimensions(selkie, reference, config, &mut issues);
@@ -451,6 +452,46 @@ fn check_extra_labels(selkie: &SvgStructure, reference: &SvgStructure, issues: &
     }
 }
 
+/// Check for user-visible markup/entity artifacts in labels.
+fn check_label_markup_artifacts(selkie: &SvgStructure, issues: &mut Vec<Issue>) {
+    let artifact_labels: Vec<_> = selkie
+        .labels
+        .iter()
+        .filter(|label| has_label_markup_artifact(label))
+        .cloned()
+        .collect();
+
+    if !artifact_labels.is_empty() {
+        issues.push(
+            Issue::error(
+                "label_markup_artifacts",
+                format!(
+                    "Label text contains raw markup, double-escaped HTML entities, or unnormalized Mermaid escapes: {:?}",
+                    artifact_labels
+                ),
+            )
+            .with_values("clean visible text".to_string(), format!("{artifact_labels:?}")),
+        );
+    }
+}
+
+fn has_label_markup_artifact(label: &str) -> bool {
+    let lower = label.to_ascii_lowercase();
+    lower.contains("&lt;")
+        || lower.contains("&gt;")
+        || lower.contains("&amp;lt;")
+        || lower.contains("&amp;gt;")
+        || lower.contains("<br")
+        || lower.contains("</br")
+        || lower.contains("<b>")
+        || lower.contains("</b>")
+        || lower.contains("<strong>")
+        || lower.contains("</strong>")
+        || lower.contains("<em>")
+        || lower.contains("</em>")
+        || label.contains("\\\\n")
+}
+
 /// Check dimensions - WARNING if >20% off, INFO if >5% off
 fn check_dimensions(
     selkie: &SvgStructure,
@@ -749,10 +790,121 @@ fn check_markers(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut V
     }
 }
 
+/// Extract text/background colors declared inside `foreignObject` HTML,
+/// canonicalized to lowercase 6-digit hex.
+///
+/// Mermaid renders label text color as HTML `color:`/`background-color:` on
+/// foreignObject `<div>`/`<span>` elements. Only values that canonicalize to a
+/// hex color (hex shorthand/longhand or `rgb(...)`) are returned so they line
+/// up with selkie's normalized fill colors; anything else is skipped to avoid
+/// inventing "missing" colors the comparator would otherwise flag.
+fn extract_foreign_object_colors(svg: &str) -> Vec<String> {
+    let mut colors = Vec::new();
+    let Ok(doc) = roxmltree::Document::parse(svg) else {
+        return colors;
+    };
+
+    for fo in doc
+        .descendants()
+        .filter(|n| n.tag_name().name() == "foreignObject")
+    {
+        for node in fo.descendants() {
+            let Some(style) = node.attribute("style") else {
+                continue;
+            };
+            for property in ["color", "background-color"] {
+                if let Some(value) = foreign_object_style_value(style, property) {
+                    if let Some(hex) = canonical_hex(value) {
+                        colors.push(hex);
+                    }
+                }
+            }
+        }
+    }
+
+    colors.sort();
+    colors.dedup();
+    colors
+}
+
+/// Read a single CSS property value out of an inline `style` string, matching
+/// the exact property name (so `color` does not match `background-color`).
+fn foreign_object_style_value<'a>(style: &'a str, property: &str) -> Option<&'a str> {
+    for decl in style.split(';') {
+        let decl = decl.trim();
+        if let Some((name, value)) = decl.split_once(':') {
+            if name.trim().eq_ignore_ascii_case(property) {
+                return Some(value.trim());
+            }
+        }
+    }
+    None
+}
+
+/// Canonicalize a CSS color to lowercase 6-digit hex (`#rrggbb`).
+///
+/// Handles `#rgb`, `#rrggbb`, and `rgb(r, g, b)` (dropping any trailing
+/// `!important`). Returns `None` for forms that cannot be reduced to hex so
+/// they are not compared against selkie's hex fills.
+fn canonical_hex(value: &str) -> Option<String> {
+    let value = value
+        .split('!')
+        .next()
+        .unwrap_or(value)
+        .trim()
+        .to_lowercase();
+
+    if let Some(hex) = value.strip_prefix('#') {
+        if hex.len() == 6 && hex.chars().all(|c| c.is_ascii_hexdigit()) {
+            return Some(format!("#{}", hex));
+        }
+        if hex.len() == 3 && hex.chars().all(|c| c.is_ascii_hexdigit()) {
+            let mut expanded = String::with_capacity(7);
+            expanded.push('#');
+            for c in hex.chars() {
+                expanded.push(c);
+                expanded.push(c);
+            }
+            return Some(expanded);
+        }
+        return None;
+    }
+
+    if let Some(inner) = value.strip_prefix("rgb(").and_then(|s| s.strip_suffix(')')) {
+        let components: Vec<u8> = inner
+            .split(',')
+            .filter_map(|p| p.trim().parse::<u8>().ok())
+            .collect();
+        if components.len() == 3 {
+            return Some(format!(
+                "#{:02x}{:02x}{:02x}",
+                components[0], components[1], components[2]
+            ));
+        }
+    }
+
+    None
+}
+
 /// Check colors - WARNING if fill colors significantly different
 fn check_colors(selkie: &SvgStructure, reference: &SvgStructure, issues: &mut Vec<Issue>) {
-    let selkie_fills: HashSet<_> = selkie.color_analysis.fill_colors.iter().collect();
-    let ref_fills: HashSet<_> = reference.color_analysis.fill_colors.iter().collect();
+    let selkie_fills: HashSet<String> = selkie.color_analysis.fill_colors.iter().cloned().collect();
+
+    // Mermaid renders label text color (from `classDef color:`) via HTML
+    // `color:`/`background-color:` on foreignObject div/span elements, so those
+    // colors never appear in the reference's shape/CSS fill set. Selkie emits
+    // the same color as a native `<text fill="...">`, which the fill analysis
+    // does pick up. Fold the reference's foreignObject colors into its fill set
+    // so selkie's text fills are recognized as matched, not "extra".
+    let mut ref_fills: HashSet<String> = reference
+        .color_analysis
+        .fill_colors
+        .iter()
+        .cloned()
+        .collect();
+    for color in extract_foreign_object_colors(&reference.raw_svg) {
+        ref_fills.insert(color);
+    }
 
     // Find colors in reference that are missing in selkie
     let missing_fills: Vec<_> = ref_fills.difference(&selkie_fills).cloned().collect();
@@ -1012,13 +1164,20 @@ fn check_edge_attachments(
             );
         }
 
-        // Build concise edge comparison
-        let min_count = selkie_count.min(ref_count);
+        // Build concise edge comparison. Pair edges by identifier so the same
+        // logical edge is compared across renderers; fall back to positional
+        // pairing only when identifiers are unavailable.
+        let edge_pairs = pair_edges_by_id(
+            &selkie_geo.edge_ids,
+            &ref_geo.edge_ids,
+            selkie_count,
+            ref_count,
+        );
         let mut edge_diffs = Vec::new();
 
-        for i in 0..min_count {
-            let (sx1, sy1, sx2, sy2) = selkie_geo.edge_endpoints[i];
-            let (rx1, ry1, rx2, ry2) = ref_geo.edge_endpoints[i];
+        for (label, (si, ri)) in edge_pairs.iter().enumerate() {
+            let (sx1, sy1, sx2, sy2) = selkie_geo.edge_endpoints[*si];
+            let (rx1, ry1, rx2, ry2) = ref_geo.edge_endpoints[*ri];
 
             // Check if edge paths differ significantly (>10px)
             let start_diff = ((sx1 - rx1).powi(2) + (sy1 - ry1).powi(2)).sqrt();
@@ -1031,7 +1190,7 @@ fn check_edge_attachments(
 
                 edge_diffs.push(format!(
                     "Edge {}: selkie={} ref={} (start diff={:.0}px, end diff={:.0}px)",
-                    i + 1,
+                    label + 1,
                     selkie_dir,
                     ref_dir,
                     start_diff,
@@ -1220,6 +1379,61 @@ fn check_edge_attachments(
 }
 
 /// Classify edge direction based on start and end points
+/// Normalize an edge identifier so the same logical edge matches across
+/// renderers. Reference emits `id="L_<src>_<dst>_<n>"`; selkie emits
+/// `id="edge-L-<src>-<dst>-<n>"`. Dropping the `edge-`/`edge_` prefix and
+/// collapsing `-`/`_` separators to a single canonical marker makes the two
+/// encodings identical.
+fn normalize_edge_id(raw: &str) -> String {
+    let trimmed = raw.trim();
+    let trimmed = trimmed
+        .strip_prefix("edge-")
+        .or_else(|| trimmed.strip_prefix("edge_"))
+        .unwrap_or(trimmed);
+    trimmed.replace(['-', '_'], "|").to_lowercase()
+}
+
+/// Pair selkie and reference edges by identifier, returning `(selkie_idx,
+/// ref_idx)` pairs into their respective `edge_endpoints` vectors. Falls back
+/// to positional pairing when identifiers are missing on either side or no id
+/// matches (e.g. renderers that omit edge ids).
+fn pair_edges_by_id(
+    selkie_ids: &[Option<String>],
+    ref_ids: &[Option<String>],
+    selkie_count: usize,
+    ref_count: usize,
+) -> Vec<(usize, usize)> {
+    let selkie_has_ids = selkie_ids.iter().any(|id| id.is_some());
+    let ref_has_ids = ref_ids.iter().any(|id| id.is_some());
+
+    if selkie_has_ids && ref_has_ids {
+        let mut ref_map: std::collections::HashMap<String, usize> =
+            std::collections::HashMap::new();
+        for (i, id) in ref_ids.iter().enumerate() {
+            if let Some(id) = id {
+                ref_map.entry(normalize_edge_id(id)).or_insert(i);
+            }
+        }
+
+        let mut pairs = Vec::new();
+        for (si, id) in selkie_ids.iter().enumerate() {
+            if let Some(id) = id {
+                if let Some(&ri) = ref_map.get(&normalize_edge_id(id)) {
+                    pairs.push((si, ri));
+                }
+            }
+        }
+
+        if !pairs.is_empty() {
+            return pairs;
+        }
+    }
+
+    // Fall back to positional pairing.
+    let min_count = selkie_count.min(ref_count);
+    (0..min_count).map(|i| (i, i)).collect()
+}
+
 fn classify_edge_direction(start: (f64, f64), end: (f64, f64)) -> &'static str {
     let dx = (end.0 - start.0).abs();
     let dy = (end.1 - start.1).abs();
@@ -2163,8 +2377,14 @@ fn check_aspect_ratio(selkie: &SvgStructure, reference: &SvgStructure, issues: &
         "square"
     };
 
-    // Report if orientation category differs
-    if ref_orientation != selkie_orientation {
+    // Relative difference between the aspect ratios. Category labels have
+    // hard boundaries (1.2 / 0.8), so two nearly identical ratios can land
+    // in different categories (e.g. 1.201 "landscape" vs 1.197 "square").
+    // Only report an orientation flip when the categories differ AND the
+    // ratios are actually far apart.
+    let ratio_diff = (ref_aspect - selkie_aspect).abs() / ref_aspect;
+
+    if ref_orientation != selkie_orientation && ratio_diff > 0.10 {
         issues.push(
             Issue::error(
                 "aspect_ratio",
@@ -2185,21 +2405,18 @@ fn check_aspect_ratio(selkie: &SvgStructure, reference: &SvgStructure, issues: &
                 format!("{} ({:.2})", selkie_orientation, selkie_aspect),
             ),
         );
-    } else {
-        // Same orientation but check for significant aspect ratio difference
-        let ratio_diff = (ref_aspect - selkie_aspect).abs() / ref_aspect;
-        if ratio_diff > 0.3 {
-            issues.push(
-                Issue::warning(
-                    "aspect_ratio",
-                    format!(
-                        "Aspect ratio differs significantly: reference {:.2}, selkie {:.2} ({:.0}% difference)",
-                        ref_aspect, selkie_aspect, ratio_diff * 100.0
-                    ),
-                )
-                .with_values(format!("{:.2}", ref_aspect), format!("{:.2}", selkie_aspect)),
-            );
-        }
+    } else if ratio_diff > 0.3 {
+        // Same (or near-boundary) orientation with a significant ratio difference
+        issues.push(
+            Issue::warning(
+                "aspect_ratio",
+                format!(
+                    "Aspect ratio differs significantly: reference {:.2}, selkie {:.2} ({:.0}% difference)",
+                    ref_aspect, selkie_aspect, ratio_diff * 100.0
+                ),
+            )
+            .with_values(format!("{:.2}", ref_aspect), format!("{:.2}", selkie_aspect)),
+        );
     }
 }
 
@@ -2875,6 +3092,7 @@ mod tests {
         SvgStructure {
             width: 400.0,
             height: 300.0,
+            viewbox_origin: (0.0, 0.0),
             node_count: nodes,
             edge_count: edges,
             labels: labels.into_iter().map(String::from).collect(),
@@ -2889,6 +3107,114 @@ mod tests {
             color_analysis: ColorAnalysis::default(),
             raw_svg: String::new(),
         }
+    }
+
+    #[test]
+    fn check_colors_treats_shorthand_hex_and_important_as_equal() {
+        // Reference: mermaid applies colors via CSS with shorthand hex.
+        // Selkie: inlines the same colors with full hex and !important.
+        // These render identically, so no color issue may be reported.
+        let reference_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <style>
+                #m .error-icon { fill: #552222; }
+                #m .error-text { fill: #552222; stroke: #552222; }
+                #m .node rect { fill: #ECECFF; stroke: #333; }
+            </style>
+            <g class="node"><rect width="80" height="40"/></g>
+        </svg>"##;
+        let selkie_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <g class="node"><rect width="80" height="40" style="fill:#ececff !important;stroke:#333333 !important"/></g>
+        </svg>"##;
+
+        let reference = SvgStructure::from_svg(reference_svg).unwrap();
+        let selkie = SvgStructure::from_svg(selkie_svg).unwrap();
+
+        let mut issues = Vec::new();
+        check_colors(&selkie, &reference, &mut issues);
+        assert!(
+            issues.is_empty(),
+            "Equivalent colors (shorthand hex, !important, dead rules) must not be flagged: {:?}",
+            issues
+        );
+    }
+
+    #[test]
+    fn check_colors_accounts_for_reference_foreign_object_text_colors() {
+        // classDef `color:` sets label text color. Selkie emits it as a native
+        // <text fill="..."> (picked up as a fill color), while mermaid hides it
+        // inside foreignObject HTML `color:` on div/span. Without teaching the
+        // comparator about foreignObject colors, selkie's #ffffff/#000000 text
+        // fills look like "extra" fills the reference lacks — a false positive
+        // (FLOW-4.2) on diagrams like data_collection / modal_click_paths.
+        let reference_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <g class="node">
+                <rect width="80" height="40" style="fill:#ff6b6b"/>
+                <g class="label"><foreignObject width="60" height="24">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(255, 255, 255) !important; display: table-cell;">
+                        <span style="color:#fff !important" class="nodeLabel"><p>Bug</p></span>
+                    </div>
+                </foreignObject></g>
+            </g>
+            <g class="node">
+                <rect width="80" height="40" style="fill:#51cf66"/>
+                <g class="label"><foreignObject width="60" height="24">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(0, 0, 0) !important; display: table-cell;">
+                        <span style="color:#000 !important" class="nodeLabel"><p>Fix</p></span>
+                    </div>
+                </foreignObject></g>
+            </g>
+        </svg>"##;
+        let selkie_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <g class="node">
+                <rect width="80" height="40" style="fill:#ff6b6b !important"/>
+                <text style="fill:#ffffff !important">Bug</text>
+            </g>
+            <g class="node">
+                <rect width="80" height="40" style="fill:#51cf66 !important"/>
+                <text style="fill:#000000 !important">Fix</text>
+            </g>
+        </svg>"##;
+
+        let reference = SvgStructure::from_svg(reference_svg).unwrap();
+        let selkie = SvgStructure::from_svg(selkie_svg).unwrap();
+
+        let mut issues = Vec::new();
+        check_colors(&selkie, &reference, &mut issues);
+        assert!(
+            issues.is_empty(),
+            "Text colors mermaid renders via foreignObject HTML must not be flagged as extra selkie fills: {:?}",
+            issues
+        );
+    }
+
+    #[test]
+    fn check_stroke_widths_ignores_marker_and_shape_paths() {
+        // Reference: edge path stroke-width 2 plus thin arrowhead marker
+        // paths in <defs> and a rough.js-style node outline path.
+        // Selkie: single edge path with stroke-width 2 via inline style.
+        // Rendered edge strokes match, so no stroke_width warning.
+        let reference_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <defs>
+                <marker id="arrow"><path d="M0,0 L10,5 L0,10 z" stroke="#333" stroke-width="1"/></marker>
+                <marker id="cross"><path d="M0,0 L10,10" stroke="#333" stroke-width="0.1"/></marker>
+            </defs>
+            <path class="basic label-container" d="M0,0 L10,10" stroke="#9370db" stroke-width="0.3"/>
+            <path class="edge-thickness-normal edge-pattern-solid flowchart-link" d="M0,0 L50,50" stroke="#333" stroke-width="2"/>
+        </svg>"##;
+        let selkie_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+            <path class="edge-path" d="M0,0 L50,50" style="stroke:#333 !important;stroke-width:2px !important"/>
+        </svg>"##;
+
+        let reference = SvgStructure::from_svg(reference_svg).unwrap();
+        let selkie = SvgStructure::from_svg(selkie_svg).unwrap();
+
+        let mut issues = Vec::new();
+        check_stroke_widths(&selkie, &reference, &mut issues);
+        assert!(
+            issues.is_empty(),
+            "Matching edge strokes must not be flagged when reference has marker/shape paths: {:?}",
+            issues
+        );
     }
 
     #[test]
@@ -2929,6 +3255,35 @@ mod tests {
         assert!(
             has_missing_label_error,
             "Should have error for missing labels"
+        );
+    }
+
+    #[test]
+    /// @spec FLOW-2.4: When Selkie renders flowchart label text with raw HTML tags, double-escaped entities, or unnormalized Mermaid escapes, the eval report shall flag the label as a visible markup artifact.
+    fn flags_visible_label_markup_artifacts() {
+        let selkie = make_structure(
+            3,
+            2,
+            vec![
+                "A",
+                "Vec&lt;Effect&gt;",
+                "Status <b>bold</b>",
+                "join with \\\\n",
+            ],
+        );
+        let reference = make_structure(
+            3,
+            2,
+            vec!["A", "Vec<Effect>", "Status bold", "join with \\n"],
+        );
+
+        let issues = check_structure(&selkie, &reference, &CheckConfig::default());
+
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.level == Level::Error && i.check == "label_markup_artifacts"),
+            "Should have error for visible label markup artifacts: {issues:?}"
         );
     }
 
@@ -3401,5 +3756,122 @@ mod tests {
                 .any(|i| i.check == "sequence_self_message_label"),
             "did not expect sequence_self_message_label issue, got {issues:?}"
         );
+    }
+
+    #[test]
+    fn edge_positions_not_flagged_for_viewbox_origin_shift() {
+        // Identical drawings that differ only in viewBox origin convention:
+        // mermaid bakes padding into coordinates (origin "0 0"), selkie uses
+        // a negative origin ("-8 -8") with content starting at 0. Both render
+        // pixel-identically, so no edge_positions issue may be reported.
+        let reference_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+            <rect class="node" id="a" x="10" y="10" width="80" height="40"/>
+            <rect class="node" id="b" x="210" y="150" width="80" height="40"/>
+            <path class="edge" d="M90,50L210,150"/>
+        </svg>"##;
+        let selkie_svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 300 200">
+            <rect class="node" id="a" x="2" y="2" width="80" height="40"/>
+            <rect class="node" id="b" x="202" y="142" width="80" height="40"/>
+            <path class="edge" d="M82,42L202,142"/>
+        </svg>"##;
+
+        let reference = SvgStructure::from_svg(reference_svg).unwrap();
+        let selkie = SvgStructure::from_svg(selkie_svg).unwrap();
+        let mut issues = Vec::new();
+
+        check_edge_attachments(&selkie, &reference, &mut issues);
+
+        assert!(
+            !issues.iter().any(|i| i.check == "edge_positions"),
+            "viewBox origin shift alone must not flag edge_positions, got {issues:?}"
+        );
+    }
+
+    fn structure_with_dims(width: f64, height: f64) -> SvgStructure {
+        let mut s = make_structure(0, 0, vec![]);
+        s.width = width;
+        s.height = height;
+        s
+    }
+
+    #[test]
+    fn aspect_ratio_near_category_boundary_is_not_error() {
+        // Reference 1237x1030 (ratio 1.2009, "landscape") vs selkie 1197x1000
+        // (ratio 1.197, "square"): dimensions are within 3.3%, so this is not
+        // an orientation flip and must not be a structural error.
+        let reference = structure_with_dims(1237.0, 1030.0);
+        let selkie = structure_with_dims(1197.0, 1000.0);
+        let mut issues = Vec::new();
+
+        check_aspect_ratio(&selkie, &reference, &mut issues);
+
+        assert!(
+            !issues
+                .iter()
+                .any(|i| i.check == "aspect_ratio" && i.level == Level::Error),
+            "near-boundary aspect ratios must not be an error, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn aspect_ratio_real_orientation_flip_is_error() {
+        // Reference clearly landscape (1.69), selkie clearly portrait (0.54).
+        let reference = structure_with_dims(1690.0, 1000.0);
+        let selkie = structure_with_dims(540.0, 1000.0);
+        let mut issues = Vec::new();
+
+        check_aspect_ratio(&selkie, &reference, &mut issues);
+
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.check == "aspect_ratio" && i.level == Level::Error),
+            "a real orientation flip must remain an error, got {issues:?}"
+        );
+    }
+
+    #[test]
+    fn test_normalize_edge_id_matches_across_renderers() {
+        // Reference "L_A_B_0" and selkie "edge-L-A-B-0" describe the same edge.
+        assert_eq!(
+            normalize_edge_id("L_A_B_0"),
+            normalize_edge_id("edge-L-A-B-0"),
+            "reference and selkie edge ids must normalize equal"
+        );
+        assert_ne!(
+            normalize_edge_id("L_A_B_0"),
+            normalize_edge_id("L_A_C_0"),
+            "distinct edges must not collide"
+        );
+    }
+
+    #[test]
+    fn test_pair_edges_by_id_ignores_document_order() {
+        // Same two logical edges, emitted in opposite order by each renderer.
+        let selkie_ids = vec![
+            Some("edge-L-A-B-0".to_string()),
+            Some("edge-L-B-C-0".to_string()),
+        ];
+        let ref_ids = vec![Some("L_B_C_0".to_string()), Some("L_A_B_0".to_string())];
+
+        let pairs = pair_edges_by_id(&selkie_ids, &ref_ids, 2, 2);
+
+        // selkie[0] (A-B) must pair with ref[1] (A-B), not ref[0].
+        assert!(
+            pairs.contains(&(0, 1)),
+            "A->B must pair by id regardless of order, got {pairs:?}"
+        );
+        assert!(
+            pairs.contains(&(1, 0)),
+            "B->C must pair by id regardless of order, got {pairs:?}"
+        );
+    }
+
+    #[test]
+    fn test_pair_edges_by_id_falls_back_to_position() {
+        // No ids available: pair positionally over the shared prefix.
+        let none: Vec<Option<String>> = vec![None, None, None];
+        let pairs = pair_edges_by_id(&none, &none, 3, 2);
+        assert_eq!(pairs, vec![(0, 0), (1, 1)]);
     }
 }

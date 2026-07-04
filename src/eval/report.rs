@@ -6,7 +6,10 @@
 //! - HTML (visual comparison report)
 //! - PNG (side-by-side comparison images for AI review)
 
-use super::{EvalResult, Level, Status, TypeStats};
+use super::{
+    failure_families::{classify_failure_families, FailureFamilySummary},
+    EvalResult, Level, Status, TypeStats,
+};
 use std::fs;
 use std::path::Path;
 
@@ -112,6 +115,21 @@ pub fn text_summary(result: &EvalResult, output_dir: Option<&Path>) -> String {
             "  {:>3} Visual   - Low SSIM (< 0.90) but structural match\n",
             result.issue_counts.visual_only
         ));
+    }
+
+    let failure_families = classify_failure_families(&result.diagrams);
+    if !failure_families.is_empty() {
+        output.push_str("\nFailure Families:\n");
+        for family in &failure_families {
+            output.push_str(&format!(
+                "  {:>3} diagrams / {:>3} issues  {}  {} - {}\n",
+                family.diagram_count,
+                family.issue_count,
+                family.spec_id,
+                family.family,
+                family.title
+            ));
+        }
     }
 
     output
@@ -382,6 +400,26 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
     output.push_str(&format!("- Warnings: {}\n", result.issue_counts.warnings));
     output.push('\n');
 
+    let failure_families = classify_failure_families(&result.diagrams);
+    if !failure_families.is_empty() {
+        output.push_str("## FAILURE FAMILIES\n\n");
+        for family in &failure_families {
+            output.push_str(&format!(
+                "- **{} {}**: {} ({} diagrams, {} issues)\n",
+                family.spec_id,
+                family.family,
+                family.description,
+                family.diagram_count,
+                family.issue_count
+            ));
+            output.push_str(&format!(
+                "  Diagrams: {}\n",
+                format_family_diagrams(&family.diagrams)
+            ));
+        }
+        output.push('\n');
+    }
+
     // Group diagrams by status for easy prioritization
     let errors: Vec<_> = result
         .diagrams
@@ -471,6 +509,14 @@ pub fn text_agent_friendly(result: &EvalResult, output_dir: Option<&Path>) -> St
     output.push_str("5. Use `cargo test -p selkie -- <diagram_type>` to run related tests\n\n");
 
     output
+}
+
+fn format_family_diagrams(diagrams: &[String]) -> String {
+    let mut names: Vec<_> = diagrams.iter().take(5).cloned().collect();
+    if diagrams.len() > 5 {
+        names.push(format!("... and {} more", diagrams.len() - 5));
+    }
+    names.join(", ")
 }
 
 /// Format a single diagram for agent-friendly output
@@ -614,6 +660,7 @@ struct SummaryReport {
     avg_visual_similarity: f64,
     by_type: std::collections::HashMap<String, super::TypeStats>,
     issue_counts: super::IssueCounts,
+    failure_families: Vec<FailureFamilySummary>,
     /// Index of all diagram JSON files
     diagrams: Vec<DiagramIndexEntry>,
 }
@@ -687,6 +734,7 @@ pub fn write_json_by_type(result: &EvalResult, output_dir: &Path) -> std::io::Re
         avg_visual_similarity: result.avg_visual_similarity,
         by_type: result.by_type.clone(),
         issue_counts: result.issue_counts.clone(),
+        failure_families: classify_failure_families(&result.diagrams),
         diagrams: diagram_index,
     };
 
@@ -1096,7 +1144,10 @@ mod tests {
                     name: "test_error_diagram".to_string(),
                     source: Some("docs/sources/test.mmd".to_string()),
                     diagram_type: "flowchart".to_string(),
-                    diagram_text: Some("flowchart LR\n    A --> B\n    B --> C".to_string()),
+                    diagram_text: Some(
+                        "flowchart LR\n    subgraph \"Critical Path\"\n    A --> B\n    end"
+                            .to_string(),
+                    ),
                     status: Status::Error,
                     visual_similarity: Some(0.65),
                     structural_similarity: Some(0.50),
@@ -1104,7 +1155,7 @@ mod tests {
                     issues: vec![
                         Issue::error("node_count", "Node count mismatch: expected 3, got 2")
                             .with_values("3", "2"),
-                        Issue::error("labels_missing", "Missing labels: [\"C\"]")
+                        Issue::error("labels_missing", "Missing labels: [\"Critical Path\"]")
                             .with_values("[\"A\", \"B\", \"C\"]", "[\"A\", \"B\"]"),
                     ],
                     parse_result: ParseResult {
@@ -1192,6 +1243,9 @@ mod tests {
         assert!(output.contains("Total diagrams: 3"));
         assert!(output.contains("Passing: 1"));
         assert!(output.contains("Errors: 2"));
+        assert!(output.contains("FAILURE FAMILIES"));
+        assert!(output.contains("FLOW-1.4"));
+        assert!(output.contains("flow_subgraph_titles"));
 
         // Check priority section exists
         assert!(output.contains("PRIORITY: FIX THESE FIRST (ERRORS)"));

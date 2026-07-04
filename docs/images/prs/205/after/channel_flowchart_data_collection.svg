@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2019.7" height="1579.2" viewBox="-8 -27.999999999999993 2019.7 1579.2" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-subGraph0">
+        <rect x="20" y="-19.999999999999993" width="340" height="323.4" class="cluster"/>
+        <text x="190" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Data Collection (snapshot.rs)</text>
+      </g>
+      <g class="subgraph" id="subgraph-subGraph1">
+        <rect x="430.0000000000001" y="-19.999999999999993" width="1210.7999999999997" height="1558.2" class="cluster"/>
+        <text x="1035.4" y="-3.999999999999993" class="cluster-label" text-anchor="middle">Task Dispatch (dispatch.rs)</text>
+      </g>
+      <g class="subgraph" id="subgraph-subGraph2">
+        <rect x="1042.8" y="358.40000000000003" width="254.4000000000001" height="154.59999999999997" class="cluster"/>
+        <text x="1170" y="374.40000000000003" class="cluster-label" text-anchor="middle">The Bug</text>
+      </g>
+      <g class="subgraph" id="subgraph-subGraph3">
+        <rect x="1367.2" y="376.80000000000007" width="614.1000000000001" height="873.9999999999999" class="cluster"/>
+        <text x="1674.25" y="392.80000000000007" class="cluster-label" text-anchor="middle">Fix Location</text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-A-B-0">
+        <path d="M 190.00 77.80 C 190.00 86.13, 190.00 94.47, 190.00 102.80 C 190.00 111.13, 190.00 119.47, 190.00 127.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-B-C-0">
+        <path d="M 190.00 180.60 C 190.00 188.93, 190.00 197.27, 190.00 205.60 C 190.00 213.93, 190.00 222.27, 190.00 230.60" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-D-E-0">
+        <path d="M 672.70 77.80 C 672.70 86.13, 672.70 94.47, 672.70 102.80 C 672.70 111.13, 672.70 119.47, 672.70 127.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-E-F-0">
+        <path d="M 672.70 180.60 C 672.70 188.93, 672.70 197.27, 672.70 205.60 C 672.70 213.93, 672.70 222.27, 672.70 230.60" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-F-G-0">
+        <path d="M 631.46 283.40 C 618.44 509.67, 605.42 735.93, 734.15 871.59 C 862.89 1007.24, 1133.38 1052.28, 1403.87 1097.33" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-G-H-0">
+        <path d="M 1466.94 1193.74 C 1457.33 1214.43, 1447.71 1235.11, 1299.29 1251.29 C 1150.87 1267.47, 863.63 1279.13, 720.02 1293.87 C 576.40 1326.40, 576.40 1344.20, 576.40 1344.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-G-I-0">
+        <path d="M 1578.79 1156.01 C 1637.99 1189.28, 1697.20 1222.54, 1573.40 1245.00 C 1449.60 1267.47, 1142.80 1279.13, 989.40 1290.80 C 836.00 1314.13, 836.00 1325.80, 836.00 1325.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-I-J-0">
+        <path d="M 836.00 1415.40 C 836.00 1423.73, 836.00 1432.07, 836.00 1440.40 C 836.00 1448.73, 836.00 1457.07, 836.00 1465.40" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-C-K-0">
+        <path d="M 190.00 283.40 C 190.00 303.40, 190.00 323.40, 353.33 339.23 C 516.67 355.07, 843.33 366.73, 1006.67 376.73 C 1170.00 395.07, 1170.00 403.40, 1170.00 403.40" class="edge-path" stroke-width="2" marker-end="url(#arrow_point)" fill="none" stroke-dasharray="3,3"/>
+      </g>
+      <g class="edge" id="edge-L-F-K-0">
+        <path d="M 677.84 283.40 C 679.46 315.07, 681.08 346.73, 745.24 371.64 C 809.40 396.55, 936.10 414.70, 1062.80 432.84" class="edge-path" stroke-width="2" fill="none" marker-end="url(#arrow_point)" stroke-dasharray="3,3"/>
+      </g>
+      <g class="edge" id="edge-L-K-G-0">
+        <path d="M 1170.00 493.00 C 1170.00 501.33, 1170.00 509.67, 1217.72 519.67 C 1265.43 529.67, 1360.87 541.33, 1411.88 625.85 C 1469.48 867.75, 1476.07 1025.13, 1476.07 1025.13" class="edge-path" stroke-dasharray="3,3" marker-end="url(#arrow_point)" stroke-width="2" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-L-M-0">
+        <path d="M 1811.30 474.60 C 1811.30 489.07, 1811.30 503.53, 1811.30 516.60 C 1811.30 529.67, 1811.30 541.33, 1811.30 553.00 C 1811.30 576.33, 1811.30 588.00, 1811.30 588.00" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-M-N-0">
+        <path d="M 1833.24 902.39 L 1842.30 1069.20" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-M-G-0">
+        <path d="M 1748.65 856.36 C 1726.26 891.64, 1703.88 926.92, 1673.60 960.89 C 1643.32 994.85, 1605.14 1027.51, 1566.96 1060.16" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-F-L-0">
+        <path d="M 779.53 283.40 C 813.26 291.73, 846.98 300.07, 863.84 315.90 C 880.70 331.73, 880.70 355.07, 1016.33 376.91 C 1423.23 419.09, 1694.50 439.44, 1694.50 439.44" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-F-G-0">
+        <rect x="623.605469281813" y="961.2587431296394" width="58.4" height="22" class="edge-label-bg"/>
+        <text x="652.8054692818131" y="972.2587431296394" class="edge-label" dominant-baseline="central" text-anchor="middle">PR #709</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-G-H-0">
+        <rect x="992.760439914046" y="1261.9949455761966" width="44" height="22" class="edge-label-bg"/>
+        <text x="1014.760439914046" y="1272.9949455761966" class="edge-label" text-anchor="middle" dominant-baseline="central">found</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-G-I-0">
+        <rect x="1344.101851976231" y="1259.0942581278055" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="1380.5018519762311" y="1270.0942581278055" class="edge-label" text-anchor="middle" dominant-baseline="central">not found</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-C-K-0">
+        <rect x="586.5111500489179" y="349.27539821603284" width="152" height="22" class="edge-label-bg"/>
+        <text x="662.5111500489179" y="360.27539821603284" class="edge-label" text-anchor="middle" dominant-baseline="central">Available but unused</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-F-K-0">
+        <rect x="753.0979093993493" y="387.85412287312664" width="144.79999999999998" height="22" class="edge-label-bg"/>
+        <text x="825.4979093993493" y="398.85412287312664" class="edge-label" dominant-baseline="central" text-anchor="middle">PR number extracted</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-K-G-0">
+        <rect x="1387.5000000000002" y="622.8643764178416" width="137.6" height="22" class="edge-label-bg"/>
+        <text x="1456.3000000000002" y="633.8643764178416" class="edge-label" dominant-baseline="central" text-anchor="middle">Should filter here</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-M-N-0">
+        <rect x="1827.5000000000002" y="974.4560911446422" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="1842.3000000000002" y="985.4560911446422" class="edge-label" dominant-baseline="central" text-anchor="middle">yes</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-M-G-0">
+        <rect x="1660.6580309526316" y="959.4459205712142" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="1671.8580309526317" y="970.4459205712142" class="edge-label" text-anchor="middle" dominant-baseline="central">no</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-A">
+        <rect x="68.4" y="25.000000000000007" width="243.2" height="52.8"/>
+        <text x="190" y="51.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">collect_world_snapshot</text>
+      </g>
+      <g class="node" id="node-B">
+        <rect x="40" y="127.80000000000001" width="300" height="52.8"/>
+        <text x="190" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">get_coworkers_with_merged_prs</text>
+      </g>
+      <g class="node" id="node-C">
+        <rect x="40" y="230.6" width="300" height="52.8"/>
+        <text x="190" y="257" class="label" text-anchor="middle" dominant-baseline="central">coworkers_with_merged_prs: HashSet</text>
+      </g>
+      <g class="node" id="node-D">
+        <rect x="546.2999999999998" y="25.000000000000007" width="252.79999999999998" height="52.8"/>
+        <text x="672.6999999999998" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">spawn_for_pending_tasks</text>
+      </g>
+      <g class="node" id="node-E">
+        <rect x="555.8999999999999" y="127.80000000000001" width="233.6" height="52.8"/>
+        <text x="672.6999999999998" y="154.20000000000002" class="label" dominant-baseline="central" text-anchor="middle">iterate pending tasks</text>
+      </g>
+      <g class="node" id="node-F">
+        <rect x="527.0999999999998" y="230.6" width="291.2" height="52.8"/>
+        <text x="672.6999999999998" y="257" class="label" dominant-baseline="central" text-anchor="middle">extract_pr_number_from_task</text>
+      </g>
+      <g class="node" id="node-G">
+        <polygon points="1504,997.2 1620.8,1114 1504,1230.8 1387.2,1114"/>
+        <text x="1504" y="1114" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1504" y="1114" dy="-0.6em">Check in-memory</tspan><tspan x="1504" dy="1.2em">PR map?</tspan></text>
+      </g>
+      <g class="node" id="node-H">
+        <rect x="450.0000000000001" y="1344.2" width="252.79999999999998" height="52.8"/>
+        <text x="576.4000000000001" y="1370.6000000000001" class="label" text-anchor="middle" dominant-baseline="central">Group to existing owner</text>
+      </g>
+      <g class="node" id="node-I">
+        <rect x="752.8" y="1325.8000000000002" width="166.4" height="89.6"/>
+        <text x="836" y="1370.6000000000001" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="836" y="1370.6000000000001" dy="-0.6em">Check disk for</tspan><tspan x="836" dy="1.2em">PR owner</tspan></text>
+      </g>
+      <g class="node" id="node-J">
+        <rect x="719.2" y="1465.4" width="233.6" height="52.8"/>
+        <text x="836" y="1491.8000000000002" class="label" text-anchor="middle" dominant-baseline="central">Assign/nudge coworker</text>
+      </g>
+      <g class="node" id="node-K">
+        <rect x="1062.8" y="403.40000000000003" width="214.4" height="89.6" style="fill:#ff6b6b !important;stroke:#c92a2a !important;color:#fff !important"/>
+        <text x="1170" y="448.20000000000005" class="label" dominant-baseline="central" text-anchor="middle" style="fill: #fff"><tspan x="1170" y="448.20000000000005" dy="-0.6em">❌ Never checks if</tspan><tspan x="1170" dy="1.2em">PR is in merged set</tspan></text>
+      </g>
+      <g class="node" id="node-L">
+        <rect x="1694.5000000000002" y="421.80000000000007" width="233.6" height="52.8"/>
+        <text x="1811.3000000000002" y="448.20000000000005" class="label" text-anchor="middle" dominant-baseline="central">After extracting PR #</text>
+      </g>
+      <g class="node" id="node-M">
+        <polygon points="1811.3000000000002,588 1961.3000000000002,757.6 1811.3000000000002,927.2 1661.3000000000002,757.6"/>
+        <text x="1811.3000000000002" y="757.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1811.3000000000002" y="757.6" dy="-0.6em">Is PR in</tspan><tspan x="1811.3000000000002" dy="1.2em">coworkers_with_merged_prs?</tspan></text>
+      </g>
+      <g class="node" id="node-N">
+        <rect x="1749.5000000000002" y="1069.2" width="185.6" height="89.6" style="fill:#51cf66 !important;stroke:#2f9e44 !important;color:#000 !important"/>
+        <text x="1842.3000000000002" y="1114" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #000"><tspan x="1842.3000000000002" y="1114" dy="-0.6em">Skip task or</tspan><tspan x="1842.3000000000002" dy="1.2em">auto-complete it</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

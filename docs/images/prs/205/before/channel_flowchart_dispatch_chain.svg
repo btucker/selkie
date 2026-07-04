@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="739.4" height="2274.88" viewBox="-8 -8 739.4 2274.88" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-Start-CheckPending-0">
+        <path d="M 198.50 52.80 C 198.50 61.13, 198.50 69.47, 198.50 77.80 C 198.50 86.13, 198.50 94.47, 198.50 102.80" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-CheckPending-End-0">
+        <path d="M 132.31 270.21 C 88.21 303.94, 44.10 337.67, 22.05 656.15 C 0.00 974.63, 0.00 1577.85, 19.03 1886.01 C 76.13 2207.27, 114.20 2220.37, 114.20 2220.37" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-CheckPending-ExtractPR-0">
+        <path d="M 239.82 295.08 L 281.60 419.84" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-ExtractPR-HasPR-0">
+        <path d="M 281.60 509.44 C 281.60 525.59, 281.60 541.73, 281.60 555.64 C 281.60 569.55, 281.60 581.21, 281.60 592.88" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-HasPR-CheckOwner-0">
+        <path d="M 248.18 708.26 L 192.40 811.68" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-HasPR-AllocateFresh-0">
+        <path d="M 325.40 697.88 C 363.00 724.15, 400.60 750.41, 417.13 904.85 C 433.67 1059.28, 429.14 1341.88, 424.60 1624.48" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-CheckOwner-InMemory-0">
+        <path d="M 192.40 901.28 C 192.40 912.95, 192.40 924.61, 192.40 936.28 C 192.40 947.95, 192.40 959.61, 192.40 971.28" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-InMemory-ReuseOwner-0">
+        <path d="M 156.16 1130.24 L 136.12 1642.88" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-InMemory-CheckDisk-0">
+        <path d="M 228.64 1130.24 L 270.70 1236.48" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-CheckDisk-OnDisk-0">
+        <path d="M 270.70 1289.28 C 270.70 1300.95, 270.70 1312.61, 270.70 1324.28 C 270.70 1335.95, 270.70 1347.61, 270.70 1359.28" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-OnDisk-ReuseOwner-0">
+        <path d="M 245.81 1529.59 L 172.90 1642.88" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-OnDisk-AllocateFresh-0">
+        <path d="M 296.36 1528.82 L 357.12 1624.48" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-ReuseOwner-AssignTask-0">
+        <path d="M 147.00 1695.68 C 147.00 1710.15, 147.00 1724.61, 157.91 1736.01 C 168.82 1747.41, 190.64 1755.75, 212.47 1764.08" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-AllocateFresh-AssignTask-0">
+        <path d="M 407.20 1714.08 L 346.11 1764.08" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-AssignTask-RunningCheck-0">
+        <path d="M 281.60 1816.88 C 281.60 1825.21, 281.60 1833.55, 281.60 1841.88 C 281.60 1850.21, 281.60 1858.55, 281.60 1866.88" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-RunningCheck-NudgeClaim-0">
+        <path d="M 237.67 1989.35 C 208.25 2015.66, 178.82 2041.97, 164.11 2060.96 C 149.40 2079.95, 149.40 2091.61, 149.40 2103.28" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-RunningCheck-SpawnFresh-0">
+        <path d="M 325.53 1989.35 C 354.95 2015.66, 384.38 2041.97, 399.09 2060.96 C 413.80 2079.95, 413.80 2091.61, 413.80 2103.28" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-NudgeClaim-End-0">
+        <path d="M 149.40 2156.08 C 149.40 2164.41, 149.40 2172.75, 149.40 2181.08 C 149.40 2189.41, 149.40 2197.75, 149.40 2206.08" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-SpawnFresh-End-0">
+        <path d="M 413.80 2156.08 C 413.80 2164.41, 413.80 2172.75, 375.60 2184.34 C 337.40 2195.93, 261.00 2210.78, 184.60 2225.64" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-MissingCheck-CheckOwner-0">
+        <path d="M 536.03 712.08 C 510.08 733.61, 484.14 755.15, 441.54 774.81 C 398.93 794.47, 339.67 812.27, 280.40 830.06" class="edge-path" stroke-width="2" marker-end="url(#arrow_point)" stroke-dasharray="3,3" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-MissingCheck-CheckDisk-0">
+        <path d="M 617.44 712.08 C 630.62 733.61, 643.81 755.15, 650.41 836.71 C 657.00 918.28, 657.00 1059.88, 612.88 1137.69 C 480.53 1229.53, 392.30 1243.55, 392.30 1243.55" class="edge-path" stroke-width="2" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-PRCache-MissingCheck-0">
+        <path d="M 590.00 522.88 C 590.00 534.55, 590.00 546.21, 590.00 562.81 C 590.00 579.41, 590.00 600.95, 590.00 622.48" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-dasharray="3,3" stroke-width="2"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-CheckPending-End-0">
+        <rect x="-11.2" y="1242.33975286955" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="0" y="1253.33975286955" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-CheckPending-ExtractPR-0">
+        <rect x="257.5401694151129" y="343.48493041172264" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="272.34016941511294" y="354.48493041172264" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-HasPR-CheckOwner-0">
+        <rect x="194.43315152400965" y="745.0348567631542" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="209.23315152400966" y="756.0348567631542" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-HasPR-AllocateFresh-0">
+        <rect x="427" y="1122.055065260987" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="438.2" y="1133.055065260987" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-InMemory-ReuseOwner-0">
+        <rect x="99.30000000000003" y="1371.9961610711935" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="114.10000000000002" y="1382.9961610711935" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-InMemory-CheckDisk-0">
+        <rect x="247.3659490787636" y="1169.931147482044" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="258.5659490787636" y="1180.931147482044" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-OnDisk-ReuseOwner-0">
+        <rect x="206.4708475372586" y="1582.5863392915294" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="221.27084753725862" y="1593.5863392915294" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-OnDisk-AllocateFresh-0">
+        <rect x="304.7990145806661" y="1572.870472164827" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="315.9990145806661" y="1583.870472164827" class="edge-label" text-anchor="middle" dominant-baseline="central">No</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-RunningCheck-NudgeClaim-0">
+        <rect x="165.69120904179758" y="2029.481354699391" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="180.4912090417976" y="2040.481354699391" class="edge-label" dominant-baseline="central" text-anchor="middle">Yes</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-RunningCheck-SpawnFresh-0">
+        <rect x="371.5087909582024" y="2029.481354699391" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="382.70879095820237" y="2040.481354699391" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-MissingCheck-CheckOwner-0">
+        <rect x="374.1364220907104" y="777.8282073632856" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="417.73642209071045" y="788.8282073632856" class="edge-label" text-anchor="middle" dominant-baseline="central">Should gate</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-MissingCheck-CheckDisk-0">
+        <rect x="613.4" y="1074.2152582675358" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="657" y="1085.2152582675358" class="edge-label" dominant-baseline="central" text-anchor="middle">Should gate</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-PRCache-MissingCheck-0">
+        <rect x="546.4" y="561.6800000000001" width="87.2" height="22" class="edge-label-bg"/>
+        <text x="590" y="572.6800000000001" class="edge-label" text-anchor="middle" dominant-baseline="central">Data exists</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-AllocateFresh">
+        <rect x="324" y="1624.48" width="166.4" height="89.6"/>
+        <text x="407.2" y="1669.28" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="407.2" y="1669.28" dy="-0.6em">Allocate fresh</tspan><tspan x="407.2" dy="1.2em">coworker name</tspan></text>
+      </g>
+      <g class="node" id="node-AssignTask">
+        <rect x="169.59999999999997" y="1764.08" width="224" height="52.8"/>
+        <text x="281.59999999999997" y="1790.48" class="label" dominant-baseline="central" text-anchor="middle">Assign task to owner</text>
+      </g>
+      <g class="node" id="node-CheckDisk">
+        <rect x="149.1" y="1236.48" width="243.2" height="52.8" style="fill:#ff9999 !important"/>
+        <text x="270.7" y="1262.88" class="label" dominant-baseline="central" text-anchor="middle">find_pr_owner_in_tasks</text>
+      </g>
+      <g class="node" id="node-CheckOwner">
+        <rect x="104.39999999999998" y="811.6800000000001" width="176" height="89.6"/>
+        <text x="192.39999999999998" y="856.48" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="192.39999999999998" y="856.48" dy="-0.6em">Check in-memory</tspan><tspan x="192.39999999999998" dy="1.2em">pr_coworker_map</tspan></text>
+      </g>
+      <g class="node" id="node-CheckPending">
+        <polygon points="198.5,102.8 315.3,219.6 198.5,336.4 81.7,219.6"/>
+        <text x="198.5" y="219.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="198.5" y="219.6" dy="-0.6em">Pending tasks</tspan><tspan x="198.5" dy="1.2em">without owners?</tspan></text>
+      </g>
+      <g class="node" id="node-End">
+        <rect x="114.19999999999997" y="2206.08" width="70.4" height="52.8"/>
+        <text x="149.39999999999998" y="2232.48" class="label" dominant-baseline="central" text-anchor="middle">Done</text>
+      </g>
+      <g class="node" id="node-ExtractPR">
+        <rect x="150.39999999999998" y="419.84000000000003" width="262.4" height="89.6"/>
+        <text x="281.59999999999997" y="464.64000000000004" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="281.59999999999997" y="464.64000000000004" dy="-0.6em">Extract PR# from</tspan><tspan x="281.59999999999997" dy="1.2em">task subject/description</tspan></text>
+      </g>
+      <g class="node" id="node-HasPR">
+        <polygon points="281.59999999999997,592.88 356,667.28 281.59999999999997,741.6800000000001 207.19999999999996,667.28"/>
+        <text x="281.59999999999997" y="667.28" class="label" dominant-baseline="central" text-anchor="middle">PR# found?</text>
+      </g>
+      <g class="node" id="node-InMemory">
+        <polygon points="192.39999999999998,971.2800000000001 290,1068.88 192.39999999999998,1166.48 94.79999999999998,1068.88"/>
+        <text x="192.39999999999998" y="1068.88" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="192.39999999999998" y="1068.88" dy="-0.6em">Owner found</tspan><tspan x="192.39999999999998" dy="1.2em">this tick?</tspan></text>
+      </g>
+      <g class="node" id="node-MissingCheck">
+        <rect x="497.2" y="622.48" width="185.6" height="89.6" style="fill:#ffcccc !important;stroke:#ff0000 !important;stroke-width:3px !important"/>
+        <text x="590" y="667.28" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="590" y="667.28" dy="-0.6em">❌ MISSING CHECK:</tspan><tspan x="590" dy="1.2em">Is PR merged?</tspan></text>
+      </g>
+      <g class="node" id="node-NudgeClaim">
+        <rect x="51.79999999999998" y="2103.2799999999997" width="195.2" height="52.8"/>
+        <text x="149.39999999999998" y="2129.68" class="label" dominant-baseline="central" text-anchor="middle">Nudge: claim task</text>
+      </g>
+      <g class="node" id="node-OnDisk">
+        <polygon points="270.7,1359.28 368.29999999999995,1456.8799999999999 270.7,1554.48 173.1,1456.8799999999999" style="fill:#ff9999 !important"/>
+        <text x="270.7" y="1456.8799999999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="270.7" y="1456.8799999999999" dy="-0.6em">Owner found</tspan><tspan x="270.7" dy="1.2em">on disk?</tspan></text>
+      </g>
+      <g class="node" id="node-PRCache">
+        <path d="M 487.6 423.872 a 102.39999999999999 17.471999999999998 0 0 0 204.79999999999998 0 a 102.39999999999999 17.471999999999998 0 0 0 -204.79999999999998 0 l 0 81.536 a 102.39999999999999 17.471999999999998 0 0 0 204.79999999999998 0 l 0 -81.536" style="fill:#ccffcc !important"/>
+        <text x="590" y="464.64000000000004" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="590" y="464.64000000000004" dy="-0.6em">merged_pr_branches</tspan><tspan x="590" dy="1.2em">HashSet</tspan></text>
+      </g>
+      <g class="node" id="node-ReuseOwner">
+        <rect x="54.19999999999989" y="1642.8799999999999" width="185.6" height="52.8"/>
+        <text x="146.9999999999999" y="1669.28" class="label" text-anchor="middle" dominant-baseline="central">Reuse same owner</text>
+      </g>
+      <g class="node" id="node-RunningCheck">
+        <polygon points="281.59999999999997,1866.8799999999999 364.79999999999995,1950.08 281.59999999999997,2033.2799999999997 198.39999999999998,1950.08"/>
+        <text x="281.59999999999997" y="1950.08" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="281.59999999999997" y="1950.08" dy="-0.6em">Coworker</tspan><tspan x="281.59999999999997" dy="1.2em">running?</tspan></text>
+      </g>
+      <g class="node" id="node-SpawnFresh">
+        <rect x="296.99999999999994" y="2103.2799999999997" width="233.6" height="52.8"/>
+        <text x="413.79999999999995" y="2129.68" class="label" text-anchor="middle" dominant-baseline="central">Spawn fresh with task</text>
+      </g>
+      <g class="node" id="node-Start">
+        <rect x="96.10000000000001" y="0" width="204.79999999999998" height="52.8"/>
+        <text x="198.5" y="26.4" class="label" text-anchor="middle" dominant-baseline="central">Task Dispatch Tick</text>
+      </g>
+    </g>
+  </g>
+</svg>

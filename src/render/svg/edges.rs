@@ -1,6 +1,6 @@
 //! Edge rendering for flowcharts
 
-use crate::diagrams::flowchart::{EdgeStroke, FlowEdge};
+use crate::diagrams::flowchart::{EdgeStroke, FlowEdge, FlowTextType};
 use crate::layout::LayoutEdge;
 
 use super::elements::{Attrs, SvgElement};
@@ -23,36 +23,54 @@ pub fn render_edge_parts(
 ) -> EdgeRenderResult {
     let edge_id = &layout_edge.id;
 
-    // Build edge path
+    // Build edge path following mermaid's insertEdge pipeline:
+    // filter NaN points -> fixCorners -> marker endpoint offsets -> curveBasis
     let path = if !layout_edge.bend_points.is_empty() {
-        let path_d = build_curved_path(&layout_edge.bend_points);
+        let line_data: Vec<crate::layout::Point> = layout_edge
+            .bend_points
+            .iter()
+            .filter(|p| !p.y.is_nan())
+            .copied()
+            .collect();
+        let line_data = fix_corners(&line_data);
+        let start_offset = markers::start_marker_offset(flow_edge.edge_type.as_deref());
+        let end_offset = markers::end_marker_offset(flow_edge.edge_type.as_deref());
+        let line_data = apply_marker_offsets(&line_data, start_offset, end_offset);
+        let path_d = build_curved_path(&line_data);
 
-        let mut attrs = Attrs::new().with_class("edge-path").with_fill("none");
-
-        // Apply stroke style
-        match flow_edge.stroke {
-            EdgeStroke::Normal => {
-                attrs = attrs.with_stroke_width(1.0);
-            }
-            EdgeStroke::Thick => {
-                attrs = attrs.with_stroke_width(3.5);
-            }
-            EdgeStroke::Dotted => {
-                attrs = attrs.with_stroke_width(2.0).with_stroke_dasharray("3,3");
-            }
-            EdgeStroke::Invisible => {
-                attrs = attrs.with_stroke_width(0.0);
-            }
+        // Stroke classes - port of mermaid insertEdge (rendering-elements/edges.js):
+        // edge.thickness and edge.pattern both derive from the flowDb stroke.
+        let stroke_classes = match flow_edge.stroke {
+            EdgeStroke::Normal => "edge-thickness-normal edge-pattern-solid",
+            EdgeStroke::Thick => "edge-thickness-thick edge-pattern-solid",
+            EdgeStroke::Dotted => "edge-thickness-normal edge-pattern-dotted",
+            EdgeStroke::Invisible => "edge-thickness-invisible edge-pattern-solid",
+        };
+        let mut attrs = Attrs::new().with_class(stroke_classes);
+        // flowDb getData: invisible edges get no flowchart-link classes
+        if flow_edge.stroke != EdgeStroke::Invisible {
+            attrs = attrs.with_class("edge-thickness-normal edge-pattern-solid flowchart-link");
         }
 
-        // Apply arrow markers
-        if let Some(marker_url) = markers::get_marker_url(flow_edge.edge_type.as_deref()) {
-            attrs = attrs.with_attr("marker-end", &marker_url);
+        // linkStyle / class styles applied inline, like mermaid's pathStyle
+        if !flow_edge.style.is_empty() {
+            let style = flow_edge
+                .style
+                .iter()
+                .fold(String::new(), |acc, s| acc + s + ";");
+            attrs = attrs.with_style(&style);
         }
-        if let Some(start_marker_url) =
-            markers::get_start_marker_url(flow_edge.edge_type.as_deref())
-        {
-            attrs = attrs.with_attr("marker-start", &start_marker_url);
+
+        // Apply arrow markers (suppressed for invisible edges, per flowDb)
+        if flow_edge.stroke != EdgeStroke::Invisible {
+            if let Some(marker_url) = markers::get_marker_url(flow_edge.edge_type.as_deref()) {
+                attrs = attrs.with_attr("marker-end", &marker_url);
+            }
+            if let Some(start_marker_url) =
+                markers::get_start_marker_url(flow_edge.edge_type.as_deref())
+            {
+                attrs = attrs.with_attr("marker-start", &start_marker_url);
+            }
         }
 
         let path_element = SvgElement::path(path_d).with_attrs(attrs);
@@ -74,8 +92,18 @@ pub fn render_edge_parts(
             let font_size = 12.0;
             let char_width_ratio = 0.6;
 
-            // Handle multiline text (split by <br> or newlines)
-            let text = crate::render::text_utils::normalize_br_tags(&flow_edge.text);
+            // Handle multiline text (split by <br> or newlines), applying
+            // mermaid's wrappingWidth word-wrap (measured at the 16px label
+            // font, like the layout's edge label measurement).
+            // Markdown labels are measured as their marker-stripped visible
+            // text (mermaid measures the rendered label, not the source markers).
+            let raw_text = if flow_edge.label_type == FlowTextType::Markdown {
+                crate::render::text_utils::strip_markdown_markers(&flow_edge.text)
+            } else {
+                flow_edge.text.clone()
+            };
+            let text = crate::render::text_utils::normalize_mermaid_label_markup(&raw_text);
+            let text = crate::render::text_utils::wrap_label_text_mermaid(&text, 16.0);
             let lines: Vec<&str> = text.lines().collect();
             let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
             let num_lines = lines.len().max(1);
@@ -101,9 +129,14 @@ pub fn render_edge_parts(
                 .with_attr("text-anchor", "middle")
                 .with_attr("dominant-baseline", "central");
 
-            label_elements.push(
-                SvgElement::text(label_pos.x, label_pos.y, &flow_edge.text).with_attrs(label_attrs),
-            );
+            // Markdown edge labels render their emphasis as styled tspans; the
+            // marker-stripped visible text drives the background sizing above.
+            let text_element = if flow_edge.label_type == FlowTextType::Markdown {
+                SvgElement::markdown_text(label_pos.x, label_pos.y, flow_edge.text.clone())
+            } else {
+                SvgElement::text(label_pos.x, label_pos.y, text)
+            };
+            label_elements.push(text_element.with_attrs(label_attrs));
 
             let group_attrs = Attrs::new()
                 .with_class("edgeLabel")
@@ -139,209 +172,306 @@ fn build_path(points: &[crate::layout::Point]) -> String {
     d
 }
 
-/// Build curved SVG path from bend points using basis spline interpolation
-/// This matches d3's curveBasis for smooth curves like mermaid.js
+/// Build curved SVG path from points using d3-shape's curveBasis.
+///
+/// This is a faithful port of d3-shape `curveBasis` combined with d3-path
+/// serialization, matching what mermaid.js produces (`line().curve(curveBasis)`).
+/// ALL points are rendered - mermaid performs no bend-point simplification.
+///
+/// d3 Basis emits, for points p0..p(n-1) with n >= 3:
+///   M p0
+///   L (5*p0 + p1) / 6
+///   C segments for each subsequent point (B-spline blending)
+///   a closing C segment toward (p(n-2) + 5*p(n-1)) / 6
+///   L p(n-1)
 pub(crate) fn build_curved_path(points: &[crate::layout::Point]) -> String {
-    build_curved_path_with_options(points, true)
-}
-
-/// Build curved SVG path with optional simplification
-/// Set `simplify` to false for fork/join edges that need to preserve curvature
-pub(crate) fn build_curved_path_with_options(
-    points: &[crate::layout::Point],
-    simplify: bool,
-) -> String {
-    if points.is_empty() {
-        return String::new();
-    }
-
-    if points.len() == 1 {
-        return format!("M {} {}", points[0].x, points[0].y);
-    }
-
-    if points.len() == 2 {
-        // For 2 points, use a straight line
-        return format!(
-            "M {} {} L {} {}",
-            points[0].x, points[0].y, points[1].x, points[1].y
-        );
-    }
-
-    let working_points = if simplify {
-        // Simplify bend points by removing nearly-collinear intermediate points
-        // This produces straighter edges when dagre routes unnecessarily
-        simplify_collinear_points(points)
-    } else {
-        points.to_vec()
-    };
-
-    // Use basis spline interpolation (like d3's curveBasis)
-    // This creates smooth curves through the control points
-    // Note: Mermaid keeps perfectly aligned coordinates for straight edges -
-    // the visual curve comes only from the basis spline interpolation, not
-    // from adding artificial x/y variations.
-    build_basis_path(&working_points)
-}
-
-/// Simplify bend points by removing intermediate points that are nearly collinear
-/// with their neighbors. This produces straighter edges.
-/// Edges that are already nearly straight are passed through unchanged.
-fn simplify_collinear_points(points: &[crate::layout::Point]) -> Vec<crate::layout::Point> {
-    if points.len() <= 2 {
-        return points.to_vec();
-    }
-
-    // First check if the edge is already nearly straight overall
-    // If so, don't simplify - preserve the original points for clean vertical/horizontal edges
-    let first = &points[0];
-    let last = &points[points.len() - 1];
-    let max_overall_deviation = points[1..points.len() - 1]
-        .iter()
-        .map(|p| perpendicular_distance(p, first, last))
-        .fold(0.0_f64, f64::max);
-
-    // If the edge is already nearly straight (all points close to the line),
-    // keep all points to preserve alignment
-    if max_overall_deviation < 5.0 {
-        return points.to_vec();
-    }
-
-    let mut result = Vec::with_capacity(points.len());
-    result.push(points[0]);
-
-    // Check each intermediate point - keep it only if it significantly deviates
-    // from the line between its neighbors
-    for i in 1..points.len() - 1 {
-        let prev = &points[i - 1];
-        let curr = &points[i];
-        let next = &points[i + 1];
-
-        // Calculate perpendicular distance from curr to line prev->next
-        let deviation = perpendicular_distance(curr, prev, next);
-
-        // Keep point only if it deviates significantly (threshold in pixels)
-        // Using a larger threshold to straighten edges that curve unnecessarily
-        if deviation > 20.0 {
-            result.push(*curr);
-        }
-    }
-
-    result.push(points[points.len() - 1]);
-    result
-}
-
-/// Calculate perpendicular distance from point p to line defined by a and b
-fn perpendicular_distance(
-    p: &crate::layout::Point,
-    a: &crate::layout::Point,
-    b: &crate::layout::Point,
-) -> f64 {
-    let dx = b.x - a.x;
-    let dy = b.y - a.y;
-    let len_sq = dx * dx + dy * dy;
-
-    if len_sq < 0.0001 {
-        // a and b are the same point
-        let px = p.x - a.x;
-        let py = p.y - a.y;
-        return (px * px + py * py).sqrt();
-    }
-
-    // Calculate perpendicular distance using cross product formula
-    ((b.x - a.x) * (a.y - p.y) - (a.x - p.x) * (b.y - a.y)).abs() / len_sq.sqrt()
-}
-
-/// Build a basis spline path (B-spline) through the given points
-/// This is equivalent to d3's curveBasis interpolation
-fn build_basis_path(points: &[crate::layout::Point]) -> String {
     let n = points.len();
-    if n < 2 {
+    if n == 0 {
         return String::new();
     }
 
     let mut d = String::new();
+    // d3-path moveTo: "M{x},{y}"
+    d.push_str(&format!("M{},{}", points[0].x, points[0].y));
 
-    // For basis splines, we need to handle the start and end specially
-    // The curve passes near (but not necessarily through) interior points
-
-    // Move to the starting point
-    d.push_str(&format!("M {:.2} {:.2}", points[0].x, points[0].y));
+    if n == 1 {
+        return d;
+    }
 
     if n == 2 {
-        // Just two points - straight line
-        d.push_str(&format!(" L {:.2} {:.2}", points[1].x, points[1].y));
+        // d3 Basis lineEnd with _point == 2: lineTo the second point
+        d.push_str(&format!("L{},{}", points[1].x, points[1].y));
         return d;
     }
 
-    if n == 3 {
-        // Three points - single quadratic curve
-        let x1 = (2.0 * points[0].x + points[1].x) / 3.0;
-        let y1 = (2.0 * points[0].y + points[1].y) / 3.0;
-        let x2 = (points[0].x + 2.0 * points[1].x) / 3.0;
-        let y2 = (points[0].y + 2.0 * points[1].y) / 3.0;
-        let x3 = (points[0].x + 4.0 * points[1].x + points[2].x) / 6.0;
-        let y3 = (points[0].y + 4.0 * points[1].y + points[2].y) / 6.0;
-        d.push_str(&format!(
-            " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
-            x1, y1, x2, y2, x3, y3
-        ));
+    // Basis "point" helper: bezierCurveTo using the two previous points
+    // (x0, y0) and (x1, y1) blended toward the incoming point (x, y).
+    let bezier =
+        |d: &mut String, p0: &crate::layout::Point, p1: &crate::layout::Point, x: f64, y: f64| {
+            d.push_str(&format!(
+                "C{},{},{},{},{},{}",
+                (2.0 * p0.x + p1.x) / 3.0,
+                (2.0 * p0.y + p1.y) / 3.0,
+                (p0.x + 2.0 * p1.x) / 3.0,
+                (p0.y + 2.0 * p1.y) / 3.0,
+                (p0.x + 4.0 * p1.x + x) / 6.0,
+                (p0.y + 4.0 * p1.y + y) / 6.0,
+            ));
+        };
 
-        // Finish to end point
-        let x4 = (2.0 * points[1].x + points[2].x) / 3.0;
-        let y4 = (2.0 * points[1].y + points[2].y) / 3.0;
-        let x5 = (points[1].x + 2.0 * points[2].x) / 3.0;
-        let y5 = (points[1].y + 2.0 * points[2].y) / 3.0;
-        d.push_str(&format!(
-            " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
-            x4, y4, x5, y5, points[2].x, points[2].y
-        ));
-        return d;
-    }
-
-    // For 4+ points, use full basis spline
-    // First segment (quadratic start)
-    let x1 = (2.0 * points[0].x + points[1].x) / 3.0;
-    let y1 = (2.0 * points[0].y + points[1].y) / 3.0;
-    let x2 = (points[0].x + 2.0 * points[1].x) / 3.0;
-    let y2 = (points[0].y + 2.0 * points[1].y) / 3.0;
-    let x3 = (points[0].x + 4.0 * points[1].x + points[2].x) / 6.0;
-    let y3 = (points[0].y + 4.0 * points[1].y + points[2].y) / 6.0;
+    // Third point (case 2 -> 3): lineTo the (5*p0 + p1)/6 blend point first
     d.push_str(&format!(
-        " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
-        x1, y1, x2, y2, x3, y3
+        "L{},{}",
+        (5.0 * points[0].x + points[1].x) / 6.0,
+        (5.0 * points[0].y + points[1].y) / 6.0,
     ));
 
-    // Middle segments (cubic)
-    for i in 2..n - 1 {
-        let p0 = &points[i - 2];
-        let p1 = &points[i - 1];
-        let p2 = &points[i];
-        let p3 = if i + 1 < n { &points[i + 1] } else { p2 };
-
-        let x1 = (p0.x + 4.0 * p1.x + p2.x) / 6.0 + (p2.x - p0.x) / 6.0;
-        let y1 = (p0.y + 4.0 * p1.y + p2.y) / 6.0 + (p2.y - p0.y) / 6.0;
-        let x2 = (p1.x + 4.0 * p2.x + p3.x) / 6.0 - (p3.x - p1.x) / 6.0;
-        let y2 = (p1.y + 4.0 * p2.y + p3.y) / 6.0 - (p3.y - p1.y) / 6.0;
-        let x3 = (p1.x + 4.0 * p2.x + p3.x) / 6.0;
-        let y3 = (p1.y + 4.0 * p2.y + p3.y) / 6.0;
-
-        d.push_str(&format!(
-            " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
-            x1, y1, x2, y2, x3, y3
-        ));
+    // Each point from index 2 onward emits one bezier segment
+    for i in 2..n {
+        bezier(
+            &mut d,
+            &points[i - 2],
+            &points[i - 1],
+            points[i].x,
+            points[i].y,
+        );
     }
 
-    // Last segment (end at final point)
-    let p_last = &points[n - 1];
-    let p_prev = &points[n - 2];
-    let x1 = (p_prev.x + 2.0 * p_last.x) / 3.0;
-    let y1 = (p_prev.y + 2.0 * p_last.y) / 3.0;
-    d.push_str(&format!(
-        " C {:.2} {:.2}, {:.2} {:.2}, {:.2} {:.2}",
-        x1, y1, p_last.x, p_last.y, p_last.x, p_last.y
-    ));
+    // lineEnd (case 3): one more bezier re-using the final point, then lineTo it
+    let last = &points[n - 1];
+    bezier(&mut d, &points[n - 2], last, last.x, last.y);
+    d.push_str(&format!("L{},{}", last.x, last.y));
 
     d
+}
+
+/// Find the positions of orthogonal corner points.
+/// Port of mermaid's `extractCornerPoints` (rendering-elements/edges.js).
+fn extract_corner_point_positions(points: &[crate::layout::Point]) -> Vec<usize> {
+    let mut positions = Vec::new();
+    if points.len() < 3 {
+        return positions;
+    }
+    for i in 1..points.len() - 1 {
+        let prev = &points[i - 1];
+        let curr = &points[i];
+        let next = &points[i + 1];
+        // Vertical-then-horizontal corner, or horizontal-then-vertical corner
+        let vertical_corner = prev.x == curr.x
+            && curr.y == next.y
+            && (curr.x - next.x).abs() > 5.0
+            && (curr.y - prev.y).abs() > 5.0;
+        let horizontal_corner = prev.y == curr.y
+            && curr.x == next.x
+            && (curr.x - prev.x).abs() > 5.0
+            && (curr.y - next.y).abs() > 5.0;
+        if vertical_corner || horizontal_corner {
+            positions.push(i);
+        }
+    }
+    positions
+}
+
+/// Return the point at `distance` from `point_b`, along the direction toward
+/// `point_a`. Port of mermaid's `findAdjacentPoint`.
+fn find_adjacent_point(
+    point_a: &crate::layout::Point,
+    point_b: &crate::layout::Point,
+    distance: f64,
+) -> crate::layout::Point {
+    let x_diff = point_b.x - point_a.x;
+    let y_diff = point_b.y - point_a.y;
+    let length = (x_diff * x_diff + y_diff * y_diff).sqrt();
+    let ratio = distance / length;
+    crate::layout::Point::new(point_b.x - ratio * x_diff, point_b.y - ratio * y_diff)
+}
+
+/// Round off sharp orthogonal corners before curve interpolation.
+/// Port of mermaid's `fixCorners` (rendering-elements/edges.js).
+fn fix_corners(line_data: &[crate::layout::Point]) -> Vec<crate::layout::Point> {
+    let corner_point_positions = extract_corner_point_positions(line_data);
+    let mut new_line_data = Vec::with_capacity(line_data.len());
+    for (i, point) in line_data.iter().enumerate() {
+        if corner_point_positions.contains(&i) {
+            let prev_point = &line_data[i - 1];
+            let next_point = &line_data[i + 1];
+            let corner_point = point;
+
+            let new_prev_point = find_adjacent_point(prev_point, corner_point, 5.0);
+            let new_next_point = find_adjacent_point(next_point, corner_point, 5.0);
+
+            let x_diff = new_next_point.x - new_prev_point.x;
+            let y_diff = new_next_point.y - new_prev_point.y;
+            new_line_data.push(new_prev_point);
+
+            let a = std::f64::consts::SQRT_2 * 2.0;
+            let mut new_corner_point = crate::layout::Point::new(corner_point.x, corner_point.y);
+            if (next_point.x - prev_point.x).abs() > 10.0
+                && (next_point.y - prev_point.y).abs() >= 10.0
+            {
+                let r = 5.0;
+                if corner_point.x == new_prev_point.x {
+                    new_corner_point = crate::layout::Point::new(
+                        if x_diff < 0.0 {
+                            new_prev_point.x - r + a
+                        } else {
+                            new_prev_point.x + r - a
+                        },
+                        if y_diff < 0.0 {
+                            new_prev_point.y - a
+                        } else {
+                            new_prev_point.y + a
+                        },
+                    );
+                } else {
+                    new_corner_point = crate::layout::Point::new(
+                        if x_diff < 0.0 {
+                            new_prev_point.x - a
+                        } else {
+                            new_prev_point.x + a
+                        },
+                        if y_diff < 0.0 {
+                            new_prev_point.y - r + a
+                        } else {
+                            new_prev_point.y + r - a
+                        },
+                    );
+                }
+            }
+            new_line_data.push(new_corner_point);
+            new_line_data.push(new_next_point);
+        } else {
+            new_line_data.push(*point);
+        }
+    }
+    new_line_data
+}
+
+/// Calculate the angle and deltas between two points.
+/// Port of mermaid's `calculateDeltaAndAngle` (utils/lineWithOffset.ts).
+fn calculate_delta_and_angle(
+    point1: &crate::layout::Point,
+    point2: &crate::layout::Point,
+) -> (f64, f64, f64) {
+    let delta_x = point2.x - point1.x;
+    let delta_y = point2.y - point1.y;
+    let angle = (delta_y / delta_x).atan();
+    (angle, delta_x, delta_y)
+}
+
+/// Inset line endpoints so they do not draw under transparent arrow markers.
+/// Port of mermaid's `getLineFunctionsWithOffset` (utils/lineWithOffset.ts),
+/// applied eagerly to the point list instead of via d3 accessors.
+fn apply_marker_offsets(
+    data: &[crate::layout::Point],
+    start_marker_height: Option<f64>,
+    end_marker_height: Option<f64>,
+) -> Vec<crate::layout::Point> {
+    let n = data.len();
+    if n < 2 || (start_marker_height.is_none() && end_marker_height.is_none()) {
+        return data.to_vec();
+    }
+
+    let first = &data[0];
+    let last = &data[n - 1];
+    // DIRECTION in the x accessor: 'left' if data[0].x < last.x, else 'right'
+    let direction_x_right = first.x >= last.x;
+    // DIRECTION in the y accessor: 'down' if data[0].y < last.y, else 'up'
+    let direction_y_up = first.y >= last.y;
+    let extra_room = 1.0;
+
+    data.iter()
+        .enumerate()
+        .map(|(i, d)| {
+            // x accessor
+            let mut x_offset = 0.0;
+            if i == 0 {
+                if let Some(height) = start_marker_height {
+                    let (angle, delta_x, _) = calculate_delta_and_angle(&data[0], &data[1]);
+                    x_offset = height * angle.cos() * if delta_x >= 0.0 { 1.0 } else { -1.0 };
+                }
+            } else if i == n - 1 {
+                if let Some(height) = end_marker_height {
+                    let (angle, delta_x, _) = calculate_delta_and_angle(&data[n - 1], &data[n - 2]);
+                    x_offset = height * angle.cos() * if delta_x >= 0.0 { 1.0 } else { -1.0 };
+                }
+            }
+            if x_offset.is_nan() {
+                x_offset = 0.0;
+            }
+
+            let difference_to_end = (d.x - last.x).abs();
+            let difference_in_y_end = (d.y - last.y).abs();
+            let difference_to_start = (d.x - first.x).abs();
+            let difference_in_y_start = (d.y - first.y).abs();
+
+            if let Some(end_height) = end_marker_height {
+                if difference_to_end < end_height
+                    && difference_to_end > 0.0
+                    && difference_in_y_end < end_height
+                {
+                    let mut adjustment = end_height + extra_room - difference_to_end;
+                    adjustment *= if direction_x_right { -1.0 } else { 1.0 };
+                    x_offset -= adjustment;
+                }
+            }
+            if let Some(start_height) = start_marker_height {
+                if difference_to_start < start_height
+                    && difference_to_start > 0.0
+                    && difference_in_y_start < start_height
+                {
+                    let mut adjustment = start_height + extra_room - difference_to_start;
+                    adjustment *= if direction_x_right { -1.0 } else { 1.0 };
+                    x_offset += adjustment;
+                }
+            }
+
+            // y accessor
+            let mut y_offset = 0.0;
+            if i == 0 {
+                if let Some(height) = start_marker_height {
+                    let (angle, _, delta_y) = calculate_delta_and_angle(&data[0], &data[1]);
+                    y_offset = height * angle.sin().abs() * if delta_y >= 0.0 { 1.0 } else { -1.0 };
+                }
+            } else if i == n - 1 {
+                if let Some(height) = end_marker_height {
+                    let (angle, _, delta_y) = calculate_delta_and_angle(&data[n - 1], &data[n - 2]);
+                    y_offset = height * angle.sin().abs() * if delta_y >= 0.0 { 1.0 } else { -1.0 };
+                }
+            }
+            if y_offset.is_nan() {
+                y_offset = 0.0;
+            }
+
+            let difference_to_end_y = (d.y - last.y).abs();
+            let difference_in_x_end = (d.x - last.x).abs();
+            let difference_to_start_y = (d.y - first.y).abs();
+            let difference_in_x_start = (d.x - first.x).abs();
+
+            if let Some(end_height) = end_marker_height {
+                if difference_to_end_y < end_height
+                    && difference_to_end_y > 0.0
+                    && difference_in_x_end < end_height
+                {
+                    let mut adjustment = end_height + extra_room - difference_to_end_y;
+                    adjustment *= if direction_y_up { -1.0 } else { 1.0 };
+                    y_offset -= adjustment;
+                }
+            }
+            if let Some(start_height) = start_marker_height {
+                if difference_to_start_y < start_height
+                    && difference_to_start_y > 0.0
+                    && difference_in_x_start < start_height
+                {
+                    let mut adjustment = start_height + extra_room - difference_to_start_y;
+                    adjustment *= if direction_y_up { -1.0 } else { 1.0 };
+                    y_offset += adjustment;
+                }
+            }
+
+            crate::layout::Point::new(d.x + x_offset, d.y + y_offset)
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -421,6 +551,7 @@ mod tests {
             label_width: 60.0,
             label_height: 20.0,
             weight: 1,
+            minlen: 1,
             reversed: false,
             metadata: HashMap::new(),
         };
@@ -472,6 +603,7 @@ mod tests {
             label_width: 60.0,
             label_height: 20.0,
             weight: 1,
+            minlen: 1,
             reversed: false,
             metadata: HashMap::new(),
         };
@@ -510,6 +642,275 @@ mod tests {
     }
 
     #[test]
+    fn test_curve_basis_matches_d3_exactly() {
+        // Faithful port of d3-shape curveBasis: for points (0,0),(6,0),(6,6)
+        // d3 produces: M0,0 L(5*p0+p1)/6 C... C... L p_last
+        let points = vec![
+            Point::new(0.0, 0.0),
+            Point::new(6.0, 0.0),
+            Point::new(6.0, 6.0),
+        ];
+
+        let path = build_curved_path(&points);
+        assert_eq!(path, "M0,0L1,0C2,0,4,0,5,1C6,2,6,4,6,5L6,6");
+    }
+
+    #[test]
+    fn test_curve_basis_two_points_is_line() {
+        // d3 curveBasis with two points: M p0 L p1
+        let points = vec![Point::new(0.0, 0.0), Point::new(100.0, 100.0)];
+        let path = build_curved_path(&points);
+        assert_eq!(path, "M0,0L100,100");
+    }
+
+    #[test]
+    fn test_no_bend_point_simplification() {
+        // A 3-point edge whose interior waypoint deviates slightly (10px) from
+        // the straight line must NOT be simplified away - mermaid renders ALL
+        // dagre points through curveBasis. The interior point (10,50) shows up
+        // as the on-curve blend (p0 + 4*p1 + p2)/6 => x = 40/6 = 6.666...
+        let points = vec![
+            Point::new(0.0, 0.0),
+            Point::new(10.0, 50.0),
+            Point::new(0.0, 100.0),
+        ];
+
+        let path = build_curved_path(&points);
+        assert!(
+            path.contains('C'),
+            "3-point edge must render cubic segments, got: {}",
+            path
+        );
+        assert!(
+            path.contains("6.666666666666667"),
+            "Interior waypoint must influence the curve shape, got: {}",
+            path
+        );
+    }
+
+    #[test]
+    fn test_fix_corners_rounds_right_angle() {
+        // Port of mermaid fixCorners: a 90-degree corner at (0,50) between
+        // (0,0) and (50,50) is replaced by prev/corner/next points 5px away
+        // with the corner nudged by a = 2*sqrt(2).
+        let points = vec![
+            Point::new(0.0, 0.0),
+            Point::new(0.0, 50.0),
+            Point::new(50.0, 50.0),
+        ];
+
+        let fixed = fix_corners(&points);
+        assert_eq!(fixed.len(), 5, "corner expands into 3 points: {:?}", fixed);
+        // newPrevPoint: 5px from corner toward prev
+        assert!((fixed[1].x - 0.0).abs() < 1e-9 && (fixed[1].y - 45.0).abs() < 1e-9);
+        // newCornerPoint: x = prev.x + r - a, y = prev.y + a (r=5, a=2*sqrt(2))
+        let a = std::f64::consts::SQRT_2 * 2.0;
+        assert!((fixed[2].x - (5.0 - a)).abs() < 1e-9, "got {:?}", fixed[2]);
+        assert!((fixed[2].y - (45.0 + a)).abs() < 1e-9, "got {:?}", fixed[2]);
+        // newNextPoint: 5px from corner toward next
+        assert!((fixed[3].x - 5.0).abs() < 1e-9 && (fixed[3].y - 50.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn test_fix_corners_ignores_non_corners() {
+        // Diagonal points are not orthogonal corners - passed through unchanged
+        let points = vec![
+            Point::new(0.0, 0.0),
+            Point::new(10.0, 50.0),
+            Point::new(0.0, 100.0),
+        ];
+        let fixed = fix_corners(&points);
+        assert_eq!(fixed.len(), 3);
+    }
+
+    #[test]
+    fn test_marker_offset_insets_arrow_point_endpoint() {
+        // Port of mermaid getLineFunctionsWithOffset: an arrow_point end marker
+        // insets the final point by 4px along the incoming direction.
+        use crate::diagrams::flowchart::{EdgeStroke, FlowEdge, FlowTextType};
+        use std::collections::HashMap;
+
+        let layout_edge = LayoutEdge {
+            id: "e1".to_string(),
+            sources: vec!["a".to_string()],
+            targets: vec!["b".to_string()],
+            label: None,
+            bend_points: vec![
+                Point::new(100.0, 0.0),
+                Point::new(100.0, 50.0),
+                Point::new(100.0, 100.0),
+            ],
+            label_position: None,
+            label_width: 0.0,
+            label_height: 0.0,
+            weight: 1,
+            minlen: 1,
+            reversed: false,
+            metadata: HashMap::new(),
+        };
+
+        let flow_edge = FlowEdge {
+            id: None,
+            is_user_defined_id: false,
+            start: "a".to_string(),
+            end: "b".to_string(),
+            interpolate: None,
+            edge_type: Some("arrow_point".to_string()),
+            stroke: EdgeStroke::Normal,
+            style: vec![],
+            length: None,
+            text: String::new(),
+            label_type: FlowTextType::Text,
+            classes: vec![],
+            animation: None,
+            animate: None,
+        };
+
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+        let svg = result.path.expect("edge path").to_svg(0);
+
+        // Final point y = 100 - 4 = 96; start point untouched (arrowTypeStart = none)
+        assert!(
+            svg.contains("L100,96"),
+            "arrow_point end must inset final point by 4px, got: {}",
+            svg
+        );
+        assert!(
+            svg.contains("M100,0"),
+            "start point must be untouched, got: {}",
+            svg
+        );
+    }
+
+    fn make_edge(stroke: EdgeStroke) -> (LayoutEdge, FlowEdge) {
+        use std::collections::HashMap;
+
+        let layout_edge = LayoutEdge {
+            id: "e1".to_string(),
+            sources: vec!["a".to_string()],
+            targets: vec!["b".to_string()],
+            label: None,
+            bend_points: vec![Point::new(0.0, 0.0), Point::new(100.0, 100.0)],
+            label_position: None,
+            label_width: 0.0,
+            label_height: 0.0,
+            weight: 1,
+            minlen: 1,
+            reversed: false,
+            metadata: HashMap::new(),
+        };
+
+        let flow_edge = FlowEdge {
+            id: None,
+            is_user_defined_id: false,
+            start: "a".to_string(),
+            end: "b".to_string(),
+            interpolate: None,
+            edge_type: Some("arrow_point".to_string()),
+            stroke,
+            style: vec![],
+            length: None,
+            text: String::new(),
+            label_type: FlowTextType::Text,
+            classes: vec![],
+            animation: None,
+            animate: None,
+        };
+
+        (layout_edge, flow_edge)
+    }
+
+    use crate::diagrams::flowchart::FlowTextType;
+
+    #[test]
+    fn test_dotted_edge_emits_mermaid_pattern_classes() {
+        // Port of mermaid insertEdge: dotted edges are styled via CSS classes
+        // (edge-pattern-dotted => stroke-dasharray: 2), not inline attributes.
+        let (layout_edge, flow_edge) = make_edge(EdgeStroke::Dotted);
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+        let svg = result.path.expect("edge path").to_svg(0);
+
+        assert!(
+            svg.contains(
+                "edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link"
+            ),
+            "dotted edge must carry mermaid stroke classes plus flowDb edge classes, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("stroke-dasharray=\""),
+            "dotted edge must not use an inline stroke-dasharray attribute, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("stroke-width=\""),
+            "edge stroke width must come from CSS classes, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_thick_edge_emits_mermaid_thickness_classes() {
+        let (layout_edge, flow_edge) = make_edge(EdgeStroke::Thick);
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+        let svg = result.path.expect("edge path").to_svg(0);
+
+        assert!(
+            svg.contains(
+                "edge-thickness-thick edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+            ),
+            "thick edge must carry edge-thickness-thick class, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_invisible_edge_emits_invisible_class_only() {
+        // flowDb getData: invisible edges get empty flowDb classes (no
+        // flowchart-link) and arrow markers are suppressed.
+        let (layout_edge, flow_edge) = make_edge(EdgeStroke::Invisible);
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+        let svg = result.path.expect("edge path").to_svg(0);
+
+        assert!(
+            svg.contains("edge-thickness-invisible edge-pattern-solid"),
+            "invisible edge must carry edge-thickness-invisible class, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("flowchart-link"),
+            "invisible edge must not carry flowchart-link class, got: {}",
+            svg
+        );
+        assert!(
+            !svg.contains("marker-end"),
+            "invisible edge must not have arrow markers, got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_edge_inline_styles_from_link_style() {
+        // mermaid insertEdge applies edge.style entries as an inline style
+        // attribute on the path.
+        let (layout_edge, mut flow_edge) = make_edge(EdgeStroke::Normal);
+        flow_edge.style = vec!["stroke:#ff3".to_string(), "stroke-width:4px".to_string()];
+        let theme = Theme::default();
+        let result = render_edge_parts(&layout_edge, &flow_edge, &theme);
+        let svg = result.path.expect("edge path").to_svg(0);
+
+        assert!(
+            svg.contains("style=\"stroke:#ff3;stroke-width:4px;\""),
+            "linkStyle styles must be applied inline on the path, got: {}",
+            svg
+        );
+    }
+
+    #[test]
     fn test_vertical_edge_produces_curved_path() {
         // Vertical points should produce a curved path (C commands), not straight (L)
         // but x-coordinates should remain constant (matching mermaid reference behavior)
@@ -528,13 +929,12 @@ mod tests {
             path
         );
 
-        // X-coordinates should all be 100.0 (no artificial variation)
+        // X-coordinates should all be 100 (no artificial variation)
         // Mermaid keeps vertical edges perfectly aligned
-        // The path format is "M x y C x1 y1, x2 y2, x y C ..."
-        // All x values should be 100.00
+        // The d3-path format is "M{x},{y}L{x},{y}C{x1},{y1},{x2},{y2},{x},{y}..."
         assert!(
-            path.contains("100.00"),
-            "Path should contain x-coordinate 100.00, got: {}",
+            path.contains("100,"),
+            "Path should contain x-coordinate 100, got: {}",
             path
         );
         // And there should be no other x values (variations)

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1375.6" height="970.4" viewBox="-8 -27.999999999999993 1375.6 970.4" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-">
+        <rect x="20.00000000000005" y="-19.999999999999993" width="1319.6" height="117.80000000000001" class="cluster"/>
+        <text x="679.8" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
+      </g>
+      <g class="subgraph" id="subgraph-">
+        <rect x="89.80000000000005" y="438.7999999999999" width="1121.6999999999998" height="154.59999999999997" class="cluster"/>
+        <text x="650.65" y="454.7999999999999" class="cluster-label" text-anchor="middle"></text>
+      </g>
+      <g class="subgraph" id="subgraph-">
+        <rect x="89.80000000000005" y="82.80000000000003" width="1121.6999999999998" height="706.9999999999999" class="cluster"/>
+        <text x="650.65" y="98.80000000000003" class="cluster-label" text-anchor="middle"></text>
+      </g>
+      <g class="subgraph" id="subgraph-">
+        <rect x="20.000000000000057" y="774.8" width="1319.6" height="154.60000000000002" class="cluster"/>
+        <text x="679.8" y="790.8" class="cluster-label" text-anchor="middle"></text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-Timer-Events-0">
+        <path d="M 1024.80 77.80 C 1024.80 86.13, 1024.80 94.47, 987.77 106.37 C 950.73 118.27, 876.67 133.74, 802.60 149.21" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Webhook-Events-0">
+        <path d="M 1231.60 77.80 C 1231.60 86.13, 1231.60 94.47, 1160.10 107.86 C 1088.60 121.25, 945.60 139.70, 802.60 158.15" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-RPC-Events-0">
+        <path d="M 99.20 77.80 C 99.20 86.13, 99.20 94.47, 179.10 108.06 C 259.00 121.66, 418.80 140.52, 578.60 159.38" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Signal-Events-0">
+        <path d="M 282.00 77.80 C 282.00 86.13, 282.00 94.47, 331.43 107.08 C 380.87 119.69, 479.73 136.58, 578.60 153.47" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Events-Snapshot-0">
+        <path d="M 690.60 217.40 C 690.60 229.07, 690.60 240.73, 690.60 252.40 C 690.60 264.07, 690.60 275.73, 690.60 287.40" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Snapshot-Health-0">
+        <path d="M 578.60 373.59 C 456.47 398.66, 334.33 423.73, 273.27 442.10 C 212.20 460.47, 212.20 472.13, 212.20 483.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Snapshot-PR-0">
+        <path d="M 578.60 398.75 C 539.80 415.44, 501.00 432.12, 481.60 446.29 C 462.20 460.47, 462.20 472.13, 462.20 483.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Snapshot-Dispatch-0">
+        <path d="M 802.60 412.63 C 824.37 424.69, 846.13 436.74, 857.02 448.61 C 867.90 460.47, 867.90 472.13, 867.90 483.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Snapshot-Chat-0">
+        <path d="M 802.60 377.55 C 901.30 401.30, 1000.00 425.05, 1049.35 442.76 C 1098.70 460.47, 1098.70 472.13, 1098.70 483.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Health-Effects-0">
+        <path d="M 212.20 573.40 C 212.20 585.07, 212.20 596.73, 262.87 614.26 C 313.53 631.78, 414.87 655.16, 516.20 678.54" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-PR-Effects-0">
+        <path d="M 462.20 573.40 C 462.20 585.07, 462.20 596.73, 472.63 608.40 C 483.06 620.07, 503.92 631.73, 524.79 643.40" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Dispatch-Effects-0">
+        <path d="M 867.90 573.40 C 867.90 585.07, 867.90 596.73, 849.82 610.28 C 831.73 623.83, 795.57 639.27, 759.40 654.70" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-Chat-Effects-0">
+        <path d="M 1098.70 573.40 C 1098.70 585.07, 1098.70 596.73, 1042.15 614.62 C 985.60 632.50, 872.50 656.59, 759.40 680.69" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Effects-Tmux-0">
+        <path d="M 516.20 729.59 C 401.20 751.32, 286.20 773.06, 228.70 788.10 C 171.20 803.13, 171.20 811.47, 171.20 819.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Effects-Channel-0">
+        <path d="M 516.20 763.71 L 450.00 819.80" class="edge-path" stroke-width="1" marker-end="url(#arrow_point)" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-Effects-Tasks-0">
+        <path d="M 759.40 739.64 C 827.07 758.03, 894.73 776.41, 928.57 789.77 C 962.40 803.13, 962.40 811.47, 962.40 819.80" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-Effects-WebSocket-0">
+        <path d="M 759.40 725.27 C 910.40 748.44, 1061.40 771.62, 1136.90 787.38 C 1212.40 803.13, 1212.40 811.47, 1212.40 819.80" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-Events-Snapshot-0">
+        <rect x="643.3999999999999" y="241.4" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="690.5999999999999" y="252.4" class="edge-label" dominant-baseline="central" text-anchor="middle">collect once</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Snapshot-Health-0">
+        <rect x="341.85742313143567" y="403.7137981782881" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="378.25742313143564" y="414.7137981782881" class="edge-label" text-anchor="middle" dominant-baseline="central">read-only</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Snapshot-PR-0">
+        <rect x="467.9229827000512" y="419.689330555407" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="504.32298270005117" y="430.689330555407" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Snapshot-Dispatch-0">
+        <rect x="814.15873612834" y="428.195306755798" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="850.55873612834" y="439.195306755798" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Snapshot-Chat-0">
+        <rect x="931.2643527673082" y="406.2692463654733" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="967.6643527673082" y="417.2692463654733" class="edge-label" dominant-baseline="central" text-anchor="middle">read-only</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Health-Effects-0">
+        <rect x="281.9480190323146" y="628.5369724364974" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="347.1480190323146" y="639.5369724364974" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&amp;lt;Effect&amp;gt;</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-PR-Effects-0">
+        <rect x="413.0193833973415" y="606.3584478907684" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="478.2193833973415" y="617.3584478907684" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&amp;lt;Effect&amp;gt;</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Dispatch-Effects-0">
+        <rect x="764.5455119042873" y="613.6832278617948" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="829.7455119042874" y="624.6832278617948" class="edge-label" text-anchor="middle" dominant-baseline="central">Vec&amp;lt;Effect&amp;gt;</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-Chat-Effects-0">
+        <rect x="880.9658237613369" y="629.8991453821582" width="130.39999999999998" height="22" class="edge-label-bg"/>
+        <text x="946.1658237613369" y="640.8991453821582" class="edge-label" dominant-baseline="central" text-anchor="middle">Vec&amp;lt;Effect&amp;gt;</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-Channel">
+        <rect x="352.4" y="819.8" width="195.2" height="89.6" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="450" y="864.5999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="450" y="864.5999999999999" dy="-0.6em">channel.rs</tspan><tspan x="450" dy="1.2em">append-only JSONL</tspan></text>
+      </g>
+      <g class="node" id="node-Chat">
+        <rect x="1005.8999999999999" y="483.7999999999999" width="185.6" height="89.6" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="1098.6999999999998" y="528.5999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="1098.6999999999998" y="528.5999999999999" dy="-0.6em">chat.rs</tspan><tspan x="1098.6999999999998" dy="1.2em">@mention routing</tspan></text>
+      </g>
+      <g class="node" id="node-Dispatch">
+        <rect x="779.8999999999999" y="483.7999999999999" width="176" height="89.6" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="867.8999999999999" y="528.5999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="867.8999999999999" y="528.5999999999999" dy="-0.6em">dispatch.rs</tspan><tspan x="867.8999999999999" dy="1.2em">task assignment</tspan></text>
+      </g>
+      <g class="node" id="node-Effects">
+        <rect x="516.1999999999999" y="643.4" width="243.2" height="126.39999999999999" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
+        <text x="637.8" y="706.6" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="637.8" y="706.6" dy="-1.2em">effects.rs</tspan><tspan x="637.8" dy="1.2em">Effect execution</tspan><tspan x="637.8" dy="1.2em">only side effects here</tspan></text>
+      </g>
+      <g class="node" id="node-Events">
+        <rect x="578.5999999999999" y="127.80000000000003" width="224" height="89.6" style="fill:#fff3e0 !important;stroke:#ff9800 !important;stroke-width:2px !important"/>
+        <text x="690.5999999999999" y="172.60000000000002" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="690.5999999999999" y="172.60000000000002" dy="-0.6em">events.rs</tspan><tspan x="690.5999999999999" dy="1.2em">DaemonEvent dispatch</tspan></text>
+      </g>
+      <g class="node" id="node-Health">
+        <rect x="109.80000000000005" y="483.7999999999999" width="204.79999999999998" height="89.6" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="212.20000000000005" y="528.5999999999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="212.20000000000005" y="528.5999999999999" dy="-0.6em">health.rs</tspan><tspan x="212.20000000000005" dy="1.2em">coworker lifecycle</tspan></text>
+      </g>
+      <g class="node" id="node-PR">
+        <rect x="364.6" y="483.7999999999999" width="195.2" height="89.6" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="462.20000000000005" y="528.5999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="462.20000000000005" y="528.5999999999999" dy="-0.6em">pr.rs</tspan><tspan x="462.20000000000005" dy="1.2em">reviewer spawning</tspan></text>
+      </g>
+      <g class="node" id="node-RPC">
+        <rect x="40.00000000000005" y="25.000000000000007" width="118.39999999999999" height="52.8"/>
+        <text x="99.20000000000005" y="51.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">RPC Calls</text>
+      </g>
+      <g class="node" id="node-Signal">
+        <rect x="208.4" y="25.000000000000007" width="147.2" height="52.8"/>
+        <text x="282" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Unix Signals</text>
+      </g>
+      <g class="node" id="node-Snapshot">
+        <rect x="578.5999999999999" y="287.4" width="224" height="126.39999999999999" style="fill:#e1f5e1 !important;stroke:#4caf50 !important;stroke-width:2px !important"/>
+        <text x="690.5999999999999" y="350.59999999999997" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="690.5999999999999" y="350.59999999999997" dy="-1.2em">snapshot.rs</tspan><tspan x="690.5999999999999" dy="1.2em">WorldSnapshot</tspan><tspan x="690.5999999999999" dy="1.2em">immutable state view</tspan></text>
+      </g>
+      <g class="node" id="node-Tasks">
+        <rect x="869.5999999999998" y="819.8" width="185.6" height="89.6" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="962.3999999999997" y="864.5999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="962.3999999999997" y="864.5999999999999" dy="-0.6em">tasks.rs</tspan><tspan x="962.3999999999997" dy="1.2em">~/.claude/tasks/</tspan></text>
+      </g>
+      <g class="node" id="node-Timer">
+        <rect x="955.9999999999998" y="25.000000000000007" width="137.6" height="52.8"/>
+        <text x="1024.7999999999997" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">Timer Ticks</text>
+      </g>
+      <g class="node" id="node-Tmux">
+        <rect x="40.00000000000006" y="819.8" width="262.4" height="89.6" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="171.20000000000005" y="864.5999999999999" class="label" dominant-baseline="central" text-anchor="middle"><tspan x="171.20000000000005" y="864.5999999999999" dy="-0.6em">tmux.rs</tspan><tspan x="171.20000000000005" dy="1.2em">spawn/nudge/pane capture</tspan></text>
+      </g>
+      <g class="node" id="node-WebSocket">
+        <rect x="1105.1999999999998" y="819.8" width="214.4" height="89.6" style="fill:#e3f2fd !important;stroke:#2196f3 !important;stroke-width:2px !important"/>
+        <text x="1212.3999999999999" y="864.5999999999999" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1212.3999999999999" y="864.5999999999999" dy="-0.6em">web.rs</tspan><tspan x="1212.3999999999999" dy="1.2em">WebSocket broadcast</tspan></text>
+      </g>
+      <g class="node" id="node-Webhook">
+        <rect x="1143.6" y="25.000000000000007" width="176" height="52.8"/>
+        <text x="1231.6" y="51.400000000000006" class="label" text-anchor="middle" dominant-baseline="central">GitHub Webhooks</text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -154,7 +154,9 @@ fn render_flowchart(
     db: &crate::diagrams::flowchart::FlowchartDb,
     config: &RenderConfig,
 ) -> Result<String> {
-    let size_estimator = CharacterSizeEstimator::default();
+    // Use trebuchet-calibrated font metrics to match mermaid's browser-based
+    // label measurement ("trebuchet ms" at 16px, line-height 1.5).
+    let size_estimator = crate::layout::TrebuchetSizeEstimator::new();
 
     // Convert to layout graph
     let graph = db.to_layout_graph(&size_estimator)?;

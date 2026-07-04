@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="858.3999999999999" height="892.8" viewBox="-8 -27.999999999999993 858.3999999999999 892.8" class="mermaid">
+  <style>
+
+.mermaid {
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.node rect,
+.node polygon,
+.node circle,
+.node ellipse,
+.node path {
+  fill: #ECECFF;
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node line {
+  stroke: #9370DB;
+  stroke-width: 1px;
+}
+
+.node .label {
+  fill: #333333;
+}
+
+.node text {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+}
+
+.edge-path {
+  fill: none;
+  stroke: #333333;
+  stroke-width: 1px;
+}
+
+.edge-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+}
+
+.edge-label-bg {
+  fill: rgba(232, 232, 232, 0.8);
+}
+
+.subgraph {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+}
+
+.subgraph-title {
+  fill: #333333;
+  font-weight: bold;
+}
+
+.cluster rect {
+  fill: #ffffde;
+  stroke: #aaaa33;
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+.cluster-label {
+  fill: #333333;
+  font-family: trebuchet ms, verdana, arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+marker path {
+  fill: #333333;
+  stroke: #333333;
+}
+
+  </style>
+  <defs>
+    <marker id="arrow_point" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z"/>
+    </marker>
+    <marker id="arrow_point_start" viewBox="0 0 10 10" refX="4.5" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 5 L 10 10 L 10 0 z"/>
+    </marker>
+    <marker id="arrow_cross" viewBox="0 0 11 11" refX="12" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="arrow_cross_start" viewBox="0 0 11 11" refX="-1" refY="5.2" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 10 M 10 1 L 1 10" fill="none" stroke-width="2"/>
+    </marker>
+    <marker id="arrow_circle" viewBox="0 0 10 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+    <marker id="arrow_circle_start" viewBox="0 0 10 10" refX="-1" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="5"/>
+    </marker>
+  </defs>
+  <g class="root">
+    <g class="clusters">
+      <g class="subgraph" id="subgraph-">
+        <rect x="34" y="-19.999999999999993" width="312" height="443.4" class="cluster"/>
+        <text x="190" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
+      </g>
+      <g class="subgraph" id="subgraph-">
+        <rect x="361.20000000000005" y="-19.999999999999993" width="442" height="666.2" class="cluster"/>
+        <text x="582.2" y="-3.999999999999993" class="cluster-label" text-anchor="middle"></text>
+      </g>
+      <g class="subgraph" id="subgraph-">
+        <rect x="20" y="510" width="340" height="341.79999999999995" class="cluster"/>
+        <text x="190" y="526" class="cluster-label" text-anchor="middle"></text>
+      </g>
+    </g>
+    <g class="edgePaths">
+      <g class="edge" id="edge-L-RenderMsg-DiagramNum-0">
+        <path d="M 591.80 77.80 C 591.80 86.13, 591.80 94.47, 591.80 102.80 C 591.80 111.13, 591.80 119.47, 591.80 127.80" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-DiagramNum-CapCheck-0">
+        <path d="M 591.80 180.60 C 591.80 192.27, 591.80 203.93, 591.80 215.60 C 591.80 227.27, 591.80 238.93, 591.80 250.60" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-CapCheck-Numbered-0">
+        <path d="M 544.13 418.93 L 478.80 536.60" class="edge-path" marker-end="url(#arrow_point)" fill="none" stroke-width="1"/>
+      </g>
+      <g class="edge" id="edge-L-CapCheck-Unnumbered-0">
+        <path d="M 639.47 418.93 L 704.80 536.60" class="edge-path" marker-end="url(#arrow_point)" stroke-width="1" fill="none"/>
+      </g>
+      <g class="edge" id="edge-L-KeyPress-HandleEvent-0">
+        <path d="M 190.00 77.80 C 190.00 86.13, 190.00 94.47, 190.00 102.80 C 190.00 111.13, 190.00 119.47, 190.00 127.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-HandleEvent-ViewMode-0">
+        <path d="M 190.00 180.60 C 190.00 192.27, 190.00 203.93, 190.00 226.13 C 190.00 248.33, 190.00 281.07, 190.00 313.80" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-ViewMode-RenderFull-0">
+        <path d="M 190.00 403.40 C 190.00 436.13, 190.00 468.87, 190.00 494.13 C 190.00 519.40, 190.00 537.20, 190.00 555.00" class="edge-path" stroke-width="1" fill="none" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-RenderFull-TmuxCheck-0">
+        <path d="M 190.00 607.80 C 190.00 622.27, 190.00 636.73, 190.00 648.13 C 190.00 659.53, 190.00 667.87, 190.00 676.20" class="edge-path" fill="none" stroke-width="1" marker-end="url(#arrow_point)"/>
+      </g>
+      <g class="edge" id="edge-L-TmuxCheck-Inner-0">
+        <path d="M 190.00 729.00 C 190.00 737.33, 190.00 745.67, 190.00 754.00 C 190.00 762.33, 190.00 770.67, 190.00 779.00" class="edge-path" fill="none" marker-end="url(#arrow_point)" stroke-width="1"/>
+      </g>
+    </g>
+    <g class="edgeLabels">
+      <g class="edgeLabel" id="edge-label-L-CapCheck-Numbered-0">
+        <rect x="485.8140621601143" y="462.9945939035722" width="29.599999999999998" height="22" class="edge-label-bg"/>
+        <text x="500.6140621601143" y="473.9945939035722" class="edge-label" text-anchor="middle" dominant-baseline="central">Yes</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-CapCheck-Unnumbered-0">
+        <rect x="671.7859378398856" y="462.99459390357214" width="22.4" height="22" class="edge-label-bg"/>
+        <text x="682.9859378398857" y="473.99459390357214" class="edge-label" dominant-baseline="central" text-anchor="middle">No</text>
+      </g>
+      <g class="edgeLabel" id="edge-label-L-HandleEvent-ViewMode-0">
+        <rect x="153.6" y="236.20000000000002" width="72.8" height="22" class="edge-label-bg"/>
+        <text x="190" y="247.20000000000002" class="edge-label" text-anchor="middle" dominant-baseline="central">idx &lt; len</text>
+      </g>
+    </g>
+    <g class="nodes">
+      <g class="node" id="node-CapCheck">
+        <polygon points="591.8,250.60000000000002 699.8,358.6 591.8,466.6 483.79999999999995,358.6" style="fill:#f96 !important"/>
+        <text x="591.8" y="358.6" class="label" dominant-baseline="central" text-anchor="middle">diagram_num &lt;= 9?</text>
+      </g>
+      <g class="node" id="node-DiagramNum">
+        <rect x="474.99999999999994" y="127.80000000000001" width="233.6" height="52.8"/>
+        <text x="591.8" y="154.20000000000002" class="label" text-anchor="middle" dominant-baseline="central">diagram_num = len + 1</text>
+      </g>
+      <g class="node" id="node-HandleEvent">
+        <rect x="106.8" y="127.80000000000001" width="166.4" height="52.8"/>
+        <text x="190" y="154.20000000000002" class="label" text-anchor="middle" dominant-baseline="central">handle_event()</text>
+      </g>
+      <g class="node" id="node-Inner">
+        <rect x="40" y="779" width="300" height="52.8" style="fill:#9f6 !important"/>
+        <text x="190" y="805.4" class="label" text-anchor="middle" dominant-baseline="central">render_fullscreen_image_inner()</text>
+      </g>
+      <g class="node" id="node-KeyPress">
+        <rect x="116.4" y="25.000000000000007" width="147.2" height="52.8"/>
+        <text x="190" y="51.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">KeyPress 1-9</text>
+      </g>
+      <g class="node" id="node-Numbered">
+        <rect x="381.20000000000005" y="536.6" width="195.2" height="89.6"/>
+        <text x="478.80000000000007" y="581.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="478.80000000000007" y="581.4" dy="-0.6em">[N] Diagram: type</tspan><tspan x="478.80000000000007" dy="1.2em">(press N to view)</tspan></text>
+      </g>
+      <g class="node" id="node-RenderFull">
+        <rect x="54" y="555" width="272" height="52.8"/>
+        <text x="190" y="581.4" class="label" text-anchor="middle" dominant-baseline="central">render_fullscreen_image()</text>
+      </g>
+      <g class="node" id="node-RenderMsg">
+        <rect x="498.99999999999994" y="25.000000000000007" width="185.6" height="52.8"/>
+        <text x="591.8" y="51.400000000000006" class="label" dominant-baseline="central" text-anchor="middle">render_message()</text>
+      </g>
+      <g class="node" id="node-TmuxCheck">
+        <rect x="97.2" y="676.2" width="185.6" height="52.8" style="fill:#f96 !important"/>
+        <text x="190" y="702.6" class="label" dominant-baseline="central" text-anchor="middle">is_inside_tmux()</text>
+      </g>
+      <g class="node" id="node-Unnumbered">
+        <rect x="626.4" y="536.6" width="156.8" height="89.6"/>
+        <text x="704.8" y="581.4" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="704.8" y="581.4" dy="-0.6em">Diagram: type</tspan><tspan x="704.8" dy="1.2em">(no shortcut)</tspan></text>
+      </g>
+      <g class="node" id="node-ViewMode">
+        <rect x="54" y="313.8" width="272" height="89.6"/>
+        <text x="190" y="358.6" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="190" y="358.6" dy="-0.6em">ViewMode enum</tspan><tspan x="190" dy="1.2em">Chat | DiagramViewer(idx)</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>
