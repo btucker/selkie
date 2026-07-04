@@ -1,0 +1,17 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": null,
+  "closed_reason": null,
+  "created_at": "2026-07-04T07:18:30Z",
+  "dependencies": [],
+  "description": "labels_unicode (café ✅ 日本語) ~0.82. Two coupled issues: (1) TrebuchetSizeEstimator mis-measures CJK ideographs (should be ~1.0em full-width) — a fix resolved the dimension warning but net eval was flat (reverted as it didn't improve SSIM); (2) the eval rasterizer renders emoji as tofu without a color/CJK font fallback — a fallback made emoji render correctly but pointwise-misaligned and net -0.2pp (reverted). Needs the measurement + eval-font fixes landed together, or same-engine rasterization. Deferred.",
+  "design": "",
+  "id": "se-aa0ccea1",
+  "labels": [],
+  "notes": "",
+  "priority": 3,
+  "status": "open",
+  "title": "flowchart: CJK/emoji label width measurement + resvg glyph fallback",
+  "type": "task",
+  "updated_at": "2026-07-04T07:18:30Z"
+}

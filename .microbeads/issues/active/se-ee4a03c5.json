@@ -1,0 +1,17 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": null,
+  "closed_reason": null,
+  "created_at": "2026-07-04T07:18:30Z",
+  "dependencies": [],
+  "description": "shapes_odd (rect_left_inv_arrow) geometry matches mermaid exactly (width 99.45, notch 9.75, height 39) but SSIM caps ~0.84 because mermaid draws shapes via rough.js EVEN in classic look (roughness=0 but still multi-stroke + bezier createPathFromPoints), giving a slightly curved double-stroked outline; selkie emits a single clean polygon path. Affects odd and likely other polygon shapes. Emulating rough.js classic-look strokes is a rendering-model change with low per-shape SSIM payoff. Backlog.",
+  "design": "",
+  "id": "se-ee4a03c5",
+  "labels": [],
+  "notes": "",
+  "priority": 4,
+  "status": "open",
+  "title": "flowchart: rough.js shape outline gap (classic look uses rough.js multi-stroke)",
+  "type": "task",
+  "updated_at": "2026-07-04T07:18:30Z"
+}

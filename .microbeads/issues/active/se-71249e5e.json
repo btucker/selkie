@@ -1,0 +1,17 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": null,
+  "closed_reason": null,
+  "created_at": "2026-07-04T03:02:56Z",
+  "dependencies": [],
+  "description": "Corpus generation surfaced a grammar-superset divergence: selkie's grammar accepts the ellipse shape A(-Ellipse-) (FlowVertexType::Ellipse, shape_ellipse rule) and renders it, but mermaid v11 errors at render time ('No such shape: ellipse'). Excluded from the parity corpus (no reference obtainable). Decide: drop ellipse from selkie's grammar to match mermaid, or keep as an extension. Found via scripts/generate-corpus.py --validate-reference.",
+  "design": "",
+  "id": "se-71249e5e",
+  "labels": [],
+  "notes": "",
+  "priority": 3,
+  "status": "open",
+  "title": "flowchart: selkie parses ellipse shape A(-t-) that mermaid v11 rejects",
+  "type": "bug",
+  "updated_at": "2026-07-04T03:02:56Z"
+}
