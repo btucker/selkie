@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1007.523536" height="1101.226576" viewBox="-8 -8 1007.523536 1101.226576" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1239.60168" height="899" viewBox="-8 -8 1239.60168 899" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -67,88 +67,88 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-subGraph0">
-        <rect x="37.5" y="420" width="712.718832" height="447.148432" class="cluster"/>
-        <text x="393.859416" y="436" class="cluster-label" text-anchor="middle">app.rs</text>
+        <rect x="37.5" y="420" width="864.718832" height="265" class="cluster"/>
+        <text x="469.859416" y="436" class="cluster-label" text-anchor="middle">app.rs</text>
       </g>
       <g class="cluster" id="subgraph-subGraph1">
         <rect x="37.5" y="20" width="316.25784" height="380" class="cluster"/>
         <text x="195.62892" y="36" class="cluster-label" text-anchor="middle">mod.rs</text>
       </g>
       <g class="cluster" id="subgraph-subGraph2">
-        <rect x="0" y="0" width="991.523536" height="1085.226576" class="cluster"/>
-        <text x="495.761768" y="16" class="cluster-label" text-anchor="middle">src/bin/midtown/cli/chat/</text>
+        <rect x="0" y="0" width="1223.60168" height="883" class="cluster"/>
+        <text x="611.80084" y="16" class="cluster-label" text-anchor="middle">src/bin/midtown/cli/chat/</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-app_tests-test_helper-0">
-        <path d="M271.19837042497363,639.865228L284.9582820208114,632.7639913333334C298.7181936166491,625.6627546666667,326.2380168083245,611.4602813333335,350.2479284041622,604.3590446666667C374.25784,597.2578080000001,394.75784,597.2578080000001,422.06043271761183,590.9859790222764C449.3630254352236,584.7141500445526,483.46821087044736,572.1704920891051,500.52080358805915,565.8986631113813L517.573396305671,559.6268341336576" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M301.72267999999997,578.5429706343407L310.39520666666664,576.9524755286172C319.0677333333333,575.3619804228938,336.41278666666665,572.1809902114469,368.00198,570.5904951057234C399.5911733333333,569,445.4245066666667,569,490.6008457771599,565.1663391027378C535.7771848876531,561.3326782054754,580.2965297753061,553.665356410951,602.5562022191327,549.8316955136887L624.8158746629592,545.9980346164264" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-mod_use-test_helper-0">
-        <path d="M316.25784,210L322.50784,210C328.75784,210,341.25784,210,357.75784,252.988932C374.25784,295.977864,394.75784,381.9557280000001,421.5358002243602,430.7749671303802C448.3137604487204,479.59420626076036,481.3696808974408,491.25482052152057,497.897641121801,497.0851276519008L514.4256013461612,502.9154347822809" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M316.25784,210L322.50784,210C328.75784,210,341.25784,210,370.4245066666667,255.16666666666666C399.5911733333333,300.3333333333333,445.4245066666667,390.6666666666667,490.6008457771599,439.66699423059555C535.7771848876531,488.6673217945245,580.2965297753061,496.3346435890491,602.5562022191327,500.16830448631134L624.8158746629592,504.0019653835736" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-test_fn-test_helper-0">
-        <path d="M316.242224,326L322.4948266666667,326C328.74742933333334,326,341.25263466666667,326,357.7552373333333,360.2076813333333C374.25784,394.4153626666667,394.75784,462.8307253333334,414.5911733333333,497.03840666666673C434.4245066666667,531.2460880000001,453.5911733333333,531.2460880000001,463.17450666666673,531.246088L472.75784,531.2460880000001" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M316.242224,326L322.4948266666667,326C328.74742933333334,326,341.25263466666667,326,370.421904,359.1666666666667C399.5911733333333,392.3333333333333,445.4245066666667,458.6666666666667,490.5911733333334,491.8333333333333C535.75784,525,580.25784,525,602.5078400000001,525L624.75784,525" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-app_tests-mod-0">
-        <path d="M285.944363897448,717.865228L297.24660991454,722.745762C308.548855931632,727.626296,331.153347965816,737.387364,352.70559398290806,742.2678980000001C374.25784,747.148432,394.75784,747.148432,429.5677856693133,779.4015642567387C464.37773133862675,811.6546965134772,513.4976226772534,876.1609610269546,538.0575683465668,908.4140932836932L562.6175140158801,940.6672255404318" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M301.72267999999997,616.7860973185677L310.39520666666664,618.3217477654731C319.0677333333333,619.8573982123785,336.41278666666665,622.9286991061892,368.00198,624.4643495530946C399.5911733333333,626,445.4245066666667,626,499.84398550525543,645.4826783300267C554.2634643438441,664.9653566600535,617.2690886876882,703.930713320107,648.7719008596102,723.4133916501337L680.2747130315323,742.8960699801604" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-mod-app-0">
-        <path d="M683.0008570222008,943.849612L694.2038528518339,938.8994153333333C705.4068486814672,933.9492186666666,727.8128403407336,924.0488253333333,747.2658361703667,919.0986286666666C766.718832,914.148432,783.218832,914.148432,799.0521653333334,914.148432C814.8854986666666,914.148432,830.0521653333334,914.148432,837.6354986666669,914.148432L845.218832,914.148432" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M835.183664,754.419717107154L846.3561919999999,750.683097589295C857.5287199999999,746.9464780714361,879.873776,739.473239035718,905.9694826666667,735.7366195178589C932.0651893333334,732,961.9115466666667,732,991.0912373333334,732C1020.270928,732,1048.783952,732,1063.040464,732L1077.296976,732" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-mod-ui-0">
-        <path d="M683.183664,1014.3508862474413L694.3561920000001,1018.3301678728677C705.5287199999999,1022.3094494982943,727.873776,1030.2680127491471,747.2963040000001,1034.2472943745736C766.718832,1038.226576,783.218832,1038.226576,800.12964,1038.226576C817.0404480000001,1038.226576,834.3620639999999,1038.226576,843.022872,1038.226576L851.68368,1038.226576" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M835.183664,813.580282892846L846.3561919999999,817.316902410705C857.5287199999999,821.0535219285639,879.873776,828.526760964282,905.9694826666667,832.2633804821411C932.0651893333334,836,961.9115466666667,836,992.1687120000001,836C1022.4258773333335,836,1053.0938506666669,836,1068.4278373333334,836L1083.7618240000002,836" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-app_tests-test_helper-0">
-        <rect x="382.45784" y="586.2578080000001" width="65.6" height="22" class="edge-label-bg"/>
-        <text x="415.25784" y="597.2578080000001" class="edge-label" text-anchor="middle" dominant-baseline="central">contains</text>
+        <rect x="458.45784" y="558" width="65.6" height="22" class="edge-label-bg"/>
+        <text x="491.25784" y="569" class="edge-label" text-anchor="middle" dominant-baseline="central">contains</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod_use-test_helper-0">
-        <rect x="386.05784" y="456.9335920000001" width="58.4" height="22" class="edge-label-bg"/>
-        <text x="415.25784" y="467.9335920000001" class="edge-label" text-anchor="middle" dominant-baseline="central">imports</text>
+        <rect x="462.05784" y="470" width="58.4" height="22" class="edge-label-bg"/>
+        <text x="491.25784" y="481" class="edge-label" text-anchor="middle" dominant-baseline="central">imports</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-test_fn-test_helper-0">
-        <rect x="393.25784" y="520.2460880000001" width="44" height="22" class="edge-label-bg"/>
-        <text x="415.25784" y="531.2460880000001" class="edge-label" text-anchor="middle" dominant-baseline="central">calls</text>
+        <rect x="469.25784" y="514" width="44" height="22" class="edge-label-bg"/>
+        <text x="491.25784" y="525" class="edge-label" text-anchor="middle" dominant-baseline="central">calls</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-app_tests-mod-0">
-        <rect x="328.45784" y="727.148432" width="173.6" height="40" class="edge-label-bg"/>
-        <text x="415.25784" y="747.148432" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="415.25784" y="747.148432" dy="-0.75em">pub(super) = visible to</tspan><tspan x="415.25784" dy="1.5em">parent</tspan></text>
+        <rect x="404.45784" y="606" width="173.6" height="40" class="edge-label-bg"/>
+        <text x="491.25784" y="626" class="edge-label" text-anchor="middle" dominant-baseline="central"><tspan x="491.25784" y="626" dy="-0.75em">pub(super) = visible to</tspan><tspan x="491.25784" dy="1.5em">parent</tspan></text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod-app-0">
-        <rect x="745.318832" y="903.148432" width="108.8" height="22" class="edge-label-bg"/>
-        <text x="799.718832" y="914.148432" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
+        <rect x="937.3579040000001" y="721" width="108.8" height="22" class="edge-label-bg"/>
+        <text x="991.757904" y="732" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-mod-ui-0">
-        <rect x="745.318832" y="1027.226576" width="108.8" height="22" class="edge-label-bg"/>
-        <text x="799.718832" y="1038.226576" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
+        <rect x="937.3579040000001" y="825" width="108.8" height="22" class="edge-label-bg"/>
+        <text x="991.757904" y="836" class="edge-label" text-anchor="middle" dominant-baseline="central">parent of both</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node default" id="node-mod">
-        <rect x="506.293008" y="943.849612" width="176.89065599999998" height="78"/>
-        <text x="594.738336" y="982.849612" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="594.738336" y="982.849612" dy="-0.75em">mod.rs</tspan><tspan x="594.738336" dy="1.5em">(parent module)</tspan></text>
+        <rect x="658.293008" y="745" width="176.89065599999998" height="78"/>
+        <text x="746.738336" y="784" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="746.738336" y="784" dy="-0.75em">mod.rs</tspan><tspan x="746.738336" dy="1.5em">(parent module)</tspan></text>
       </g>
       <g class="node default" id="node-app">
-        <rect x="849.218832" y="887.148432" width="104.804704" height="54"/>
-        <text x="901.621184" y="914.148432" class="label" text-anchor="middle" dominant-baseline="central">app.rs</text>
+        <rect x="1081.296976" y="705" width="104.804704" height="54"/>
+        <text x="1133.6993280000002" y="732" class="label" text-anchor="middle" dominant-baseline="central">app.rs</text>
       </g>
       <g class="node default" id="node-ui">
-        <rect x="855.68368" y="1011.226576" width="91.87500800000001" height="54"/>
-        <text x="901.621184" y="1038.226576" class="label" text-anchor="middle" dominant-baseline="central">ui.rs</text>
+        <rect x="1087.7618240000002" y="809" width="91.87500800000001" height="54"/>
+        <text x="1133.6993280000002" y="836" class="label" text-anchor="middle" dominant-baseline="central">ui.rs</text>
       </g>
       <g class="node default" id="node-app_code">
         <rect x="91.3906" y="455" width="208.47663999999997" height="54"/>
         <text x="195.62892" y="482" class="label" text-anchor="middle" dominant-baseline="central">pub struct App { ... }</text>
       </g>
       <g class="node default visibility" id="node-app_tests">
-        <rect x="89.53516" y="639.865228" width="212.18751999999998" height="78" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#fff4e1 !important"/>
-        <text x="195.62892" y="678.865228" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="195.62892" y="678.865228" dy="-0.75em">#[cfg(test)]</tspan><tspan x="195.62892" dy="1.5em">pub(super) mod tests</tspan></text>
+        <rect x="89.53516" y="559" width="212.18751999999998" height="78" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#fff4e1 !important"/>
+        <text x="195.62892" y="598" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="195.62892" y="598" dy="-0.75em">#[cfg(test)]</tspan><tspan x="195.62892" dy="1.5em">pub(super) mod tests</tspan></text>
       </g>
       <g class="node default visibility" id="node-test_helper">
-        <rect x="476.75784" y="504.24608800000004" width="235.96099199999998" height="54" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#e1f5e1 !important"/>
-        <text x="594.738336" y="531.2460880000001" class="label" text-anchor="middle" dominant-baseline="central">pub(super) fn test_app()</text>
+        <rect x="628.75784" y="498" width="235.96099199999998" height="54" style="stroke:#666 !important;stroke-width:2px !important;stroke-dasharray: 5 5 !important;fill:#e1f5e1 !important"/>
+        <text x="746.738336" y="525" class="label" text-anchor="middle" dominant-baseline="central">pub(super) fn test_app()</text>
       </g>
       <g class="node default" id="node-mod_tests">
         <rect x="124.804696" y="55" width="141.64844799999997" height="78"/>
