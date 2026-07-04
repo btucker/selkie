@@ -381,7 +381,8 @@ impl SvgRenderer {
 
     /// Fallback cluster box computed from member node bounds, used only when the
     /// laid-out cluster node is missing usable geometry. Returns
-    /// `(min_x, min_y, width, height)` with mermaid-like padding + title band.
+    /// `(min_x, min_y, width, height)` with mermaid-like symmetric padding (the
+    /// title is absorbed into the top padding band, not stacked above content).
     fn subgraph_box_from_members(
         &self,
         subgraph: &FlowSubGraph,
@@ -409,12 +410,16 @@ impl SvgRenderer {
             return None;
         }
 
-        let padding = 20.0;
-        let title_height = 25.0;
-        min_x -= padding;
-        min_y -= padding + title_height;
-        max_x += padding;
-        max_y += padding;
+        // Match the primary (laid-out) cluster geometry: horizontal padding of
+        // 37.5 and a symmetric vertical band that centers the content with the
+        // title absorbed into the top padding (rather than a title height stacked
+        // above the content).
+        let padding_x = 37.5;
+        let padding_y = 35.0;
+        min_x -= padding_x;
+        min_y -= padding_y;
+        max_x += padding_x;
+        max_y += padding_y;
 
         Some((min_x, min_y, max_x - min_x, max_y - min_y))
     }

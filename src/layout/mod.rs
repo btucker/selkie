@@ -31,11 +31,19 @@ use std::collections::{HashMap, HashSet};
 /// corresponding to the border-node separation `(nodesep + edgesep)/2`
 /// = `(50 + 25)/2` in the flowchart SVG renderer.
 const CLUSTER_PADDING_X: f64 = 37.5;
-/// Vertical padding between cluster contents and the cluster border, matching the
-/// flowchart SVG renderer's subgraph padding.
+/// Vertical padding between a cluster border and content that is itself a
+/// cluster. Mermaid centers a container cluster's content vertically with a
+/// symmetric ~20px band and does NOT stack an additive title band per nesting
+/// level (evidence: nested `Outer` rect y 8->172 h164 around inner content of
+/// height 124 => (164-124)/2 = 20 each side).
 const CLUSTER_PADDING_Y: f64 = 20.0;
-/// Vertical space reserved for the cluster title, matching the renderer.
-const CLUSTER_TITLE_HEIGHT: f64 = 25.0;
+/// Vertical padding between a leaf cluster border and its plain-node content.
+/// Mermaid centers leaf content vertically and absorbs the title into the top
+/// padding band, giving a symmetric ~35px band (evidence: titled `S1` rect
+/// y 8->132 h124 around node A of height 54 => (124-54)/2 = 35 each side). This
+/// also matches selkie's own dagre compound-cluster padding for a non-extracted
+/// leaf (cf. the nested `Inner` cluster, which renders at height 124).
+const CLUSTER_LEAF_PADDING_Y: f64 = 35.0;
 /// Extra rank separation applied to extracted cluster graphs, mirroring
 /// mermaid's dagre wrapper (`ranksep: ranksep + 25` in
 /// rendering-util/layout-algorithms/dagre/index.js).
@@ -78,13 +86,15 @@ fn layout_with_depth(mut graph: LayoutGraph, depth: usize) -> Result<LayoutGraph
         skip_edges.extend(extraction.internal_edge_indices.iter().copied());
 
         // Size the collapsed cluster node from the sub-layout bounds plus the
-        // cluster decoration (padding + title), mirroring mermaid's
-        // updateNodeBounds after recursiveRender.
+        // cluster decoration, mirroring mermaid's updateNodeBounds after
+        // recursiveRender. Mermaid centers content vertically within a symmetric
+        // padding band (title absorbed into it) instead of stacking a title band
+        // per nesting level, so the vertical padding is applied on BOTH sides and
+        // no separate title height is added.
+        let vpad = cluster_vertical_padding(&graph, &extraction.cluster_id);
         if let Some(node) = graph.get_node_mut(&extraction.cluster_id) {
             node.width = extraction.sub.width.unwrap_or(0.0) + 2.0 * CLUSTER_PADDING_X;
-            node.height = extraction.sub.height.unwrap_or(0.0)
-                + 2.0 * CLUSTER_PADDING_Y
-                + CLUSTER_TITLE_HEIGHT;
+            node.height = extraction.sub.height.unwrap_or(0.0) + 2.0 * vpad;
         }
     }
 
@@ -116,6 +126,29 @@ fn flip_direction(dir: LayoutDirection) -> LayoutDirection {
     match dir {
         LayoutDirection::TopToBottom => LayoutDirection::LeftToRight,
         _ => LayoutDirection::TopToBottom,
+    }
+}
+
+/// Vertical padding a collapsed cluster reserves around its content. Mermaid
+/// centers cluster content vertically; a container cluster (one whose content
+/// includes another cluster) uses a symmetric `CLUSTER_PADDING_Y` band with no
+/// additive title height, while a leaf cluster (plain-node content) uses the
+/// larger `CLUSTER_LEAF_PADDING_Y` band with the title absorbed into it. Both
+/// the collapsed-node sizing and the content placement must use this same value
+/// so content lands centered.
+fn cluster_vertical_padding(graph: &LayoutGraph, cluster_id: &str) -> f64 {
+    let has_cluster_child = graph.nodes.iter().any(|child| {
+        child.parent_id.as_deref() == Some(cluster_id)
+            && child.metadata.get("is_group") == Some(&"true".to_string())
+            && graph
+                .nodes
+                .iter()
+                .any(|n| n.parent_id.as_deref() == Some(child.id.as_str()))
+    });
+    if has_cluster_child {
+        CLUSTER_PADDING_Y
+    } else {
+        CLUSTER_LEAF_PADDING_Y
     }
 }
 
@@ -275,10 +308,14 @@ fn place_extracted_cluster(graph: &mut LayoutGraph, extraction: &ClusterExtracti
         None => return,
     };
 
+    // Center the content vertically within the collapsed cluster node: use the
+    // same symmetric padding the node was sized with (no additive title band),
+    // so the interior content is not pushed down by a per-level title height.
+    let vpad = cluster_vertical_padding(graph, &extraction.cluster_id);
     let origin_x = extraction.sub.bounds_x.unwrap_or(0.0);
     let origin_y = extraction.sub.bounds_y.unwrap_or(0.0);
     let dx = cluster_x + CLUSTER_PADDING_X - origin_x;
-    let dy = cluster_y + CLUSTER_PADDING_Y + CLUSTER_TITLE_HEIGHT - origin_y;
+    let dy = cluster_y + vpad - origin_y;
 
     for sub_node in &extraction.sub.nodes {
         if let Some(node) = graph.get_node_mut(&sub_node.id) {
@@ -694,6 +731,100 @@ mod tests {
             "B should be below A in TB sub-layout. A.y={:.1}, B.y={:.1}",
             a.y.unwrap(),
             b.y.unwrap()
+        );
+    }
+
+    #[test]
+    fn test_leaf_cluster_content_vertically_centered() {
+        // An isolated LEAF cluster (plain-node content) must center its content
+        // vertically with a symmetric ~35px padding band, with the title
+        // absorbed into the top padding rather than stacked above the content.
+        // Mermaid: titled `S1 { A --> B }` -> rect height 124 around node height
+        // 54 => 35px top and bottom (node vertically centered).
+        let mut graph = LayoutGraph::new("test_leaf_centered");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        let mut s1 = LayoutNode::new("S1", 0.0, 0.0);
+        s1.metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(s1);
+        graph.add_node(LayoutNode::new("A", 69.4375, 54.0).with_parent("S1"));
+        graph.add_node(LayoutNode::new("B", 69.0625, 54.0).with_parent("S1"));
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+
+        let result = layout(graph).unwrap();
+
+        let s1 = result.get_node("S1").unwrap();
+        let a = result.get_node("A").unwrap();
+
+        let top_pad = a.y.unwrap() - s1.y.unwrap();
+        let bottom_pad = (s1.y.unwrap() + s1.height) - (a.y.unwrap() + a.height);
+        assert!(
+            (top_pad - bottom_pad).abs() < 2.0,
+            "Leaf cluster content should be vertically centered (title absorbed \
+             into top padding). top_pad={:.1}, bottom_pad={:.1}",
+            top_pad,
+            bottom_pad
+        );
+        assert!(
+            (top_pad - 35.0).abs() < 3.0,
+            "Leaf cluster top padding should be ~35, got {:.1}",
+            top_pad
+        );
+    }
+
+    #[test]
+    fn test_nested_container_cluster_omits_title_band() {
+        // A CONTAINER cluster (whose content includes another cluster) must NOT
+        // add a title band per nesting level. Mermaid centers the inner content
+        // with a symmetric ~20px band: nested `Outer { Inner { A }, B }` renders
+        // Outer rect height 164 around inner content of height 124 => 20px each
+        // side. The extra per-level title height (25) previously inflated this to
+        // ~189 and pushed the interior content down.
+        let mut graph = LayoutGraph::new("test_nested_container");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        let mut outer = LayoutNode::new("Outer", 0.0, 0.0);
+        outer
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(outer);
+
+        let mut inner = LayoutNode::new("Inner", 0.0, 0.0).with_parent("Outer");
+        inner
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        graph.add_node(inner);
+
+        graph.add_node(LayoutNode::new("A", 69.4375, 54.0).with_parent("Inner"));
+        graph.add_node(LayoutNode::new("B", 69.0625, 54.0).with_parent("Outer"));
+        graph.add_edge(LayoutEdge::new("e1", "A", "B"));
+
+        let result = layout(graph).unwrap();
+
+        let outer = result.get_node("Outer").unwrap();
+        let inner = result.get_node("Inner").unwrap();
+
+        assert!(
+            (outer.height - 164.0).abs() < 6.0,
+            "Container cluster height should be ~164 (inner content 124 + 2*20), \
+             with no additive title band; got {:.1}",
+            outer.height
+        );
+
+        // Inner should sit vertically centered inside Outer (~20px each side).
+        let top_pad = inner.y.unwrap() - outer.y.unwrap();
+        let bottom_pad = (outer.y.unwrap() + outer.height) - (inner.y.unwrap() + inner.height);
+        assert!(
+            (top_pad - bottom_pad).abs() < 2.0,
+            "Inner should be vertically centered in Outer. top_pad={:.1}, bottom_pad={:.1}",
+            top_pad,
+            bottom_pad
+        );
+        assert!(
+            (top_pad - 20.0).abs() < 3.0,
+            "Container top padding should be ~20 (no title band), got {:.1}",
+            top_pad
         );
     }
 

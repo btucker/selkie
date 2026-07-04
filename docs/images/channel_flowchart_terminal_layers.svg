@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1751.85168" height="1036" viewBox="-8 -8 1751.85168 1036" class="mermaid">
+<svg xmlns="http://www.w3.org/2000/svg" width="1751.85168" height="1046" viewBox="-8 -8 1751.85168 1046" class="mermaid">
   <style>
 .mermaid{font-family:trebuchet ms, verdana, arial, sans-serif;font-size:16px;fill:#333333;}
 .error-icon{fill:#552222;}
@@ -62,112 +62,112 @@ rect.text{fill:none;stroke-width:0;}
   <g class="root">
     <g class="clusters">
       <g class="cluster" id="subgraph-Terminal">
-        <rect x="954.38876" y="0" width="335" height="497" class="cluster"/>
+        <rect x="954.38876" y="0" width="335" height="502" class="cluster"/>
         <text x="1121.88876" y="16" class="cluster-label" text-anchor="middle">Terminal Output Layers</text>
       </g>
       <g class="cluster" id="subgraph-Problem">
-        <rect x="0" y="724" width="1350.85168" height="143" class="cluster"/>
-        <text x="675.42584" y="740" class="cluster-label" text-anchor="middle">The Fragility</text>
+        <rect x="0" y="729" width="1350.85168" height="148" class="cluster"/>
+        <text x="675.42584" y="745" class="cluster-label" text-anchor="middle">The Fragility</text>
       </g>
       <g class="cluster" id="subgraph-Solution">
-        <rect x="1400.85168" y="571" width="335" height="449" class="cluster"/>
-        <text x="1568.35168" y="587" class="cluster-label" text-anchor="middle">Select-to-Open Pattern</text>
+        <rect x="1400.85168" y="576" width="335" height="454" class="cluster"/>
+        <text x="1568.35168" y="592" class="cluster-label" text-anchor="middle">Select-to-Open Pattern</text>
       </g>
     </g>
     <g class="edgePaths">
       <g class="edge" id="edge-L-Layer1-Calc-0">
-        <path d="M1121.88876,147L1121.88876,155.25C1121.88876,163.5,1121.88876,180,1121.88876,195.83333333333334C1121.88876,211.66666666666666,1121.88876,226.83333333333334,1121.88876,234.41666666666666L1121.88876,242" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1121.88876,137L1121.88876,145.25C1121.88876,153.5,1121.88876,170,1121.88876,185.83333333333334C1121.88876,201.66666666666666,1121.88876,216.83333333333334,1121.88876,224.41666666666666L1121.88876,232" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Calc-Layer2-0">
-        <path d="M1121.88876,300L1121.88876,308.25C1121.88876,316.5,1121.88876,333,1121.88876,348.8333333333333C1121.88876,364.6666666666667,1121.88876,379.8333333333333,1121.88876,387.4166666666667L1121.88876,395" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1121.88876,290L1121.88876,298.25C1121.88876,306.5,1121.88876,323,1121.88876,338.8333333333333C1121.88876,354.6666666666667,1121.88876,369.8333333333333,1121.88876,377.4166666666667L1121.88876,385" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-P1-P2-0">
-        <path d="M182.398448,808L188.648448,808C194.898448,808,207.398448,808,219.23178133333332,808C231.06511466666666,808,242.23178133333337,808,247.81511466666666,808L253.39844800000003,808" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M182.398448,803L188.648448,803C194.898448,803,207.398448,803,219.23178133333332,803C231.06511466666666,803,242.23178133333337,803,247.81511466666666,803L253.39844800000003,803" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-P2-P3-0">
-        <path d="M461.30472,808L467.55472000000003,808C473.8047199999999,808,486.3047199999999,808,498.13805333333335,808C509.9713866666666,808,521.1380533333332,808,526.7213866666667,808L532.30472,808" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M461.30472,803L467.55472000000003,803C473.8047199999999,803,486.3047199999999,803,498.13805333333335,803C509.9713866666666,803,521.1380533333332,803,526.7213866666667,803L532.30472,803" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-P3-P4-0">
-        <path d="M717.3359839999999,808L723.5859839999999,808C729.8359839999999,808,742.3359839999999,808,754.1693173333333,808C766.0026506666667,808,777.1693173333333,808,782.7526506666667,808L788.3359839999999,808" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M717.3359839999999,803L723.5859839999999,803C729.8359839999999,803,742.3359839999999,803,754.1693173333333,803C766.0026506666667,803,777.1693173333333,803,782.7526506666667,803L788.3359839999999,803" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-P4-P5-0">
-        <path d="M1030.531344,808L1036.781344,808C1043.031344,808,1055.531344,808,1067.3646773333332,808C1079.1980106666667,808,1090.3646773333332,808,1095.9480106666667,808L1101.531344,808" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1030.531344,803L1036.781344,803C1043.031344,803,1055.531344,803,1067.3646773333332,803C1079.1980106666667,803,1090.3646773333332,803,1095.9480106666667,803L1101.531344,803" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S1-S2-0">
-        <path d="M1568.35168,694L1568.35168,700.25C1568.35168,706.5,1568.35168,719,1568.35168,730.8333333333334C1568.35168,742.6666666666666,1568.35168,753.8333333333334,1568.35168,759.4166666666666L1568.35168,765" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1568.35168,689L1568.35168,695.25C1568.35168,701.5,1568.35168,714,1568.35168,725.8333333333334C1568.35168,737.6666666666666,1568.35168,748.8333333333334,1568.35168,754.4166666666666L1568.35168,760" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-S2-S3-0">
-        <path d="M1568.35168,823L1568.35168,829.25C1568.35168,835.5,1568.35168,848,1568.35168,859.8333333333334C1568.35168,871.6666666666666,1568.35168,882.8333333333334,1568.35168,888.4166666666666L1568.35168,894" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1568.35168,818L1568.35168,824.25C1568.35168,830.5,1568.35168,843,1568.35168,854.8333333333334C1568.35168,866.6666666666666,1568.35168,877.8333333333334,1568.35168,883.4166666666666L1568.35168,889" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Terminal-Problem-0">
-        <path d="M954.38876,355.6113587663674L907.89494,385.34279897197285C861.40112,415.07423917757825,768.41348,474.53711958878915,721.91966,535.2685597943946C675.42584,596,675.42584,658,675.42584,689L675.42584,720" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M954.38876,359.04928660144947L907.89494,389.0410721678745C861.40112,419.0328577342996,768.41348,479.01642886714984,721.91966,540.0082144335748C675.42584,601,675.42584,663,675.42584,694L675.42584,725" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
       <g class="edge" id="edge-L-Terminal-Solution-0">
-        <path d="M1289.3887599999998,355.6113587663674L1335.8825799999997,385.34279897197285C1382.3763999999999,415.07423917757825,1475.3640399999997,474.53711958878915,1521.85786,509.7685597943946C1568.35168,545,1568.35168,556,1568.35168,561.5L1568.35168,567" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
+        <path d="M1289.3887599999998,359.04928660144947L1335.8825799999997,389.0410721678745C1382.3763999999999,419.0328577342996,1475.3640399999997,479.01642886714984,1521.85786,514.5082144335748C1568.35168,550,1568.35168,561,1568.35168,566.5L1568.35168,572" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" marker-end="url(#arrow_point)"/>
       </g>
     </g>
     <g class="edgeLabels">
       <g class="edgeLabel" id="edge-label-L-Layer1-Calc-0">
-        <rect x="1035.08876" y="185.5" width="173.6" height="22" class="edge-label-bg"/>
-        <text x="1121.88876" y="196.5" class="edge-label" text-anchor="middle" dominant-baseline="central">returns (x,y) positions</text>
+        <rect x="1035.08876" y="175.5" width="173.6" height="22" class="edge-label-bg"/>
+        <text x="1121.88876" y="186.5" class="edge-label" text-anchor="middle" dominant-baseline="central">returns (x,y) positions</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Calc-Layer2-0">
-        <rect x="1074.68876" y="338.5" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="1121.88876" y="349.5" class="edge-label" text-anchor="middle" dominant-baseline="central">every redraw</text>
+        <rect x="1074.68876" y="328.5" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="1121.88876" y="339.5" class="edge-label" text-anchor="middle" dominant-baseline="central">every redraw</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Terminal-Problem-0">
-        <rect x="613.82584" y="523" width="123.19999999999999" height="22" class="edge-label-bg"/>
-        <text x="675.42584" y="534" class="edge-label" text-anchor="middle" dominant-baseline="central">current approach</text>
+        <rect x="613.82584" y="528" width="123.19999999999999" height="22" class="edge-label-bg"/>
+        <text x="675.42584" y="539" class="edge-label" text-anchor="middle" dominant-baseline="central">current approach</text>
       </g>
       <g class="edgeLabel" id="edge-label-L-Terminal-Solution-0">
-        <rect x="1521.15168" y="523" width="94.39999999999999" height="22" class="edge-label-bg"/>
-        <text x="1568.35168" y="534" class="edge-label" text-anchor="middle" dominant-baseline="central">proposed fix</text>
+        <rect x="1521.15168" y="528" width="94.39999999999999" height="22" class="edge-label-bg"/>
+        <text x="1568.35168" y="539" class="edge-label" text-anchor="middle" dominant-baseline="central">proposed fix</text>
       </g>
     </g>
     <g class="nodes">
       <g class="node default" id="node-Layer1">
-        <rect x="991.88876" y="45" width="260" height="102" style="fill:#4a5568 !important;stroke:#cbd5e0 !important;color:#fff !important"/>
-        <text x="1121.88876" y="96" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1121.88876" y="96" dy="-1.5em">Ratatui Text Buffer</tspan><tspan x="1121.88876" dy="1.5em">(Lines, Scroll State,</tspan><tspan x="1121.88876" dy="1.5em">Layout)</tspan></text>
+        <rect x="991.88876" y="35" width="260" height="102" style="fill:#4a5568 !important;stroke:#cbd5e0 !important;color:#fff !important"/>
+        <text x="1121.88876" y="86" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1121.88876" y="86" dy="-1.5em">Ratatui Text Buffer</tspan><tspan x="1121.88876" dy="1.5em">(Lines, Scroll State,</tspan><tspan x="1121.88876" dy="1.5em">Layout)</tspan></text>
       </g>
       <g class="node default" id="node-Layer2">
-        <rect x="996.763736" y="399" width="250.25004800000002" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
-        <text x="1121.88876" y="438" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1121.88876" y="438" dy="-0.75em">Kitty Graphics Layer</tspan><tspan x="1121.88876" dy="1.5em">(Absolute x,y Coordinates)</tspan></text>
+        <rect x="996.763736" y="389" width="250.25004800000002" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
+        <text x="1121.88876" y="428" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1121.88876" y="428" dy="-0.75em">Kitty Graphics Layer</tspan><tspan x="1121.88876" dy="1.5em">(Absolute x,y Coordinates)</tspan></text>
       </g>
       <g class="node default" id="node-Calc">
-        <rect x="992.5840720000001" y="246" width="258.609376" height="54" style="fill:#805ad5 !important;stroke:#b794f4 !important;color:#fff !important"/>
-        <text x="1121.88876" y="273" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">resolve_image_placement()</text>
+        <rect x="992.5840720000001" y="236" width="258.609376" height="54" style="fill:#805ad5 !important;stroke:#b794f4 !important;color:#fff !important"/>
+        <text x="1121.88876" y="263" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">resolve_image_placement()</text>
       </g>
       <g class="node default" id="node-P1">
-        <rect x="37.5" y="781" width="144.898448" height="54" style="fill:#2d3748 !important;stroke:#4a5568 !important;color:#fff !important"/>
-        <text x="109.949224" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">Scroll Event</text>
+        <rect x="37.5" y="776" width="144.898448" height="54" style="fill:#2d3748 !important;stroke:#4a5568 !important;color:#fff !important"/>
+        <text x="109.949224" y="803" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">Scroll Event</text>
       </g>
       <g class="node default" id="node-P2">
-        <rect x="257.39844800000003" y="769" width="203.906272" height="78" style="fill:#2d3748 !important;stroke:#4a5568 !important;color:#fff !important"/>
-        <text x="359.351584" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="359.351584" y="808" dy="-0.75em">Text Buffer Redraws</tspan><tspan x="359.351584" dy="1.5em">(new line positions)</tspan></text>
+        <rect x="257.39844800000003" y="764" width="203.906272" height="78" style="fill:#2d3748 !important;stroke:#4a5568 !important;color:#fff !important"/>
+        <text x="359.351584" y="803" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="359.351584" y="803" dy="-0.75em">Text Buffer Redraws</tspan><tspan x="359.351584" dy="1.5em">(new line positions)</tspan></text>
       </g>
       <g class="node default" id="node-P3">
-        <rect x="536.30472" y="769" width="181.031264" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
-        <text x="626.820352" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="626.820352" y="808" dy="-0.75em">Must Recalculate</tspan><tspan x="626.820352" dy="1.5em">Image Positions</tspan></text>
+        <rect x="536.30472" y="764" width="181.031264" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
+        <text x="626.820352" y="803" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="626.820352" y="803" dy="-0.75em">Must Recalculate</tspan><tspan x="626.820352" dy="1.5em">Image Positions</tspan></text>
       </g>
       <g class="node default" id="node-P4">
-        <rect x="792.3359839999999" y="769" width="238.19536" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
-        <text x="911.4336639999999" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="911.4336639999999" y="808" dy="-0.75em">Tmux DCS Passthrough</tspan><tspan x="911.4336639999999" dy="1.5em">(doubled ESC sequences)</tspan></text>
+        <rect x="792.3359839999999" y="764" width="238.19536" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
+        <text x="911.4336639999999" y="803" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="911.4336639999999" y="803" dy="-0.75em">Tmux DCS Passthrough</tspan><tspan x="911.4336639999999" dy="1.5em">(doubled ESC sequences)</tspan></text>
       </g>
       <g class="node default" id="node-P5">
-        <rect x="1105.531344" y="769" width="207.820336" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
-        <text x="1209.4415119999999" y="808" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1209.4415119999999" y="808" dy="-0.75em">Re-render All Images</tspan><tspan x="1209.4415119999999" dy="1.5em">at New Coords</tspan></text>
+        <rect x="1105.531344" y="764" width="207.820336" height="78" style="fill:#e53e3e !important;stroke:#fc8181 !important;color:#fff !important"/>
+        <text x="1209.4415119999999" y="803" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1209.4415119999999" y="803" dy="-0.75em">Re-render All Images</tspan><tspan x="1209.4415119999999" dy="1.5em">at New Coords</tspan></text>
       </g>
       <g class="node default" id="node-S1">
-        <rect x="1456.73448" y="616" width="223.2344" height="78" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
-        <text x="1568.35168" y="655" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1568.35168" y="655" dy="-0.75em">User Sees Placeholder</tspan><tspan x="1568.35168" dy="1.5em">(text-based reference)</tspan></text>
+        <rect x="1456.73448" y="611" width="223.2344" height="78" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
+        <text x="1568.35168" y="650" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1568.35168" y="650" dy="-0.75em">User Sees Placeholder</tspan><tspan x="1568.35168" dy="1.5em">(text-based reference)</tspan></text>
       </g>
       <g class="node default" id="node-S2">
-        <rect x="1449.140728" y="769" width="238.421904" height="54" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
-        <text x="1568.35168" y="796" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">User Presses &apos;s&apos; + Number</text>
+        <rect x="1449.140728" y="764" width="238.421904" height="54" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
+        <text x="1568.35168" y="791" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff">User Presses &apos;s&apos; + Number</text>
       </g>
       <g class="node default" id="node-S3">
-        <rect x="1438.35168" y="898" width="260" height="102" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
-        <text x="1568.35168" y="949" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1568.35168" y="949" dy="-1.5em">Open Image Fullscreen</tspan><tspan x="1568.35168" dy="1.5em">(separate rendering</tspan><tspan x="1568.35168" dy="1.5em">context)</tspan></text>
+        <rect x="1438.35168" y="893" width="260" height="102" style="fill:#38a169 !important;stroke:#9ae6b4 !important;color:#fff !important"/>
+        <text x="1568.35168" y="944" class="label" text-anchor="middle" dominant-baseline="central" style="fill: #fff"><tspan x="1568.35168" y="944" dy="-1.5em">Open Image Fullscreen</tspan><tspan x="1568.35168" dy="1.5em">(separate rendering</tspan><tspan x="1568.35168" dy="1.5em">context)</tspan></text>
       </g>
     </g>
   </g>
