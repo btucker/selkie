@@ -229,14 +229,24 @@ pub fn render_shape(
             SvgElement::polygon(points)
         }
         FlowVertexType::Odd => {
-            // Odd shape (flag-like) - rectangle with notch
-            let notch = w * 0.15;
+            // Odd shape ('>text]') - mermaid rect_left_inv_arrow: a rectangle
+            // with an inward arrow notch on the LEFT edge. In mermaid's
+            // origin-centered coords the point list is
+            //   {x+notch,y},{x,0},{x+notch,-y},{-x,-y},{-x,y}
+            // with x=-w/2, y=-h/2 and notch=y/2=-h/4, then the polygon is
+            // shifted by translate(-notch/2,0)=translate(h/8,0). Mapping that
+            // into selkie's top-left absolute coords (node.width already
+            // includes the +h/4 the notch adds, see layout/size.rs Odd)
+            // collapses to: top-left and bottom-left corners on the left edge,
+            // the notch tip caved inward to x+h/4 at mid-height, and a flat
+            // right edge.
+            let notch = h / 4.0;
             let points = [
-                Point::new(x, y),              // top-left
-                Point::new(x + w, y),          // top-right
-                Point::new(x + w - notch, cy), // right notch
-                Point::new(x + w, y + h),      // bottom-right
-                Point::new(x, y + h),          // bottom-left
+                Point::new(x, y),          // top-left
+                Point::new(x + notch, cy), // left-edge notch tip (caved inward)
+                Point::new(x, y + h),      // bottom-left
+                Point::new(x + w, y + h),  // bottom-right
+                Point::new(x + w, y),      // top-right
             ];
             let d = format!(
                 "M {} {} L {} {} L {} {} L {} {} L {} {} Z",
@@ -286,7 +296,16 @@ pub fn render_shape(
         }
     }
 
-    let label = SvgElement::text(cx, cy, label_text).with_attrs(label_attrs);
+    // Some shapes offset their label from the geometric center so the text
+    // stays centered in the visible body. mermaid's rect_left_inv_arrow (the
+    // Odd shape) shifts both the polygon and the label right by -notch/2 = h/8
+    // to compensate for the inward notch that eats into the left edge.
+    let label_dx = match shape_type {
+        FlowVertexType::Odd => h / 8.0,
+        _ => 0.0,
+    };
+
+    let label = SvgElement::text(cx + label_dx, cy, label_text).with_attrs(label_attrs);
 
     // Wrap shape and label in a group. mermaid flowDb assigns
     // cssClasses = 'default ' + vertex.classes, so classDef CSS rules like
@@ -432,6 +451,49 @@ mod tests {
         assert!(
             !svg.contains("stroke=\"#9370DB\""),
             "Subroutine lines should not have hardcoded stroke '#9370DB', got: {}",
+            svg
+        );
+    }
+
+    #[test]
+    fn test_odd_shape_left_edge_chevron_and_label_offset() {
+        // mermaid rect_left_inv_arrow puts the arrow notch on the LEFT edge
+        // (caved inward at mid-left, right edge flat) with notch depth = h/4,
+        // then shifts the polygon/label right by -notch/2 = h/8 to keep the
+        // body centered. The old selkie geometry mirrored this: it put the
+        // notch on the RIGHT edge with depth w*0.15 and no label offset.
+        let mut node = LayoutNode::new("test", 100.0, 40.0);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("test", "test");
+        vertex.text = Some("Odd".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Odd);
+
+        let theme = Theme::default();
+        let shape_element = render_shape(&node, &vertex, &theme, None);
+        let svg = shape_element.to_svg(0);
+
+        // Geometry: notch tip on the LEFT edge at x + h/4 = 10, y-mid = 20.
+        // Right edge flat: bottom-right (100,40) then top-right (100,0).
+        assert!(
+            svg.contains("M 0 0 L 10 20 L 0 40 L 100 40 L 100 0 Z"),
+            "Odd shape must have left-edge chevron notch (h/4 deep) with a \
+             flat right edge, got: {}",
+            svg
+        );
+        // The old mirrored geometry (notch on the right) must be gone.
+        assert!(
+            !svg.contains("L 85 20"),
+            "Odd shape must not put the notch on the right edge, got: {}",
+            svg
+        );
+
+        // Label offset: content is shifted right by h/8 = 5 to stay centered
+        // in the body, so the text is drawn at cx + h/8 = 55.
+        assert!(
+            svg.contains("<text x=\"55\" y=\"20\""),
+            "Odd shape label must be offset by h/8 to x=55, got: {}",
             svg
         );
     }

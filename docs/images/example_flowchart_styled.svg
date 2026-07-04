@@ -115,8 +115,8 @@ rect.text{fill:none;stroke-width:0;}
         <text x="691.753968" y="494.397672" class="label" text-anchor="middle" dominant-baseline="central">Circle shape</text>
       </g>
       <g class="node default" id="node-od">
-        <path d="M 76.117184 39.5 L 175.56251199999997 39.5 L 160.64571279999998 59 L 175.56251199999997 78.5 L 76.117184 78.5 Z"/>
-        <text x="125.83984799999999" y="59" class="label" text-anchor="middle" dominant-baseline="central">Odd shape</text>
+        <path d="M 76.117184 39.5 L 85.867184 59 L 76.117184 78.5 L 175.56251199999997 78.5 L 175.56251199999997 39.5 Z"/>
+        <text x="130.714848" y="59" class="label" text-anchor="middle" dominant-baseline="central">Odd shape</text>
       </g>
       <g class="node default" id="node-ro">
         <path d="M 391.37502399999994 44.52538800000001 H 472.664096 A 5 5 0 0 1 477.664096 49.52538800000001 V 141.52538800000002 A 5 5 0 0 1 472.664096 146.52538800000002 H 391.37502399999994 A 5 5 0 0 1 386.37502399999994 141.52538800000002 V 49.52538800000001 A 5 5 0 0 1 391.37502399999994 44.52538800000001 Z"/>
@@ -135,8 +135,8 @@ rect.text{fill:none;stroke-width:0;}
         <text x="1016.528988" y="180.89258" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="1016.528988" y="180.89258" dy="-1.5em">Inner / circle</tspan><tspan x="1016.528988" dy="1.5em">and some odd</tspan><tspan x="1016.528988" dy="1.5em">special characters</tspan></text>
       </g>
       <g class="node default" id="node-od3">
-        <path d="M 793.15632 450.897672 L 1029.90632 450.897672 L 994.39382 494.397672 L 1029.90632 537.8976720000001 L 793.15632 537.8976720000001 Z"/>
-        <text x="911.53132" y="494.397672" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="911.53132" y="494.397672" dy="-1.5em">Really long text with</tspan><tspan x="911.53132" dy="1.5em">linebreak</tspan><tspan x="911.53132" dy="1.5em">in an Odd shape</tspan></text>
+        <path d="M 793.15632 450.897672 L 814.90632 494.397672 L 793.15632 537.8976720000001 L 1029.90632 537.8976720000001 L 1029.90632 450.897672 Z"/>
+        <text x="922.40632" y="494.397672" class="label" text-anchor="middle" dominant-baseline="central"><tspan x="922.40632" y="494.397672" dy="-1.5em">Really long text with</tspan><tspan x="922.40632" dy="1.5em">linebreak</tspan><tspan x="922.40632" dy="1.5em">in an Odd shape</tspan></text>
       </g>
       <g class="node default" id="node-f">
         <path d="M 1084.90632 467.397672 H 1158.146992 A 5 5 0 0 1 1163.146992 472.397672 V 516.3976720000001 A 5 5 0 0 1 1158.146992 521.3976720000001 H 1084.90632 A 5 5 0 0 1 1079.90632 516.3976720000001 V 472.397672 A 5 5 0 0 1 1084.90632 467.397672 Z"/>

@@ -185,8 +185,8 @@ rect.text{fill:none;stroke-width:0;}
         <text x="487.14061200000003" y="776.8405263745889" class="label" text-anchor="middle" dominant-baseline="central">Circle</text>
       </g>
       <g class="node default" id="node-H">
-        <path d="M 432.69530800000007 855.1999023745889 L 541.585916 855.1999023745889 L 525.2523248 874.6999023745889 L 541.585916 894.1999023745889 L 432.69530800000007 894.1999023745889 Z"/>
-        <text x="487.14061200000003" y="874.6999023745889" class="label" text-anchor="middle" dominant-baseline="central">Asymmetric</text>
+        <path d="M 432.69530800000007 855.1999023745889 L 442.44530800000007 874.6999023745889 L 432.69530800000007 894.1999023745889 L 541.585916 894.1999023745889 L 541.585916 855.1999023745889 Z"/>
+        <text x="492.01561200000003" y="874.6999023745889" class="label" text-anchor="middle" dominant-baseline="central">Asymmetric</text>
       </g>
       <g class="node default" id="node-I">
         <polygon points="433.7273248,944.1999023745889 563.4453080000001,944.1999023745889 540.5538992,983.1999023745889 410.835916,983.1999023745889"/>
