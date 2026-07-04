@@ -254,6 +254,19 @@ pub fn calculate_ssim_with_resize(
 /// on white; anti-aliased edges are darker than this.
 const CONTENT_THRESHOLD: u8 = 250;
 
+/// Minimum long-edge (in pixels) at which the registered content boxes are
+/// compared. Windowed SSIM deflates monotonically as the raster shrinks: the
+/// fixed 8x8 window covers a larger fraction of a tiny image, so sub-pixel and
+/// anti-aliasing differences decorrelate nearly every window and a minimal 2-4
+/// node diagram (~110-160px on the long edge at mmdc scale 1) is systematically
+/// under-scored independent of render quality. Below this floor both registered
+/// crops are upsampled to a genuine resolution before windowing so the score
+/// reflects render quality rather than raster area. Upsampling adds no new
+/// information, so it cannot mask a real geometric divergence — mismatched
+/// regions stay mismatched at every scale; it only stops the window/image size
+/// ratio from deflating an otherwise-faithful tiny render.
+const MIN_REGISTERED_LONG_EDGE: u32 = 700;
+
 /// Maximum tolerated ratio between the two images' content aspect ratios before
 /// registration is skipped. Layout-aligned diagrams differ only by white slack
 /// and sub-pixel scale, so their content boxes share an aspect ratio; a larger
@@ -341,10 +354,15 @@ pub fn calculate_ssim_registered(
         return calculate_ssim_with_resize(img1, w1, h1, img2, w2, h2);
     }
 
-    // Rescale both content boxes to common dimensions (the smaller of each
-    // axis) so residual scale differences are removed before comparison.
-    let target_w = cw1.min(cw2).max(1);
-    let target_h = ch1.min(ch2).max(1);
+    // Rescale both content boxes to common dimensions so residual scale
+    // differences are removed before comparison. The base common size is the
+    // smaller of each axis; the minimum render-scale floor then raises it so a
+    // tiny diagram is compared at a genuine resolution instead of being
+    // deflated by the fixed window covering a large fraction of a small raster.
+    let base_w = cw1.min(cw2).max(1);
+    let base_h = ch1.min(ch2).max(1);
+    let (target_w, target_h) = floor_dims(base_w, base_h);
+
     let r1 = if cw1 != target_w || ch1 != target_h {
         resize_grayscale(&c1, cw1, ch1, target_w, target_h)
     } else {
@@ -357,6 +375,20 @@ pub fn calculate_ssim_registered(
     };
 
     calculate_ssim(&r1, &r2, target_w, target_h)
+}
+
+/// Scale `(w, h)` up so its long edge reaches [`MIN_REGISTERED_LONG_EDGE`],
+/// preserving aspect ratio. Returns the input unchanged when it already meets
+/// (or exceeds) the floor.
+fn floor_dims(w: u32, h: u32) -> (u32, u32) {
+    let long = w.max(h);
+    if long == 0 || long >= MIN_REGISTERED_LONG_EDGE {
+        return (w, h);
+    }
+    let scale = MIN_REGISTERED_LONG_EDGE as f64 / long as f64;
+    let fw = ((w as f64 * scale).round() as u32).max(1);
+    let fh = ((h as f64 * scale).round() as u32).max(1);
+    (fw, fh)
 }
 
 #[cfg(test)]
@@ -524,6 +556,129 @@ mod tests {
         assert!(
             (registered - fallback).abs() < 1e-9,
             "aspect-ratio mismatch must fall back to resize compare, got {registered} vs {fallback}"
+        );
+    }
+
+    #[test]
+    fn test_floor_dims_scales_sub_floor_up_preserving_aspect() {
+        // Below the floor, scale the long edge up to the floor and the short
+        // edge proportionally.
+        let (w, h) = floor_dims(100, 200);
+        assert_eq!(h, MIN_REGISTERED_LONG_EDGE);
+        assert_eq!(w, MIN_REGISTERED_LONG_EDGE / 2);
+
+        // At or above the floor, leave dimensions untouched.
+        assert_eq!(
+            floor_dims(MIN_REGISTERED_LONG_EDGE, 300),
+            (MIN_REGISTERED_LONG_EDGE, 300)
+        );
+        assert_eq!(floor_dims(1200, 800), (1200, 800));
+
+        // Degenerate zero input is passed through, not divided by zero.
+        assert_eq!(floor_dims(0, 0), (0, 0));
+    }
+
+    #[test]
+    fn test_registration_applies_minimum_resolution_floor() {
+        // Windowed SSIM deflates catastrophically as the compared raster
+        // shrinks: the fixed 8x8 window covers a large fraction of a tiny image,
+        // so a sub-pixel-scale rendering difference decorrelates nearly every
+        // window. Here two 40x40 rasters carry the SAME structure - a shared
+        // border frame plus five internal horizontal rules - with the rules
+        // offset by a single pixel (the kind of sub-pixel positioning drift
+        // between two faithful renderers). At native resolution the fixed window
+        // straddles the offset rules and the score collapses toward zero. The
+        // minimum render-scale floor upsamples the registered crops to a genuine
+        // resolution so interior windows dominate and the score reflects the
+        // near-identical structure - without collapsing to 1.0, so a real
+        // difference stays visible.
+        let w = 40u32;
+        let h = 40u32;
+        let mut a = vec![255u8; (w * h) as usize];
+        let mut b = vec![255u8; (w * h) as usize];
+        // shared border so both content boxes fill the raster (same AR).
+        for i in 0..w {
+            a[i as usize] = 0;
+            b[i as usize] = 0;
+            a[((h - 1) * w + i) as usize] = 0;
+            b[((h - 1) * w + i) as usize] = 0;
+        }
+        for j in 0..h {
+            a[(j * w) as usize] = 0;
+            b[(j * w) as usize] = 0;
+            a[(j * w + w - 1) as usize] = 0;
+            b[(j * w + w - 1) as usize] = 0;
+        }
+        // five internal rules, offset by 1px between A and B.
+        for k in 1..6 {
+            for x in 1..w - 1 {
+                a[((k * 6) * w + x) as usize] = 0;
+                b[((k * 6 + 1) * w + x) as usize] = 0;
+            }
+        }
+
+        let native = calculate_ssim_with_resize(&a, w, h, &b, w, h);
+        let floored = calculate_ssim_registered(&a, w, h, &b, w, h);
+        assert!(
+            native < 0.3,
+            "tiny raster with a 1px sub-pixel offset must collapse without the \
+             floor (baseline of the bug), got {native}"
+        );
+        assert!(
+            floored > 0.5,
+            "the render-scale floor must lift near-identical tiny structure well \
+             above the deflated native score, got {floored}"
+        );
+        assert!(
+            floored < 0.95,
+            "the floor must NOT collapse a genuine 1px difference to identity, \
+             got {floored}"
+        );
+    }
+
+    #[test]
+    fn test_registration_floor_preserves_identical_tiny_content() {
+        // Identical tiny content must still score ~1.0 after the floor upsample:
+        // the floor adds resolution, never spurious dissimilarity.
+        let w = 30u32;
+        let h = 45u32;
+        let mut img = vec![255u8; (w * h) as usize];
+        for y in 5..40 {
+            for x in 5..25 {
+                img[(y * w + x) as usize] = 0;
+            }
+        }
+        let ssim = calculate_ssim_registered(&img, w, h, &img, w, h);
+        assert!(
+            ssim > 0.99,
+            "identical tiny content must stay ~1.0 through the floor, got {ssim}"
+        );
+    }
+
+    #[test]
+    fn test_registration_floor_does_not_mask_geometric_divergence() {
+        // The floor must recalibrate the measurement basis WITHOUT masking real
+        // geometric differences. Two same-aspect-ratio images whose content
+        // genuinely diverges (a filled block vs a hollow outline of the same
+        // bounds) must still score low even after floor upsampling.
+        let w = 80u32;
+        let h = 80u32;
+        let mut filled = vec![255u8; (w * h) as usize];
+        let mut outline = vec![255u8; (w * h) as usize];
+        for y in 10..70 {
+            for x in 10..70 {
+                filled[(y * w + x) as usize] = 0;
+                // outline: only the border ring is black
+                if x == 10 || x == 69 || y == 10 || y == 69 {
+                    outline[(y * w + x) as usize] = 0;
+                }
+            }
+        }
+
+        let registered = calculate_ssim_registered(&filled, w, h, &outline, w, h);
+        assert!(
+            registered < 0.9,
+            "floor upsampling must not mask a genuine geometric difference, got {registered}"
         );
     }
 
