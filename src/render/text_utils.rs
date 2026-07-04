@@ -61,6 +61,118 @@ fn decode_mermaid_escapes(text: &str) -> String {
     text.replace("\\\\", "\\")
 }
 
+/// A styled run of text produced by parsing a markdown label.
+///
+/// Mirrors the word/segment records mermaid's `markdownToLines`
+/// (`rendering-util/createText.ts`) emits, reduced to the inline styles
+/// Selkie renders: bold (`**x**` / `__x__`) and italic (`*x*` / `_x_`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct MarkdownRun {
+    pub text: String,
+    pub bold: bool,
+    pub italic: bool,
+}
+
+/// Parse a minimal markdown subset into styled runs.
+///
+/// Transliterates mermaid's markdown handling for the inline emphasis it
+/// renders on flowchart labels: `**x**`/`__x__` become bold runs and
+/// `*x*`/`_x_` become italic runs. Everything else is emitted verbatim as
+/// unstyled runs. Unbalanced markers are treated as literal text (never
+/// panics). Bold is matched before italic so `**` is not mis-read as two
+/// italic delimiters.
+pub(crate) fn parse_markdown_runs(text: &str) -> Vec<MarkdownRun> {
+    let chars: Vec<char> = text.chars().collect();
+    let n = chars.len();
+    let mut runs: Vec<MarkdownRun> = Vec::new();
+    let mut buf = String::new();
+    let mut i = 0;
+
+    fn flush(buf: &mut String, runs: &mut Vec<MarkdownRun>) {
+        if !buf.is_empty() {
+            runs.push(MarkdownRun {
+                text: std::mem::take(buf),
+                bold: false,
+                italic: false,
+            });
+        }
+    }
+
+    while i < n {
+        let c = chars[i];
+
+        // Bold: paired `**` or `__` delimiters with non-empty inner text.
+        if (c == '*' || c == '_') && i + 1 < n && chars[i + 1] == c {
+            if let Some(close) = find_markdown_close(&chars, i + 2, c, true) {
+                flush(&mut buf, &mut runs);
+                runs.push(MarkdownRun {
+                    text: chars[i + 2..close].iter().collect(),
+                    bold: true,
+                    italic: false,
+                });
+                i = close + 2;
+                continue;
+            }
+        }
+
+        // Italic: paired single `*` or `_` delimiter with non-empty inner text.
+        if c == '*' || c == '_' {
+            if let Some(close) = find_markdown_close(&chars, i + 1, c, false) {
+                flush(&mut buf, &mut runs);
+                runs.push(MarkdownRun {
+                    text: chars[i + 1..close].iter().collect(),
+                    bold: false,
+                    italic: true,
+                });
+                i = close + 1;
+                continue;
+            }
+        }
+
+        buf.push(c);
+        i += 1;
+    }
+
+    flush(&mut buf, &mut runs);
+    runs
+}
+
+/// Find the index of the closing delimiter for an emphasis span, or `None`
+/// when the span is unbalanced or empty. `double` requires two consecutive
+/// `delim` characters (bold); otherwise a single `delim` closes (italic).
+fn find_markdown_close(chars: &[char], from: usize, delim: char, double: bool) -> Option<usize> {
+    let n = chars.len();
+    let mut j = from;
+    while j < n {
+        if chars[j] == delim {
+            if double {
+                if j + 1 < n && chars[j + 1] == delim {
+                    return if j > from { Some(j) } else { None };
+                }
+                // A lone delimiter inside a bold span is literal content.
+                j += 1;
+                continue;
+            }
+            return if j > from { Some(j) } else { None };
+        }
+        j += 1;
+    }
+    None
+}
+
+/// The visible text of a markdown label with all emphasis markers removed.
+///
+/// Mermaid measures the *rendered* label (bold/italic glyphs, no `*`/`_`
+/// source markers), so layout must size markdown nodes from this stripped
+/// text rather than the raw source. `<br/>` tags and HTML entities are left
+/// intact for the downstream measurement/normalization step to handle.
+pub(crate) fn strip_markdown_markers(text: &str) -> String {
+    parse_markdown_runs(text)
+        .iter()
+        .map(|run| run.text.as_str())
+        .collect()
+}
+
 /// Wrap flowchart label text exactly like the layout measurement does
 /// (mermaid `flowchart.wrappingWidth` = 200px greedy word-wrap), so the
 /// drawn tspans match the node/edge boxes sized by the layout.
@@ -194,6 +306,71 @@ mod tests {
             normalize_mermaid_label_markup("Line 1<br/>Line <b>2</b>"),
             "Line 1\nLine 2"
         );
+    }
+
+    // ── markdown runs ────────────────────────────────────────────────
+
+    #[test]
+    fn parse_markdown_runs_splits_bold_and_italic() {
+        let runs = parse_markdown_runs("**bold** and _em_");
+        assert_eq!(
+            runs,
+            vec![
+                MarkdownRun {
+                    text: "bold".to_string(),
+                    bold: true,
+                    italic: false
+                },
+                MarkdownRun {
+                    text: " and ".to_string(),
+                    bold: false,
+                    italic: false
+                },
+                MarkdownRun {
+                    text: "em".to_string(),
+                    bold: false,
+                    italic: true
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn parse_markdown_runs_handles_underscore_bold_and_asterisk_italic() {
+        assert_eq!(
+            parse_markdown_runs("__b__"),
+            vec![MarkdownRun {
+                text: "b".to_string(),
+                bold: true,
+                italic: false
+            }]
+        );
+        assert_eq!(
+            parse_markdown_runs("*i*"),
+            vec![MarkdownRun {
+                text: "i".to_string(),
+                bold: false,
+                italic: true
+            }]
+        );
+    }
+
+    #[test]
+    fn parse_markdown_runs_treats_unbalanced_markers_as_literal() {
+        assert_eq!(
+            parse_markdown_runs("2 * 3 = 6"),
+            vec![MarkdownRun {
+                text: "2 * 3 = 6".to_string(),
+                bold: false,
+                italic: false
+            }]
+        );
+    }
+
+    #[test]
+    fn strip_markdown_markers_removes_all_emphasis() {
+        assert_eq!(strip_markdown_markers("**bold** and _em_"), "bold and em");
+        assert_eq!(strip_markdown_markers("plain"), "plain");
     }
 
     #[test]

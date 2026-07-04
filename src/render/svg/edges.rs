@@ -1,6 +1,6 @@
 //! Edge rendering for flowcharts
 
-use crate::diagrams::flowchart::{EdgeStroke, FlowEdge};
+use crate::diagrams::flowchart::{EdgeStroke, FlowEdge, FlowTextType};
 use crate::layout::LayoutEdge;
 
 use super::elements::{Attrs, SvgElement};
@@ -95,7 +95,14 @@ pub fn render_edge_parts(
             // Handle multiline text (split by <br> or newlines), applying
             // mermaid's wrappingWidth word-wrap (measured at the 16px label
             // font, like the layout's edge label measurement).
-            let text = crate::render::text_utils::normalize_mermaid_label_markup(&flow_edge.text);
+            // Markdown labels are measured as their marker-stripped visible
+            // text (mermaid measures the rendered label, not the source markers).
+            let raw_text = if flow_edge.label_type == FlowTextType::Markdown {
+                crate::render::text_utils::strip_markdown_markers(&flow_edge.text)
+            } else {
+                flow_edge.text.clone()
+            };
+            let text = crate::render::text_utils::normalize_mermaid_label_markup(&raw_text);
             let text = crate::render::text_utils::wrap_label_text_mermaid(&text, 16.0);
             let lines: Vec<&str> = text.lines().collect();
             let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
@@ -122,8 +129,14 @@ pub fn render_edge_parts(
                 .with_attr("text-anchor", "middle")
                 .with_attr("dominant-baseline", "central");
 
-            label_elements
-                .push(SvgElement::text(label_pos.x, label_pos.y, text).with_attrs(label_attrs));
+            // Markdown edge labels render their emphasis as styled tspans; the
+            // marker-stripped visible text drives the background sizing above.
+            let text_element = if flow_edge.label_type == FlowTextType::Markdown {
+                SvgElement::markdown_text(label_pos.x, label_pos.y, flow_edge.text.clone())
+            } else {
+                SvgElement::text(label_pos.x, label_pos.y, text)
+            };
+            label_elements.push(text_element.with_attrs(label_attrs));
 
             let group_attrs = Attrs::new()
                 .with_class("edgeLabel")

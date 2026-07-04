@@ -1,6 +1,6 @@
 //! Shape rendering for flowchart nodes
 
-use crate::diagrams::flowchart::{FlowVertex, FlowVertexType};
+use crate::diagrams::flowchart::{FlowTextType, FlowVertex, FlowVertexType};
 use crate::layout::{LayoutNode, Point};
 
 use super::color::extract_style_property;
@@ -305,7 +305,15 @@ pub fn render_shape(
         _ => 0.0,
     };
 
-    let label = SvgElement::text(cx + label_dx, cy, label_text).with_attrs(label_attrs);
+    // Markdown labels carry emphasis (`**bold**`, `_italic_`) that must render
+    // as styled tspans, so route them through MarkdownText (which strips the
+    // markers and emits font-weight/font-style runs) using the raw source text.
+    let label = if vertex.label_type == FlowTextType::Markdown {
+        let md_text = vertex.text.clone().unwrap_or_else(|| node.id.clone());
+        SvgElement::markdown_text(cx + label_dx, cy, md_text).with_attrs(label_attrs)
+    } else {
+        SvgElement::text(cx + label_dx, cy, label_text).with_attrs(label_attrs)
+    };
 
     // Wrap shape and label in a group. mermaid flowDb assigns
     // cssClasses = 'default ' + vertex.classes, so classDef CSS rules like

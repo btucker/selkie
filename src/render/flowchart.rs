@@ -2,7 +2,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::diagrams::flowchart::{Direction, FlowVertexType, FlowchartDb};
+use crate::diagrams::flowchart::{Direction, FlowTextType, FlowVertexType, FlowchartDb};
 use crate::error::Result;
 use crate::layout::{
     LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode, LayoutOptions, NodeShape, NodeSizeConfig,
@@ -86,7 +86,18 @@ impl ToLayoutGraph for FlowchartDb {
                 .map(vertex_type_to_shape)
                 .unwrap_or(NodeShape::Rectangle);
 
-            let label = vertex.text.as_deref();
+            // Markdown labels are measured (and stored) as their rendered
+            // visible text: mermaid strips the `**`/`_` emphasis markers before
+            // measuring the label bbox, so the node is sized from "bold and em",
+            // not the source "**bold** and _em_".
+            let stripped_label = match vertex.label_type {
+                FlowTextType::Markdown => vertex
+                    .text
+                    .as_deref()
+                    .map(crate::render::text_utils::strip_markdown_markers),
+                FlowTextType::Text => None,
+            };
+            let label = stripped_label.as_deref().or(vertex.text.as_deref());
             let (width, height) = size_estimator.estimate_node_size(label, shape, &config);
 
             let mut node = LayoutNode::new(id, width, height).with_shape(shape);
@@ -122,11 +133,18 @@ impl ToLayoutGraph for FlowchartDb {
 
             if !edge.text.is_empty() {
                 // Measure the label before layout (mermaid's insertEdgeLabel):
-                // the raw text bbox, with no extra padding.
+                // the raw text bbox, with no extra padding. Markdown edge labels
+                // are measured/stored as their marker-stripped visible text.
+                let edge_label = match edge.label_type {
+                    FlowTextType::Markdown => {
+                        crate::render::text_utils::strip_markdown_markers(&edge.text)
+                    }
+                    FlowTextType::Text => edge.text.clone(),
+                };
                 let (label_w, label_h) =
-                    size_estimator.estimate_text_size(&edge.text, config.font_size);
+                    size_estimator.estimate_text_size(&edge_label, config.font_size);
                 layout_edge = layout_edge
-                    .with_label(&edge.text)
+                    .with_label(&edge_label)
                     .with_label_size(label_w, label_h);
             }
 
@@ -207,6 +225,42 @@ mod tests {
 
         let node_c = graph.get_node("C").unwrap();
         assert_eq!(node_c.shape, NodeShape::Diamond);
+    }
+
+    #[test]
+    fn test_markdown_label_measured_with_markers_stripped() {
+        // mermaid measures the rendered markdown label ("bold and em"), not the
+        // source markers ("**bold** and _em_"). Reference node A renders as
+        // 149.953 x 54 (bbox 89.953 + 4*15 padding); measuring the raw markers
+        // would inflate the node to ~205px wide.
+        use crate::diagrams::flowchart::FlowText;
+        use crate::layout::TrebuchetSizeEstimator;
+
+        let mut db = FlowchartDb::new();
+        db.set_direction("TD");
+        db.add_vertex(
+            "A",
+            Some(FlowText::markdown("**bold** and _em_")),
+            Some(FlowVertexType::Square),
+            vec![],
+            vec![],
+            None,
+            None,
+        );
+        db.add_vertex_simple("B", Some("Next"), Some(FlowVertexType::Square));
+        db.add_edge("A", "B", "-->", "-->", None, None);
+
+        let estimator = TrebuchetSizeEstimator::new();
+        let graph = db.to_layout_graph(&estimator).unwrap();
+
+        let node_a = graph.get_node("A").unwrap();
+        assert!(
+            (node_a.width - 149.953125).abs() <= 2.0,
+            "markdown node A should be sized from stripped text (~149.95), got {}",
+            node_a.width
+        );
+        // The stored label is the visible text, not the source markers.
+        assert_eq!(node_a.label.as_deref(), Some("bold and em"));
     }
 
     #[test]

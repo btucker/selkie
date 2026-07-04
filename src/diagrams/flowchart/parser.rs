@@ -208,7 +208,10 @@ fn process_vertex(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> Re
         }
     }
 
-    db.add_vertex_simple(&id, text.as_ref().map(|t| t.text.as_str()), vertex_type);
+    // Use add_vertex (not add_vertex_simple) so the label's FlowTextType
+    // (e.g. Markdown for `["`...`"]` strings) is preserved onto the vertex;
+    // add_vertex_simple would flatten every label to plain Text.
+    db.add_vertex(&id, text, vertex_type, vec![], vec![], None, None);
     Ok(id)
 }
 
@@ -724,6 +727,21 @@ mod tests {
         let db = result.unwrap();
         let a = db.get_vertices().get("A").unwrap();
         assert_eq!(a.text, Some("Start".to_string()));
+    }
+
+    #[test]
+    fn test_parse_markdown_label_preserves_type() {
+        // A markdown string label (`["`...`"]`) must keep its Markdown type all
+        // the way to the vertex, not be flattened to plain Text. The raw source
+        // markers are preserved on `text` so the renderer can style them.
+        use super::super::types::FlowTextType;
+        let input = "flowchart TD\n  A[\"`**bold** and _em_`\"] --> B[Next]";
+        let db = parse(input).unwrap();
+        let a = db.get_vertices().get("A").unwrap();
+        assert_eq!(a.label_type, FlowTextType::Markdown);
+        assert_eq!(a.text.as_deref(), Some("**bold** and _em_"));
+        let b = db.get_vertices().get("B").unwrap();
+        assert_eq!(b.label_type, FlowTextType::Text);
     }
 
     #[test]

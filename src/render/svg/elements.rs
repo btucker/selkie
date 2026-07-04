@@ -99,6 +99,30 @@ impl Attrs {
     }
 }
 
+/// Render one line of a markdown label into styled `<tspan>` runs.
+///
+/// Bold/italic runs become `<tspan>` elements carrying `font-weight`/
+/// `font-style`; unstyled runs are emitted as bare escaped text so the
+/// concatenated text content stays exactly the visible label. Emphasis
+/// markers are removed by [`parse_markdown_runs`].
+fn render_markdown_runs(line: &str) -> String {
+    crate::render::text_utils::parse_markdown_runs(line)
+        .iter()
+        .map(|run| {
+            let escaped = escape_xml(&run.text);
+            match (run.bold, run.italic) {
+                (true, true) => format!(
+                    "<tspan font-weight=\"bold\" font-style=\"italic\">{}</tspan>",
+                    escaped
+                ),
+                (true, false) => format!("<tspan font-weight=\"bold\">{}</tspan>", escaped),
+                (false, true) => format!("<tspan font-style=\"italic\">{}</tspan>", escaped),
+                (false, false) => escaped,
+            }
+        })
+        .collect()
+}
+
 /// Escape special XML characters
 fn escape_xml(s: &str) -> String {
     s.replace('&', "&amp;")
@@ -154,6 +178,15 @@ pub enum SvgElement {
     Polyline { points: Vec<Point>, attrs: Attrs },
     /// Text element
     Text {
+        x: f64,
+        y: f64,
+        content: String,
+        attrs: Attrs,
+    },
+    /// Text element whose content is a markdown label. Emphasis markers
+    /// (`**bold**`, `_italic_`) are parsed into styled `<tspan>` runs and the
+    /// markers themselves are dropped from the rendered output.
+    MarkdownText {
         x: f64,
         y: f64,
         content: String,
@@ -255,6 +288,16 @@ impl SvgElement {
         }
     }
 
+    /// Create a markdown text element (emphasis markers become styled tspans)
+    pub fn markdown_text(x: f64, y: f64, content: impl Into<String>) -> Self {
+        Self::MarkdownText {
+            x,
+            y,
+            content: content.into(),
+            attrs: Attrs::new(),
+        }
+    }
+
     /// Create a group
     pub fn group(children: Vec<SvgElement>) -> Self {
         Self::Group {
@@ -342,6 +385,17 @@ impl SvgElement {
                 content,
                 attrs: attrs.with_style(style),
             },
+            Self::MarkdownText {
+                x,
+                y,
+                content,
+                attrs,
+            } => Self::MarkdownText {
+                x,
+                y,
+                content,
+                attrs: attrs.with_style(style),
+            },
             Self::Group { children, attrs } => Self::Group {
                 children,
                 attrs: attrs.with_style(style),
@@ -390,6 +444,12 @@ impl SvgElement {
             },
             Self::Polyline { points, .. } => Self::Polyline { points, attrs },
             Self::Text { x, y, content, .. } => Self::Text {
+                x,
+                y,
+                content,
+                attrs,
+            },
+            Self::MarkdownText { x, y, content, .. } => Self::MarkdownText {
                 x,
                 y,
                 content,
@@ -580,6 +640,57 @@ impl SvgElement {
                     )
                 }
             }
+            Self::MarkdownText {
+                x,
+                y,
+                content,
+                attrs,
+            } => {
+                // Mirror mermaid's createText markdown path: split on <br/>,
+                // decode entities, then render each line's emphasis runs
+                // (`**bold**`, `_italic_`) as styled tspans with the markers
+                // dropped. Multi-line blocks are centered exactly like the
+                // plain Text path (line-height 1.5, first line offset up).
+                let normalized = crate::render::text_utils::normalize_br_tags(content);
+                let normalized = crate::render::text_utils::decode_html_entities(&normalized);
+                let lines: Vec<&str> = normalized.split('\n').collect();
+                let num_lines = lines.len();
+                let first_line_offset = if num_lines > 1 {
+                    -((num_lines - 1) as f64 * 0.75)
+                } else {
+                    0.0
+                };
+                let tspans = lines
+                    .iter()
+                    .enumerate()
+                    .map(|(idx, line)| {
+                        let runs = render_markdown_runs(line);
+                        if idx == 0 {
+                            if num_lines > 1 {
+                                format!(
+                                    "<tspan x=\"{}\" y=\"{}\" dy=\"{}em\">{}</tspan>",
+                                    x, y, first_line_offset, runs
+                                )
+                            } else {
+                                // Single line: rely on the text element's own
+                                // x/y and text-anchor for centering.
+                                runs
+                            }
+                        } else {
+                            format!("<tspan x=\"{}\" dy=\"1.5em\">{}</tspan>", x, runs)
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join("");
+                format!(
+                    "{}<text x=\"{}\" y=\"{}\"{}>{}</text>",
+                    indent_str,
+                    x,
+                    y,
+                    attrs.to_string(),
+                    tspans
+                )
+            }
             Self::Group { children, attrs } => {
                 let children_str: String = children
                     .iter()
@@ -665,6 +776,39 @@ mod tests {
         assert!(svg.contains("<tspan x=\"10\" y=\"20\" dy=\"-0.75em\">Line 1</tspan>"));
         assert!(svg.contains("<tspan x=\"10\" dy=\"1.5em\">Line 2</tspan>"));
         assert!(!svg.contains("<br/>"));
+    }
+
+    #[test]
+    fn markdown_text_renders_bold_and_italic_tspans() {
+        let element = SvgElement::markdown_text(50.0, 30.0, "**bold** and _em_")
+            .with_attrs(Attrs::new().with_attr("text-anchor", "middle"));
+        let svg = element.to_svg(0);
+
+        // Emphasis becomes styled tspans and the source markers are dropped.
+        assert!(
+            svg.contains("<tspan font-weight=\"bold\">bold</tspan>"),
+            "expected bold tspan, got: {svg}"
+        );
+        assert!(
+            svg.contains("<tspan font-style=\"italic\">em</tspan>"),
+            "expected italic tspan, got: {svg}"
+        );
+        assert!(!svg.contains("**"), "markers must be stripped, got: {svg}");
+        assert!(
+            !svg.contains("_em_"),
+            "italic markers must be stripped, got: {svg}"
+        );
+        // The plain run between them is bare escaped text, so the concatenated
+        // text content reads exactly "bold and em".
+        assert!(
+            svg.contains(">bold</tspan> and <tspan"),
+            "plain run should join the tspans, got: {svg}"
+        );
+        // The attrs passed via with_attrs must survive on the <text> element.
+        assert!(
+            svg.contains("text-anchor=\"middle\""),
+            "attrs must be applied, got: {svg}"
+        );
     }
 
     #[test]
