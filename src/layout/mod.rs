@@ -25,9 +25,15 @@ use dagre::graph::{DagreGraph, EdgeLabel, NodeLabel};
 use dagre::{DagreConfig, RankDir, Ranker};
 use std::collections::{HashMap, HashSet};
 
-/// Padding between cluster contents and the cluster border, matching the
+/// Horizontal padding between cluster contents and the cluster border. Mermaid's
+/// effective inner horizontal padding (node-left-edge to cluster-left-edge) is a
+/// measured ~37.5px constant in every cluster (leaf and nested, LR and TB),
+/// corresponding to the border-node separation `(nodesep + edgesep)/2`
+/// = `(50 + 25)/2` in the flowchart SVG renderer.
+const CLUSTER_PADDING_X: f64 = 37.5;
+/// Vertical padding between cluster contents and the cluster border, matching the
 /// flowchart SVG renderer's subgraph padding.
-const CLUSTER_PADDING: f64 = 20.0;
+const CLUSTER_PADDING_Y: f64 = 20.0;
 /// Vertical space reserved for the cluster title, matching the renderer.
 const CLUSTER_TITLE_HEIGHT: f64 = 25.0;
 /// Extra rank separation applied to extracted cluster graphs, mirroring
@@ -75,9 +81,10 @@ fn layout_with_depth(mut graph: LayoutGraph, depth: usize) -> Result<LayoutGraph
         // cluster decoration (padding + title), mirroring mermaid's
         // updateNodeBounds after recursiveRender.
         if let Some(node) = graph.get_node_mut(&extraction.cluster_id) {
-            node.width = extraction.sub.width.unwrap_or(0.0) + 2.0 * CLUSTER_PADDING;
-            node.height =
-                extraction.sub.height.unwrap_or(0.0) + 2.0 * CLUSTER_PADDING + CLUSTER_TITLE_HEIGHT;
+            node.width = extraction.sub.width.unwrap_or(0.0) + 2.0 * CLUSTER_PADDING_X;
+            node.height = extraction.sub.height.unwrap_or(0.0)
+                + 2.0 * CLUSTER_PADDING_Y
+                + CLUSTER_TITLE_HEIGHT;
         }
     }
 
@@ -270,8 +277,8 @@ fn place_extracted_cluster(graph: &mut LayoutGraph, extraction: &ClusterExtracti
 
     let origin_x = extraction.sub.bounds_x.unwrap_or(0.0);
     let origin_y = extraction.sub.bounds_y.unwrap_or(0.0);
-    let dx = cluster_x + CLUSTER_PADDING - origin_x;
-    let dy = cluster_y + CLUSTER_PADDING + CLUSTER_TITLE_HEIGHT - origin_y;
+    let dx = cluster_x + CLUSTER_PADDING_X - origin_x;
+    let dy = cluster_y + CLUSTER_PADDING_Y + CLUSTER_TITLE_HEIGHT - origin_y;
 
     for sub_node in &extraction.sub.nodes {
         if let Some(node) = graph.get_node_mut(&sub_node.id) {
@@ -687,6 +694,60 @@ mod tests {
             "B should be below A in TB sub-layout. A.y={:.1}, B.y={:.1}",
             a.y.unwrap(),
             b.y.unwrap()
+        );
+    }
+
+    #[test]
+    fn test_titled_cluster_horizontal_padding_is_37_5() {
+        // Mermaid's effective inner HORIZONTAL padding (node-left-edge to
+        // cluster-left-edge) is a measured ~37.5px constant in every cluster
+        // (leaf and nested, LR and TB), while VERTICAL padding is ~20px. The
+        // collapsed cluster node width must therefore be content_width + 2*37.5,
+        // not content_width + 2*20. A single-child titled cluster has a content
+        // width equal to that child's width, so the relationship is exact.
+        let mut graph = LayoutGraph::new("test_cluster_hpad");
+        graph.options.direction = LayoutDirection::TopToBottom;
+
+        let mut subgraph = LayoutNode::new("sub1", 0.0, 0.0);
+        subgraph
+            .metadata
+            .insert("is_group".to_string(), "true".to_string());
+        subgraph
+            .metadata
+            .insert("label".to_string(), "Titled".to_string());
+        graph.add_node(subgraph);
+
+        // Single child of known width; the extracted sub content width equals it.
+        graph.add_node(LayoutNode::new("A", 100.0, 40.0).with_parent("sub1"));
+
+        // Unrelated external nodes so the cluster stays isolated (extractable).
+        graph.add_node(LayoutNode::new("X", 50.0, 30.0));
+        graph.add_node(LayoutNode::new("Y", 50.0, 30.0));
+        graph.add_edge(LayoutEdge::new("e1", "X", "Y"));
+
+        let result = layout(graph).unwrap();
+
+        let sub = result.get_node("sub1").unwrap();
+        let a = result.get_node("A").unwrap();
+
+        // Content width for a single child is its own width.
+        let expected = a.width + 2.0 * 37.5;
+        assert!(
+            (sub.width - expected).abs() < 0.5,
+            "Cluster width should be content + 2*37.5 (horizontal padding). \
+             content={:.1}, expected={:.1}, got={:.1}",
+            a.width,
+            expected,
+            sub.width
+        );
+
+        // The leftmost child's inset from the cluster's left edge is the
+        // horizontal padding constant.
+        let inset = a.x.unwrap() - sub.x.unwrap();
+        assert!(
+            (inset - 37.5).abs() < 0.5,
+            "Left inner padding should be 37.5, got {:.1}",
+            inset
         );
     }
 
