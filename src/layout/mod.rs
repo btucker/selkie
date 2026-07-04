@@ -357,6 +357,7 @@ fn to_dagre_graph_filtered(
 
             let label = EdgeLabel {
                 weight: edge.weight as i32,
+                minlen: edge.minlen as i32,
                 width: label_width,
                 height: label_height,
                 // Mermaid renders flowchart/state/class/requirement edges with

@@ -284,6 +284,10 @@ pub struct LayoutEdge {
     pub label_height: f64,
     /// Edge weight for layout prioritization
     pub weight: u32,
+    /// Minimum rank separation between endpoints. Mermaid maps a flowchart
+    /// edge's dash count (`----`) to the dagre edge minlen so extra dashes
+    /// lengthen the edge (flowDb.ts: `minlen: rawEdge.length`).
+    pub minlen: u32,
     /// Whether this edge was reversed for cycle removal
     pub reversed: bool,
     /// Additional metadata
@@ -306,6 +310,7 @@ impl LayoutEdge {
             label_width: 0.0,
             label_height: 0.0,
             weight: 1,
+            minlen: 1,
             reversed: false,
             metadata: HashMap::new(),
         }
@@ -333,6 +338,14 @@ impl LayoutEdge {
 
     pub fn with_weight(mut self, weight: u32) -> Self {
         self.weight = weight;
+        self
+    }
+
+    /// Set the minimum rank separation between the edge's endpoints. Mermaid
+    /// derives this from a flowchart edge's dash count so `A ----> B` spans
+    /// more ranks than `A --> B` (flowDb.ts: `minlen: rawEdge.length`).
+    pub fn with_minlen(mut self, minlen: u32) -> Self {
+        self.minlen = minlen.max(1);
         self
     }
 

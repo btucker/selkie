@@ -538,6 +538,7 @@ mod tests {
             label_width: 60.0,
             label_height: 20.0,
             weight: 1,
+            minlen: 1,
             reversed: false,
             metadata: HashMap::new(),
         };
@@ -589,6 +590,7 @@ mod tests {
             label_width: 60.0,
             label_height: 20.0,
             weight: 1,
+            minlen: 1,
             reversed: false,
             metadata: HashMap::new(),
         };
@@ -729,6 +731,7 @@ mod tests {
             label_width: 0.0,
             label_height: 0.0,
             weight: 1,
+            minlen: 1,
             reversed: false,
             metadata: HashMap::new(),
         };
@@ -780,6 +783,7 @@ mod tests {
             label_width: 0.0,
             label_height: 0.0,
             weight: 1,
+            minlen: 1,
             reversed: false,
             metadata: HashMap::new(),
         };

@@ -130,9 +130,11 @@ impl ToLayoutGraph for FlowchartDb {
                     .with_label_size(label_w, label_h);
             }
 
-            // Set weight based on length hint
+            // Map the edge's dash count (`----`) to the dagre minlen so extra
+            // dashes add rank separation and lengthen the edge, mirroring
+            // mermaid (flowDb.ts: `minlen: rawEdge.length`).
             if let Some(length) = edge.length {
-                layout_edge = layout_edge.with_weight(length);
+                layout_edge = layout_edge.with_minlen(length);
             }
 
             // Store edge type for rendering
@@ -407,6 +409,39 @@ mod tests {
             !edge.bend_points.is_empty(),
             "Flowchart edge should have bend points after layout, got: {:?}",
             edge
+        );
+    }
+
+    #[test]
+    fn test_edge_extra_length_increases_edge_span() {
+        use crate::layout;
+
+        // Mermaid maps an edge's dash count (`length`) to the dagre edge
+        // minlen (flowDb.ts: `minlen: rawEdge.length`), so extra dashes add
+        // rank separation and lengthen the edge. A short `A --> B` edge
+        // (length 1) must produce a smaller horizontal span than a long
+        // `A ----> B` edge (length 3) in an LR layout.
+        let span = |arrow: &str| -> f64 {
+            let mut db = FlowchartDb::new();
+            db.set_direction("LR");
+            db.add_vertex_simple("A", Some("Start"), Some(FlowVertexType::Rect));
+            db.add_vertex_simple("B", Some("End"), Some(FlowVertexType::Rect));
+            db.add_edge("A", "B", arrow, None, None);
+
+            let estimator = CharacterSizeEstimator::default();
+            let graph = db.to_layout_graph(&estimator).unwrap();
+            let graph = layout::layout(graph).unwrap();
+
+            let a = graph.get_node("A").unwrap();
+            let b = graph.get_node("B").unwrap();
+            b.x.unwrap() - a.x.unwrap()
+        };
+
+        let short = span("-->");
+        let long = span("---->");
+        assert!(
+            long > short + 50.0,
+            "A ----> B (length 3) should span noticeably wider than A --> B (length 1). short={short:.1}, long={long:.1}"
         );
     }
 
