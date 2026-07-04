@@ -140,7 +140,8 @@ pub fn render_shape(
         }
         FlowVertexType::Cylinder => {
             // Cylinder (database) shape using path
-            let ry = h * 0.15; // ellipse height for top/bottom
+            // mermaid cylinder.ts createCylinderPathD: rx = w/2; ry = rx / (2.5 + w/50)
+            let ry = (w / 2.0) / (2.5 + w / 50.0); // ellipse height for top/bottom
             let d = format!(
                 "M {} {} \
                  a {} {} 0 0 0 {} 0 \
@@ -460,6 +461,46 @@ mod tests {
             !svg.contains("stroke=\"#9370DB\""),
             "Subroutine lines should not have hardcoded stroke '#9370DB', got: {}",
             svg
+        );
+    }
+
+    #[test]
+    fn test_cylinder_cap_ry_derived_from_width() {
+        // mermaid cylinder.ts createCylinderPathD: rx = w/2; ry = rx / (2.5 + w/50).
+        // The cap ellipse depth must be derived from width, not h * 0.15,
+        // otherwise the caps render visibly over-round.
+        let w = 100.0;
+        let h = 68.0;
+        let mut node = LayoutNode::new("A", w, h);
+        node.x = Some(0.0);
+        node.y = Some(0.0);
+
+        let mut vertex = FlowVertex::new("A", "A");
+        vertex.text = Some("Database".to_string());
+        vertex.vertex_type = Some(FlowVertexType::Cylinder);
+
+        let theme = Theme::default();
+        let shape_element = render_shape(&node, &vertex, &theme, None);
+        let svg = shape_element.to_svg(0);
+
+        let rx = w / 2.0;
+        let expected_ry = rx / (2.5 + w / 50.0);
+        let wrong_ry = h * 0.15;
+        assert_ne!(
+            expected_ry, wrong_ry,
+            "sanity: the two formulas must differ"
+        );
+
+        let expected_arc = format!("a {} {} 0 0 0 {} 0", rx, expected_ry, w);
+        assert!(
+            svg.contains(&expected_arc),
+            "Cylinder cap arc should use width-derived ry {expected_ry}, got: {svg}"
+        );
+
+        let wrong_arc = format!("a {} {} 0 0 0 {} 0", rx, wrong_ry, w);
+        assert!(
+            !svg.contains(&wrong_arc),
+            "Cylinder cap must not use h * 0.15 ry, got: {svg}"
         );
     }
 
