@@ -323,7 +323,11 @@ pub fn redirect_edges_to_border_nodes(g: &mut DagreGraph) {
             label.original_target = Some(old_key.w.clone());
         }
 
-        g.set_edge(&new_source, &new_target, label);
+        if let Some(name) = old_key.name {
+            g.set_edge_with_name(&new_source, &new_target, label, name);
+        } else {
+            g.set_edge(&new_source, &new_target, label);
+        }
     }
 }
 
@@ -350,10 +354,15 @@ pub fn restore_redirected_edges(g: &mut DagreGraph) {
     for (old_key, mut label) in edges_to_restore {
         g.remove_edge_by_key(&old_key);
 
+        let name = old_key.name.clone();
         let orig_source = label.original_source.take().unwrap_or(old_key.v);
         let orig_target = label.original_target.take().unwrap_or(old_key.w);
 
-        g.set_edge(&orig_source, &orig_target, label);
+        if let Some(name) = name {
+            g.set_edge_with_name(&orig_source, &orig_target, label, name);
+        } else {
+            g.set_edge(&orig_source, &orig_target, label);
+        }
     }
 }
 

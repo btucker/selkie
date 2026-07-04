@@ -35,7 +35,9 @@ pub fn run(graph: &mut DagreGraph) {
                 None => continue,
             };
 
-            // Only normalize edges that span more than 1 rank
+            // Normalize edges that are not between adjacent ranks. Same-rank
+            // edges become direct replacement edges below; preserve their names
+            // so public layout lookup can still match the original edge.
             if w_rank != v_rank + 1 {
                 edges_to_normalize.push((v.clone(), w.clone(), name, v_rank, w_rank));
             }
@@ -105,15 +107,22 @@ pub fn run(graph: &mut DagreGraph) {
             prev_node = dummy_id;
         }
 
-        // Connect last dummy to the target
-        graph.set_edge(
-            &prev_node,
-            &w,
-            EdgeLabel {
-                weight,
-                ..Default::default()
-            },
-        );
+        // Connect last dummy to the target. If no dummy was created (for
+        // example a same-rank edge), this is the replacement for the original
+        // edge and must keep the original multigraph name.
+        let final_label = EdgeLabel {
+            weight,
+            ..Default::default()
+        };
+        if first_dummy.is_none() {
+            if let Some(ref name) = name {
+                graph.set_edge_with_name(&prev_node, &w, final_label, name);
+            } else {
+                graph.set_edge(&prev_node, &w, final_label);
+            }
+        } else {
+            graph.set_edge(&prev_node, &w, final_label);
+        }
 
         // Track the first dummy in this chain
         if let Some(dummy) = first_dummy {
@@ -439,6 +448,36 @@ pub fn assign_node_intersects(graph: &mut DagreGraph) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::dagre::internal::graph::EdgeKey;
+
+    #[test]
+    fn run_preserves_named_same_rank_edges() {
+        let mut graph = DagreGraph::new();
+        graph.set_node(
+            "a",
+            NodeLabel {
+                rank: Some(0),
+                ..Default::default()
+            },
+        );
+        graph.set_node(
+            "b",
+            NodeLabel {
+                rank: Some(0),
+                ..Default::default()
+            },
+        );
+        graph.set_edge_with_name("a", "b", EdgeLabel::default(), "edge-1");
+
+        run(&mut graph);
+
+        let key = EdgeKey::with_name("a", "b", "edge-1");
+        assert!(
+            graph.edge_by_key(&key).is_some(),
+            "same-rank named edge should keep its original key"
+        );
+        assert_eq!(graph.edge_count(), 1);
+    }
 
     #[test]
     fn test_intersect_rect_from_below() {

@@ -331,12 +331,14 @@ fn parse_arrow(arrow: &str) -> (String, EdgeStroke, u32) {
     (edge_type, stroke, length)
 }
 
-fn next_available_generated_subgraph_id(used: &HashSet<String>) -> String {
-    let mut index = 0;
+fn next_available_generated_subgraph_id(
+    used: &HashSet<String>,
+    mut index: usize,
+) -> (String, usize) {
     loop {
         let candidate = format!("subGraph{index}");
         if !used.contains(&candidate) {
-            return candidate;
+            return (candidate, index + 1);
         }
         index += 1;
     }
@@ -696,6 +698,13 @@ impl FlowchartDb {
         &self.subgraphs
     }
 
+    pub(crate) fn next_generated_subgraph_id(&self) -> String {
+        let mut used: HashSet<String> = self.vertices.keys().cloned().collect();
+        used.extend(self.subgraphs.iter().map(|subgraph| subgraph.id.clone()));
+
+        next_available_generated_subgraph_id(&used, self.subgraphs.len()).0
+    }
+
     /// Rename generated subgraph IDs that collide with later user-defined IDs.
     ///
     /// Generated IDs are internal implementation details for title-only
@@ -711,13 +720,16 @@ impl FlowchartDb {
         );
 
         let mut used = reserved;
+        let mut next_index = 0;
         for subgraph in &mut self.subgraphs {
             if !subgraph.generated_id {
                 continue;
             }
 
             if used.contains(&subgraph.id) {
-                subgraph.id = next_available_generated_subgraph_id(&used);
+                let (id, index) = next_available_generated_subgraph_id(&used, next_index);
+                subgraph.id = id;
+                next_index = index;
             }
             used.insert(subgraph.id.clone());
         }

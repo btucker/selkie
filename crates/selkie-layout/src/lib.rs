@@ -54,9 +54,11 @@ pub use types::{
     NodeShape, Padding, Point,
 };
 
-use crate::dagre::internal::graph::{DagreGraph as InternalDagreGraph, EdgeLabel, NodeLabel};
+use crate::dagre::internal::graph::{
+    DagreGraph as InternalDagreGraph, EdgeKey, EdgeLabel, NodeLabel,
+};
 use crate::dagre::internal::{self as dagre_internal, DagreConfig, RankDir, Ranker};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 /// Stored layout result for a subgraph that was laid out with its own direction
 #[derive(Debug, Clone)]
@@ -79,10 +81,8 @@ pub fn layout(mut graph: LayoutGraph) -> LayoutResult<LayoutGraph> {
     // Phase 2: Update subgraph node dimensions based on their internal layouts
     for (subgraph_id, layout_result) in &subgraph_layouts {
         if let Some(node) = graph.get_node_mut(subgraph_id) {
-            // Set subgraph dimensions from internal layout + padding for the cluster
-            let padding = 20.0; // Padding around subgraph content
-            node.width = layout_result.width + padding * 2.0;
-            node.height = layout_result.height + padding * 2.0;
+            node.width = layout_result.width + node.padding.left + node.padding.right;
+            node.height = layout_result.height + node.padding.top + node.padding.bottom;
         }
     }
 
@@ -104,12 +104,17 @@ pub fn layout(mut graph: LayoutGraph) -> LayoutResult<LayoutGraph> {
 }
 
 fn validate_graph(graph: &LayoutGraph) -> LayoutResult<()> {
-    use std::collections::{HashMap, HashSet};
-
     let mut ids = HashSet::new();
     for id in graph.all_node_ids() {
         if !ids.insert(id.to_string()) {
             return Err(LayoutError::DuplicateNodeId(id.to_string()));
+        }
+    }
+
+    let mut edge_ids = HashSet::new();
+    for edge in &graph.edges {
+        if !edge_ids.insert(edge.id.clone()) {
+            return Err(LayoutError::DuplicateEdgeId(edge.id.clone()));
         }
     }
 
@@ -226,37 +231,35 @@ fn layout_subgraphs_with_directions(
 
                 // Only process if direction differs from parent
                 if subgraph_dir != graph.options.direction {
-                    // Find all child nodes belonging to this subgraph
-                    let child_ids: Vec<&str> = graph
+                    let child_nodes: Vec<LayoutNode> = graph
                         .nodes
                         .iter()
                         .filter(|n| n.parent_id.as_deref() == Some(&node.id))
-                        .map(|n| n.id.as_str())
+                        .cloned()
+                        .map(|mut child| {
+                            child.parent_id = None;
+                            child
+                        })
                         .collect();
 
-                    if child_ids.is_empty() {
+                    if child_nodes.is_empty() {
                         continue;
                     }
+                    let child_ids: HashSet<&str> =
+                        child_nodes.iter().map(|n| n.id.as_str()).collect();
 
-                    // Create a sub-graph with just these nodes
                     let mut sub_graph = LayoutGraph::new(format!("{}_internal", node.id));
                     sub_graph.options.direction = subgraph_dir;
                     sub_graph.options.node_spacing = graph.options.node_spacing;
                     sub_graph.options.layer_spacing = graph.options.layer_spacing;
 
-                    // Add child nodes (without parent relationship for internal layout)
-                    for child_id in &child_ids {
-                        if let Some(child_node) = graph.get_node(child_id) {
-                            let mut cloned = child_node.clone();
-                            cloned.parent_id = None; // Remove parent for internal layout
-                            sub_graph.add_node(cloned);
-                        }
+                    for child_node in child_nodes.iter().cloned() {
+                        sub_graph.add_node(child_node);
                     }
 
-                    // Add edges between children
                     for edge in &graph.edges {
                         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
-                            if child_ids.contains(&source) && child_ids.contains(&target) {
+                            if child_ids.contains(source) && child_ids.contains(target) {
                                 sub_graph.add_edge(edge.clone());
                             }
                         }
@@ -310,30 +313,43 @@ fn apply_subgraph_child_positions(
     graph: &mut LayoutGraph,
     subgraph_layouts: &HashMap<String, SubgraphLayoutResult>,
 ) {
-    for (subgraph_id, layout_result) in subgraph_layouts {
-        // Get the subgraph's final position
-        if let Some(subgraph_node) = graph.get_node(subgraph_id).cloned() {
-            if let (Some(sg_x), Some(sg_y)) = (subgraph_node.x, subgraph_node.y) {
-                // Calculate padding offset (center the content in the subgraph)
-                let padding = 20.0;
-                let content_offset_x = padding;
-                let content_offset_y = padding;
+    let mut pending_positions = HashMap::new();
 
-                // Apply relative positions to children
+    for (subgraph_id, layout_result) in subgraph_layouts {
+        if let Some(subgraph_node) = graph.get_node(subgraph_id) {
+            if let (Some(sg_x), Some(sg_y)) = (subgraph_node.x, subgraph_node.y) {
+                let content_offset_x = subgraph_node.padding.left;
+                let content_offset_y = subgraph_node.padding.top;
+
                 for (child_id, (rel_x, rel_y)) in &layout_result.child_positions {
-                    if let Some(child) = graph.get_node_mut(child_id) {
-                        child.x = Some(sg_x + content_offset_x + rel_x);
-                        child.y = Some(sg_y + content_offset_y + rel_y);
-                    }
+                    pending_positions.insert(
+                        child_id.clone(),
+                        (
+                            sg_x + content_offset_x + rel_x,
+                            sg_y + content_offset_y + rel_y,
+                        ),
+                    );
                 }
             }
         }
     }
+
+    if pending_positions.is_empty() {
+        return;
+    }
+
+    graph.traverse_nodes_mut(|node| {
+        if let Some((x, y)) = pending_positions.get(&node.id) {
+            node.x = Some(*x);
+            node.y = Some(*y);
+        }
+    });
 }
 
 /// Convert LayoutGraph to DagreGraph for dagre processing
 fn to_dagre_graph(graph: &LayoutGraph) -> InternalDagreGraph {
     let mut dg = InternalDagreGraph::new();
+    let endpoint_counts = edge_endpoint_counts(&graph.edges);
 
     // Set graph-level options
     dg.graph_mut().nodesep = graph.options.node_spacing;
@@ -351,14 +367,7 @@ fn to_dagre_graph(graph: &LayoutGraph) -> InternalDagreGraph {
     // Add edges
     for edge in &graph.edges {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
-            // Estimate label size if present (roughly 8px per char, 16px height)
-            let (label_width, label_height) = if let Some(label) = &edge.label {
-                let width = (label.len() as f64) * 8.0 + 16.0; // padding
-                let height = 20.0;
-                (width, height)
-            } else {
-                (0.0, 0.0)
-            };
+            let (label_width, label_height) = edge_label_size(edge);
 
             let label = EdgeLabel {
                 weight: edge.weight as i32,
@@ -366,11 +375,56 @@ fn to_dagre_graph(graph: &LayoutGraph) -> InternalDagreGraph {
                 height: label_height,
                 ..Default::default()
             };
-            dg.set_edge(source, target, label);
+            if has_parallel_edges(&endpoint_counts, source, target) {
+                dg.set_edge_with_name(source, target, label, edge.id.as_str());
+            } else {
+                dg.set_edge(source, target, label);
+            }
         }
     }
 
     dg
+}
+
+fn edge_endpoint_counts(edges: &[LayoutEdge]) -> HashMap<(String, String), usize> {
+    let mut counts = HashMap::new();
+    for edge in edges {
+        if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
+            *counts
+                .entry((source.to_string(), target.to_string()))
+                .or_insert(0) += 1;
+        }
+    }
+    counts
+}
+
+fn has_parallel_edges(
+    counts: &HashMap<(String, String), usize>,
+    source: &str,
+    target: &str,
+) -> bool {
+    counts
+        .get(&(source.to_string(), target.to_string()))
+        .copied()
+        .unwrap_or(0)
+        > 1
+}
+
+fn edge_label_size(edge: &LayoutEdge) -> (f64, f64) {
+    if edge.label.is_none() {
+        return (0.0, 0.0);
+    }
+
+    if edge.label_width > 0.0 || edge.label_height > 0.0 {
+        return (edge.label_width, edge.label_height);
+    }
+
+    let label_width = edge
+        .label
+        .as_ref()
+        .map(|label| label.len() as f64 * 8.0 + 16.0)
+        .unwrap_or(0.0);
+    (label_width, 20.0)
 }
 
 /// Recursively add nodes to DagreGraph, handling compound nodes
@@ -423,12 +477,21 @@ fn to_dagre_config(options: &LayoutOptions) -> DagreConfig {
 
 /// Copy position results from DagreGraph back to LayoutGraph
 fn apply_dagre_results(graph: &mut LayoutGraph, dg: &InternalDagreGraph) {
+    let endpoint_counts = edge_endpoint_counts(&graph.edges);
+
     apply_results_recursive(&mut graph.nodes, dg);
 
     // Copy edge bend points
     for edge in &mut graph.edges {
         if let (Some(source), Some(target)) = (edge.source(), edge.target()) {
-            if let Some(edge_label) = dg.edge(source, target) {
+            let edge_label = if has_parallel_edges(&endpoint_counts, source, target) {
+                let key = EdgeKey::with_name(source, target, edge.id.as_str());
+                dg.edge_by_key(&key)
+            } else {
+                dg.edge(source, target)
+            };
+
+            if let Some(edge_label) = edge_label {
                 // Convert dagre points to layout points
                 edge.bend_points = edge_label
                     .points

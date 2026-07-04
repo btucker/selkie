@@ -4,6 +4,8 @@ use thiserror::Error;
 pub enum LayoutError {
     #[error("Duplicate node id: {0}")]
     DuplicateNodeId(String),
+    #[error("Duplicate edge id: {0}")]
+    DuplicateEdgeId(String),
     #[error("Missing edge endpoint `{endpoint}` for edge `{edge}`")]
     MissingEdgeEndpoint { edge: String, endpoint: String },
     #[error("Invalid parent relationship: {0}")]

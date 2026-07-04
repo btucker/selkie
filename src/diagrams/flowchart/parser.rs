@@ -245,10 +245,7 @@ fn process_text(pair: pest::iterators::Pair<Rule>) -> Result<FlowText> {
     for inner in pair.into_inner() {
         match inner.as_rule() {
             Rule::quoted_string => {
-                let s = inner.as_str();
-                // Remove surrounding quotes
-                let text = &s[1..s.len() - 1];
-                return Ok(FlowText::new(text));
+                return Ok(FlowText::new(quoted_string_contents(inner.as_str())));
             }
             Rule::md_string => {
                 let s = inner.as_str();
@@ -507,8 +504,9 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                                     Rule::tooltip => {
                                         for t in a.into_inner() {
                                             if t.as_rule() == Rule::quoted_string {
-                                                let s = t.as_str();
-                                                tooltip = Some(s[1..s.len() - 1].to_string());
+                                                tooltip = Some(
+                                                    quoted_string_contents(t.as_str()).to_string(),
+                                                );
                                             }
                                         }
                                     }
@@ -520,8 +518,7 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                             for a in action.into_inner() {
                                 match a.as_rule() {
                                     Rule::quoted_string => {
-                                        let s = a.as_str();
-                                        href = Some(s[1..s.len() - 1].to_string());
+                                        href = Some(quoted_string_contents(a.as_str()).to_string());
                                     }
                                     Rule::link_target => {
                                         for t in a.into_inner() {
@@ -531,8 +528,9 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                                     Rule::tooltip => {
                                         for t in a.into_inner() {
                                             if t.as_rule() == Rule::quoted_string {
-                                                let s = t.as_str();
-                                                tooltip = Some(s[1..s.len() - 1].to_string());
+                                                tooltip = Some(
+                                                    quoted_string_contents(t.as_str()).to_string(),
+                                                );
                                             }
                                         }
                                     }
@@ -625,7 +623,7 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
 
     let generated_id = id.is_empty();
     if generated_id {
-        id = next_generated_subgraph_id(db);
+        id = db.next_generated_subgraph_id();
     }
 
     db.add_generated_subgraph_with_dir(
@@ -640,23 +638,6 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
 
 fn quoted_string_contents(value: &str) -> &str {
     &value[1..value.len() - 1]
-}
-
-fn next_generated_subgraph_id(db: &FlowchartDb) -> String {
-    let mut index = db.subgraphs().len();
-    loop {
-        let candidate = format!("subGraph{index}");
-        let conflicts_with_subgraph = db
-            .subgraphs()
-            .iter()
-            .any(|subgraph| subgraph.id == candidate);
-        let conflicts_with_vertex = db.vertices().contains_key(&candidate);
-
-        if !conflicts_with_subgraph && !conflicts_with_vertex {
-            return candidate;
-        }
-        index += 1;
-    }
 }
 
 #[cfg(test)]

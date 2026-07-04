@@ -40,8 +40,9 @@ impl ToLayoutGraph for FlowchartDb {
         // Add subgraph nodes first (compound parent nodes)
         // These have zero dimensions initially - they're calculated from children by layout
         for subgraph in self.subgraphs() {
-            let mut sg_node =
-                LayoutNode::new(&subgraph.id, 0.0, 0.0).with_shape(NodeShape::Rectangle);
+            let mut sg_node = LayoutNode::new(&subgraph.id, 0.0, 0.0)
+                .with_shape(NodeShape::Rectangle)
+                .with_padding(Padding::uniform(20.0));
 
             // Use subgraph title as label if available
             if !subgraph.title.is_empty() {
@@ -344,7 +345,20 @@ Terminal -.->|"current approach"| Problem
             .count();
         assert_eq!(problem_nodes, 1, "Problem should be only the subgraph node");
 
-        layout::layout(graph).expect("layout should accept edge between subgraphs");
+        let graph = layout::layout(graph).expect("layout should accept edge between subgraphs");
+        let edge = graph
+            .edges()
+            .iter()
+            .find(|edge| edge.id == "L-Terminal-Problem-0")
+            .expect("edge between subgraphs should remain in layout graph");
+        assert!(
+            !edge.bend_points.is_empty(),
+            "edge between subgraphs should retain routed bend points"
+        );
+        assert!(
+            edge.label_position.is_some(),
+            "edge between subgraphs should retain its label position"
+        );
     }
 
     #[test]
@@ -372,6 +386,50 @@ subGraph0 --> A
         assert_ne!(
             real_node.metadata.get("is_group").map(String::as_str),
             Some("true")
+        );
+    }
+
+    #[test]
+    fn styled_flowchart_preserves_all_layout_edges() {
+        use crate::diagrams::flowchart::parse;
+        use crate::layout;
+
+        let input = r#"graph TB
+    sq[Square shape] --> ci((Circle shape))
+
+    subgraph A
+        od>Odd shape]-- Two line<br/>edge comment --> ro
+        di{Diamond with <br/> line break} -.-> ro(Rounded<br>square<br>shape)
+        di==>ro2(Rounded square shape)
+    end
+
+    e --> od3>Really long text with linebreak<br>in an Odd shape]
+
+    e((Inner / circle<br>and some odd <br>special characters)) --> f(,.?!+-*ز)
+
+    cyr[Cyrillic]-->cyr2((Circle shape Начало))"#;
+
+        let db = parse(input).expect("flowchart parses");
+        let estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&estimator)
+            .expect("flowchart converts to layout");
+        let graph = layout::layout(graph).expect("layout succeeds");
+
+        let missing_edges: Vec<_> = db
+            .edges()
+            .iter()
+            .filter_map(|flow_edge| {
+                let id = flow_edge.id.as_ref()?;
+                let layout_edge = graph.edges.iter().find(|edge| edge.id == *id)?;
+                layout_edge.bend_points.is_empty().then_some(id.as_str())
+            })
+            .collect();
+
+        assert_eq!(
+            missing_edges,
+            Vec::<&str>::new(),
+            "all flowchart edges should retain routed bend points"
         );
     }
 

@@ -7,6 +7,8 @@ pub(crate) mod internal;
 
 pub use internal::{Acyclicer, RankDir};
 
+use crate::Point;
+
 /// Configuration for the Dagre layout algorithm.
 #[derive(Debug, Clone)]
 pub struct DagreConfig {
@@ -75,11 +77,7 @@ pub struct DagreGraph {
     inner: internal::graph::DagreGraph,
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq)]
-pub struct DagrePoint {
-    pub x: f64,
-    pub y: f64,
-}
+pub type DagrePoint = Point;
 
 #[derive(Debug, Clone)]
 pub struct DagreNode<'a> {
@@ -158,10 +156,7 @@ impl DagreEdge<'_> {
         self.label
             .points
             .iter()
-            .map(|point| DagrePoint {
-                x: point.x,
-                y: point.y,
-            })
+            .map(|point| DagrePoint::new(point.x, point.y))
             .collect()
     }
 }

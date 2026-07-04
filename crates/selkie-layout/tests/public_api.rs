@@ -31,6 +31,34 @@ fn lays_out_simple_graph_with_public_api() {
 }
 
 #[test]
+fn preserves_parallel_edges_between_same_nodes() {
+    let mut graph = LayoutGraph::new("parallel");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+    graph.add_edge(LayoutEdge::new("first", "A", "B").with_label("first"));
+    graph.add_edge(LayoutEdge::new("second", "A", "B").with_label("second with longer label"));
+
+    let result = layout(graph).expect("layout should succeed");
+    let first = result
+        .edges()
+        .iter()
+        .find(|edge| edge.id() == "first")
+        .expect("first edge exists");
+    let second = result
+        .edges()
+        .iter()
+        .find(|edge| edge.id() == "second")
+        .expect("second edge exists");
+
+    assert!(first.points().len() >= 2);
+    assert!(second.points().len() >= 2);
+    assert_ne!(
+        first.label_position, second.label_position,
+        "parallel labeled edges should keep distinct Dagre edge results"
+    );
+}
+
+#[test]
 fn rejects_missing_edge_endpoint() {
     let mut graph = LayoutGraph::new("invalid");
     graph.add_node(LayoutNode::new("A", 80.0, 40.0));
@@ -92,6 +120,18 @@ fn rejects_duplicate_node_ids() {
 
     let error = layout(graph).expect_err("duplicate node should fail");
     assert_eq!(error, LayoutError::DuplicateNodeId("A".to_string()));
+}
+
+#[test]
+fn rejects_duplicate_edge_ids() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+    graph.add_edge(LayoutEdge::new("same", "A", "B"));
+    graph.add_edge(LayoutEdge::new("same", "A", "B"));
+
+    let error = layout(graph).expect_err("duplicate edge should fail");
+    assert_eq!(error, LayoutError::DuplicateEdgeId("same".to_string()));
 }
 
 #[test]
