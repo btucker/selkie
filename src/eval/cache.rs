@@ -420,17 +420,35 @@ impl ReferenceCache {
             .collect()
     }
 
-    /// Render multiple diagrams in a single mmdc invocation using markdown batch mode
+    /// Render multiple diagrams in a single mmdc invocation using markdown batch
+    /// mode, falling back to individual rendering for any diagram the batch run
+    /// could not produce.
+    ///
+    /// The batch is a fast path: a single `mmdc` process renders every diagram.
+    /// But if `mmdc` fails to render ANY diagram in the batch, the whole process
+    /// fails and produces no SVGs. To keep one bad diagram from blanking all
+    /// references, we treat the batch attempt as best-effort (per-index SVG or
+    /// `None`) and render any missing entry individually via
+    /// [`render_with_mermaid`]. A single unrenderable diagram then only fails
+    /// its own entry.
     fn render_batch_with_mmdc(&self, diagrams: &[(usize, &str)]) -> Vec<Result<String, String>> {
+        let batch_outputs = self.run_batch_mmdc(diagrams);
+        combine_batch_results(batch_outputs, |i| self.render_with_mermaid(diagrams[i].1))
+    }
+
+    /// Best-effort single batch `mmdc` invocation.
+    ///
+    /// Returns one entry per diagram: `Some(svg)` when the diagram's SVG was
+    /// produced and read back, or `None` when it was not (missing output file,
+    /// or a hard failure of the whole batch such as a non-zero exit status or an
+    /// I/O error). `None` entries are re-rendered individually by the caller.
+    fn run_batch_mmdc(&self, diagrams: &[(usize, &str)]) -> Vec<Option<String>> {
+        let all_missing = || vec![None; diagrams.len()];
+
         // Create temp directory for mmdc output
         let temp_dir = match tempfile::tempdir() {
             Ok(dir) => dir,
-            Err(e) => {
-                return diagrams
-                    .iter()
-                    .map(|_| Err(format!("Failed to create temp dir: {}", e)))
-                    .collect();
-            }
+            Err(_) => return all_missing(),
         };
 
         // Create markdown file with all diagrams as fenced code blocks
@@ -443,11 +461,8 @@ impl ReferenceCache {
             ));
         }
 
-        if let Err(e) = fs::write(&md_path, &md_content) {
-            return diagrams
-                .iter()
-                .map(|_| Err(format!("Failed to write markdown: {}", e)))
-                .collect();
+        if fs::write(&md_path, &md_content).is_err() {
+            return all_missing();
         }
 
         // Run mmdc with markdown input
@@ -469,30 +484,23 @@ impl ReferenceCache {
 
         let output = match output {
             Ok(o) => o,
-            Err(e) => {
-                return diagrams
-                    .iter()
-                    .map(|_| Err(format!("Failed to run mmdc: {}", e)))
-                    .collect();
-            }
+            Err(_) => return all_missing(),
         };
 
         if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            return diagrams
-                .iter()
-                .map(|_| Err(format!("mmdc failed: {}", stderr)))
-                .collect();
+            // The batch failed as a whole (one bad diagram fails the process).
+            // Fall back to individual rendering for every diagram.
+            return all_missing();
         }
 
-        // Read generated SVGs (mmdc names them output-1.svg, output-2.svg, etc.)
+        // Read generated SVGs (mmdc names them output-1.svg, output-2.svg, etc.).
+        // A missing file becomes `None` so it is re-rendered individually.
         diagrams
             .iter()
             .enumerate()
             .map(|(i, _)| {
                 let svg_path = artefacts_dir.join(format!("output-{}.svg", i + 1));
-                fs::read_to_string(&svg_path)
-                    .map_err(|e| format!("Failed to read SVG {}: {}", svg_path.display(), e))
+                fs::read_to_string(&svg_path).ok()
             })
             .collect()
     }
@@ -617,6 +625,29 @@ impl ReferenceCache {
     }
 }
 
+/// Combine best-effort batch outputs with a per-diagram fallback renderer.
+///
+/// `batch_outputs[i]` is `Some(svg)` when the batch run produced diagram `i`,
+/// or `None` when it did not. Present outputs pass through unchanged; each
+/// missing entry is rendered individually via `render_one`, so one unrenderable
+/// diagram only fails its own entry instead of blanking the whole batch.
+fn combine_batch_results<F>(
+    batch_outputs: Vec<Option<String>>,
+    mut render_one: F,
+) -> Vec<Result<String, String>>
+where
+    F: FnMut(usize) -> Result<String, String>,
+{
+    batch_outputs
+        .into_iter()
+        .enumerate()
+        .map(|(i, out)| match out {
+            Some(svg) => Ok(svg),
+            None => render_one(i),
+        })
+        .collect()
+}
+
 /// Cache statistics
 #[derive(Debug, Default)]
 pub struct CacheStats {
@@ -643,6 +674,59 @@ fn hash_diagram(diagram: &str) -> String {
 mod tests {
     use super::*;
     use std::env::temp_dir;
+
+    /// BUG 1: batch reference rendering must be fault-isolated. When the batch
+    /// mmdc run produces some SVGs but not others (one bad diagram), the present
+    /// outputs pass through and only the missing ones are re-rendered
+    /// individually via the fallback closure.
+    #[test]
+    fn test_combine_batch_results_falls_back_only_for_missing() {
+        let batch_outputs = vec![
+            Some("<svg>0</svg>".to_string()),
+            None, // index 1 failed in the batch
+            Some("<svg>2</svg>".to_string()),
+        ];
+
+        let mut fallback_calls: Vec<usize> = Vec::new();
+        let results = combine_batch_results(batch_outputs, |i| {
+            fallback_calls.push(i);
+            Ok(format!("<svg>fallback-{}</svg>", i))
+        });
+
+        assert_eq!(results.len(), 3);
+        assert_eq!(results[0].as_deref(), Ok("<svg>0</svg>"));
+        assert_eq!(results[2].as_deref(), Ok("<svg>2</svg>"));
+        // Only the missing index 1 was retried individually.
+        assert_eq!(fallback_calls, vec![1]);
+        assert_eq!(results[1].as_deref(), Ok("<svg>fallback-1</svg>"));
+    }
+
+    /// A per-diagram fallback failure only fails ITS OWN entry.
+    #[test]
+    fn test_combine_batch_results_fallback_failure_is_isolated() {
+        let batch_outputs = vec![Some("<svg>ok</svg>".to_string()), None];
+
+        let results = combine_batch_results(batch_outputs, |_| {
+            Err("mmdc could not render this diagram".to_string())
+        });
+
+        assert_eq!(results[0].as_deref(), Ok("<svg>ok</svg>"));
+        assert!(results[1].is_err());
+    }
+
+    /// Full batch success: every output present, no fallback invoked.
+    #[test]
+    fn test_combine_batch_results_all_present_no_fallback() {
+        let batch_outputs = vec![Some("a".to_string()), Some("b".to_string())];
+        let mut calls = 0;
+        let results = combine_batch_results(batch_outputs, |_| {
+            calls += 1;
+            Err("should not be called".to_string())
+        });
+        assert_eq!(calls, 0);
+        assert_eq!(results[0].as_deref(), Ok("a"));
+        assert_eq!(results[1].as_deref(), Ok("b"));
+    }
 
     #[test]
     fn test_hash_consistency() {
