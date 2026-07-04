@@ -134,9 +134,13 @@ impl SizeEstimator for CharacterSizeEstimator {
                 // Fork/join bar: fixed dimensions, ignore text
                 (70.0, 10.0)
             }
-            NodeShape::Rectangle | NodeShape::RoundedRect => {
-                // Standard rectangles - no adjustment needed
+            NodeShape::Rectangle => {
+                // Standard rectangle - no adjustment needed
                 (base_width, base_height)
+            }
+            NodeShape::RoundedRect => {
+                // roundedRect.ts uses half the horizontal padding of squareRect.ts
+                (text_width + config.padding_horizontal, base_height)
             }
         };
 
@@ -289,7 +293,9 @@ impl SizeEstimator for FontdueSizeEstimator {
             NodeShape::Subroutine => (base_width + 20.0, base_height),
             NodeShape::Odd => (base_width * 1.1, base_height),
             NodeShape::HorizontalBar => (70.0, 10.0),
-            NodeShape::Rectangle | NodeShape::RoundedRect => (base_width, base_height),
+            NodeShape::Rectangle => (base_width, base_height),
+            // roundedRect.ts uses half the horizontal padding of squareRect.ts
+            NodeShape::RoundedRect => (text_width + config.padding_horizontal, base_height),
         };
 
         // Apply min/max constraints
@@ -671,7 +677,10 @@ impl SizeEstimator for TrebuchetSizeEstimator {
         let p = config.padding;
 
         match shape {
-            NodeShape::Rectangle | NodeShape::RoundedRect => (bw + 4.0 * p, bh + 2.0 * p),
+            // squareRect.ts: labelPaddingX = padding*2 -> bbox.w + 4*p
+            NodeShape::Rectangle => (bw + 4.0 * p, bh + 2.0 * p),
+            // roundedRect.ts: labelPaddingX = padding -> bbox.w + 2*p
+            NodeShape::RoundedRect => (bw + 2.0 * p, bh + 2.0 * p),
             NodeShape::Circle => {
                 let d = bw + p;
                 (d, d)
@@ -868,6 +877,29 @@ mod tests {
             estimator.estimate_node_size(Some("Square Rect"), NodeShape::Rectangle, &config);
         assert_close(w, 145.1875, 2.0, "rect width");
         assert_close(h, 54.0, 2.0, "rect height");
+    }
+
+    #[test]
+    fn trebuchet_rounded_rect_uses_half_horizontal_padding() {
+        // roundedRect.ts: labelPaddingX = node.padding (p), so w = bbox.w + 2*p
+        // (squareRect.ts uses labelPaddingX = padding*2 -> bbox.w + 4*p).
+        // Reference 'Round' bezier bbox width is 73.66 = 43.66 text + 2*15.
+        let estimator = TrebuchetSizeEstimator::new();
+        let config = NodeSizeConfig::default();
+        let p = config.padding;
+        let (text_w, _) = estimator.estimate_text_size("Round", 16.0);
+        let (w, h) = estimator.estimate_node_size(Some("Round"), NodeShape::RoundedRect, &config);
+        assert_close(w, text_w + 2.0 * p, 0.001, "rounded rect width = text + 2p");
+        assert_close(h, 54.0, 2.0, "rounded rect height unchanged = bbox + 2p");
+        // Must be strictly narrower than a plain rectangle of the same label.
+        let (rect_w, _) =
+            estimator.estimate_node_size(Some("Round"), NodeShape::Rectangle, &config);
+        assert_close(
+            rect_w - w,
+            2.0 * p,
+            0.001,
+            "rounded is 2p narrower than rect",
+        );
     }
 
     #[test]

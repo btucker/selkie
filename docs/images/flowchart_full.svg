@@ -161,7 +161,7 @@ rect.text{fill:none;stroke-width:0;}
         <text x="487.14061200000003" y="52" class="label" text-anchor="middle" dominant-baseline="central">Rectangle</text>
       </g>
       <g class="node default" id="node-B">
-        <path d="M 431.496076 129 H 542.785148 A 5 5 0 0 1 547.785148 134 V 178 A 5 5 0 0 1 542.785148 183 H 431.496076 A 5 5 0 0 1 426.496076 178 V 134 A 5 5 0 0 1 431.496076 129 Z"/>
+        <path d="M 446.496076 129 H 527.785148 A 5 5 0 0 1 532.785148 134 V 178 A 5 5 0 0 1 527.785148 183 H 446.496076 A 5 5 0 0 1 441.496076 178 V 134 A 5 5 0 0 1 446.496076 129 Z"/>
         <text x="487.14061200000003" y="156" class="label" text-anchor="middle" dominant-baseline="central">Rounded</text>
       </g>
       <g class="node default" id="node-C">
