@@ -1,5 +1,6 @@
 use selkie_layout::{
     layout, LayoutDirection, LayoutEdge, LayoutError, LayoutGraph, LayoutNode, LayoutOptions,
+    Padding,
 };
 
 #[test]
@@ -155,6 +156,64 @@ fn rejects_invalid_spacing() {
     assert!(
         matches!(error, LayoutError::InvalidValue(message) if message.contains("node_spacing"))
     );
+}
+
+#[test]
+fn rejects_invalid_graph_padding() {
+    let mut graph = LayoutGraph::new("invalid").with_options(LayoutOptions {
+        padding: Padding {
+            left: f64::NEG_INFINITY,
+            ..Default::default()
+        },
+        ..Default::default()
+    });
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+
+    let error = layout(graph).expect_err("invalid graph padding should fail");
+    assert!(
+        matches!(error, LayoutError::InvalidValue(message) if message.contains("graph padding left"))
+    );
+}
+
+#[test]
+fn rejects_invalid_node_padding() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0).with_padding(Padding {
+        left: f64::NAN,
+        ..Default::default()
+    }));
+
+    let error = layout(graph).expect_err("invalid node padding should fail");
+    assert!(
+        matches!(error, LayoutError::InvalidValue(message) if message.contains("node padding left"))
+    );
+}
+
+#[test]
+fn rejects_invalid_edge_label_size() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+
+    let mut edge = LayoutEdge::new("bad_label", "A", "B").with_label("bad");
+    edge.label_height = -1.0;
+    graph.add_edge(edge);
+
+    let error = layout(graph).expect_err("invalid edge label size should fail");
+    assert!(
+        matches!(error, LayoutError::InvalidValue(message) if message.contains("edge label height"))
+    );
+}
+
+#[test]
+fn rejects_edge_weight_that_cannot_fit_dagre() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+    graph.add_edge(LayoutEdge::new("too_heavy", "A", "B").with_weight(i32::MAX as u32 + 1));
+
+    let error = layout(graph).expect_err("oversized edge weight should fail");
+    assert!(matches!(error, LayoutError::InvalidValue(message) if message.contains("edge weight")));
 }
 
 #[test]

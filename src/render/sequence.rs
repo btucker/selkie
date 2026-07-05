@@ -184,6 +184,11 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
         .all_bounds()
         .map(|bounds| bounds.bottom())
         .fold(lifeline_start_y, f64::max);
+    let content_bounds = layout
+        .all_bounds()
+        .fold(None, |acc: Option<Bounds>, bounds| {
+            Some(acc.map_or(bounds, |existing| existing.union(bounds)))
+        });
     let bottom_actor_y = content_bottom + cfg.box_margin * 2.0;
     let lifeline_end_y = bottom_actor_y;
 
@@ -225,12 +230,18 @@ pub fn render_sequence(db: &SequenceDb, config: &RenderConfig) -> Result<String>
     }
 
     // Set final SVG dimensions with mermaid-style viewBox offset for visual padding
-    // Mermaid uses viewBox="-50 -10 width height" to create visual padding around content
+    // Mermaid uses a negative viewBox origin to create visual padding around content.
     let content_height = bottom_actor_y + cfg.actor_height;
-    let total_width = content_width + 2.0 * cfg.diagram_margin_x;
+    let content_left = content_bounds
+        .map(|bounds| bounds.x.min(0.0))
+        .unwrap_or(0.0);
+    let content_right = content_bounds
+        .map(|bounds| bounds.right().max(content_width))
+        .unwrap_or(content_width);
+    let total_width = content_right - content_left + 2.0 * cfg.diagram_margin_x;
     let total_height = content_height + 2.0 * cfg.diagram_margin_y;
     doc.set_size_with_origin(
-        -cfg.diagram_margin_x,
+        content_left - cfg.diagram_margin_x,
         -cfg.diagram_margin_y,
         total_width,
         total_height,

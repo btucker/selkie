@@ -127,8 +127,16 @@ fn validate_graph(graph: &LayoutGraph) -> LayoutResult<()> {
         Ok(())
     }
 
+    fn validate_padding(name: &str, padding: crate::types::Padding) -> LayoutResult<()> {
+        validate_finite_non_negative(&format!("{name} top"), padding.top)?;
+        validate_finite_non_negative(&format!("{name} right"), padding.right)?;
+        validate_finite_non_negative(&format!("{name} bottom"), padding.bottom)?;
+        validate_finite_non_negative(&format!("{name} left"), padding.left)
+    }
+
     validate_finite_non_negative("node_spacing", graph.options.node_spacing)?;
     validate_finite_non_negative("layer_spacing", graph.options.layer_spacing)?;
+    validate_padding("graph padding", graph.options.padding)?;
 
     let mut parent_by_child = HashMap::new();
     let mut node_error = None;
@@ -139,6 +147,7 @@ fn validate_graph(graph: &LayoutGraph) -> LayoutResult<()> {
 
         if let Err(error) = validate_finite_non_negative("node width", node.width)
             .and_then(|_| validate_finite_non_negative("node height", node.height))
+            .and_then(|_| validate_padding("node padding", node.padding))
         {
             node_error = Some(error);
             return;
@@ -173,6 +182,15 @@ fn validate_graph(graph: &LayoutGraph) -> LayoutResult<()> {
     }
 
     for edge in &graph.edges {
+        validate_finite_non_negative("edge label width", edge.label_width)?;
+        validate_finite_non_negative("edge label height", edge.label_height)?;
+        if edge.weight > i32::MAX as u32 {
+            return Err(LayoutError::InvalidValue(format!(
+                "edge weight must fit in i32, got {}",
+                edge.weight
+            )));
+        }
+
         if edge.sources.is_empty() {
             return Err(LayoutError::MissingEdgeEndpoint {
                 edge: edge.id.clone(),
