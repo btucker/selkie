@@ -1,0 +1,20 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": null,
+  "closed_reason": null,
+  "created_at": "2026-07-05T03:22:15Z",
+  "dependencies": [],
+  "description": "Review found that old public paths such as selkie::layout::dagre::graph::DagreGraph, NodeLabel, dagre::rank/order, and Ranker::TightTree are no longer reachable through the compatibility facade. Decide whether this PR is a breaking release with migration notes, or add deprecated compatibility wrappers/re-exports. Include related curated API gaps: compound parent APIs, label/weight config, named/parallel edges, and default custom-direction group padding behavior.",
+  "design": "",
+  "id": "se-2d4b5a72",
+  "labels": [
+    "layout",
+    "api"
+  ],
+  "notes": "",
+  "priority": 1,
+  "status": "open",
+  "title": "layout crate: preserve or document old dagre public API",
+  "type": "bug",
+  "updated_at": "2026-07-05T03:22:15Z"
+}

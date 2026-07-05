@@ -1,0 +1,20 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": null,
+  "closed_reason": null,
+  "created_at": "2026-07-05T03:22:15Z",
+  "dependencies": [],
+  "description": "Review found DagreGraph::edges() documents insertion order but returns HashMap::keys(). Order-sensitive phases still consume it, so tie-sensitive layouts or self/parallel edge handling can vary across runs. Add explicit edge_order maintenance or ensure order-sensitive phases use ordered in/out edges and update docs.",
+  "design": "",
+  "id": "se-fe6c52c7",
+  "labels": [
+    "layout",
+    "determinism"
+  ],
+  "notes": "",
+  "priority": 2,
+  "status": "open",
+  "title": "dagre graph: make edge iteration deterministic or update callers",
+  "type": "bug",
+  "updated_at": "2026-07-05T03:22:15Z"
+}

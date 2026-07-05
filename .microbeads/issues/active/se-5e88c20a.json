@@ -1,0 +1,20 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": null,
+  "closed_reason": null,
+  "created_at": "2026-07-05T03:22:15Z",
+  "dependencies": [],
+  "description": "Review found DagreEdge::points() allocates a Vec on every read and has_parallel_edges allocates String keys for every lookup during layout/result application. Expose a borrowed/iterator points API or store public point types directly, and replace tuple String lookup with a borrowed-friendly structure such as nested maps.",
+  "design": "",
+  "id": "se-5e88c20a",
+  "labels": [
+    "layout",
+    "performance"
+  ],
+  "notes": "",
+  "priority": 3,
+  "status": "open",
+  "title": "layout crate: remove avoidable allocation hot spots",
+  "type": "chore",
+  "updated_at": "2026-07-05T03:22:15Z"
+}

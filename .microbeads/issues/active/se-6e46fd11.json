@@ -1,0 +1,20 @@
+{
+  "acceptance_criteria": "",
+  "closed_at": null,
+  "closed_reason": null,
+  "created_at": "2026-07-05T03:22:15Z",
+  "dependencies": [],
+  "description": "Review found src/render/svg/mod.rs publicly exports sequence_geometry even though the module says it is unstable support for eval/integration tests. Keep it crate-private and move integration helpers, or gate/doc-hide it under an explicit test/eval support feature.",
+  "design": "",
+  "id": "se-6e46fd11",
+  "labels": [
+    "api",
+    "renderer"
+  ],
+  "notes": "",
+  "priority": 2,
+  "status": "open",
+  "title": "svg: stop exposing sequence geometry test helpers as stable API",
+  "type": "chore",
+  "updated_at": "2026-07-05T03:22:15Z"
+}
