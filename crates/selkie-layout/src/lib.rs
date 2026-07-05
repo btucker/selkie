@@ -18,6 +18,16 @@
 //! for rendering. The internal Dagre-compatible layout uses center coordinates,
 //! but this crate converts them before exposing results.
 //!
+//! The public API validates dimensions, spacing, padding, edge label sizes, and
+//! edge weights before layout. Invalid numeric inputs return [`LayoutError`]
+//! instead of being passed through to the Dagre-compatible algorithm.
+//!
+//! The [`dagre`] module is a curated expert API for direct Dagre-style layout.
+//! It intentionally does not expose every internal phase module or graph
+//! implementation detail as semver-stable API. The main `selkie` crate keeps a
+//! `selkie::layout` compatibility facade for Selkie integrations; standalone
+//! users should depend on `selkie-layout` directly.
+//!
 //! ```rust
 //! use selkie_layout::{
 //!     layout, LayoutDirection, LayoutEdge, LayoutGraph, LayoutNode, LayoutOptions,
