@@ -1,19 +1,27 @@
 {
   "acceptance_criteria": "",
-  "closed_at": null,
-  "closed_reason": null,
+  "closed_at": "2026-07-05T20:38:10Z",
+  "closed_reason": "Restored Microbeads quick reference and mb sync in AGENTS.md.",
   "created_at": "2026-07-05T03:22:15Z",
   "dependencies": [],
   "description": "Review found the session-completion workflow still requires filing/updating issues, but repo docs in this branch no longer provide the Microbeads quick reference or mb sync in the pre-push block. Restore the mb commands or replace them with the concrete new tracker workflow so issue state is not stranded locally.",
   "design": "",
+  "history": [
+    {
+      "at": "2026-07-05T20:38:10Z",
+      "field": "status",
+      "new": "closed",
+      "old": "open"
+    }
+  ],
   "id": "se-1875bb14",
   "labels": [
     "docs"
   ],
   "notes": "",
   "priority": 2,
-  "status": "open",
+  "status": "closed",
   "title": "docs: restore concrete Microbeads completion workflow",
   "type": "chore",
-  "updated_at": "2026-07-05T03:22:15Z"
+  "updated_at": "2026-07-05T20:38:10Z"
 }
