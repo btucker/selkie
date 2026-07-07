@@ -6,7 +6,7 @@
 
 **MANDATORY WORKFLOW:**
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
+1. **Document remaining work** - Capture anything that needs follow-up in the handoff
 2. **Run quality gates** (if code changed) - Tests, linters, builds:
 
    ```bash
@@ -15,7 +15,7 @@
    cargo test --features all-formats               # Run tests
    ```
 
-3. **Update issue status** - Close finished work, update in-progress items
+3. **Summarize completed work** - Include completed scope and any remaining risks in the handoff
 4. **PUSH TO REMOTE** - This is MANDATORY:
 
    ```bash
@@ -53,7 +53,7 @@ Rule 5: Always prefer the implementation approach of the reference-implementatio
 
 1. Use `cargo run --features eval --bin selkie -- eval --type <diagram_type>` evaluate where our implementation is relative to the reference.
 2. Follow all instructions from its output & confirm our changes are increasing scores
-3. Record remaining follow-up work and resolve completed items in the current project tracker or handoff notes
+3. Record remaining follow-up work in handoff notes
 4. When you resolve a rendering issue, update the svg in docs/images
 5. Follow TDD, run `cargo fmt && cargo clippy --features all-formats -- -D warnings` before committing, commit when tests pass
 6. Explore Reference implementations available as git submodules in reference-implementations:

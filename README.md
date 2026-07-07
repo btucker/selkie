@@ -16,6 +16,25 @@ Selkie aims to provide a fast, native alternative to Mermaid.js for parsing and 
 
 This project has been built entirely with coding agents, mostly [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Development is guided by an [evaluation system](EVAL.md) that compares Selkie's output against the reference Mermaid.js implementation, providing automated feedback on structural and visual parity. The eval system serves as the primary guidance mechanism—agents run `selkie eval` to see prioritized issues, investigate differences by comparing generated SVGs against reference implementations, and verify that changes improve scores without introducing regressions. This creates a tight feedback loop where the agent can autonomously identify what needs work and measure its progress.
 
+## Standalone Layout Crate
+
+The graph layout engine is also available as the `selkie-layout` workspace crate for callers that want layout without Mermaid parsing or SVG rendering.
+
+`selkie-layout` accepts graph nodes with explicit dimensions and edges, then returns top-left node positions plus routed edge points. Text measurement, font lookup, Mermaid parsing, and rendering stay in the main `selkie-rs` crate.
+
+```rust
+use selkie_layout::{layout, LayoutEdge, LayoutGraph, LayoutNode};
+
+let mut graph = LayoutGraph::new("example");
+graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+graph.add_edge(LayoutEdge::new("A_to_B", "A", "B"));
+
+let result = layout(graph)?;
+```
+
+Most users should use `LayoutGraph`, `LayoutNode`, `LayoutEdge`, and `layout`. The `selkie_layout::dagre` module is a curated expert API; low-level Dagre phase modules are intentionally not public. The `selkie` crate keeps a `selkie::layout` compatibility facade for Selkie integrations, but new standalone users should depend on `selkie-layout` directly.
+
 ## Performance
 
 Selkie provides significant performance improvements over mermaid-js in both CLI and browser environments.

@@ -1,0 +1,286 @@
+use selkie_layout::{
+    layout, LayoutDirection, LayoutEdge, LayoutError, LayoutGraph, LayoutNode, LayoutOptions,
+    Padding,
+};
+
+#[test]
+fn lays_out_simple_graph_with_public_api() {
+    let mut graph = LayoutGraph::new("example").with_options(LayoutOptions {
+        direction: LayoutDirection::TopToBottom,
+        node_spacing: 50.0,
+        layer_spacing: 50.0,
+        ..Default::default()
+    });
+
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+    graph.add_edge(LayoutEdge::new("A_to_B", "A", "B"));
+
+    let result = layout(graph).expect("layout should succeed");
+    let a = result.get_node("A").expect("node A exists");
+    let b = result.get_node("B").expect("node B exists");
+
+    assert_eq!(a.size(), (80.0, 40.0));
+
+    let a_pos = a.position().expect("node A has a position");
+    let b_pos = b.position().expect("node B has a position");
+    assert!(b_pos.y > a_pos.y);
+
+    let edge = result.edges().first().expect("edge exists");
+    assert_eq!(edge.id(), "A_to_B");
+    assert!(edge.points().len() >= 2);
+}
+
+#[test]
+fn preserves_parallel_edges_between_same_nodes() {
+    let mut graph = LayoutGraph::new("parallel");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+    graph.add_edge(LayoutEdge::new("first", "A", "B").with_label("first"));
+    graph.add_edge(LayoutEdge::new("second", "A", "B").with_label("second with longer label"));
+
+    let result = layout(graph).expect("layout should succeed");
+    let first = result
+        .edges()
+        .iter()
+        .find(|edge| edge.id() == "first")
+        .expect("first edge exists");
+    let second = result
+        .edges()
+        .iter()
+        .find(|edge| edge.id() == "second")
+        .expect("second edge exists");
+
+    assert!(first.points().len() >= 2);
+    assert!(second.points().len() >= 2);
+    assert_ne!(
+        first.label_position, second.label_position,
+        "parallel labeled edges should keep distinct Dagre edge results"
+    );
+}
+
+#[test]
+fn rejects_missing_edge_endpoint() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_edge(LayoutEdge::new("missing", "A", "B"));
+
+    let error = layout(graph).expect_err("missing endpoint should fail");
+    assert_eq!(
+        error,
+        LayoutError::MissingEdgeEndpoint {
+            edge: "missing".to_string(),
+            endpoint: "B".to_string()
+        }
+    );
+}
+
+#[test]
+fn rejects_edge_with_empty_sources() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+
+    let mut edge = LayoutEdge::new("empty_source", "A", "A");
+    edge.sources.clear();
+    graph.add_edge(edge);
+
+    let error = layout(graph).expect_err("empty sources should fail");
+    assert_eq!(
+        error,
+        LayoutError::MissingEdgeEndpoint {
+            edge: "empty_source".to_string(),
+            endpoint: "<source>".to_string()
+        }
+    );
+}
+
+#[test]
+fn rejects_edge_with_empty_targets() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+
+    let mut edge = LayoutEdge::new("empty_target", "A", "A");
+    edge.targets.clear();
+    graph.add_edge(edge);
+
+    let error = layout(graph).expect_err("empty targets should fail");
+    assert_eq!(
+        error,
+        LayoutError::MissingEdgeEndpoint {
+            edge: "empty_target".to_string(),
+            endpoint: "<target>".to_string()
+        }
+    );
+}
+
+#[test]
+fn rejects_duplicate_node_ids() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+
+    let error = layout(graph).expect_err("duplicate node should fail");
+    assert_eq!(error, LayoutError::DuplicateNodeId("A".to_string()));
+}
+
+#[test]
+fn rejects_duplicate_edge_ids() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+    graph.add_edge(LayoutEdge::new("same", "A", "B"));
+    graph.add_edge(LayoutEdge::new("same", "A", "B"));
+
+    let error = layout(graph).expect_err("duplicate edge should fail");
+    assert_eq!(error, LayoutError::DuplicateEdgeId("same".to_string()));
+}
+
+#[test]
+fn rejects_invalid_node_dimensions() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", -1.0, 40.0));
+
+    let error = layout(graph).expect_err("negative width should fail");
+    assert!(matches!(error, LayoutError::InvalidValue(message) if message.contains("node width")));
+}
+
+#[test]
+fn rejects_invalid_spacing() {
+    let mut graph = LayoutGraph::new("invalid").with_options(LayoutOptions {
+        node_spacing: f64::NAN,
+        ..Default::default()
+    });
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+
+    let error = layout(graph).expect_err("NaN spacing should fail");
+    assert!(
+        matches!(error, LayoutError::InvalidValue(message) if message.contains("node_spacing"))
+    );
+}
+
+#[test]
+fn rejects_invalid_graph_padding() {
+    let mut graph = LayoutGraph::new("invalid").with_options(LayoutOptions {
+        padding: Padding {
+            left: f64::NEG_INFINITY,
+            ..Default::default()
+        },
+        ..Default::default()
+    });
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+
+    let error = layout(graph).expect_err("invalid graph padding should fail");
+    assert!(
+        matches!(error, LayoutError::InvalidValue(message) if message.contains("graph padding left"))
+    );
+}
+
+#[test]
+fn rejects_invalid_node_padding() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0).with_padding(Padding {
+        left: f64::NAN,
+        ..Default::default()
+    }));
+
+    let error = layout(graph).expect_err("invalid node padding should fail");
+    assert!(
+        matches!(error, LayoutError::InvalidValue(message) if message.contains("node padding left"))
+    );
+}
+
+#[test]
+fn rejects_invalid_edge_label_size() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+
+    let mut edge = LayoutEdge::new("bad_label", "A", "B").with_label("bad");
+    edge.label_height = -1.0;
+    graph.add_edge(edge);
+
+    let error = layout(graph).expect_err("invalid edge label size should fail");
+    assert!(
+        matches!(error, LayoutError::InvalidValue(message) if message.contains("edge label height"))
+    );
+}
+
+#[test]
+fn rejects_edge_weight_that_cannot_fit_dagre() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0));
+    graph.add_edge(LayoutEdge::new("too_heavy", "A", "B").with_weight(i32::MAX as u32 + 1));
+
+    let error = layout(graph).expect_err("oversized edge weight should fail");
+    assert!(matches!(error, LayoutError::InvalidValue(message) if message.contains("edge weight")));
+}
+
+#[test]
+fn rejects_missing_parent() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0).with_parent("missing"));
+
+    let error = layout(graph).expect_err("missing parent should fail");
+    assert!(
+        matches!(error, LayoutError::InvalidParent(message) if message.contains("missing parent"))
+    );
+}
+
+#[test]
+fn rejects_parent_cycle() {
+    let mut graph = LayoutGraph::new("invalid");
+    graph.add_node(LayoutNode::new("A", 80.0, 40.0).with_parent("B"));
+    graph.add_node(LayoutNode::new("B", 80.0, 40.0).with_parent("A"));
+
+    let error = layout(graph).expect_err("parent cycle should fail");
+    assert!(
+        matches!(error, LayoutError::InvalidParent(message) if message.contains("parent cycle"))
+    );
+}
+
+#[test]
+fn curated_dagre_api_lays_out_flat_graph() {
+    use selkie_layout::dagre::{layout as dagre_layout, DagreConfig, DagreGraph};
+
+    let mut graph = DagreGraph::new();
+    graph.set_node("A", 80.0, 40.0);
+    graph.set_node("B", 80.0, 40.0);
+    graph.set_edge("A", "B");
+
+    dagre_layout(&mut graph, &DagreConfig::default());
+
+    let a = graph.node("A").expect("node A exists");
+    let b = graph.node("B").expect("node B exists");
+
+    assert!(a.x().is_some());
+    assert!(a.y().is_some());
+    assert!(b.x().is_some());
+    assert!(b.y().is_some());
+    assert!(b.y().expect("node B has y") > a.y().expect("node A has y"));
+
+    let edge = graph.edge("A", "B").expect("edge A -> B exists");
+    assert!(edge.points().len() >= 2);
+}
+
+#[test]
+fn curated_dagre_api_supports_longest_path_ranker() {
+    use selkie_layout::dagre::{layout as dagre_layout, DagreConfig, DagreGraph, Ranker};
+
+    let mut graph = DagreGraph::new();
+    graph.set_node("A", 80.0, 40.0);
+    graph.set_node("B", 80.0, 40.0);
+    graph.set_edge("A", "B");
+
+    dagre_layout(
+        &mut graph,
+        &DagreConfig {
+            ranker: Ranker::LongestPath,
+            ..Default::default()
+        },
+    );
+
+    let a = graph.node("A").expect("node A exists");
+    let b = graph.node("B").expect("node B exists");
+    assert!(b.y().expect("node B has y") > a.y().expect("node A has y"));
+}

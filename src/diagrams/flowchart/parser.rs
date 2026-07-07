@@ -32,6 +32,8 @@ pub fn parse_into(input: &str, db: &mut FlowchartDb) -> Result<()> {
         }
     }
 
+    db.resolve_generated_subgraph_id_collisions();
+
     Ok(())
 }
 
@@ -243,10 +245,7 @@ fn process_text(pair: pest::iterators::Pair<Rule>) -> Result<FlowText> {
     for inner in pair.into_inner() {
         match inner.as_rule() {
             Rule::quoted_string => {
-                let s = inner.as_str();
-                // Remove surrounding quotes
-                let text = &s[1..s.len() - 1];
-                return Ok(FlowText::new(text));
+                return Ok(FlowText::new(quoted_string_contents(inner.as_str())));
             }
             Rule::md_string => {
                 let s = inner.as_str();
@@ -505,8 +504,9 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                                     Rule::tooltip => {
                                         for t in a.into_inner() {
                                             if t.as_rule() == Rule::quoted_string {
-                                                let s = t.as_str();
-                                                tooltip = Some(s[1..s.len() - 1].to_string());
+                                                tooltip = Some(
+                                                    quoted_string_contents(t.as_str()).to_string(),
+                                                );
                                             }
                                         }
                                     }
@@ -518,8 +518,7 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                             for a in action.into_inner() {
                                 match a.as_rule() {
                                     Rule::quoted_string => {
-                                        let s = a.as_str();
-                                        href = Some(s[1..s.len() - 1].to_string());
+                                        href = Some(quoted_string_contents(a.as_str()).to_string());
                                     }
                                     Rule::link_target => {
                                         for t in a.into_inner() {
@@ -529,8 +528,9 @@ fn process_click_stmt(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -
                                     Rule::tooltip => {
                                         for t in a.into_inner() {
                                             if t.as_rule() == Rule::quoted_string {
-                                                let s = t.as_str();
-                                                tooltip = Some(s[1..s.len() - 1].to_string());
+                                                tooltip = Some(
+                                                    quoted_string_contents(t.as_str()).to_string(),
+                                                );
                                             }
                                         }
                                     }
@@ -580,6 +580,10 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
                             let flow_text = process_text(i)?;
                             title = Some(flow_text.text);
                         }
+                        Rule::quoted_string => {
+                            let text = quoted_string_contents(i.as_str()).to_string();
+                            title = Some(text);
+                        }
                         _ => {}
                     }
                 }
@@ -617,13 +621,23 @@ fn process_subgraph(pair: pest::iterators::Pair<Rule>, db: &mut FlowchartDb) -> 
         .cloned()
         .collect();
 
-    db.add_subgraph_with_dir(
+    let generated_id = id.is_empty();
+    if generated_id {
+        id = db.next_generated_subgraph_id();
+    }
+
+    db.add_generated_subgraph_with_dir(
         &id,
         title.as_deref().unwrap_or(&id),
         new_vertices,
         subgraph_dir,
+        generated_id,
     );
     Ok(())
+}
+
+fn quoted_string_contents(value: &str) -> &str {
+    &value[1..value.len() - 1]
 }
 
 #[cfg(test)]
@@ -739,6 +753,61 @@ end"#;
         assert!(result.is_ok(), "Failed to parse: {:?}", result);
         let db = result.unwrap();
         assert!(!db.subgraphs().is_empty(), "Should have subgraphs");
+    }
+
+    #[test]
+    fn test_parse_quoted_title_only_subgraph() {
+        let input = r#"flowchart TD
+subgraph "Current Code"
+    A --> B
+end"#;
+        let db = parse(input).expect("quoted-title-only subgraph should parse");
+
+        let subgraphs = db.subgraphs();
+        assert_eq!(subgraphs.len(), 1);
+        assert_eq!(subgraphs[0].id, "subGraph0");
+        assert_eq!(subgraphs[0].title, "Current Code");
+        assert!(!subgraphs[0].id.is_empty());
+    }
+
+    #[test]
+    fn test_parse_multiple_quoted_title_only_subgraphs_have_distinct_ids() {
+        let input = r#"flowchart TD
+subgraph "Current Code"
+    A --> B
+end
+subgraph "Fix Location"
+    C --> D
+end"#;
+        let db = parse(input).expect("quoted-title-only subgraphs should parse");
+
+        let subgraphs = db.subgraphs();
+        assert_eq!(subgraphs.len(), 2);
+        assert_eq!(subgraphs[0].id, "subGraph0");
+        assert_eq!(subgraphs[0].title, "Current Code");
+        assert_eq!(subgraphs[1].id, "subGraph1");
+        assert_eq!(subgraphs[1].title, "Fix Location");
+        assert_ne!(subgraphs[0].id, subgraphs[1].id);
+        assert!(subgraphs.iter().all(|subgraph| !subgraph.id.is_empty()));
+    }
+
+    #[test]
+    fn test_generated_subgraph_id_does_not_collide_with_later_explicit_subgraph() {
+        let input = r#"flowchart TD
+subgraph "First"
+    A --> B
+end
+subgraph subGraph0[Second]
+    C --> D
+end"#;
+        let db = parse(input).expect("subgraphs should parse");
+
+        let subgraphs = db.subgraphs();
+        assert_eq!(subgraphs.len(), 2);
+        assert_eq!(subgraphs[0].title, "First");
+        assert_eq!(subgraphs[1].id, "subGraph0");
+        assert_eq!(subgraphs[1].title, "Second");
+        assert_ne!(subgraphs[0].id, subgraphs[1].id);
     }
 
     #[test]

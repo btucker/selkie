@@ -1,3 +1,8 @@
+[workspace]
+members = ["crates/selkie-layout"]
+default-members = [".", "crates/selkie-layout"]
+resolver = "2"
+
 [package]
 name = "selkie-rs"
 version = "0.3.0"
@@ -33,6 +38,7 @@ regex = "1.10"
 
 # Error handling
 thiserror = "1.0"
+selkie-layout = { path = "crates/selkie-layout", version = "0.3.0" }
 
 # Logging
 log = "0.4"

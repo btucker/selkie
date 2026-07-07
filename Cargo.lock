@@ -1014,6 +1014,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a50f4cf475b65d88e057964e0e9bb1f0aa9bbb2036dc65c64596b42932536984"
 
 [[package]]
+name = "selkie-layout"
+version = "0.3.0"
+dependencies = [
+ "thiserror",
+]
+
+[[package]]
 name = "selkie-rs"
 version = "0.3.0"
 dependencies = [
@@ -1034,6 +1041,7 @@ dependencies = [
  "regex",
  "resvg",
  "roxmltree",
+ "selkie-layout",
  "serde",
  "serde_json",
  "simplecss",

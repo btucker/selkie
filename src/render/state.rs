@@ -2757,39 +2757,24 @@ mod tests {
     }
 
     #[test]
-    fn test_dagre_graph_compound_structure() {
-        // Test that DagreGraph is correctly set up with compound structure
-        use crate::layout::dagre::graph::DagreGraph;
-        use crate::layout::dagre::graph::NodeLabel;
+    fn test_layout_graph_compound_structure() {
+        let input = r#"stateDiagram-v2
+    state Parent {
+        [*] --> Child
+        Child --> Done
+    }
+"#;
+        let db = parse(input).expect("Should parse");
+        let size_estimator = CharacterSizeEstimator::default();
+        let graph = db
+            .to_layout_graph(&size_estimator)
+            .expect("Should create layout graph");
 
-        let mut dg = DagreGraph::new();
+        let parent = graph.get_node("Parent").expect("Parent exists");
+        let child = graph.get_node("Child").expect("Child exists");
 
-        // Set up simple compound: Parent contains Child
-        dg.set_node(
-            "Parent",
-            NodeLabel {
-                width: 0.0,
-                height: 0.0,
-                ..Default::default()
-            },
-        );
-        dg.set_node(
-            "Child",
-            NodeLabel {
-                width: 50.0,
-                height: 30.0,
-                ..Default::default()
-            },
-        );
-        dg.set_parent("Child", "Parent");
-
-        eprintln!("is_compound: {}", dg.is_compound());
-        eprintln!("Parent children: {:?}", dg.children("Parent"));
-        eprintln!("Child parent: {:?}", dg.parent("Child"));
-
-        assert!(dg.is_compound(), "Graph should be compound");
-        assert!(dg.children("Parent").contains(&&"Child".to_string()));
-        assert_eq!(dg.parent("Child"), Some(&"Parent".to_string()));
+        assert_eq!(parent.metadata.get("is_group"), Some(&"true".to_string()));
+        assert_eq!(child.parent_id.as_deref(), Some("Parent"));
     }
 
     #[test]

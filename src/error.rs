@@ -39,5 +39,29 @@ impl From<Box<dyn std::error::Error>> for MermaidError {
     }
 }
 
+impl From<selkie_layout::LayoutError> for MermaidError {
+    fn from(error: selkie_layout::LayoutError) -> Self {
+        MermaidError::LayoutError(error.to_string())
+    }
+}
+
 /// Result type alias for mermaid operations
 pub type Result<T> = std::result::Result<T, MermaidError>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn converts_layout_error_to_mermaid_error() {
+        let error =
+            MermaidError::from(selkie_layout::LayoutError::DuplicateNodeId("A".to_string()));
+
+        match error {
+            MermaidError::LayoutError(message) => {
+                assert_eq!(message, "Duplicate node id: A");
+            }
+            other => panic!("expected layout error, got {other:?}"),
+        }
+    }
+}

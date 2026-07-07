@@ -12,6 +12,18 @@ fn geometry(svg: &str) -> SequenceGeometry {
     SequenceGeometry::parse(svg).expect("valid sequence svg geometry")
 }
 
+fn svg_visible_left(svg: &str) -> f64 {
+    let doc = roxmltree::Document::parse(svg).expect("valid svg");
+    let root = doc.root_element();
+    let view_box = root.attribute("viewBox").expect("svg viewBox");
+    view_box
+        .split_whitespace()
+        .next()
+        .expect("viewBox min x")
+        .parse()
+        .expect("numeric viewBox min x")
+}
+
 #[test]
 fn sequence_fragment_frames_use_lines_not_rects() {
     // Mermaid.js renders fragment frames as 4 line elements (top/right/bottom/left)
@@ -193,6 +205,26 @@ fn sequence_last_right_note_uses_rendered_width_for_viewbox() {
                 .svg_visible_right()
                 .expect("missing SVG visible right"),
         "last right-of note should fit in viewBox\n{svg}"
+    );
+}
+
+#[test]
+fn sequence_left_note_uses_rendered_width_for_viewbox() {
+    let input = r#"sequenceDiagram
+    participant Alice
+    Note left of Alice: This rendered left note has a very long first line that must remain visible in the SVG viewBox<br/>short"#;
+
+    let svg = render_sequence(input);
+    let geometry = geometry(&svg);
+    let note = geometry
+        .note_box_containing(
+            "This rendered left note has a very long first line that must remain visible in the SVG viewBox",
+        )
+        .expect("missing left note rect");
+
+    assert!(
+        note.x >= svg_visible_left(&svg),
+        "left-of note should fit in viewBox\n{svg}"
     );
 }
 
