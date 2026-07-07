@@ -1,25 +1,12 @@
 # Agent Instructions
 
-This project uses **mb** (Microbeads) for issue tracking. Run `mb prime` to get
-the current workflow context.
-
-## Quick Reference
-
-```bash
-mb ready              # Find available work
-mb show <id>          # View issue details
-mb update <id> --status in_progress  # Claim work
-mb close <id> -r "reason"            # Complete work
-mb sync               # Sync tracker changes
-```
-
 ## Landing the Plane (Session Completion)
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
 
 **MANDATORY WORKFLOW:**
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
+1. **Document remaining work** - Capture anything that needs follow-up in the handoff
 2. **Run quality gates** (if code changed) - Tests, linters, builds:
 
    ```bash
@@ -28,12 +15,11 @@ mb sync               # Sync tracker changes
    cargo test --features all-formats               # Run tests
    ```
 
-3. **Update issue status** - Close finished work, update in-progress items
+3. **Summarize completed work** - Include completed scope and any remaining risks in the handoff
 4. **PUSH TO REMOTE** - This is MANDATORY:
 
    ```bash
    git pull --rebase
-   mb sync
    git push
    git status  # MUST show "up to date with origin"
    ```
@@ -67,7 +53,7 @@ Rule 5: Always prefer the implementation approach of the reference-implementatio
 
 1. Use `cargo run --features eval --bin selkie -- eval --type <diagram_type>` evaluate where our implementation is relative to the reference.
 2. Follow all instructions from its output & confirm our changes are increasing scores
-3. Record remaining follow-up work and resolve completed items in Microbeads
+3. Record remaining follow-up work in handoff notes
 4. When you resolve a rendering issue, update the svg in docs/images
 5. Follow TDD, run `cargo fmt && cargo clippy --features all-formats -- -D warnings` before committing, commit when tests pass
 6. Explore Reference implementations available as git submodules in reference-implementations:

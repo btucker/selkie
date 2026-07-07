@@ -38,24 +38,13 @@
 - Read: `src/eval/checks.rs`
 - Read: `tests/sequence_rendering.rs`
 
-- [ ] **Step 1: Identify and claim the mb issue**
+- [ ] **Step 1: Identify the work item**
 
-Run:
+Use the current project planning source or handoff notes to confirm the exact
+sequence-rendering work item for this refactor.
 
-```bash
-mb ready
-mb show <mb-id>
-mb update <mb-id> --status in_progress
-```
-
-Use the existing sequence-rendering issue if it covers this work, likely `se-d9bc527b` from `mb ready`. If no existing issue covers this refactor, create one and use the new ID for Task 6:
-
-```bash
-mb create "sequence: share SVG geometry helpers" --description "Remove duplicated sequence SVG geometry parsing between eval overlap checks and sequence rendering tests."
-mb update <new-mb-id> --status in_progress
-```
-
-Expected: there is one concrete mb ID for this work. Record it and use that same `<mb-id>` in Task 6.
+Expected: there is one concrete work item for this task. Record it and refer to
+it in Task 6.
 
 - [ ] **Step 2: Ensure Mermaid reference implementation is available**
 
@@ -755,49 +744,19 @@ If no source edits were needed, do not make an empty commit.
 **Files:**
 - No code changes expected.
 
-- [ ] **Step 1: Review issue state and file follow-ups**
+- [ ] **Step 1: Review follow-ups**
 
-Run:
+If any remaining work is discovered during implementation, record it in the
+handoff with enough context for the next session.
 
-```bash
-mb show <mb-id>
-```
+Expected: all known remaining work is either complete or documented.
 
-If any remaining work is discovered during implementation, file follow-up issues before closing this work:
-
-```bash
-mb create "<short follow-up title>" --description "<specific remaining work and context>"
-```
-
-Expected: all known remaining work is either complete or tracked.
-
-- [ ] **Step 2: Close completed issue**
-
-Run:
-
-```bash
-mb close <mb-id>
-```
-
-Expected: the mb issue for this work is closed. If the issue is already closed, note that in the handoff.
-
-- [ ] **Step 3: Sync issue tracker**
-
-Run:
-
-```bash
-mb sync
-```
-
-Expected: `Changes synced.`
-
-- [ ] **Step 4: Push branch**
+- [ ] **Step 2: Push branch**
 
 Run:
 
 ```bash
 git pull --rebase
-mb sync
 git push
 git status
 ```
@@ -812,4 +771,4 @@ Report:
 - tests and eval commands run
 - latest sequence eval report path
 - whether `sequence_overlap` appears in the latest report
-- any remaining follow-up issues that should be tracked in `mb`
+- any remaining follow-up work that should be picked up later

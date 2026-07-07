@@ -1196,10 +1196,10 @@ If no source tuning happened in this task, commit only docs images.
 
 ---
 
-### Task 9: Final Quality Gates and Issue Tracker
+### Task 9: Final Quality Gates and Handoff
 
 **Files:**
-- Potentially modify: mb issue records, if new follow-up issues are discovered.
+- No source files expected unless verification reveals a bug.
 
 - [ ] **Step 1: Run formatting**
 
@@ -1233,20 +1233,15 @@ cargo run --features eval --bin selkie -- eval --type sequence
 
 Expected: sequence overlap warnings for issue 202 class are gone or clearly reduced. Record summary numbers and report path.
 
-- [ ] **Step 5: File follow-up issues for remaining work**
+- [ ] **Step 5: Document follow-up work**
 
-Use `mb create` for any non-blocking follow-up discovered during eval, for example:
+Record any non-blocking follow-up discovered during eval in the handoff, with
+specific context and verification evidence. Only include real remaining work,
+not speculative nice-to-haves.
 
-```bash
-mb create "Improve generic SVG text measurement for eval" --description "Sequence overlap detector uses conservative approximate text boxes. Consider rendered text measurement if false negatives become common."
-```
-
-Only file follow-ups for real remaining work, not speculative nice-to-haves.
-
-- [ ] **Step 6: Sync tracker and push**
+- [ ] **Step 6: Push**
 
 ```bash
-mb sync
 git pull --rebase --autostash
 git push
 git status --short --branch

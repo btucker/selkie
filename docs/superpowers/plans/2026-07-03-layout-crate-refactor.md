@@ -6,7 +6,7 @@
 
 **Architecture:** Add `crates/selkie-layout` as a workspace member that owns layout graph types, layout execution, layout errors, and a curated public Dagre API. Keep Mermaid/Selkie adapter and sizing utilities in the main `selkie-rs` crate behind a compatibility `src/layout` facade. Perform the migration in one coordinated branch with frequent local verification and commits.
 
-**Tech Stack:** Rust 2021, Cargo workspace, `thiserror`, existing Dagre port, existing Selkie render/eval test gates, Microbeads (`mb`) for issue sync.
+**Tech Stack:** Rust 2021, Cargo workspace, `thiserror`, existing Dagre port, existing Selkie render/eval test gates.
 
 ---
 
@@ -1004,12 +1004,11 @@ git commit -m "docs: document standalone layout crate api"
 
 ---
 
-## Task 6: Full Verification, Eval Smoke, Microbeads, And Push
+## Task 6: Full Verification, Eval Smoke, And Push
 
 **Files:**
 
 - Modify: no source files expected unless verification reveals a bug.
-- May create/update: Microbeads issue files only if follow-up work is discovered.
 
 - [ ] **Step 1: Run formatting**
 
@@ -1053,17 +1052,14 @@ Expected: command completes. Because this refactor should not alter layout behav
 
 If eval output gives instructions, follow them before continuing; project rules make eval output authoritative.
 
-- [ ] **Step 5: File follow-up issues for any deferred work**
+- [ ] **Step 5: Document follow-up work for any deferred work**
 
-If implementation reveals non-blocking follow-up work, create Microbeads issues:
+If implementation reveals non-blocking follow-up work, record it in the handoff
+with the relevant files, failure mode, and verification context.
 
-```bash
-mb create "layout: <follow-up title>" --priority 2
-```
+Expected: no follow-up is required unless something is intentionally deferred.
 
-Expected: no follow-up issue is required unless something is intentionally deferred.
-
-- [ ] **Step 6: Sync Microbeads and commit any final formatting/fixes**
+- [ ] **Step 6: Commit any final formatting/fixes**
 
 Run:
 
@@ -1078,13 +1074,12 @@ git add <changed-files>
 git commit -m "chore: finalize layout crate refactor"
 ```
 
-- [ ] **Step 7: Rebase, sync, push, and verify remote status**
+- [ ] **Step 7: Rebase, push, and verify remote status**
 
 Run:
 
 ```bash
 git pull --rebase
-mb sync
 git push
 git status --short --branch
 ```
